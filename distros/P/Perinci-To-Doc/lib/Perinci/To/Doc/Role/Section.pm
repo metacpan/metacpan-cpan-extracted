@@ -1,10 +1,10 @@
 package Perinci::To::Doc::Role::Section;
 
-our $DATE = '2017-02-27'; # DATE
-our $VERSION = '0.84'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.85'; # VERSION
 
 use 5.010;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo::Role;
 
 has doc_sections => (is=>'rw');
@@ -77,7 +77,7 @@ sub dec_doc_indent {
 
 sub gen_doc {
     my ($self, %opts) = @_;
-    $log->tracef("-> gen_doc(opts=%s)", \%opts);
+    log_trace("-> gen_doc(opts=%s)", \%opts);
 
     $self->doc_lines([]);
     $self->doc_indent_level(0);
@@ -86,13 +86,13 @@ sub gen_doc {
 
     for my $s (@{ $self->doc_sections // [] }) {
         my $meth = "gen_doc_section_$s";
-        $log->tracef("=> $meth(%s)", \%opts);
+        log_trace("=> $meth(%s)", \%opts);
         $self->$meth(%opts);
     }
 
     $self->after_gen_doc(%opts) if $self->can("after_gen_doc");
 
-    $log->tracef("<- gen_doc()");
+    log_trace("<- gen_doc()");
     join("", @{ $self->doc_lines });
 }
 
@@ -111,7 +111,7 @@ Perinci::To::Doc::Role::Section - Role for class that generates documentation wi
 
 =head1 VERSION
 
-This document describes version 0.84 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2017-02-27.
+This document describes version 0.85 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2017-07-03.
 
 =head1 DESCRIPTION
 
@@ -176,7 +176,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-To
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-To-Doc>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-To-Doc>.
 
 =head1 BUGS
 

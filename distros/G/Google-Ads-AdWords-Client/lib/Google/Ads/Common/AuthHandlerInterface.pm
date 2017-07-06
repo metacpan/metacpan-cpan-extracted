@@ -14,6 +14,9 @@
 
 package Google::Ads::Common::AuthHandlerInterface;
 
+use strict;
+use warnings;
+
 # Initializes the handler with a given set of properties and the API client
 # object.
 sub initialize {

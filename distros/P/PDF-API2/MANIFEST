@@ -135,6 +135,7 @@ t/annotate.t
 t/author-critic.t
 t/author-pod-syntax.t
 t/barcode.t
+t/circular-references.t
 t/cmap.t
 t/content.t
 t/cs-webcolor.t
@@ -143,6 +144,7 @@ t/extgstate.t
 t/filter-ascii85decode.t
 t/filter-asciihexdecode.t
 t/filter-runlengthdecode.t
+t/font-synfont.t
 t/font-ttf.t
 t/font-type1.t
 t/gd.t
@@ -164,6 +166,8 @@ t/resources/1x1.tif
 t/resources/sample-xrefstm-index.pdf
 t/resources/sample-xrefstm.pdf
 t/resources/sample.pdf
+t/rt120397.t
+t/rt120450.t
 t/rt67767.t
 t/rt69503.t
 t/string.t

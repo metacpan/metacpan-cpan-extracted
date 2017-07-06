@@ -7,7 +7,7 @@ use AnyEvent::RabbitMQ;
 use Data::Dumper;
 use Carp qw(longmess);
 
-our $VERSION = "3.1.2";
+our $VERSION = "3.2.0";
 
 sub connect {
     my %connection_opts = @_;
@@ -115,9 +115,9 @@ AnyEvent::RabbitMQ::PubSub - Publish and consume RabbitMQ messages.
     $consumer->consume(
         $cv,
         sub {
-            my ($self, $msg) = @_;
+            my ($consumer, $msg) = @_;
             print 'received ', $msg->{body}->payload, "\n";
-            $self->channel->ack();
+            $consumer->ack($msg);
             $cv->send();
         },
     );

@@ -15,7 +15,7 @@ WriteMakefile(
     'Sub::Util' => 0
   },
   PREREQ_PM => {
-    'Math::Prime::Util' => '0.21', # 0.58
+    'Math::Prime::Util' => '0.65', # '0.21'
     'Carp'         => 0,
     'Digest::SHA'  => 0,
     'MIME::Base64' => '3.15',

@@ -201,7 +201,7 @@ role {
 		my $self   = shift;
 		my $status = shift;
 
-		$self->_register_status( $status );
+		$self->_base_register_status( $status );
 	};
 
 	sub _base_register_status {
@@ -209,7 +209,12 @@ role {
 		my $status = shift;
 		my $stath  = $self->stats;
 		$stath->{exit_status} = $status;
-		if ($status & 127) {
+		if ($status =~ /\D/) {
+			$self->killsignal( "internal code failed: $status" );
+			$self->status( $stath->{exit_status} = 126 );
+			;
+		}
+		elsif ($status & 127) {
 			$self->kill( 1 );
 			$self->killsignal( $sig_name[$status & 127] // "Unknown signal #".($status&127) );
 		}
@@ -220,9 +225,10 @@ role {
 
 	around '_register_status' => sub {
 		my $orig = shift;
-		$orig->(@_);
 		my $self   = shift;
-		$self->_base_register_status( @_ );
+		my $status = shift || 0;
+		$orig->($self,$status);
+		$self->_base_register_status( $status );
 	};
 
 };

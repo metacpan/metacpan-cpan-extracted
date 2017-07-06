@@ -1,16 +1,16 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/html2wp/html2wp
-# and generated automatically using Perinci::CmdLine::Gen version 0.45
+# and generated automatically using Perinci::CmdLine::Gen version 0.46
 
-our $DATE = '2017-06-17'; # DATE
+our $DATE = '2017-07-03'; # DATE
 our $DIST = 'App-html2wp'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
@@ -35,7 +35,7 @@ html2wp - Publish HTML document to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.002 of html2wp (from Perl distribution App-html2wp), released on 2017-06-17.
+This document describes version 0.003 of html2wp (from Perl distribution App-html2wp), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -196,23 +196,23 @@ Do not read environment for default options.
 
 =item B<--debug>
 
-Set log level to debug (note: you also need to set LOG=1 to enable logging, or use DEBUG=1).
+Shortcut for --log-level=debug.
 
 =item B<--log-level>=I<s>
 
-Set log level (note: you also need to set LOG=1 to enable logging).
+Set log level.
 
 =item B<--quiet>
 
-Set log level to quiet (note: you also need to set LOG=1 to enable logging, or use QUIET=1).
+Shortcut for --log-level=error.
 
 =item B<--trace>
 
-Set log level to trace (note: you also need to set LOG=1 to enable logging, or use TRACE=1).
+Shortcut for --log-level=trace.
 
 =item B<--verbose>
 
-Set log level to info (note: you also need to set LOG=1 to enable logging, or use VERBOSE=1).
+Shortcut for --log-level=info.
 
 =back
 

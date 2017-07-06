@@ -1,6 +1,14 @@
 
 === version history of XML::Compile::SOAP
 
+version 3.22: Fri 30 Jun 10:03:10 CEST 2017
+
+	Fixes:
+	- ::XOP::Include read from file always died
+	  rt.cpan.org#119955 [Pavel Trushkin]
+	- ::XOP::Include read should enforce raw mode
+	  rt.cpan.org#119955 [Pavel Trushkin]
+
 version 3.21: Wed 11 Jan 10:02:19 CET 2017
 
 	Fixes:

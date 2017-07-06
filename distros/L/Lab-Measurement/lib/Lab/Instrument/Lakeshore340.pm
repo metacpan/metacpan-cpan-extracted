@@ -1,5 +1,5 @@
 package Lab::Instrument::Lakeshore340;
-$Lab::Instrument::Lakeshore340::VERSION = '3.550';
+$Lab::Instrument::Lakeshore340::VERSION = '3.552';
 use warnings;
 use strict;
 use 5.010;

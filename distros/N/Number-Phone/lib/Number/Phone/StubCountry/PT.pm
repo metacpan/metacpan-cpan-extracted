@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -39,20 +39,6 @@ my $formatters = [
               ];
 
 my $validators = {
-                'fixed_line' => '
-          2(?:
-            [12]\\d|
-            [35][1-689]|
-            4[1-59]|
-            6[1-35689]|
-            7[1-9]|
-            8[1-69]|
-            9[1256]
-          )\\d{6}
-        ',
-                'voip' => '30\\d{7}',
-                'pager' => '',
-                'personal_number' => '884[0-4689]\\d{5}',
                 'geographic' => '
           2(?:
             [12]\\d|
@@ -63,13 +49,6 @@ my $validators = {
             8[1-69]|
             9[1256]
           )\\d{6}
-        ',
-                'toll_free' => '80[02]\\d{6}',
-                'mobile' => '
-          9(?:
-            [1236]\\d{2}|
-            480
-          )\\d{5}
         ',
                 'specialrate' => '(
           80(?:
@@ -93,7 +72,28 @@ my $validators = {
               8[17]
             )
           )\\d{5}
-        )'
+        )',
+                'personal_number' => '884[0-4689]\\d{5}',
+                'mobile' => '
+          9(?:
+            [1236]\\d{2}|
+            480
+          )\\d{5}
+        ',
+                'fixed_line' => '
+          2(?:
+            [12]\\d|
+            [35][1-689]|
+            4[1-59]|
+            6[1-35689]|
+            7[1-9]|
+            8[1-69]|
+            9[1256]
+          )\\d{6}
+        ',
+                'voip' => '30\\d{7}',
+                'pager' => '',
+                'toll_free' => '80[02]\\d{6}'
               };
 my %areanames = (
   35121 => "Lisbon",

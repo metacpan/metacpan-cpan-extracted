@@ -8,7 +8,7 @@ BEGIN {
 	$^W = 1;
 }
 
-use Test::More tests => 30;
+use Test::More tests => 31;
 use File::ShareDir;
 
 sub dies {
@@ -125,7 +125,11 @@ is(
 #####################################################################
 # Class Tests
 
-use t::lib::ShareDir;
+{
+    local @INC;
+    push @INC, "." unless grep { $_ eq "." } @INC;
+    use_ok( "t::lib::ShareDir" );
+}
 my $class_file = class_file('t::lib::ShareDir', 'test_file.txt');
 ok( -f $class_file, 'class_file ok' );
 is( $class_file, $module_file, 'class_file matches module_file for subclass' );

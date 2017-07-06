@@ -1,5 +1,39 @@
 Revision history for Test-BrewBuild
 
+2.18    2017-06-25
+        - logging output modifications (changes and relocations)
+        - in Git::listen(), we now make comparisons of the commit checksums, and
+          if they are equal, we no longer perform a pull request
+        - added Test::BrewBuild::Plugin::Author as a required dependency
+        - added a section to Tutorial that covers using Plugins
+        - for RPi LCD mode, changed commit csum to 7 chars as opposed to 8,
+          which is typical/common across the board
+        - major changes on how we figure out which module is the distribution
+          name. Instead of taking the first module name found, we check each one
+          with MetaCPAN::Client, and use the first one found that is a legit
+          distribution (work on #208)
+        - fix uninit warning in bbtester. We were trying to use $ARGV[0] even
+          in cases where it wasn't defined
+        - fix issue where in Dispatch, we were loading the wrong directive
+          value into $self->{auto_sleep} from the config file
+        - fix issue where we getting segfaults when bbdispatch was in auto mode
+          with --rpi enabled. We were creating a new LCD on each run, and were
+          eventually hitting wiringPi's MAX_LCD (8) limit. Moved the LCD init
+          to run once on object instantiation (fixes #209; fixes 
+          stevieb9/rpi-lcd#6)
+        - in bbdispatch, the --repo|-r flag will prepend https://github.com if
+          you omit it. To do so, you need to specify the repo in 
+          "user/repo-name" format
+        - hard coded MetaCPAN::Client version in Makefile to 2.017000 due to a
+          bug I reported and was fixed promptly by Mickey. See
+          https://github.com/metacpan/metacpan-client#89
+        - updated auto log entry at end of dispatch run to include seconds
+          we'll be sleeping (closes #212)
+        - fix issue where the repo link was being pre-pended twice with the URL
+          in log entries due to an earlier change (closes #211)
+        - opened PR https://github.com/metacpan/metacpan-client/pull/90 for
+          MetaCPAN::Client
+
 2.17    2017-04-27
         - troubleshooting issue where this current commit is causing the LCD
           to shift off a couple chars per run. This needs to be looked at
@@ -37,8 +71,6 @@ Revision history for Test-BrewBuild
           directory directly, 'git ls-remote' wouldn't ever get any csums back.
           Now, revision() requires a repo param if remote is sent in (closes
           #205)
-        - added numerous additional config file directives (not yet implemented
-          in code) (work on #202)
 
 2.16    2017-04-21
         - remove the named loop in Dispatch::_fork() (closes #188)

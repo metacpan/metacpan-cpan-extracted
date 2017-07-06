@@ -6,6 +6,7 @@ Net::Azure::CognitiveServices::Face - A wrapper class for Face API of Azure Cogn
 # SYNOPSIS
 
     use Net::Azure::CognitiveServices::Face;
+    Net::Azure::CognitiveServices::Face->endpoint('https://westus.api.cognitive.microsoft.com/face/v1.0');
     Net::Azure::CognitiveServices::Face->access_key('YOUR_ACCESS_KEY');
 
     ### Face - Detect
@@ -35,6 +36,10 @@ Net::Azure::CognitiveServices::Face provides following subclasses.
 Please see [https://dev.projectoxford.ai/docs/services/563879b61984550e40cbbe8d/operations/563879b61984550f30395236](https://dev.projectoxford.ai/docs/services/563879b61984550e40cbbe8d/operations/563879b61984550f30395236) for more information. 
 
 # METHODS
+
+## endpoint
+
+Set the endpoint url for accessing to Azure Cognitive Services APIs
 
 ## access\_key
 

@@ -1,4 +1,5 @@
 .gitignore
+04-deparse.t.disabled
 Changes
 lib/Filter/signatures.pm
 Makefile.PL
@@ -12,6 +13,8 @@ t/00-load.t
 t/01-compile.t
 t/02-compile-direct.t
 t/03-compilation-output.t
+t/05-multiline-signature.t
+t/06-linenumbers.t
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t

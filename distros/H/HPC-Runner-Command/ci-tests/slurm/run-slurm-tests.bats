@@ -16,7 +16,7 @@ install_hpc_sqlite() {
 
 	if [[ -z "${HPC_SQLITE_BRANCH}" ]] ; then
 	    echo "NO HPC-Runner-Command-Plugin-Logger-Sqlite branch specified. Installing from master."
-	    cpanm --quiet --notest git://github.com/jerowe/HPC-Runner-Command-Plugin-Logger-Sqlite.git@${HPC_SQLITE_BRANCH}
+	    cpanm --quiet --notest git://github.com/jerowe/HPC-Runner-Command-Plugin-Logger-Sqlite.git
 	else
 	    echo "Installing HPC-Runner-Command-Plugin-Logger-Sqlite from develop"
 	    cpanm --quiet --notest git://github.com/jerowe/HPC-Runner-Command-Plugin-Logger-Sqlite.git@${HPC_SQLITE_BRANCH}

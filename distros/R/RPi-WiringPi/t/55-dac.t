@@ -1,6 +1,9 @@
 use warnings;
 use strict;
 
+use lib 't/';
+
+use RPiTest qw(check_pin_status);
 use RPi::WiringPi;
 use RPi::WiringPi::Constant qw(:all);
 use Test::More;
@@ -14,7 +17,8 @@ if (! $ENV{PI_BOARD}){
 
 my ($adc_cs_pin, $dac_cs_pin) = (26, 12);
 
-my $adc_dac_in = 1;
+my $adc_dac0_in = 1;
+my $adc_dac1_in = 3;
 
 my $pi = RPi::WiringPi->new;
 
@@ -38,23 +42,45 @@ my @output = (
     [95, 100],
 );
 
-my $c = 0;
+{ # dac0
+    my $c = 0;
 
-for (0..4095){
-    $dac->set(0, $_);
+    for (0..4095){
+        $dac->set(0, $_);
 
-    if ($_ % 1000 == 0 || $_ == 4095){
-        my $r = $adc->percent($adc_dac_in);
+        if ($_ % 1000 == 0 || $_ == 4095){
+            my $r = $adc->percent($adc_dac0_in);
 
-        is 
-            $r >= $output[$c]->[0] && $r <= $output[$c]->[1], 
-            1,
-            "DAC output at $_ ok";
+            is 
+                $r >= $output[$c]->[0] && $r <= $output[$c]->[1], 
+                1,
+                "DAC 0 output at $_ ok";
 
-        $c++;
+            $c++;
+        }
+    }
+}
+{ # dac1
+    my $c = 0;
+
+    for (0..4095){
+        $dac->set(1, $_);
+
+        if ($_ % 1000 == 0 || $_ == 4095){
+            my $r = $adc->percent($adc_dac1_in);
+
+            is 
+                $r >= $output[$c]->[0] && $r <= $output[$c]->[1], 
+                1,
+                "DAC 1 output at $_ ok";
+
+            $c++;
+        }
     }
 }
 
 $pi->cleanup;
+
+check_pin_status();
 
 done_testing();

@@ -6,7 +6,7 @@ SYNOPSIS
 
     Sample script and output:
 
-     % TRACE=1 perl -MLog::Any::App
+     % TRACE=1 perl -MLog::ger::Output=Screen
        -MNet::HTTP::Methods::Patch::LogRequest \
        -MLWP::UserAgent::Patch::LogRequestContent \
        -MLWP::UserAgent \
@@ -25,13 +25,13 @@ SYNOPSIS
      Content-Length: 7
      Content-Type: application/x-www-form-urlencoded
 
-    Or you can also use via Log::Any::For::LWP.
+    Or you can also use via Log::ger::For::LWP.
 
 DESCRIPTION
 
     This module patches LWP::UserAgent (which is used by LWP::Simple,
     WWW::Mechanize, among others) so that HTTP request contents are logged
-    using Log::Any.
+    using Log::ger.
 
 FAQ
 
@@ -52,6 +52,6 @@ SEE ALSO
 
     Use LWP::UserAgent::Patch::LogResponse to log HTTP responses.
 
-    Log::Any::For::LWP bundles all three mentioned patches in a single
+    Log::ger::For::LWP bundles all three mentioned patches in a single
     convenient package.
 

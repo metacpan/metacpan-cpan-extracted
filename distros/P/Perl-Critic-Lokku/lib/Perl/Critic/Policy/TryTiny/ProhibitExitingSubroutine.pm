@@ -1,5 +1,5 @@
 package Perl::Critic::Policy::TryTiny::ProhibitExitingSubroutine;
-$Perl::Critic::Policy::TryTiny::ProhibitExitingSubroutine::VERSION = '0.002';
+$Perl::Critic::Policy::TryTiny::ProhibitExitingSubroutine::VERSION = '0.003';
 use strict;
 use warnings;
 use utf8;
@@ -96,14 +96,14 @@ sub _check_block {
             if ( $element->type eq 'for' || $element->type eq 'foreach') {
                 my ($subblock) = grep { $_->isa('PPI::Structure::Block') } $element->schildren;
                 $subblock->find_any(sub { $wanted->(@_, 1, $in_sub_block) });
-                return undef;
+                return;
             }
         }
         elsif ($element->isa("PPI::Structure::Block")) {
             my $prev_sib = $element->sprevious_sibling;
             if ($prev_sib && $prev_sib->isa("PPI::Token::Word") && $prev_sib eq 'sub') {
                 $element->find_any(sub { $wanted->(@_, $in_for_loop, 1) });
-                return undef;
+                return;
             }
         }
         elsif ($element->isa('PPI::Token::Word')) {
@@ -151,7 +151,7 @@ Perl::Critic::Policy::TryTiny::ProhibitExitingSubroutine - Ban next/last/return 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -194,14 +194,12 @@ One way to fix this is to use labels:
         # other code
     }
 
+This policy assumes that L<Try::Tiny> is being used, and it doesn't run if it
+can't find it being imported.
+
 =head1 CONFIGURATION
 
 This Policy is not configurable except for the standard options.
-
-=head1 KNOWN BUGS
-
-This policy assumes that L<Try::Tiny> is being used, and it doesn't run if it
-can't find it being imported.
 
 =head1 AUTHOR
 
@@ -209,7 +207,7 @@ David D Lowe <flimm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Lokku <cpan@lokku.com>.
+This software is copyright (c) 2017 by Lokku <cpan@lokku.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

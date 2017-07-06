@@ -17,6 +17,8 @@
 
 package Google::Ads::SOAP::Generator::Generator;
 
+use strict;
+use warnings;
 use base qw(SOAP::WSDL::Generator::Template::XSD);
 
 use Google::Ads::SOAP::Generator::TypemapVisitor;
@@ -53,8 +55,8 @@ sub visit_XSD_ComplexType {
   my ($self, $type) = @_;
 
   my $output =
-    defined $output_of{ident $self}
-    ? $output_of{ident $self}
+    defined $SOAP::WSDL::Generator::Template::XSD::output_of{ident $self}
+    ? $SOAP::WSDL::Generator::Template::XSD::output_of{ident $self}
     : $self->generate_filename(
     $self->get_name_resolver()->create_xsd_name($type));
   warn "Creating complexType class $output \n" if not $self->get_silent();

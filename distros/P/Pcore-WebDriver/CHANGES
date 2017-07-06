@@ -1,3 +1,9 @@
+v0.7.3 2017-07-03T18:05:57Z
+ - No issues on bugtracker were closed since the last release
+ - drivers updated
+ - invalid chromedriver version fixed
+ - chrome default args updated
+
 v0.7.2 2017-05-23T14:42:56Z
  - No issues on bugtracker were closed since the last release
  - Pcore::HTTP::Request removed

@@ -24,8 +24,8 @@
             "Capture::Tiny" : "0.28",
             "Cwd" : "0.0",
             "File::Slurp" : "0.00",
+            "HTTP::Tiny" : "0.070",
             "JSON::XS" : "3.01",
-            "LWP::Simple" : "6.13",
             "List::MoreUtils" : "0.410",
             "MCE" : "1.52",
             "Math::Vector::Real" : "0.14",
@@ -57,7 +57,7 @@
          "web" : "https://github.com/demianriccardi/HackaMol"
       }
    },
-   "version" : "0.040",
+   "version" : "0.043",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

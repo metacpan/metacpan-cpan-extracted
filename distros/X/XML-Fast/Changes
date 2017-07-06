@@ -1,5 +1,17 @@
 Revision history for Perl extension XML::Fast.
 
+0.17  2017-06-30
+      - Fix nasty bug with CCFLAGS
+
+0.16  2017-06-27
+      - Fixes for RT tickets
+
+0.15  2015-08-25
+      - Support emoji
+
+0.14  2013-02-21
+      - Fix text: undef, attr: undef (useless attr, but worked wrong)
+
 0.11  2010-12-17
       - Fix decoding of &quot; (was inserting \0 after ")
 

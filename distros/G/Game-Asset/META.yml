@@ -16,28 +16,28 @@ name: Game-Asset
 provides:
   Game::Asset:
     file: lib/Game/Asset.pm
-    version: '0.5'
+    version: '0.6'
   Game::Asset::Multi:
     file: lib/Game/Asset/Multi.pm
-    version: '0.5'
+    version: '0.6'
   Game::Asset::MultiExample:
     file: lib/Game/Asset/MultiExample.pm
-    version: '0.5'
+    version: '0.6'
   Game::Asset::Null:
     file: lib/Game/Asset/Null.pm
-    version: '0.5'
+    version: '0.6'
   Game::Asset::PerlModule:
     file: lib/Game/Asset/PerlModule.pm
-    version: '0.5'
+    version: '0.6'
   Game::Asset::PlainText:
     file: lib/Game/Asset/PlainText.pm
-    version: '0.5'
+    version: '0.6'
   Game::Asset::Type:
     file: lib/Game/Asset/Type.pm
-    version: '0.5'
+    version: '0.6'
   Game::Asset::YAML:
     file: lib/Game/Asset/YAML.pm
-    version: '0.5'
+    version: '0.6'
 requires:
   Archive::Zip: '1.59'
   Moose: '2.1806'
@@ -47,5 +47,5 @@ requires:
 resources:
   homepage: http://www.wumpus-cave.net
   repository: https://github.com/frezik/Game-Asset
-version: '0.5'
+version: '0.6'
 x_serialization_backend: 'YAML::Tiny version 1.69'

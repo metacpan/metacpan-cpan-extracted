@@ -550,6 +550,12 @@ apc_widget_destroy( Handle self)
 		XFreePixmap( DISP, XX-> user_p_mask);
 		XX-> user_p_mask = None;
 	}
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+	if ( XX-> user_xcursor != NULL) {
+		XcursorImageDestroy(XX-> user_xcursor);
+		XX-> user_xcursor = NULL;
+	}
+#endif
 	if ( guts. currentMenu && PComponent( guts. currentMenu)-> owner == self)
 		prima_end_menu();
 	if ( guts. focused == self)
@@ -581,6 +587,7 @@ apc_widget_destroy( Handle self)
 		hash_delete( guts.windows, (void*)&X_WINDOW, sizeof(X_WINDOW), false);
 		X_WINDOW = nilHandle;
 	}
+	XFlush( DISP);
 	return true;
 }
 
@@ -629,6 +636,12 @@ apc_widget_end_paint_info( Handle self)
 	prima_cleanup_drawable_after_painting( self);
 	prima_update_cursor( self);
 	return true;
+}
+
+Bool
+apc_widget_get_clip_by_children( Handle self)
+{
+	return X(self)->flags. clip_by_children;
 }
 
 Bool
@@ -1063,6 +1076,18 @@ AGAIN:
 		guts. grab_widget = nilHandle;
 	}
 	XFlush( DISP);
+	return true;
+}
+
+Bool
+apc_widget_set_clip_by_children( Handle self, Bool clip_by_children)
+{
+	DEFXX;
+	XX->flags. clip_by_children = clip_by_children;
+	if ( XF_IN_PAINT(XX) ) {
+		XX-> gcv. subwindow_mode = (XX->flags.clip_by_children ? ClipByChildren : IncludeInferiors);
+		XChangeGC( DISP, XX-> gc, GCSubwindowMode, &XX-> gcv);
+	}
 	return true;
 }
 

@@ -8,15 +8,17 @@ This module provides the functionality necessary to use Let's Encrypt API and ge
 
 ### COMPATIBILITY
 
-The code has been successfully tested on more than 500 combinations of OS and Perl versions. It should install and run fine on Linux, FreeBSD, NetBSD, etc. It also works on Mac OS X and Windows (tested with ActiveState and Strawberry Perl). You can find appropriate PPMs at [ActiveState](https://code.activestate.com/ppm/Crypt-LE/). Please note that pure Windows environments are supported starting from version 0.17 of the module. If you are using Cygwin, then earlier versions would work too.
+- The code has been successfully tested on more than 500 combinations of OS and Perl versions. It should install and run fine on Linux, FreeBSD, NetBSD, etc. It also works on Mac OS X and Windows (tested with ActiveState and Strawberry Perl). You can find appropriate PPMs at [ActiveState](https://code.activestate.com/ppm/Crypt-LE/). Please note that pure Windows environments are supported starting from version 0.17 of the module. If you are using Cygwin, then earlier versions would work too.
 
-**In addition, if you are able to run docker containers, you can pull the latest client image from https://hub.docker.com/r/zerossl/client/. Docker image is lightweight and the client is run as a non-privileged user in a container.**
+- If you are a _Windows_ user, you can download portable [Win32/Win64 binaries](https://github.com/do-know/Crypt-LE/releases) (works even on Windows XP).
+
+- In addition, you can pull the latest client image from [Docker Hub](https://hub.docker.com/r/zerossl/client/) (lightweight non-root container).
 
 ### REQUIREMENTS
 
 With Linux systems there are just 3 essential things which should be in place for the package to be successfully installed: "gcc", "make" and the SSL development package. The SSL development package name differs depending on Linux distribution and it can be either "libssl-dev" or "openssl-devel". See https://zerossl.com/installation.html for more details.
 
-With Windows you don't have to install anything but Perl. In fact, in case of [Strawberry Perl](http://strawberryperl.com/releases.html) you don't have to install Perl either - it is enough to download the portable version of it, unzip and then use "cpanm" to install Crypt::LE. This way you can even carry it with you on a flash drive and run it anywhere.
+With Windows you don't have to install anything but Perl. In fact, in case of [Strawberry Perl](http://strawberryperl.com/releases.html) you don't have to install Perl either - it is enough to download the portable version of it, unzip and then use "cpanm" to install Crypt::LE. This way you can even carry it with you on a flash drive and run it anywhere. Also, if you don't want to install anything at all or download Perl, you can simply use [Windows binaries](https://github.com/do-know/Crypt-LE/releases) - self-sufficient and portable.
 
 ### INSTALLATION
 
@@ -34,6 +36,13 @@ With Windows you don't have to install anything but Perl. In fact, in case of [S
 	make
 	make test
 	make install
+
+**Windows installation (with Strawberry Perl)**
+
+    cpanm -f Log::Log4perl
+    cpanm Crypt::LE
+
+Note: On Windows current version of the logging module needs to be installed with -f flag first if Strawberry Perl is used.
 
 ### CLIENT
 
@@ -59,11 +68,15 @@ If you are using IDN (internationalized domain names) and generating a certifica
 conversion to work properly you need to have correct locale settings on your system. For Linux-based systems you can check that with the "locale" command, for Windows make sure that "System locale" in the Control Panel is
 set correctly.
 
+**Note:** If you would like to receive expiration notifications for your domain, you can specify `--email` parameter and an appropriate email address
+during the initial registration of the account. Later, shall you want to change your email or specify more than one, you can use `--update-contacts`
+parameter to update your contact information. For example:
+
+    le.pl --key account.key --update-contacts "one@email.address, another@email.address"
+
 For more examples, logging configuration and all available parameters overview use `--help`:
 
     le.pl --help
-
-**Note:** It is advised to also use `--email` parameter for the very first run of the client, to register your account key with the email. While it is optional, that will allow you to receive certificaties expiration notifications and it might be used later to recover access to your account if you lose the key.
 
 ### RENEWALS
 

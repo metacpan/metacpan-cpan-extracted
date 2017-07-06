@@ -1,4 +1,4 @@
-# $Id: 08-IPv4.t 1549 2017-03-08 09:54:14Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 1567 2017-05-19 09:52:52Z willem $ -*-perl-*-
 
 use strict;
 use Test::More;
@@ -364,7 +364,7 @@ NonFatalBegin();
 	$resolver->retry(0);
 	$resolver->tcp_timeout(0);
 
-	my @query = (qw(. SOA IN));
+	my @query = (qw(:: SOA IN));
 	my $query = new Net::DNS::Packet(@query);
 	ok( !$resolver->query(@query),	'$resolver->query() failure' );
 	ok( !$resolver->search(@query), '$resolver->search() failure' );

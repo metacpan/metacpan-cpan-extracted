@@ -1,0 +1,8 @@
+CRC algorithm code taken from CRC-32 by Craig Bruce. 
+The module stuff is inspired by a similar perl module called 
+String::CRC by David Sharnoff & Matthew Dillon.
+Horst Fickenscher told me that it could be useful to supply an init
+value to the crc checking function and so I included this possibility.
+
+The author of this package disclaims all copyrights and 
+releases it into the public domain.

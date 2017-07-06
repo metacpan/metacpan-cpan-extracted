@@ -45,19 +45,19 @@
 
 	  </a>
     <ul>
-      <li><a href="[% c.mount_url %]/adm/#!/adm/main/db/db_post/add">
+      <li><a href="[% mount_url %]/adm/#!/adm/main/db/db_post/add">
         <i class="fa fa-plus"></i>&nbsp;
         New Post
       </a></li>
-      <li><a href="[% c.mount_url %]/adm">
+      <li><a href="[% mount_url %]/adm">
         <i class="fa fa-gear"></i>&nbsp;
         Admin area
       </a></li>
-      <li><a href="[% c.mount_url %]/adm/#!/adm/main/db/db_user/item/[% User.id %]">
+      <li><a href="[% mount_url %]/adm/#!/adm/main/db/db_user/item/[% User.id %]">
         <i class="fa fa-user"></i>&nbsp;
         User Profile
       </a></li>
-      <li><a href="[% c.mount_url %]/auth/logout_to_referer">
+      <li><a href="[% mount_url %]/auth/logout_to_referer">
         <i class="fa fa-sign-out"></i>&nbsp;
         Sign out
       </a></li>
@@ -66,7 +66,7 @@
 
 [%- ELSE -%]
   <li style="float:right;">
-    <a href="[% c.mount_url %]/auth/to_referer">
+    <a href="[% mount_url %]/auth/to_referer">
     <i class="fa fa-sign-in"></i>&nbsp;Sign in
    </a>
   </li>

@@ -12,6 +12,8 @@
 
 MODULE = UV::Util       PACKAGE = UV::Util   PREFIX = luv_
 
+PROTOTYPES: DISABLE
+
 BOOT:
 {
     HV *stash = gv_stashpvn("UV::Util", 8, TRUE);

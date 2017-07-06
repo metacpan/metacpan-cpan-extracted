@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -54,6 +54,21 @@ my $formatters = [
               ];
 
 my $validators = {
+                'voip' => '',
+                'toll_free' => '',
+                'pager' => '',
+                'mobile' => '
+          (?:
+            3\\d|
+            7(?:
+              [01]\\d|
+              6[013-9]|
+              8[89]|
+              9[1-3]
+            )|
+            81\\d
+          )\\d{5}
+        ',
                 'fixed_line' => '
           (?:
             [14-6]\\d{2}|
@@ -67,9 +82,6 @@ my $validators = {
             9\\d{2}
           )\\d{4}
         ',
-                'pager' => '',
-                'voip' => '',
-                'toll_free' => '',
                 'geographic' => '
           (?:
             [14-6]\\d{2}|
@@ -83,20 +95,8 @@ my $validators = {
             9\\d{2}
           )\\d{4}
         ',
-                'personal_number' => '',
                 'specialrate' => '(80\\d{6})|(9[01]\\d{6})',
-                'mobile' => '
-          (?:
-            3\\d|
-            7(?:
-              [01]\\d|
-              6[013-9]|
-              8[89]|
-              9[1-3]
-            )|
-            81\\d
-          )\\d{5}
-        '
+                'personal_number' => ''
               };
 
     sub new {

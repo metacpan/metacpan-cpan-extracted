@@ -2,7 +2,7 @@ package # hidden from PAUSE indexer
 Multilingual::Code;
 our $VERSION = '0.000001';
 
-use 5.014; use warnings;
+use 5.012; use warnings;
 use Keyword::Declare;
 
 sub left_justify {

@@ -916,13 +916,12 @@ GLOBAL VARIABLES AND FUNCTIONS
         model is autodetected (or immediately if that has already happened).
 
         The block will be executed *after* the actual backend has been
-        detected ($AnyEvent::MODEL is set), but *before* any watchers have
-        been created, so it is possible to e.g. patch @AnyEvent::ISA or do
-        other initialisations - see the sources of AnyEvent::Strict or
-        AnyEvent::AIO to see how this is used.
+        detected ($AnyEvent::MODEL is set), so it is possible to do some
+        initialisation only when AnyEvent is actually initialised - see the
+        sources of AnyEvent::AIO to see how this is used.
 
         The most common usage is to create some global watchers, without
-        forcing event module detection too early, for example, AnyEvent::AIO
+        forcing event module detection too early. For example, AnyEvent::AIO
         creates and installs the global IO::AIO watcher in a "post_detect"
         block to avoid autodetecting the event module at load time.
 
@@ -948,9 +947,16 @@ GLOBAL VARIABLES AND FUNCTIONS
            $WATCHER ||= $guard;
 
     @AnyEvent::post_detect
-        If there are any code references in this array (you can "push" to it
-        before or after loading AnyEvent), then they will be called directly
-        after the event loop has been chosen.
+        This is a lower level interface then "AnyEvent::post_detect" (the
+        function). This variable is mainly useful for modules that can do
+        something useful when AnyEvent is used and thus want to know when it
+        is initialised, but do not need to even load it by default. This
+        array provides the means to hook into AnyEvent passively, without
+        loading it.
+
+        Here is how it works: If there are any code references in this array
+        (you can "push" to it before or after loading AnyEvent), then they
+        will be called directly after the event loop has been chosen.
 
         You should check $AnyEvent::MODEL before adding to this array,
         though: if it is defined then the event loop has already been
@@ -958,12 +964,6 @@ GLOBAL VARIABLES AND FUNCTIONS
 
         Best use "AnyEvent::post_detect { BLOCK }" when your application
         allows it, as it takes care of these details.
-
-        This variable is mainly useful for modules that can do something
-        useful when AnyEvent is used and thus want to know when it is
-        initialised, but do not need to even load it by default. This array
-        provides the means to hook into AnyEvent passively, without loading
-        it.
 
         Example: To load Coro::AnyEvent whenever Coro and AnyEvent are used
         together, you could put this into Coro (this is the actual code used

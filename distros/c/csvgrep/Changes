@@ -1,5 +1,19 @@
 Revision history for Perl script csvgrep
 
+0.05 2017-06-22 NEILB
+    - The count of lines had an off-by-one error, as it was including
+      the header line. Thanks to Scott Baker for catching this.
+    - Put the shebang line back to #!perl, as ExtUtils::MakeMaker
+      doesn't currently fix "#!/usr/bin/env perl" on installation.
+      See https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/58
+
+0.04 2017-06-22 NEILB
+    - Now display the number of matching records, and total # lines.
+      PR#5 from Scott Baker++. I changed to only display the count if
+      more than 7 lines matched.
+    - Scott Baker fixed the shebang line. PR#3.
+    - Added support for tab separator. Requested by Scott Baker in #2.
+
 0.03 2017-06-22 NEILB
     - Fixed error in doc
     - Added bit to doc on how I define aliases for this

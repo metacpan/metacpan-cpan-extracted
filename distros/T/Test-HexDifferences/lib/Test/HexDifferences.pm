@@ -15,7 +15,7 @@ use Test::Builder::Module;
 use Test::HexDifferences::HexDump qw(hex_dump);
 use Text::Diff qw(diff);
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 my $builder = Test::Builder->new;
 
@@ -105,7 +105,7 @@ Test::HexDifferences - Test binary as hexadecimal string
 
 =head1 VERSION
 
-1.000
+1.001
 
 =head1 SYNOPSIS
 

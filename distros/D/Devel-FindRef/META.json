@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -22,12 +22,14 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Task::Weaken" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Canary::Stability" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "runtime" : {
@@ -37,5 +39,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : 1.44
+   "version" : 1.45
 }

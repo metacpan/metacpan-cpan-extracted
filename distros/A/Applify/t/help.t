@@ -1,3 +1,4 @@
+use lib '.';
 use t::Helper;
 
 my $app = eval 'use Applify; app {0};' or die $@;
@@ -9,9 +10,9 @@ $script->option(str => foo_3   => 'foo_3 can also something', 123, required => 1
 
 my $application_class = $script->_generate_application_class(sub { });
 like $application_class, qr{^Applify::__ANON__2__::}, 'generated application class';
-can_ok $application_class, qw( new run _script foo_bar foo_2 foo_3 );
+can_ok $application_class, qw(new run _script foo_bar foo_2 foo_3);
 
-is_deeply [$script->_default_options], [qw( help )], 'default options';
+is_deeply [$script->_default_options], [qw(help)], 'default options';
 is + (run_method($script, 'print_help'))[0], <<'HERE', 'print_help()';
 Usage:
    --foo-bar  Foo can something
@@ -28,7 +29,7 @@ is $script->documentation('Applify'), $script, 'documentation(...) return $self 
 is $script->documentation, 'Applify', 'documentation() return what was set';
 
 $script->documentation(__FILE__)->version('1.23');
-is_deeply [$script->_default_options], [qw( help man version )], 'default options after documentation() and version()';
+is_deeply [$script->_default_options], [qw(help man version)], 'default options after documentation() and version()';
 is + (run_method($script, 'print_help'))[0], <<'HERE', 'print_help()';
 
 dummy synopsis...

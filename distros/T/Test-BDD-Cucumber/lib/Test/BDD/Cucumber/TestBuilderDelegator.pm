@@ -1,5 +1,5 @@
 package Test::BDD::Cucumber::TestBuilderDelegator;
-$Test::BDD::Cucumber::TestBuilderDelegator::VERSION = '0.52';
+$Test::BDD::Cucumber::TestBuilderDelegator::VERSION = '0.53';
 # Original fix and investigation all by https://github.com/tomas-zemres - based
 # on Test::Tester::Delegate. Original patch here:
 #

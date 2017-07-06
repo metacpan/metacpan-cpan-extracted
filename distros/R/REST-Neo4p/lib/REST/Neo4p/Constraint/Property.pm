@@ -5,8 +5,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::Constraint::Property::VERSION = '0.3012';
-  $REST::Neo4p::Constraint::Property::VERSION = '0.3012';
+  $REST::Neo4p::Constraint::Property::VERSION = '0.3020';
 }
 
 sub new_from_constraint_hash {
@@ -190,8 +189,7 @@ use base 'REST::Neo4p::Constraint::Property';
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Constraint::NodeProperty::VERSION='0.3012';
-  $REST::Neo4p::Constraint::NodeProperty::VERSION='0.3012';
+  $REST::Neo4p::Constraint::NodeProperty::VERSION='0.3020';
 }
 
 sub new {
@@ -218,8 +216,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::Constraint::RelationshipProperty::VERSION='0.3012';
-  $REST::Neo4p::Constraint::RelationshipProperty::VERSION='0.3012';
+  $REST::Neo4p::Constraint::RelationshipProperty::VERSION='0.3020';
 }
 # relationship_type is added as a pseudoproperty
 
@@ -367,7 +364,7 @@ L<REST::Neo4p::Constraint::RelationshipType>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2015 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

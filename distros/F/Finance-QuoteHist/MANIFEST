@@ -3,12 +3,9 @@ Changes
 LICENSE
 MANIFEST
 Makefile.PL
-META.json
-META.yml
 lib/Finance/QuoteHist.pm
 lib/Finance/QuoteHist/Generic.pm
 lib/Finance/QuoteHist/Yahoo.pm
-lib/Finance/QuoteHist/StockNod.pm
 lib/Finance/QuoteHist/Google.pm
 lib/Finance/QuoteHist/DailyFinance.pm
 t/00_basic.t
@@ -21,7 +18,6 @@ t/dat/csv.dat
 t/dat/quote_daily_dailyfinance.dat
 t/dat/quote_daily_google.dat
 t/dat/quote_daily_plain.dat
-t/dat/quote_daily_stocknod.dat
 t/dat/quote_daily_yahoo.dat
 t/dat/quote_weekly_google.dat
 t/dat/quote_weekly_yahoo.dat
@@ -30,3 +26,5 @@ t/dat/dividend_yahoo.dat
 t/dat/dividend_plain.dat
 t/dat/split_plain.dat
 t/dat/split_yahoo.dat
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

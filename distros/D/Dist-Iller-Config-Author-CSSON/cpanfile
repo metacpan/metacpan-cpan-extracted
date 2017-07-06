@@ -1,4 +1,4 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2017-04-30 17:25:55 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2017-06-27 20:20:02 UTC.
 
 on runtime => sub {
     requires 'Dist::Iller' => '0.1401';
@@ -33,7 +33,7 @@ on develop => sub {
     requires 'Badge::Depot::Plugin::Travis' => '0';
     requires 'Dist::Zilla' => '6.008';
     requires 'Dist::Zilla::Plugin::Authority' => '1.009';
-    requires 'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.007';
+    requires 'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.008';
     requires 'Dist::Zilla::Plugin::ChangeStats::Dependencies::Git' => '0.0200';
     requires 'Dist::Zilla::Plugin::CheckChangesHasContent' => '0.008';
     requires 'Dist::Zilla::Plugin::Clean' => '0.07';
@@ -45,7 +45,7 @@ on develop => sub {
     requires 'Dist::Zilla::Plugin::Git::Check' => '0';
     requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch' => '0.014';
     requires 'Dist::Zilla::Plugin::Git::Commit' => '0';
-    requires 'Dist::Zilla::Plugin::Git::Contributors' => '0.029';
+    requires 'Dist::Zilla::Plugin::Git::Contributors' => '0.030';
     requires 'Dist::Zilla::Plugin::Git::GatherDir' => '0';
     requires 'Dist::Zilla::Plugin::Git::Push' => '0';
     requires 'Dist::Zilla::Plugin::Git::Tag' => '0';
@@ -73,9 +73,8 @@ on develop => sub {
     requires 'Dist::Zilla::Plugin::Test::Compile' => '2.056';
     requires 'Dist::Zilla::Plugin::Test::EOF' => '0.0501';
     requires 'Dist::Zilla::Plugin::Test::EOL' => '0.18';
-    requires 'Dist::Zilla::Plugin::Test::Kwalitee::Extra' => 'v0.2.1';
     requires 'Dist::Zilla::Plugin::Test::NoTabs' => '0.15';
-    requires 'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.021';
+    requires 'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.027';
     requires 'Dist::Zilla::Plugin::Test::Version' => '1.05';
     requires 'Dist::Zilla::Plugin::TestRelease' => '0';
     requires 'Dist::Zilla::Plugin::TravisYML' => '1.15';
@@ -105,5 +104,5 @@ on develop => sub {
 };
 on develop => sub {
     suggests 'Dist::Iller' => '0.1408';
-    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0315';
+    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0316';
 };

@@ -5,7 +5,8 @@ File Transfer Protocol.
 
 PREREQUISITES
 
-    * Net::SSH::Perl (1.24 or greater)
+    * Net::SSH::Perl (2.12 or greater)
+    * Math::Int64
 
 In particular, Net::SFTP requires the SSH2 support in Net::SSH::Perl;
 thus, during Net::SSH::Perl installation, you should choose that
@@ -39,3 +40,6 @@ Take a look at eg/psftp, an interactive SFTP shell using Net::SFTP,
 for some examples on using Net::SFTP and its various methods.
 
 David Robins / dbrobins@cpan.org
+
+Updated to work with Net::SSH::Perl 2.xx by:
+Lance Kinley / lkinley@rythmos.com

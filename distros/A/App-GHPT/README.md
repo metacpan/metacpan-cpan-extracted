@@ -4,7 +4,7 @@ App::GHPT - A command line tool to simplify using Github and Pivotal Tracker for
 
 # VERSION
 
-version 1.000004
+version 1.000007
 
 # SYNOPSIS
 
@@ -64,6 +64,18 @@ You'll also need to tell git about your PT account:
 Your actual username and token can be found at
 [https://www.pivotaltracker.com/profile](https://www.pivotaltracker.com/profile).
 
+# CREATING PULL REQUEST QUESTIONS
+
+A question is a class which consumes the
+[App::GHPT::WorkSubmitter::Role::Question](https://metacpan.org/pod/App::GHPT::WorkSubmitter::Role::Question) and implements a method named
+`ask`. See that role's documentation for details.
+
+By default, this tools looks for modules that have a a package name beginning
+with `App::GHPT::WorkSubmitter::Question` to find question classes. However,
+you can configure one or more alternative namespaces by setting the git config
+key `submit-work.question-namespaces`. This should be a space-separated list
+of namespaces under which questions can live.
+
 # COMMAND LINE OPTIONS
 
 This tool accepts the following options:
@@ -76,7 +88,7 @@ want to limit this to just one.
 
 ## --base branch
 
-The branch against which the PR should be made. This default to the master
+The branch against which the PR should be made. This defaults to the master
 branch.
 
 ## --dry-run
@@ -127,6 +139,7 @@ Bugs may be submitted through [https://github.com/maxmind/App-GHPT/issues](https
 
 # CONTRIBUTORS
 
+- Florian Ragwitz <rafl@debian.org>
 - Greg Oschwald <goschwald@maxmind.com>
 - Mark Fowler <mfowler@maxmind.com>
 

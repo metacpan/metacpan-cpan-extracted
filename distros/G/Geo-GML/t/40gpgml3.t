@@ -1,9 +1,9 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # Check conversions from Geo::Point objects to GML3.
 use warnings;
 use strict;
 
-use lib 'lib', '../XMLCompile/lib';
+use lib 'lib';
 use Test::More;
 use XML::Compile::Tester;
 
@@ -48,7 +48,7 @@ my $line = Geo::Line->filled
   , proj => 'wgs84'
   );
 
-my $poly  = Geo::Surface->new($line);
+my $poly  = Geo::Space->new($line);
 #warn Dumper $poly;
 
 #$gml->printIndex(\*STDERR);
@@ -87,6 +87,7 @@ my $expected =
   }
 };
 
+#warn Dumper $data;
 is_deeply($data, $expected, 'nested GML surface');
 
 ### now create XML
@@ -98,7 +99,9 @@ my $doc = XML::LibXML::Document->new('1.0', 'UTF-8');
 my $xml = $w->($doc, $expected);   # $expected===$data
 
 compare_xml($xml, <<'_XML');
-<gml:multiExtentOf xmlns:gml="http://www.opengis.net/gml/3.2">
+<gml:multiExtentOf xmlns:gml="http://www.opengis.net/gml/3.2"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <gml:MultiSurface srsName="EPGS:4326">
     <gml:surfaceMembers>
       <gml:Polygon>
@@ -140,7 +143,7 @@ isa_ok($w2, 'CODE', 'centerOf');
 my $xml2 = $w2->($doc, $data2);
 
 compare_xml($xml2, <<'_XML');
-<gml:centerOf xmlns:gml="http://www.opengis.net/gml/3.2">
+<gml:centerOf xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:xlink="http://www.w3.org/1999/xlink">
   <gml:Point srsName="EPGS:4326">
     <gml:pos>6.139263 53.477199</gml:pos>
   </gml:Point>

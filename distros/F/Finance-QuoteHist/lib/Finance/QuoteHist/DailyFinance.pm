@@ -4,7 +4,7 @@ use strict;
 use vars qw(@ISA $VERSION);
 use Carp;
 
-$VERSION = '1.00';
+$VERSION = "1.00";
 
 use constant DEBUG => 0;
 

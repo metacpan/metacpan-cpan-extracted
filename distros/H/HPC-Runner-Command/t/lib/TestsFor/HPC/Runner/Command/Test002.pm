@@ -14,6 +14,8 @@ use Capture::Tiny ':all';
 use Slurp;
 use File::Slurp;
 use JSON::XS;
+use File::Spec;
+use Path::Tiny;
 
 use Algorithm::Dependency::Source::HoA;
 use Algorithm::Dependency;
@@ -26,8 +28,8 @@ extends 'TestMethods::Base';
 sub write_test_file {
     my $test_dir = shift;
 
-    open( my $fh, ">$test_dir/script/test002.1.sh" );
-    print $fh <<EOF;
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test002.1.sh' );
+    my $text = <<EOF;
 #HPC partition=PARTITION
 
 #HPC jobname=job01
@@ -51,7 +53,7 @@ echo "goodbye from job 3"
 echo "hello again from job 3" && sleep 5
 EOF
 
-    close($fh);
+    write_file( $file, $text );
 }
 
 sub construct {
@@ -59,15 +61,15 @@ sub construct {
 
     my $test_methods = TestMethods::Base->new();
     my $test_dir     = $test_methods->make_test_dir();
+
+    my $file         = File::Spec->catdir( $test_dir, 'script', 'test002.1.sh' );
     write_test_file($test_dir);
 
-    my $t = "$test_dir/script/test002.1.sh";
     MooseX::App::ParsedArgv->new(
         argv => [
-            "submit_jobs",    "--infile",
-            $t,               "--outdir",
-            "$test_dir/logs", "--hpc_plugins",
-            "Dummy",
+            "submit_jobs", "--infile", $file, "--outdir",
+            File::Spec->catdir( $test_dir, 'logs' ),
+            "--hpc_plugins", "Dummy",
         ]
     );
 
@@ -79,12 +81,14 @@ sub construct {
 
 sub test_003 : Tags(construction) {
 
-    my $cur_dir  = getcwd();
     my $test     = construct();
     my $test_dir = getcwd();
 
-    is( $test->outdir, "$test_dir/logs", "Outdir is logs" );
-    is( $test->infile, "$test_dir/script/test002.1.sh", "Infile is ok" );
+    my $expect_logdir = File::Spec->catdir($test_dir, 'logs');
+    my $expect_infile = File::Spec->catdir($test_dir, 'script', 'test002.1.sh');
+
+    is( path($test->outdir)->relative, path($expect_logdir)->relative, "Outdir is logs" );
+    is( path($test->infile)->relative, path($expect_infile)->relative, "Infile is ok" );
 
     isa_ok( $test, 'HPC::Runner::Command' );
 }
@@ -92,7 +96,6 @@ sub test_003 : Tags(construction) {
 sub test_005 : Tags(submit_jobs) {
     my $self = shift;
 
-    my $cwd      = getcwd();
     my $test     = construct();
     my $test_dir = getcwd();
 
@@ -141,7 +144,7 @@ sub test_005 : Tags(submit_jobs) {
     #     like( $got, qr/$expect7/, 'Template matches' );
     #     like( $got, qr/$expect8/, 'Template matches' );
 
-    chdir($cwd);
+    chdir($Bin);
     remove_tree($test_dir);
 }
 
@@ -160,6 +163,15 @@ sub test_007 : Tags(check_hpc_meta) {
         [ 'thing1', 'thing2' ],
         $test->jobs->{ $test->jobname }->module,
         'Modules pass'
+    );
+
+    $line = "#HPC conda_env=path_to_conda\n";
+    $test->process_hpc_meta($line);
+
+    is_deeply(
+        'path_to_conda',
+        $test->jobs->{ $test->jobname }->conda_env,
+        'Conda passes'
     );
 
     chdir($cwd);
@@ -264,14 +276,13 @@ sub test_014 : Tags(job_stats) {
     $test->iterate_schedule();
 
     my $batch_job01_001 = {
-        'job'        => 'job01',
-        'batch_tags' => ['Sample1'],
-
-        # 'array_deps'      => [],
+        'job'             => 'job01',
+        'batch_tags'      => ['Sample1'],
         'scheduler_index' => {},
         'scheduler_id'    => '1234',
         'cmd_count'       => 1,
         'cmd_start'       => 1,
+        # 'logname'         => '001_job01',
     };
 
     is_deeply( $test->jobs->{job01}->batches->[0],
@@ -284,12 +295,15 @@ sub test_014 : Tags(job_stats) {
         'scheduler_id'    => '1234',
         'cmd_count'       => 1,
         'cmd_start'       => 2,
+
+        # 'logname'         => '002_job01',
     };
 
     is_deeply( $test->jobs->{job01}->batches->[1],
         $batch_job01_002, 'Job 01 Batch 002 matches' );
 
     my $batch_job02_001 = {
+
         # 'array_deps' => [ [ '1235_3', '1234_1' ] ],
         # 'scheduler_index' => { 'job01' => [0] },
         'job'             => 'job02',
@@ -298,12 +312,15 @@ sub test_014 : Tags(job_stats) {
         'scheduler_id'    => '1235',
         'cmd_count'       => 1,
         'cmd_start'       => 1,
+
+        # 'logname'         => '002_job01',
     };
 
     is_deeply( $test->jobs->{job02}->batches->[0],
         $batch_job02_001, 'Job 02 Batch 001 matches' );
 
     my $batch_job02_002 = {
+
         # 'array_deps' => [ [ '1235_4', '1234_2' ] ],
         # 'scheduler_index' => { 'job01' => [1] },
         'job'             => 'job02',
@@ -317,7 +334,7 @@ sub test_014 : Tags(job_stats) {
     is_deeply( $test->jobs->{job02}->batches->[1],
         $batch_job02_002, 'Job 02 Batch 002 matches' );
 
-    my $array_deps = { '1235_3' => ['1234_1' ] , '1235_4' => [ '1234_2' ] };
+    my $array_deps = { '1235_3' => ['1234_1'], '1235_4' => ['1234_2'] };
 
     is_deeply( $test->array_deps, $array_deps, 'ArrayDeps Match' );
     #
@@ -364,7 +381,7 @@ sub test_016 : Tags(files) {
     my $logdir = $test->logdir;
     my $outdir = $test->outdir;
 
-    my @files = glob( $test->outdir . "/*" );
+    my @files = glob( File::Spec->catdir(path($test->outdir)->relative , "*") );
 
     #TODO add tests to make sure files say what they should
     is( scalar @files, 4, 'number of files matches' );

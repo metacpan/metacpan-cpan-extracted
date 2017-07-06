@@ -7,7 +7,7 @@ use Test::Exception;
 use Hashids;
 use Math::BigInt;
 
-plan tests => 11;
+plan tests => 10;
 
 my $salt = "this is my salt";
 
@@ -23,7 +23,7 @@ subtest 'basics' => sub {
     $hashids = Hashids->new( salt => $salt );
     is( $hashids->salt, $salt, 'low salt' );
 
-    $hashids->new($salt);
+    $hashids = $hashids->new($salt);
     is( $hashids->salt, $salt, 'single-arg constructor' );
 
     subtest 'hash length' => sub {
@@ -83,36 +83,6 @@ subtest 'basics' => sub {
     };
 };
 
-subtest 'internal functions' => sub {
-    plan tests => 9;
-
-    is( Hashids->_consistentShuffle( '123', 'salt' ), '231', 'shuffle 1' );
-    is( Hashids->_consistentShuffle( 'abcdefghij', 'salt' ),
-        'iajecbhdgf', 'shuffle 2' );
-
-    is( Hashids->_consistentShuffle( [ '1', '2', '3' ], 'salt' ),
-        '231', 'shuffle alphabet list 1' );
-    is( Hashids->_consistentShuffle( [ 'a' .. 'j' ], 'salt' ),
-        'iajecbhdgf', 'shuffle alphabet list 2' );
-
-    my @res = Hashids->_consistentShuffle( '123', 'salt' );
-    is_deeply( \@res, [qw( 2 3 1 )], 'shuffle returns a list' );
-
-    is( Hashids->_consistentShuffle( [ 'a' .. 'j' ], [qw( s a l t )] ),
-        'iajecbhdgf', 'shuffle with salt as list' );
-
-    is( Hashids->_hash( 123, 'abcdefghij' ), 'bcd', 'internal hash' );
-    is( Hashids->_unhash( 'bcd', 'abcdefghij' ), 123, 'internal unhash' );
-
-    subtest '_hash/_unhash with list' => sub {
-        plan tests => 2;
-
-        my @alphabet = qw(a b c d e f g h i j);
-        is( Hashids->_hash( 123, \@alphabet ), 'bcd', 'internal hash' );
-        is( Hashids->_unhash( 'bcd', \@alphabet ), 123, 'internal unhash' );
-    };
-};
-
 subtest 'simple encode/decode' => sub {
     plan tests => 6;
 
@@ -134,7 +104,7 @@ subtest 'simple encode/decode' => sub {
 };
 
 subtest 'encode with minHashLength' => sub {
-    plan tests => 2;
+    plan tests => 4;
 
     my $hashids = Hashids->new( salt => $salt, minHashLength => 15 );
 
@@ -142,6 +112,13 @@ subtest 'encode with minHashLength' => sub {
     my $encoded   = 'V34xpAYDx0mQNvl';
     is( $hashids->encode($plaintext), $encoded,   'encode minHashLength' );
     is( $hashids->decode($encoded),   $plaintext, 'decode minHashLength' );
+
+    $hashids = Hashids->new( salt => '', minHashLength => 12 );
+    $plaintext = [ 123, 456, 789 ];
+    $encoded = 'peEl3fkRIo3d';
+    is( $hashids->encode(@$plaintext), $encoded, 'encode minHashLength(12)' );
+    is_deeply( scalar $hashids->decode($encoded),
+        $plaintext, 'decode minHashLength(12)' );
 };
 
 subtest 'list encode/decode' => sub {
@@ -285,7 +262,7 @@ subtest 'BigInt and 2^53+1 support' => sub {
         '1_152_921_504_606_846_976' => 'YkZM1Vrj77o0'
     );
 
-    plan tests => scalar( keys %bignums ) * 2;
+    plan tests => scalar( keys %bignums ) * 2 + 1;
 
     my $hashids = Hashids->new;
     for my $bignum ( keys %bignums ) {
@@ -295,4 +272,26 @@ subtest 'BigInt and 2^53+1 support' => sub {
         is( $hashids->decode( $bignums{$bignum} ),
             $bigint, "decode bignum $bignum" );
     }
+
+    subtest 'BigInt bounds' => sub {
+        my %big6 = (
+            '666_666_666_666'         => 'Lg8j28K8w',
+            '6_666_666_666_666'       => 'L2jqVjD3v',
+            '66_666_666_666_666'      => 'L7q3Gkq5Mw',
+            '666_666_666_666_666'     => 'L982g6zWEQv',
+            '6_666_666_666_666_666'   => 'LA4V2Z0BAQw',
+            '66_666_666_666_666_666'  => 'LglKVmY922Mv',
+            '666_666_666_666_666_666' => 'LVwzmqgWko3w',
+        );
+
+        plan tests => scalar( keys %big6 ) * 2;
+
+        for my $bignum ( keys %big6 ) {
+            my $bigint = Math::BigInt->new($bignum);
+            is( $hashids->encode( $bigint->bstr ),
+                $big6{$bignum}, "encode bignum $bignum" );
+            is( $hashids->decode( $big6{$bignum} ),
+                $bigint, "decode bignum $bignum" );
+        }
+    };
 };

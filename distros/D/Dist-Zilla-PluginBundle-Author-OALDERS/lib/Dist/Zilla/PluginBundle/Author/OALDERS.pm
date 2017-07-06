@@ -1,53 +1,10 @@
 package Dist::Zilla::PluginBundle::Author::OALDERS;
-$Dist::Zilla::PluginBundle::Author::OALDERS::VERSION = '0.000011';
+$Dist::Zilla::PluginBundle::Author::OALDERS::VERSION = '0.000015';
 use Moose;
 use namespace::autoclean;
 
 use feature qw( say );
 
-use Dist::Zilla::Plugin::AutoPrereqs;
-use Dist::Zilla::Plugin::CPANFile;
-use Dist::Zilla::Plugin::CheckChangesHasContent;
-use Dist::Zilla::Plugin::ConfirmRelease;
-use Dist::Zilla::Plugin::ContributorsFile;
-use Dist::Zilla::Plugin::CopyFilesFromBuild;
-use Dist::Zilla::Plugin::ExecDir;
-use Dist::Zilla::Plugin::Git::Check;
-use Dist::Zilla::Plugin::Git::Commit;
-use Dist::Zilla::Plugin::Git::Contributors;
-use Dist::Zilla::Plugin::Git::GatherDir;
-use Dist::Zilla::Plugin::Git::Push;
-use Dist::Zilla::Plugin::Git::Tag;
-use Dist::Zilla::Plugin::GithubMeta;
-use Dist::Zilla::Plugin::InstallGuide;
-use Dist::Zilla::Plugin::License;
-use Dist::Zilla::Plugin::MAXMIND::TidyAll;
-use Dist::Zilla::Plugin::MakeMaker;
-use Dist::Zilla::Plugin::Manifest;
-use Dist::Zilla::Plugin::ManifestSkip;
-use Dist::Zilla::Plugin::MetaJSON;
-use Dist::Zilla::Plugin::MetaConfig;
-use Dist::Zilla::Plugin::MetaNoIndex;
-use Dist::Zilla::Plugin::MetaResources;
-use Dist::Zilla::Plugin::MetaYAML;
-use Dist::Zilla::Plugin::MinimumPerl;
-use Dist::Zilla::Plugin::PkgVersion;
-use Dist::Zilla::Plugin::PodCoverageTests;
-use Dist::Zilla::Plugin::PodWeaver;
-use Dist::Zilla::Plugin::Prereqs;
-use Dist::Zilla::Plugin::PromptIfStale;
-use Dist::Zilla::Plugin::PruneCruft;
-use Dist::Zilla::Plugin::ReadmeAnyFromPod;
-use Dist::Zilla::Plugin::RunExtraTests;
-use Dist::Zilla::Plugin::ShareDir;
-use Dist::Zilla::Plugin::Test::CPAN::Changes;
-use Dist::Zilla::Plugin::Test::PodSpelling;
-use Dist::Zilla::Plugin::TestRelease;
-use Dist::Zilla::Plugin::Test::ReportPrereqs;
-use Dist::Zilla::Plugin::Test::Synopsis;
-use Dist::Zilla::Plugin::Test::TidyAll;
-use Dist::Zilla::Plugin::TravisCI::StatusBadge;
-use Dist::Zilla::Plugin::UploadToCPAN;
 use List::AllUtils qw( first );
 use Pod::Elemental::Transformer::List;
 use Types::Path::Tiny qw( Path );
@@ -56,6 +13,7 @@ use Types::Standard qw( ArrayRef Maybe Str );
 with(
     'Dist::Zilla::Role::PluginBundle::Easy',
     'Dist::Zilla::Role::PluginBundle::PluginRemover',
+    'Dist::Zilla::Role::PluginBundle::Config::Slicer',    # needs to come last
 );
 
 has stopwords => (
@@ -78,13 +36,14 @@ has stopwords_file => (
 sub configure {
     my $self = shift;
 
-    my $readme = 'README.md';
-    my @copy   = (
-        'cpanfile', 'Install', 'LICENSE', 'Makefile.PL', 'META.json',
-        $readme
+    my $readme          = 'README.md';
+    my @copy_from_build = (
+        'cpanfile', 'LICENSE', 'Makefile.PL', 'META.json', $readme,
     );
+    my @copy_from_release = ('Install');
 
-    my @allow_dirty = ( 'dist.ini', 'Changes', @copy );
+    my @allow_dirty
+        = ( 'dist.ini', 'Changes', @copy_from_build, @copy_from_release );
 
     my @plugins = (
         [
@@ -101,15 +60,43 @@ sub configure {
             }
         ],
 
+        'MAXMIND::TidyAll',
+
         'AutoPrereqs',
         'CheckChangesHasContent',
+        'MakeMaker',    # needs to precede InstallGuide
         'CPANFile',
-        'ConfirmRelease',
         'ContributorsFile',
-        [ 'CopyFilesFromBuild' => { copy => \@copy } ],
+        'MetaJSON',
+        'MetaYAML',
+        'Manifest',
+        'ManifestSkip',
+        [ 'MetaNoIndex' => { directory => [ 'examples', 't', 'xt' ] } ],
+        'MetaConfig',
+        'MetaResources',
+        'License',
+        'InstallGuide',
+
+        'Prereqs',
+
         'ExecDir',
 
+        [ 'Test::PodSpelling' => { stopwords => $self->_all_stopwords } ],
+        'PodCoverageTests',
+        'Test::CPAN::Changes',
+        'TestRelease',
+        'Test::ReportPrereqs',
+        'Test::Synopsis',
+        'Test::TidyAll',
+
         'RunExtraTests',
+
+        'MinimumPerl',
+        'PkgVersion',
+        'PodWeaver',
+        'PruneCruft',
+
+        [ 'CopyFilesFromBuild' => { copy => \@copy_from_build } ],
 
         [
             'NextRelease' => {
@@ -119,9 +106,14 @@ sub configure {
             }
         ],
 
-        [ 'GithubMeta'     => { issues           => 1 } ],
-        [ 'Git::GatherDir' => { exclude_filename => \@copy } ],
-        [ 'Git::Check'     => { allow_dirty      => \@allow_dirty } ],
+        [ 'GithubMeta' => { issues => 1 } ],
+        [
+            'Git::GatherDir' => {
+                exclude_filename => [ @copy_from_build, @copy_from_release ]
+            }
+        ],
+        [ 'CopyFilesFromRelease' => { filename    => [@copy_from_release] } ],
+        [ 'Git::Check'           => { allow_dirty => \@allow_dirty } ],
         [
             'Git::Commit' => 'commit generated files' => {
                 allow_dirty => \@allow_dirty,
@@ -130,23 +122,7 @@ sub configure {
         'Git::Contributors',
         'Git::Tag',
         'Git::Push',
-        'InstallGuide',
-        'License',
-        'MakeMaker',
-        'Manifest',
-        'ManifestSkip',
-        'MAXMIND::TidyAll',
-        'MetaJSON',
-        [ 'MetaNoIndex' => { directory => [ 'examples', 't', 'xt' ] } ],
-        'MetaResources',
-        'MetaYAML',
-        'MetaConfig',
-        'MinimumPerl',
-        'PkgVersion',
-        'PodCoverageTests',
-        'PodWeaver',
-        'Prereqs',
-        'PruneCruft',
+
         [
             'ReadmeAnyFromPod' => 'ReadmeMdInBuild' => {
                 filename => $readme,
@@ -155,13 +131,8 @@ sub configure {
             }
         ],
         'ShareDir',
-        'Test::CPAN::Changes',
-        [ 'Test::PodSpelling' => { stopwords => $self->_all_stopwords } ],
-        'TestRelease',
-        'Test::ReportPrereqs',
-        'Test::Synopsis',
-        'Test::TidyAll',
         'TravisCI::StatusBadge',
+        'ConfirmRelease',
         'UploadToCPAN',
     );
 
@@ -205,7 +176,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000011
+version 0.000015
 
 =head2 configure
 

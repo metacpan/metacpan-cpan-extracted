@@ -34,6 +34,7 @@
       "develop" : {
          "requires" : {
             "CPAN::Uploader" : "0",
+            "LWP::Protocol::https" : "0",
             "Minilla" : "0",
             "Module::Build::Tiny" : "0",
             "Test::CPAN::Meta" : "0",
@@ -62,7 +63,7 @@
    "provides" : {
       "AnyEvent::RabbitMQ::PubSub" : {
          "file" : "lib/AnyEvent/RabbitMQ/PubSub.pm",
-         "version" : "v3.1.2"
+         "version" : "v3.2.0"
       },
       "AnyEvent::RabbitMQ::PubSub::Consumer" : {
          "file" : "lib/AnyEvent/RabbitMQ/PubSub/Consumer.pm"
@@ -82,9 +83,10 @@
          "web" : "https://github.com/tynovsky/AnyEvent-RabbitMQ-PubSub"
       }
    },
-   "version" : "3.1.2",
+   "version" : "3.2.0",
    "x_authority" : "cpan:TYNOVSKY",
    "x_contributors" : [
+      "Jan Seidl <seidl@avast.com>",
       "tynovsky <tynovsky@seznam.cz>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01"

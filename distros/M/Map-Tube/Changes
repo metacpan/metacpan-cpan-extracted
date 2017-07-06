@@ -1,5 +1,10 @@
 Revision history for Map::Tube
 
+3.32  2017-07-03T11:20:00+00:00
+      - Downgraded dependency on File::Basename v2.6 (RT #122294), thanks @JWRIGHT.
+      - Added optionally experimental flag.
+      - Marked the inter-changeable route change as 'experimental'.
+
 3.31  2017-06-18T03:55:00+00:00
       - Updated method get_shortest_route() to return least inter-changeable route.
       - Tidied up attribute definitions in general.

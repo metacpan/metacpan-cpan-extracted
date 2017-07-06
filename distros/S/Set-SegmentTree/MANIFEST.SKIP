@@ -1,0 +1,10 @@
+Generate.PL
+.git
+Set-SegmentTree-*.*/
+Set-SegmentTree-*.*.tar.gz
+Makefile.old
+Makefile
+MANIFEST.bak
+MANIFEST.SKP
+smalltemp.fastbuf
+tree.bin

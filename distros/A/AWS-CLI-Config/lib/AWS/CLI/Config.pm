@@ -1,4 +1,5 @@
 package AWS::CLI::Config;
+
 use 5.008001;
 use strict;
 use warnings;
@@ -7,7 +8,7 @@ use Carp ();
 use File::Spec;
 use autodie;
 
-our $VERSION = "0.04";
+our $VERSION = '0.05';
 
 my $DEFAULT_PROFILE = 'default';
 
@@ -17,20 +18,26 @@ my $CONFIG;
 my %CONFIG_PROFILE_OF;
 
 BEGIN: {
-    my %accessor_of = (
-        access_key_id     => +{ env => 'AWS_ACCESS_KEY_ID',     key => 'aws_access_key_id' },
-        secret_access_key => +{ env => 'AWS_SECRET_ACCESS_KEY', key => 'aws_secret_access_key' },
-        session_token     => +{ env => 'AWS_SESSION_TOKEN',     key => 'aws_session_token' },
-        region            => +{ env => 'AWS_DEFAULT_REGION' },
-        output            => +{},
+    my %attributes = (
+        access_key_id => {
+            env => 'AWS_ACCESS_KEY_ID',
+            key => 'aws_access_key_id'
+        },
+        secret_access_key => {
+            env => 'AWS_SECRET_ACCESS_KEY',
+            key => 'aws_secret_access_key',
+        },
+        session_token => {
+            env => 'AWS_SESSION_TOKEN',
+            key => 'aws_session_token',
+        },
+        region => { env => 'AWS_DEFAULT_REGION' },
+        output => {},
     );
 
-    MK_ACCESSOR: {
+    while (my ($name, $opts) = each %attributes) {
         no strict 'refs';
-        for my $attr (keys %accessor_of) {
-            my $func = __PACKAGE__ . "::$attr";
-            *{$func} = _mk_accessor($attr, %{$accessor_of{$attr}});
-        }
+        *{__PACKAGE__ . "::$name"} = _mk_accessor($name, %{$opts});
     }
 }
 
@@ -64,31 +71,31 @@ sub _mk_accessor {
 
 sub credentials {
     my $profile = shift || _default_profile();
-    $CREDENTIALS ||= sub {
-        my $path = File::Spec->catfile(_default_dir(), 'credentials');
-        return +{} unless (-r $path);
-        return _parse($path);
-    }->();
+
+    $CREDENTIALS ||= _parse(
+        (exists $ENV{AWS_CONFIG_FILE} and $ENV{AWS_CONFIG_FILE})
+            ? $ENV{AWS_CONFIG_FILE}
+            : File::Spec->catfile(_default_dir(), 'credentials')
+    );
+
     return unless (exists $CREDENTIALS->{$profile});
-    $CREDENTIALS_PROFILE_OF{$profile} ||= AWS::CLI::Config::Profile->_new($CREDENTIALS->{$profile});
+    $CREDENTIALS_PROFILE_OF{$profile} ||=
+        AWS::CLI::Config::Profile->new($CREDENTIALS->{$profile});
     return $CREDENTIALS_PROFILE_OF{$profile};
 }
 
 sub config {
     my $profile = shift || _default_profile();
 
-    $CONFIG ||= sub {
-        my $path
-            = (exists $ENV{AWS_CONFIG_FILE} && $ENV{AWS_CONFIG_FILE})
+    $CONFIG ||= _parse(
+        (exists $ENV{AWS_CONFIG_FILE} and $ENV{AWS_CONFIG_FILE})
             ? $ENV{AWS_CONFIG_FILE}
-            : File::Spec->catfile(_default_dir(), 'config');
-        return +{} unless (-r $path);
-
-        return _parse($path);
-    }->();
+            : File::Spec->catfile(_default_dir(), 'config')
+    );
 
     return unless (exists $CONFIG->{$profile});
-    $CONFIG_PROFILE_OF{$profile} ||= AWS::CLI::Config::Profile->_new($CONFIG->{$profile});
+    $CONFIG_PROFILE_OF{$profile} ||=
+        AWS::CLI::Config::Profile->new($CONFIG->{$profile});
     return $CONFIG_PROFILE_OF{$profile};
 }
 
@@ -106,73 +113,81 @@ sub _default_profile {
         : $DEFAULT_PROFILE;
 }
 
+# This only supports one level of nesting, but it seems AWS config files
+# themselves only have but one level
 sub _parse {
-  my $file = shift;
-  my $profile = shift || _default_profile();
+    my $file = shift;
+    my $profile = shift || _default_profile();
 
-  my $hash = {};
-  my $nested = {};
+    my $hash = {};
+    my $nested = {};
 
-  my $contents;
-  {
-    local $/  = undef;
-    open my $fh, '<', $file;
-    $contents = <$fh>;
-    close( $fh );
-  }
+    return +{} unless -r $file;
 
-  foreach my $line (split /\n/, $contents) {
-    chomp $line;
-
-    $profile = $1 if $line =~ /^\[(?:profile )?([\w]+)\]/;
-    my ($indent, $key, $value) = $line =~ /^(\s*)([\w]+)\s*=\s*(.*)/;
-
-    next if !defined $key or $key eq q{};
-
-    if (length $indent) {
-      $nested->{$key} = $value;
+    my $contents;
+    {
+        local $/  = undef;
+        open my $fh, '<', $file;
+        $contents = <$fh>;
+        close( $fh );
     }
-    else {
-      # Reset nested hash
-      $nested = {} if keys %{$nested};
-      $hash->{$profile}{$key} = ($key and $value) ? $value : $nested;
-    }
-  }
 
-  return $hash;
+    foreach my $line (split /\n/, $contents) {
+        chomp $line;
+
+        $profile = $1 if $line =~ /^\[(?:profile )?([\w]+)\]/;
+        my ($indent, $key, $value) = $line =~ /^(\s*)([\w]+)\s*=\s*(.*)/;
+
+        next if !defined $key or $key eq q{};
+
+        if (length $indent) {
+            $nested->{$key} = $value;
+        }
+        else {
+            # Reset nested hash
+            $nested = {} if keys %{$nested};
+            $hash->{$profile}{$key} = ($key and $value) ? $value : $nested;
+        }
+    }
+
+    return $hash;
 }
 
 PROFILE: {
     package AWS::CLI::Config::Profile;
+
     use 5.008001;
     use strict;
     use warnings;
 
-    my @ACCESSORS;
-
-    BEGIN {
-        @ACCESSORS = qw(
-            aws_access_key_id
-            aws_secret_access_key
-            aws_session_token
-            region
-            output
-        );
+    sub new {
+        my $class = shift;
+        my $data = @_ ? @_ > 1 ? { @_ } : shift : {};
+        return bless $data, $class;
     }
 
-    use Object::Tiny @ACCESSORS;
+    sub AUTOLOAD {
+        our $AUTOLOAD;
+        my $self = shift;
 
-    sub _new {
-        my $class = shift;
-        my $data  = shift;
-        return bless $data, $class;
+        return if $AUTOLOAD =~ /DESTROY/;
+        my $method = $AUTOLOAD;
+           $method =~ s/.*:://;
+
+        no strict 'refs';
+        *{$AUTOLOAD} = sub {
+          return shift->{$method}
+        };
+
+        return $self->{$method};
     }
 }
 
 1;
+
 __END__
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -188,62 +203,75 @@ AWS::CLI::Config - Interface to access AWS CLI configs and credentials
 
 =head1 DESCRIPTION
 
-B<AWS::CLI::Config> is interface to access AWS CLI configuration and credentials.
-It fetches configured value from environment varialbes or credential file or
-config file in order of priority.
-The priority order is described in L<AWS CLI Documents|http://docs.aws.amazon.com/cli/>.
+B<AWS::CLI::Config> provides an interface to access AWS CLI configuration and
+credentials. It fetches its values from the appropriate environment variables,
+or a credential or config file in the order described in
+L<AWS CLI Documents|http://docs.aws.amazon.com/cli/>.
 
 =head1 SUBROUTINES
 
 =head2 access_key_id (Str)
 
-Fetches $ENV{AWS_ACCESS_KEY_ID} or I<aws_access_key_id> defined in credential
-file or in config file.
-You can specify your profile by first argument (optional).
+Fetches $ENV{AWS_ACCESS_KEY_ID} or I<aws_access_key_id> defined in the
+credential or config file. You can optionally specify the profile as the
+first argument.
 
 =head2 secret_access_key (Str)
 
-Fetches $ENV{AWS_SECRET_ACCESS_KEY} or I<aws_secret_access_key> defined in credential
-file or in config file.
-You can specify your profile by first argument (optional).
+Fetches $ENV{AWS_SECRET_ACCESS_KEY} or I<aws_secret_access_key> defined in
+the credential or config file. You can optionally specify the profile as
+the first argument.
 
 =head2 session_token (Str)
 
-Fetches $ENV{AWS_SESSION_TOKEN} or I<aws_session_token> defined in credential
-file or in config file.
-You can specify your profile by first argument (optional).
+Fetches $ENV{AWS_SESSION_TOKEN} or I<aws_session_token> defined in the
+credential or config file. You can optionally specify the profile as the first
+argument.
 
 =head2 region (Str)
 
-Fetches $ENV{AWS_DEFAULT_REGION} or I<region> defined in credential
-file or in config file.
-You can specify your profile by first argument (optional).
+Fetches $ENV{AWS_DEFAULT_REGION} or I<region> defined in the credential or
+config file. You can optionally specify the profile as the first argument.
 
 =head2 output (Str)
 
-Fetches I<output> defined in credential file or in config file.
-You can specify your profile by first argument (optional).
+Fetches I<output> defined in the credential or config file. You can optionally
+specify the profile as the first argument.
 
 =head2 credentials (Str)
 
-Fetches information from credential file if it exists.
-You can specify your profile by first argument (optional).
+Fetches information from the credential file if it exists. You can optionally
+specify the profile as the first argument.
 
 =head2 config (Str)
 
-Fetches information from config file if it exists.
-$ENV{AWS_CONFIG_FILE} can override default path of the file.
-You can specify your profile by first argument (optional).
+Fetches information from the config file if it exists. If you need to override
+the default path of this file, use the C<$ENV{AWS_CONFIG_FILE}> variable.
+You can optionally specify the profile as the first argument.
+
+=head2 Automatic accessors
+
+Accessors will also be automatically generated for all top-level keys in a given
+profile the first time they are called. They will be cached, so that you only
+pay this cost if you ask for it, and only do so once.
+
+The accessors will have the same name as the keys they represent.
+
+Please note, however, that accessors will B<not> be generated for nested values.
 
 =head1 LIMITATIONS
 
-"Instance profile credentials" are not supported by this module yet which is
-supported in original AWS CLI.
+"Instance profile credentials" are not yet supported by this module.
 
 =head1 SEE ALSO
 
-L<Net::Amazon::Config>,
-L<http://aws.amazon.com/cli/>
+=over 4
+
+=item * L<Net::Amazon::Config>,
+
+=item * L<http://aws.amazon.com/cli/>
+
+=back
 
 =head1 LICENSE
 
@@ -252,9 +280,21 @@ Copyright (C) IKEDA Kiyoshi.
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-IKEDA Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+=over 4
+
+=item * IKEDA Kiyoshi E<lt>keyamb@cpan.orgE<gt>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item * José Joaquín Atria E<lt>jjatria@cpan.orgE<gt>
+
+=back
 
 =cut
 

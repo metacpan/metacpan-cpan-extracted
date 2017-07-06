@@ -2,9 +2,8 @@ package App::cpm::Resolver::Snapshot;
 use strict;
 use warnings;
 use App::cpm::version;
-use App::cpm::Logger;
 use Carton::Snapshot;
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 sub new {
     my ($class, %option) = @_;

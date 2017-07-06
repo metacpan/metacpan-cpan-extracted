@@ -2,13 +2,13 @@
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '1.16.0';
+$Git::Hooks::CheckAcls::VERSION = '2.0.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Error qw(:try);
-use Git::Hooks qw/:DEFAULT :utils/;
+use Try::Tiny;
+use Git::Hooks;
 
 my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -57,18 +57,18 @@ sub check_ref {
         $op = 'R';              # rewrite a non-branch
     } else {
         # This is an U if "merge-base(old, new) == old". Otherwise it's an R.
-        try {
-            chomp(my $merge_base = $git->command('merge-base' => $old_commit, $new_commit));
-            $op = ($merge_base eq $old_commit) ? 'U' : 'R';
-        } otherwise {
+        $op = try {
+            chomp(my $merge_base = $git->run('merge-base' => $old_commit, $new_commit));
+            ($merge_base eq $old_commit) ? 'U' : 'R';
+        } catch {
             # Probably $old_commit and $new_commit do not have a common ancestor.
-            $op = 'R';
+            'R';
         };
     }
 
     foreach my $acl (grok_acls($git)) {
         my ($who, $what, $refspec) = @$acl;
-        next unless match_user($git, $who);
+        next unless $git->match_user($who);
         next unless match_ref($ref, $refspec);
         if ($what =~ /[^CRUD-]/) {
             $git->error($PKG, "invalid acl 'what' component: '$what'");
@@ -98,7 +98,7 @@ sub check_ref {
 sub check_affected_refs {
     my ($git) = @_;
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     foreach my $ref ($git->get_affected_refs()) {
         check_ref($git, $ref)
@@ -126,13 +126,12 @@ Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =head1 DESCRIPTION
 
-This Git::Hooks plugin hooks itself to the hooks below to guarantee
-that only allowed users can push commits and tags to specific
-branches.
+This L<Git::Hooks> plugin hooks itself to the hooks below to guarantee that
+only allowed users can push commits and tags to specific branches.
 
 =over
 
@@ -161,11 +160,11 @@ option:
 
     git config --add githooks.plugin CheckAcls
 
-=for Pod::Coverage check_ref grok_acls match_ref
+=for Pod::Coverage check_ref grok_acls match_ref check_affected_refs
 
 =head1 NAME
 
-Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control.
+Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
 
 =head1 CONFIGURATION
 
@@ -247,22 +246,16 @@ branches below "refs/heads/{USER}". Supposing the environment variable
 USER contains the user's login name during a "pre-receive" hook. For
 all other branches (^refs/heads) the users have only update (U) rights.
 
-=head1 EXPORTS
-
-This module exports two routines that can be used directly without
-using all of Git::Hooks infrastructure.
-
-=head2 check_affected_refs GIT
-
-This is the routine used to implement the C<update> and the
-C<pre-receive> hooks. It needs a C<Git::More> object.
-
 =head1 REFERENCES
 
-This script is heavily inspired (and, in some places, derived) from
-the
-L<update-paranoid|https://github.com/gitster/git/blob/b12905140a8239ac687450ad43f18b5f0bcfb62e/contrib/hooks/update-paranoid>
+=over
+
+=item * L<update-paranoid|https://github.com/gitster/git/blob/b12905140a8239ac687450ad43f18b5f0bcfb62e/contrib/hooks/update-paranoid>
+
+This script is heavily inspired (and, in some places, derived) from the
 example hook which comes with the Git distribution.
+
+=back
 
 =head1 AUTHOR
 

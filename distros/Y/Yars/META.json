@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -86,7 +86,13 @@
          "web" : "https://github.com/clustericious/Yars"
       }
    },
-   "version" : "1.27",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "1.28",
+   "x_contributors" : [
+      "Marty Brandon",
+      "Graham Ollis <plicease@cpan.org>",
+      "Brian Duggan",
+      "Curt Tilmes"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

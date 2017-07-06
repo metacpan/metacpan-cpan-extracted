@@ -1,3 +1,11 @@
+0.013   2017-07-02 (PERLANCAR)
+
+        - Add utility: csv-grep.
+
+        - Add common option: --(no-)header to be able to handle CSV that does
+          not have header row.
+
+
 0.012   2017-04-25 (PERLANCAR)
 
 	- csv-select-fields: Add --field-pat to select by regular

@@ -1,4 +1,4 @@
-package Pcore::API::PayPal v0.2.1;
+package Pcore::API::PayPal v0.3.0;
 
 use Pcore -dist, -class, -result, -const;
 use Pcore::Util::Data qw[from_json to_json to_b64];
@@ -118,6 +118,47 @@ sub exec_payment ( $self, $payment_id, $payer_id, $cb ) {
                         else {
                             $api_res = result 200, $data;
                         }
+                    }
+
+                    $cb->($api_res);
+
+                    return;
+                }
+            );
+
+            return;
+        }
+    );
+
+    return;
+}
+
+# https://developer.paypal.com/docs/api/payments.payouts-batch#payouts
+sub payout ( $self, $payment, $cb ) {
+    $self->_get_access_token(
+        sub ($access_token) {
+            my $url = ( $self->{sandbox} ? $SANDBOX_ENDPOINT : $LIVE_ENDPOINT ) . '/v1/payments/payouts?sync_mode=true';
+
+            P->http->post(
+                $url,
+                headers => {
+                    CONTENT_TYPE  => 'application/json',
+                    ACCCEPT       => 'application/json',
+                    AUTHORIZATION => "$access_token->{token_type} $access_token->{access_token}",
+                },
+                body      => to_json($payment),
+                on_finish => sub ($res) {
+                    my $api_res;
+
+                    if ( !$res ) {
+                        my $data = $res->body ? from_json $res->body : {};
+
+                        $api_res = result [ $res->status, $res->reason ], $data;
+                    }
+                    else {
+                        my $data = from_json $res->body;
+
+                        $api_res = result 200, $data;
                     }
 
                     $cb->($api_res);

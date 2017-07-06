@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.422",
    "license" : [
       "perl_5"
    ],
@@ -27,14 +27,15 @@
             "File::Basename" : "0",
             "File::Path" : "2.07",
             "File::Spec" : "0",
-            "Module::Build" : "0"
+            "Module::Build" : "0",
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "Alien::libtermkey" : {
          "file" : "lib/Alien/libtermkey.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -43,6 +44,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

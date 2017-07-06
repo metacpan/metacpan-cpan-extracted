@@ -1,6 +1,6 @@
 package WWW::Google::URLShortener;
 
-$WWW::Google::URLShortener::VERSION   = '0.22';
+$WWW::Google::URLShortener::VERSION   = '0.23';
 $WWW::Google::URLShortener::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::URLShortener - Interface to Google URL Shortener API.
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Author;
 # ABSTRACT: An Author data object
-$MetaCPAN::Client::Author::VERSION = '2.016000';
+$MetaCPAN::Client::Author::VERSION = '2.017000';
 use Moo;
 use Ref::Util qw< is_arrayref >;
 
@@ -93,7 +93,7 @@ MetaCPAN::Client::Author - An Author data object
 
 =head1 VERSION
 
-version 2.016000
+version 2.017000
 
 =head1 SYNOPSIS
 

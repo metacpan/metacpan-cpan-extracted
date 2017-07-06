@@ -1,0 +1,217 @@
+package Log::ger::Manual::Internals;
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Log::ger internals
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Log::ger::Manual::Internals - Log::ger internals
+
+=head1 VERSION
+
+version 0.012
+
+=head1 DESCRIPTION
+
+When an importer package does this:
+
+ use Log::ger;
+
+Basically all Log::ger does is construct logging routines and install them to
+importer's package (target), e.g. L<log_warn>, L<log_debug>, L<log_is_debug> and
+so on. Log::ger also records the target name. When a reinit is requested (e.g.
+due to a change of log level or outputs), Log::ger will again construct logging
+routines and install them to each target, replacing the old routines.
+
+In addition to installing routines to a package, Log::ger can also target a hash
+or an object (which is basically the same as installing to a package, but the
+routines will expect to be called as object methods instead of plain
+subroutines, i.e. they expect the first argument to be the object).
+
+=head1 GLOSSARY
+
+=head2 Formatter
+
+A routine that takes arguments supplied by the user to the logger routine (e.g.
+C<< log_warn("blah", $args, ...) >> and converts it to the message (usually
+string) that is sent to the output (or the layouter, if there is one).
+
+=head2 Output
+
+=head2 Log routine
+
+=head2 Is routine
+
+=head2 Layouter
+
+A routine that takes the formatted message (usually a string) and converts it to
+the final message string that is sent to output.
+
+=head2 Plugin
+
+A Perl module that supplies hooks.
+
+=head2 Target
+
+=head2 Phase
+
+=head2 Hook
+
+=head2 Hook priority
+
+=head2 Init
+
+The process of constructing logger routines and installing them to targets.
+
+=head2 Logger routine
+
+=head2 Level
+
+=head2 Composite output
+
+=head2 Category
+
+=head2 Category level
+
+=head1 HOOKS AND PLUGINS
+
+Hooks are how Log::ger provides its flexibility. At various times (phases),
+Log::ger will turn to running hooks to get some behavior or result. For example
+when wanting to construct a logging routine or formatting routine or
+before/after installing logging routines. Plugins, which are modules in the
+Log::ger::{Plugin,Output,Format,Filter,...} namespaces, can supply these hooks.
+
+Hooks are stored in the C<%Global_Hooks> variable, where the key is phase name
+and the value an array of hook records. Each hook record is in the form of:
+
+ [$key, $prio, $coderef]
+
+where C<$key> is (plugin) package name, C<$prio> is a number between 0-100 (the
+lower the number, the higher the priority and the earlier it is run),
+C<$coderef> is the actual hook routine. A plugin is supposed to put only at most
+one hook per phase.
+
+A hook routine is passed a hash argument and is expected to return an array:
+
+ [$result, $flow_control]
+
+By default each hook will be executed in order of its priority. C<$flow_control>
+can be set to 1 by a hook to stop immediately after this hook instead of
+continuing to the next. Some phases will nevertheless stop after the first hook
+that returns non-undef C<$result>. A hook that returns undef is effectively
+declining and causing Log::ger to move to the next hook in the chain.
+
+Aguments received by hook: C<target> (str, can be C<package> if installing to a
+package, or C<hash> or C<object>), C<target_arg> (str, when C<target> is
+C<package>, will be the package name; when C<target> is C<hash> will be the
+hash; when C<target> is C<object> will be the object), C<init_args> (hash,
+arguments passed to Log::ger when importing, e.g. C<< {category =>
+'My::Package'} >>; it also serves as a per-target stash which survives reinit,
+by convention you can put stuffs here under keys that start with C<_>). In some
+phases, hook will receive more arguments (see phase documentation below).
+
+Available phases:
+
+=over
+
+=item * create_formatter
+
+Used to construct formatter routine, which will be called with arguments from
+the user when she calls the logging routines.
+
+=item * create_layouter
+
+Used to construct layouter routine, which will be called with arguments C<<
+($fmsg, \%init_args, $lnum, $lname) >> where C<$fmsg> is formatted message from
+the formatter, C<%init_args> are arguments given to C<< Log::ger->get_logger >>
+or to Log::ger's import(), C<$lnum> is numeric level, C<$lname> is string level.
+
+=item * create_routine_names
+
+Used to construct routine names. Hook must return this (all keys are optional):
+
+ [{
+   log_subs      => [ [NAME, STR_LEVEL], ... ],
+   log_methods   => [ [NAME, STR_LEVEL], ... ],
+
+   is_subs       => [ [NAME, STR_LEVEL], ... ],
+   is_methods    => [ [NAME, STR_LEVEL], ... ],
+
+   logml_subs    => [ [NAME, undef    ], ... ],
+   logml_methods => [ [NAME, undef    ], ... ],
+ }]
+
+Where C<log_subs> and C<log_methods> are names of per-level log routines,
+C<is_subs> an C<is_methods> are names of per-level level detection routines,
+C<logml_subs> and C<logml_methods> are names of multiple-level log routines.
+
+=item * create_log_routine
+
+Used to create per-level "log_I<level>" routines which will be called with C<<
+(\%init_args, $msg) >> arguments. Called for each routine specified in the
+C<log_subs> (or C<log_methods>) in the routine names (see documentation on
+C<create_routine_names> phase). Extra arguments received by hook: C<name>
+(routine name), C<level> (numeric level), C<str_level>.
+
+=item * create_is_routine
+
+Used to create per-level "log_is_I<level>" routines. Called for each routine
+specified in the C<is_subs> (or C<is_methods>) in the routine names (see
+documentation on C<create_routine_names> phase). Extra Arguments received by
+hooks: C<name> (routine name), C<level> (numeric level), C<str_level>.
+
+=item * create_logml_routine
+
+Used to create multiple-level "log" routines which will be called with C<<
+(\%init_args, $level, $msg) >> arguments. Called for each routine specified in
+the C<logml_subs> (or C<logml_methods>) in the routine names (see documentation
+on C<create_routine_names> phase). Extra arguments received by hooks: C<name>
+(routine name).
+
+=item * before_install_routines
+
+Extra arguments received by hooks: C<routines> which is in the form of:
+
+ [
+   [$coderef, $name, $numlevel, $type],
+   ...
+ ]
+
+Where C<$type> is either C<log_sub>, C<log_method>, C<logml_sub>,
+C<logml_method>, C<is_sub>, C<is_method>.
+
+=item * after_install_routines
+
+Extra arguments received by hooks: C<routines>.
+
+=back
+
+Aside from the global hooks, there are also per-target hooks, which are stored
+in C<%Per_Package_Hooks>, C<%Per_Hash_Hooks>, C<%Per_Object_Hooks>.
+
+=head1 TARGETS
+
+Log::ger can install logger routines to a package, or an object (which is
+similar to installing to a package), or a hash (usually for testing).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

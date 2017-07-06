@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164947;
 
 my $formatters = [
                 {
@@ -34,43 +34,6 @@ my $formatters = [
               ];
 
 my $validators = {
-                'toll_free' => '
-          8(?:
-            00|
-            33|
-            44|
-            55|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
-                'personal_number' => '
-          5(?:
-            00|
-            22|
-            33|
-            44|
-            66|
-            77|
-            88
-          )[2-9]\\d{6}
-        ',
-                'geographic' => '
-          767(?:
-            2(?:
-              55|
-              66
-            )|
-            4(?:
-              2[01]|
-              4[0-25-9]
-            )|
-            50[0-4]|
-            70[1-3]
-          )\\d{4}
-        ',
-                'specialrate' => '(900[2-9]\\d{6})',
                 'mobile' => '
           767(?:
             2(?:
@@ -95,8 +58,45 @@ my $validators = {
             70[1-3]
           )\\d{4}
         ',
+                'pager' => '',
+                'toll_free' => '
+          8(?:
+            00|
+            33|
+            44|
+            55|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
                 'voip' => '',
-                'pager' => ''
+                'personal_number' => '
+          5(?:
+            00|
+            22|
+            33|
+            44|
+            66|
+            77|
+            88
+          )[2-9]\\d{6}
+        ',
+                'specialrate' => '(900[2-9]\\d{6})',
+                'geographic' => '
+          767(?:
+            2(?:
+              55|
+              66
+            )|
+            4(?:
+              2[01]|
+              4[0-25-9]
+            )|
+            50[0-4]|
+            70[1-3]
+          )\\d{4}
+        '
               };
 use Number::Phone::NANP::Data;
 sub areaname {

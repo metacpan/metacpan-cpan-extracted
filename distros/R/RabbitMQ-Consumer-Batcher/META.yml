@@ -1,0 +1,48 @@
+---
+abstract: 'batch consumer of RMQ messages'
+author:
+  - 'Jan Seidl <seidl@avast.com>'
+build_requires:
+  Mock::Quick: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RabbitMQ-Consumer-Batcher
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  RabbitMQ::Consumer::Batcher:
+    file: lib/RabbitMQ/Consumer/Batcher.pm
+    version: v0.1.1
+  RabbitMQ::Consumer::Batcher::Item:
+    file: lib/RabbitMQ/Consumer/Batcher/Item.pm
+  RabbitMQ::Consumer::Batcher::Message:
+    file: lib/RabbitMQ/Consumer/Batcher/Message.pm
+requires:
+  Moose: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/avast/RabbitMQ-Consumer-Batcher/issues
+  homepage: https://github.com/avast/RabbitMQ-Consumer-Batcher
+  repository: git://github.com/avast/RabbitMQ-Consumer-Batcher.git
+version: 0.1.1
+x_authority: cpan:JASEI
+x_contributors:
+  - 'Jan Seidl <janseidl@volny.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,11 @@
 Revision history for Bot::IRC::X::Reminder
 
+1.03      2017-06-30 11:39:28-04:00 America/New_York
+        - Fix crontab-style date expression being interpreted as now + 0 seconds
+
+1.02      2017-06-30 11:19:47-04:00 America/New_York
+        - Fix bug where sometimes captured hook doesn't authoritatively answer
+          the input and lets subsequent hooks fire
+
 1.01      2016-11-10 20:23:14-08:00 America/Los_Angeles
         - First version, released on an unsuspecting world

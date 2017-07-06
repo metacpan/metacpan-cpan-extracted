@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Core download plugin
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 sub _hook
@@ -26,8 +26,8 @@ sub _hook
   if($res->{type} eq 'list')
   {
     $res = $build->prefer($res);
-    my $version = $res->{list}->[0]->{version};
     die "no matching files in listing" if @{ $res->{list} } == 0;
+    my $version = $res->{list}->[0]->{version};
     my($pick, @other) = map { $_->{url} } @{ $res->{list} };
     if(@other > 8)
     {
@@ -42,7 +42,7 @@ sub _hook
     {
       $version =~ s/\.+$//;
       $build->log("setting version based on archive to $version");
-      $build->install_prop->{version} = $version;
+      $build->runtime_prop->{version} = $version;
     }
   }
 
@@ -98,7 +98,7 @@ Alien::Build::Plugin::Core::Download - Core download plugin
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -122,6 +122,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

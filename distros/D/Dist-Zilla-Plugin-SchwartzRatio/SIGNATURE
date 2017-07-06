@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,25 +14,29 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 785c1455ed0fb9bcec72f5f9c979f1339c6f887c Build.PL
-SHA1 27ec72b77360c00b85cfa44451c117f3baec5ff1 Changes
-SHA1 9043479b5a95bee535cd4d126f5e8a09edae9716 INSTALL
-SHA1 33260abc93b43a44581b0b6263d7e4318f4122bb LICENSE
-SHA1 e86a86ad29261f94968f905e3d10148d5e86bd39 MANIFEST
+SHA1 0197ebe61d74b28de7865c1d920e13db4817856e AUTHOR_PLEDGE
+SHA1 0a6939050f79ab1422dda1b268fe1c02c218fd3c CONTRIBUTORS
+SHA1 05ba4f829fba591ff97f3a00d6d39e20a337774b Changes
+SHA1 e8007ac990a7517c842776487fd6302146bec6d6 INSTALL
+SHA1 4635555632db4eb10b992acc94a499271d2044ef LICENSE
+SHA1 8558753de92b357c6d8ce440959c81bd95c4d2db MANIFEST
 SHA1 3da861a860595300cadbe86a572103e075d891ad MANIFEST.SKIP
-SHA1 cecbebeb9f3fb903be2da67def067a4eb25da65e META.json
-SHA1 b747b8db83efcb888be988af2dc3169ea3cf1ab5 META.yml
-SHA1 d99f677d4f2982725c511d95f6893aeb411b97b5 README
-SHA1 39dbb45cf7edfe11a1dba67b16e0685e2da66b32 README.mkdn
-SHA1 fc3a83f39f4012cf6e731ec66f184dc8bcc9730d a
-SHA1 189663e6966fade31535c50fde167f1ccea301fb dist.ini
-SHA1 b16ddc5b310e598601e5ab1b0015dc087c46b96a lib/Dist/Zilla/Plugin/SchwartzRatio.pm
-SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
-SHA1 473906254ecd96009795d4b7fbc82fac48c03ecd t/000-report-versions.t
+SHA1 2b9bd13ac305ffbea218288c711184d179549aa4 META.json
+SHA1 9fb65f7191e4267010b2e0677be8d1715b012210 META.yml
+SHA1 ac975dbc97b057d0d830c9b7abc0d71001290d54 Makefile.PL
+SHA1 814256ec29c1eb247951cb566d02831f6d8186e3 README.mkdn
+SHA1 a45bd97f1e593117252ba541e12449f38cc73242 cpanfile
+SHA1 59e3a9ed0a39b5d296cab9d312318569a1c9f69e dist.ini
+SHA1 38fde09abea4006f6942ff9dda33d0eb4dbbc308 doap.xml
+SHA1 1497cb451bb87d37ca01fb07e57b86cec3a1b021 lib/Dist/Zilla/Plugin/SchwartzRatio.pm
+SHA1 ead0b7e7d5c9a906ef0f4c10f2baa05a20e46475 t/00-compile.t
+SHA1 fba6d6f1d1f8317a8cd32fe94abe9bf102b18e85 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 20dcb95bfc7dc22192bf8856790d66de0a22c167 t/basic.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAk9n0RoACgkQ34Hwf+GwC4zL2gCfcjmwykGC+7k3+KQfgmuXAfjl
-fHcAoId9M94zGwrAjJeotnqWN7aADdho
-=oRAs
+iEYEARECAAYFAlldbhAACgkQ34Hwf+GwC4whQQCfcp5sqCo1EmpH7zwavVjR/UEd
+L3MAoJcSnBdnKzSsEOuvfWglTv3URgqx
+=Xuwc
 -----END PGP SIGNATURE-----

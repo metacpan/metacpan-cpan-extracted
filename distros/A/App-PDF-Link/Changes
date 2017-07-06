@@ -1,5 +1,9 @@
 Revision history for App-PDF-Link
 
+0.19
+	Fix problem with links ending up on the last page when
+	--targets is used.
+
 0.18    2017-03-20
 
 	Add --attach to attach (as opposed to embbed) documents.
@@ -16,5 +20,5 @@ Revision history for App-PDF-Link
 
 0.15    2016-12-12
 
-	First version, imported from linkit.pl from MobileSheets.
-
+	First version, imported from linkit.pl from MobileSheets Tools
+	https://github.com/sciurius/MSPro-Tools

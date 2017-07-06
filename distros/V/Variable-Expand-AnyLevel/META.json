@@ -56,7 +56,7 @@
    "provides" : {
       "Variable::Expand::AnyLevel" : {
          "file" : "lib/Variable/Expand/AnyLevel.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/tsucchi/p5-Variable-Expand-AnyLevel"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:TSUCCHI",
    "x_contributors" : [
       "tsucchi <takuya.tsuchida at gmail.com>",

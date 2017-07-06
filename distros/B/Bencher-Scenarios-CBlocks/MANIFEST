@@ -8,7 +8,6 @@ Makefile.PL
 README
 cout.txt
 dist.ini
-lib/Bencher/Scenario/CBlocks/#Startup.pm#
 lib/Bencher/Scenario/CBlocks/IO.pm
 lib/Bencher/Scenario/CBlocks/Numeric.pm
 lib/Bencher/Scenario/CBlocks/Startup.pm

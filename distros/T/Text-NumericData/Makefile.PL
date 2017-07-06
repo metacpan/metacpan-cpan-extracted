@@ -3,16 +3,16 @@ require 5.006;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'VERSION_FROM' => 'lib/Text/NumericData.pm',
   'NAME' => 'Text::NumericData',
   'INSTALLDIRS' => 'site',
+  'PL_FILES' => {},
   'PREREQ_PM' => {
-                   'Test::More' => 0,
+                   'Text::ASCIIPipe' => '1.001',
+                   'Math::Spline' => 0,
+                   'Config::Param' => '3',
                    'Storable' => 0,
                    'File::Compare' => 0,
-                   'Math::Spline' => 0,
-                   'Text::ASCIIPipe' => '1.001',
-                   'Config::Param' => '3'
+                   'Test::More' => 0
                  },
   'EXE_FILES' => [
                    'script/txdbaseline',
@@ -29,12 +29,13 @@ WriteMakefile
                    'script/txdinfo',
                    'script/txdmean',
                    'script/txdnorm',
+                   'script/txdodeint',
                    'script/txdrecycle',
                    'script/txdrows',
                    'script/txdsort',
                    'script/txdstatistics',
                    'script/txdtotex'
                  ],
-  'PL_FILES' => {}
+  'VERSION_FROM' => 'lib/Text/NumericData.pm'
 )
 ;

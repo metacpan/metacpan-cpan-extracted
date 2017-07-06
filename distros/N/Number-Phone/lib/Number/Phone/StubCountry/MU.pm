@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -36,7 +36,14 @@ my $formatters = [
               ];
 
 my $validators = {
-                'specialrate' => '(30\\d{5})',
+                'voip' => '
+          3(?:
+            20|
+            9\\d
+          )\\d{4}
+        ',
+                'toll_free' => '80[012]\\d{4}',
+                'pager' => '',
                 'mobile' => '
           5(?:
             2[59]\\d|
@@ -53,37 +60,6 @@ my $validators = {
               7[15-8]
             )|
             9[0-8]\\d
-          )\\d{4}
-        ',
-                'toll_free' => '80[012]\\d{4}',
-                'geographic' => '
-          (?:
-            2(?:
-              [03478]\\d|
-              1[0-7]|
-              6[1-69]
-            )|
-            4(?:
-              [013568]\\d|
-              2[4-7]
-            )|
-            5(?:
-              44\\d|
-              471
-            )|
-            6\\d{2}|
-            8(?:
-              14|
-              3[129]
-            )
-          )\\d{4}
-        ',
-                'personal_number' => '',
-                'pager' => '',
-                'voip' => '
-          3(?:
-            20|
-            9\\d
           )\\d{4}
         ',
                 'fixed_line' => '
@@ -107,7 +83,31 @@ my $validators = {
               3[129]
             )
           )\\d{4}
-        '
+        ',
+                'geographic' => '
+          (?:
+            2(?:
+              [03478]\\d|
+              1[0-7]|
+              6[1-69]
+            )|
+            4(?:
+              [013568]\\d|
+              2[4-7]
+            )|
+            5(?:
+              44\\d|
+              471
+            )|
+            6\\d{2}|
+            8(?:
+              14|
+              3[129]
+            )
+          )\\d{4}
+        ',
+                'specialrate' => '(30\\d{5})',
+                'personal_number' => ''
               };
 my %areanames = (
   2302 => "North\ Region",

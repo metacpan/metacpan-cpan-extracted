@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use Prty::Perl;
 use Prty::Process;
@@ -135,7 +135,15 @@ sub new {
                 }
             }
         }
-
+ 
+        if (substr($cfgFile,0,1) ne '/') {
+            # Wenn der Dateiname kein absoluter Pfad ist,
+            # müssen wir ./ voranstellen, weil perlDoFile()
+            # die Datei sonst nicht findet. Warum?
+    
+            $cfgFile = "./$cfgFile";
+        }
+    
         if (!-e $cfgFile) {
             $class->throw(q{CFG-00002: Konfigurationsdatei nicht gefunden},
                 ConfigFile=>$cfgFile,
@@ -240,7 +248,7 @@ sub try {
 
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

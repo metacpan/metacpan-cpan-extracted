@@ -17,7 +17,7 @@ use base 'PDF::API2::Basic::PDF::Pages';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 use PDF::API2::Basic::PDF::Dict;
 use PDF::API2::Basic::PDF::Utils;

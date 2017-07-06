@@ -1,0 +1,48 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Alien::HIDAPI' => '0',
+                                    'ExtUtils::MakeMaker' => '0'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Alien::HIDAPI' => '0',
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Inline::C' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'blib' => '1.01',
+                                      'perl' => '5.006'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Device::HID::XS' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Data::Hexdumper' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::HexString' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

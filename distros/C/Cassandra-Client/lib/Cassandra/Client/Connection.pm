@@ -1,4 +1,6 @@
 package Cassandra::Client::Connection;
+our $AUTHORITY = 'cpan:TVDW';
+$Cassandra::Client::Connection::VERSION = '0.13';
 use 5.010;
 use strict;
 use warnings;
@@ -26,15 +28,13 @@ use Cassandra::Client::Protocol qw/
     unpack_inet
     unpack_int
     unpack_metadata
+    unpack_metadata2
     unpack_shortbytes
     unpack_string
     unpack_stringmultimap
 /;
 use Cassandra::Client::Encoder qw/
     make_encoder
-/;
-use Cassandra::Client::Decoder qw/
-    make_decoder
 /;
 use Cassandra::Client::Error;
 use Cassandra::Client::ResultSet;
@@ -181,7 +181,7 @@ sub execute_prepared {
         return $self->prepare_and_try_execute_again($callback, $queryref, $parameters, $attr, $exec_info);
     };
 
-    my $want_result_metadata= !$prepared->{result_metadata}{columns};
+    my $want_result_metadata= !$prepared->{decoder};
     my $row;
     if ($parameters) {
         eval {
@@ -379,20 +379,24 @@ sub prepare {
             }
 
             my $id= unpack_shortbytes($body);
+
             my $metadata= eval { unpack_metadata($body) } or return $next->("Unable to unpack query metadata: $@");
-            my $resultmetadata= eval { unpack_metadata($body) } or return $next->("Unable to unpack query metadata: $@");
 
             my ($encoder, $decoder);
             eval {
+                ($decoder)= unpack_metadata2($body);
+                1;
+            } or return $next->("Unable to unpack query result metadata: $@");
+
+            eval {
                 $encoder= make_encoder($metadata);
-                $decoder= make_decoder($resultmetadata);
                 1;
             } or do {
                 my $error= $@ || "??";
-                return $next->("Error while preparing query, couldn't compile encoder/decoder: $error");
+                return $next->("Error while preparing query, couldn't compile encoder: $error");
             };
 
-            $self->{metadata}->add_prepared($query, $id, $metadata, $resultmetadata, $decoder, $encoder);
+            $self->{metadata}->add_prepared($query, $id, $metadata, $decoder, $encoder);
             return $next->();
         },
     ], sub {
@@ -409,21 +413,15 @@ sub decode_result {
 
     my $result_type= unpack('l>', substr($_[3], 0, 4, ''));
     if ($result_type == RESULT_ROWS) { # Rows
-        my $metadata= eval { unpack_metadata($_[3]) } or return $callback->("Unable to unpack query metadata: $@");
-        my $rows;
-        eval {
-            my $decoder= $prepared->{decoder} || make_decoder($metadata);
-            $rows= $decoder->($_[3]);
-            1;
-        } or do {
-            my $error= $@ || "??";
-            return $callback->("Error while decoding row: $error");
-        };
+        my ($paging_state, $decoder);
+        eval { ($decoder, $paging_state)= unpack_metadata2($_[3]); 1 } or return $callback->("Unable to unpack query metadata: $@");
+        $decoder= $prepared->{decoder} || $decoder;
+
         $callback->(undef,
             Cassandra::Client::ResultSet->new(
-                $rows,
-                [ map { $_->[2] } @{$prepared->{result_metadata}{columns} || $metadata->{columns}} ],
-                $metadata->{paging_state},
+                \$_[3],
+                $decoder,
+                $paging_state,
             )
         );
 
@@ -1091,3 +1089,28 @@ sub decompress_lz4 {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Cassandra::Client::Connection
+
+=head1 VERSION
+
+version 0.13
+
+=head1 AUTHOR
+
+Tom van der Woerdt <tvdw@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

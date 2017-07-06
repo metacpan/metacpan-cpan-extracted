@@ -1,0 +1,5 @@
+name = "MooseX-Getopt-Kingpin"
+badges = ["travis"]
+authority="cpan:JASEI"
+
+module_maker="ModuleBuildTiny"

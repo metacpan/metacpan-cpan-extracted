@@ -17,7 +17,7 @@ my $req = $face->_group_request(
 );
 
 isa_ok $req, 'HTTP::Request';
-is $req->uri, 'https://api.projectoxford.ai/face/v1.0/group';
+is $req->uri, 'https://westus.api.cognitive.microsoft.com/face/v1.0/group';
 is $req->method, 'POST';
 is $req->header('Content-Type'), 'application/json';
 is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';

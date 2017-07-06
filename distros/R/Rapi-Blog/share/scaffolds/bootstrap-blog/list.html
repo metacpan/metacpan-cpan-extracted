@@ -75,10 +75,10 @@
     <ul>
       [% FOREACH Post IN posts %]
         <li>
-          <a href="../post/[% Post.name %]">[% Post.title %]</a> 
+          <a href="[%- mount_url -%]/post/[% Post.name %]">[% Post.title %]</a> 
           <i style="padding-left:3px;opacity:0.6;font-size:.9em;"> 
             [% date.format(Post.ts) %] <span style="font-size:.8em;">by 
-            <a href="/list?username=[% Post.author.username %]">[% Post.author.full_name %]</a></span>
+            <a href="[%- mount_url -%]/list?username=[% Post.author.username %]">[% Post.author.full_name %]</a></span>
           </i>
           
           [% IF result.params.summary %]
@@ -90,7 +90,7 @@
                 </td>
               [% END %]
               <td>
-                [% Post.summary %] ... <a href="../post/[% Post.name %]">read more</a> 
+                [% Post.summary %] ... <a href="[%- mount_url -%]/post/[% Post.name %]">read more</a> 
               </td>
             </tr></table>
             

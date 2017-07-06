@@ -1,9 +1,70 @@
 ==================================================
-Changes from 2014-12-01 00:00:00 +0000 to present.
+Changes from 2015-07-02 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 3.6 at 2016-11-30 08:03:08 +0000
+version 3.7 at 2017-07-01 01:09:29 +0000
+----------------------------------------
+
+  Change: 38fd47d87a1748d6f5d629b4d08c27d1d7e6a7b6
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 18:09:14 +0000
+
+    Docs regenerated for release 3.7 
+
+  Change: 9962ab830e690f43e0dcd5a1a1a743e915f982fe
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 18:09:14 +0000
+
+    Remove the datetime_local and datetime_utc fields, datetime_str is what you
+    want always.
+
+    Also convert regexes to explicit non-backtracking. 
+
+  Change: 06ebc048f34fbf7c7b86cd8784dd7d54c90d0d63
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 18:09:14 +0000
+
+    Added the new datefields into the spec. 
+
+  Change: 251510a5be147a44fcc9a2fe68821e8511e1e33d
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 18:09:14 +0000
+
+    Disable grouping captures on date regexes. 
+
+  Change: a99e54a4ea96a00bcaebb089af69f1ee6ca4f8a3
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 18:09:14 +0000
+
+    Almost ready for a release. 
+
+  Change: 09ddc8637760c758c40d98d2878d2bcf27188f3b
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 18:09:14 +0000
+
+    Reworking the date handling logic. 
+
+  Change: 22bd1081c40b77698b83befce990d0096ef10a6d
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 17:55:32 +0000
+
+    Added the Recommended settings into the test suite. 
+
+  Change: e8d3e5aca1a01ddfce08aea892fb35bbc9065c51
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 17:52:30 +0000
+
+    Use Dumbbench for benchmarking. 
+
+  Change: 2922e97db8a63b78e25c8d8865a6ed5218295ceb
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-30 15:34:09 +0000
+
+    Simple benchmark for NYTProf'ing. 
+
+----------------------------------------
+version 3.6 at 2016-11-30 08:02:37 +0000
 ----------------------------------------
 
   Change: 818698f37d682abd78769e7b1cef0063a6efd64c
@@ -186,84 +247,6 @@ version 3.3 at 2016-01-24 21:09:02 +0000
 
     Parse microseconds 
 
-----------------------------------------
-version 3.2 at 2015-05-27 12:06:19 +0000
-----------------------------------------
-
-  Change: 483bdda1ac30583b1ebc092aa2eaf17efa9e1fe8
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2015-05-27 14:06:19 +0000
-
-    Handle logs from F5's which insert the log priority unnecessarily into the
-    logging message between the hostname and the program name. 
-
-----------------------------------------
-version 3.1 at 2015-03-06 13:02:07 +0000
-----------------------------------------
-
-  Change: ee38616fd2f5960ab2a0dc8469ba35dcc4295a32
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-03-06 14:02:07 +0000
-
-    Release for 3.1 
-
-  Change: c0a6d1731fff745f9003785593fa4796b0447590
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2015-03-06 14:01:12 +0000
-
-    Preparing the 3.1 release. 
-
-  Change: d6192c263d0ceeb11f510482914454152d82bcda
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2015-03-06 13:59:08 +0000
-
-    NetApp syslog parsing * Extract program name to be compliant with
-    inconsistent formating
-
-    between versions * Add tests for NetApp variations 
-
-----------------------------------------
-version 3.0 at 2015-02-24 13:39:13 +0000
-----------------------------------------
-
-  Change: 7ffb8be9dcb0bdaeeb3324a22a162221291683fe
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-02-24 14:39:13 +0000
-
-    Preparing the 3.0 release. 
-
-  Change: bcd7fd3862d958aa27150df6d5fa1b3dbd0bb471
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2015-02-24 14:30:39 +0000
-
-    Handle NetApp filer log formats which include redundant information in
-    their syslog data. 
-
-  Change: 2c5cdaa202b50b1ea872b62746463e8bf5313573
-  Author: Csillag Tamas <cstamas@digitus.itk.ppke.hu>
-  Date : 2015-01-20 18:17:50 +0000
-
-    remove newline from the end of the content
-
-    After the change the behaviour works as documented. 
-
-----------------------------------------
-version 2.9 at 2015-01-04 14:07:24 +0000
-----------------------------------------
-
-  Change: b194758d552a9325de6688141f7dab303cf958b8
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-01-04 15:07:24 +0000
-
-    Changes file needs an entry for 2.9 
-
-  Change: 35b8b77e00a48a551ab12d4e1477a948d5e27b51
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-01-04 15:05:53 +0000
-
-    Fixing the date handling logic in the tests to prevent installation
-    failures. 
-
 =================================================
-Plus 19 releases after 2014-12-01 00:00:00 +0000.
+Plus 23 releases after 2015-07-02 00:00:00 +0000.
 =================================================

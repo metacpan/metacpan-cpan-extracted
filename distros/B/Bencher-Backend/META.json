@@ -37,6 +37,7 @@
          },
          "requires" : {
             "Benchmark::Dumb" : "0",
+            "Browser::Open" : "0",
             "Capture::Tiny" : "0",
             "Chart::Gnuplot" : "0",
             "Complete::Module" : "0",
@@ -54,7 +55,7 @@
             "JSON::MaybeXS" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
-            "Log::Any::IfLOG" : "0.07",
+            "Log::ger" : "0.011",
             "Math::ScientificNotation::Util" : "0",
             "Module::Load" : "0",
             "Module::Path::More" : "0.32",
@@ -64,6 +65,7 @@
             "Package::Abbreviate" : "0",
             "Perinci::Result::Format::Lite" : "0.22",
             "Permute::Named::Iter" : "0",
+            "Proc::ChildError" : "0",
             "Role::Tiny" : "0",
             "Role::Tiny::With" : "0",
             "Scalar::Util" : "0",
@@ -99,7 +101,7 @@
          "web" : "https://github.com/perlancar/perl-Bencher-Backend"
       }
    },
-   "version" : "1.036",
+   "version" : "1.039",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -439,7 +441,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::Validate",
             "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.23"
+            "version" : "0.24"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

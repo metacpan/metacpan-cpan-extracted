@@ -3,7 +3,7 @@
 # Crypt::HashCash::Mint - Mint for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Mint.pm v1.124 Mon Jun 19 15:51:59 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Mint.pm v1.126 Sat Jun 24 02:15:18 PDT 2017 $
 
 package Crypt::HashCash::Mint;
 
@@ -18,7 +18,7 @@ use Persistence::Object::Simple;
 use vars qw( $VERSION $AUTOLOAD );
 use DBI;
 
-our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.126 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my $class = shift;
@@ -179,8 +179,8 @@ Crypt::HashCash::Mint - Mint for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.124 $
- $Date: Mon Jun 19 15:51:59 PDT 2017 $
+ $Revision: 1.126 $
+ $Date: Sat Jun 24 02:15:18 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -246,7 +246,7 @@ DB, or 1 if it was successfully unspent.
 
 =head1 SEE ALSO
 
-=head2 L<www.hashcash.com>
+=head2 L<http://www.hashcash.com>
 
 =head2 L<Crypt::HashCash>
 

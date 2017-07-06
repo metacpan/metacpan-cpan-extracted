@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000004';
+our $VERSION = '1.000007';
 
 use App::GHPT::Types qw( ArrayRef Bool PositiveInt Str );
 use App::GHPT::WorkSubmitter::AskPullRequestQuestions;
@@ -37,6 +37,20 @@ has dry_run => (
     isa           => Bool,
     default       => 0,
     documentation => 'Dry run, just print out the PR we would have created',
+);
+
+has _question_namespaces => (
+    is      => 'ro',
+    isa     => ArrayRef [Str],
+    lazy    => 1,
+    default => sub ($self) {
+        my $ns = $self->_config_val('submit-work.question-namespaces');
+        [
+            $ns
+            ? ( split / +/, $ns )
+            : 'App::GHPT::WorkSubmitter::Question'
+        ];
+    },
 );
 
 has _username => (

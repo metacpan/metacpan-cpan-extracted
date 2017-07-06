@@ -1,7 +1,7 @@
 package Bencher::Scenarios::LogGer;
 
-our $DATE = '2017-06-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: Scenarios for benchmarking Log::ger
@@ -18,7 +18,7 @@ Bencher::Scenarios::LogGer - Scenarios for benchmarking Log::ger
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenarios::LogGer (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-06-21.
+This document describes version 0.009 of Bencher::Scenarios::LogGer (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-02.
 
 =head1 DESCRIPTION
 
@@ -26,9 +26,19 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =over
 
-=item * L<Bencher::Scenario::LogGer::NullOutput>
+=item * L<Bencher::Scenario::LogGer::InitTarget>
 
 =item * L<Bencher::Scenario::LogGer::Startup>
+
+=item * L<Bencher::Scenario::LogGer::StringLevel>
+
+=item * L<Bencher::Scenario::LogGer::OutputStartup>
+
+=item * L<Bencher::Scenario::LogGer::NumericLevel>
+
+=item * L<Bencher::Scenario::LogGer::NullOutput>
+
+=item * L<Bencher::Scenario::LogGer::LayoutStartup>
 
 =back
 

@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Die;
 use vars '$VERSION';
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 use base 'Exporter';
 

@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::ChangedFiles;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000004';
+our $VERSION = '1.000007';
 
 use List::Util 1.44 qw( any uniq );
 use App::GHPT::Types qw( ArrayRef HashRef Str );
@@ -75,7 +75,7 @@ App::GHPT::WorkSubmitter::ChangedFiles - Contains all the files that were modifi
 
 =head1 VERSION
 
-version 1.000004
+version 1.000007
 
 =head1 SYNOPSIS
 

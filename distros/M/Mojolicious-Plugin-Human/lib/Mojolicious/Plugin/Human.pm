@@ -15,7 +15,7 @@ use DateTime::TimeZone;
 use Mojo::Util  qw(url_unescape);
 use Mojo::ByteStream;
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 =encoding utf-8
 
@@ -279,7 +279,9 @@ sub register {
         return unless $str;
 
         my $dt = eval {
-            if( $str =~ m{$REGEXP_TIMESTAMP} ) {
+            if( ref $str ) {
+                $str->clone;
+            } elsif( $str =~ m{$REGEXP_TIMESTAMP} ) {
                 DateTime->from_epoch( epoch => $str );
             } else {
                 DateTime::Format::DateParse->parse_datetime( $str );

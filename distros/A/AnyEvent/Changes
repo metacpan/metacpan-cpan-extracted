@@ -9,9 +9,27 @@ TODO: AnyEvent::Handle with AnyEvent::IO?
 TODO: invalid. and localhost. specialcasing inside AEDNS and not AESocket (rfc6761)
 TODO: maybe implement env variable to give hosts precedence
 TODO: more formats for parse_ipv6 (single ipv6 address without port, ...p80, ...#80)
-
 TODO: inet_aton maybe pack C4? no, add a comment why not
-TODO: hosts read multiple times for initial concurrent tcp_connect's?
+TODO: socket prepare callbacks, can they easily signal failure as well?
+
+7.14 Sat Jun 24 01:44:19 CEST 2017
+	- fix a crash bug in AnyEvent::Handle with openssl 1.1.0 (patched
+	  by Paul Howarth and apparently tracked down by Mike McCauley).
+	- AnyEvent::Handle->keepalive was documented (and defined) twice
+          (found by Matt Merhar).
+        - AnyEvent::Socket::tcp_bind/tcp_server would immediately unlink a unix
+          listening socket unless a guard is used. Change this so that no
+          cleanup will be performed unless a guard is used and document this more
+          clearly.
+        - make tcp_bind/tcp_server error messages more regular.
+        - work around latest perl upstream breakage - this time, perl5porters were
+          apparently bullied by a bogus CVE (CVE-2016-1238), and since distros
+          stupidly apply anything that has "security fix" stamped on it, it's likely
+          going to be a problem in practise (and working around it is trivial on
+          windows and unix).
+        - add TCP_FASTOPEN/MSG_FASTOPEN and MSG_NOSIGNAL/MSG_MORE/MSG_DONTWAIT
+          to constants.
+        - update warnings to common::sense 3.74 standards.
 
 7.13 Sat Sep 17 04:31:49 CEST 2016
 	- Only call tlsext_host_name for non-empty common names (reported

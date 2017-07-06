@@ -7,10 +7,11 @@
 use Test::More tests => 21;
 use IPC::Queue::Duplex;
 
-my $henry = new IPC::Queue::Duplex ( Dir => '/tmp' );
-my $lisa = new IPC::Queue::Duplex ( Dir => '/tmp' );
+BAIL_OUT 'OS unsupported' if $^O eq 'MSWin32';
 
 SKIP: {
+  my $henry = new IPC::Queue::Duplex ( Dir => '/tmp' );
+  my $lisa = new IPC::Queue::Duplex ( Dir => '/tmp' );
   skip "IPC::Queue::Duplex Objects not initialized", 21 unless $henry and $lisa;
 
   ok ($henry, 'Henry created');

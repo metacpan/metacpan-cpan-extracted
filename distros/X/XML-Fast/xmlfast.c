@@ -111,7 +111,7 @@ static inline char *parse_entity (parser_state * context, char *p) {
 			}
 		}
 		if ( *p == ';' ) p++;
-		if (chr > 0 && chr <= 0xFFFF) {
+		if (chr > 0 && chr <= 0x2FFFF) {
 			if (context->cb.uchar) context->cb.uchar(context->ctx, chr);
 		} else {
 			if (context->cb.warn) {

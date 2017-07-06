@@ -1,4 +1,3 @@
-requires 'Object::Tiny';
 requires 'perl', '5.008001';
 
 on configure => sub {

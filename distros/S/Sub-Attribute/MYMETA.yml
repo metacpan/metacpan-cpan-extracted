@@ -1,0 +1,30 @@
+---
+abstract: 'Reliable subroutine attribute handlers'
+author:
+  - 'Goro Fuji (gfx) <gfuji(at)cpan.org>.'
+build_requires:
+  Class::Trigger: '0.14'
+  Devel::PPPort: '3.19'
+  ExtUtils::MakeMaker: '6.59'
+  ExtUtils::ParseXS: '3.18'
+  MRO::Compat: '0.09'
+  Test::More: '0.88'
+  parent: '0.221'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Sub-Attribute
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XSLoader: '0.02'
+  parent: '0.2'
+  perl: '5.008001'
+version: '0.06'

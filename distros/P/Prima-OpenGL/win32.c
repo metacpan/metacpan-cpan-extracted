@@ -40,10 +40,12 @@ static DWORD  last_error_code  = 0;
 #define CLEAR_ERROR  last_failed_func = 0
 #define SET_ERROR(s) { last_error_code = GetLastError(); last_failed_func = s; }
 
+static GLRequest ** xx;
+
 HBITMAP
 setupDIB(HDC hDC, int w, int h)
 {
-    BITMAPINFO bmInfo;
+    BITMAPINFO *bmInfo;
     BITMAPINFOHEADER *bmHeader;
     UINT usage;
     VOID *base;
@@ -51,7 +53,7 @@ setupDIB(HDC hDC, int w, int h)
     int bitsPerPixel;
     HBITMAP bm;
 
-    bmiSize = sizeof(bmInfo);
+    bmiSize = sizeof(BITMAPINFO);
     bitsPerPixel = GetDeviceCaps(hDC, BITSPIXEL);
 
     switch (bitsPerPixel) {
@@ -69,8 +71,10 @@ setupDIB(HDC hDC, int w, int h)
 	/* bmiColors not used */
 	break;
     }
+    if ( !( bmInfo = malloc(bmiSize)))
+        return NULL;
 
-    bmHeader = &bmInfo.bmiHeader;
+    bmHeader = &bmInfo->bmiHeader;
 
     bmHeader->biSize = sizeof(*bmHeader);
     bmHeader->biWidth = w;
@@ -89,7 +93,7 @@ setupDIB(HDC hDC, int w, int h)
 	usage = DIB_PAL_COLORS;
 	/* bmiColors is 256 WORD palette indices */
 	{
-	    WORD *palIndex = (WORD *) &bmInfo.bmiColors[0];
+	    WORD *palIndex = (WORD *) &bmInfo->bmiColors[0];
 	    int i;
 
 	    for (i=0; i<256; i++) {
@@ -103,7 +107,7 @@ setupDIB(HDC hDC, int w, int h)
 	usage = DIB_RGB_COLORS;
 	/* bmiColors is 3 WORD component masks */
 	{
-	    DWORD *compMask = (DWORD *) &bmInfo.bmiColors[0];
+	    DWORD *compMask = (DWORD *) &bmInfo->bmiColors[0];
 
 	    compMask[0] = 0xF800;
 	    compMask[1] = 0x07E0;
@@ -120,8 +124,9 @@ setupDIB(HDC hDC, int w, int h)
 	break;
     }
 
-    bm = CreateDIBSection(hDC, &bmInfo, usage, &base, NULL, 0);
+    bm = CreateDIBSection(hDC, bmInfo, usage, NULL, NULL, 0);
 		SelectObject( hDC, bm);
+    free(bmInfo);
     return bm;
 }
 
@@ -412,6 +417,13 @@ gl_context_pop(void)
 	}
 	stack_ptr--;
 	return wglMakeCurrent( stack[stack_ptr].dc, stack[stack_ptr].gl);
+}
+
+Bool
+gl_is_direct(Handle context)
+{
+	CLEAR_ERROR;
+	return true;
 }
 
 #ifdef __cplusplus

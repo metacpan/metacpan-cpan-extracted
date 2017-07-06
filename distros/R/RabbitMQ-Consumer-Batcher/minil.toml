@@ -1,0 +1,6 @@
+name = "RabbitMQ-Consumer-Batcher"
+badges = ["travis"]
+authority="cpan:JASEI"
+
+module_maker="ModuleBuildTiny"
+

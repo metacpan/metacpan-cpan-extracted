@@ -9,22 +9,64 @@ use Date::Simple;
 
 use File::Spec;
 
-use Hash::FieldHash ':all';
-
 use Module::CoreList;
-
 use Module::Metadata::CoreList::Config;
+
+use Moo;
 
 use Text::Xslate 'mark_raw';
 
-fieldhash my %config       => 'config';
-fieldhash my %dir_name     => 'dir_name';
-fieldhash my %file_name    => 'file_name';
-fieldhash my %module_name  => 'module_name';
-fieldhash my %perl_version => 'perl_version';
-fieldhash my %report_type  => 'report_type';
+use Types::Standard qw/HashRef Str/;
 
-our $VERSION = '1.07';
+has config =>
+(
+	default  => sub{return Module::Metadata::CoreList::Config -> new -> config},
+	is       => 'rw',
+	isa      => HashRef,
+	required => 0,
+);
+
+has dir_name =>
+(
+	default  => sub{return '.'},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
+has file_name =>
+(
+	default  => sub{return ''},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
+has module_name =>
+(
+	default  => sub{return ''},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
+has perl_version =>
+(
+	default  => sub{return ''},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
+has report_type =>
+(
+	default  => sub{return 'text'},
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
+);
+
+our $VERSION = '1.08';
 
 # ------------------------------------------------
 
@@ -107,34 +149,6 @@ sub check_perl_module
 
 # -----------------------------------------------
 
-sub _init
-{
-	my($self, $arg)     = @_;
-	$$arg{config}       = Module::Metadata::CoreList::Config -> new -> config;
-	$$arg{dir_name}     ||= '.';    # Caller can set.
-	$$arg{file_name}    ||= '';     # Caller can set.
-	$$arg{module_name}  ||= '';     # Caller can set.
-	$$arg{perl_version} ||= '';     # Caller can set.
-	$$arg{report_type}  ||= 'text'; # Caller can set.
-
-	return from_hash($self, $arg);
-
-} # End of _init.
-
-# -----------------------------------------------
-
-sub new
-{
-	my($class, %arg) = @_;
-	my($self)        = bless {}, $class;
-	$self            = $self -> _init(\%arg);
-
-	return $self;
-
-}	# End of new.
-
-# -----------------------------------------------
-
 sub process_build_pl
 {
 	my($self, $line_ara) = @_;
@@ -168,7 +182,7 @@ sub process_build_pl
 		{
 			$candidate = 0;
 		}
-		elsif ($candidate && ($line =~ /^\s*(['"])?([\w:]+)\1?\s*=>\s*(.+),/) )
+		elsif ($candidate && ($line =~ /^\s*(['"])?([\w:]+)\1?\s*=>\s*(.+),/) ) # Add ' to comment for UltraEdit.
 		{
 			push @name, [$2, $3];
 		}
@@ -206,7 +220,7 @@ sub process_makefile_pl
 		{
 			$candidate = 0;
 		}
-		elsif ($candidate && ($line =~ /^\s*(['"])?([\w:]+)\1?\s*=>\s*(.+),/) )
+		elsif ($candidate && ($line =~ /^\s*(['"])?([\w:]+)\1?\s*=>\s*(.+),/) ) # Add ' to comment for UltraEdit.
 		{
 			push @name, [$2, $3];
 		}
@@ -508,11 +522,11 @@ See L</bin/cc.whichperlmodule.pl> as discussed in the synopsis.
 
 =head2 Usage via method check_perl_module()
 
-This usage tells you whether or not you've correctly specified a Perl version number, as recognized by L<Module::CoreList>,
-by calling the latter module's find_version() function.
+This usage tells you whether or not you have correctly specified a Perl version number, as recognized by
+L<Module::CoreList>.find_version() function.
 
 Further, you can detrmine whether or not a specific module is shipped with a specific version of Perl, by calling
-L<Module::CoreList>'s function find_modules().
+L<Module::CoreList>.find_modules().
 
 See L</bin/cc.perlmodule.pl> as discussed in the synopsis.
 
@@ -535,7 +549,7 @@ See L</bin/cc.corelist.pl> as discussed in the synopsis.
 
 =head2 Inheritance model
 
-To keep this module light-weight, it uses L<Hash::FieldHash> mutators for managing object attributes.
+To keep this module light-weight, it uses L<Moo> managing object attributes.
 
 =head1 Distributions
 
@@ -581,7 +595,7 @@ All that remains is to tell L<Module::Metadata::CoreList> your values for some o
 For that, see config/.htmodule.metadata.corelist.conf.
 
 The default value for template_path is /dev/shm/html/assets/templates/module/metadata/corelist,
-where /dev/shm/ is Debian's RAM disk, since on my dev box I have the web server's doc root dir
+where /dev/shm/ is the Debian RAM disk, since on my dev box I have the web server doc root dir
 set to /dev/shm/html/.
 
 The template files are shipped in htdocs/assets/templates/module/metadata/corelist.
@@ -608,7 +622,7 @@ The point of this is that after the module is installed, the config file will be
 easily accessible and editable without needing permission to write to the directory
 structure in which modules are stored.
 
-That's why L<File::HomeDir> and L<Path::Class> are pre-requisites for this module.
+That is why L<File::HomeDir> and L<Path::Class> are pre-requisites for this module.
 
 All modules which ship with their own config file are advised to use the same mechanism
 for storing such files.
@@ -617,7 +631,7 @@ for storing such files.
 
 new(...) returns an object of type L<Module::Metadata::CoreList>.
 
-This is the class's contructor.
+This is the class contructor.
 
 Usage: C<< Module::Metadata::CoreList -> new() >>.
 
@@ -701,14 +715,14 @@ This module first checks the value of the module_name option.
 
 =item o If the user has specified a module name...
 
-Use both the specified module name, and the perl version (if any), to call L<Module::CoreList>'s
-find_modules() function.
+Use both the specified module name, and the perl version (if any), to call L<Module::CoreList>
+L<Module::CoreList>.find_modules().
 
 The output is a single line of text. The value of report_type is ignored.
 
 =item o If the user has not specified a module name...
 
-Use just the perl version to call L<Module::CoreList>'s find_version() function.
+Use just the perl version to call L<Module::CoreList>.find_version().
 
 The output is a single line of text. The values of module_name and report_type are ignored.
 
@@ -774,11 +788,21 @@ See L</bin/cc.corelist.pl> as discussed in the synopsis.
 
 Method run() always returns 0 (for success).
 
+=head1 Repository
+
+L<https://github.com/ronsavage/Module-Metadata-CoreList>
+
+=head1 Support
+
+Email the author, or log a bug on RT:
+
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Module::Metadata::CoreList>.
+
 =head1 Author
 
 L<Module::Metadata::CoreList> was written by Ron Savage I<E<lt>ron@savage.net.auE<gt>> in 2011.
 
-Home page: L<http://savage.net.au/index.html>.
+Homepage: L<http://savage.net.au/index.html>.
 
 =head1 Copyright
 
@@ -786,7 +810,7 @@ Australian copyright (c) 2011, Ron Savage.
 
 	All Programs of mine are 'OSI Certified Open Source Software';
 	you can redistribute them and/or modify them under the terms of
-	The Artistic License, a copy of which is available at:
+	The Perl License, a copy of which is available at:
 	http://www.opensource.org/licenses/index.html
 
 =cut

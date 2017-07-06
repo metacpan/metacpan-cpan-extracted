@@ -12,7 +12,7 @@ check_lib_or_exit(
     lib => 'gmp',
 );
 
-use 5.006;
+use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Math-GMP",
   "LICENSE" => "lgpl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Math::GMP",
   "PREREQ_PM" => {
     "AutoLoader" => 0,
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "2.14",
+  "VERSION" => "2.15",
   "test" => {
     "TESTS" => "t/*.t"
   }

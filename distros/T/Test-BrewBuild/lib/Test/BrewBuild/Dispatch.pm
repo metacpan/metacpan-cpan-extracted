@@ -14,12 +14,21 @@ use Storable;
 use Test::BrewBuild;
 use Test::BrewBuild::Git;
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 $| = 1;
 
+use constant REPO_PREFIX => 'https://github.com/';
+
 my ($log, $last_run_status, $results_returned);
 $ENV{BB_RUN_STATUS} = 'PASS';
+
+my $lcd;
+
+if ($ENV{BB_RPI_LCD}){
+    my @pins = split /,/, $ENV{BB_RPI_LCD};
+    $lcd = _lcd(@pins) if @pins == 6;
+}
 
 sub new {
     my ($class, %args) = @_;
@@ -60,6 +69,11 @@ sub auto {
     if (! defined $params{repo}){
         $log->_5("auto() requires the --repo param sent in. Can't continue...");
         croak "auto mode requires the repository parameter sent in.\n";
+    }
+    else {
+        if ($params{repo} !~ /^http/ || $params{repo} !~ /^git/){
+            $params{repo} = REPO_PREFIX . $params{repo};
+        }
     }
 
     my $sleep = defined $self->{auto_sleep} ? $self->{auto_sleep} : 60;
@@ -107,29 +121,24 @@ sub auto {
             $log->_7("RPi specific testing enabled");
 
             if ($ENV{BB_RPI_LCD}){
-                my @pins = split /,/, $ENV{BB_RPI_LCD};
-                if (@pins == 6){
-                    if ($results_returned){
-                        my $commit = $git->revision(remote => 1, repo => $params{repo});
-                        $commit = substr $commit, 0, 8;
+                if ($results_returned){
+                    my $commit = $git->revision(remote => 1, repo => $params{repo});
+                    $commit = substr $commit, 0, 7;
 
-                        my $time = strftime(
-                            "%Y-%m-%d %H:%M:%S", localtime(time)
-                        );
-                        
-                        my $lcd = _lcd(@pins);
+                    my $time = strftime(
+                        "%Y-%m-%d %H:%M:%S", localtime(time)
+                    );
 
-                        $lcd->clear;
+                    $lcd->clear;
 
-                        $lcd->position(0, 0);
-                        $lcd->print($time);
+                    $lcd->position(0, 0);
+                    $lcd->print($time);
 
-                        $lcd->position(0, 1);
-                        $lcd->print($ENV{BB_RUN_STATUS});
+                    $lcd->position(0, 1);
+                    $lcd->print($ENV{BB_RUN_STATUS});
 
-                        $lcd->position(8, 1);
-                        $lcd->print($commit);
-                    }
+                    $lcd->position(9, 1);
+                    $lcd->print($commit);
                 }
                 else {
                     $log->_1(
@@ -148,9 +157,11 @@ sub auto {
             $log->_7("not in --rpi mode");
         }
 
-        $log->_6(
-            "auto run complete. Sleeping, then restarting if more runs required"
-        );
+        my $sleep_msg =
+            "auto run complete. Sleeping for $sleep seconds, then restarting" .
+            " if more runs required";
+
+        $log->_6($sleep_msg);
 
         exit() if $run_count >= $runs && $runs != 0;
         $run_count++;
@@ -191,6 +202,11 @@ sub dispatch {
     my $cmd = $params{cmd} || $self->{cmd};
     $cmd = 'brewbuild' if ! $cmd;
     my $repo = $params{repo} || $self->{repo};
+
+    if (defined $repo && ($repo !~ /^http/ && $repo !~ /^git/)){
+        $repo = REPO_PREFIX . $repo;
+    }
+
     my $testers = $params{testers} || $self->{testers};
 
     my $log = $log->child('dispatch');
@@ -287,7 +303,8 @@ sub _config {
         }
         $self->{repo} = $conf->{repo} if $conf->{repo};
         $self->{cmd} = $conf->{cmd} if $conf->{cmd};
-        $self->{auto_sleep} = $conf->{cmd} if defined $conf->{auto_sleep};
+        $self->{auto_sleep} = $conf->{auto_sleep} 
+          if defined $conf->{auto_sleep};
     }
 }
 sub _fork {
@@ -465,7 +482,8 @@ C<cmd> is the C<brewbuild> command string that will be executed.
 
 C<repo> is the name of the repo to test against, and is optional.
 If not supplied, we'll attempt to get a repo name from the local working
-directory you're working in.
+directory you're working in. If it's a Github repo, you need not enter in the full
+path... we'll prepend C<https://github.com/> if you send in C<user/repo-name>.
 
 C<testers> is manadory unless you've set up a config file, and contains an
 array reference of IP/Port pairs for remote testers to dispatch to and follow.

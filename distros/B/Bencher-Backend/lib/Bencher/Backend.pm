@@ -1,12 +1,12 @@
 package Bencher::Backend;
 
-our $DATE = '2017-02-20'; # DATE
-our $VERSION = '1.036'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '1.039'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Dmp;
 use List::MoreUtils qw(all);
@@ -27,7 +27,7 @@ sub _get_tempfile_path {
     my ($filename) = @_;
     state $tempdir = do {
         require File::Temp;
-        File::Temp::tempdir(CLEANUP => $log->is_debug ? 0:1);
+        File::Temp::tempdir(CLEANUP => log_is_debug() ? 0:1);
     };
     "$tempdir/$filename";
 }
@@ -55,7 +55,7 @@ sub _get_process_size {
 
     my $script_path = _get_tempfile_path("get_process_size-$it->{seq}");
 
-    $log->debugf("Creating script to measure get process size at %s ...", $script_path);
+    log_debug("Creating script to measure get process size at %s ...", $script_path);
     {
         open my($fh), ">", $script_path or die "Can't open file $script_path: $!";
 
@@ -96,7 +96,7 @@ sub _get_process_size {
     {
         require Capture::Tiny;
         my @cmd = ($^X, $script_path);
-        $log->debugf("Running %s ...", \@cmd);
+        log_debug("Running %s ...", \@cmd);
         my ($stdout, @res) = &Capture::Tiny::capture_stdout(sub {
             system @cmd;
             die "Failed running script '$script_path' to get process size" if $?;
@@ -441,7 +441,7 @@ sub _parse_scenario {
     my $parsed = {%$unparsed}; # shallow copy
 
     if ($parsed->{before_parse_participants}) {
-        $log->infof("Executing before_parse_participants hook ...");
+        log_info("Executing before_parse_participants hook ...");
         $parsed->{before_parse_participants}->(
             hook_name => 'before_parse_participants',
             scenario  => $unparsed,
@@ -561,10 +561,10 @@ sub _parse_scenario {
                             warn "Can't determine if module '$_->{module}' is XS or PP";
                             1;
                         } elsif ($xs_or_pp =~ /xs/ && $pargs->{exclude_xs_modules}) {
-                            $log->info("Excluding XS module '$_->{module}'");
+                            log_info("Excluding XS module '$_->{module}'");
                             0;
                         } elsif ($xs_or_pp =~ /pp/ && $pargs->{exclude_pp_modules}) {
-                            $log->info("Excluding PP module '$_->{module}'");
+                            log_info("Excluding PP module '$_->{module}'");
                             0;
                         } else {
                             1;
@@ -592,7 +592,7 @@ sub _parse_scenario {
     } # normalize participants
 
     if ($parsed->{before_parse_datasets}) {
-        $log->infof("Executing before_parse_datasets hook ...");
+        log_info("Executing before_parse_datasets hook ...");
         $parsed->{before_parse_datasets}->(
             hook_name => 'before_parse_datasets',
             scenario  => $unparsed,
@@ -835,7 +835,7 @@ sub _gen_items {
             my $v = MM->parse_version($path);
             $v = undef if defined($v) && $v eq 'undef';
             if (!defined($v)) {
-                $log->warnf("Can't parse version from %s", $path);
+                log_warn("Can't parse version from %s", $path);
                 next;
             }
             $versions{$v}++;
@@ -866,7 +866,7 @@ sub _gen_items {
         push @permute, "env_hash", [0..$#{$env_hashes}];
     }
 
-    $log->debugf("permute: %s", \@permute);
+    log_debug("permute: %s", \@permute);
 
     # to store multiple argument values that are hash, e.g.
     # {args=>{sizes=>{"1M"=>1024**2, "1G"=>1024**3, "1T"=>1024**4}}} instead of
@@ -879,7 +879,7 @@ sub _gen_items {
     my %item_mems; # key=item key, value=1
   ITER:
     while (my $h = $iter->()) {
-        $log->tracef("iter returns: %s", $h);
+        log_trace("iter returns: %s", $h);
 
         my $p = _find_record_by_seq($participants, $h->{participant});
         my $ds;
@@ -907,7 +907,7 @@ sub _gen_items {
                     }
                 }
                 unless ($included) {
-                    $log->tracef(
+                    log_trace(
                         "skipped dataset by include_participant_tags ".
                             "(%s vs participant:%s)",
                         $ds->{include_participant_tags}, $p->{tags});
@@ -934,7 +934,7 @@ sub _gen_items {
                     }
                 }
                 if ($excluded) {
-                    $log->tracef(
+                    log_trace(
                         "skipped dataset by exclude_participant_tags ".
                             "(%s vs participant:%s)",
                         $ds->{exclude_participant_tags}, $p->{tags});
@@ -954,7 +954,7 @@ sub _gen_items {
                 if (ref($vals) eq 'HASH') {
                     push @permute_args, $mk => [sort keys %$vals];
                     $ds_arg_values{$h->{dataset}}{$mk} = $vals;
-                } elsif(ref($vals) eq 'ARRAY') {
+                } elsif (ref($vals) eq 'ARRAY') {
                     push @permute_args, $mk => $vals;
                 } else {
                     return [400, "Error in dataset #$h->{dataset} arg '$mk0': value must be hash or array"];
@@ -962,7 +962,7 @@ sub _gen_items {
             }
             $iter_args = Permute::Named::Iter::permute_named_iter(
                 @permute_args);
-            $log->debugf("permute args: %s", \@permute_args);
+            log_debug("permute args: %s", \@permute_args);
         } else {
             # create an iterator that returns just a single item: {}
             # require Array::Iter; $iter_args = Array::Iter::list_iter({});
@@ -1083,7 +1083,7 @@ sub _gen_items {
                     die "BUG: Unknown command type";
                 }
 
-                $log->debugf("Item #%d: cmdline=%s", $item_seq, \@cmd);
+                log_debug("Item #%d: cmdline=%s", $item_seq, \@cmd);
 
                 {
                     $code_str = "package main; sub { ";
@@ -1172,7 +1172,7 @@ sub _gen_items {
                         }
                     }
                     $code_str .= _fill_template($template, $template_vars, 'dmp') . " }";
-                    $log->debugf("Item #%d: code=%s", $item_seq, $code_str);
+                    log_debug("Item #%d: code=%s", $item_seq, $code_str);
                     $code = eval $code_str;
                     return [400, "Item #$item_seq: code compile error: $@ (code: $code_str)"] if $@;
                 }
@@ -1217,9 +1217,9 @@ sub _gen_items {
             my $key = dmp [map { $item->{$_} }
                                grep { !/^_/ }
                                sort keys %$item];
-            $log->tracef("item key=%s", $key);
+            log_trace("item key=%s", $key);
             if ($item_mems{$key}++) {
-                $log->tracef("Duplicate key, skipped item, recycling seq number %d", $item_seq);
+                log_trace("Duplicate key, skipped item, recycling seq number %d", $item_seq);
                 next ITER;
             }
 
@@ -2329,6 +2329,9 @@ _
                            show-items-results
                            show-items-results-sizes
                            show-items-outputs
+                           dump-items
+                           dump-parsed-scenario
+                           profile
                            bench
                        /]
                     # list-functions
@@ -2400,6 +2403,21 @@ _
                     is_flag => 1,
                     summary => 'Shortcut for -a show-items-outputs',
                     code => sub { $_[0]{action} = 'show-items-outputs' },
+                },
+                dump_items => {
+                    is_flag => 1,
+                    summary => 'Shortcut for -a dump-items',
+                    code => sub { $_[0]{action} = 'dump-items' },
+                },
+                dump_parsed_scenario => {
+                    is_flag => 1,
+                    summary => 'Shortcut for -a dump-parsed-scenario',
+                    code => sub { $_[0]{action} = 'dump-parsed-scenario' },
+                },
+                profile => {
+                    is_flag => 1,
+                    summary => 'Shortcut for -a profile',
+                    code => sub { $_[0]{action} = 'profile' },
                 },
             },
             tags => ['category:action'],
@@ -3113,7 +3131,7 @@ sub bencher {
     $aibdf = 0 if $action =~ /\A(list-(datasets|participants))\z/;
 
     if ($unparsed->{before_parse_scenario}) {
-        $log->infof("Executing before_parse_scenario hook ...");
+        log_info("Executing before_parse_scenario hook ...");
         $unparsed->{before_parse_scenario}->(
             hook_name => 'before_parse_scenario',
             scenario  => $unparsed,
@@ -3129,7 +3147,7 @@ sub bencher {
     );
 
     if ($parsed->{after_parse_scenario}) {
-        $log->infof("Executing after_parse_scenario hook ...");
+        log_info("Executing after_parse_scenario hook ...");
         $parsed->{after_parse_scenario}->(
             hook_name => 'after_parse_scenario',
             scenario  => $parsed,
@@ -3142,7 +3160,7 @@ sub bencher {
     # DEPRECATED/now undocumented, see before_parse_datasets for more
     # appropriate hook
     if ($parsed->{before_list_datasets}) {
-        $log->infof("Executing before_list_datasets hook ...");
+        log_info("Executing before_list_datasets hook ...");
         $parsed->{before_list_datasets}->(
             hook_name => 'before_list_datasets',
             scenario  => $parsed,
@@ -3190,7 +3208,7 @@ sub bencher {
     # DEPRECATED/now undocumented, see before_parse_participants for more
     # appropriate hook
     if ($parsed->{before_list_participants}) {
-        $log->infof("Executing before_list_participants hook ...");
+        log_info("Executing before_list_participants hook ...");
         $parsed->{before_list_participants}->(
             hook_name => 'before_list_participants',
             scenario  => $parsed,
@@ -3269,7 +3287,7 @@ sub bencher {
             last;
         }
         if ($parsed->{before_gen_items}) {
-            $log->infof("Executing before_gen_items hook ...");
+            log_info("Executing before_gen_items hook ...");
             $parsed->{before_gen_items}->(
                 hook_name => 'before_gen_items',
                 scenario  => $parsed,
@@ -3319,6 +3337,96 @@ sub bencher {
         goto L_END;
     }
 
+    if ($action eq 'dump-items') {
+        if ($is_cli_and_text_format) {
+            require Data::Dump;
+            $envres = [200, "OK", Data::Dump::dump($items),
+                       {'cmdline.skip_format' => 1}];
+            goto L_END;
+        } else {
+            $envres = [200, "OK", $items];
+        }
+        goto L_END;
+    }
+
+    if ($action eq 'dump-parsed-scenario') {
+        if ($is_cli_and_text_format) {
+            require Data::Dump;
+            $envres = [200, "OK", Data::Dump::dump($parsed),
+                       {'cmdline.skip_format' => 1}];
+        } else {
+            $envres = [200, "OK", $parsed];
+        }
+        goto L_END;
+    }
+
+    if ($action eq 'profile') {
+        require File::Temp;
+        require Proc::ChildError;
+        die "profile currently not yet supported on multiperl or multimodver\n" if $args{multiperl} || $args{multimodver};
+        my @res;
+        my ($fh, $fname) = File::Temp::tempfile();
+        for my $it (@$items) {
+            # get participant's module & helper_modules
+            my $participant;
+            for my $p (@{ $parsed->{participants} }) {
+                if ($p->{name} eq $it->{participant}) {
+                    $participant = $p;
+                    last;
+                }
+            }
+            my %mods;
+            $mods{$participant->{module}}++ if $participant->{module};
+            for (@{ $participant->{helper_modules} // [] }) {
+                $mods{$_}++;
+            }
+            my $code = $it->{_code_str};
+            # unravel subroutine
+            $code =~ s/.+?sub \{\s*//; $code =~ s/\}\s*\z//;
+            # if start=no, activate profiler
+            $code = "DB::enable_profile(); $code";
+            my @cmd = (
+                $^X,
+                "-d:NYTProf",
+                (map {"-m$_"} sort keys %mods),
+                "-e",
+                $code,
+            );
+            my $file = "$fname-nytprof$it->{seq}";
+            local $ENV{NYTPROF} = "start=no:file=$file.out";
+            #local $ENV{NYTPROF} = "file=$file.out";
+            log_debug("Running command: %s ...", \@cmd);
+            system @cmd;
+            die "Failed running profiler for item #$it->{seq}: ".
+                Proc::ChildError::explain_child_error()." (cmd=".
+                      join(" ", @cmd).")" if $?;
+            @cmd = (
+                "nytprofhtml",
+                "-f", "$file.out",
+                "-o", "$file.dir",
+            );
+            log_debug("Running command: %s ...", @cmd);
+            system @cmd;
+            die "Failed running profiler for item #$it->{seq}: ".
+                Proc::ChildError::explain_child_error()." (cmd=".
+                      join(" ", @cmd).")" if $?;
+            push @res, {
+                seq => $it->{seq},
+                dataset => $it->{dataset},
+                participant => $it->{participant},
+                profile_result_path => "$file.dir/index.html",
+            };
+        }
+        if (@res == 1 && (-t STDOUT)) {
+            require Browser::Open;
+            Browser::Open::open_browser($res[0]{profile_result_path});
+        }
+        $envres = [200, "OK", \@res, {
+            'table.fields'=>[qw/seq dataset participant profile_result_path/],
+        }];
+        goto L_END;
+    }
+
     if ($action =~ /\A(show-items-results-sizes|show-items-results|show-items-outputs|bench)\z/) {
         require Capture::Tiny;
         require Module::Load;
@@ -3349,11 +3457,11 @@ sub bencher {
         my $code_load = sub {
             no strict 'refs';
             my ($mod, $optional) = @_;
-            $log->tracef("Loading module: %s", $mod);
+            log_trace("Loading module: %s", $mod);
             if ($optional) {
                 eval { Module::Load::load($mod) };
-                $log->infof("Failed loading optional module %s: %s, skipped",
-                            $mod, $@);
+                log_info("Failed loading optional module %s: %s, skipped",
+                         $mod, $@);
                 return;
             } else {
                 Module::Load::load($mod);
@@ -3391,7 +3499,7 @@ sub bencher {
         $code_load->($_) for @{ $parsed->{extra_modules} // [] };
 
         if ($parsed->{before_bench}) {
-            $log->infof("Executing before_bench hook ...");
+            log_info("Executing before_bench hook ...");
             $parsed->{before_bench}->(
                 hook_name => 'before_bench',
                 scenario  => $parsed,
@@ -3429,8 +3537,8 @@ sub bencher {
                         item      => $it,
                     );
                 }
-                $log->tracef("Testing code for item #%d (%s) ...",
-                             $it->{seq}, $it->{_name});
+                log_trace("Testing code for item #%d (%s) ...",
+                          $it->{seq}, $it->{_name});
 
                 my $participant = _find_record_by_seq($participants, $it->{_permute}{participant});
 
@@ -3703,7 +3811,7 @@ sub bencher {
                 Data::Clone::clone($parsed->{env_hashes});
         }
 
-        $log->tracef("Running benchmark (precision=%g) ...", $precision);
+        log_trace("Running benchmark (precision=%g) ...", $precision);
 
         my @columns       = (qw/seq participant dataset/);
         my @column_aligns = ('right', 'left', 'left');
@@ -3738,7 +3846,7 @@ sub bencher {
                         push @{$sc->{items}}, $it;
                     }
                     #use DD; dd {perl=>$perl, modver=>$modver, items=>$sc->{items}};
-                    $log->debugf("Creating scenario dump file for %s (modver %s) at %s", $perl, $modver, $scd_path);
+                    log_debug("Creating scenario dump file for %s (modver %s) at %s", $perl, $modver, $scd_path);
                     open my($fh), ">", $scd_path or die "Can't open file $scd_path: $!";
                     print $fh dmp($sc), ";\n";
                     close $fh;
@@ -3751,7 +3859,7 @@ sub bencher {
                         @{ $perl_opts{$modver} // [] },
                         "-e'print dmp(Bencher::Backend::bencher(action=>q[bench], runner=>q[$runner], precision=>$precision, scenario_file=>q[$scd_path], with_args_size=>q[$with_args_size], with_result_size=>q[$with_result_size], return_meta=>0, capture_stdout=>$capture_stdout, capture_stderr=>$capture_stderr))' > '$res_path'",
                     );
-                    $log->debugf("Running %s ...", $cmd);
+                    log_debug("Running %s ...", $cmd);
                     system $cmd;
                     die "Failed running bencher for perl $perl (1)" if $?;
                     my $res = do $res_path;
@@ -3762,7 +3870,7 @@ sub bencher {
                     for my $row (@{ $res->[2] }) {
                         $row->{perl} = $perl;
                         unless (grep {$_ eq 'perl'} @columns) {
-                            push @columns,        "perl";
+                            push @columns,       "perl";
                             push @column_aligns, 'left';
                         }
                         if (length $modver) {
@@ -3864,7 +3972,7 @@ sub bencher {
         }
 
         if ($parsed->{after_bench}) {
-            $log->infof("Executing after_bench hook ...");
+            log_info("Executing after_bench hook ...");
             $parsed->{after_bench}->(
                 hook_name => 'after_bench',
                 scenario  => $parsed,
@@ -3901,7 +4009,7 @@ sub bencher {
             };
             my $path = "$result_dir/$result_filename";
             my $cleanser = Data::Clean::JSON->get_cleanser;
-            $log->tracef("Saving result to %s ...", $path);
+            log_trace("Saving result to %s ...", $path);
             File::Slurper::write_text(
                 $path,
                 JSON::MaybeXS::encode_json(
@@ -3953,7 +4061,7 @@ sub bencher {
   L_END:
 
     if ($parsed->{before_return}) {
-        $log->infof("Executing before_return hook ...");
+        log_info("Executing before_return hook ...");
         $parsed->{before_return}->(
             hook_name => 'before_return',
             scenario  => $parsed,
@@ -3996,7 +4104,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.036 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2017-02-20.
+This document describes version 1.039 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2017-07-02.
 
 =head1 FUNCTIONS
 

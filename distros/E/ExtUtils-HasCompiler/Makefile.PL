@@ -29,9 +29,12 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Cwd" => 0,
+    "File::Path" => 0,
+    "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.017",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,12 +43,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Cwd" => 0,
   "DynaLoader" => 0,
   "Exporter" => 0,
   "ExtUtils::Mksymlists" => 0,
   "File::Basename" => 0,
+  "File::Path" => 0,
   "File::Spec::Functions" => 0,
   "File::Temp" => 0,
+  "IPC::Open3" => 0,
   "Test::More" => 0,
   "base" => 0,
   "strict" => 0,

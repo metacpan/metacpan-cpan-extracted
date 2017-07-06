@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/TestBase.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Sledge/Plugin/Private.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00_compile.t
+t/01_private.t
+t/02_post.t
+xt/97_podspell.t
+xt/98_perlcritic.t
+xt/99_pod.t

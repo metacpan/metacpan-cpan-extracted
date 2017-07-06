@@ -4,7 +4,7 @@ use 5.008001;
 use Moose;
 
 # ABSTRACT: Special prereq handling
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -27,16 +27,35 @@ sub register_prereqs
 {
   my($self) = @_;
 
-  my %dist = (
-    (map { $_ => 'Test2' } (
+  my $prereqs = $self->zilla->prereqs->as_string_hash;
+
+  my %upgrades = qw(
+    Moo                                   2.0
+    PerlX::Maybe                          0.003
+    File::HomeDir                         0.91
+    AnyEvent::Open3::Simple               0.83
+    Path::Class                           0.26
+    Mojolicious                           4.31
+    Role::Tiny                            1.003001
+    Test::More                            0.94
+    Test::Exit                            0.11
+    Clustericious                         1.20
+    Test::Clustericious::Cluster          0.31
+    Test2::V0                             0.000071
+  );
+  
+  $upgrades{$_} = '1.302015' for (
       (map { "Test2::$_" } qw( API Event Formatter Formatter::TAP Hub IPC Util )),
       (map { "Test2::API::$_" } qw( Breakage Context Instance Stack )),
       (map { "Test2::Event::$_" } qw( Bail Diag Exception Note Ok Plan Skp Subtest Waiting )),
       (map { "Test2::Hub::$_" } qw( Interceptor Interceptor::Terminator Subtest )),      
       (map { "Test2::IPC::$_" } qw( Driver Driver::Files )),
       (map { "Test2::Util::$_" } qw( ExternalMeta HashBase Trace )),
-    )),
-    (map { $_ => 'Test2::Suite' } qw( 
+      'Test2',
+  );
+
+  $upgrades{$_} = '0.000060' for qw(
+      Test2::V0
       Test2::Bundle
       Test2::Bundle::Extended
       Test2::Bundle::More
@@ -100,48 +119,8 @@ sub register_prereqs
       Test2::Util::Sub
       Test2::Util::Table
       Test2::Util::Table::LineBreak
-    )),
   );
   
-  my $prereqs = $self->zilla->prereqs->as_string_hash;
-
-  foreach my $phase (keys %$prereqs)
-  {
-    foreach my $type (keys %{ $prereqs->{$phase} })
-    {
-      foreach my $module (sort keys %{ $prereqs->{$phase}->{$type} })
-      {
-        my $prefer = $dist{$module};
-        if($prefer)
-        {
-          $self->zilla->prereqs->requirements_for($phase, $type)->clear_requirement($module);
-          $self->zilla->register_prereqs({
-            type => $type,
-            phase => $phase,
-          }, $prefer => 0 );
-        }
-      }
-    }
-  }
-
-  my %upgrades = qw(
-    Moo                                   2.0
-    PerlX::Maybe                          0.003
-    File::HomeDir                         0.91
-    AnyEvent::Open3::Simple               0.83
-    Path::Class                           0.26
-    Mojolicious                           4.31
-    Role::Tiny                            1.003001
-    Test::More                            0.94
-    Test::Exit                            0.11
-    Test2                                 1.302015
-    Test2::Suite                          0.000060
-    Clustericious                         1.20
-    Test::Clustericious::Cluster          0.31
-  );
-  
-  $prereqs = $self->zilla->prereqs->as_string_hash;
-
   foreach my $upgrade (@{ $self->upgrade })
   {
     if($upgrade =~ /^\s*(\S+)\s*=\s*(\S+)\s*$/)
@@ -257,7 +236,7 @@ Dist::Zilla::Plugin::Author::Plicease::SpecialPrereqs - Special prereq handling
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 

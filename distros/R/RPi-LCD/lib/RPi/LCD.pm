@@ -3,15 +3,17 @@ package RPi::LCD;
 use strict;
 use warnings;
 
-our $VERSION = '2.3601';
+our $VERSION = '2.3603';
 
 use parent 'WiringPi::API';
+use Carp qw(confess);
 use RPi::WiringPi::Constant qw(:all);
 
 sub new {
     my $self = bless {}, shift;
     if (! defined $ENV{RPI_PIN_SCHEME}){
-        $self->setup_gpio();
+        $ENV{RPI_PIN_SCHEME} = RPI_MODE_GPIO;
+        $self->setup_gpio;
     }
     return $self;
 }
@@ -65,21 +67,33 @@ sub char_def {
     my ($self, $index, $data) = @_;
     $self->lcd_char_def($self->_fd, $index, $data);
 }
-sub print_char {
+
+*print_char = \&put_char;
+
+sub put_char {
     my ($self, $data) = @_;
     $self->lcd_put_char($self->_fd, $data);
 }
-sub print {
+
+*print = \&puts;
+
+sub puts {
     my ($self, $string) = @_;
     $self->lcd_puts($self->_fd, $string);
 }
 sub _fd {
     my ($self, $fd) = @_;
     if (defined $fd){
+        if ($fd == -1){
+            confess "\nMaximum number of LCDs (8) in use. Can't continue...\n" .
+                    "Are you instantiating LCD objects within a loop?\n\n";
+        }
         $self->{fd} = $fd;
     }
     return $self->{fd}
 }
+sub __placeholder {} # vim folds
+
 1;
 __END__
 
@@ -126,8 +140,10 @@ pins
 =head1 DESCRIPTION
 
 This module acts as an interface to typical 2 or 4 row, 16 or 20 column LCD
-screens when connected to a Raspberry Pi. It is best used through a
-L<RPi::WiringPi> object.
+screens when connected to a Raspberry Pi.
+
+It is standalone code, but if you access an instance of this class through the
+L<RPi::WiringPi> library, we'll ensure safe exit upon a crash.
 
 
 =head1 METHODS
@@ -140,7 +156,7 @@ have been run, and if not, we set up in GPIO pin mode.
 =head2 init(%args)
 
 Initializes the LCD library, and returns an integer representing the handle
-handle (file descriptor) of the device. The return is supposed to be constant,
+(file descriptor) of the device. The return is supposed to be constant,
 so DON'T change it.
 
 Parameters:
@@ -226,7 +242,7 @@ Mandatory: Row position. C<0> is the top row.
 
 This allows you to re-define one of the 8 user-definable characters in the
 display. The data array is 8 bytes which represent the character from the
-top-line to the bottom line. Note that the characters are actually 5×8, so
+top line to the bottom line. Note that the characters are actually 5 x 8, so
 only the lower 5 bits are used. The index is from 0 to 7 and you can
 subsequently print the character defined using the lcdPutchar() call.
 
@@ -240,7 +256,7 @@ Mandatory: Index of the display character. Values are C<0-7>.
 
 Mandatory: See above description.
 
-=head2 print_char($char)
+=head2 put_char($char)
 
 Writes a single ASCII character to the LCD display, at the current cursor
 position.
@@ -251,13 +267,21 @@ Parameters:
 
 Mandatory: A single ASCII character.
 
-=head2 print($string)
+=head2 print_char($char)
+
+Alias of C<put_char()>.
+
+=head2 puts($string)
 
 Parameters:
 
     $string
 
 Mandatory: A string to display.
+
+=head2 print($string)
+
+Alias of C<puts()>.
 
 =head1 AUTHOR
 

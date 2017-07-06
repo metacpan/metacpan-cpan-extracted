@@ -2,7 +2,7 @@ package # hidden from PAUSE indexer
 Var::Your;
 our $VERSION = '0.000001';
 
-use 5.014; use warnings; use autodie;
+use 5.012; use warnings; use autodie;
 use Carp;
 use Data::Dump 'dump';
 

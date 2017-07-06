@@ -46,6 +46,7 @@
       "runtime" : {
          "requires" : {
             "Getopt::Std" : "0",
+            "HTML::Entities" : "3.69",
             "HTML::Form" : "6.03",
             "HTTP::Cookies" : "6.01",
             "LWP::UserAgent" : "6.05",
@@ -66,12 +67,12 @@
    "provides" : {
       "SpamcupNG" : {
          "file" : "lib/SpamcupNG.pm",
-         "version" : "0.4"
+         "version" : "0.6"
       }
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.4",
+   "version" : "0.6",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"

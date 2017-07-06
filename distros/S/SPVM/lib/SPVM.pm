@@ -8,63 +8,37 @@ use SPVM::Data;
 
 use Carp 'croak';
 
-our $VERSION = '0.0201';
+our $VERSION = '0.0208';
 
-my $SPVM;
-
-sub get_spvm { $SPVM }
-
-sub new {
-  my $class = shift;
-  
-  my $self = {};
-  
-  $self->{package_infos} = [];
-  $self->{include_paths} = [];
-  
-  return bless $self, __PACKAGE__;
-}
-
-BEGIN {
-  # SPVM
-  my $spvm = SPVM->new;
-  
-  # Add moduel include path
-  push @{$spvm->{include_paths}}, @INC;
-  
-  # Save SPVM
-  $SPVM = $spvm;
-}
+our $COMPILER;
+our @PACKAGE_INFOS;
+our %SUB_SYMTABLE;
+our %TYPE_SYMTABLE;
+our $API;
 
 # Compile SPVM source code just after compile-time of Perl
 CHECK {
-  # SPVM
-  my $spvm = $SPVM;
-  
   # Compile SPVM source code
-  $spvm->compile;
+  compile();
   
   # Build resolved type symbol table
-  $spvm->build_type_symtable;
+  build_type_symtable();
   
   # Build subroutine symbole table
-  $spvm->build_sub_symtable;
+  build_sub_symtable();
   
   # Build SPVM subroutine
-  $spvm->build_spvm_subs;
+  build_spvm_subs();
   
   # Build run-time
-  $spvm->build_runtime;
+  build_runtime();
   
   # Free compiler
-  $spvm->free_compiler;
+  free_compiler();
 }
 
 sub import {
   my ($class, $package_name) = @_;
-  
-  # SPVM
-  my $spvm = $SPVM;
   
   # Add package infomations
   if (defined $package_name) {
@@ -75,20 +49,16 @@ sub import {
       file => $file,
       line => $line
     };
-    push @{$spvm->{package_infos}}, $package_info;
+    push @PACKAGE_INFOS, $package_info;
   }
 }
 
 sub build_spvm_subs {
-  my $spvm = $SPVM;
-  
-  my $sub_symtable = $spvm->{sub_symtable};
-  
-  for my $abs_name (keys %$sub_symtable) {
+  for my $abs_name (keys %SUB_SYMTABLE) {
     
     my $sub;
     $sub .= "sub SPVM::$abs_name {\n";
-    $sub .= "  SPVM::call_sub(\$spvm, \"$abs_name\", \@_);\n";
+    $sub .= "  SPVM::call_sub(\"$abs_name\", \@_);\n";
     $sub .= "}";
     
     # Define SPVM subroutine
@@ -122,8 +92,8 @@ B<SPVM is under developing! I will change implementation and specification witho
 
   use SPVM 'MyModule2';
   
-  my $total = SPVM::MyModule2::foo(SPVM::int(3), SPVM::int(5));
-  print $total->value . "\n";
+  my $total = SPVM::MyModule2::foo(3, 5);
+  print $total . "\n";
   
 Module file
 
@@ -188,9 +158,223 @@ B<Perl module> - SPVM function can be called from Perl itself (Not yet implement
 
 =back;
 
+SPVM only work on the Perl which support 64 bit integer.
+
+=head1 SPVM SYNTAX
+
+=head2 Type
+
+=head3 Numeric type
+
+Numeric types are byte, short, int, long, float, double.
+
+  byte    signed integer          1byte
+  short   signed integer          2byte
+  int     signed integer          4byte
+  long    signed integer          8byte
+  float   floating-point number   4byte
+  double  floating-point number   8byte
+
+Declaration
+
+  my $value : byte;
+  my $value : short;
+  my $value : int;
+  my $value : long;
+  my $value : float;
+  my $value : double;
+
+=head3 Reference type
+
+Reference types are `array` and `object`.
+
+B<Object type>
+
+    PackageName
+
+Declaration
+
+    my $object : PackageName;
+
+B<Array type>
+
+  byte[]   byte array
+  short[]  short array
+  int[]    int array array
+  long[]   long array
+  float[]  float array
+  doube[]  double array
+  PackageName[] object array
+
+Declaration
+
+  my $values : byte[];
+  my $values : short[];
+  my $values : int[];
+  my $values : long[];
+  my $values : float[];
+  my $values : double[];
+  my $values : PackageName[];
+
+B<Multiple array type>
+
+  my $values : byte[][];
+  my $values : short[][];
+  my $values : int[][];
+  my $values : long[][];
+  my $values : float[][];
+  my $values : double[][];
+  my $values : PackageName[][];
+
+  my $values : byte[][][];
+  my $values : short[][][];
+  my $values : int[][][];
+  my $values : long[][][];
+  my $values : float[][][];
+  my $values : double[][][];
+  my $values : PackageName[][][];
+
+=head2 Type inference
+
+If the type of right value is known, the type of left value is automatically decided.
+    
+  # Type of $value2 is byte.
+  my $value1 : byte;
+  my $value2 = $value1;
+  
+  # Type of $values2 is int[]
+  my $values1 = malloc int[3];
+  my $values2 = $values1;
+  
+  # Type of $object2 is PackageName
+  my $object1 = malloc PackageName
+  my $object2 = $object1;
+
+=head2 Constant
+
+=head3 Constant type
+
+Type of constant default integral value is `int`.
+    
+    # int type
+    1;
+    3;
+
+Type of constant default floating-point value is `double`.
+
+    # double
+    1.2
+    5.3
+    
+Type of constant is specified by type specifier.
+    
+    # long
+    3L
+    
+    # float
+    3.2f
+    
+    # double
+    3.2d
+
+=head2 Name
+
+=head3 Package name
+
+Package name is a combination of alphabets, numbers, and `::`. Numbers should not appear as the first character. `_` can't be used in class name.
+    
+    # OK
+    Foo
+    Foo::Bar
+    Foo1::Bar1
+    
+    # Not OK
+    1Foo
+    Foo::2Bar
+    Foo_Bar;
+
+=head3 Subroutine name
+
+Subroutine name is a combination of alphabets, numbers, and `_` separators. Continual `_`(For example `__`) can't be used in subroutine name.
+
+    # OK
+    foo
+    foo1
+    foo_bar
+    
+    # Not OK
+    1foo
+    foo__bar
+
+=head3 Field name
+
+Field name is a combination of alphabets, numbers, and `_` separators. Continual `_`(For example `__`) can't be used in field name.
+
+    # OK
+    foo
+    foo1
+    foo_bar
+    
+    # Not OK
+    1foo
+    foo__bar
+
+=head3 Absolute name
+
+Absolute name is combination of package name and subroutine name, or package name and field name.
+
+    PackageName1::foo
+    PackageName1::PackageName2::foo_bar
+
+=head2 Limitation
+
+Object can't have object and array of object.
+
+=head2 FAQ
+
+=over 4
+
+=item * B<Why SPVM don't support 32 bit Perl>
+
+In many 32 bit Perl, 64 bit integer is not supported. This means that Perl can not express 64 bit integers on source code.
+
+See the following code.
+
+    my $value = 9223372036854775807;
+
+In 32 bit Perl, 64bit integer value is converted to double automatically. The double value can't express long value accurately.
+
+=back
+
 =head1 AUTHOR
 
 Yuki Kimoto E<lt>kimoto.yuki@gmail.com<gt>
+
+=head1 CONTRIBUTERS
+
+=over 4
+
+=item *
+
+[akinomyoga](https://github.com/akinomyoga) (Koichi Murase)
+
+=item *
+
+[NAGAYASU Shinya](https://github.com/nagayasu-shinya)
+
+=item *
+
+[Reini Urban](https://github.com/rurban)
+
+=item *
+
+[chromatic](https://github.com/chromatic)
+
+=item *
+
+[Kazutake Hiramatsu](https://github.com/kazhiramatsu)
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

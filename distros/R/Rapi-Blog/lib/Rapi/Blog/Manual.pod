@@ -2,15 +2,373 @@
  
 Rapi::Blog::Manual - Rapi::Blog user and developer manual
  
-=head1 DESCRIPTION
- 
-This is the WIP L<Rapi::Blog> users manual.
- 
-=head1 SECTIONS
+=head1 OVERVIEW
 
-=head2 L<Rapi::Blog::Manual::Scaffolds>
- 
-Description of the L<Rapi::Blog> scaffold structure.
- 
+L<Rapi::Blog> is a turn-key, customizable blog platform written using L<RapidApp>.
 
+=head1 INSTALLATION
+
+L<Rapi::Blog> can be installed from CPAN in the usual manner:
+
+  cpanm Rapi::Blog
+
+It is also distributed with the L<RapidApp> Docker images on Docker Hub, specifically the 
+L<rapi/psgi|https://hub.docker.com/r/rapi/psgi/> image which contains the full stack as of version
+C<1.3001-B>. You can pull this image to any system with docker installed by running this command:
+
+  docker pull rapi/psgi
+
+=head1 CREATING NEW SITES
+
+L<Rapi::Blog> is a Plack app and can be ran directly (See the C<SYNOPSIS> in L<Rapi::Blog>). However,
+for most cases, setting up a new blog can be done using the included utility script L<rabl.pl>:
+
+  rabl.pl create path/to/my-cool-blog
+
+Where "my-cool-blog" is a directory which does not exist (or is empty). This script will start a wizard
+which will allow you to choose from one of the built-in scaffolds to use as a starting point. This will
+also give you a chance to set a custom password for the admin user (or use the default init from RapidApp
+which is C<pass>).
+
+The script will create the databases and files within the directory you choose, including an C<app.psgi>
+file which you can use to L<plackup> the site.
+
+The public content will be copied into the C<scaffold> directory from the built-in skeleton scaffold
+you selected. Depending on the one you chose (only a couple choices as of version 1.0), this will
+provide a fully working blog out-of-the-box. You can then replace/change any of the html files for your
+own needs within the scaffold, which is just an ordinary html site, with access to call template 
+directives.
+
+=head2 Creating with Docker
+
+In order to create a new site using Docker and the RapidApp L<rapi/psgi|https://hub.docker.com/r/rapi/psgi/> 
+image, you simply need to create a new container and then run the L<rabl.pl> script from witin it.
+
+First, create the directory you want to use for the site, then create and start a new container. 
+For this example, we'll use port C<5001> to run the app:
+
+  # Manually create the site directory:
+  mkdir path/to/my-cool-blog
+  
+  # Create the new container:
+  docker create -it \
+    --name=my-cool-blog --hostname=my-cool-blog \
+    -p 5001:5000 \
+    -v $(pwd)/my-cool-blog:/opt/app \
+  rapi/psgi
+  
+  # Start the container:
+  docker start my-cool-blog
+
+Since the app directory is empty, the app will start in a shutdown state. Next, open a shell on the 
+running container and run the L<rabl.pl> create script using the special C</opt/app> directory as
+the path:
+
+  docker exec -it my-cool-blog bash
+  
+  # Now from the shell of the docker container, create the site:
+  rabl.pl create /opt/app
+
+Once the site is created, you can either restart the docker container, or run the provided 
+C<app-restart> command from the container shell. Now that the app directory is populated, the container
+will start normally going forward.
+
+For more information, see the C<rapi/psgi> documentation on Docker Hub:
+
+L<https://hub.docker.com/r/rapi/psgi/>
+
+
+=head1 SCAFFOLDS
+
+L<Rapi::Blog> serves public facing content from a local "scaffold" which is a simple directory
+of HTML and associated content, mounted at the root C</> of the app. The other, backend namespaces 
+for the various controllers/modules are merged into the common root-based namespace. This design allows
+for the scaffolds to be structured as an ordinary HTML site following the same conventions as a static
+site living in a folder on your PC. The only difference between a Rapi::Blog scaffold and a static HTML
+directory is that files within the scaffold are able to *optionally* call template directives for
+dynamic content via simple variable substitution. 
+
+Scaffolds may also define an additional config which declares details about how it can be used by 
+the backend. See below.
+
+=head1 SCAFFOLD CONFIG
+
+The scaffold config is defined in a YAML text file named B<scaffold.yml> in the root of the scaffold 
+directory.
+
+The B<scaffold.yml> supports the following options:
+
+=head2 static_paths
+
+List of path prefixes which are considered 'static' meaning no template processing will happen on
+those paths. You want to list asset/image dirs like 'css/', 'fonts/' etc in this param, which
+helps performance for paths which the system doesn't need to parse for template directives.
+
+=head2 private_paths
+
+List of path prefixes which will not be served publicly, but will still be available internally
+to include, use as a wrapper, etc. Note that this option isn't really about security but about cleaning
+the public namespace of paths which are known not to be able to render as stand-alone pages in that
+context (like snippets, block directives, etc etc)
+
+=head2 landing_page
+
+Path/template to render when a user lands on the home page at C<'/'> (or the URL the app is mounted on)
+
+=head2 not_found
+
+Path/template to render when a requested path is not found (404). This provides a mechanism to have
+branded 404 pages. If not specified, a default/plain 404 page is used.
+
+=head2 favicon
+
+Path to the favicon to use for the site.
+
+=head2 view_wrappers
+
+The C<view_wrappers> are what expose Posts in the database to public URLs. The view_wrappers are 
+supplied as a list of HashRefs defining the config of an individual view_wrapper. For example:
+
+  view_wrappers:
+    - { path: post/,  type: include, wrapper: private/post.html  }
+
+For typical setups, only one view_wrapper is needed, but you can setup as many as you choose.
+
+Each C<'view_wrapper'> config requires the following three params:
+
+=head3 path
+
+The path prefix to be exposed. The Post name is appended to this path to produce a valid URL for the
+given Post. Using the above example, a Post named C<'my-cool-post'> would be accessible at the public
+URL C<'/post/my-cool-post'>.
+
+=head3 wrapper
+
+The scaffold template to use when rendering the Post. This should be a TT template which has been 
+setup as a L<WRAPPER|https://metacpan.org/pod/Template#WRAPPER> with a the Post body content loaded
+in C<[% content %]>. The given Post row object will also be available as C<[% Post %]>.
+
+=head3 type
+
+Must be either C<'insert'> or C<'include'> to control which TT directive is used internally to
+load the Post into the C<[% content %]> in the wrapper. With C<'include'> (default) the content of 
+the template, along with its template directives, is processed in advance and then populated into
+the C<[% content %]> variable, while with C<'insert'> the content is inserted as-is, leaving any 
+directives to be processed in the scope of the wrapper. You shouldn't need to use C<'insert'> 
+unless you have a specific reason and know what you are doing.
+
+=head2 default_view_path
+
+The default C<'view_wrapper'>, identified by its configured C<path>, to use for accessing posts. This
+is used in locations where the system generates URLs when it needs to publicly link to a post. Defaults
+to the first C<'include'> type view_wrapper.
+
+=head2 preview_path
+
+Optional alternative path to use instead of C<default_view_path> for the purpose of rendering a "preview"
+of the post as it will display on the site. This preview is presented in an iframe on the "Publish Preview"
+tab on the internal Post row page. This is useful in case you want to use a different wrapper that excludes
+items like top navigation, sidebars, etc, and display just the post itself with the active styles on the 
+site. It is totally optional, and for some cases you may prefer using the same exact view as the public
+site to be able to really see exactly how the post will look. This would be one of the common a cases 
+for a second C<'view_wrapper'> to be defined.
+
+=head2 internal_post_path
+
+The one, "real" URL path used to access Posts *internally*. This is used by the view_wrappers internally
+to resolve the Post from the supplied URL. Defaults to C<'private/post/'> which shouldn't normally need
+to be changed. It is suggested that it be within a private (i.e. covered by C<'private_paths'>) namespace.
+
+=head2 default_ext
+
+Default file extension for scaffold templates, defaults to C<html>. This makes it so that the template
+C<'/path/to/doc.html'> can alternatively be accessed at C<'/path/to/doc'> for cleaner/nicer looking URLs
+
+=head1 User-defined scaffold datapoints
+
+You may also define any additional datapoints you like in the scaffold config which can be used by the
+scaffold templates internally. The built-in scaffolds define custom datapoints such as "pages" which
+they use internally to build menus, etc. The scaffold can be used as a general-purpose meta data store
+which is available in templates via the C<[% scaffold %]> template variable.
+
+
+=head1 TEMPLATE DIRECTIVES
+
+Files within the scaffold (which are not defined as C<static_paths>) are processed as L<Template::Toolkit>
+templates with the following methods/parameters exposed in the template variables (i.e. the L<Template::Stash>):
+
+=head2 scaffold
+
+The active scaffold config/data structure.
+
+=head2 list_posts
+
+Interface to retrieve and filter Posts from the database. This is exposed with the 
+L<ListAPI|Rapi::Blog::DB::Component::ResultSet::ListAPI>
+interface which accepts several named params and returns a common
+L<ListAPI|Rapi::Blog::DB::Component::ResultSet::ListAPI> result packet.
+
+Accepted params (all optional):
+
+=head3 search
+
+String to search/filter results. The search will match substrings in the C<body>, C<name>, C<title>,
+C<summary>, C<body> and exact match on a C<tag>. Only Posts with at least one match will be returned.
+
+=head3 tag
+
+Limit posts to those containing the named C<tag>.
+
+=head3 limit
+
+The maximum number of results to return (i.e. page size)
+
+=head3 page
+
+The page number to return, in conjunction with C<limit>.
+
+=head3 sort
+
+Sort keyword for the order posts are returned in. Currently supports 3 possible values (defaults to
+C<newest>)
+
+=head4 newest
+
+Newest (by Post Date/Time) Posts first
+
+=head4 popularity
+
+Posts with the most "Hits" first. Note that in order for a hit to be recorded, the scaffold must
+call the template directive C<[% Post.record_hit %]>.
+
+=head4 most_comments
+
+Posts with the most comments (includes sub-comments/replies) first
+
+=head2 list_tags
+
+Interface to retrieve and filter Tags from the database. This is exposed with the 
+L<ListAPI|Rapi::Blog::DB::Component::ResultSet::ListAPI>
+interface which accepts several named params and returns a common
+L<ListAPI|Rapi::Blog::DB::Component::ResultSet::ListAPI> result packet.
+
+Accepted params (all optional):
+
+=head3 search
+
+String to search/filter results. The search will match substrings of the tag name.
+
+=head3 post_id
+
+Limit results to Tags linked to the supplied post_id
+
+=head3 sort
+
+Sort keyword for the order tags are returned in. Currently supports 3 possible values (defaults to
+C<popularity>)
+
+=head4 popularity
+
+Most popular tags by number of posts which use them.
+
+=head4 alphabetical
+
+Tags in alphabetical order.
+
+=head4 recent
+
+Most recently used (according to Post Date/Time) tags first.
+
+=head2 list_users
+
+Interface to retrieve and filter Users from the database. This is exposed with the 
+L<ListAPI|Rapi::Blog::DB::Component::ResultSet::ListAPI>
+interface which accepts several named params and returns a common
+L<ListAPI|Rapi::Blog::DB::Component::ResultSet::ListAPI> result packet.
+
+Accepted params (all optional):
+
+=head3 search
+
+String to search/filter results. The search will match substrings of the C<username> or the C<full_name>.
+
+=head3 only
+
+Limit users to those with the matching named permission, which are currently 'authors' or 'commenters'
+
+=head2 User
+
+The currently logged in user, or C<undef> if not logged in. Returns a L<Rapi::Blog::DB::Result::User> object.
+
+=head2 request_path
+
+The path of the current request
+
+=head2 remote_action_path
+
+URL path that a client can use to access the L<Remote|Rapi::Blog::Controller::Remote> controller which
+provides additional API end-points that can be used to post comments, etc.
+
+=head2 add_post_path
+
+URL path to directly load the "New Post" form. Useful if the scaffold wants to provide its own 
+"New Post" links(s).
+
+=head2 mount_url
+
+Same as C<[% c.mount_url %]> - from RapidApp, the mounted path of the app if it is at a sub-url (e.g.
+using C<mount> with L<Plack::Builder>, etc). If the app is mounted normally on C</> this will be an
+empty string C<''>.
+
+This is provided as a top-level variable so non-privileged templates can access it (since they do 
+not have access to the actual context object in C<[% c %]>.
+
+=head2 Post
+
+When the target template of the request is a Post, including requests dispatched via a C<view_wrapper>,
+C<'Post'> template variable will also be available. This will be a reference to the associated Post Row object
+(see L<Rapi::Blog::DB::Result::Post>). For non-post requests (i.e. requests to ordinary templates within
+the scaffold) this value will be undef.
+
+=head1 PRIVILEGED TEMPLATE DIRECTIVES
+
+Both scaffold templates as well as post templates are able to access the above template 
+directives/attributes, however, additional privileged directives are available to scaffold templates
+only (excludes view_wrappers which are processed in the role of a post)
+
+=head2 c
+
+A reference to the Catalyst context object for the current request. This provides an entrypoint to 
+the entire application which can be used to perform actions based on the query string params 
+(e.g. C<[% c.req.params.foo %]>, direct access to the database 
+(e.g. C<[% c.model('DB::Post').search_rs(...) %]>) or anything else which can be reached via the context.
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Rapi::Blog>
+
+=item *
+
+L<rabl.pl>
+
+=item *
+
+L<Rapi::Blog::DB::Component::ResultSet::ListAPI>
+
+=item *
+
+L<RapidApp>
+
+=item *
+
+L<rapi/psgi|https://hub.docker.com/r/rapi/psgi/> 
+
+=back
+ 
 =cut

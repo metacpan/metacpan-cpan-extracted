@@ -54,8 +54,9 @@ try { test_rw($schema, test1 => <<__XML, undef) };
 <test1><t1>42</t1><t2>43</t2><t3>44</t3></test1>
 __XML
 
-ok($@, 'compile-time error');
-my $error = $@->wasFatal;
+my $e = $@;  # fragile
+ok($e, 'compile-time error');
+my $error = $e->wasFatal;
 is("$error", "error: data for element or block starting with `head' missing at {$TestNS}test1\n");
 
 $schema->importDefinitions( <<__EXTRA );

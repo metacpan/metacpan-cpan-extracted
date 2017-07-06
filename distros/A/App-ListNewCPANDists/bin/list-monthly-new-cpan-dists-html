@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/ListNewCPANDists/list_monthly_new_cpan_dists_html
-# and generated automatically using Perinci::CmdLine::Gen version 0.45
+# and generated automatically using Perinci::CmdLine::Gen version 0.46
 
-our $DATE = '2017-06-16'; # DATE
+our $DATE = '2017-07-02'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ list-monthly-new-cpan-dists-html - List new CPAN distributions in a given month 
 
 =head1 VERSION
 
-This document describes version 0.003 of list-monthly-new-cpan-dists-html (from Perl distribution App-ListNewCPANDists), released on 2017-06-16.
+This document describes version 0.005 of list-monthly-new-cpan-dists-html (from Perl distribution App-ListNewCPANDists), released on 2017-07-02.
 
 =head1 SYNOPSIS
 

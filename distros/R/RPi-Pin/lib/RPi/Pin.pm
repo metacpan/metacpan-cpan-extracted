@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'WiringPi::API';
 
-our $VERSION = '2.3601';
+our $VERSION = '2.3603';
 
 sub new {
     my ($class, $pin) = @_;
@@ -39,6 +39,15 @@ sub mode {
     }
 
     $self->pin_mode($self->num, $mode);
+}
+sub mode_alt {
+    my ($self, $alt) = @_;
+
+    if (! defined $alt){
+        return $self->get_alt($self->num);
+    }
+
+    $self->pin_mode_alt($self->num, $alt);
 }
 sub read {
     my $state = $_[0]->read_pin($_[0]->num);
@@ -148,7 +157,7 @@ Mandatory, Integer: The pin number to attach to.
 
 Puts the pin into either C<INPUT>, C<OUTPUT>, C<PWM_OUT> or C<GPIO_CLOCK>
 mode. If C<$mode> is not sent in, we'll return the pin's current mode.
-
+           
 Parameters:
 
     $mode
@@ -156,6 +165,28 @@ Parameters:
 Optional: If not sent in, we'll simply return the current mode of the pin.
 Otherwise, send in: C<0> for C<INPUT>, C<1> for C<OUTPUT>, C<2> for C<PWM_OUT>
 and C<3> for C<GPIO_CLOCK> mode.
+
+=head2 mode_alt($alt)
+
+Allows you to set any pin to any mode.
+            
+Parameters:
+        
+    $alt
+
+Optional: If not sent in, we'll simply return the current mode of the pin. The
+possible values of this method are as follows:
+
+    Value   Mode
+    ------------
+    0       INPUT
+    1       OUTPUT
+    4       ALT0
+    5       ALT1
+    6       ALT2
+    7       ALT3
+    3       ALT4
+    2       ALT5
 
 =head2 read()
 

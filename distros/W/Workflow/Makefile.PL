@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Class::Observable" => "1.04",
     "DBI" => 0,
     "Data::Dumper" => 0,
+    "Data::UUID" => 0,
     "DateTime" => "0.15",
     "DateTime::Format::Strptime" => "1.00",
     "Exception::Class" => "1.10",
@@ -49,7 +50,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08"
   },
-  "VERSION" => "1.43",
+  "VERSION" => "1.45",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,6 +65,7 @@ my %FallbackPrereqs = (
   "DBD::Mock" => "0.10",
   "DBI" => 0,
   "Data::Dumper" => 0,
+  "Data::UUID" => 0,
   "DateTime" => "0.15",
   "DateTime::Format::Strptime" => "1.00",
   "Exception::Class" => "1.10",

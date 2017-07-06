@@ -1,5 +1,9 @@
 Revision history for Perl extension Ceph::Rados.
 
+0.08  Thu 22 Jun 12:35:15 BST 2017
+    - warning suppression for 'tell() on unopened filehandle'
+    - fixes inconsistent references to write_io() and write_handle()
+
 0.07  Fri 16 Jun 12:02:54 BST 2017
     - versions of read/write which take handles to directly copy data to/from
     - expanded perldoc

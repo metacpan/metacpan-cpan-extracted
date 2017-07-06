@@ -83,16 +83,7 @@ sub sql_connected ($) {
 
     return undef unless $self->{'sql'};
 
-    # MySQL seems to send error messages directly to stderr. Hiding them
-    #
-    use vars qw(*SE);
-    open(SE,">&STDERR");
-    open(STDERR,">/dev/null");
-
     my $rc=eval { $self->{'sql'}->do('select 1') };
-
-    open(STDERR,">&SE");
-    close(SE);
 
     return $rc ? 1 : 0;
 }

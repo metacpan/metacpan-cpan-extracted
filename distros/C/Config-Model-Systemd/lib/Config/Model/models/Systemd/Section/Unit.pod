@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::Systemd::Section::Unit
 # ABSTRACT:  Configuration class Systemd::Section::Unit
+
 =encoding utf8
 
 =head1 NAME
@@ -204,7 +205,7 @@ Web Server> is a good example. Bad examples are
 C<high-performance light-weight HTTP server>
 (too generic) or C<Apache2> (too specific and
 meaningless for people who do not know
-Apache). I<< Optional. Type uniline.  >> 
+Apache). I< Optional. Type uniline.  > 
 
 =head2 Documentation
 
@@ -222,7 +223,7 @@ related documentation. This option may be specified more than
 once, in which case the specified list of URIs is merged. If
 the empty string is assigned to this option, the list is reset
 and all prior assignments will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 Requires
 
@@ -252,14 +253,14 @@ Note that dependencies of this type may also be
 configured outside of the unit configuration file by adding a
 symlink to a .requires/ directory
 accompanying the unit file. For details, see
-above. I<< Optional. Type list of uniline.  >> 
+above. I< Optional. Type list of uniline.  > 
 
 =head2 Requisite
 
 Similar to C<Requires>.
 However, if the units listed here are not started already,
 they will not be started and the transaction will fail
-immediately. I<< Optional. Type uniline.  >> 
+immediately. I< Optional. Type list of uniline.  > 
 
 =head2 Wants
 
@@ -275,7 +276,7 @@ Note that dependencies of this type may also be
 configured outside of the unit configuration file by adding
 symlinks to a .wants/ directory
 accompanying the unit file. For details, see
-above. I<< Optional. Type uniline.  >> 
+above. I< Optional. Type list of uniline.  > 
 
 =head2 BindsTo
 
@@ -286,7 +287,7 @@ stopped when any of the units listed suddenly disappears.
 Units can suddenly, unexpectedly disappear if a service
 terminates on its own choice, a device is unplugged or a mount
 point unmounted without involvement of
-systemd. I<< Optional. Type uniline.  >> 
+systemd. I< Optional. Type list of uniline.  > 
 
 =head2 PartOf
 
@@ -295,7 +296,7 @@ C<Requires>, but limited to stopping and
 restarting of units. When systemd stops or restarts the units
 listed here, the action is propagated to this unit. Note that
 this is a one-way dependency — changes to this unit do not
-affect the listed units. I<< Optional. Type uniline.  >> 
+affect the listed units. I< Optional. Type list of uniline.  > 
 
 =head2 Conflicts
 
@@ -314,7 +315,7 @@ modified to be fixed (in case one or both jobs are not a
 required part of the transaction). In the latter case, the job
 that is not the required will be removed, or in case both are
 not required, the unit that conflicts will be started and the
-unit that is conflicted is stopped. I<< Optional. Type uniline.  >> 
+unit that is conflicted is stopped. I< Optional. Type list of uniline.  > 
 
 =head2 Before
 
@@ -353,7 +354,7 @@ started up. The shutdown is ordered before the start-up in all
 cases. If two units have no ordering dependencies between them,
 they are shut down or started up simultaneously, and no ordering
 takes place.
-I<< Optional. Type list of uniline.  >> 
+I< Optional. Type list of uniline.  > 
 
 =head2 After
 
@@ -392,13 +393,13 @@ started up. The shutdown is ordered before the start-up in all
 cases. If two units have no ordering dependencies between them,
 they are shut down or started up simultaneously, and no ordering
 takes place.
-I<< Optional. Type list of uniline.  >> 
+I< Optional. Type list of uniline.  > 
 
 =head2 OnFailure
 
 A space-separated list of one or more units
 that are activated when this unit enters the
-C<failed> state. I<< Optional. Type uniline.  >> 
+C<failed> state. I< Optional. Type uniline.  > 
 
 =head2 PropagatesReloadTo
 
@@ -408,7 +409,7 @@ reload requests on the other unit will be propagated to this
 unit, respectively. Issuing a reload request on a unit will
 automatically also enqueue a reload request on all units that
 the reload request shall be propagated to via these two
-settings. I<< Optional. Type uniline.  >> 
+settings. I< Optional. Type uniline.  > 
 
 =head2 ReloadPropagatedFrom
 
@@ -418,7 +419,7 @@ reload requests on the other unit will be propagated to this
 unit, respectively. Issuing a reload request on a unit will
 automatically also enqueue a reload request on all units that
 the reload request shall be propagated to via these two
-settings. I<< Optional. Type uniline.  >> 
+settings. I< Optional. Type uniline.  > 
 
 =head2 JoinsNamespaceOf
 
@@ -438,7 +439,7 @@ Note that this setting only has an effect if
 C<PrivateNetwork> and/or
 C<PrivateTmp> is enabled for both the unit
 that joins the namespace and the unit whose namespace is
-joined. I<< Optional. Type uniline.  >> 
+joined. I< Optional. Type uniline.  > 
 
 =head2 RequiresMountsFor
 
@@ -452,7 +453,7 @@ mounted automatically and will be ignored for the purposes of
 this option. If such a mount should be a requirement for this
 unit, direct dependencies on the mount units may be added
 (C<Requires> and C<After> or
-some other combination). I<< Optional. Type uniline.  >> 
+some other combination). I< Optional. Type uniline.  > 
 
 =head2 OnFailureJobMode
 
@@ -470,14 +471,14 @@ L<systemctl(1)>'s
 C<--job-mode=> option for details on the
 possible values. If this is set to C<isolate>,
 only a single unit may be listed in
-C<OnFailure>.. I<< Optional. Type uniline.  >> 
+C<OnFailure>.. I< Optional. Type uniline.  > 
 
 =head2 IgnoreOnIsolate
 
 Takes a boolean argument. If
 C<true>, this unit will not be stopped when
 isolating another unit. Defaults to
-C<false>. I<< Optional. Type boolean.  >> 
+C<false>. I< Optional. Type boolean.  > 
 
 =head2 StopWhenUnneeded
 
@@ -488,7 +489,7 @@ executed, systemd will not stop units by default unless they
 are conflicting with other units, or the user explicitly
 requested their shut down. If this option is set, a unit will
 be automatically cleaned up if no other active unit requires
-it. Defaults to C<false>. I<< Optional. Type boolean.  >> 
+it. Defaults to C<false>. I< Optional. Type boolean.  > 
 
 =head2 RefuseManualStart
 
@@ -502,7 +503,7 @@ to ensure that the user does not accidentally activate units
 that are not intended to be activated explicitly, and not
 accidentally deactivate units that are not intended to be
 deactivated. These options default to
-C<false>. I<< Optional. Type boolean.  >> 
+C<false>. I< Optional. Type boolean.  > 
 
 =head2 RefuseManualStop
 
@@ -516,7 +517,7 @@ to ensure that the user does not accidentally activate units
 that are not intended to be activated explicitly, and not
 accidentally deactivate units that are not intended to be
 deactivated. These options default to
-C<false>. I<< Optional. Type boolean.  >> 
+C<false>. I< Optional. Type boolean.  > 
 
 =head2 AllowIsolate
 
@@ -527,7 +528,7 @@ will be refused. It probably is a good idea to leave this
 disabled except for target units that shall be used similar to
 runlevels in SysV init systems, just as a precaution to avoid
 unusable system states. This option defaults to
-C<false>. I<< Optional. Type boolean.  >> 
+C<false>. I< Optional. Type boolean.  > 
 
 =head2 DefaultDependencies
 
@@ -544,7 +545,7 @@ option to C<false>. It is highly recommended to
 leave this option enabled for the majority of common units. If
 set to C<false>, this option does not disable
 all implicit dependencies, just non-essential
-ones. I<< Optional. Type boolean.  >> 
+ones. I< Optional. Type boolean.  > 
 
 =head2 JobTimeoutSec
 
@@ -570,7 +571,7 @@ C<none>. C<JobTimeoutRebootArgument>
 configures an optional reboot string
 to pass to the
 L<reboot(2)>
-system call. I<< Optional. Type uniline.  >> 
+system call. I< Optional. Type uniline.  > 
 
 =head2 JobTimeoutAction
 
@@ -596,7 +597,7 @@ C<none>. C<JobTimeoutRebootArgument>
 configures an optional reboot string
 to pass to the
 L<reboot(2)>
-system call. I<< Optional. Type uniline.  >> 
+system call. I< Optional. Type uniline.  > 
 
 =head2 JobTimeoutRebootArgument
 
@@ -622,7 +623,7 @@ C<none>. C<JobTimeoutRebootArgument>
 configures an optional reboot string
 to pass to the
 L<reboot(2)>
-system call. I<< Optional. Type uniline.  >> 
+system call. I< Optional. Type uniline.  > 
 
 =head2 StartLimitIntervalSec
 
@@ -644,7 +645,7 @@ which is useful if the administrator wants to manually start a unit and the star
 that. Note that this rate-limiting is enforced after any unit condition checks are executed, and hence unit
 activations with failing conditions are not counted by this rate limiting. Slice, target, device and scope
 units do not enforce this setting, as they are unit types whose activation may either never fail, or may
-succeed only a single time. I<< Optional. Type uniline.  >> 
+succeed only a single time. I< Optional. Type uniline.  > 
 
 =head2 StartLimitBurst
 
@@ -666,7 +667,7 @@ which is useful if the administrator wants to manually start a unit and the star
 that. Note that this rate-limiting is enforced after any unit condition checks are executed, and hence unit
 activations with failing conditions are not counted by this rate limiting. Slice, target, device and scope
 units do not enforce this setting, as they are unit types whose activation may either never fail, or may
-succeed only a single time. I<< Optional. Type uniline.  >> 
+succeed only a single time. I< Optional. Type uniline.  > 
 
 =head2 StartLimitAction
 
@@ -683,14 +684,14 @@ C<reboot-immediate> causes immediate execution of the
 L<reboot(2)> system call, which
 might result in data loss. Similarly, C<poweroff>, C<poweroff-force>,
 C<poweroff-immediate> have the effect of powering down the system with similar
-semantics. Defaults to C<none>. I<< Optional. Type enum. choice: 'none', 'reboot', 'reboot-force', 'reboot-immediate', 'poweroff', 'poweroff-force', 'poweroff-immediate'.  >> 
+semantics. Defaults to C<none>. I< Optional. Type enum. choice: 'none', 'reboot', 'reboot-force', 'reboot-immediate', 'poweroff', 'poweroff-force', 'poweroff-immediate'.  > 
 
 =head2 RebootArgument
 
 Configure the optional argument for the
 L<reboot(2)> system call if
 C<StartLimitAction> or a service's C<FailureAction> is a reboot action. This
-works just like the optional argument to systemctl reboot command. I<< Optional. Type uniline.  >> 
+works just like the optional argument to systemctl reboot command. I< Optional. Type uniline.  > 
 
 =head2 ConditionArchitecture
 
@@ -758,7 +759,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of enum.  >> 
+effect. I< Optional. Type list of enum.  > 
 
 =head2 ConditionVirtualization
 
@@ -816,7 +817,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionHost
 
@@ -854,7 +855,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionKernelCommandLine
 
@@ -891,7 +892,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionSecurity
 
@@ -928,7 +929,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionCapability
 
@@ -965,7 +966,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionACPower
 
@@ -1003,7 +1004,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionNeedsUpdate
 
@@ -1047,7 +1048,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionFirstBoot
 
@@ -1082,7 +1083,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionPathExists
 
@@ -1118,7 +1119,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionPathExistsGlob
 
@@ -1150,7 +1151,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionPathIsDirectory
 
@@ -1181,7 +1182,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionPathIsSymbolicLink
 
@@ -1213,7 +1214,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionPathIsMountPoint
 
@@ -1244,7 +1245,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionPathIsReadWrite
 
@@ -1276,7 +1277,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionDirectoryNotEmpty
 
@@ -1308,7 +1309,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionFileNotEmpty
 
@@ -1340,7 +1341,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionFileIsExecutable
 
@@ -1372,7 +1373,7 @@ C<ConditionPathIsSymbolicLink=>, all path
 checks follow symlinks. If any of these options is assigned
 the empty string, the list of conditions is reset completely,
 all previous condition settings (of any kind) will have no
-effect. I<< Optional. Type list of uniline.  >> 
+effect. I< Optional. Type list of uniline.  > 
 
 =head2 AssertArchitecture
 
@@ -1381,7 +1382,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertVirtualization
 
@@ -1390,7 +1391,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertHost
 
@@ -1399,7 +1400,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertKernelCommandLine
 
@@ -1408,7 +1409,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertSecurity
 
@@ -1417,7 +1418,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertCapability
 
@@ -1426,7 +1427,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertACPower
 
@@ -1435,7 +1436,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertNeedsUpdate
 
@@ -1444,7 +1445,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertFirstBoot
 
@@ -1453,7 +1454,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertPathExists
 
@@ -1462,7 +1463,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertPathExistsGlob
 
@@ -1471,7 +1472,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertPathIsDirectory
 
@@ -1480,7 +1481,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertPathIsSymbolicLink
 
@@ -1489,7 +1490,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertPathIsMountPoint
 
@@ -1498,7 +1499,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertPathIsReadWrite
 
@@ -1507,7 +1508,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertDirectoryNotEmpty
 
@@ -1516,7 +1517,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertFileNotEmpty
 
@@ -1525,7 +1526,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 AssertFileIsExecutable
 
@@ -1534,7 +1535,7 @@ C<ConditionVirtualization>, …, condition settings described above, these setti
 assertion checks to the start-up of the unit. However, unlike the conditions settings, any assertion setting
 that is not met results in failure of the start job (which means this is logged loudly). Use assertion
 expressions for units that cannot operate when specific requirements are not met, and when this is something
-the administrator or user should look into. I<< Optional. Type uniline.  >> 
+the administrator or user should look into. I< Optional. Type uniline.  > 
 
 =head2 SourcePath
 
@@ -1543,7 +1544,7 @@ been generated from. This is primarily useful for
 implementation of generator tools that convert configuration
 from an external configuration file format into native unit
 files. This functionality should not be used in normal
-units. I<< Optional. Type uniline.  >> 
+units. I< Optional. Type uniline.  > 
 
 =head1 SEE ALSO
 

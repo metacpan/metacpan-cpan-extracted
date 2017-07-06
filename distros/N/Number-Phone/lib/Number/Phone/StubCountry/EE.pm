@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164947;
 
 my $formatters = [
                 {
@@ -46,15 +46,14 @@ my $formatters = [
                   'pattern' => '([3-79]\\d{2})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '70',
-                  'pattern' => '(70)(\\d{2})(\\d{4})'
+                  'pattern' => '(70)(\\d{2})(\\d{4})',
+                  'leading_digits' => '70'
                 },
                 {
-                  'pattern' => '(8000)(\\d{3})(\\d{3})',
-                  'leading_digits' => '8000'
+                  'leading_digits' => '8000',
+                  'pattern' => '(8000)(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '([458]\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             40|
             5|
@@ -62,7 +61,8 @@ my $formatters = [
               00[1-9]|
               [1-5]
             )
-          '
+          ',
+                  'pattern' => '([458]\\d{3})(\\d{3,4})'
                 }
               ];
 
@@ -75,14 +75,6 @@ my $validators = {
             7[1-9]|
             88
           )\\d{5}
-        ',
-                'personal_number' => '70[0-2]\\d{5}',
-                'toll_free' => '
-          800(?:
-            0\\d{3}|
-            1\\d|
-            [2-9]
-          )\\d{3}
         ',
                 'specialrate' => '(
           (?:
@@ -101,6 +93,7 @@ my $validators = {
             9[012]
           )\\d{1,2}
         )',
+                'personal_number' => '70[0-2]\\d{5}',
                 'mobile' => '
           (?:
             5\\d|
@@ -126,8 +119,15 @@ my $validators = {
             88
           )\\d{5}
         ',
-                'pager' => '',
-                'voip' => ''
+                'voip' => '',
+                'toll_free' => '
+          800(?:
+            0\\d{3}|
+            1\\d|
+            [2-9]
+          )\\d{3}
+        ',
+                'pager' => ''
               };
 my %areanames = (
   37232 => "Rakvere",

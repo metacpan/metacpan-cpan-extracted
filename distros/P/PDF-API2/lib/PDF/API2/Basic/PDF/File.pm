@@ -16,7 +16,7 @@ package PDF::API2::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 =head1 NAME
 
@@ -140,7 +140,7 @@ is in PDF which contains the location of the previous cross-reference table.
 
 =cut
 
-use Scalar::Util qw(blessed);
+use Scalar::Util qw(blessed weaken);
 
 use vars qw($cr $irreg_char $reg_char $ws_char $delim_char %types);
 
@@ -149,6 +149,9 @@ $delim_char = '[][<>{}()/%]';
 $reg_char = '[^][<>{}()/% \t\r\n\f\0]';
 $irreg_char = '[][<>{}()/% \t\r\n\f\0]';
 $cr = '\s*(?:\015|\012|(?:\015\012))';
+
+my $re_comment = qr/(?:\%[^\r\n]*)/;
+my $re_whitespace = qr/(?:[ \t\r\n\f\0]|$re_comment)/;
 
 %types = (
     'Page'  => 'PDF::API2::Basic::PDF::Page',
@@ -525,10 +528,10 @@ sub readval {
     }
 
     # Indirect Object
-    elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+R/s) {
+    elsif ($str =~ m/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+R/s) {
         my $num = $1;
         $value = $2;
-        $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+R//s;
+        $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+R//s;
         unless ($result = $self->test_obj($num, $value)) {
             $result = PDF::API2::Basic::PDF::Objind->new();
             $result->{' objnum'} = $num;
@@ -536,17 +539,18 @@ sub readval {
             $self->add_obj($result, $num, $value);
         }
         $result->{' parent'} = $self;
+        weaken $result->{' parent'};
         $result->{' realised'} = 0;
         # gdj: FIXME: if any of the ws chars were crs, then the whole
         # string might not have been read.
     }
 
     # Object
-    elsif ($str =~ m/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj/s) {
+    elsif ($str =~ m/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj/s) {
         my $obj;
         my $num = $1;
         $value = $2;
-        $str =~ s/^([0-9]+)$ws_char+([0-9]+)$ws_char+obj//s;
+        $str =~ s/^([0-9]+)(?:$ws_char|$re_comment)+([0-9]+)(?:$ws_char|$re_comment)+obj//s;
         ($obj, $str) = $self->readval($str, %opts);
         if ($result = $self->test_obj($num, $value)) {
             $result->merge($obj);
@@ -656,6 +660,18 @@ sub readval {
     elsif ($str =~ m/^([+-.0-9]+)($irreg_char|$)/) {
         $value = $1;
         $str =~ s/^([+-.0-9]+)//;
+
+        # If $str only consists of whitespace (or is empty), call update to
+        # see if this is the beginning of an indirect object or reference
+        if ($update and ($str =~ /^$re_whitespace*$/s or $str =~ /^$re_whitespace+[0-9]+$re_whitespace*$/s)) {
+            $str =~ s/^$re_whitespace+/ /s;
+            $str =~ s/$re_whitespace+$/ /s;
+            $str = update($fh, $str);
+            if ($str =~ m/^$re_whitespace*([0-9]+)$re_whitespace+(?:R|obj)/s) {
+                return $self->readval("$value $str", %opts);
+            }
+        }
+
         $result = PDF::API2::Basic::PDF::Number->from_pdf($value);
     }
 
@@ -723,7 +739,7 @@ sub read_objnum {
             $pairs = substr($object_stream->{' stream'}, 0, $object_stream->{'First'}->val);
         }
         else {
-            open $fh, '<', $object_stream->{' streamfile'};
+            CORE::open($fh, '<', $object_stream->{' streamfile'});
             read($fh, $pairs, $object_stream->{'First'}->val());
         }
         my @map = split /\s+/, $pairs;
@@ -812,7 +828,6 @@ sub new_obj {
                 }
                 else {
                     $res = $self->test_obj($i, $ng) || $self->add_obj(PDF::API2::Basic::PDF::Objind->new(), $i, $ng);
-                    $tdict->{' xref'}{$i}[0] = $tdict->{' xref'}{$i}[0];
                     $self->out_obj($res);
                     return $res;
                 }
@@ -852,6 +867,7 @@ sub out_obj {
     # in the hash) (which is super-fast).
     unless (exists $self->{' outlist_cache'}{$obj}) {
         push @{$self->{' outlist'}}, $obj;
+        weaken $self->{' outlist'}->[-1];
         $self->{' outlist_cache'}{$obj} = 1;
     }
     return $obj;
@@ -976,6 +992,7 @@ sub copy {
                 $obj->{' objgen'} = $ng;
                 $self->add_obj($obj, $i, $ng);
                 $obj->{' parent'} = $self;
+                weaken $obj->{' parent'};
                 $obj->{' realised'} = 0;
             }
             $obj->realise;
@@ -1089,6 +1106,7 @@ sub add_obj {
 
     $self->{' objcache'}{$num, $gen} = $obj;
     $self->{' objects'}{$obj->uid()} = [$num, $gen];
+    weaken $self->{' objcache'}{$num, $gen};
     return $obj;
 }
 
@@ -1167,15 +1185,13 @@ sub readxrtr {
 
         ($tdict, $buf) = $self->readval($buf);
     }
-    elsif ($buf =~ m/^(\d+)\s+(\d+)\s+obj/i)
-    {
+    elsif ($buf =~ m/^(\d+)\s+(\d+)\s+obj/i) {
         my ($xref_obj, $xref_gen) = ($1, $2);
 
         # XRef streams.
         ($tdict, $buf) = $self->readval($buf);
 
-        unless ($tdict->{' stream'})
-        {
+        unless ($tdict->{' stream'}) {
             die "Malformed XRefStm at $xref_obj $xref_gen obj in PDF file $self->{' fname'}";
         }
         $tdict->read_stream(1);
@@ -1187,12 +1203,10 @@ sub readxrtr {
         my $last;
 
         my @index;
-        if (defined $tdict->{Index})
-        {
+        if (defined $tdict->{Index}) {
             @index = map { $_->val() } @{$tdict->{Index}->val};
         }
-        else
-        {
+        else {
             @index = (0, $tdict->{Size}->val);
         }
 
@@ -1200,16 +1214,14 @@ sub readxrtr {
             $start = shift(@index);
             $last = $start + shift(@index) - 1;
 
-            for my $i ($start...$last)
-            {
+            for my $i ($start...$last) {
                 # Replaced "for $xmin" because it creates a loop-specific local variable, and we
                 # need $xmin to be correct for maxobj below.
                 $xmin = $i;
 
                 my @cols;
 
-                for my $w (@widths)
-                {
+                for my $w (@widths) {
                     my $data;
                     $data = $self->_unpack_xref_stream($w, substr($stream, 0, $w, '')) if $w;
 
@@ -1230,8 +1242,7 @@ sub readxrtr {
             }
         }
     }
-    else
-    {
+    else {
         die "Malformed xref in PDF file $self->{' fname'}";
     }
 
@@ -1273,7 +1284,7 @@ sub out_trailer {
     my $tloc = $fh->tell();
     $fh->print("xref\n");
 
-    my @xreflist = sort { $self->{' objects'}{$a->uid}[0] <=> $self->{' objects'}{$b->uid}[0] } (@{$self->{' printed'}}, @{$self->{' free'}});
+    my @xreflist = sort { $self->{' objects'}{$a->uid}[0] <=> $self->{' objects'}{$b->uid}[0] } (@{$self->{' printed'} || []}, @{$self->{' free'} || []});
 
     my ($i, $j, $k);
     unless ($update) {
@@ -1294,7 +1305,7 @@ sub out_trailer {
         }
     }
 
-    my @freelist = sort { $self->{' objects'}{$a->uid}[0] <=> $self->{' objects'}{$b->uid}[0] } @{$self->{' free'}};
+    my @freelist = sort { $self->{' objects'}{$a->uid}[0] <=> $self->{' objects'}{$b->uid}[0] } @{$self->{' free'} || []};
 
     $j = 0; my $first = -1; $k = 0;
     for ($i = 0; $i <= $#xreflist + 1; $i++) {

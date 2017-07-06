@@ -12,7 +12,13 @@ pnginspect - print contents of PNG files
 
 =head1 DESCRIPTION
 
-This is a primitive "dumper" for PNG image data.
+This is a primitive "dumper" for PNG image data. If you have
+L<Data::Validate::URI> and L<LWP::Simple> installed, you can also use
+it to examine PNG files on the web, like this:
+
+    pnginspect http://libpng.org/pub/png/img_png/libpng-88x31.png
+
+These modules are not installed by default.
 
 =head1 SEE ALSO
 

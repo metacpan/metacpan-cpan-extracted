@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-OurPkgVersion
 
+0.11      2017-07-02
+  - use :PerlExecFiles filefinder whenever possible
+
 0.10      2016-06-21
   - Production release identical to 0.09_01
 

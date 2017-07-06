@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 =encoding utf8
 
@@ -13,10 +13,10 @@ Prty - Class library in Perl
 
 =head1 DESCRIPTION
 
-Diese Klassenbibliothek enthält meine persönlichen
-anwendungsunabhängigen Klassen. Sie sind nach einheitlichen
-Prinzipien konzipiert. Die Bibliothek befindet sich unter
-kontinuierlicher Weiterentwicklung.
+Diese Klassenbibliothek enthält anwendungsunabhängige Klassen,
+die ich in Perl-Projekten einsetze. Sie sind nach
+einheitlichen Prinzipien konzipiert. Die Bibliothek befindet
+sich unter kontinuierlicher Weiterentwicklung.
 
 =head1 CLASSES
 
@@ -33,6 +33,10 @@ L<Prty::Array> - Operationen auf Arrays
 =item *
 
 L<Prty::ClassConfig> - Verwalte Information auf Klassenebene
+
+=item *
+
+L<Prty::ClassLoader> - Lade Perl-Klassen automatisch
 
 =item *
 
@@ -296,6 +300,10 @@ L<Prty::Http::Client> - HTTP-Client
 
 =item *
 
+L<Prty::Http::Client::Lwp> - HTTP Operationen
+
+=item *
+
 L<Prty::Http::Cookie> - HTTP-Cookie
 
 =item *
@@ -380,7 +388,7 @@ L<Prty::OrderedHash> - Hash mit geordneten Elementen
 
 =item *
 
-L<Prty::Parallel> - Führe eine Berechnung parallel aus
+L<Prty::Parallel> - Parallele Verarbeitung
 
 =item *
 
@@ -556,6 +564,14 @@ L<Prty::Terminal> - Ein- und Ausgabe aufs Terminal
 
 =item *
 
+L<Prty::Test::Class> - Basisklasse für Testklassen
+
+=item *
+
+L<Prty::Test::Class::Method> - Testmethode
+
+=item *
+
 L<Prty::TextFile> - Textdatei als Array von Zeilen
 
 =item *
@@ -608,17 +624,21 @@ L<Prty::Url> - URL Klasse
 
 =item *
 
-L<Prty::XML::LibXML> - Funktionale Erweiterungen von XML::LibXML
+L<Prty::XTerm> - XTerminal Fenster
 
 =item *
 
-L<Prty::XTerm> - XTerminal Fenster
+L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =back
 
+=head1 INSTALL
+
+            $ cpanm Prty
+
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

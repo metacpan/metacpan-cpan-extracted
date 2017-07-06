@@ -13,14 +13,14 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Generate and compare checksums of database schematas",
+  "dist_abstract" => "Manage your datebase schema via checksums",
   "dist_author" => [
     "Thomas Klausner <domm\@cpan.org>",
     "Maro\x{161} Koll\x{e1}r <maros\@cpan.org>",
     "Klaus Ita <koki\@worstofall.com>"
   ],
   "dist_name" => "DBIx-SchemaChecksum",
-  "dist_version" => "1.006",
+  "dist_version" => "1.101",
   "license" => "perl",
   "module_name" => "DBIx::SchemaChecksum",
   "recommends" => {},
@@ -31,9 +31,11 @@ my %module_build_args = (
     "Data::Dumper" => 0,
     "Digest::SHA1" => 0,
     "File::Find::Rule" => 0,
+    "File::HomeDir" => 0,
     "IO::Prompt::Tiny" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
+    "Moose::Util::TypeConstraints" => 0,
     "MooseX::App" => "1.21",
     "MooseX::App::Command" => 0,
     "Path::Class" => 0,
@@ -45,7 +47,8 @@ my %module_build_args = (
     "warnings" => 0
   },
   "script_files" => [
-    "bin/scs.pl"
+    "bin/scs.pl",
+    "bin/dbchecksum"
   ],
   "test_requires" => {
     "DBD::SQLite" => "1.35",

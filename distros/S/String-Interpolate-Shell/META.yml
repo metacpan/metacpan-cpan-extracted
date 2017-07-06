@@ -1,28 +1,47 @@
 ---
-abstract: ~
+abstract: 'Variable interpolation, shell style'
 author:
-  - 'Smithsonian Astrophysical Observatory'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 1.01'
-license: gpl3
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: String-Interpolate-Shell
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  String::Interpolate::Shell:
+    file: lib/String/Interpolate/Shell.pm
+    version: '0.02'
 requires:
-  Params::Check: 0
-  Text::Balanced: 0
-  base: 0
+  Carp: '0'
+  Exporter: '0'
+  Params::Check: '0'
+  Text::Balanced: '0'
+  base: '0'
+  if: '0'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://opensource.org/licenses/gpl-3.0.html
-version: 0.01
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=String-Interpolate-Shell
+  repository: git://github.com/djerius/string-interpolate-shell.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Prereqs::CheckCircular;
 
-our $DATE = '2016-10-07'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-07-04'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,7 +10,7 @@ use warnings;
 use Moose;
 with 'Dist::Zilla::Role::InstallTool';
 
-use App::lcpan::Call qw(call_lcpan_script);
+use App::lcpan::Call qw(call_lcpan_script check_lcpan);
 use namespace::autoclean;
 
 sub _list_my_modules {
@@ -32,6 +32,14 @@ sub setup_installer {
     if ($ENV{DZIL_CHECKCIRCULAR_SKIP}) {
         $self->log(["Skipping checking circular dependency because ".
                         "environment DZIL_CHECKCIRCULAR_SKIP is set to true"]);
+        return;
+    }
+
+    my $lcpan_check = check_lcpan();
+    unless ($lcpan_check->[0] == 200) {
+        $self->log(["Skipping checking circular dependency because ".
+                        "check_lcpan() was not successful: " .
+                            $lcpan_check->[1]]);
         return;
     }
 
@@ -86,7 +94,7 @@ Dist::Zilla::Plugin::Prereqs::CheckCircular - Check for circular/recursive depen
 
 =head1 VERSION
 
-This document describes version 0.003 of Dist::Zilla::Plugin::Prereqs::CheckCircular (from Perl distribution Dist-Zilla-Plugin-Prereqs-CheckCircular), released on 2016-10-07.
+This document describes version 0.004 of Dist::Zilla::Plugin::Prereqs::CheckCircular (from Perl distribution Dist-Zilla-Plugin-Prereqs-CheckCircular), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -136,7 +144,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

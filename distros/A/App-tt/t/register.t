@@ -1,3 +1,4 @@
+use lib '.';
 use t::Helper;
 use File::Path 'remove_tree';
 use File::Spec::Functions 'catdir';

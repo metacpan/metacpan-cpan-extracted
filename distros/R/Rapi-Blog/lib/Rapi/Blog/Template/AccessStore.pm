@@ -212,7 +212,10 @@ around 'get_template_vars' => sub {
       else {
         return join('',$c->mount_url,'/',$ns,'/#!/',$ns,'/main/db/db_post/add')
       }
-    }
+    },
+    
+    # Expose this here so its available to non-priv templates:
+    mount_url => sub { $c->mount_url }
     
   };
   

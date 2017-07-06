@@ -1,0 +1,172 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Template::Textdomain - template translation with one domain
+
+=head1 INHERITANCE
+
+ Log::Report::Template::Textdomain
+   is a Log::Report::Domain
+   is a Log::Report::Minimal::Domain
+
+=head1 SYNOPSIS
+
+ my $templater = Log::Report::Template->new(...);
+ my $domain    = $templater->newTextdomain(%options);
+
+=head1 DESCRIPTION
+
+Manage one translation domain for L<Log::Report::Template|Log::Report::Template>.
+
+Extends L<"DESCRIPTION" in Log::Report::Domain|Log::Report::Domain/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in Log::Report::Domain|Log::Report::Domain/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in Log::Report::Domain|Log::Report::Domain/"Constructors">.
+ 
+=over 4
+
+=item Log::Report::Template::Textdomain-E<gt>B<new>(%options)
+
+ -Option              --Defined in                  --Default
+  lexicon                                             undef
+  name                  Log::Report::Minimal::Domain  <required>
+  only_in_directory                                   undef
+  translation_function                                'loc'
+
+=over 2
+
+=item lexicon => DIRECTORY
+
+=item name => STRING
+
+=item only_in_directory => DIRECTORY|ARRAY
+
+The textdomain can only be used in the indicated directories: if found
+anywhere else, it's an error.  When not specified, the function is
+allowed everywhere.
+
+=item translation_function => STRING
+
+The name of the function as used in the template to call for translation.
+See L<function()|Log::Report::Template::Textdomain/"Attributes">.  It must be unique over all text-domains used.
+
+=back
+
+=back
+
+=head2 Attributes
+
+Extends L<"Attributes" in Log::Report::Domain|Log::Report::Domain/"Attributes">.
+ 
+=over 4
+
+=item $obj-E<gt>B<configure>(%options)
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<contextRules>()
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<defaultContext>()
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<expectedIn>($filename)
+
+Return true when the function name which relates to this domain is
+allowed to be used for the indicated file.  The msgid extractor will warn
+when there is no match.
+
+=item $obj-E<gt>B<function>()
+
+Returns the name of the function which is used for translations.
+
+=item $obj-E<gt>B<isConfigured>()
+
+Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
+
+=item $obj-E<gt>B<lexicon>()
+
+Directory where the translation tables are kept.
+
+=item $obj-E<gt>B<name>()
+
+Inherited, see L<Log::Report::Minimal::Domain/"Attributes">
+
+=item $obj-E<gt>B<nativeLanguage>()
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<readConfig>($filename)
+
+=item Log::Report::Template::Textdomain-E<gt>B<readConfig>($filename)
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<setContext>(STRING|HASH|ARRAY|PAIRS)
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<translator>()
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=item $obj-E<gt>B<updateContext>(STRING|HASH|ARRAY|PAIRS)
+
+Inherited, see L<Log::Report::Domain/"Attributes">
+
+=back
+
+=head2 Action
+
+Extends L<"Action" in Log::Report::Domain|Log::Report::Domain/"Action">.
+ 
+=over 4
+
+=item $obj-E<gt>B<interpolate>( $msgid, [$args] )
+
+Inherited, see L<Log::Report::Minimal::Domain/"Action">
+
+=item $obj-E<gt>B<translate>($message, $language)
+
+Inherited, see L<Log::Report::Domain/"Action">
+
+=back
+
+=head2 Translating
+
+=over 4
+
+=item $obj-E<gt>B<translationFunction>()
+
+This method returns a CODE which is able to handle a call for
+translation by Template Toolkit.
+
+=encoding utf-8
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in Log::Report::Domain|Log::Report::Domain/"DETAILS">.
+ 
+=head1 SEE ALSO
+
+This module is part of Log-Report-Template distribution version 0.12,
+built on July 05, 2017. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

@@ -3,6 +3,7 @@ use Test::More;
 use lib qw(../lib);
 use DDC::Any qw(:pp);
 use File::Basename;
+use lib '.'; ##-- for perl 5.26 (--> '.' is no longer in @INC; did you mean do "./t/parseme.pl"?)
 
 my $TEST_DIR = File::Basename::dirname($0);
 my $loadpl = do "$TEST_DIR/parseme.pl"

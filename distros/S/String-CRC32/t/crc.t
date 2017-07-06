@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl  -I./blib/arch -I./blib/lib
 
-require String::CRC32;
+use String::CRC32;
 
 $string1 = "This is the test string";
 

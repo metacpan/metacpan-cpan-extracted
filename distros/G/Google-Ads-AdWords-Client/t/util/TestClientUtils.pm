@@ -70,6 +70,7 @@ sub get_test_client_no_auth {
 
   $client = Test::MockObject::Extends->new($client);
   $client->mock("_get_auth_handler", sub { return undef; });
+  $client->mock("get_last_soap_request", sub { return "N/A"; });
 
   return $client;
 }

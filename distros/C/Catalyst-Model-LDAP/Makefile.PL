@@ -11,12 +11,13 @@ requires 'Catalyst::Model';
 requires 'Class::Accessor::Fast';
 requires 'Data::Page';
 requires 'MRO::Compat';
-requires 'Net::LDAP' => '0.34';
+requires 'Net::LDAP' => '0.65';
 requires 'Net::LDAP::Constant';
 requires 'Net::LDAP::Control::Sort';
 requires 'Net::LDAP::Control::VLV';
 requires 'Net::LDAP::Entry';
 requires 'Net::LDAP::Search';
+requires 'Net::LDAP::Control::ProxyAuth' => '1.09';
 
 build_requires 'Data::Dumper';
 build_requires 'FindBin';

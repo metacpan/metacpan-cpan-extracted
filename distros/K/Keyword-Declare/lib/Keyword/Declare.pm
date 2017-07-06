@@ -1,7 +1,7 @@
 package Keyword::Declare;
-our $VERSION = '0.001000';
+our $VERSION = '0.001004';
 
-use 5.014;     # required for pluggable keywords plus /.../r
+use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
 use Carp;
 use List::Util 1.45 'max', 'uniqstr';
@@ -70,10 +70,11 @@ sub import {
         my %keytype_info = ( %+, location => "$file line $line" );
 
         if (${^H}{"Keyword::Declare debug"}) {
-            warn +( ("#" x 50) . "\n"
-                . " Installed keytype at $keytype_info{location}:\n\n$keytype_info{syntax}\n\n"
-                . ("#" x 50) . "\n"
-                ) =~ s{^}{###}gmr;
+            my $msg = ("#" x 50) . "\n"
+                    . " Installed keytype at $keytype_info{location}:\n\n$keytype_info{syntax}\n\n"
+                    . ("#" x 50) . "\n";
+            $msg =~ s{^}{###}gm;
+            warn $msg;
         }
 
         # Install the lexical type definition...
@@ -167,7 +168,7 @@ sub import {
             $PPR::GRAMMAR
         }{}xms
             or croak "Invalid keyword definition. Expected $expected\nbut found: ",
-                     substr($$src_ref, $failed_at) =~ /(\S+)/;
+                      substr($$src_ref, $failed_at) =~ /(\S+)/;
 
         # Save the information from the keyword definition..
         @Keyword::Declare::params = map { _deprefix($_) } @Keyword::Declare::params;
@@ -210,10 +211,11 @@ sub import {
 
         # Report installation of keyword if requested...
         if (${^H}{"Keyword::Declare debug"}) {
-            warn +( ("#" x 50) . "\n"
-                . " Installed keyword macro at $keyword_info{location}:\n\n$keyword_info{syntax}\n\n"
-                . ("#" x 50) . "\n"
-                ) =~ s{^}{###}gmr;
+            my $msg = ("#" x 50) . "\n"
+                      . " Installed keyword macro at $keyword_info{location}:\n\n$keyword_info{syntax}\n\n"
+                      . ("#" x 50) . "\n";
+            $msg =~ s{^}{###}gm;
+            warn $msg;
         }
 
         # Install the keyword, exporting it as well if it's in an import() or unimport() sub...
@@ -228,7 +230,8 @@ sub _deprefix {
     my ($hash_ref) = @_;
 
     return undef if !defined $hash_ref;
-    return { map { s{^____K_D___}{}r => $hash_ref->{$_} }  keys %{$hash_ref} };
+    return { map { my $key = $_; $key =~ s{^____K_D___}{}; $key => $hash_ref->{$_} }
+                 keys %{$hash_ref} };
 }
 
 
@@ -261,6 +264,7 @@ sub _get_dispatcher_for {
     return $dispatcher_for{$keyword_name} //= sub {
         my ($src_ref) = @_;
         my ($package, $file, $line) = caller;
+        local $PPR::ERROR;
 
         # Which variants of this keyword are currently in scope???
         my @candidate_IDs = @^H{ grep { m{^ Keyword::Declare \s+ active:$keyword_name:}xms } keys %^H };
@@ -280,12 +284,23 @@ sub _get_dispatcher_for {
 
         # If none of them match...game over!!!
         if (!@viable_IDs) {
+            my $error = eval "no strict;sub{\n" . ($PPR::ERROR//q{}) . '}'
+                            ? "    $keyword_name  "
+                                 . do{ my $src = $$src_ref;
+                                       $src =~ s{ \A \s*+ (\S++ [^\n]*+) \n .* }{$1}xs;
+                                       $src;
+                                   }
+                            : do{ my $err = $@;
+                                  $err =~ s{^}{    }gm;
+                                  $err =~ s{\(eval \d++\) line \d++}
+                                           { "$file line " . $PPR::ERROR->line($line) }eg;
+                                  $err
+                                };
             croak "Invalid "
                 . join(" or ", uniqstr map { $keyword_impls[$_]{desc} } @candidate_IDs)
                 . " at $file line $line.\nExpected:"
                 . join("\n    ", q{}, uniqstr map { $keyword_impls[$_]{syntax} } @candidate_IDs)
-                . "\nbut found:\n    $keyword_name  "
-                . ($$src_ref =~ s{ \A \s*+ (\S++ [^\n]*+) \n .* }{$1}xsr)
+                . "\nbut found:\n$error"
                 . "\nCompilation failed";
         }
 
@@ -312,7 +327,10 @@ sub _get_dispatcher_for {
                 croak "Ambiguous "
                     . join(" or ", uniqstr map { $keyword_impls[$_]{desc} } @viable_IDs)
                     . " at $file line $line:\n    $keyword_name  "
-                    . ($$src_ref =~ s{ \A \s*+ ( \S++ [^\n]*+) \n .* }{$1}xsr)
+                    . do{ my $src = $$src_ref;
+                          $src =~ s{ \A \s*+ ( \S++ [^\n]*+) \n .* }{$1}xs;
+                          $src;
+                        }
                     . "\nCould be:\n"
                     . join("\n", map { "    $keyword_impls[$_]{syntax}" } @viable_IDs)
                     . "\nCompilation failed";
@@ -490,7 +508,9 @@ sub _resolve_type {
     }
     elsif ($type =~ $REGEX_TYPE ) {
         $type =~ $REGEX_PAT or die "Keyword::Declare internal error: weird regex";
-        return $+{pattern} =~ s{(?<!\\)/}{\\/}gr;
+        my $pat = $+{pattern};
+        $pat =~ s{(?<!\\)/}{\\/}g;
+        return $pat;
     }
     elsif ($type =~ $TYPE_JUNCTION) {
         return join '|', map { _resolve_type($_, $user_defined_type_for) } split /[|]/, $type;
@@ -539,14 +559,22 @@ sub _unpack_signature {
             }
 
             # Convert component types to regexes...
-            $param->{desc} //= ($param->{name} ? "<$param->{name}>" : '<'.join(' or ', @types).'>') =~ tr/_/ /r;
+            $param->{desc} //= do {
+                my $desc = $param->{name} ? "<$param->{name}>" : '<'.join(' or ', @types).'>';
+                $desc =~ tr/_/ /;
+                $desc;
+            };
             $type = '/' . join('|', map { _resolve_type( $_ ) } @types) . '/';
 
         }
 
         # ...for literal string types...
         if ($type =~ m{\A (?: q\s*\S | ' ) (.*) \S \z }x) {
-            $param->{desc} //= ($param->{name} ? "<$param->{name}>" =~ tr/_/ /r : $1);
+            $param->{desc}
+                //= ($param->{name}
+                        ? do{ my $name = "<$param->{name}>"; $name =~ tr/_/ /; $name }
+                        : $1
+                    );
             $matcher = '(?:' . quotemeta($1) . ')';
         }
 
@@ -555,7 +583,11 @@ sub _unpack_signature {
             $type =~ $REGEX_PAT or die "Keyword::Declare internal error: weird regex";
             my %match = %+;
             $match{pattern} =~ s{(?<!\\)/}{\\/}g;
-            $param->{desc} //= ($param->{name} ? "<$param->{name}>" =~ tr/_/ /r : "/$match{pattern}/$match{modifiers}");
+            $param->{desc}
+                //= ($param->{name}
+                        ? do{ my $name = "<$param->{name}>"; $name =~ tr/_/ /; $name }
+                        : "/$match{pattern}/$match{modifiers}"
+                    );
             $matcher = "(?$match{modifiers}:$match{pattern})";
         }
 
@@ -570,8 +602,9 @@ sub _unpack_signature {
 
         # Resolve implicit quantification (and any default value)...
         if (exists $param->{default}) {
-            $keyword_info_ref->{sig_defaults}{$param->{name}}
-                = $param->{default} =~ s{\A (?: qq? \s* \S | ["']) (.*) \S \Z }{$1}grx;
+            my $def = $param->{default};
+            $def =~ s{\A (?: qq? \s* \S | ["']) (.*) \S \Z }{$1}gx;
+            $keyword_info_ref->{sig_defaults}{$param->{name}} = $def;
             $param->{quantifier} //= $param->{sigil} && $param->{sigil} eq '@' ? '*' : '?';
         }
         else {
@@ -606,7 +639,7 @@ sub _unpack_signature {
             $keyword_info_ref->{sig_vars_unpack} .= "$param->{sigil}$param->{name} = "
                                                   . ( $param->{sigil} eq '$'
                                                         ? 'shift();'
-                                                        : "map { s{^(?: \\s*+ (?: [#].*\\n \\s*+ )*+)}{}rx } grep {defined && /\\S/} split m{($single_matcher \$PPR::GRAMMAR)}x, shift();"
+                                                        : "map { s{^(?: \\s*+ (?: [#].*\\n \\s*+ )*+)}{}x; \$_ } grep {defined && /\\S/} split m{($single_matcher \$PPR::GRAMMAR)}x, shift();"
                                                     )
         }
         else {
@@ -721,7 +754,13 @@ sub _insert_replacement_code {
 
     # Tidy them, if requested...
     @args = map {
-        !defined($_) ? undef : m{\S} ? s{\A\s*+(?:\#.*\n\s*+)*+}{}r =~ s{\s*+(?:\#.*\n\s*+)*+\z}{}r : $_
+          !defined($_) ? undef
+        : m{\S}        ? do { my $arg = $_;
+                              $arg =~ s{\A\s*+(?:\#.*\n\s*+)*+}{};
+                              $arg =~ s{\s*+(?:\#.*\n\s*+)*+\z}{};
+                              $arg;
+                            }
+        :                $_
     } @args
         if !$keyword->{keepspace};
 
@@ -735,14 +774,19 @@ sub _insert_replacement_code {
     if (${^H}{"Keyword::Declare debug"}) {
         my $keyword = "    $keyword_impls[$ID]{syntax}";
         my $from    = "    $keyword_impls[$ID]{keyword} $arg_list";
-        my $to      = $replacement_code =~ s{\A\s*\n|\n\s*\Z}{}gmr =~ s{\h+}{ }gr =~ s{^}{    }gmr;
+        my $to      = $replacement_code;
+           $to =~ s{\A\s*\n|\n\s*\Z}{}gm;
+           $to =~ s{\h+}{ }g;
+           $to =~ s{^}{    }gm;
 
-        warn +( ("#" x 50) . "\n"
+        my $msg
+            =   ("#" x 50) . "\n"
               . " Keyword macro defined at $keyword_impls[$ID]{location}:\n\n$keyword\n\n"
               . " Converted code at $file line $line:"                . "\n\n$from\n\n"
               . " Into:"                                              . "\n\n$to\n\n"
-              . ("#" x 50) . "\n"
-              ) =~ s{^}{###}gmr;
+              . ("#" x 50) . "\n";
+        $msg =~ s{^}{###}gm;
+        warn $msg;
     }
 
     # Track possible cycles...
@@ -806,7 +850,11 @@ sub _resolve_matches {
     # Extend type hierarchy...
     my @keytype_isa = map { my ($derived, $base) = m{ \A Keyword::Declare \s+ keytype:(\w+)=(\w+) \z}xms;
                             if ($derived) {
-                                my @ancestors = map  { s{ \A $base $; }{$derived$;}xmsr => 1 }
+                                my @ancestors = map  { my $anc = $_;
+                                                       $anc =~ s{ \A $base $; }
+                                                                {$derived$;}xms;
+                                                       $anc => 1
+                                                     }
                                                 grep { m{ \A $base $; }xms }
                                                 keys %isa;
                                 $derived.$;.$base => 1, @ancestors;
@@ -852,7 +900,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001000
+This document describes Keyword::Declare version 0.001004
 
 
 =head1 STATUS
@@ -1955,8 +2003,7 @@ Keyword::Declare requires no configuration files or environment variables.
 
 The module is an interface to Perl's pluggable keyword mechanism, which
 was introduced in Perl 5.12. Hence it will never work under earlier
-versions of Perl. The implementation also uses contructs introduced in
-Perl 5.14, so that is the minimal practical version.
+versions of Perl.
 
 Currently requires both the Keyword::Simple module and the PPR module.
 

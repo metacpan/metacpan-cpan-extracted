@@ -13,7 +13,7 @@ sub _croak {
 
 use XSLoader;
 BEGIN {
-    our $VERSION = '2.000007';
+    our $VERSION = '2.001001';
     #$VERSION =~ s/-TRIAL[0-9]*\z//;
     XSLoader::load;
 }
@@ -231,15 +231,6 @@ for my $v (values %import_map) {
     }
 }
 
-our @type_reifiers = (
-    \&_reify_type_auto,
-    \&_reify_type_moose,
-);
-
-our @sub_installers;
-
-our @shifty_types;
-
 sub import {
     my $class = shift;
 
@@ -289,7 +280,7 @@ sub import {
         _assert_valid_attributes $clean{attrs} if $clean{attrs};
 
         if (!exists $type{reify_type}) {
-            $clean{reify_type} = 0;
+            $clean{reify_type} = \&_reify_type_auto;
         } else {
             my $rt = delete $type{reify_type} // '(undef)';
             if (!ref $rt) {
@@ -301,7 +292,7 @@ sub import {
                 confess qq{"$rt" doesn't look like a type reifier};
             }
 
-            $clean{reify_type} = _find_or_add_idx \@type_reifiers, $rt;
+            $clean{reify_type} = $rt;
         }
 
         if (!exists $type{install_sub}) {
@@ -312,8 +303,6 @@ sub import {
                 _assert_valid_identifier $is;
             } elsif (ref $is ne 'CODE') {
                 confess qq{"$is" doesn't look like a sub installer};
-            } else {
-                $is = _find_or_add_idx \@sub_installers, $is;
             }
 
             $clean{install_sub} = $is;
@@ -323,6 +312,7 @@ sub import {
             my $shift = delete $type{shift} // [];
             $shift = [$shift] if !ref $shift;
             my $str = '';
+            my @shifty_types;
             for my $item (@$shift) {
                 my ($name, $type);
                 if (ref $item) {
@@ -341,6 +331,7 @@ sub import {
                 }
                 $str .= ' ';
             }
+            $clean{shift_types} = \@shifty_types;
             $str
         };
 
@@ -357,6 +348,7 @@ sub import {
         $spec{$name} = \%clean;
     }
 
+    my %config = %{$^H{+HINTK_CONFIG} // {}};
     for my $kw (keys %spec) {
         my $type = $spec{$kw};
 
@@ -372,26 +364,31 @@ sub import {
         $flags |= FLAG_NAMED_PARAMS if $type->{named_parameters};
         $flags |= FLAG_TYPES_OK     if $type->{types};
         $flags |= FLAG_RUNTIME      if $type->{runtime};
-        $^H{HINTK_FLAGS_   . $kw} = $flags;
-        $^H{HINTK_SHIFT_   . $kw} = $type->{shift};
-        $^H{HINTK_ATTRS_   . $kw} = $type->{attrs};
-        $^H{HINTK_REIFY_   . $kw} = $type->{reify_type};
-        $^H{HINTK_INSTALL_ . $kw} = $type->{install_sub};
-        $^H{+HINTK_KEYWORDS} .= "$kw ";
+        $config{$kw} = {
+            HINTSK_FLAGS, => $flags,
+            HINTSK_SHIFT, => $type->{shift},
+            HINTSK_ATTRS, => $type->{attrs},
+            HINTSK_REIFY, => $type->{reify_type},
+            HINTSK_INSTL, => $type->{install_sub},
+            !@{$type->{shift_types}} ? () : (
+                HINTSK_SHIF2, => $type->{shift_types},
+            ),
+        };
     }
+    $^H{+HINTK_CONFIG} = \%config;
 }
 
 sub unimport {
     my $class = shift;
 
     if (!@_) {
-        delete $^H{+HINTK_KEYWORDS};
+        delete $^H{+HINTK_CONFIG};
         return;
     }
 
-    for my $kw (@_) {
-        $^H{+HINTK_KEYWORDS} =~ s/(?<![^ ])\Q$kw\E //g;
-    }
+    my %config = %{$^H{+HINTK_CONFIG}};
+    delete @config{@_};
+    $^H{+HINTK_CONFIG} = \%config;
 }
 
 

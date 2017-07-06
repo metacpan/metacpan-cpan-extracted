@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use Prty::Formatter;
 
@@ -155,7 +155,7 @@ sub roundTo {
 
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

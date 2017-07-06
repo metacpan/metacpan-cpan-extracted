@@ -32,5 +32,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/app-git-ship/issues
   homepage: https://github.com/jhthorsen/app-git-ship
   repository: https://github.com/jhthorsen/app-git-ship.git
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

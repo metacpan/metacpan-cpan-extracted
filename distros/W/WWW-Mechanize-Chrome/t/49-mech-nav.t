@@ -5,7 +5,7 @@ use Test::More;
 use Log::Log4perl qw(:easy);
 
 use WWW::Mechanize::Chrome;
-use lib './inc', '../inc';
+use lib './inc', '../inc', '.';
 use Test::HTTP::LocalServer;
 
 use t::helper;
@@ -23,16 +23,11 @@ if (my $err = t::helper::default_unavailable) {
     plan tests => 3*@instances;
 };
 
-my %args;
 sub new_mech {
-    # Just keep these to pass the parameters to new instances
-    if( ! keys %args ) {
-        %args = @_;
-    };
     #use Mojolicious;
     WWW::Mechanize::Chrome->new(
         autodie => 1,
-        %args,
+        @_,
     );
 };
 

@@ -2,10 +2,10 @@ package PICA::Parser::Plain;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use charnames ':full';
-use Carp qw(croak);
+use Carp qw(carp croak);
 
 use parent 'PICA::Parser::Base';
 
@@ -30,13 +30,22 @@ sub _next_record {
     for my $field (@fields) {
 
         my ( $tag, $occurence, $data );
-        if ( $field =~ m/^(\d{3}[A-Z@])(\/(\d{2}))?\s(.*)/ ) {
+        if ( $field =~ m/^(\d{3}[A-Z@])(\/(\d{2}))?\s(.+)/ ) {
             $tag       = $1;
             $occurence = $3 // '';
             $data      = $4;
-        } else {
-            croak 'ERROR: no valid PICA field structure';
         }
+        else {
+            if ( $self->{strict} ) {
+                croak "ERROR: no valid PICA field structure \"$field\"";
+            }
+            else {
+                carp
+                    "WARNING: no valid PICA field structure \"$field\". Skipped field";
+                next;
+            }
+        }
+
 
         # data is byte sequence, no character sequence!
         my @subfields = split /\$(\$+|.)/, $data;
@@ -75,12 +84,24 @@ __END__
 
 =head1 NAME
 
-PICA::Parser::Plain - Plain PICA+ format parser
+PICA::Parser::Plain - Plain PICA format parser
 
 =head2 DESCRIPTION
 
 See L<PICA::Parser::Base> for synopsis and details.
 
 The counterpart of this module is L<PICA::Writer::Plain>.
+
+=head2 Configuration
+
+See L<PICA::Parser::Base> for common configuration parameters.
+
+=over
+ 
+=item C<strict>
+
+By default faulty fields in records are skipped with warnings. You can make them fatal by setting the I<strict> parameter to 1.
+ 
+=back
 
 =cut

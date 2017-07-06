@@ -1,5 +1,8 @@
 Revision history for Alien-MSYS
 
+0.08      2017-06-27 05:02:40 -0400
+  - Add environment override ALIEN_MSYS_INSTALL_TYPE, ALIEN_INSTALL_TYPE
+
 0.07      2014-05-15 09:17:18 -0400
   - fix reinstall bug (GH#3)
 

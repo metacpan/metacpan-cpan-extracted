@@ -65,6 +65,9 @@ gl_context_push(void);
 int 
 gl_context_pop(void);
 
+Bool 
+gl_is_direct(Handle context);
+
 char *
 gl_error_string(char * buf, int len);
 

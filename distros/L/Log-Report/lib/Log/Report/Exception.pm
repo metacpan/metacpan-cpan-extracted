@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Exception;
 use vars '$VERSION';
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 
 use Log::Report      'log-report';
@@ -18,6 +18,7 @@ use Scalar::Util      qw/blessed/;
 
 use overload
     '""'     => 'toString'
+  , 'bool'   => sub {1}    # avoid accidental serialization of message
   , fallback => 1;
 
 
@@ -43,7 +44,8 @@ sub isFatal() { is_fatal shift->{reason} }
 sub message(;$)
 {   my $self = shift;
     @_ or return $self->{message};
-    my $msg = shift;
+
+    my $msg  = shift;
     blessed $msg && $msg->isa('Log::Report::Message')
         or panic "message() of exception expects Log::Report::Message";
     $self->{message} = $msg;

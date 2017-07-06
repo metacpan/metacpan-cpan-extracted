@@ -50,5 +50,5 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Bot-IRC/issues
   homepage: https://github.com/gryphonshafer/Bot-IRC
   repository: https://github.com/gryphonshafer/Bot-IRC.git
-version: '1.14'
+version: '1.15'
 x_serialization_backend: 'YAML::Tiny version 1.70'

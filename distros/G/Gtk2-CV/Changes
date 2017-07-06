@@ -1,7 +1,71 @@
+TODO: mkv
 TODO/FIXME: pixmap-bg-trick sometimes doesn't work (race?)
 TODO/FIXME: remove event does not recalculate schanuzer content size
 TODO: with manual placement, initial contents aren't displayed
 TODO: update a file that has been removed etc.
+TODO: note to self, the reason mplayer hangs during long copies is that execve hangs, because it closes an fd to the target file.
+
+TODO: metacluster
+TODO: "mädhcne" utf-8 bug move to ERROR is a directory
+TODO: up == select dir
+TODO: turbojpeg
+TODO: CV_THUMBNAIL_SCALE
+TODO: Pango-WARNING **: Invalid UTF-8 string passed to pango_layout_set_text() at /opt/bin/cv line 224.
+
+1.61 Sat Jun 24 01:55:48 CEST 2017
+	- work around parser bug in 5.18.1 (-a).
+        - very simple "better than nothing" jpeg cmyk/ycck format decoding.
+	- use ffprobe instead of mplayer to probe video size/type.
+	- switch to using AnyEvent::Fork as provider for the processpool, which ought
+          to save gobs of memory.
+        - much improved async communications with worker processes.
+        - batch expose events together, in an attempt to reduce the amount of
+          expose races in gtk+ (does not fix scrolling races).
+        - create #cpu + 1 worker jobs now, not 1.5 * #cpu + 1 as before.
+        - better shell-quoting: use ""-style for utf-8 filenames and paste as unicode,
+          use bash's $'' syntax for other filenames.
+	- no longer pass a-z from viewer to schnauzer.
+	- properly serialise jobs by priority, instead of executing
+          jobs in parallel on the same path *sometimes*.
+	- escape select-by-prefix menu item labels.
+	- work around more perl unicode bugs.
+        - slightly improved filetype detection.
+        - add "cp" job for external plugins.
+        - work around even more perl unicode bugs that the perl5-porters
+          don't want to fix because of backwards compatibility.
+        - do not stupidly load big video files into memory just
+          to make a thumbnail.
+        - don't modify global $_ in aio callbacks.
+	- make drag-rectangle more visible.
+        - do not enter the last directory on the commandline, if more
+          than one argument is specified.
+        - started using AnyEvent.
+        - space by default activates first file, or first directory, if no files
+          (as opposed to first file or last directory in previous versions).
+        - fix race condition where the schnauzer might stay non-sensitive
+          on fast directory changes.
+        - allow reversal of rotation via .cvrc $REVERSE_ROTATION = 1.
+        - delay initialisation of Gtk2::CV::Schnauzer until first use.
+        - fix a runtime error when starting namecluster with newer gtk's.
+        - do not rely on /dev/shm being world-writable, use
+          /run/shm, /dev/shm and /tmp, in this order.
+        - expect mplayer to sometimes generate more than 2 frames when 1 is
+          requested.
+        - tune video thumbnail generation a bit.
+        - more fixups for "file -i" failing.
+        - properly follows symlinks instead of bailing out.
+        - support perl multicore specification (http://perlmulticore.schmorp.de/)
+          for jpeg loading and image transformations, although nothing takes
+          advantage of this *yet*.
+        - ctrl-up/down in schnauzer tries to move name cluster cursor.
+        - ctrl-shift-T in image window now sets default rotation for
+          subsequent image loads.
+        - ctrl-shift-G in schnauzer now removes thumbnails.
+        - implement j (cycle subtitle) and # (cycle audio track)
+          in mplayer mode.
+        - respect load time (ctrl-shift-T) rotation setting for videos
+          (no clue how to do that at runtime).
+        - print jpeg error messages to stderr.
 
 1.56 Thu Oct 28 14:13:36 CEST 2010
 	- try an ugly workaround against Gtk's CONTINUED brokenness

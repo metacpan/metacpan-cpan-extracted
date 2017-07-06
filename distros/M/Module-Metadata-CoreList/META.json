@@ -1,28 +1,33 @@
 {
    "abstract" : "Scripts to cross-check Build.PL/Makefile.PL with Module::CoreList, etc",
    "author" : [
-      "Ron Savage <ron@savage.net.au>"
+      "Ron Savage (ron@savage.net.au)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "artistic_1"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
    "name" : "Module-Metadata-CoreList",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0",
-            "Test::Pod" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -35,31 +40,31 @@
             "File::HomeDir" : "0.99",
             "File::Spec" : "0",
             "Getopt::Long" : "0",
-            "Hash::FieldHash" : "0",
             "Module::CoreList" : "2.61",
+            "Moo" : "0",
             "Path::Class" : "0",
             "Pod::Usage" : "0",
             "Text::Xslate" : "0",
+            "Types::Standard" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Module::Metadata::CoreList" : {
-         "file" : "lib/Module/Metadata/CoreList.pm",
-         "version" : "1.07"
       },
-      "Module::Metadata::CoreList::Config" : {
-         "file" : "lib/Module/Metadata/CoreList/Config.pm",
-         "version" : "1.07"
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "Test::Pod" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://opensource.org/licenses/artistic-license.php"
-      ]
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/Module-Metadata-CoreList.git",
+         "web" : "https://github.com/ronsavage/Module-Metadata-CoreList"
+      }
    },
-   "version" : "1.07"
+   "version" : "1.08",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

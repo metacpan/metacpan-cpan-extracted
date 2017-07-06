@@ -1,42 +1,42 @@
 ---
 abstract: 'Scripts to cross-check Build.PL/Makefile.PL with Module::CoreList, etc'
 author:
-  - 'Ron Savage <ron@savage.net.au>'
+  - 'Ron Savage (ron@savage.net.au)'
 build_requires:
-  Test::More: 0
-  Test::Pod: 0
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Pod: '0'
 configure_requires:
-  Module::Build: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
-license: artistic
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Module-Metadata-CoreList
-provides:
-  Module::Metadata::CoreList:
-    file: lib/Module/Metadata/CoreList.pm
-    version: 1.07
-  Module::Metadata::CoreList::Config:
-    file: lib/Module/Metadata/CoreList/Config.pm
-    version: 1.07
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Capture::Tiny: 0
-  Config: 0
-  Config::Tiny: 0
-  Date::Simple: 0
-  File::Copy: 0
-  File::HomeDir: 0.99
-  File::Spec: 0
-  Getopt::Long: 0
-  Hash::FieldHash: 0
-  Module::CoreList: 2.61
-  Path::Class: 0
-  Pod::Usage: 0
-  Text::Xslate: 0
-  strict: 0
-  warnings: 0
+  Capture::Tiny: '0'
+  Config: '0'
+  Config::Tiny: '0'
+  Date::Simple: '0'
+  File::Copy: '0'
+  File::HomeDir: '0.99'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  Module::CoreList: '2.61'
+  Moo: '0'
+  Path::Class: '0'
+  Pod::Usage: '0'
+  Text::Xslate: '0'
+  Types::Standard: '0'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://opensource.org/licenses/artistic-license.php
-version: 1.07
+  repository: https://github.com/ronsavage/Module-Metadata-CoreList.git
+version: '1.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

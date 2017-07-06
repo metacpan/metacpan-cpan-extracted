@@ -12,7 +12,7 @@ use File::ShareDir ();
 use Dist::Zilla::Util::CurrentCmd ();
 
 # ABSTRACT: Dist::Zilla plugin bundle used by Plicease
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -32,7 +32,7 @@ sub mvp_multivalue_args { qw(
 
 my %plugin_versions = qw(
   Alien                0.023
-  Author::Plicease.*   2.15
+  Author::Plicease.*   2.16
   OurPkgVersion        0.06
   MinimumPerl          1.006
   InstallGuide         1.200006
@@ -323,7 +323,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 

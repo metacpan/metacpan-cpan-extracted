@@ -1,7 +1,7 @@
 package Log::ger::Util;
 
-our $DATE = '2017-06-21'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '0.012'; # VERSION
 
 use strict;
 use warnings;
@@ -31,11 +31,6 @@ sub _dump {
     $Log::ger::_dumper->($_[0]);
 }
 
-sub set_level {
-    $Log::ger::Current_Level = numeric_level(shift);
-    resetup_importers();
-}
-
 sub numeric_level {
     my $level = shift;
     return $level if $level =~ /\A\d+\z/;
@@ -46,112 +41,190 @@ sub numeric_level {
     die "Unknown level '$level'";
 }
 
-sub resetup_importers {
-    for my $pkg (keys %Log::ger::Setup_Args) {
-        Log::ger::setup_package($pkg, $Log::ger::Setup_Args{$pkg});
+sub string_level {
+    my $level = shift;
+    return $level if defined $Log::ger::Levels{$level};
+    $level = $Log::ger::Level_Aliases{$level}
+        if defined $Log::ger::Level_Aliases{$level};
+    for (keys %Log::ger::Levels) {
+        my $v = $Log::ger::Levels{$_};
+        return $_ if $v == $level;
     }
+    die "Unknown level '$level'";
 }
 
-sub set_output {
-    my ($mod, %args) = @_;
-    die "Invalid output module syntax" unless $mod =~ /\A\w+(::\w+)*\z/;
-    $mod = "Log::ger::Output::$mod" unless $mod =~ /\ALog::ger::Output::/;
-    (my $mod_pm = "$mod.pm") =~ s!::!/!g;
-    require $mod_pm;
-    $mod->import(%args);
-    resetup_importers();
+sub set_level {
+    no warnings 'once';
+    $Log::ger::Current_Level = numeric_level(shift);
+    reinit_all_targets();
 }
 
-sub _action_on_plugins {
-    my $action = shift;
+sub _action_on_hooks {
+    no warnings 'once';
 
-    my $phase = shift;
-    my $plugins = $Log::ger::Plugins{$phase} or die "Unknown phase '$phase'";
+    my ($action, $target, $target_arg, $phase) = splice @_, 0, 4;
 
-    if ($action eq 'add_for_package') {
-        my ($package, $plugin, $replace) = @_;
-        $Log::ger::Importer_Plugins{$package}{$phase} ||= [];
-        my $key;
-        if (ref $plugin eq 'ARRAY') {
-            $key = $plugin->[2];
-        } else {
-            $key = $plugin;
-        }
-        if ($replace) {
-            $Log::ger::Importer_Plugins{$package}{$phase} = [
-                grep { ref $_ eq 'ARRAY' ? $key ne $_->[2] : $key ne $_ }
-                    @{ $Log::ger::Importer_Plugins{$package}{$phase} }
-            ];
-        } else {
-            return 0
-                if grep { ref $_ eq 'ARRAY' ? $key eq $_->[2] : $key eq $_ }
-                @{ $Log::ger::Importer_Plugins{$package}{$phase} };
-        }
-        unshift @{ $Log::ger::Importer_Plugins{$package}{$phase} }, $plugin;
-    } elsif ($action eq 'add') {
-        my ($plugin, $replace) = @_;
-        my $key;
-        if (ref $plugin eq 'ARRAY') {
-            $key = $plugin->[2];
-        } else {
-            $key = $plugin;
-        }
-        if ($replace) {
-            $Log::ger::Plugins{$phase} = [
-                grep { ref $_ eq 'ARRAY' ? $key ne $_->[2] : $key ne $_ }
-                    @{ $Log::ger::Plugins{$phase} }
-            ];
-        } else {
-            return 0
-                if grep { ref $_ eq 'ARRAY' ? $key eq $_->[2] : $key eq $_ }
-                @{ $Log::ger::Plugins{$phase} };
-        }
-        unshift @{ $Log::ger::Plugins{$phase} }, $plugin;
+    my $hooks = $Log::ger::Global_Hooks{$phase} or die "Unknown phase '$phase'";
+    if ($target eq 'package') {
+        $hooks = ($Log::ger::Per_Package_Hooks{$target_arg}{$phase} ||= []);
+    } elsif ($target eq 'object') {
+        my ($addr) = $target_arg =~ /\(0x(\w+)/;
+        $hooks = ($Log::ger::Per_Object_Hooks{$addr}{$phase} ||= []);
+    } elsif ($target eq 'hash') {
+        my ($addr) = $target_arg =~ /\(0x(\w+)/;
+        $hooks = ($Log::ger::Per_Hash_Hooks{$addr}{$phase} ||= []);
+    }
+
+    if ($action eq 'add') {
+        my $hook = shift;
+        # XXX remove duplicate key
+        # my $key = $hook->[0];
+        unshift @$hooks, $hook;
     } elsif ($action eq 'reset') {
-        my $saved = $Log::ger::Plugins{$phase};
-        $Log::ger::Plugins{$phase} = [@{ $Log::ger::Default_Plugins{$phase} }];
+        my $saved = [@$hooks];
+        splice @$hooks, 0, scalar(@$hooks),
+            @{ $Log::ger::Default_Hooks{$phase} };
         return $saved;
     } elsif ($action eq 'empty') {
-        my $saved = $Log::ger::Plugins{$phase};
-        $Log::ger::Plugins{$phase} = [];
+        my $saved = [@$hooks];
+        splice @$hooks, 0;
         return $saved;
     } elsif ($action eq 'save') {
-        return [@{ $Log::ger::Plugins{$phase} }];
+        return [@$hooks];
     } elsif ($action eq 'restore') {
         my $saved = shift;
-        $Log::ger::Plugins{$phase} = [@$saved];
+        splice @$hooks, 0, scalar(@$hooks), @$saved;
         return $saved;
     }
 }
 
-sub add_plugin {
-    my ($phase, $plugin, $replace) = @_;
-    _action_on_plugins('add', $phase, $plugin, $replace);
+sub add_hook {
+    my ($phase, $hook) = @_;
+    _action_on_hooks('add', '', undef, $phase, $hook);
 }
 
-sub add_plugin_for_package {
-    my ($package, $phase, $plugin, $replace) = @_;
-    _action_on_plugins('add_for_package', $phase, $package, $plugin, $replace);
+sub add_per_target_hook {
+    my ($target, $target_arg, $phase, $hook) = @_;
+    _action_on_hooks('add', $target, $target_arg, $phase, $hook);
 }
 
-sub reset_plugins {
+sub reset_hooks {
     my ($phase) = @_;
-    _action_on_plugins('reset', $phase);
+    _action_on_hooks('reset', '', undef, $phase);
 }
 
-sub empty_plugins {
+sub reset_per_target_hooks {
+    my ($target, $target_arg, $phase) = @_;
+    _action_on_hooks('reset', $target, $target_arg, $phase);
+}
+
+sub empty_hooks {
     my ($phase) = @_;
-    _action_on_plugins('empty', $phase);
+    _action_on_hooks('empty', '', undef, $phase);
 }
 
-sub save_plugins {
+sub empty_per_target_hooks {
+    my ($target, $target_arg, $phase) = @_;
+    _action_on_hooks('empty', $target, $target_arg, $phase);
+}
+
+sub save_hooks {
     my ($phase) = @_;
-    _action_on_plugins('save', $phase);
+    _action_on_hooks('save', '', undef, $phase);
 }
 
-sub restore_plugins {
+sub save_per_target_hooks {
+    my ($target, $target_arg, $phase) = @_;
+    _action_on_hooks('save', $target, $target_arg, $phase);
+}
+
+sub restore_hooks {
     my ($phase, $saved) = @_;
-    _action_on_plugins('restore', $phase, $saved);
+    _action_on_hooks('restore', '', undef, $phase, $saved);
+}
+
+sub restore_per_target_hooks {
+    my ($target, $target_arg, $phase, $saved) = @_;
+    _action_on_hooks('restore', $target, $target_arg, $phase, $saved);
+}
+
+sub set_plugin {
+    no strict 'refs';
+
+    my %args = @_;
+
+    my $hooks;
+    if ($args{hooks}) {
+        $hooks = $args{hooks};
+    } else {
+        my $prefix = $args{prefix} || 'Log::ger::Plugin::';
+        my $mod = $args{name};
+        $mod = $prefix . $mod unless index($mod, $prefix) == 0;
+        (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+        require $mod_pm;
+        $hooks = &{"$mod\::get_hooks"}(%{ $args{conf} || {} });
+    }
+
+    for my $phase (keys %$hooks) {
+        my $hook = $hooks->{$phase};
+        if (defined $args{target}) {
+            add_per_target_hook(
+                $args{target}, $args{target_arg}, $phase, $hook);
+        } else {
+            add_hook($phase, $hook);
+        }
+    }
+
+    my $reinit = $args{reinit};
+    $reinit = 1 unless defined $reinit;
+    if ($reinit) {
+        if (defined $args{target}) {
+            reinit_target($args{target}, $args{target_arg});
+        } else {
+            reinit_all_targets();
+        }
+    }
+}
+
+sub reinit_target {
+    my ($target, $target_arg) = @_;
+
+    # adds target if not already exists
+    Log::ger::add_target($target, $target_arg, {}, 0);
+
+    if ($target eq 'package') {
+        my $init_args = $Log::ger::Package_Targets{$target_arg};
+        Log::ger::init_target(package => $target_arg, $init_args);
+    } elsif ($target eq 'object') {
+        my ($obj_addr) = $target_arg =~ /\(0x(\w+)/
+            or die "Invalid object '$target_arg': not a reference";
+        my $v = $Log::ger::Object_Targets{$obj_addr}
+            or die "Unknown object target '$target_arg'";
+        Log::ger::init_target(object => $v->[0], $v->[1]);
+    } elsif ($target eq 'hash') {
+        my ($hash_addr) = $target_arg =~ /\(0x(\w+)/
+            or die "Invalid hashref '$target_arg': not a reference";
+        my $v = $Log::ger::Hash_Targets{$hash_addr}
+            or die "Unknown hash target '$target_arg'";
+        Log::ger::init_target(hash => $v->[0], $v->[1]);
+    } else {
+        die "Unknown target '$target'";
+    }
+}
+
+sub reinit_all_targets {
+    for my $pkg (keys %Log::ger::Package_Targets) {
+        Log::ger::init_target(
+            package => $pkg, $Log::ger::Package_Targets{$pkg});
+    }
+    for my $k (keys %Log::ger::Object_Targets) {
+        my ($obj, $init_args) = @{ $Log::ger::Object_Targets{$k} };
+        Log::ger::init_target(object => $obj, $init_args);
+    }
+    for my $k (keys %Log::ger::Hash_Targets) {
+        my ($hash, $init_args) = @{ $Log::ger::Hash_Targets{$k} };
+        Log::ger::init_target(hash => $hash, $init_args);
+    }
 }
 
 1;
@@ -169,7 +242,7 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.004
+version 0.012
 
 =head1 DESCRIPTION
 

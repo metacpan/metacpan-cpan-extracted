@@ -10,7 +10,7 @@ use lib '../XMLCompile/lib', '../LogReport/lib', '../XMLTester/lib';
 
 package TestTools;
 use vars '$VERSION';
-$VERSION = '3.21';
+$VERSION = '3.22';
 
 use base 'Exporter';
 

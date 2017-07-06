@@ -1,0 +1,9 @@
+Revision history for Perl extension RabbitMQ-Consumer-Batcher
+
+0.1.1 2017-06-30T07:45:32Z
+    - Message header isn't HashRef, but Object (Net::AMQP::Protocol::Basic::ContentHeader)
+
+0.1.0 2017-06-29T14:09:40Z
+
+    - original version
+

@@ -7,8 +7,9 @@ MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
-README
+bin/dbchecksum
 bin/scs.pl
+cpanfile
 dist.ini
 lib/DBIx/SchemaChecksum.pm
 lib/DBIx/SchemaChecksum/App.pm

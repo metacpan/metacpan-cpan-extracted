@@ -7,7 +7,7 @@ use warnings;
 use Scalar::Util qw(weaken);
 use Sub::Delete;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 my %stacks;
 
@@ -110,9 +110,11 @@ sub DESTROY {
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -120,20 +122,35 @@ Monkey::Patch::Action::Handle
 
 =head1 VERSION
 
-version 0.04
+This document describes version 0.05 of Monkey::Patch::Action::Handle (from Perl distribution Monkey-Patch-Action), released on 2017-07-04.
 
 =for Pod::Coverage .*
 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Monkey-Patch-Action>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-Monkey-Patch-Action>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Monkey-Patch-Action>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Steven Haryanto.
+This software is copyright (c) 2017, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

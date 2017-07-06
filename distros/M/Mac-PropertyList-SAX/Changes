@@ -108,6 +108,10 @@ Revision history for Mac-PropertyList-SAX
         Require LWP for test, since XML::Parser needs to fetch entity
         definitions from the web.
 
-0.85	2010-12-04T11:10
-		Integrate bug fix from Bion Pohl / ingz-inc.com. Thanks !
+0.85    2010-12-04T11:10
+        Integrate bug fix from Bion Pohl / ingz-inc.com. Thanks !
+
+0.86    2017-06-24T13:23-07:00
+        Delegate binary plist handling to Mac::PropertyList, resolving RT
+        #99072.
 

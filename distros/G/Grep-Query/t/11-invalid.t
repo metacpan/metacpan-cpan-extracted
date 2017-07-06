@@ -108,5 +108,45 @@ sub getTests
 				q => '==(a)',
 				e => qr/Not a number for '==': 'a' /,
 			}, 
+			{
+				desc => q'invalid same delimiter (',
+				q => '==(42(',
+				e => qr/Invalid query at offset 0:/,
+			}, 
+			{
+				desc => q'invalid same delimiter )',
+				q => '==)42)',
+				e => qr/Invalid query at offset 0:/,
+			}, 
+			{
+				desc => q'invalid same delimiter {',
+				q => '=={42{',
+				e => qr/Invalid query at offset 0:/,
+			}, 
+			{
+				desc => q'invalid same delimiter }',
+				q => '==}42}',
+				e => qr/Invalid query at offset 0:/,
+			}, 
+			{
+				desc => q'invalid same delimiter [',
+				q => '==[42[',
+				e => qr/Invalid query at offset 0:/,
+			}, 
+			{
+				desc => q'invalid same delimiter ]',
+				q => '==]42]',
+				e => qr/Invalid query at offset 0:/,
+			}, 
+			{
+				desc => q'invalid same delimiter <',
+				q => '==<42<',
+				e => qr/Invalid query at offset 0:/,
+			}, 
+			{
+				desc => q'invalid same delimiter >',
+				q => '==>42>',
+				e => qr/Invalid query at offset 0:/,
+			}, 
 		);
 }

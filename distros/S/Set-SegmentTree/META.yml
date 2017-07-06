@@ -1,0 +1,25 @@
+---
+author:
+  - 'David Ihnen <davidihnen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl_5
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Set::SegmentTree
+name: Set-SegmentTree
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Map: '0.64'
+  Set::IntervalTree: '0.01'
+  Test::XT: '0.04'
+version: '0.01'

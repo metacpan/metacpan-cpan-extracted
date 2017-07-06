@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::os2;
 
 #
-# $Id: os2.pm 1527 2017-01-18 21:42:48Z willem $
+# $Id: os2.pm 1568 2017-05-27 06:40:20Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1527 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1568 $)[1];
 
 
 =head1 NAME
@@ -18,38 +18,23 @@ use warnings;
 use base qw(Net::DNS::Resolver::Base);
 
 
-my $config_dir	= $ENV{ETC} || '/etc';
-my $resolv_conf = "$config_dir/resolv";
-my $dotfile	= '.resolv.conf';
+my $config_file = 'resolv';
+my @config_path = ( $ENV{ETC} || '/etc' );
+my @config_file = grep -f $_ && -r _, map "$_/$config_file", @config_path;
 
-my @resolv_conf = grep -f $_ && -r _, $resolv_conf;
-
-my @config_path;
-push( @config_path, $ENV{HOME} ) if exists $ENV{HOME};
-push( @config_path, '.' );
-
-my @config_file = grep -f $_ && -o _, map "$_/$dotfile", @config_path;
-
-
-sub _untaint {
-	map { m/^(.*)$/; $1 } grep defined, @_;
-}
+my $dotfile = '.resolv.conf';
+my @dotpath = grep defined, $ENV{HOME}, '.';
+my @dotfile = grep -f $_ && -o _, map "$_/$dotfile", @dotpath;
 
 
 sub _init {
 	my $defaults = shift->_defaults;
 
-	foreach (@resolv_conf) {
-		$defaults->_read_config_file($_);
-	}
+	map $defaults->_read_config_file($_), @config_file;
 
-	foreach my $attr (qw(nameservers searchlist)) {
-		$defaults->$attr( _untaint $defaults->$attr() );
-	}
+	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
 
-	foreach (@config_file) {
-		$defaults->_read_config_file($_);
-	}
+	map $defaults->_read_config_file($_), @dotfile;
 
 	$defaults->_read_env;
 }

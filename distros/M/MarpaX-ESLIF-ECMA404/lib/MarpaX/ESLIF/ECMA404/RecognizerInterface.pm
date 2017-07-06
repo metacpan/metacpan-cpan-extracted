@@ -5,7 +5,7 @@ package MarpaX::ESLIF::ECMA404::RecognizerInterface;
 
 # ABSTRACT: MarpaX::ESLIF::ECMA404 Recognizer Interface
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -67,7 +67,7 @@ MarpaX::ESLIF::ECMA404::RecognizerInterface - MarpaX::ESLIF::ECMA404 Recognizer 
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -81,9 +81,21 @@ MarpaX::ESLIF::ECMA404's Recognizer Interface
 
 =head1 SUBROUTINES/METHODS
 
-=head2 new($class, $string, $encoding)
+=head2 new($class, %options)
 
-Instantiate a new recognizer interface object. Argument is the data, following eventually by encoding.
+Instantiate a new recognizer interface object. C<%options> may contain:
+
+=over
+
+=item data
+
+The data to parse
+
+=item encoding
+
+The encoding of the data
+
+=back
 
 =head2 Required methods
 

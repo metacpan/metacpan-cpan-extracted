@@ -11,7 +11,7 @@ use Mojo::Util qw(class_to_path monkey_patch);
 
 use constant DEBUG => $ENV{TOADFARM_DEBUG} ? 1 : 0;
 
-our $VERSION = '0.77';
+our $VERSION = '0.78';
 
 BEGIN {
   $ENV{TOADFARM_ACTION} //= (@ARGV and $ARGV[0] =~ /^(reload|start|stop)$/) ? $1 : 'load';
@@ -308,7 +308,7 @@ Toadfarm - One Mojolicious app to rule them all
 
 =head1 VERSION
 
-0.77
+0.78
 
 =head1 DESCRIPTION
 

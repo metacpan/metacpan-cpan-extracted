@@ -1,6 +1,6 @@
-README file for Module::Metadata::CorePrereqs.
+README file for Module::Metadata::CoreList.
 
-See also: CorePrereqs.txt.
+See also: CHANGES and Changelog.ini.
 
 Warning: WinZip 8.1 and 9.0 both contain an 'accidental' bug which stops
 them recognizing POSIX-style directory structures in valid tar files.
@@ -9,8 +9,8 @@ ftp://ftp.info-zip.org/pub/infozip/
 
 1 Installing from a Unix-like distro
 ------------------------------------
-shell>gunzip Module-Metadata-CorePrereqs-1.00.tgz
-shell>tar mxvf Module-Metadata-CorePrereqs-1.00.tar
+shell>gunzip Module-Metadata-CoreList-1.07.tgz
+shell>tar mxvf Module-Metadata-CoreList-1.07.tar
 
 On Unix-like systems, assuming you have installed Module::Build V 0.25+:
 
@@ -39,20 +39,11 @@ shell>exit            (for Unix-like systems)
 
 On all systems:
 
-Run CorePrereqs.pm through you favourite pod2html translator.
-
-If you are using my fancy-pom2.pl, with its 'default.css' file installed in
-/apache2/htdocs/assets/css/, you'd do:
-
-shell>perl fancy-pom2.pl html -css CorePrereqs.pm > /apache2/htdocs/assets/CorePrereqs.html
-
-or perhaps something like:
-
-shell>perl fancy-pom2.pl html -css CorePrereqs.pm > /perl/html/site/lib/Module/Metadata/CorePrereqs.html
+Run CoreList.pm through your favourite pod2html translator.
 
 2 Installing from an ActiveState distro
 ---------------------------------------
-shell>unzip Module-Metadata-CorePrereqs-1.00.zip
-shell>ppm install --location=. Module-Metadata-CorePrereqs
-shell>del Module-Metadata-CorePrereqs-1.00.ppd
-shell>del PPM-Module-Metadata-CorePrereqs-1.00.tar.gz
+shell>unzip Module-Metadata-CoreList-1.07.zip
+shell>ppm install --location=. Module-Metadata-CoreList
+shell>del Module-Metadata-CoreList-1.07.ppd
+shell>del PPM-Module-Metadata-CoreList-1.07.tar.gz

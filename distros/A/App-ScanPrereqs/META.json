@@ -42,10 +42,10 @@
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "File::Find" : "0",
             "Filename::Backup" : "0",
-            "Log::Any" : "0",
+            "Log::ger" : "0.011",
             "Module::CoreList" : "0",
             "Perinci::CmdLine::Any" : "0",
-            "Perinci::CmdLine::Base" : "1.72",
+            "Perinci::CmdLine::Base" : "1.75",
             "Perl::PrereqScanner" : "0",
             "Sah::Schema::pathname" : "0",
             "perl" : "5.010001",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-App-ScanPrereqs"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -414,7 +414,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::Validate",
             "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.23"
+            "version" : "0.24"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",
@@ -571,6 +571,6 @@
       }
    },
    "x_authority" : "cpan:PERLANCAR",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

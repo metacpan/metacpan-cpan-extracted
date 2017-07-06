@@ -1,7 +1,5 @@
 package WebDAO::Engine;
 
-#$Id$
-
 =head1 NAME
 
 =head1 DESCRIPTION

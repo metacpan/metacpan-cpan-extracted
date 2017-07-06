@@ -14,8 +14,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::VERSION = '0.3012';
-  $REST::Neo4p::VERSION = '0.3012';
+  $REST::Neo4p::VERSION = '0.3020';
 }
 
 our $CREATE_AUTO_ACCESSORS = 0;
@@ -669,7 +668,7 @@ L<REST::Neo4p::Schema>,L<REST::Neo4p::Constrain>, L<REST::Neo4p::Constraint>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2015 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

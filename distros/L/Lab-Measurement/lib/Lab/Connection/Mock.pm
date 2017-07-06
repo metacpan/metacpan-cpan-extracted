@@ -1,5 +1,5 @@
 package Lab::Connection::Mock;
-$Lab::Connection::Mock::VERSION = '3.550';
+$Lab::Connection::Mock::VERSION = '3.552';
 use warnings;
 use strict;
 use 5.010;

@@ -99,6 +99,24 @@ The timestamp of the response as a DateTime object.
 
 The unmodified Errors structure
 
+=head2 errors_count
+
+The number of errors
+
+=head2 is_error_code($code)
+
+Check if the error has the code passed as argument. It checks if
+all the errors reported have this code.
+
+=head2 has_error_code($code)
+
+Check if the error code passed as argument is present in the response
+and return the count of the matching errors.
+
+=head2 error_codes
+
+Return a plain list of error codes found in the response.
+
 =head2 errors_as_string
 
 A single string with the errors found in the response. If you need
@@ -230,6 +248,55 @@ sub _get_struct_key {
     }
     return;
 }
+
+sub errors_count {
+    my ($self) = shift;
+    my $count = 0;
+    if (my $errors = $self->errors) {
+        if (ref($errors) eq 'ARRAY') {
+            $count = scalar(@$errors);
+        }
+    }
+    return $count;
+}
+
+sub is_error_code {
+    my ($self, $code) = @_;
+    if (my $count = $self->errors_count) {
+        my $match = $self->has_error_code($code);
+        return $count == $match;
+    }
+    return 0;
+}
+
+sub has_error_code {
+    my ($self, $code) = @_;
+    die "Missing argument" unless $code;
+    if (my $errors = $self->errors) {
+        if (ref($errors) eq 'ARRAY') {
+            return scalar(grep { $_->{ErrorCode} eq $code } @$errors);
+        }
+    }
+    return 0;
+}
+
+sub error_codes {
+    my $self = shift;
+    my @out;
+    if (my $errors = $self->errors) {
+        if (ref($errors) eq 'ARRAY') {
+            foreach my $err (@$errors) {
+                if (ref($err) eq 'HASH') {
+                    if (my $code = $err->{ErrorCode}) {
+                        push @out, $code;
+                    }
+                }
+            }
+        }
+    }
+    return @out;
+}
+
 
 sub errors_as_string {
     my $self = shift;

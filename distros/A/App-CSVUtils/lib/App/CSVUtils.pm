@@ -1,7 +1,7 @@
 package App::CSVUtils;
 
-our $DATE = '2017-04-25'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -27,7 +27,8 @@ sub _get_field_idx {
 }
 
 sub _get_csv_row {
-    my ($csv, $row, $i) = @_;
+    my ($csv, $row, $i, $has_header) = @_;
+    return "" if $i == 1 && !$has_header;
     my $status = $csv->combine(@$row)
         or die "Error in line $i: ".$csv->error_input."\n";
     $csv->string . "\n";
@@ -94,6 +95,20 @@ sub _complete_field {
 sub _complete_field_list {
     _complete_field_or_field_list('field_list', @_);
 }
+
+my %args_common = (
+    header => {
+        summary => 'Whether CSV has a header row',
+        schema => 'bool*',
+        default => 1,
+        description => <<'_',
+
+When you declare that CSV does not have header row (`--no-header`), the fields
+will be named `field1`, `field2`, and so on.
+
+_
+    },
+);
 
 my %arg_filename_1 = (
     filename => {
@@ -228,6 +243,7 @@ $SPEC{csvutil} = {
     summary => 'Perform action on a CSV file',
     'x.no_index' => 1,
     args => {
+        %args_common,
         action => {
             schema => ['str*', in=>[
                 'list-field-names',
@@ -238,6 +254,7 @@ $SPEC{csvutil} = {
                 'sum',
                 'avg',
                 'select-row',
+                'grep',
                 'convert-to-hash',
                 'select-fields',
             ]],
@@ -258,7 +275,6 @@ $SPEC{csvutil} = {
         },
     },
     args_rels => {
-        # XXX sort_* hanya relevan untuk action=sort-fields
     },
 };
 sub csvutil {
@@ -266,6 +282,7 @@ sub csvutil {
 
     my %args = @_;
     my $action = $args{action};
+    my $has_header = $args{header} // 1;
 
     my $csv = Text::CSV_XS->new({binary => 1});
     open my($fh), "<:encoding(utf8)", $args{filename} or
@@ -284,7 +301,19 @@ sub csvutil {
     my $selected_row;
     my $row_spec_sub;
 
-    while (my $row = $csv->getline($fh)) {
+    my $row0;
+    my $code_getline = sub {
+        if ($i == 0 && !$has_header) {
+            $row0 = $csv->getline($fh);
+            return unless $row0;
+            return [map { "field$_" } 1..@$row0];
+        } elsif ($i == 1 && !$has_header) {
+            return $row0;
+        }
+        $csv->getline($fh);
+    };
+
+    while (my $row = $code_getline->()) {
         $i++;
         if ($i == 1) {
             # header row
@@ -336,6 +365,8 @@ sub csvutil {
                 $row_spec_sub = eval 'sub { my $i = shift; '.join(" || ", @codestr).' }';
                 return [400, "BUG: Invalid row_spec code: $@"] if $@;
             }
+            if ($action eq 'grep') {
+            }
         } # if i==1 (header row)
 
         if ($action eq 'list-field-names') {
@@ -359,7 +390,7 @@ sub csvutil {
                     $row->[$field_idx] = $_;
                 }
             }
-            $res .= _get_csv_row($csv, $row, $i);
+            $res .= _get_csv_row($csv, $row, $i, $has_header);
         } elsif ($action eq 'add-field') {
             if ($i == 1) {
                 if (defined $args{_at}) {
@@ -412,7 +443,7 @@ sub csvutil {
                     splice @$row, $field_idx, 0, $_;
                 }
             }
-            $res .= _get_csv_row($csv, $row, $i);
+            $res .= _get_csv_row($csv, $row, $i, $has_header);
         } elsif ($action eq 'delete-field') {
             if (!defined($field_idxs)) {
                 $field_idxs = [];
@@ -431,7 +462,7 @@ sub csvutil {
                     splice @$row, $_, 1;
                 }
             }
-            $res .= _get_csv_row($csv, $row, $i);
+            $res .= _get_csv_row($csv, $row, $i, $has_header);
         } elsif ($action eq 'select-fields') {
             if (!defined($field_idxs)) {
                 $field_idxs = [];
@@ -449,7 +480,7 @@ sub csvutil {
                 }
             }
             $row = [map { $row->[$_] } @$field_idxs];
-            $res .= _get_csv_row($csv, $row, $i);
+            $res .= _get_csv_row($csv, $row, $i, $has_header);
         } elsif ($action eq 'sort-fields') {
             unless ($i == 1) {
                 my @new_row;
@@ -458,34 +489,51 @@ sub csvutil {
                 }
                 $row = \@new_row;
             }
-            $res .= _get_csv_row($csv, $row, $i);
+            $res .= _get_csv_row($csv, $row, $i, $has_header);
         } elsif ($action eq 'sum') {
             if ($i == 1) {
-                $res .= _get_csv_row($csv, $row, $i);
+                $res .= _get_csv_row($csv, $row, $i, $has_header);
             } else {
                 require Scalar::Util;
                 for (0..$#{$row}) {
                     next unless Scalar::Util::looks_like_number($row->[$_]);
                     $summary_row[$_] += $row->[$_];
                 }
-                $res .= _get_csv_row($csv, $row, $i)
+                $res .= _get_csv_row($csv, $row, $i, $has_header)
                     if $args{_with_data_rows};
             }
         } elsif ($action eq 'avg') {
             if ($i == 1) {
-                $res .= _get_csv_row($csv, $row, $i);
+                $res .= _get_csv_row($csv, $row, $i, $has_header);
             } else {
                 require Scalar::Util;
                 for (0..$#{$row}) {
                     next unless Scalar::Util::looks_like_number($row->[$_]);
                     $summary_row[$_] += $row->[$_];
                 }
-                $res .= _get_csv_row($csv, $row, $i)
+                $res .= _get_csv_row($csv, $row, $i, $has_header)
                     if $args{_with_data_rows};
             }
         } elsif ($action eq 'select-row') {
             if ($i == 1 || $row_spec_sub->($i)) {
-                $res .= _get_csv_row($csv, $row, $i);
+                $res .= _get_csv_row($csv, $row, $i, $has_header);
+            }
+        } elsif ($action eq 'grep') {
+            unless ($code) {
+                $code = _compile($args{eval});
+            }
+            if ($i == 1 || do {
+                my $rowhash;
+                if ($args{hash}) {
+                    $rowhash = {};
+                    for (0..$#{$fields}) {
+                        $rowhash->{ $fields->[$_] } = $row->[$_];
+                    }
+                }
+                local $_ = $args{hash} ? $rowhash : $row;
+                $code->($row);
+            }) {
+                $res .= _get_csv_row($csv, $row, $i, $has_header);
             }
         } elsif ($action eq 'convert-to-hash') {
             if ($i == $args{_row_number}) {
@@ -507,13 +555,15 @@ sub csvutil {
 
     if ($action eq 'sum') {
         $res .= _get_csv_row($csv, \@summary_row,
-                             $args{_with_data_rows} ? $i+1 : 2);
+                             $args{_with_data_rows} ? $i+1 : 2,
+                             $has_header);
     } elsif ($action eq 'avg') {
         if ($i > 2) {
             for (@summary_row) { $_ /= ($i-1) }
         }
         $res .= _get_csv_row($csv, \@summary_row,
-                             $args{_with_data_rows} ? $i+1 : 2);
+                             $args{_with_data_rows} ? $i+1 : 2,
+                             $has_header);
     }
     [200, "OK", $res, {"cmdline.skip_format"=>1}];
 }
@@ -534,6 +584,7 @@ field), or `--at` (to put at specific position, 1 means as the first field).
 
 _
     args => {
+        %args_common,
         %arg_filename_0,
         %arg_field_1_nocomp,
         %arg_eval_2,
@@ -569,6 +620,7 @@ $SPEC{csv_list_field_names} = {
     v => 1.1,
     summary => 'List field names of CSV file',
     args => {
+        %args_common,
         %arg_filename_0,
     },
 };
@@ -581,6 +633,7 @@ $SPEC{csv_delete_field} = {
     v => 1.1,
     summary => 'Delete one or more fields from CSV file',
     args => {
+        %args_common,
         %arg_filename_0,
         %arg_fields_1,
     },
@@ -602,6 +655,7 @@ row number (2 means the first data row).
 
 _
     args => {
+        %args_common,
         %arg_filename_0,
         %arg_field_1,
         %arg_eval_2,
@@ -625,6 +679,7 @@ newline (`--with-nothing`), replace with encoded representation
 
 _
     args => {
+        %args_common,
         %arg_filename_0,
         with => {
             schema => 'str*',
@@ -666,6 +721,7 @@ $SPEC{csv_sort_fields} = {
     v => 1.1,
     summary => 'Sort CSV fields',
     args => {
+        %args_common,
         %arg_filename_0,
         %args_sort_short,
     },
@@ -688,6 +744,7 @@ $SPEC{csv_sum} = {
     v => 1.1,
     summary => 'Output a summary row which are arithmetic sums of data rows',
     args => {
+        %args_common,
         %arg_filename_0,
         %arg_with_data_rows,
     },
@@ -702,6 +759,7 @@ $SPEC{csv_avg} = {
     v => 1.1,
     summary => 'Output a summary row which are arithmetic averages of data rows',
     args => {
+        %args_common,
         %arg_filename_0,
         %arg_with_data_rows,
     },
@@ -716,6 +774,7 @@ $SPEC{csv_select_row} = {
     v => 1.1,
     summary => 'Only output specified row(s)',
     args => {
+        %args_common,
         %arg_filename_0,
         row_spec => {
             schema => 'str*',
@@ -732,10 +791,47 @@ sub csv_select_row {
     csvutil(%args, action=>'select-row');
 }
 
+$SPEC{csv_grep} = {
+    v => 1.1,
+    summary => 'Only output row(s) where Perl expression returns true',
+    description => <<'_',
+
+This is like Perl's grep performed over rows of CSV. In `$_`, your Perl code
+will find the CSV row as an arrayref (or, if you specify `-H`, as a hashref).
+Your code is then free to return true or false based on some criteria. Only rows
+where Perl expression returns true will be included in the result.
+
+_
+    args => {
+        %args_common,
+        %arg_filename_0,
+        eval => {
+            summary => 'Perl code',
+            schema => 'str*',
+            cmdline_aliases => { e=>{} },
+            req => 1,
+        },
+        hash => {
+            summary => 'Provide row in $_ as hashref instead of arrayref',
+            schema => ['bool*', is=>1],
+            cmdline_aliases => {H=>{}},
+        },
+    },
+    links => [
+        {url=>'prog:csvgrep'},
+    ],
+};
+sub csv_grep {
+    my %args = @_;
+
+    csvutil(%args, action=>'grep');
+}
+
 $SPEC{csv_convert_to_hash} = {
     v => 1.1,
     summary => 'Return a hash of field names as keys and first row as values',
     args => {
+        %args_common,
         %arg_filename_0,
         row_number => {
             schema => ['int*', min=>2],
@@ -790,6 +886,7 @@ will result in:
 
 _
     args => {
+        %args_common,
         %arg_filenames_0,
     },
 };
@@ -852,6 +949,7 @@ $SPEC{csv_select_fields} = {
     v => 1.1,
     summary => 'Only output selected field(s)',
     args => {
+        %args_common,
         %arg_filename_0,
         %arg_fields_or_field_pat,
     },
@@ -880,7 +978,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.012 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2017-04-25.
+This document describes version 0.013 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2017-07-02.
 
 =head1 DESCRIPTION
 
@@ -897,6 +995,8 @@ This distribution contains the following CLI utilities:
 =item * L<csv-convert-to-hash>
 
 =item * L<csv-delete-field>
+
+=item * L<csv-grep>
 
 =item * L<csv-list-field-names>
 
@@ -964,6 +1064,13 @@ Field name.
 
 Input CSV file.
 
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
 =back
 
 Returns an enveloped result (an array).
@@ -995,6 +1102,13 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
 
 =item * B<with_data_rows> => I<bool>
 
@@ -1062,6 +1176,13 @@ Arguments ('*' denotes required arguments):
 
 Input CSV files.
 
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1093,6 +1214,13 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
 
 =item * B<row_number> => I<int> (default: 2)
 
@@ -1134,6 +1262,65 @@ Field names.
 
 Input CSV file.
 
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+=head2 csv_grep
+
+Usage:
+
+ csv_grep(%args) -> [status, msg, result, meta]
+
+Only output row(s) where Perl expression returns true.
+
+This is like Perl's grep performed over rows of CSV. In C<$_>, your Perl code
+will find the CSV row as an arrayref (or, if you specify C<-H>, as a hashref).
+Your code is then free to return true or false based on some criteria. Only rows
+where Perl expression returns true will be included in the result.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<eval>* => I<str>
+
+Perl code.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file.
+
+=item * B<hash> => I<bool>
+
+Provide row in $_ as hashref instead of arrayref.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1165,6 +1352,13 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
 
 =back
 
@@ -1211,6 +1405,13 @@ Field name.
 
 Input CSV file.
 
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1248,6 +1449,13 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
 
 =item * B<with> => I<str> (default: " ")
 
@@ -1291,6 +1499,13 @@ Field names.
 
 Input CSV file.
 
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
 =back
 
 Returns an enveloped result (an array).
@@ -1322,6 +1537,13 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
 
 =item * B<row_spec>* => I<str>
 
@@ -1365,6 +1587,13 @@ A comma-separated list of field names.
 
 Input CSV file.
 
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
+
 =item * B<reverse> => I<bool>
 
 =back
@@ -1398,6 +1627,13 @@ Arguments ('*' denotes required arguments):
 =item * B<filename>* => I<filename>
 
 Input CSV file.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether CSV has a header row.
+
+When you declare that CSV does not have header row (C<--no-header>), the fields
+will be named C<field1>, C<field2>, and so on.
 
 =item * B<with_data_rows> => I<bool>
 
@@ -1435,6 +1671,9 @@ patch to an existing test-file that illustrates the bug or desired
 feature.
 
 =head1 SEE ALSO
+
+
+L<csvgrep>.
 
 =head1 AUTHOR
 

@@ -1,10 +1,10 @@
 NAME
 
-    HTML::Scrubber - Perl extension for scrubbing/sanitizing html
+    HTML::Scrubber - Perl extension for scrubbing/sanitizing HTML
 
 VERSION
 
-    version 0.15
+    version 0.17
 
 SYNOPSIS
 
@@ -43,11 +43,30 @@ DESCRIPTION
 METHODS
 
     First a note on documentation: just study the EXAMPLE below. It's all
-    the documentation you could need
+    the documentation you could need.
 
     Also, be sure to read all the comments as well as How does it work?.
 
     If you're new to perl, good luck to you.
+
+ new
+
+        my $scrubber = HTML::Scrubber->new( allow => [ qw[ p b i u hr br ] ] );
+
+    Build a new HTML::Scrubber. The arguments are the initial values for
+    the following directives:-
+
+      * default
+
+      * allow
+
+      * deny
+
+      * rules
+
+      * process
+
+      * comment
 
  comment
 
@@ -102,12 +121,12 @@ METHODS
             ...
         );
 
-    Updates set of attribute rules. Each rule can be 1/0, regular
+    Updates a set of attribute rules. Each rule can be 1/0, a regular
     expression or a callback. Values longer than 1 char are treated as
-    regexps. Callback is called with the following arguments: this object,
-    tag name, attribute name and attribute value, should return empty list
-    to drop attribute, undef to keep it without value or a new scalar
-    value.
+    regexps. The callback is called with the following arguments: the
+    current object, tag name, attribute name, and attribute value; the
+    callback should return an empty list to drop the attribute, undef to
+    keep it without a value, or a new scalar value.
 
  default
 
@@ -137,9 +156,9 @@ METHODS
             or die "Eeek $!"
                 if fileno STDOUT;
 
-    default handler, used by both _scrub and _scrub_fh Moved all the common
-    code (basically all of it) into a single routine for ease of
-    maintenance
+    default handler, used by both _scrub and _scrub_fh. Moved all the
+    common code (basically all of it) into a single routine for ease of
+    maintenance.
 
     default handler, does the scrubbing if we're scrubbing out to a file.
     Now calls _scrub_str and pushes that out to a file.
@@ -154,7 +173,7 @@ How does it work?
 
     If no explicit rule exists, Scrubber applies the default rule.
 
-    If an explicit rule exists, but it's a simple rule(1), the default
+    If an explicit rule exists, but it's a simple rule(1), then the default
     attribute rule is applied.
 
  EXAMPLE
@@ -312,31 +331,12 @@ CONTRIBUTING
     there's some documentation on using Vagrant and Perlbrew here
     <http://mrcaron.github.io/2015/03/06/Perl-CPAN-Pull-Request.html>.
 
-    There is now a .perltidyrc and a <.tidyallrc> file within the
-    respository for the standard perltidy settings used - I will apply
-    these before new releases. Please do not let formatting prevent you
-    from sending in patches etc - this can be sorted out as part of the
-    release process. Info on tidyall can be found at
+    There is now a .perltidyrc and a .tidyallrc file within the repository
+    for the standard perltidy settings used - I will apply these before new
+    releases. Please do not let formatting prevent you from sending in
+    patches etc - this can be sorted out as part of the release process.
+    Info on tidyall can be found at
     https://metacpan.org/pod/distribution/Code-TidyAll/bin/tidyall.
-
-INSTALLATION
-
-    See perlmodinstall for information and options on installing Perl
-    modules.
-
-BUGS AND LIMITATIONS
-
-    You can make new bug reports, and view existing ones, through the web
-    interface at
-    http://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Scrubber.
-
-AVAILABILITY
-
-    The project homepage is https://metacpan.org/release/HTML-Scrubber.
-
-    The latest version of this module is available from the Comprehensive
-    Perl Archive Network (CPAN). Visit http://www.perl.com/CPAN/ to find a
-    CPAN site near you, or see https://metacpan.org/module/HTML::Scrubber/.
 
 AUTHORS
 
@@ -348,9 +348,130 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2015 by Ruslan Zakirov, Nigel
-    Metheringham, 2003-2004 D. H..
+    This software is copyright (c) 2017 by Ruslan Zakirov, Nigel
+    Metheringham, 2003-2004 D. H.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc HTML::Scrubber
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/HTML-Scrubber
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/HTML-Scrubber
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Scrubber
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/HTML-Scrubber
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/HTML-Scrubber
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/HTML-Scrubber
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/HTML-Scrubber
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/H/HTML-Scrubber
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=HTML-Scrubber
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=HTML::Scrubber
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-html-scrubber at rt.cpan.org, or through the web interface at
+    https://rt.cpan.org/Public/Bug/Report.html?Queue=HTML-Scrubber. You
+    will be automatically notified of any progress on the request by the
+    system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/nigelm/html-scrubber
+
+      git clone https://github.com/nigelm/html-scrubber.git
+
+CONTRIBUTORS
+
+      * Andrei Vereha <avereha@gmail.com>
+
+      * Lee Johnson <lee@givengain.ch>
+
+      * Michael Caron <michael.r.caron@gmail.com>
+
+      * Michael Caron <mrcaron@users.noreply.github.com>
+
+      * Nigel Metheringham <nm9762github@muesli.org.uk>
+
+      * Paul Cochrane <paul@liekut.de>
+
+      * Ruslan Zakirov <ruz@bestpractical.com>
+
+      * Sergey Romanov <complefor@rambler.ru>
+
+      * vagrant <vagrant@precise64.(none)>
 

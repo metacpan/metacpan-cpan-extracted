@@ -20,7 +20,8 @@ $modules{$_} = $_ for qw(
   MooseX::Types::Path::Tiny
   Path::Tiny
   Shell::Perl
-  Test2::Suite
+  Test2::Tools::Basic
+  Test2::V0
   Test::Exit
   Test::More
   Test::Script

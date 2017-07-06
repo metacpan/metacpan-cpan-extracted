@@ -19,7 +19,7 @@
       <p class="blog-post-meta">
         <i style="padding-left:3px;"> 
           [% date.format(Post.ts) %] <span style="font-size:.9em;">by 
-          <a href="/list?username=[% Post.author.username %]">[% Post.author.full_name %]</a></span>
+          <a href="[%- mount_url -%]/list?username=[% Post.author.username %]">[% Post.author.full_name %]</a></span>
         </i>
         
         [% IF scaffold.edit_post_link %]

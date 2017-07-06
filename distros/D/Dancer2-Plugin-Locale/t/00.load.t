@@ -1,32 +1,49 @@
-use Test::More tests => 15;    ## TODO: SOOOOO many more tests
+use Test::More tests => 19;    ## TODO: SOOOOO many more tests
+our @warns;
 
 use Plack::Test;
 use HTTP::Request::Common;
-use File::Slurp      ();
 use File::Path::Tiny ();
 
 diag("Testing Dancer2::Plugin::Locale $Dancer2::Plugin::Locale::VERSION");
 
-package YourDancerApp {
+package YourDancerApp;
+{
     use Dancer2;
+
+    BEGIN {
+        $SIG{__WARN__} = sub { push @warns, @_ }
+    }
     use Dancer2::Plugin::Locale;
+
+    sub _write_file {
+        my ( $path, @cont ) = @_;
+        if ( open my $fh, '> :encoding(UTF-8)', $path ) {
+            print {$fh} @cont;
+            close $fh;
+        }
+        else {
+            die "Could not open $path: $!\n";
+        }
+    }
 
     set template => "template_toolkit";
     File::Path::Tiny::rm( config->{appdir} . '/views' );
     File::Path::Tiny::mk( config->{appdir} . '/views/tt' );
-    File::Slurp::write_file( config->{appdir} . '/views/tt.tt',       "[% locale.maketext('Hello World') %]" );
-    File::Slurp::write_file( config->{appdir} . '/views/tt/tag.tt',   "[% locale.get_language_tag() %]" );
-    File::Slurp::write_file( config->{appdir} . '/views/tt/noarg.tt', "[% locale() %]" );
-    File::Slurp::write_file( config->{appdir} . '/views/tt/argfr.tt', "[% locale('fr') %]" );
+    _write_file( config->{appdir} . '/views/tt.tt',       "[% locale.maketext('Hello World') %]" );
+    _write_file( config->{appdir} . '/views/tt/tag.tt',   "[% locale.get_language_tag() %]" );
+    _write_file( config->{appdir} . '/views/tt/noarg.tt', "[% locale() %]" );
+    _write_file( config->{appdir} . '/views/tt/argfr.tt', "[% locale('fr') %]" );
 
     File::Path::Tiny::rm( config->{appdir} . '/locale' );
     File::Path::Tiny::mk( config->{appdir} . '/locale' );
     File::Path::Tiny::mk( config->{appdir} . '/locale/ru.json' );
-    File::Slurp::write_file( config->{appdir} . '/locale/fr.json',    { binmode => ':utf8' }, '{"Hello World™":"Bonjour Monde™"}' );
-    File::Slurp::write_file( config->{appdir} . '/locale/es.what',    { binmode => ':utf8' }, '{"Hello World™":"Hola Mundo™"}' );
-    File::Slurp::write_file( config->{appdir} . '/locale/ar.json',    { binmode => ':utf8' }, '' );
-    File::Slurp::write_file( config->{appdir} . '/locale/zh.json',    { binmode => ':utf8' }, '{"Hello World™":' );
-    File::Slurp::write_file( config->{appdir} . '/locale/pt-BR.what', { binmode => ':utf8' }, '{"Hello World™":"Olá Mundo™"}' );
+    _write_file( config->{appdir} . '/locale/fr.json',    '{"Hello World™":"Bonjour Monde™"}' );
+    _write_file( config->{appdir} . '/locale/es.what',    '{"Hello World™":"Hola Mundo™"}' );
+    _write_file( config->{appdir} . '/locale/ar.json',    '' );
+    _write_file( config->{appdir} . '/locale/zh.json',    '{"Hello World™":' );
+    _write_file( config->{appdir} . '/locale/pt-BR.what', '{"Hello World™":"Olá Mundo™"}' );
+    _write_file( config->{appdir} . '/locale/en-GB.json', '{"Hello World™":"’elo Guvna"}' );
 
     get '/' => sub {
         return locale->maketext('Hello World');
@@ -87,10 +104,17 @@ package YourDancerApp {
     get '/lex/dir' => sub {
         return locale("ru")->maketext('Hello World™');
     };
-};
+}
+
+package main;
 
 my $app  = YourDancerApp->to_app;
 my $test = Plack::Test->create($app);
+
+ok( grep( m/Skipping non-file lexicon \(ru\.json\)/,                        @warns ), "non-file lexicon gets a warning" );
+ok( grep( m/Ignoring lexicon, .*zh\.json, since it containes invalid JSON/, @warns ), "bad JSON lexicon gets a warning" );
+ok( grep( m/Skipping un-normalized locale named lexicon \(en-GB\.json\)/,   @warns ), "un-normalized locale lexicon gets a warning" );
+ok( @warns == 3, "no unexpected warnings" ) or diag( explain( \@warns ) );
 
 my $res = $test->request( GET '/' );
 like( $res->content, qr/Hello World/, 'locale() works in code' );

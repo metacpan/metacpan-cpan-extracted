@@ -649,7 +649,7 @@ perl_png_set_image_data (Png, image_data, own = & PL_sv_undef)
 	SV * own;
 CODE:
 	if (Png->type != perl_png_write_obj) {
-		perl_png_error (Png, "Cannot set image data in read PNG");
+		croak ("Cannot set image data in read PNG");
 	}
 	Png->image_data = image_data;
 	Png->memory_gets++;
@@ -660,7 +660,7 @@ perl_png_set_row_pointers (Png, row_pointers)
 	SV * row_pointers;
 CODE:
 	if (Png->type != perl_png_write_obj) {
-		perl_png_error (Png, "Cannot set row pointers in read PNG");
+		croak ("Cannot set row pointe	rs in read PNG");
 	}
 	Png->row_pointers = INT2PTR (png_bytepp, SvIV (row_pointers));
         png_set_rows (Png->png, Png->info, Png->row_pointers);

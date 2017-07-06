@@ -4,13 +4,13 @@ package App::PDF::Link;
 
 # pdflink -- insert file links in PDF documents
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 # Author          : Johan Vromans
 # Created On      : Thu Sep 15 11:43:40 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Mar 20 09:36:20 2017
-# Update Count    : 316
+# Last Modified On: Fri Jun 23 11:08:15 2017
+# Update Count    : 319
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -69,13 +69,14 @@ sub linktargets {
 	foreach ( @targets ) {
 	    $_ = $pp . $_ if /^\.\w+$/;
 	}
+	$pageno = 1;
     }
     elsif ( @_ == 3 ) {
 	( $pdf, $pageno, $targets ) = @_;
 	@targets = @$targets;
     }
     else {
-	die("Internal error -- wrong vall to linktargets\n");
+	die("Internal error -- wrong args to linktargets\n");
     }
 
     my $page;			# the current page

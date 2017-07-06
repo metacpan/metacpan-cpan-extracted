@@ -1,21 +1,21 @@
 package HPC::Runner::Command::execute_job::Utils::Log;
 
 use MooseX::App::Role;
+use namespace::autoclean;
+
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
 
 use IPC::Open3;
+use IPC::Cmd qw[can_run];
 use IO::Select;
 use Symbol;
-
-# use Log::Log4perl qw(:easy);
-# use Data::Dumper;
-# use DateTime;
-# use DateTime::Format::Duration;
-# use Cwd;
-# use File::Path qw(make_path);
-# use File::Spec;
+use Try::Tiny;
+use Path::Tiny;
+use File::Path qw(make_path remove_tree);
+use File::Slurp;
 
 with 'HPC::Runner::Command::Utils::Log';
+with 'HPC::Runner::Command::execute_job::Utils::MemProfile';
 
 ##Command Log
 has 'command_log' => ( is => 'rw', );
@@ -80,18 +80,23 @@ perl command.pl 2
 =cut
 
 sub _log_commands {
-    my ( $self, $pid ) = @_;
+  my $self = shift;
+  my $pid = shift;
 
     my $dt1 = DateTime->now( time_zone => 'local' );
+    $self->task_start_time($dt1);
 
     #$DB::single = 2;
     my $ymd = $dt1->ymd();
     my $hms = $dt1->hms();
 
     $self->clear_table_data;
-    $self->set_table_data( start_time => "$ymd $hms" );
+    $self->set_table_data( start_time    => "$ymd $hms" );
+    $self->set_table_data( start_time_dt => $dt1 );
 
     my ( $cmdpid, $exitcode ) = $self->log_job;
+    return unless defined $cmdpid;
+    return unless defined $exitcode;
 
     #TODO Make table data its own class and return it
     $self->set_table_data( cmdpid => $cmdpid );
@@ -114,6 +119,8 @@ sub _log_commands {
         $cmdpid );
 
     $self->log_table( $cmdpid, $exitcode, $format->format_duration($duration) );
+
+    $self->update_json_task;
 
     return $exitcode;
 }
@@ -154,16 +161,13 @@ sub log_table {
     $self->set_table_data( exit_time => "$ymd $hms" );
     $self->set_table_data( exitcode  => $exitcode );
     $self->set_table_data( duration  => $duration );
+    $self->set_table_data( task_id   => $self->counter );
 
     my $version = $self->version || "0.0";
     my $task_tags = "";
 
-    my $logfile = $self->logdir . "/" . $self->logfile;
-
-    open( my $pidtablefh, ">>" . $self->process_table )
-      or die $self->app_log->fatal("Couldn't open process file $!\n");
-
-    #or die print "Couldn't open process file $!\n";
+    ##TODO Update this with File::Spec
+    my $logfile = File::Spec->catdir( $self->logdir, $self->logfile );
 
     if ( $self->can('task_tags') ) {
         my $aref = $self->get_task_tag($cmdpid) || [];
@@ -177,11 +181,12 @@ sub log_table {
         $self->set_table_data( version => $version );
     }
 
+    my $text = '';
     if ( $self->can('job_scheduler_id') && $self->can('jobname') ) {
         my $schedulerid = $self->job_scheduler_id || '';
 
         my $jobname = $self->jobname || '';
-        print $pidtablefh <<EOF;
+        $text =<<EOF;
 |$version|$schedulerid|$jobname|$task_tags|$cmdpid|$exitcode|$duration|
 EOF
 
@@ -189,10 +194,12 @@ EOF
         $self->set_table_data( jobname     => $jobname );
     }
     else {
-        print $pidtablefh <<EOF;
+        $text =<<EOF;
 |$cmdpid|$exitcode|$duration|
 EOF
     }
+
+    write_file($self->process_table, {append => 1}, $text) || $self->app_log->warn("Unable to write to the process table! $!");
 }
 
 #TODO move to execute_jobs
@@ -216,54 +223,47 @@ sub log_job {
     my $self = shift;
 
     #Start running job
-    my ( $infh, $outfh, $errfh );
+    my ( $infh, $outfh, $errfh, $exitcode );
     $errfh = gensym();    # if you uncomment this line, $errfh will
     my $cmdpid;
-    eval { $cmdpid = open3( $infh, $outfh, $errfh, $self->cmd ); };
 
-    if ($@) {
-      $self->app_log->warn(
-            "There was an error running the command $@\n");
-      die;
+    try {
+        $cmdpid = open3( $infh, $outfh, $errfh, $self->cmd );
     }
-
-    if ( !$cmdpid ) {
-        $self->app_log->fatal(
-"There is no process id please contact your administrator with the full command\n"
+    catch {
+        $exitcode = $?;
+        $self->app_log(
+            "fatal",
+            "Error running job " . $self->counter . " with ExitCode $exitcode",
+            $cmdpid
         );
-        die;
-    }
+        $self->app_log->warn("There was an error running the command $@\n");
+
+        return ( $cmdpid, $exitcode );
+    };
 
     $infh->autoflush();
 
     # Start Command Log
     $self->start_command_log($cmdpid);
-
-    #$DB::single = 2;
+    $self->create_json_task($cmdpid);
+    $self->get_cmd_stats($cmdpid);
 
     my $sel = new IO::Select;    # create a select object
     $sel->add( $outfh, $errfh ); # and add the fhs
 
-    while ( my @ready = $sel->can_read ) {
+    while (1) {
+        last unless $sel->can_read;
+        my @ready = $sel->can_read;
         foreach my $fh (@ready) {    # loop through them
             my $line;
-
-            # read up to 4096 bytes from this fh.
             my $len = sysread $fh, $line, 4096;
-            if ( not defined $len ) {
-
-                # There was an error reading
-                $self->log_cmd_messages( "fatal", "Error from child: $!",
-                    $cmdpid );
-            }
-            elsif ( $len == 0 ) {
-
-                # Finished reading from this FH because we read
-                # 0 bytes.  Remove this handle from $sel.
+            next unless defined $len;
+            if ( $len == 0 ) {
                 $sel->remove($fh);
-                next;
+                close($fh);
             }
-            else {    # we read data alright
+            else {                   # we read data alright
                 if ( $fh == $outfh ) {
                     $self->log_cmd_messages( "info", $line, $cmdpid );
                 }
@@ -275,10 +275,13 @@ sub log_job {
                 }
             }
         }
+        $self->get_cmd_stats($cmdpid);
+        ##TODO Add Variable
+        sleep( $self->poll_time );
     }
 
     waitpid( $cmdpid, 1 );
-    my $exitcode = $?;
+    $exitcode = $?;
 
     return ( $cmdpid, $exitcode );
 }
@@ -295,7 +298,10 @@ sub start_command_log {
     my $self   = shift;
     my $cmdpid = shift;
 
-    if ( $self->job_scheduler_id ) {
+    if ( $self->single_node ) {
+        $self->name_log( "PID_" . $cmdpid );
+    }
+    elsif ( $self->job_scheduler_id ) {
         $self->name_log(
             "_SID_" . $self->job_scheduler_id . "_PID_" . $cmdpid );
     }
@@ -308,28 +314,35 @@ sub start_command_log {
     #$DB::single = 2;
     my $log_array_msg = "";
     if ( $self->can('task_id') ) {
-        $log_array_msg = "\n\tArray ID:\t" . $self->task_id;
+        $log_array_msg = "\nArray ID:\t" . $self->task_id . "\n";
+    }
+    else {
+        $log_array_msg = "\nTask ID:\t" . $self->counter . "\n";
     }
 
-    $self->log_cmd_messages( "info",
-            "\nStarting Job:\n\tJobID:\t"
+    $self->log_cmd_messages(
+        "info",
+        "Starting Job:\n"
+          . "================================================"
+          . "\nJobID:\t"
           . $self->job_scheduler_id
-          . " \n\tCmdPID:\t"
+          . " \nCmdPID:\t"
           . $cmdpid . "\n"
-          . "\n\tHostname:\t"
+          . "\nHostname:\t"
           . $self->hostname
-          . "\n\tJob Scheduler ID:\t"
+          . "\nJob Scheduler ID:\t"
           . $self->job_scheduler_id
-          . "$log_array_msg\n\n", $cmdpid );
+          . "$log_array_msg\n",
+        $cmdpid
+    );
 
     #TODO counter is not terribly applicable with task ids
     $self->log_cmd_messages(
         "info",
         "Starting execution: "
           . $self->counter
-          . "\n\nCOMMAND:\n"
-          . $self->cmd
-          . "\n\n\n",
+          . "\n\nCOMMAND:\n\n"
+          . $self->cmd . "\n\n",
         $cmdpid
     );
 }
@@ -373,4 +386,5 @@ sub pop_note_meta {
     }
     return \@ts;
 }
+
 1;

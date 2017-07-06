@@ -7,6 +7,7 @@ use Try::Tiny;
 
 extends 'HPC::Runner::Command';
 
+with 'HPC::Runner::Command::Logger::JSON';
 with 'HPC::Runner::Command::Utils::Base';
 with 'HPC::Runner::Command::Utils::Log';
 with 'HPC::Runner::Command::Utils::Git';
@@ -24,6 +25,7 @@ option 'batch_index_start' => (
     documentation => 'Counter to tell execute_array where to start reading in the infile'
 );
 
+## For the scheduler we get this from the environment
 has 'task_id' => (
     is      => 'rw',
     default => sub {
@@ -52,10 +54,16 @@ after 'BUILD' => sub {
     $self->git_things;
 
     # $self->get_infile;
+    ##The Task ID is the initial value for the job array that is caught by an environmental variable
+    ##Once we get it we use the counter for both execute_job and execute_array
+    ##Except for the read_command, which uses the task_id
     $self->counter( $self->task_id );
 
     $self->gen_load_plugins;
     $self->job_load_plugins;
+
+    my $tar = $self->set_archive;
+    $self->archive($tar);
 };
 
 sub execute {

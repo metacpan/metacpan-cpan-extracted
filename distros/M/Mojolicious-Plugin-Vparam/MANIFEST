@@ -68,6 +68,7 @@ t/310_time.t
 t/320_date.t
 t/325_date_dt.t
 t/400_bool.t
+t/410_logic.t
 t/500_email.t
 t/510_url.t
 t/600_phone.t

@@ -146,6 +146,7 @@ typedef struct _HandleOptions_ {
 	unsigned aptMovePending          : 1;       // for optLayered
 	unsigned aptLayeredPaint         : 1;       // painting children of layered window
 	unsigned aptLayeredRequested     : 1;       // Prima wants layered
+	unsigned aptClipByChildren       : 1;       // cached clipping by children
 } HandleOptions;
 
 typedef struct _WinGuts
@@ -281,6 +282,7 @@ typedef struct _PaintSaveData
 	unsigned char * linePattern;
 	int         linePatternLen;
 	FillPattern fillPattern;
+	Point       fillPatternOffset;
 	int         rop;
 	int         rop2;
 	Point       transform;
@@ -385,6 +387,7 @@ typedef struct _DrawableData
 	int            linePatternLen;
 	FillPattern    fillPattern;
 	FillPattern    fillPattern2;
+	Point          fillPatternOffset;
 	int            rop;
 	int            rop2;
 	Point          transform;
@@ -611,6 +614,7 @@ extern int          apcUpdateWindow( HWND wnd );
 extern void         reset_system_fonts(void);
 extern void         dpi_change(void);
 extern Bool         set_dwm_blur( HWND win, int enable, HRGN mask, int transition_on_maximized);
+extern Bool         is_dwm_enabled(void);
 
 /* compatibility to MSVC 6 */
 #ifndef GWLP_USERDATA

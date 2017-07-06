@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 =head1 NAME
 
@@ -54,16 +54,11 @@ our $FUTURE_FACTORY = sub {
     Future->new->set_label($_[1])
 };
 
-# It'd be nice if L<Future> already provided a method for this, maybe I should suggest it
-our $future_state = sub {
-      $_[0]->is_done
-    ? 'done'
-    : $_[0]->is_failed
-    ? 'failed'
-    : $_[0]->is_cancelled
-    ? 'cancelled'
-    : 'pending'
-};
+=head2 %ENCODER
+
+An encoder is a coderef which takes input and returns output.
+
+=cut
 
 our %ENCODER = (
     utf8 => sub {
@@ -87,6 +82,8 @@ our %ENCODER = (
         }
     },
 );
+# The naming of this one is a perennial source of confusion in Perl,
+# let's just support both
 $ENCODER{'UTF-8'} = $ENCODER{utf8};
 
 our %DECODER = (
@@ -119,7 +116,15 @@ $DECODER{'UTF-8'} = $DECODER{utf8};
 
 =head2 new
 
-Takes named parameters.
+Takes named parameters, such as:
+
+=over 4
+
+=item * label - the label used in descriptions
+
+=back
+
+Note that this is rarely called directly, see L</from>, L</empty> and L</never> instead.
 
 =cut
 
@@ -127,18 +132,6 @@ sub new {
     my ($self, %args) = @_;
     $args{label} //= 'unknown';
     $self->SUPER::new(%args);
-}
-
-=head2 describe
-
-Returns a string describing this source and any parents - typically this will result in a chain
-like C<< from->combine_latest->count >>.
-
-=cut
-
-sub describe {
-    my ($self) = @_;
-    ($self->parent ? $self->parent->describe . '=>' : '') . $self->label . '(' . $future_state->($self->completed) . ')';
 }
 
 =head2 from
@@ -199,6 +192,57 @@ sub from {
     }
 }
 
+=head2 empty
+
+Creates an empty source, which finishes immediately.
+
+=cut
+
+sub empty {
+    my ($class) = @_;
+
+    $class->new(label => (caller 0)[3] =~ /::([^:]+)$/)->finish
+}
+
+=head2 never
+
+An empty source that never finishes.
+
+=cut
+
+sub never {
+    my ($class) = @_;
+
+    $class->new(label => (caller 0)[3] =~ /::([^:]+)$/)
+}
+
+=head1 METHODS - Instance
+
+=cut
+
+=head2 describe
+
+Returns a string describing this source and any parents - typically this will result in a chain
+like C<< from->combine_latest->count >>.
+
+=cut
+
+# It'd be nice if L<Future> already provided a method for this, maybe I should suggest it
+our $future_state = sub {
+      $_[0]->is_done
+    ? 'done'
+    : $_[0]->is_failed
+    ? 'failed'
+    : $_[0]->is_cancelled
+    ? 'cancelled'
+    : 'pending'
+};
+
+sub describe {
+    my ($self) = @_;
+    ($self->parent ? $self->parent->describe . '=>' : '') . $self->label . '(' . $future_state->($self->completed) . ')';
+}
+
 =head2 encode
 
 Passes each item through an encoder.
@@ -255,17 +299,6 @@ sub decode {
     }, $src);
 }
 
-=head2 say
-
-Shortcut for C<< ->each(sub { print "$_\n" }) >>.
-
-=cut
-
-sub say {
-    my ($self) = @_;
-    $self->each(sub { print "$_\n" });
-}
-
 =head2 print
 
 Shortcut for C< ->each(sub { print }) >, except this will
@@ -280,29 +313,15 @@ sub print {
     $self->each(sub { local $\ = $delim; print });
 }
 
-=head2 empty
+=head2 say
 
-Creates an empty source, which finishes immediately.
-
-=cut
-
-sub empty {
-    my ($self, $code) = @_;
-
-    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    $src->finish;
-}
-
-=head2 never
-
-An empty source that never finishes.
+Shortcut for C<< ->each(sub { print "$_\n" }) >>.
 
 =cut
 
-sub never {
-    my ($self, $code) = @_;
-
-    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+sub say {
+    my ($self) = @_;
+    $self->each(sub { local $\; print "$_\n" });
 }
 
 =head2 throw
@@ -314,23 +333,6 @@ Throws something. I don't know what, maybe a chair.
 sub throw {
     my $src = shift->new(@_);
     $src->fail('...');
-}
-
-=head1 METHODS - Instance
-
-=cut
-
-=head2 new_future
-
-Used internally to get a L<Future>.
-
-=cut
-
-sub new_future {
-    my $self = shift;
-    (
-        $self->{new_future} //= $FUTURE_FACTORY
-    )->($self, @_)
 }
 
 =head2 pause
@@ -380,10 +382,16 @@ sub debounce {
 
 =head2 chomp
 
-Chomps all items with the current delimiter.
+Chomps all items with the given delimiter.
 
 Once you've instantiated this, it will stick with the delimiter which was in force at the time of instantiation.
 Said delimiter follows the usual rules of C<< $/ >>, whatever they happen to be.
+
+Example:
+
+ $ryu->stdin
+     ->chomp("\n")
+     ->say
 
 =cut
 
@@ -401,6 +409,20 @@ sub chomp {
 
 A bit like L<perlfunc/map>.
 
+Takes a single parameter - the coderef to execute for each item. This should return
+a scalar value which will be used as the next item.
+
+Often useful in conjunction with a C<< do >> block to provide a closure.
+
+Examples:
+
+ $src->map(do {
+           my $idx = 0;
+           sub {
+            [ @$_, ++$idx ]
+           }
+       })
+
 =cut
 
 sub map : method {
@@ -411,12 +433,98 @@ sub map : method {
         return if $src->is_ready;
         shift->on_ready($src->completed);
     });
-    $self->each_while_source(sub { $src->emit($_->$code) }, $src);
+    $self->each_while_source(sub { $src->emit(scalar $_->$code) }, $src);
 }
+
+=head2 flat_map
+
+Similar to L</map>, but will flatten out some items:
+
+=over 4
+
+=item * an arrayref will be expanded out to emit the individual elements
+
+=item * for a L<Ryu::Source>, passes on any emitted elements
+
+=back
+
+This also means you can "merge" items from a series of sources.
+
+Note that this is not recursive - an arrayref of arrayrefs will be expanded out
+into the child arrayrefs, but no further.
+
+=cut
+
+sub flat_map {
+    use Scalar::Util qw(blessed weaken);
+    use Ref::Util qw(is_plain_arrayref is_plain_coderef);
+    use namespace::clean qw(blessed is_plain_arrayref is_plain_coderef weaken);
+
+    my ($self, $code) = splice @_, 0, 2;
+
+    # Upgrade ->flat_map(method => args...) to a coderef
+    if(!is_plain_coderef($code)) {
+        my $method = $code;
+        my @args = @_;
+        $code = sub { $_->$method(@args) }
+    }
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+
+    weaken(my $weak_sauce = $src);
+    my $add = sub  {
+        my $v = shift;
+        my $src = $weak_sauce or return;
+
+        my $k = "$v";
+        $log->tracef("Adding %s which will bring our count to %d", $k, 0 + keys %{$src->{waiting}});
+        $src->{waiting}{$k} = $v->on_ready(sub {
+            return unless my $src = $weak_sauce;
+            delete $src->{waiting}{$k};
+            $src->finish unless %{$src->{waiting}};
+        })
+    };
+
+    $add->($self->completed);
+    $self->each_while_source(sub {
+        my $src = $weak_sauce or return;
+        for ($code->($_)) {
+            my $item = $_;
+            if(is_plain_arrayref($item)) {
+                $log->tracef("Have an arrayref of %d items", 0 + @$item);
+                for(@$item) {
+                    last if $src->is_ready;
+                    $src->emit($_);
+                }
+            } elsif(blessed($item) && $item->isa(__PACKAGE__)) {
+                $log->tracef("This item is a source");
+                $add->($item->completed);
+                $src->on_ready(sub {
+                    return if $item->is_ready;
+                    $log->tracef("Marking %s as ready because %s was", $item->describe, $src->describe);
+                    shift->on_ready($item->completed);
+                });
+                $item->each_while_source(sub {
+                    my $src = $weak_sauce or return;
+                    $src->emit($_)
+                }, $src)->on_ready(sub {
+                    undef $item;
+                });
+            }
+        }
+    }, $src);
+    $src
+}
+
 
 =head2 split
 
-Splits the input into chunks. By default, will split into characters.
+Splits the input on the given delimiter.
+
+By default, will split into characters.
+
+Note that each item will be processed separately - the buffer won't be
+retained across items, see L</by_line> for that.
 
 =cut
 
@@ -457,6 +565,14 @@ sub chunksize : method {
     }, $src);
 }
 
+=head2 by_line
+
+Emits one item for each line in the input. Similar to L</split> with a C<< \n >> parameter,
+except this will accumulate the buffer over successive items and only emit when a complete
+line has been extracted.
+
+=cut
+
 sub by_line : method {
     my ($self, $delim) = @_;
     $delim //= $/;
@@ -475,6 +591,12 @@ sub by_line : method {
     }, $src);
 }
 
+=head2 prefix
+
+Applies a string prefix to each item.
+
+=cut
+
 sub prefix {
     my ($self, $txt) = @_;
     my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
@@ -485,6 +607,12 @@ sub prefix {
         $src->emit($txt . $_)
     }, $src);
 }
+
+=head2 suffix
+
+Applies a string suffix to each item.
+
+=cut
 
 sub suffix {
     my ($self, $txt) = @_;
@@ -573,6 +701,14 @@ sub as_string {
 
 =head2 combine_latest
 
+Takes the most recent item from one or more L<Ryu::Source>s, and emits
+an arrayref containing the values in order.
+
+An item is emitted for each update as soon as all sources have provided
+at least one value. For example, given 2 sources, if the first emits C<1>
+then C<2>, then the second emits C<a>, this would emit a single C<< [2, 'a'] >>
+item.
+
 =cut
 
 sub combine_latest : method {
@@ -624,6 +760,10 @@ sub with_index {
 
 =head2 with_latest_from
 
+Similar to L</combine_latest>, but will start emitting as soon as
+we have any values. The arrayref will contain C<< undef >> for any
+sources which have not yet emitted any items.
+
 =cut
 
 sub with_latest_from : method {
@@ -657,6 +797,12 @@ sub with_latest_from : method {
 }
 
 =head2 merge
+
+Emits items as they are generated by the given sources.
+
+Example:
+
+ $numbers->merge($letters)->say # 1, 'a', 2, 'b', 3, 'c'...
 
 =cut
 
@@ -708,37 +854,6 @@ sub apply : method {
     # Pass through the original events
     $self->each_while_source(sub {
         $src->emit($_)
-    }, $src)
-}
-
-=head2 each_as_source
-
-=cut
-
-sub each_as_source : method {
-    use Variable::Disposition qw(retain_future);
-    use namespace::clean qw(retain_future);
-    my ($self, @code) = @_;
-
-    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-    my @active;
-    $self->completed->on_ready(sub {
-        retain_future(
-            Future->needs_all(
-                grep $_, @active
-            )->on_ready(sub {
-                $src->finish
-            })
-        );
-    });
-
-    $self->each_while_source(sub {
-        my @pending;
-        for my $code (@code) {
-            push @pending, $code->($_);
-        }
-        push @active, map $_->completed, @pending;
-        $src->emit($_);
     }, $src)
 }
 
@@ -1096,6 +1211,16 @@ sub first {
 
 =head2 some
 
+Applies the given code to each item, and emits a single item:
+
+=over 4
+
+=item * 0 if the code never returned true or no items were received
+
+=item * 1 if the code ever returned a true value
+
+=back
+
 =cut
 
 sub some {
@@ -1121,6 +1246,9 @@ sub some {
 
 =head2 every
 
+Similar to L</some>, except this requires the coderef to return true for
+all values in order to emit a C<1> value.
+
 =cut
 
 sub every {
@@ -1143,6 +1271,8 @@ sub every {
 
 =head2 count
 
+Emits the count of items seen once the parent source completes.
+
 =cut
 
 sub count {
@@ -1160,6 +1290,8 @@ sub count {
 }
 
 =head2 sum
+
+Emits the numeric sum of items seen once the parent completes.
 
 =cut
 
@@ -1181,6 +1313,8 @@ sub sum {
 
 =head2 mean
 
+Emits the mean (average) numerical value of all seen items.
+
 =cut
 
 sub mean {
@@ -1197,6 +1331,8 @@ sub mean {
 }
 
 =head2 max
+
+Emits the maximum numerical value of all seen items.
 
 =cut
 
@@ -1215,6 +1351,8 @@ sub max {
 }
 
 =head2 min
+
+Emits the minimum numerical value of all seen items.
 
 =cut
 
@@ -1235,6 +1373,22 @@ sub min {
 =head2 statistics
 
 Emits a single hashref of statistics once the source completes.
+
+This will contain the following keys:
+
+=over 4
+
+=item * count
+
+=item * sum
+
+=item * min
+
+=item * max
+
+=item * mean
+
+=back
 
 =cut
 
@@ -1269,6 +1423,16 @@ sub statistics {
 }
 
 =head2 filter
+
+Applies the given parameter to filter values.
+
+The parameter can be a regex or coderef. You can also
+pass (key, value) pairs to filter hashrefs or objects
+based on regex or coderef values.
+
+Examples:
+
+ $src->filter(name => qr/^[A-Z]/, id => sub { $_ % 2 })
 
 =cut
 
@@ -1342,6 +1506,7 @@ sub filter {
 =head2 filter_isa
 
 Emits only the items which C<< ->isa >> one of the given parameters.
+Will skip non-blessed items.
 
 =cut
 
@@ -1363,6 +1528,8 @@ sub filter_isa {
 }
 
 =head2 emit
+
+Emits the given item.
 
 =cut
 
@@ -1387,86 +1554,6 @@ sub emit {
     $self
 }
 
-=head2 flat_map
-
-Similar to L</map>, but will flatten out some items:
-
-=over 4
-
-=item * an arrayref will be expanded out to emit the individual elements
-
-=item * for a L<Ryu::Source>, passes on any emitted elements
-
-=back
-
-This also means you can "merge" items from a series of sources.
-
-Note that this is not recursive - an arrayref of arrayrefs will be expanded out
-into the child arrayrefs, but no further.
-
-=cut
-
-sub flat_map {
-    use Scalar::Util qw(blessed weaken);
-    use Ref::Util qw(is_plain_arrayref is_plain_coderef);
-    use namespace::clean qw(blessed is_plain_arrayref is_plain_coderef weaken);
-
-    my ($self, $code) = splice @_, 0, 2;
-
-    # Upgrade ->flat_map(method => args...) to a coderef
-    if(!is_plain_coderef($code)) {
-        my $method = $code;
-        my @args = @_;
-        $code = sub { $_->$method(@args) }
-    }
-
-    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
-
-    weaken(my $weak_sauce = $src);
-    my $add = sub  {
-        my $v = shift;
-        my $src = $weak_sauce or return;
-
-        my $k = "$v";
-        $log->tracef("Adding %s which will bring our count to %d", $k, 0 + keys %{$src->{waiting}});
-        $src->{waiting}{$k} = $v->on_ready(sub {
-            return unless my $src = $weak_sauce;
-            delete $src->{waiting}{$k};
-            $src->finish unless %{$src->{waiting}};
-        })
-    };
-
-    $add->($self->completed);
-    $self->each_while_source(sub {
-        my $src = $weak_sauce or return;
-        for ($code->($_)) {
-            my $item = $_;
-            if(is_plain_arrayref($item)) {
-                $log->tracef("Have an arrayref of %d items", 0 + @$item);
-                for(@$item) {
-                    last if $src->is_ready;
-                    $src->emit($_);
-                }
-            } elsif(blessed($item) && $item->isa(__PACKAGE__)) {
-                $log->tracef("This item is a source");
-                $add->($item->completed);
-                $src->on_ready(sub {
-                    return if $item->is_ready;
-                    $log->tracef("Marking %s as ready because %s was", $item->describe, $src->describe);
-                    shift->on_ready($item->completed);
-                });
-                $item->each_while_source(sub {
-                    my $src = $weak_sauce or return;
-                    $src->emit($_)
-                }, $src)->on_ready(sub {
-                    undef $item;
-                });
-            }
-        }
-    }, $src);
-    $src
-}
-
 =head2 each
 
 =cut
@@ -1477,7 +1564,41 @@ sub each {
     $self;
 }
 
+=head2 each_as_source
+
+=cut
+
+sub each_as_source : method {
+    use Variable::Disposition qw(retain_future);
+    use namespace::clean qw(retain_future);
+    my ($self, @code) = @_;
+
+    my $src = $self->chained(label => (caller 0)[3] =~ /::([^:]+)$/);
+    my @active;
+    $self->completed->on_ready(sub {
+        retain_future(
+            Future->needs_all(
+                grep $_, @active
+            )->on_ready(sub {
+                $src->finish
+            })
+        );
+    });
+
+    $self->each_while_source(sub {
+        my @pending;
+        for my $code (@code) {
+            push @pending, $code->($_);
+        }
+        push @active, map $_->completed, @pending;
+        $src->emit($_);
+    }, $src)
+}
+
+
 =head2 completed
+
+Returns a L<Future> indicating completion (or failure) of this stream.
 
 =cut
 
@@ -1530,6 +1651,29 @@ sub label { shift->{label} }
 
 sub parent { shift->{parent} }
 
+=head2 await
+
+Block until this source finishes.
+
+=cut
+
+sub await {
+    my ($self) = @_;
+    my $f = $self->completed;
+    $f->await until $f->is_ready;
+    $self
+}
+
+=head2 finish
+
+Mark this source as completed.
+
+=cut
+
+sub finish { $_[0]->completed->done; $_[0] }
+
+sub refresh { }
+
 =head1 METHODS - Proxied
 
 The following methods are proxied to our completion L<Future>:
@@ -1569,29 +1713,6 @@ sub get {
 for my $k (qw(then cancel fail on_ready transform is_ready is_done failure is_cancelled else)) {
     do { no strict 'refs'; *$k = $_ } for sub { shift->completed->$k(@_) }
 }
-
-=head2 await
-
-Block until this source finishes.
-
-=cut
-
-sub await {
-    my ($self) = @_;
-    my $f = $self->completed;
-    $f->await until $f->is_ready;
-    $self
-}
-
-=head2 finish
-
-Mark this source as completed.
-
-=cut
-
-sub finish { shift->completed->done }
-
-sub refresh { }
 
 =head1 METHODS - Internal
 
@@ -1640,6 +1761,19 @@ sub each_while_source {
         $log->tracef("->e_w_s completed on %s for refaddr 0x%x", $self->describe, refaddr($self));
     });
     $src
+}
+
+=head2 new_future
+
+Used internally to get a L<Future>.
+
+=cut
+
+sub new_future {
+    my $self = shift;
+    (
+        $self->{new_future} //= $FUTURE_FACTORY
+    )->($self, @_)
 }
 
 sub DESTROY {

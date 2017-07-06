@@ -31,7 +31,7 @@ ok !$app->can('option'),         'option() was not applied to app class';
 ok !$app->can('documentation'),  'documentation() was not applied to app class';
 ok !$app->can('version'),        'version() was not applied to app class';
 isa_ok $script, 'Applify';
-can_ok $script, qw( option app documentation version options new print_help import );
+can_ok $script, qw(option app documentation version options new print_help import);
 is $script->{caller}->[0], 'main', 'called from main::';
 
 done_testing;

@@ -73,7 +73,7 @@ Many of the internals use site spesific SWQL statements, they are defined as con
 
 =cut
 
-use constant SWQL_getInterfacesOnNode=>'SELECT Caption, InterfaceID, DisplayName, FullName, ifname, interfacetype as ifType FROM Orion.NPM.Interfaces where NodeID=%s';
+use constant SWQL_getInterfacesOnNode=>'SELECT Caption, InterfaceID, DisplayName, FullName, ifname, interfacetype as ifType,Uri FROM Orion.NPM.Interfaces where NodeID=%s';
 
 =item * my $sql=$self->SWQL_getNodesByDisplayName;
 
@@ -145,27 +145,63 @@ use constant SWQL_getTemplatesOnNode=>q{SELECT ApplicationID, ApplicationTemplat
 =cut
 
 use constant SWQL_getNodesByIp=>q{SELECT
-  NodeID,
-  IPAddress,
-  IPAddressGUID,
-  Caption,
-  DynamicIP,
-  EngineID,
-  Status,
-  UnManaged,
-  Allow64BitCounters,
-  ObjectSubType,
-  SysObjectID,
-  MachineType,
-  VendorIcon,
-  SNMPVersion,
-  Community,
-  RediscoveryInterval,
-  PollInterval,
-  StatCollection,
-  Uri,
-  DisplayName
-  FROM Orion.Nodes where IP_Address='%s'};
+  n.NodeID,
+  n.IPAddress,
+  n.IPAddressGUID,
+  n.Caption,
+  n.DynamicIP,
+  n.EngineID,
+  n.Status,
+  n.UnManaged,
+  n.Allow64BitCounters,
+  n.ObjectSubType,
+  n.SysObjectID,
+  n.MachineType,
+  n.VendorIcon,
+  n.SNMPVersion,
+  n.Community,
+  n.RediscoveryInterval,
+  n.PollInterval,
+  n.StatCollection,
+  n.Uri,
+  n.DisplayName
+  FROM 
+    Orion.NodeIPAddresses i
+    inner join Orion.Nodes n on n.ObjectSubType='SNMP' and i.NodeID=n.NodeID
+  where  
+    i.IPAddress='%s'};
+
+=item * my $sql=$self->SWQL_bulk_ip_lookup
+
+=cut
+
+use constant SWQL_bulk_ip_lookup=>q{SELECT
+  n.NodeID,
+  n.IPAddress,
+  n.IPAddressGUID,
+  n.Caption,
+  n.DynamicIP,
+  n.EngineID,
+  n.Status,
+  n.UnManaged,
+  n.Allow64BitCounters,
+  n.ObjectSubType,
+  n.SysObjectID,
+  n.MachineType,
+  n.VendorIcon,
+  n.SNMPVersion,
+  n.Community,
+  n.RediscoveryInterval,
+  n.PollInterval,
+  n.StatCollection,
+  n.Uri,
+  n.DisplayName,
+  i.IPAddress as LookupIP
+  FROM 
+    Orion.NodeIPAddresses i
+    inner join Orion.Nodes n on n.ObjectSubType='SNMP' and i.NodeID=n.NodeID
+  where  
+    i.IPAddress in('%s')};
 
 =item * my $sql=$self->SWQL_getVolumeTypeMap;
 
@@ -211,9 +247,20 @@ use constant SWQL_getVolumeMap=>q{SELECT
     StatCollection,
     RediscoveryInterval,
     VolumeID,
+    Uri,
     NodeID
 
   FROM Orion.Volumes where NodeID=%s};
+
+=item * my $sql=$self->SWQL_GetAlertSettings;
+
+=cut
+
+use constant SWQL_GetAlertSettings=>'SELECT NodeID, EntityType, InstanceId, MetricId, MetricName, InstanceCaption, ThresholdType, Timestamp, MinDateTime, MaxDateTime, CurrentValue, WarningThreshold, CriticalThreshold, CapacityThreshold, Aavg, Bavg, Apeak, Bpeak, DaysToWarningAvg, DaysToCriticalAvg, DaysToCapacityAvg, DaysToWarningPeak, DaysToCriticalPeak, DaysToCapacityPeak, InstanceUri, DetailsUrl, DisplayName, Description, InstanceType, Uri, InstanceSiteId
+FROM Orion.ForecastCapacity
+where nodeid=%s';
+
+
 
 =item * my $sql=$self->SWQL_GetNodePollers;
 

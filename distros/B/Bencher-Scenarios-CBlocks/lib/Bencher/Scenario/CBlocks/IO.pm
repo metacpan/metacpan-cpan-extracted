@@ -1,12 +1,12 @@
 package Bencher::Scenario::CBlocks::IO;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 
 use File::Temp qw(tempfile);
 
@@ -25,7 +25,7 @@ _
     precision => 6,
     before_bench => sub {
         (my $fh, $infile_path) = tempfile();
-        $log->debugf("Input temp file is %s", $infile_path);
+        log_debug("Input temp file is %s", $infile_path);
         for my $i (1..100*1024) {
             if ($i % 10 == 0) {
                 print $fh "Fred Fred\n";
@@ -35,11 +35,11 @@ _
         }
         close $fh;
         (my $out_fh, $outfile_path) = tempfile();
-        $log->debugf("Output temp file is %s", $outfile_path);
+        log_debug("Output temp file is %s", $outfile_path);
     },
     after_bench => sub {
-        if ($log->is_debug) {
-            $log->debugf("Keeping input and output temp files");
+        if (log_is_debug) {
+            log_debug("Keeping input and output temp files");
         } else {
             unlink $infile_path;
             unlink $outfile_path;
@@ -121,7 +121,7 @@ Bencher::Scenario::CBlocks::IO - Benchmark I/O performance of C::Blocks
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenario::CBlocks::IO (from Perl distribution Bencher-Scenarios-CBlocks), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenario::CBlocks::IO (from Perl distribution Bencher-Scenarios-CBlocks), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -173,23 +173,23 @@ Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2
 Benchmark with default options (C<< bencher -m CBlocks::IO >>):
 
  #table1#
- +-------------+-----------+-----------+------------+--------+---------+
- | participant | rate (/s) | time (ms) | vs_slowest | errors | samples |
- +-------------+-----------+-----------+------------+--------+---------+
- | perl        |        30 |        30 |        1   | 0.0003 |       7 |
- | C::Blocks   |        49 |        20 |        1.4 | 0.0001 |       6 |
- +-------------+-----------+-----------+------------+--------+---------+
+ +-------------+-----------+-----------+------------+---------+---------+
+ | participant | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+ +-------------+-----------+-----------+------------+---------+---------+
+ | perl        |      36   |      28   |       1    | 6.5e-05 |       6 |
+ | C::Blocks   |      50.8 |      19.7 |       1.42 | 9.8e-06 |       7 |
+ +-------------+-----------+-----------+------------+---------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m CBlocks::IO --module-startup >>):
 
  #table2#
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
- | C::Blocks           | 2.4                          | 5.9                | 22             |      23   |                   17.1 |        1   |   0.00021 |       6 |
- | perl -e1 (baseline) | 0.82                         | 4.1                | 16             |       5.9 |                    0   |        3.9 | 1.5e-05   |       7 |
- +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+-----------+---------+
+ +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+ +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+ | C::Blocks           | 2.39                         | 5.85               | 22             |      20.8 |                   15.8 |        1   | 9.4e-06 |       6 |
+ | perl -e1 (baseline) | 0.83                         | 4.1                | 16             |       5   |                    0   |        4.2 | 1.9e-05 |       7 |
+ +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

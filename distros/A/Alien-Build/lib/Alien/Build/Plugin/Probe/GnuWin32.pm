@@ -10,10 +10,11 @@ use Capture::Tiny qw( capture );
 use List::Util ();
 
 # ABSTRACT: Probe for GnuWin32 packages using the Windows registry
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 has native_only         => 0;
-has registery_key_regex => sub { Carp::croak "register_key_regex is required" };
+has registery_key_regex => undef;
+has registry_key_regex  => undef;
 has exe_name            => undef;
 has exe_match           => undef;
 has exe_version         => undef;
@@ -22,6 +23,23 @@ has exe_args            => ['--version'];
 sub _short ($)
 {
   $_[0] =~ /\s+/ ? Win32::GetShortPathName( $_[0] ) : $_[0];
+}
+
+sub new
+{
+  my $class = shift;
+  
+  my $self = $class->SUPER::new(@_);
+  
+  if($self->registery_key_regex)
+  {
+    require Alien::Build;
+    Alien::Build->log("warning: you are using a typo'd property, 'registery_key_regex', please use 'registry_key_regex' instead");
+  }
+  
+  $self->registry_key_regex || $self->registry_key_regex($self->registery_key_regex) || Carp::croak "register_key_regex is required";
+  
+  $self;  
 }
 
 sub init
@@ -141,7 +159,7 @@ Alien::Build::Plugin::Probe::GnuWin32 - Probe for GnuWin32 packages using the Wi
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 AUTHOR
 
@@ -152,6 +170,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

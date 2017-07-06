@@ -3,13 +3,20 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 use Moose;
 with (
 	'Dist::Zilla::Role::FileMunger',
 	'Dist::Zilla::Role::FileFinderUser' => {
-		default_finders => [ ':InstallModules', ':ExecFiles' ],
+        default_finders => [
+            ':InstallModules',
+            (
+                eval { Dist::Zilla::Dist::Builder->VERSION('5.038'); 1 }
+                    ? ':PerlExecFiles'
+                    : ':ExecFiles'
+            )
+        ],
 	},
 	'Dist::Zilla::Role::PPI',
 );
@@ -104,7 +111,7 @@ Dist::Zilla::Plugin::OurPkgVersion - No line insertion and does Package version 
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -228,12 +235,20 @@ the number of files to search to only be modules and executables.
 
 tells which files to munge, see L<Dist::Zilla::Role::FileMunger>
 
+=item finder
+
+Override the default L<FileFinder|Dist::Zilla::Role::FileFinder> for
+finding files to check and update. The default value is C<:InstallModules>
+and C<:PerlExecFiles> (when available; otherwise C<:ExecFiles>)
+-- see also L<Dist::Zilla::Plugin::ExecDir>, to make sure the script
+files are properly marked as executables for the installer.
+
 =back
 
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/plicease/dist-zilla-plugin-ourpkgversion/issues
+L<https://github.com/plicease/dist-zilla-plugin-ourpkgversion/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -241,7 +256,7 @@ feature.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexandr Ciornii Alexei Znamensky Christian Walde Christopher J. Madsen David Golden Graham Ollis Ian Sealy
+=for stopwords Alexandr Ciornii Alexei Znamensky Christian Walde Christopher J. Madsen David Golden Graham Ollis Ian Sealy Stephan Loyd
 
 =over 4
 
@@ -277,6 +292,10 @@ Graham Ollis <plicease@cpan.org>
 
 Ian Sealy <git@iansealy.com>
 
+=item *
+
+Stephan Loyd <stephanloyd9@gmail.com>
+
 =back
 
 =head1 AUTHORS
@@ -295,7 +314,7 @@ Grahan Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Caleb Cushing.
+This software is Copyright (c) 2017 by Caleb Cushing.
 
 This is free software, licensed under:
 

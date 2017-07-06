@@ -1,5 +1,5 @@
 package Perl::Critic::Lokku;
-$Perl::Critic::Lokku::VERSION = '0.002';
+$Perl::Critic::Lokku::VERSION = '0.003';
 use strict;
 use warnings;
 use utf8;
@@ -19,7 +19,7 @@ Perl::Critic::Lokku - A collection of Perl::Critic policies from Lokku
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -28,8 +28,15 @@ see if you could use any.
 
 =head1 DESCRIPTION
 
-Currently, this distribution only contains policies that check for gotchas
-about L<Try::Tiny>.
+This distribution only contains policies that check for gotchas about
+L<Try::Tiny>.
+
+=head1 ABANDONED
+
+This distribution is abandoned. Please do not expect to see any updates. The
+code is is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself. Please feel free
+to copy this code and release it yourself, just don't use the Lokku name.
 
 =head2 TryTiny policies
 
@@ -55,7 +62,7 @@ David D Lowe <flimm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Lokku <cpan@lokku.com>.
+This software is copyright (c) 2017 by Lokku <cpan@lokku.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

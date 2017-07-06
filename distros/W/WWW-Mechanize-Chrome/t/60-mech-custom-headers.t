@@ -24,19 +24,14 @@ if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
     exit
 } else {
-    plan tests => 19*@instances;
+    plan tests => 20*@instances;
 };
 
-my %args;
 sub new_mech {
-    # Just keep these to pass the parameters to new instances
-    if( ! keys %args ) {
-        %args = @_;
-    };
     #use Mojolicious;
     WWW::Mechanize::Chrome->new(
         autodie => 1,
-        %args,
+        @_,
     );
 };
 
@@ -44,7 +39,7 @@ my $server = Test::HTTP::LocalServer->spawn(
     #debug => 1
 );
 
-t::helper::run_across_instances(\@instances, $instance_port, \&new_mech, 19, sub {
+t::helper::run_across_instances(\@instances, $instance_port, \&new_mech, 20, sub {
 
     my ($browser_instance, $mech) = @_;
 
@@ -77,6 +72,8 @@ t::helper::run_across_instances(\@instances, $instance_port, \&new_mech, 19, sub
     like $headers, qr!^User-Agent: \Q$ua\E$!m, "We sent the correct User-Agent header";
     like $headers, qr!^X-WWW-Mechanize-Chrome: \Q$WWW::Mechanize::Chrome::VERSION\E$!m, "We can add completely custom headers";
     like $headers, qr!^Host: www.example.com\s*$!m, "We can add custom Host: headers";
+    $mech->submit_form; # retrieve the JS window.navigator.userAgent value
+    is $mech->value('navigator'), $ua, "JS window.navigator.userAgent gets set as well";
     # diag $mech->content;
 
     $mech->delete_header(

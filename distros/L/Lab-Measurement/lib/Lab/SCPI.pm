@@ -1,5 +1,5 @@
 package Lab::SCPI;
-$Lab::SCPI::VERSION = '3.550';
+$Lab::SCPI::VERSION = '3.552';
 use 5.010;
 use warnings;
 no warnings 'recursion';

@@ -20,8 +20,8 @@ sub get_cmd ($self) {
 
 sub get_desired_capabilities ( $self, $desired_capabilities ) {
     $desired_capabilities->{chromeOptions} = {
-        args  => ['start-maximized'],    # 'no-sandbox', 'user-data-dir'
-        prefs => {                       #
+        args => [ 'start-maximized', 'disable-infobars', '--disable-popup-blocking', '--disable-default-apps' ],    # 'no-sandbox', 'user-data-dir'
+        prefs => {                                                                                                  #
             ( $self->disable_images ? ( 'profile.default_content_setting_values.images' => 2 ) : () ),
             ( $self->enable_notifications ? () : ( 'profile.default_content_setting_values.notifications' => 2 ) ),
             ( $self->enable_flash         ? () : ( 'profile.default_content_setting_values.plugins'       => 2 ) ),

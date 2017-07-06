@@ -1,0 +1,6 @@
+Revision history for Perl extension Device::HID::XS.
+
+0.01  Sun Jun 25 19:57:31 2017
+	- original version; created by h2xs 1.23 with options
+		-e -n Device::HID::XS /usr/local/Cellar/hidapi/0.8.0-rc1/include/hidapi/hidapi.h
+

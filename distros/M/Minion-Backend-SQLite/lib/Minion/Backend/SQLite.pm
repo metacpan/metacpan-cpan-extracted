@@ -1,11 +1,12 @@
 package Minion::Backend::SQLite;
 use Mojo::Base 'Minion::Backend';
 
+use Carp 'croak';
 use Mojo::SQLite;
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = '1.000';
+our $VERSION = '2.000';
 
 has 'sqlite';
 
@@ -39,11 +40,12 @@ sub enqueue {
   my $db = $self->sqlite->db;
   return $db->query(
     q{insert into minion_jobs
-       (args, attempts, delayed, parents, priority, queue, task)
-      values (?, ?, (datetime('now', ? || ' seconds')), ?, ?, ?, ?)},
+       (args, attempts, delayed, notes, parents, priority, queue, task)
+      values (?, ?, (datetime('now', ? || ' seconds')), ?, ?, ?, ?, ?)},
     {json => $args}, $options->{attempts} // 1,
-    $options->{delay} // 0, {json => ($options->{parents} || [])},
-    $options->{priority} // 0, $options->{queue} // 'default', $task
+    $options->{delay} // 0, {json => $options->{notes} || {}},
+    {json => ($options->{parents} || [])}, $options->{priority} // 0,
+    $options->{queue} // 'default', $task
   )->last_insert_id;
 }
 
@@ -51,19 +53,18 @@ sub fail_job   { shift->_update(1, @_) }
 sub finish_job { shift->_update(0, @_) }
 
 sub job_info {
-  my $info = shift->sqlite->db->query(
+  shift->sqlite->db->query(
     q{select id, args, attempts,
         (select json_group_array(distinct child.id)
           from minion_jobs as child, json_each(child.parents) as parent_id
           where j.id = parent_id.value) as children,
         strftime('%s',created) as created,
         strftime('%s',delayed) as delayed,
-        strftime('%s',finished) as finished, parents, priority, queue, result,
-        strftime('%s',retried) as retried, retries,
+        strftime('%s',finished) as finished, notes, parents, priority, queue,
+        result, strftime('%s',retried) as retried, retries,
         strftime('%s',started) as started, state, task, worker
       from minion_jobs as j where id = ?}, shift
-  )->expand(json => [qw(args children parents result)])->hash // return undef;
-  return $info;
+  )->expand(json => [qw(args children notes parents result)])->hash;
 }
 
 sub list_jobs {
@@ -84,6 +85,32 @@ sub list_workers {
   my $sql = 'select id from minion_workers order by id desc limit ? offset ?';
   return $self->sqlite->db->query($sql, $limit, $offset)
     ->arrays->map(sub { $self->worker_info($_->[0]) })->to_array;
+}
+
+sub lock {
+  my ($self, $name, $duration, $options) = (shift, shift, shift, shift // {});
+  my $db = $self->sqlite->db;
+  $db->query(q{delete from minion_locks where expires < datetime('now')});
+  my $tx = $db->begin('exclusive');
+  my $locks = $db->query(q{select count(*) from minion_locks where name = ?},
+    $name)->arrays->first->[0];
+  return !!0 if defined $locks and $locks >= ($options->{limit} || 1);
+  if (defined $duration and $duration > 0) {
+    $db->query(q{insert into minion_locks (name, expires)
+      values (?, datetime('now', ? || ' seconds'))}, $name, $duration);
+    $tx->commit;
+  }
+  return !!1;
+}
+
+sub note {
+  my ($self, $id, $key, $value) = @_;
+  croak qq{Invalid note key '$key'; must not contain '.', '[', or ']'}
+    if $key =~ m/[\[\].]/;
+  return !!$self->sqlite->db->query(
+    q{update minion_jobs set notes = json_set(notes, '$.' || ?, json(?))
+      where id = ?}, $key, {json => $value}, $id
+  )->rows;
 }
 
 sub receive {
@@ -136,18 +163,6 @@ sub repair {
   )->hashes;
   $fail->each(sub { $self->fail_job(@$_{qw(id retries)}, 'Worker went away') });
 
-  # Jobs with missing parents (can't be retried)
-  $db->query(
-    q{update minion_jobs
-      set finished = datetime('now'), result = json('"Parent went away"'),
-        state = 'failed'
-      where json_array_length(parents) > 0 and json_array_length(parents) <> (
-        select count(distinct parent.id)
-        from minion_jobs as parent, json_each(minion_jobs.parents) as parent_id
-        where parent.id = parent_id.value
-      ) and state = 'inactive'}
-  );
-
   # Old jobs with no unresolved dependencies
   $db->query(
     q{delete from minion_jobs
@@ -162,9 +177,10 @@ sub reset {
   my $db = shift->sqlite->db;
   my $tx = $db->begin;
   $db->query('delete from minion_jobs');
+  $db->query('delete from minion_locks');
   $db->query('delete from minion_workers');
   $db->query(q{delete from sqlite_sequence
-    where name in ('minion_jobs','minion_workers')});
+    where name in ('minion_jobs','minion_locks','minion_workers')});
   $tx->commit;
 }
 
@@ -185,24 +201,30 @@ sub stats {
   my $self = shift;
 
   my $stats = $self->sqlite->db->query(
-    q{select 'enqueued_jobs', seq from sqlite_sequence
-      where name = 'minion_jobs'
-      union all
-      select state || '_jobs', count(state) from minion_jobs group by state
-      union all
-      select 'delayed_jobs', count(*) from minion_jobs
-      where (delayed > datetime('now') or json_array_length(parents) > 0)
-        and state = 'inactive'
-      union all
-      select 'inactive_workers', count(*) from minion_workers
-      union all
-      select 'active_workers', count(distinct worker) from minion_jobs
-      where state = 'active'}
-  )->arrays->reduce(sub { $a->{$b->[0]} = $b->[1]; $a }, {});
+    q{select count(case state when 'inactive' then 1 end) as inactive_jobs,
+      count(case state when 'active' then 1 end) as active_jobs,
+      count(case state when 'failed' then 1 end) as failed_jobs,
+      count(case state when 'finished' then 1 end) as finished_jobs,
+      count(case when state = 'inactive' and (delayed > datetime('now')
+        or json_array_length(parents) > 0) then 1 end) as delayed_jobs,
+      count(distinct case when state = 'active' then worker end) as active_workers,
+      ifnull((select seq from sqlite_sequence where name = 'minion_jobs'), 0)
+        as enqueued_jobs,
+      (select count(*) from minion_workers) as inactive_workers
+      from minion_jobs}
+  )->hash;
   $stats->{inactive_workers} -= $stats->{active_workers};
-  $stats->{"${_}_jobs"} ||= 0 for qw(inactive active failed finished enqueued);
 
   return $stats;
+}
+
+sub unlock {
+  !!shift->sqlite->db->query(
+    q{delete from minion_locks where id = (
+      select id from minion_locks
+      where expires > datetime('now') and name = ?
+      order by expires limit 1)}, shift
+  )->rows;
 }
 
 sub unregister_worker {
@@ -235,10 +257,10 @@ sub _try {
   my $res = $db->query(
     qq{select id from minion_jobs as j
        where delayed <= datetime('now')
-       and (json_array_length(parents) = 0 or json_array_length(parents) = (
-         select count(distinct parent.id)
-         from minion_jobs as parent, json_each(j.parents) as parent_id
-         where parent.id = parent_id.value and parent.state = 'finished'
+       and (json_array_length(parents) = 0 or not exists (
+         select 1 from minion_jobs as parent, json_each(j.parents) as parent_id
+         where parent.id = parent_id.value
+         and parent.state in ('inactive', 'active', 'failed')
        )) and queue in ($queues_in) and state = 'inactive'
        and task in ($tasks_in)
        order by priority desc, id
@@ -413,6 +435,12 @@ L<Minion/"backoff"> after the first attempt, defaults to C<1>.
 
 Delay job for this many seconds (from now).
 
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
+
 =item parents
 
   parents => [$id1, $id2, $id3]
@@ -504,6 +532,12 @@ Epoch time job was delayed to.
   finished => 784111777
 
 Epoch time job was finished.
+
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
 
 =item parents
 
@@ -603,6 +637,34 @@ List only jobs for this task.
   my $batch = $backend->list_workers($offset, $limit);
 
 Returns the same information as L</"worker_info"> but in batches.
+
+=head2 lock
+
+  my $bool = $backend->lock('foo', 3600);
+  my $bool = $backend->lock('foo', 3600, {limit => 20});
+
+Try to acquire a named lock that will expire automatically after the given
+amount of time in seconds.
+
+These options are currently available:
+
+=over 2
+
+=item limit
+
+  limit => 20
+
+Number of shared locks with the same name that can be active at the same time,
+defaults to C<1>.
+
+=back
+
+=head2 note
+
+  my $bool = $backend->note($job_id, foo => 'bar');
+
+Change a metadata field for a job. It is currently an error to attempt to set a
+metadata field with a name containing the characters C<.>, C<[>, or C<]>.
 
 =head2 receive
 
@@ -744,6 +806,12 @@ Number of workers that are currently not processing a job.
 
 =back
 
+=head2 unlock
+
+  my $bool = $backend->unlock('foo');
+
+Release a named lock.
+
 =head2 unregister_worker
 
   $backend->unregister_worker($worker_id);
@@ -883,10 +951,10 @@ drop table minion_jobs;
 alter table minion_jobs_NEW rename to minion_jobs;
 
 -- 4 up
-alter table minion_jobs add column parents text default '[]';
+alter table minion_jobs add column parents text not null default '[]';
 
 -- 5 up
-alter table minion_workers add column inbox text
+alter table minion_workers add column inbox text not null
   check(json_valid(inbox) and json_type(inbox) = 'array') default '[]';
 
 -- 6 up
@@ -895,5 +963,18 @@ drop index if exists minion_jobs_state;
 create index if not exists minion_jobs_state_priority_id on minion_jobs (state, priority desc, id);
 
 -- 7 up
-alter table minion_workers add column status text
+alter table minion_workers add column status text not null
   check(json_valid(status) and json_type(status) = 'object') default '{}';
+
+-- 8 up
+create table if not exists minion_locks (
+  id integer not null primary key autoincrement,
+  name text not null,
+  expires text not null
+);
+create index if not exists minion_locks_name_expires on minion_locks (name, expires);
+alter table minion_jobs add column notes text not null
+  check(json_valid(notes) and json_type(notes) = 'object') default '{}';
+
+-- 8 down
+drop table if exists minion_locks;

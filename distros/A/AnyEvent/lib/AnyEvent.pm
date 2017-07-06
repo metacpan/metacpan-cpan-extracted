@@ -964,13 +964,12 @@ Arranges for the code block to be executed as soon as the event model is
 autodetected (or immediately if that has already happened).
 
 The block will be executed I<after> the actual backend has been detected
-(C<$AnyEvent::MODEL> is set), but I<before> any watchers have been
-created, so it is possible to e.g. patch C<@AnyEvent::ISA> or do
-other initialisations - see the sources of L<AnyEvent::Strict> or
+(C<$AnyEvent::MODEL> is set), so it is possible to do some initialisation
+only when AnyEvent is actually initialised - see the sources of
 L<AnyEvent::AIO> to see how this is used.
 
 The most common usage is to create some global watchers, without forcing
-event module detection too early, for example, L<AnyEvent::AIO> creates
+event module detection too early. For example, L<AnyEvent::AIO> creates
 and installs the global L<IO::AIO> watcher in a C<post_detect> block to
 avoid autodetecting the event module at load time.
 
@@ -997,9 +996,15 @@ C<$WATCHER>, but do so only do so after the event loop is initialised.
 
 =item @AnyEvent::post_detect
 
-If there are any code references in this array (you can C<push> to it
-before or after loading AnyEvent), then they will be called directly
-after the event loop has been chosen.
+This is a lower level interface then C<AnyEvent::post_detect> (the
+function). This variable is mainly useful for modules that can do
+something useful when AnyEvent is used and thus want to know when it
+is initialised, but do not need to even load it by default. This array
+provides the means to hook into AnyEvent passively, without loading it.
+
+Here is how it works: If there are any code references in this array (you
+can C<push> to it before or after loading AnyEvent), then they will be
+called directly after the event loop has been chosen.
 
 You should check C<$AnyEvent::MODEL> before adding to this array, though:
 if it is defined then the event loop has already been detected, and the
@@ -1007,11 +1012,6 @@ array will be ignored.
 
 Best use C<AnyEvent::post_detect { BLOCK }> when your application allows
 it, as it takes care of these details.
-
-This variable is mainly useful for modules that can do something useful
-when AnyEvent is used and thus want to know when it is initialised, but do
-not need to even load it by default. This array provides the means to hook
-into AnyEvent passively, without loading it.
 
 Example: To load Coro::AnyEvent whenever Coro and AnyEvent are used
 together, you could put this into Coro (this is the actual code used by
@@ -1260,7 +1260,7 @@ BEGIN {
 
 use Carp ();
 
-our $VERSION = 7.13;
+our $VERSION = 7.14;
 our $MODEL;
 our @ISA;
 our @REGISTRY;

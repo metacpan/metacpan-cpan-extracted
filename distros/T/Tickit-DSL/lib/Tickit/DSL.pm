@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Exporter);
 
-our $VERSION = '0.031';
+our $VERSION = '0.033';
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ Tickit::DSL - domain-specific language for Tickit terminal apps
 
 =head1 VERSION
 
-version 0.031
+version 0.032
 
 =head1 SYNOPSIS
 
@@ -79,7 +79,6 @@ mainly intended for prototyping:
 
 =cut
 
-use Tickit::Console;
 use Tickit::Widget::Border;
 use Tickit::Widget::Box;
 use Tickit::Widget::Breadcrumb;
@@ -133,23 +132,23 @@ our $GRID_COL;
 our $GRID_ROW;
 
 our @EXPORT = our @EXPORT_OK = qw(
-	tickit later timer loop
-	widget customwidget
-	add_widgets
-	gridbox gridrow vbox hbox vsplit hsplit desktop relative pane frame
-	floatbox float
-	static entry checkbox button
-	radiogroup radiobutton
-	scroller scroller_text scroller_richtext scrollbox
-	console term
-	tabbed
-	tree table breadcrumb
-	placeholder placegrid decoration
-	statusbar
-	menubar submenu menuitem menuspacer
-	fileviewer
-	logpanel
-	figlet
+    tickit later timer loop
+    widget customwidget
+    add_widgets
+    gridbox gridrow vbox hbox vsplit hsplit desktop relative pane frame
+    floatbox float
+    static entry checkbox button
+    radiogroup radiobutton
+    scroller scroller_text scroller_richtext scrollbox
+    console term
+    tabbed
+    tree table breadcrumb
+    placeholder placegrid decoration
+    statusbar
+    menubar submenu menuitem menuspacer
+    fileviewer
+    logpanel
+    figlet
 );
 
 =head1 METHODS
@@ -188,22 +187,22 @@ This is not:
 =cut
 
 sub import {
-	my $class = shift;
-	my ($mode) = extract_by { /^:a?sync$/ } @_;
-	if($MODE && $mode && $mode ne $MODE) {
-		die "Cannot mix sync/async - we are already $MODE and were requested to switch to $mode";
-	} elsif($mode) {
-		$MODE = $mode;
-	}
-	$MODE ||= ':sync';
-	if($MODE eq ':sync') {
-		require Tickit;
-	} elsif($MODE eq ':async') {
-		require IO::Async::Loop;
-		require Tickit::Async;
-	} else {
-		die "Unknown mode: $MODE";
-	}
+    my $class = shift;
+    my ($mode) = extract_by { /^:a?sync$/ } @_;
+    if($MODE && $mode && $mode ne $MODE) {
+        die "Cannot mix sync/async - we are already $MODE and were requested to switch to $mode";
+    } elsif($mode) {
+        $MODE = $mode;
+    }
+    $MODE ||= ':sync';
+    if($MODE eq ':sync') {
+        require Tickit;
+    } elsif($MODE eq ':async') {
+        require IO::Async::Loop;
+        require Tickit::Async;
+    } else {
+        die "Unknown mode: $MODE";
+    }
     $class->export_to_level(1, $class, @_);
 }
 
@@ -221,9 +220,9 @@ exception if we're not. See L</import> for details.
 =cut
 
 sub loop {
-	die "No loop available when running as $MODE" unless $MODE eq ':async';
-	$LOOP = shift if @_;
-	$LOOP ||= IO::Async::Loop->new
+    die "No loop available when running as $MODE" unless $MODE eq ':async';
+    $LOOP = shift if @_;
+    $LOOP ||= IO::Async::Loop->new
 }
 
 =head2 tickit
@@ -233,16 +232,16 @@ Returns (constructing if necessary) the L<Tickit> (or L<Tickit::Async>) instance
 =cut
 
 sub tickit {
-	$TICKIT = shift if @_;
-	return $TICKIT if $TICKIT;
+    $TICKIT = shift if @_;
+    return $TICKIT if $TICKIT;
 
-	if($MODE eq ':async') {
-		$TICKIT = Tickit::Async->new;
-		loop->add($TICKIT);
-	} else {
-		$TICKIT ||= Tickit->new;
-	}
-	$TICKIT
+    if($MODE eq ':async') {
+        $TICKIT = Tickit::Async->new;
+        loop->add($TICKIT);
+    } else {
+        $TICKIT ||= Tickit->new;
+    }
+    $TICKIT
 }
 
 =head2 later
@@ -258,8 +257,8 @@ Will run the code after the next round of I/O events.
 =cut
 
 sub later(&) {
-	my $code = shift;
-	tickit->later($code)
+    my $code = shift;
+    tickit->later($code)
 }
 
 =head2 timer
@@ -280,10 +279,10 @@ anything other than a single definition will cause an exception.
 =cut
 
 sub timer(&@) {
-	my $code = shift;
-	my %args = @_;
-	die 'when did you want to run the code?' unless 1 == grep exists $args{$_}, qw(at after);
-	tickit->timer(%args, $code);
+    my $code = shift;
+    my %args = @_;
+    die 'when did you want to run the code?' unless 1 == grep exists $args{$_}, qw(at after);
+    tickit->timer(%args, $code);
 }
 
 =head2 add_widgets
@@ -301,12 +300,12 @@ Returns the widget we added the new widgets under (i.e. the C< under > parameter
 =cut
 
 sub add_widgets(&@) {
-	my $code = shift;
-	my %args = @_;
-	local $PARENT = delete $args{under} or die 'expected add_widgets { ... } under => $some_widget;';
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %args);
-	$code->($PARENT);
-	$PARENT;
+    my $code = shift;
+    my %args = @_;
+    local $PARENT = delete $args{under} or die 'expected add_widgets { ... } under => $some_widget;';
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %args);
+    $code->($PARENT);
+    $PARENT;
 }
 
 =head1 FUNCTIONS - Layout
@@ -332,15 +331,15 @@ instance:
 =cut
 
 sub vbox(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::VBox->new(%args);
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::VBox->new(%args);
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 vsplit
@@ -362,20 +361,20 @@ instance:
 =cut
 
 sub vsplit(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = do {
-		local $PARENT = 'Tickit::Widget::VSplit';
-		local @PENDING_CHILD;
-		$code->();
-		Tickit::Widget::VSplit->new(
-			left_child  => $PENDING_CHILD[0],
-			right_child => $PENDING_CHILD[1],
-			%args,
-		);
-	};
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = do {
+        local $PARENT = 'Tickit::Widget::VSplit';
+        local @PENDING_CHILD;
+        $code->();
+        Tickit::Widget::VSplit->new(
+            left_child  => $PENDING_CHILD[0],
+            right_child => $PENDING_CHILD[1],
+            %args,
+        );
+    };
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 frame
@@ -393,15 +392,15 @@ instance:
 =cut
 
 sub frame(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Frame->new(%args);
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Frame->new(%args);
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 gridbox
@@ -424,17 +423,17 @@ instance:
 =cut
 
 sub gridbox(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::GridBox->new(%args);
-	{
-		local $PARENT = $w;
-		local $GRID_COL = 0;
-		local $GRID_ROW = 0;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::GridBox->new(%args);
+    {
+        local $PARENT = $w;
+        local $GRID_COL = 0;
+        local $GRID_ROW = 0;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 gridrow
@@ -445,11 +444,11 @@ something like a container, see L</gridbox> for details.
 =cut
 
 sub gridrow(&@) {
-	my ($code) = @_;
-	die "Grid rows must be in a gridbox" unless $PARENT->isa('Tickit::Widget::GridBox');
-	$code->($PARENT);
-	$GRID_COL = 0;
-	++$GRID_ROW;
+    my ($code) = @_;
+    die "Grid rows must be in a gridbox" unless $PARENT->isa('Tickit::Widget::GridBox');
+    $code->($PARENT);
+    $GRID_COL = 0;
+    ++$GRID_ROW;
 }
 
 =head2 hbox
@@ -471,15 +470,15 @@ instance:
 =cut
 
 sub hbox(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::HBox->new(%args);
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::HBox->new(%args);
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 hsplit
@@ -501,20 +500,20 @@ instance:
 =cut
 
 sub hsplit(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = do {
-		local $PARENT = 'Tickit::Widget::HSplit';
-		local @PENDING_CHILD;
-		$code->();
-		Tickit::Widget::HSplit->new(
-			top_child    => $PENDING_CHILD[0],
-			bottom_child => $PENDING_CHILD[1],
-			%args
-		);
-	};
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = do {
+        local $PARENT = 'Tickit::Widget::HSplit';
+        local @PENDING_CHILD;
+        $code->();
+        Tickit::Widget::HSplit->new(
+            top_child    => $PENDING_CHILD[0],
+            bottom_child => $PENDING_CHILD[1],
+            %args
+        );
+    };
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 desktop
@@ -529,26 +528,26 @@ then move them around interactively.
    $txt->set_text($_[1])
   } 'parent:label' => 'entry widget',
     'parent:left' => 1,
-	'parent:top' => 1;
+    'parent:top' => 1;
  };
 
 =cut
 
 sub desktop(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Layout::Desktop->new(%args);
-	{
-		tickit->later(sub {
-			local @WIDGET_ARGS;
-			local $PARENT = $w;
-			$code->($w);
-		});
-	}
-	{
-		local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-		apply_widget($w);
-	}
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Layout::Desktop->new(%args);
+    {
+        tickit->later(sub {
+            local @WIDGET_ARGS;
+            local $PARENT = $w;
+            $code->($w);
+        });
+    }
+    {
+        local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+        apply_widget($w);
+    }
 }
 
 =head2 relative
@@ -558,18 +557,18 @@ See L</pane> for the details.
 =cut
 
 sub relative(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Layout::Relative->new(%args);
-	{
-		local @WIDGET_ARGS;
-		local $PARENT = $w;
-		$code->($w);
-	}
-	{
-		local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-		apply_widget($w);
-	}
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Layout::Relative->new(%args);
+    {
+        local @WIDGET_ARGS;
+        local $PARENT = $w;
+        $code->($w);
+    }
+    {
+        local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+        apply_widget($w);
+    }
 }
 
 =head2 pane
@@ -579,12 +578,12 @@ A pane in a L</relative> layout.
 =cut
 
 sub pane(&@) {
-	my ($code, %args) = @_;
-	die "pane should be used within a relative { ... } item" unless $PARENT->isa('Tickit::Widget::Layout::Relative');
-	{
-		local @WIDGET_ARGS = (@WIDGET_ARGS, %args);
-		$code->($PARENT);
-	}
+    my ($code, %args) = @_;
+    die "pane should be used within a relative { ... } item" unless $PARENT->isa('Tickit::Widget::Layout::Relative');
+    {
+        local @WIDGET_ARGS = (@WIDGET_ARGS, %args);
+        $code->($PARENT);
+    }
 }
 
 =head1 FUNCTIONS - Scrolling
@@ -608,20 +607,20 @@ instance:
 =cut
 
 sub scrollbox(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = do {
-		local $PARENT = 'Tickit::Widget::ScrollBox';
-		local @PENDING_CHILD;
-		$code->();
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = do {
+        local $PARENT = 'Tickit::Widget::ScrollBox';
+        local @PENDING_CHILD;
+        $code->();
 
-		Tickit::Widget::ScrollBox->new(
-			child => $PENDING_CHILD[0],
-			%args
-		);
-	};
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+        Tickit::Widget::ScrollBox->new(
+            child => $PENDING_CHILD[0],
+            %args
+        );
+    };
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 scroller
@@ -642,15 +641,15 @@ Passes any additional args to the constructor:
 =cut
 
 sub scroller(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Scroller->new(%args);
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Scroller->new(%args);
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 scroller_text
@@ -660,8 +659,8 @@ A text item, expects to be added to a L</scroller>.
 =cut
 
 sub scroller_text {
-	my $w = Tickit::Widget::Scroller::Item::Text->new(shift // '');
-	apply_widget($w);
+    my $w = Tickit::Widget::Scroller::Item::Text->new(shift // '');
+    apply_widget($w);
 }
 
 =head2 scroller_richtext
@@ -677,8 +676,8 @@ a L<String::Tagged> instance, like this:
 =cut
 
 sub scroller_richtext {
-	my $w = Tickit::Widget::Scroller::Item::RichText->new(shift);
-	apply_widget($w);
+    my $w = Tickit::Widget::Scroller::Item::RichText->new(shift);
+    apply_widget($w);
 }
 
 =head2 console
@@ -698,17 +697,22 @@ although a future version may provide C< console_tab >
 as a helper function for adding tabs to an existing
 console.
 
+Note that this will attempt to load L<Tickit::Console>
+at runtime, so it may throw an exception if it is not
+already installed.
+
 =cut
 
 sub console(&@) {
-	my %args = (on_line => @_);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Console->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
-	$w
+    require Tickit::Console;
+    my %args = (on_line => @_);
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Console->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
+    $w
 }
 
 =head2 term
@@ -720,14 +724,14 @@ Terminal widget.
 =cut
 
 sub term(@) {
-	my %args = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Term->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
-	$w
+    my %args = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Term->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
+    $w
 }
 
 =head2 logpanel
@@ -739,14 +743,14 @@ Displays any log messages raised by L<Log::Any> or, optionally, through STDERR.
 =cut
 
 sub logpanel(@) {
-	my %args = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::LogAny->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
-	$w
+    my %args = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::LogAny->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
+    $w
 }
 
 =head1 FUNCTIONS - Miscellaneous container
@@ -776,15 +780,15 @@ The C<ribbon_class> parameter may be undocumented.
 =cut
 
 sub tabbed(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Tabbed->new(%args);
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Tabbed->new(%args);
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 floatbox
@@ -798,7 +802,7 @@ of providing dynamic windows such as popups and dropdowns.
    button {
     float {
      static 'this is a float'
-	} lines => 3, top => -1, left => '-50%';
+    } lines => 3, top => -1, left => '-50%';
    } 'Show';
   }
  }
@@ -806,15 +810,15 @@ of providing dynamic windows such as popups and dropdowns.
 =cut
 
 sub floatbox(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::FloatBox->new(%args);
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::FloatBox->new(%args);
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 float
@@ -827,7 +831,7 @@ does not need to be an immediate parent.
    button {
     float {
      static 'this is a float'
-	} lines => 3, top => -1, left => '-50%';
+    } lines => 3, top => -1, left => '-50%';
    } 'Show';
   }
  }
@@ -835,28 +839,28 @@ does not need to be an immediate parent.
 =cut
 
 sub float(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
 
-	# Work out which container to use - either the least-distant ancestor,
-	# or a specific floatbox if one was provided
-	my $floatbox = delete($args{container}) || $PARENT;
-	while($floatbox && !$floatbox->isa('Tickit::Widget::FloatBox')) {
-		$floatbox = $floatbox->parent;
-	}
-	die "No floatbox found for this float" unless $floatbox;
+    # Work out which container to use - either the least-distant ancestor,
+    # or a specific floatbox if one was provided
+    my $floatbox = delete($args{container}) || $PARENT;
+    while($floatbox && !$floatbox->isa('Tickit::Widget::FloatBox')) {
+        $floatbox = $floatbox->parent;
+    }
+    die "No floatbox found for this float" unless $floatbox;
 
-	my $w = Tickit::Widget::VBox->new;
-	my $float = $floatbox->add_float(
-		child => $w,
-		%args
-	);
-	# The new float won't be visible yet, defer this code until the
-	# window is ready.
-	later {
-		local $PARENT = $w;
-		$code->($float);
-	};
+    my $w = Tickit::Widget::VBox->new;
+    my $float = $floatbox->add_float(
+        child => $w,
+        %args
+    );
+    # The new float won't be visible yet, defer this code until the
+    # window is ready.
+    later {
+        local $PARENT = $w;
+        $code->($float);
+    };
 }
 
 =head2 statusbar
@@ -866,15 +870,15 @@ A L<Tickit::Widget::Statusbar>. Not very exciting.
 =cut
 
 sub statusbar(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Statusbar->new(%args);
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Statusbar->new(%args);
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head1 FUNCTIONS - General widgets
@@ -892,14 +896,14 @@ You can be more specific if you want:
 =cut
 
 sub static {
-	my %args = (text => @_);
-	$args{text} //= '';
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Static->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my %args = (text => @_);
+    $args{text} //= '';
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Static->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 figlet
@@ -915,14 +919,14 @@ but you can specify a font as well:
 =cut
 
 sub figlet {
-	my %args = (text => @_);
-	$args{text} //= '';
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Figlet->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my %args = (text => @_);
+    $args{text} //= '';
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Figlet->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 entry
@@ -936,13 +940,13 @@ since the C<on_enter> handler seems like an important feature.
 =cut
 
 sub entry(&@) {
-	my %args = (on_enter => @_);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Entry->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my %args = (on_enter => @_);
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Entry->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 checkbox
@@ -952,13 +956,13 @@ Checkbox (or checkbutton).
 =cut
 
 sub checkbox(&@) {
-	my %args = (on_toggle => @_);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::CheckButton->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my %args = (on_toggle => @_);
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::CheckButton->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 radiobutton
@@ -972,19 +976,19 @@ sub checkbox(&@) {
 =cut
 
 sub radiobutton(&@) {
-	my $code = shift;
-	die "need a radiogroup" unless $RADIOGROUP;
-	my %args = (
-		group => $RADIOGROUP,
-		label => @_
-	);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::RadioButton->new(%args);
-	$w->set_on_toggle($code);
-	{
-		local @WIDGET_ARGS = %parent_args;
-		apply_widget($w);
-	}
+    my $code = shift;
+    die "need a radiogroup" unless $RADIOGROUP;
+    my %args = (
+        group => $RADIOGROUP,
+        label => @_
+    );
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::RadioButton->new(%args);
+    $w->set_on_toggle($code);
+    {
+        local @WIDGET_ARGS = %parent_args;
+        apply_widget($w);
+    }
 }
 
 =head2 radiogroup
@@ -994,15 +998,15 @@ See L</radiobutton>.
 =cut
 
 sub radiogroup(&@) {
-	my $code = shift;
-	my %args = @_;
-	# my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $group = Tickit::Widget::RadioButton::Group->new;
-	$group->set_on_changed(delete $args{on_changed}) if exists $args{on_changed};
-	{
-		local $RADIOGROUP = $group;
-		$code->();
-	}
+    my $code = shift;
+    my %args = @_;
+    # my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $group = Tickit::Widget::RadioButton::Group->new;
+    $group->set_on_changed(delete $args{on_changed}) if exists $args{on_changed};
+    {
+        local $RADIOGROUP = $group;
+        $code->();
+    }
 }
 
 =head2 button
@@ -1015,22 +1019,22 @@ second parameter is the label:
 =cut
 
 sub button(&@) {
-	my $code = shift;
-	my %args = (
-		label => @_
-	);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Button->new(
-		%args
-	);
-	$w->set_on_click(sub {
-		local $PARENT = $w->parent;
-		$code->($w->parent);
-	});
-	{
-		local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-		apply_widget($w);
-	}
+    my $code = shift;
+    my %args = (
+        label => @_
+    );
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Button->new(
+        %args
+    );
+    $w->set_on_click(sub {
+        local $PARENT = $w->parent;
+        $code->($w->parent);
+    });
+    {
+        local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+        apply_widget($w);
+    }
 }
 
 =head2 tree
@@ -1038,31 +1042,31 @@ sub button(&@) {
 A L<Tickit::Widget::Tree>. It only partially works, but you're welcome to try it.
 
  tree {
-	warn "activated: @_\n";
+    warn "activated: @_\n";
  } data => [
- 	node1 => [
-		qw(some nodes here)
-	],
-	node2 => [
-		qw(more nodes in this one),
-		and => [
-			qw(this has a few child nodes too)
-		]
-	],
+    node1 => [
+        qw(some nodes here)
+    ],
+    node2 => [
+        qw(more nodes in this one),
+        and => [
+            qw(this has a few child nodes too)
+        ]
+    ],
  ];
 
 =cut
 
 sub tree(&@) {
-	my %args = (on_activate => @_);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my %args = (on_activate => @_);
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
 
-	my $w = Tickit::Widget::Tree->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
-	$w
+    my $w = Tickit::Widget::Tree->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
+    $w
 }
 
 =head2 table
@@ -1082,14 +1086,14 @@ Tabular rendering.
 =cut
 
 sub table(&@) {
-	my %args = (on_activate => @_);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Table->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
-	$w
+    my %args = (on_activate => @_);
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Table->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
+    $w
 }
 
 =head2 breadcrumb
@@ -1104,14 +1108,14 @@ Provides a "breadcrumb trail".
 =cut
 
 sub breadcrumb(&@) {
-	my %args = (on_activate => @_);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Breadcrumb->new(
-		%args
-	);
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
-	$w
+    my %args = (on_activate => @_);
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Breadcrumb->new(
+        %args
+    );
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
+    $w
 }
 
 =head2 placeholder
@@ -1130,10 +1134,10 @@ This is also available under the alias C<placegrid>.
 =cut
 
 sub placeholder(@) {
-	my %args = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget(Tickit::Widget::Placegrid->new(%args));
+    my %args = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget(Tickit::Widget::Placegrid->new(%args));
 }
 
 =head2 placegrid
@@ -1157,10 +1161,10 @@ Purely decorative. A L<Tickit::Widget::Decoration>, controlled entirely through 
 =cut
 
 sub decoration(@) {
-	my %args = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget(Tickit::Widget::Decoration->new(%args));
+    my %args = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget(Tickit::Widget::Decoration->new(%args));
 }
 
 =head2 fileviewer
@@ -1173,20 +1177,20 @@ but eventually will be called when the current line is activated in the widget.
 =cut
 
 sub fileviewer(&;@) {
-	my ($code, $file) = splice @_, 0, 2;
-	my %args = (
-		@_,
-		file => $file
-	);
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my ($code, $file) = splice @_, 0, 2;
+    my %args = (
+        @_,
+        file => $file
+    );
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
 
-	my $w = Tickit::Widget::FileViewer->new(
-		%args
-	);
-	{
-		local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-		apply_widget($w);
-	}
+    my $w = Tickit::Widget::FileViewer->new(
+        %args
+    );
+    {
+        local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+        apply_widget($w);
+    }
 }
 
 =head2 FUNCTIONS - Menu-related
@@ -1216,9 +1220,9 @@ point. Try this:
    menubar {
     submenu Help => sub {
      menuitem About => sub {
-	  float {
-	   static 'this is a popup message'
-	  }
+      float {
+       static 'this is a popup message'
+      }
     };
    };
    static 'plain text under the menubar';
@@ -1230,16 +1234,16 @@ point. Try this:
 # haxx. A menubar has no link back to the container.
 our $MENU_PARENT;
 sub menubar(&@) {
-	my ($code, %args) = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::MenuBar->new(%args);
-	local $MENU_PARENT = $PARENT;
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($code, %args) = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::MenuBar->new(%args);
+    local $MENU_PARENT = $PARENT;
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 submenu
@@ -1252,16 +1256,16 @@ See L</menubar>.
 =cut
 
 sub submenu {
-	my ($text, $code) = splice @_, 0, 2;
-	my %args = @_;
-	my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
-	my $w = Tickit::Widget::Menu->new(name => $text);
-	{
-		local $PARENT = $w;
-		$code->($w);
-	}
-	local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
-	apply_widget($w);
+    my ($text, $code) = splice @_, 0, 2;
+    my %args = @_;
+    my %parent_args = map {; $_ => delete $args{'parent:' . $_} } map /^parent:(.*)/ ? $1 : (), keys %args;
+    my $w = Tickit::Widget::Menu->new(name => $text);
+    {
+        local $PARENT = $w;
+        $code->($w);
+    }
+    local @WIDGET_ARGS = (@WIDGET_ARGS, %parent_args);
+    apply_widget($w);
 }
 
 =head2 menuspacer
@@ -1271,8 +1275,8 @@ Adds a spacer if you're in a menu. No idea what it'd do if you're not in a menu.
 =cut
 
 sub menuspacer() {
-	my $w = Tickit::Widget::Menu->separator;
-	apply_widget($w);
+    my $w = Tickit::Widget::Menu->separator;
+    apply_widget($w);
 }
 
 =head2 menuitem
@@ -1282,17 +1286,17 @@ A menu is not much use without something in it. See L</menubar>.
 =cut
 
 sub menuitem {
-	my ($text, $code) = splice @_, 0, 2;
-	my $parent = $MENU_PARENT;
-	my $w = Tickit::Widget::Menu::Item->new(
-		name        => $text,
-		on_activate => sub {
-			local $PARENT = $parent;
-			$code->($PARENT);
-		},
-		@_
-	);
-	apply_widget($w);
+    my ($text, $code) = splice @_, 0, 2;
+    my $parent = $MENU_PARENT;
+    my $w = Tickit::Widget::Menu::Item->new(
+        name        => $text,
+        on_activate => sub {
+            local $PARENT = $parent;
+            $code->($PARENT);
+        },
+        @_
+    );
+    apply_widget($w);
 }
 
 =head2 FUNCTIONS - Generic or internal use
@@ -1317,14 +1321,14 @@ as widget arguments, see L</widget> for details.
 =cut
 
 sub customwidget(&@) {
-	my ($code, @args) = @_;
-	my %args = @args;
-	local $PARENT = delete($args{parent}) || $PARENT;
-	my $w = $code->($PARENT);
-	{
-		local @WIDGET_ARGS = (@WIDGET_ARGS, %args);
-		apply_widget($w);
-	}
+    my ($code, @args) = @_;
+    my %args = @args;
+    local $PARENT = delete($args{parent}) || $PARENT;
+    my $w = $code->($PARENT);
+    {
+        local @WIDGET_ARGS = (@WIDGET_ARGS, %args);
+        apply_widget($w);
+    }
 }
 
 =head2 widget
@@ -1358,12 +1362,12 @@ thus be:
 =cut
 
 sub widget(&@) {
-	my ($code, %args) = @_;
-	local $PARENT = delete($args{parent}) || $PARENT;
-	{
-		local @WIDGET_ARGS = (@WIDGET_ARGS, %args);
-		$code->($PARENT);
-	}
+    my ($code, %args) = @_;
+    local $PARENT = delete($args{parent}) || $PARENT;
+    {
+        local @WIDGET_ARGS = (@WIDGET_ARGS, %args);
+        $code->($PARENT);
+    }
 }
 
 =head2 apply_widget
@@ -1375,40 +1379,40 @@ Not exported.
 =cut
 
 sub apply_widget {
-	my $w = shift;
-	if($PARENT) {
-		if($PARENT->isa('Tickit::Widget::Scroller')) {
-			$PARENT->push($w);
-		} elsif($PARENT->isa('Tickit::Widget::Menu')) {
-			$PARENT->push_item($w, @WIDGET_ARGS);
-		} elsif($PARENT->isa('Tickit::Widget::MenuBar')) {
-			$PARENT->push_item($w, @WIDGET_ARGS);
-		} elsif($PARENT->isa('Tickit::Widget::HSplit')) {
-			push @PENDING_CHILD, $w;
-		} elsif($PARENT->isa('Tickit::Widget::VSplit')) {
-			push @PENDING_CHILD, $w;
-		} elsif($PARENT->isa('Tickit::Widget::ScrollBox')) {
-			push @PENDING_CHILD, $w;
-		} elsif($PARENT->isa('Tickit::Widget::Tabbed')) {
-			$PARENT->add_tab($w, @WIDGET_ARGS);
-		} elsif($PARENT->isa('Tickit::Widget::GridBox')) {
-			$PARENT->add($GRID_ROW, $GRID_COL++, $w, @WIDGET_ARGS);
-		} elsif($PARENT->isa('Tickit::Widget::FloatBox')) {
-			# Needs 0.02+ to ensure parent is set correctly
-			$PARENT->set_base_child($w);
-		} elsif($PARENT->isa('Tickit::Widget::Layout::Desktop')) {
-			my %args = @WIDGET_ARGS;
-			$PARENT->create_panel(
-				label  => 'New window',
-				%args,
-			)->add($w);
-		} else {
-			$PARENT->add($w, @WIDGET_ARGS);
-		}
-	} else {
-		tickit->set_root_widget($w);
-	}
-	$w
+    my $w = shift;
+    if($PARENT) {
+        if($PARENT->isa('Tickit::Widget::Scroller')) {
+            $PARENT->push($w);
+        } elsif($PARENT->isa('Tickit::Widget::Menu')) {
+            $PARENT->push_item($w, @WIDGET_ARGS);
+        } elsif($PARENT->isa('Tickit::Widget::MenuBar')) {
+            $PARENT->push_item($w, @WIDGET_ARGS);
+        } elsif($PARENT->isa('Tickit::Widget::HSplit')) {
+            push @PENDING_CHILD, $w;
+        } elsif($PARENT->isa('Tickit::Widget::VSplit')) {
+            push @PENDING_CHILD, $w;
+        } elsif($PARENT->isa('Tickit::Widget::ScrollBox')) {
+            push @PENDING_CHILD, $w;
+        } elsif($PARENT->isa('Tickit::Widget::Tabbed')) {
+            $PARENT->add_tab($w, @WIDGET_ARGS);
+        } elsif($PARENT->isa('Tickit::Widget::GridBox')) {
+            $PARENT->add($GRID_ROW, $GRID_COL++, $w, @WIDGET_ARGS);
+        } elsif($PARENT->isa('Tickit::Widget::FloatBox')) {
+            # Needs 0.02+ to ensure parent is set correctly
+            $PARENT->set_base_child($w);
+        } elsif($PARENT->isa('Tickit::Widget::Layout::Desktop')) {
+            my %args = @WIDGET_ARGS;
+            $PARENT->create_panel(
+                label  => 'New window',
+                %args,
+            )->add($w);
+        } else {
+            $PARENT->add($w, @WIDGET_ARGS);
+        }
+    } else {
+        tickit->set_root_widget($w);
+    }
+    $w
 }
 
 1;

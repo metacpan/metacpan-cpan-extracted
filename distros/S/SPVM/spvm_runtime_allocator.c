@@ -5,7 +5,6 @@
 #include <math.h>
 #include <stdint.h>
 
-#include "spvm_api.h"
 #include "spvm_runtime_allocator.h"
 #include "spvm_runtime_api.h"
 #include "spvm_util_allocator.h"
@@ -13,8 +12,11 @@
 #include "spvm_array.h"
 #include "spvm_runtime.h"
 #include "spvm_constant_pool.h"
+#include "spvm_api.h"
 
 SPVM_RUNTIME_ALLOCATOR* SPVM_RUNTIME_ALLOCATOR_new(SPVM_RUNTIME* runtime) {
+  (void)runtime;
+  
   SPVM_RUNTIME_ALLOCATOR* allocator = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(1, sizeof(SPVM_RUNTIME_ALLOCATOR));
   
   // Memory pool
@@ -24,17 +26,21 @@ SPVM_RUNTIME_ALLOCATOR* SPVM_RUNTIME_ALLOCATOR_new(SPVM_RUNTIME* runtime) {
   allocator->freelists = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(16, sizeof(SPVM_ARRAY));
   
   // Initialize free list
-  for (int32_t i = 0; i < 16; i++) {
-    allocator->freelists[i] = SPVM_ARRAY_new(0);
+  {
+    int32_t i;
+    for (i = 0; i < 16; i++) {
+      allocator->freelists[i] = SPVM_ARRAY_new(0);
+    }
   }
   
   // use memory pool max reference byte size
-  allocator->data_max_byte_size_use_memory_pool = 0xFFFF;
+  allocator->base_object_max_byte_size_use_memory_pool = 0xFFFF;
   
   return allocator;
 }
 
-inline int32_t SPVM_RUNTIME_ALLOCATOR_get_freelist_index(SPVM_RUNTIME* runtime, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t size) {
+inline int32_t SPVM_RUNTIME_ALLOCATOR_get_freelist_index(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t size) {
+  (void)api;
   (void)allocator;
   
   assert(size > 0);
@@ -68,16 +74,16 @@ inline int32_t SPVM_RUNTIME_ALLOCATOR_get_freelist_index(SPVM_RUNTIME* runtime, 
   return index;
 }
 
-inline void* SPVM_RUNTIME_ALLOCATOR_malloc(SPVM_RUNTIME* runtime, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t size) {
+inline void* SPVM_RUNTIME_ALLOCATOR_malloc(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t size) {
   
   assert(size > 0);
   
   void* block;
-  if (size > allocator->data_max_byte_size_use_memory_pool) {
+  if (size > allocator->base_object_max_byte_size_use_memory_pool) {
     block = SPVM_UTIL_ALLOCATOR_safe_malloc_i64(1, size);
   }
   else {
-    int32_t index = SPVM_RUNTIME_ALLOCATOR_get_freelist_index(runtime, allocator, size);
+    int32_t index = SPVM_RUNTIME_ALLOCATOR_get_freelist_index(api, allocator, size);
     
     void* free_address = SPVM_ARRAY_pop(allocator->freelists[index]);
     if (free_address) {
@@ -91,30 +97,32 @@ inline void* SPVM_RUNTIME_ALLOCATOR_malloc(SPVM_RUNTIME* runtime, SPVM_RUNTIME_A
   return block;
 }
 
-inline void SPVM_RUNTIME_ALLOCATOR_free_data(SPVM_RUNTIME* runtime, SPVM_RUNTIME_ALLOCATOR* allocator, SPVM_DATA* data) {
-  if (data == NULL) {
+inline void SPVM_RUNTIME_ALLOCATOR_free_base_object(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, SPVM_BASE_OBJECT* base_object) {
+  if (base_object == NULL) {
     return;
   }
   else {
     // Byte size
-    int64_t byte_size = SPVM_RUNTIME_API_calcurate_data_byte_size(runtime, data);
+    int64_t byte_size = SPVM_RUNTIME_API_calcurate_base_object_byte_size(api, base_object);
     
     assert(byte_size > 0);
     
-    if (byte_size > allocator->data_max_byte_size_use_memory_pool) {
-      free(data);
+    if (byte_size > allocator->base_object_max_byte_size_use_memory_pool) {
+      free(base_object);
     }
     else {
       // Freelist index
-      int32_t freelist_index = SPVM_RUNTIME_ALLOCATOR_get_freelist_index(runtime, allocator, byte_size);
+      int32_t freelist_index = SPVM_RUNTIME_ALLOCATOR_get_freelist_index(api, allocator, byte_size);
       
       // Push free address
-      SPVM_ARRAY_push(allocator->freelists[freelist_index], data);
+      SPVM_ARRAY_push(allocator->freelists[freelist_index], base_object);
     }
   }
 }
 
 void SPVM_RUNTIME_ALLOCATOR_free(SPVM_RUNTIME* runtime, SPVM_RUNTIME_ALLOCATOR* allocator) {
+  (void)runtime;
+  
   // Free memory pool */
   SPVM_MEMORY_POOL_free(allocator->memory_pool);
   

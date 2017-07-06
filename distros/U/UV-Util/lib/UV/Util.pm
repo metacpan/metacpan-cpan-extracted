@@ -1,14 +1,24 @@
 package UV::Util;
 
-our $VERSION = '0.003';
+our $VERSION = '0.007';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
 use strict;
 use warnings;
-
+use Exporter qw(import);
 require XSLoader;
-XSLoader::load();
+
+our @EXPORT_OK  = qw(
+    cpu_info get_free_memory get_total_memory getrusage guess_handle_type
+    hrtime interface_addresses loadavg resident_set_memory version
+    UV_UNKNOWN_HANDLE UV_ASYNC UV_CHECK UV_FS_EVENT UV_FS_POLL
+    UV_HANDLE UV_IDLE UV_NAMED_PIPE UV_POLL UV_PREPARE UV_PROCESS
+    UV_STREAM UV_TCP UV_TIMER UV_TTY UV_UDP UV_SIGNAL UV_FILE
+    UV_HANDLE_TYPE_MAX
+);
+
+XSLoader::load('UV::Util', $XS_VERSION);
 
 1;
 __END__

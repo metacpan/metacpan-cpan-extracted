@@ -31,7 +31,7 @@ WriteMakefile(
 								    'IO::Socket::INET' => 0,
 								    'GD::Barcode::QRcode' => 0,
 								    'Crypt::Diceware' => 0,
-								    'IPC::Queue::Duplex' => 0,
+								    'IPC::Queue::Duplex' => 1.005,
 								    'Authen::TuringImage' => 0,
 								    'Business::Bitcoin' => 0
 								   },

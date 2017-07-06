@@ -7,7 +7,7 @@
 #
 
 package Lab::Connection::VISA_RS232;
-$Lab::Connection::VISA_RS232::VERSION = '3.550';
+$Lab::Connection::VISA_RS232::VERSION = '3.552';
 use strict;
 use Lab::Bus::VISA;
 use Lab::Connection;

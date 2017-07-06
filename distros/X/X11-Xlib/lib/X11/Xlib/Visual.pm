@@ -1,5 +1,7 @@
 package X11::Xlib::Visual;
-require X11::Xlib;
+require X11::Xlib::Opaque;
+# parent class "Opaque" and XS handle all methods.
+# No need to load this package.
 
 __END__
 

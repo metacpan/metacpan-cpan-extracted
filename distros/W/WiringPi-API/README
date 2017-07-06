@@ -48,10 +48,11 @@ EXPORT_OK
         pwm_set_range   lcd_init        lcd_home            lcd_clear
         lcd_display     lcd_cursor      lcd_cursor_blink    lcd_send_cmd
         lcd_position    lcd_char_def    lcd_put_char        lcd_puts
-        set_interrupt   soft_pwm_create soft_pwm_write      soft_pwm_stop
-        shift_reg_setup pin_mode        analog_read         analog_write
-        bmp180_setup    bmp180_pressure bmp180_temp         phys_to_wpi
-        ads1115_setup   spi_setup       spi_data
+        set_interrupt   pin_mode        analog_read         analog_write
+        shift_reg_setup bmp180_setup    bmp180_pressure     bmp180_temp
+        ads1115_setup   spi_setup       spi_data            phys_to_wpi
+        serial_open     serial_flush    serial_put_char     serial_puts
+        serial_get_char serial_close    serial_data_avail
 
 EXPORT_TAGS
 
@@ -75,10 +76,6 @@ FUNCTION TABLE OF CONTENTS
 
     See "LCD FUNCTIONS".
 
- SOFTWARE PWM
-
-    See "SOFT PWM FUNCTIONS".
-
  INTERRUPT
 
     See "INTERRUPT FUNCTIONS".
@@ -89,7 +86,11 @@ FUNCTION TABLE OF CONTENTS
 
  SHIFT REGISTER
 
-    See "SHIFT REGISTER FUNCTIONS".
+    See "SHIFT REGISTER FUNCTIONS"
+
+ SERIAL
+
+    See "SERIAL FUNCTIONS"
 
  I2C
 
@@ -157,7 +158,7 @@ CORE FUNCTIONS
 
     Maps to void pinMode(int pin, int mode)
 
-    Puts the pin in either INPUT or OUTPUT mode.
+    Puts the pin in either INPUT, OUTPUT, PWM or GPIO_CLOCK mode.
 
     Parameters:
 
@@ -169,6 +170,35 @@ CORE FUNCTIONS
         $mode
 
     Mandatory: 0 for INPUT, 1 OUTPUT, 2 PWM_OUTPUT and 3 GPIO_CLOCK.
+
+ pin_mode_alt($pin, $alt)
+
+    Maps to the undocumented void pinModeAlt(int pin, int mode)
+
+    Allows you to set any pin to any mode. ALT modes allowed:
+
+        value   mode
+        ------------
+        0       INPUT
+        1       OUTPUT
+        4       ALT0
+        5       ALT1
+        6       ALT2
+        7       ALT3
+        3       ALT4
+        2       ALT5
+
+    Parameters:
+
+        $pin
+
+    Mandatory: The pin number, in the pin numbering scheme dictated by
+    whichever setup*() routine you used.
+
+        $alt
+
+    Mandatory, Integer: The mode you want to put the pin into. See the list
+    above for the relevant values for this parameter.
 
  read_pin($pin);
 
@@ -379,6 +409,12 @@ LCD FUNCTIONS
     pins d4 through d7 on the LCD board, so you need to connect those pins
     to their respective selected GPIO pins.
 
+    NOTE: There is an upper limit of the number of LCDs that can be
+    initialized simultaneously. This number is 8 (0-7). Always check the
+    return of this function to ensure you're under the maximum file
+    descriptors. If you receive a `-1`, you're out of bounds, and any
+    functions called on the LCD will cause a segmentation fault.
+
  lcd_home($fd)
 
     Maps to void lcdHome(int fd)
@@ -556,51 +592,6 @@ LCD FUNCTIONS
 
     Mandatory: A string to display.
 
-SOFT PWM FUNCTIONS
-
-    Note: The software PWM functionality is experimental, and from what
-    I've tested, not very reliable, so I'd stay away from this at this
-    time.
-
-    Software Pulse Width Modulation is not the same as hardware PWM. It
-    should not be used for critical things as it's frequency isn't 100%
-    stable.
-
-    This software PWM allows you to use PWM on ANY GPIO pin, not just the
-    single hardware pin available.
-
- soft_pwm_create($pin, $initial_value, $range)
-
-    Creates a new software PWM thread that runs outside of your main
-    application.
-
-    Parameters:
-
-        $pin
-
-    Mandatory: The pin number, in the pin numbering scheme dictated by
-    whichever setup*() routine you used.
-
-        $initial_value
-
-    Optional: A value between 0 and $range.
-
-        $range
-
-    Optional: Look at this like a dial. We start at 0 and the dial has
-    turned completely when we hit the $range integer. If not sent in,
-    defaults to 1023.
-
- soft_pwm_write($pin, $value)
-
-    Sets the HIGH frequency on pin to whatever is in $value. The value must
-    be lower than what was set in the $range parameter to
-    soft_pwm_create().
-
- soft_pwm_stop($pin)
-
-    Turns off software PWM on the $pin.
-
 INTERRUPT FUNCTIONS
 
  set_interrupt($pin, $edge, $callback)
@@ -715,6 +706,115 @@ SHIFT REGISTER FUNCTIONS
 
     Mandatory: Integer, the GPIO pin number connected to the register's
     STCP pin (12). Can be any GPIO pin capable of output.
+
+SERIAL FUNCTIONS
+
+    These functions provide basic access to read and write to a serial
+    device.
+
+ serial_open($device, $baud)
+
+    Maps to int serialOpen(const char *device, const int baud)
+
+    Opens a serial device for read/write access.
+
+    Parameters:
+
+        $device
+
+    Mandatory, String: The name of the serial device, eg: /dev/ttyACM0.
+
+        $baud
+
+    Mandatory, Integer: The speed of the serial device. (eg: 9600).
+
+    Return, Integer: The file descriptor of the device.
+
+ serial_close($fd)
+
+    Maps to void serialClose(const int fd)
+
+    Closes an already open serial device.
+
+    Parameters:
+
+        $fd
+
+    Mandatory, Integer: The file descriptor returned by your call to
+    serial_open().
+
+ serial_flush($fd)
+
+    Maps to serialFlush(const int fd)
+
+    Flushes the serial device's buffer.
+
+    Parameters:
+
+        $fd
+
+    Mandatory, Integer: The file descriptor returned by your call to
+    serial_open().
+
+ serial_data_avail($fd)
+
+    Maps to serialDataAvail(const int fd)
+
+    Check if there is any data available on the serial interface.
+
+    Parameters:
+
+        $fd
+
+    Mandatory, Integer: The file descriptor returned by your call to
+    serial_open().
+
+ serial_get_char($fd)
+
+    Maps to serialGetchar(const int fd)
+
+    Read a single byte from the serial interface.
+
+    Parameters:
+
+        $fd
+
+    Mandatory, Integer: The file descriptor returned by your call to
+    serial_open().
+
+ serial_put_char($fd, $char)
+
+    Maps to serialPutchar(const int fd, const unsigned char c)
+
+    Write a single byte to the interface.
+
+    Parameters:
+
+        $fd
+
+    Mandatory, Integer: The file descriptor returned by your call to
+    serial_open().
+
+        $char
+
+    Mandatory, Byte: A single byte to write to the serial interface.
+
+ serial_puts($fd, $string)
+
+    Maps to serialPuts(const int fd, const char* string)
+
+    Write an arbitrary length string to the serial interface.
+
+    Parameters:
+
+        $fd
+
+    Mandatory, Integer: The file descriptor returned by your call to
+    serial_open().
+
+        $string
+
+    Mandatory, String: The content to write to the device.
 
 I2C FUNCTIONS
 
@@ -1048,13 +1148,13 @@ DEVELOPER FUNCTIONS
     Same as "digitalReadByte", but reads from the second group of eight
     GPIO pins.
 
-    head1 AUTHOR
+AUTHOR
 
     Steve Bertrand, <steveb@cpan.org>
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2016 by Steve Bertrand
+    Copyright (C) 2017 by Steve Bertrand
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.18.2 or, at

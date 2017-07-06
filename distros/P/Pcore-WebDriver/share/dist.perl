@@ -29,7 +29,7 @@
     },
 
     phantomjs_ver    => '2.1.1',
-    chromedriver_ver => '2.29',
-    geckodriver_ver  => '0.16.1',
-    ff_ver           => '53.0.2',
+    chromedriver_ver => '2.30',
+    geckodriver_ver  => '0.17.0',
+    ff_ver           => '54.0.1',
 }

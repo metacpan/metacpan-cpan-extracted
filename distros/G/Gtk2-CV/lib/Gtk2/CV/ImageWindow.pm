@@ -32,6 +32,8 @@ use Errno ();
 use Fcntl ();
 use Socket ();
 
+use JSON::XS ();
+
 my $title_image;
 
 use Glib::Object::Subclass
@@ -162,8 +164,11 @@ sub set_image {
 
    $self->{type}        = $type;
    $self->{image}       = $image;
-   $self->{tran_rotate} = 0;
    $self->{path}        = undef;
+   $self->{tran_rotate} = $self->{load_rotate} %= 360;
+
+   $image =  Gtk2::CV::rotate $image, -$self->{load_rotate}
+      if $self->{load_rotate};
 
    $self->set_subimage ($image);
 }
@@ -213,12 +218,14 @@ my %othertypes = (
    "Ogg data, OGM video (XviD)" => "video/x-ogg",
    "Ogg data, OGM video (DivX 5)" => "video/x-ogg",
    "RIFF (little-endian) data, wrapped MPEG-1 (CDXA)" => "video/mpeg",
+   "ISO Media"      => "video/x-mp4",
 );
 
 my %exttypes = (
    mpg  => "video/mpeg",
    mpeg => "video/mpeg",
    ogm  => "video/x-ogg",
+   mkv  => "video/x-matroska",
 );
 
 #sub gstreamer_setup {
@@ -266,181 +273,244 @@ my %exttypes = (
 sub load_image {
    my ($self, $path) = @_;
 
-   $self->kill_player;
-   $self->force_redraw;
+   eval {#d#
+      $self->kill_player;
+      $self->force_redraw;
 
-   my $image;
-   my $type = Gtk2::CV::magic_mime $path;
+      my $image;
+      my $type = Gtk2::CV::magic_mime $path;
 
-   if ($type =~ /^application\//) {
-      my $magic = Gtk2::CV::magic $path;
-      $type = $othertypes{$magic}
-         if exists $othertypes{$magic};
-   }
+      if ($type =~ /^application\//) {
+         my $magic = Gtk2::CV::magic $path;
+         $type = $othertypes{$magic}
+            if exists $othertypes{$magic};
+      }
 
-   if (!length $type && $path =~ /\.([^.]+)$/) {
-      $type = $exttypes{lc $1};
-   }
+      if ((!$type or $type =~ /^application\/octet-stream/) && $path =~ /\.([^.]+)$/) {
+         $type = $exttypes{lc $1};
+      }
 
-   $type =~ s/;.*//; # remove ; charset= etc.
+      $type =~ s/;.*//; # remove ; charset= etc.
 
-   $@ = "generic file display error";
+      $@ = "generic file display error";
 
-   if ($type eq "application/octet-stream" or $type =~ /^text\//) {
-      $@ = "unrecognised file format";
-      # should, but can't
+      if (!$type or $type =~ /^text\//) {
+         $@ = "unrecognised file format";
+         # should, but can't
 
-   } elsif ($type eq "image/jpeg") {
-      $image = Gtk2::CV::load_jpeg $path;
+      } elsif ($type eq "image/jpeg") {
+         $image = Gtk2::CV::load_jpeg $path;
 
-   } elsif ($type eq "image/jp2") { # jpeg2000 hack
-      open my $pnm, "-|:raw", "jasper", "--input", $path, "--output-format", "pnm"
-         or die "error running jasper (jpeg2000): $!";
-      my $loader = new_with_type Gtk2::Gdk::PixbufLoader "pnm";
-      local $/; $loader->write (<$pnm>);
-      $loader->close;
-      $image = $loader->get_pixbuf;
+      } elsif ($type eq "image/jp2") { # jpeg2000 hack
+         open my $pnm, "-|:raw", "jasper", "--input", $path, "--output-format", "pnm"
+            or die "error running jasper (jpeg2000): $!";
+         my $loader = new_with_type Gtk2::Gdk::PixbufLoader "pnm";
+         local $/; $loader->write (<$pnm>);
+         $loader->close;
+         $image = $loader->get_pixbuf;
 
-   } elsif ($type eq "application/pdf") {
-      # hack, sorry, unsupported, should use mimetools etc.
-      system "xpdf \Q$path\E &";
+      } elsif ($type eq "application/pdf") {
+         # hack, sorry, unsupported, should use mimetools etc.
+         system "xpdf \Q$path\E &";
 
-   } elsif ($type =~ /^image\//) {
-      open my $fh, "<", $path
-         or die "$path: $!";
-      my $loader = new Gtk2::Gdk::PixbufLoader;
-      local $/; $loader->write (<$fh>);
-      $loader->close;
-      $image = $loader->get_pixbuf;
+      } elsif ($type =~ /^image\//) {
+         open my $fh, "<", $path
+            or die "$path: $!";
+         my $loader = new Gtk2::Gdk::PixbufLoader;
+         local $/; $loader->write (<$fh>);
+         $loader->close;
+         $image = $loader->get_pixbuf;
 
-   } elsif ($type =~ /^(audio\/|application\/ogg$)/) {
-      if (1 || exists $ENV{CV_AUDIO_PLAYER}) {
-         $self->{player_pid} = fork;
+      } elsif ($type =~ /^(audio\/|application\/ogg$)/) {
+         if (1 || exists $ENV{CV_AUDIO_PLAYER}) {
+            $self->{player_pid} = fork;
 
-         if ($self->{player_pid} == 0) {
+            if ($self->{player_pid} == 0) {
 #            open STDIN , "</dev/null";
 #            open STDOUT, ">/dev/null";
 #            open STDERR, ">&2";
 
-            my $player = $ENV{CV_AUDIO_PLAYER} || "play";
-            $path = "./$path" if $path =~ /^-/;
-            exec "$player \Q$path";
-            POSIX::_exit 0;
-         }
-      } else {
-         $image = $self->gstreamer_setup ($path);
-      }
-
-   } elsif ($type =~ /^(?:video|application)\//) {
-      $path = "./$path" if $path =~ /^-/;
-
-      # try video
-      my $mplayer = qx{LC_ALL=C exec mplayer </dev/null 2>/dev/null -sub /dev/null -sub-fuzziness 0 -cache-min 0 -input nodefault-bindings:conf=/dev/null -identify -vo null -ao null -frames 0 \Q$path};
-
-      my $w = $mplayer =~ /^ID_VIDEO_WIDTH=(\d+)$/sm ? $1 : undef;
-      my $h = $mplayer =~ /^ID_VIDEO_HEIGHT=(\d+)$/sm ? $1 : undef;
-
-      if ($w && $h) {
-         if ($mplayer =~ /^ID_VIDEO_ASPECT=([0-9\.]+)$/sm && $1 > 0) {
-            $w = POSIX::ceil $w * $1 * ($h / $w); # correct aspect ratio, assume square pixels
+               my $player = $ENV{CV_AUDIO_PLAYER} || "mplayer";
+               $path = "./$path" if $path =~ /^-/;
+               exec "$player \Q$path";
+               POSIX::_exit 0;
+            }
          } else {
-            # no idea what to do, mplayer's aspect factors seem to be random
-            #$w = POSIX::ceil $w * 1.50 * ($h / $w); # correct aspect ratio, assume square pixels
-            #$w = POSIX::ceil $w * 1.33;
+            $image = $self->gstreamer_setup ($path);
          }
 
-         $type = "video";
-         $image = new Gtk2::Gdk::Pixbuf "rgb", 0, 8, $w, $h;
-         $image->fill ("\0\0\0");
+      } elsif ($type =~ /^(?:video|application)\//) {
+         $path = "./$path" if $path =~ /^-/;
 
-         # d'oh, we need to do that because realize() doesn't reliably cause
-         # the window to have the correct size
-         $self->show;
+         # try video
+#         our $EXECER;
+#         $EXECER ||= AnyEvent::Fork
+#            ->new
+#            ->eval ('
+#               $ENV{LC_ALL} = "C";
+#               open STDIN , "</dev/null";
+#               sub run {
+#                  my ($fh, $path) = @_;
+#                  open STDOUT, ">&" . fileno $fh or die;
+#                  open STDERR, ">&1" or die;
+#                  exec qw(mplayer2 -sub /dev/null -sub-fuzziness 0 -cache-min 0 -input nodefault-bindings:conf=/dev/null -identify -vo null -ao null -frames 0), $path;
+#                  POSIX::_exit 0;
+#               }
+#            ');
+#
+#         pipe my $pr, my $pw
+#            or die "pipe: $!";
+#
+#         $EXECER->fork->send_fh ($pw)->send_arg ($path)->run ("run");
 
-         # add a couple of windows just for mplayer's sake
-         my $box = $self->{mplayer_box} = new Gtk2::EventBox;
-         $box->set_above_child (1);
-         $box->set_visible_window (0);
-         $box->set_events ([]);
-         $box->can_focus (0);
+         my ($w, $h);
 
-         my $window = new Gtk2::DrawingArea;
-         $box->add ($window);
-         $self->add ($box);
-         $box->show_all;
-         $window->realize;
+         if (1) {
+            no integer;
 
-         $self->{mplayer_window} = $window;
+            # use ffmpeg's ffprobe to detect the video
+            my $ffmpeg = qx{ffprobe -v quiet -show_streams -of json -- \Q$path};
 
-         my $xid = $window->window->get_xid;
+            # ffmpeg doesn't properly encode json
+            $ffmpeg = eval { JSON::XS->new->latin1->decode ($ffmpeg) };
 
-         socketpair my $sfh, my $mfh, Socket::AF_UNIX (), Socket::SOCK_STREAM (), 0;
-         $self->{mplayer_fh} = $mfh;
-         $mfh->autoflush (1);
-         fcntl $mfh, Fcntl::F_SETFD (), Fcntl::FD_CLOEXEC ();
-         fcntl $mfh, Fcntl::F_SETFL (), Fcntl::O_NONBLOCK ();
+            for (@{ $ffmpeg->{streams} }) {
+               if ($_->{codec_type} eq "video") {
+                  $w = $_->{width};
+                  $h = $_->{height};
 
-         $self->{player_pid} = fork;
-
-         if ($self->{player_pid} == 0) {
-            $ENV{LC_ALL} = "C";
-
-            open STDIN, "<&" . fileno $sfh;
-            open STDOUT, ">&" . fileno $sfh;
-            #open STDOUT, ">/dev/null";
-            open STDERR, ">/dev/null";
-
-            exec "mplayer", qw(-slave -nofs -nokeepaspect -input nodefault-bindings:conf=/dev/null -zoom -fixed-vo -quiet -loop 0),
-                            -wid => $xid, $path;
-            POSIX::_exit 0;
-         }
-
-         close $sfh;
-
-         print $mfh "get_file_name\n";
-
-         my $input;
-         add_watch Glib::IO fileno $mfh, in => sub {
-            my $len = sysread $mfh, $input, 128, length $input;
-
-            if ($len > 0) {
-               while ($input =~ s/^(.*)\n//) {
-                  my $line = $1;
-
-                  if ($line =~ /ANS_FILENAME=/) {
-                     # presumably, everything is set-up now
-                     $self->update_mplayer_window;
+                  if ($_->{sample_aspect_ratio} =~ /^(\d+):(\d+)$/ && $1 && $2) {
+                     $w = POSIX::ceil $w * ($1 / $2);
                   }
+
+                  if ($_->{display_aspect_ratio} =~ /^(\d+):(\d+)$/ && $1 && $2) {
+                     $w = POSIX::ceil $h * ($1 / $2);
+                  }
+
+                  last;
                }
-            } elsif (defined $len or $! != Errno::EAGAIN) {
-               return 0;
             }
 
-            1
-         };
+         } else {
+            no integer;
+
+            my $mplayer = qx{LC_ALL=C exec mplayer </dev/null 2>/dev/null -really-quiet -noconfig all -noautosub -nofontconfig -sub /dev/null -sub-fuzziness 0 -cache-min 0 -input nodefault-bindings:conf=/dev/null -identify -vo null -ao null -frames 0 \Q$path};
+
+            $w = $mplayer =~ /^ID_VIDEO_WIDTH=(\d+)$/sm ? $1 : undef;
+            $h = $mplayer =~ /^ID_VIDEO_HEIGHT=(\d+)$/sm ? $1 : undef;
+
+            if ($w && $mplayer =~ /^ID_VIDEO_ASPECT=([0-9\.]+)$/sm && $1 > 0) {
+               $w = POSIX::ceil $w * $1 * ($h / $w); # correct aspect ratio, assume square pixels
+            } else {
+               # no idea what to do, mplayer's aspect factors seem to be random
+               #$w = POSIX::ceil $w * 1.50 * ($h / $w); # correct aspect ratio, assume square pixels
+               #$w = POSIX::ceil $w * 1.33;
+            }
+         }
+
+         if ($w && $h) {
+            $type = "video";
+            $image = new Gtk2::Gdk::Pixbuf "rgb", 0, 8, $w, $h;
+            $image->fill ("\0\0\0");
+
+            # d'oh, we need to do that because realize() doesn't reliably cause
+            # the window to have the correct size
+            $self->show;
+
+            # add a couple of windows just for mplayer's sake
+            my $box = $self->{mplayer_box} = new Gtk2::EventBox;
+            $box->set_above_child (1);
+            $box->set_visible_window (0);
+            $box->set_events ([]);
+            $box->can_focus (0);
+
+            my $window = new Gtk2::DrawingArea;
+            $box->add ($window);
+            $self->add ($box);
+            $box->show_all;
+            $window->realize;
+
+            $self->{mplayer_window} = $window;
+
+            my $xid = $window->window->get_xid;
+
+            socketpair my $sfh, my $mfh, Socket::AF_UNIX (), Socket::SOCK_STREAM (), 0;
+            $self->{mplayer_fh} = $mfh;
+            $mfh->autoflush (1);
+            fcntl $mfh, Fcntl::F_SETFD (), Fcntl::FD_CLOEXEC ();
+            fcntl $mfh, Fcntl::F_SETFL (), Fcntl::O_NONBLOCK ();
+
+            $self->{player_pid} = fork;
+
+            if ($self->{player_pid} == 0) {
+               $ENV{LC_ALL} = "C";
+
+               open STDIN, "<&" . fileno $sfh;
+               open STDOUT, ">&" . fileno $sfh;
+               #open STDOUT, ">/dev/null";
+               open STDERR, ">/dev/null";
+
+               my @rotate = (
+                  [],
+                  ["-vf-add", "rotate=0"],
+                  ["-vf-add", "flip", "-vf-add", "mirror"],
+                  ["-vf-add", "rotate=2"],
+               );
+
+               exec "mplayer", qw(-slave -nofs -nokeepaspect -input nodefault-bindings:conf=/dev/null -zoom -fixed-vo -quiet -loop 0),
+                               @{ $rotate[$self->{load_rotate} / 90] },
+                               -wid => $xid, $path;
+               POSIX::_exit 0;
+            }
+
+            close $sfh;
+
+            print $mfh "get_file_name\n";
+
+            my $input;
+            add_watch Glib::IO fileno $mfh, in => sub {
+               my $len = sysread $mfh, $input, 128, length $input;
+
+               if ($len > 0) {
+                  while ($input =~ s/^(.*)\n//) {
+                     my $line = $1;
+
+                     if ($line =~ /ANS_FILENAME=/) {
+                        # presumably, everything is set-up now
+                        $self->update_mplayer_window;
+                     }
+                  }
+               } elsif (defined $len or $! != Errno::EAGAIN) {
+                  return 0;
+               }
+
+               1
+            };
+         } else {
+            $@ = "mplayer doesn't recognize this '$type' file";
+            # probably audio, or a real error
+         }
+
       } else {
-         $@ = "mplayer doesn't recognize this '$type' file";
-         # probably audio, or a real error
+         $@ = "unrecognized file format '$type'";
       }
 
-   } else {
-      $@ = "unrecognized file format '$type'";
-   }
+      if (!$image) {
+         warn "$@";
 
-   if (!$image) {
-      warn "$@";
+         $type = "error";
+         $image = Gtk2::CV::require_image "error.png";
+      }
 
-      $type = "error";
-      $image = Gtk2::CV::require_image "error.png";
-   }
-
-   if ($image) {
-      $self->set_image ($image, $type);
-      $self->{path} = $path;
-      $self->set_title ("CV: $path");
-   } else {
-      $self->clear_image;
-   }
+      if ($image) {
+         $self->set_image ($image, $type);
+         $self->{path} = $path;
+         $self->set_title ("CV: $path");
+      } else {
+         $self->clear_image;
+      }
+   };#d#
+   warn "$@" if $@;#d#
 }
 
 sub reload {
@@ -494,7 +564,7 @@ sub do_realize {
 
    $self->{drag_gc} = Gtk2::Gdk::GC->new ($self->{window});
    $self->{drag_gc}->set_function ('xor');
-   $self->{drag_gc}->set_rgb_foreground (new Gtk2::Gdk::Color 0x8000, 0x8000, 0x8000);
+   $self->{drag_gc}->set_rgb_foreground (new Gtk2::Gdk::Color 0xffff, 0xffff, 0xffff);
    $self->{drag_gc}->set_line_attributes (1, 'solid', 'round', 'miter');
 
    $self->{screen_width}  = $self->{window}->get_screen->get_width;
@@ -745,8 +815,12 @@ sub handle_key {
    local $SIG{PIPE} = 'IGNORE'; # for mplayer_fh
 
    if ($state * "control-mask") {
-      if ($key == $Gtk2::Gdk::Keysyms{p}) {
-         new Gtk2::CV::PrintDialog pixbuf => $self->{subimage}, aspect => $self->{dw} / $self->{dh};
+      if ($key == $Gtk2::Gdk::Keysyms{p} || $key == $Gtk2::Gdk::Keysyms{P}) {
+         new Gtk2::CV::PrintDialog
+            pixbuf => $self->{subimage},
+            aspect => $self->{dw} / $self->{dh},
+            autook => $key == $Gtk2::Gdk::Keysyms{P}
+         ;
 
       } elsif ($key == $Gtk2::Gdk::Keysyms{m}) {
          $self->{maxpect} = !$self->{maxpect};
@@ -758,6 +832,9 @@ sub handle_key {
          } else {
             ($self->{sw}, $self->{sh}) = ($self->{rsw}, $self->{rsh});
          }
+
+      } elsif ($key == $Gtk2::Gdk::Keysyms{T}) {
+         $self->{load_rotate} = $self->{tran_rotate};
 
       } elsif ($key == $Gtk2::Gdk::Keysyms{e}) {
          if (fork == 0) {
@@ -807,12 +884,14 @@ sub handle_key {
          $self->force_redraw; $self->redraw;
 
       } elsif ($key == $Gtk2::Gdk::Keysyms{t}) {
-         $self->set_subimage (Gtk2::CV::rotate $self->{subimage}, 270);
-         $self->{tran_rotate} += 90;
+         my $r = $::REVERSE_ROTATION ? +90 : -90;
+         $self->set_subimage (Gtk2::CV::rotate $self->{subimage}, $r);
+         $self->{tran_rotate} -= $r;
 
       } elsif ($key == $Gtk2::Gdk::Keysyms{T}) {
-         $self->set_subimage (Gtk2::CV::rotate $self->{subimage},  90);
-         $self->{tran_rotate} -= 90;
+         my $r = $::REVERSE_ROTATION ? -90 : +90;
+         $self->set_subimage (Gtk2::CV::rotate $self->{subimage}, $r);
+         $self->{tran_rotate} -= $r;
 
       } elsif ($key == $Gtk2::Gdk::Keysyms{a}) {
          $self->{path}
@@ -854,6 +933,10 @@ sub handle_key {
          print {$self->{mplayer_fh}} "seek +600\n";
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{Page_Down}) {
          print {$self->{mplayer_fh}} "seek -600\n";
+      } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{'#'}) {
+         print {$self->{mplayer_fh}} "switch_audio\n";
+      } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{j}) {
+         print {$self->{mplayer_fh}} "sub_select\n";
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{o}) {
          print {$self->{mplayer_fh}} "osd\n";
       } elsif ($self->{player_pid} && $key == $Gtk2::Gdk::Keysyms{p}) {

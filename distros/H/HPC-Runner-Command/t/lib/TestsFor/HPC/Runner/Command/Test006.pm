@@ -13,6 +13,7 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use Slurp;
 use File::Slurp;
+use File::Spec;
 
 extends 'TestMethods::Base';
 
@@ -22,17 +23,17 @@ extends 'TestMethods::Base';
 sub write_test_file {
     my $test_dir = shift;
 
-    open( my $fh, ">$test_dir/script/test002.1.sh" );
-    print $fh <<EOF;
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
+    my $text = <<EOF;
 #HPC jobname=pyfasta
 #HPC procs=1
 EOF
 
-    for(my $x=1; $x<=12; $x++){
-        print $fh "pyfasta split -n 20 Sample$x.fasta\n";
+    for ( my $x = 1 ; $x <= 12 ; $x++ ) {
+        $text .= "pyfasta split -n 20 Sample$x.fasta\n";
     }
 
-    close($fh);
+    write_file( $file, $text );
 }
 
 sub construct {
@@ -42,13 +43,12 @@ sub construct {
     my $test_dir     = $test_methods->make_test_dir();
     write_test_file($test_dir);
 
-    my $t = "$test_dir/script/test002.1.sh";
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
     MooseX::App::ParsedArgv->new(
         argv => [
-            "submit_jobs",    "--infile",
-            $t,               "--outdir",
-            "$test_dir/logs", "--hpc_plugins",
-            "Dummy",
+            "submit_jobs", "--infile", $file, "--outdir",
+            File::Spec->catdir( $test_dir, 'logs' ),
+            "--hpc_plugins", "Dummy",
         ]
     );
 
@@ -68,7 +68,7 @@ sub test_001 : Tags(job_stats) {
     $test->parse_file_slurm();
     $test->iterate_schedule();
 
-    is($test->jobs->{'pyfasta'}->{num_job_arrays}, 4);
+    is( $test->jobs->{'pyfasta'}->{num_job_arrays}, 4 );
 
     ok(1);
 

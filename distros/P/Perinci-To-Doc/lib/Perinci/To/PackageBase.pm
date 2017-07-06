@@ -1,11 +1,11 @@
 package Perinci::To::PackageBase;
 
-our $DATE = '2017-02-27'; # DATE
-our $VERSION = '0.84'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.85'; # VERSION
 
 use 5.010;
 use Data::Dump::OneLine qw(dump1);
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo;
 use Perinci::Object;
 
@@ -38,7 +38,7 @@ sub BUILD {
 
 sub before_gen_doc {
     my ($self, %opts) = @_;
-    $log->tracef("=> PackageBase's before_gen_doc(opts=%s)", \%opts);
+    log_trace("=> PackageBase's before_gen_doc(opts=%s)", \%opts);
 
     # initialize hash to store [intermediate] result
     $self->{_doc_res} = {};
@@ -134,7 +134,7 @@ Perinci::To::PackageBase - Base class for Perinci::To::* package documentation g
 
 =head1 VERSION
 
-This document describes version 0.84 of Perinci::To::PackageBase (from Perl distribution Perinci-To-Doc), released on 2017-02-27.
+This document describes version 0.85 of Perinci::To::PackageBase (from Perl distribution Perinci-To-Doc), released on 2017-07-03.
 
 =for Pod::Coverage .+
 
@@ -144,7 +144,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-To
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-To-Doc>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-To-Doc>.
 
 =head1 BUGS
 

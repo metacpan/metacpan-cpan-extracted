@@ -60,8 +60,6 @@ sub build_request {
     my $request = HTTP::Request->new();
 
     $request->uri($self->{url});
-    #$request->header('Cookie', sprintf('reddit_session=%s', $self->{cookie}))
-    #    if $self->{cookie};
     $request->header("Authorization"=> "$self->{tokentype} $self->{token}") if $self->{tokentype} && $self->{token};
 
     if ($self->{method} eq 'POST') {
@@ -76,16 +74,12 @@ sub build_request {
         $request->method('GET');
     }
 
-	#use Data::Dump::Color;
-	#dd $request;
     return $request;
 }
 
 sub send {
     my $self    = shift;
     my $request = $self->build_request;
-	#use Data::Dump::Color;
-	#dd $request;
 
     Reddit::Client::DEBUG('%4s request to %s', $self->{method}, $self->{url});
 
@@ -93,7 +87,6 @@ sub send {
     my $res = $ua->request($request);
 
     if ($res->is_success) {
-	#dd $res->content;
         return $res->content;
     } else {
         croak sprintf('Request error: HTTP %s', $res->status_line);

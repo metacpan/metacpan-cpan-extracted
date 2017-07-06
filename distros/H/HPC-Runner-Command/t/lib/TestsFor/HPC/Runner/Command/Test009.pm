@@ -13,6 +13,7 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use Slurp;
 use File::Slurp;
+use File::Spec;
 
 extends 'TestMethods::Base';
 
@@ -23,12 +24,10 @@ Test for failing schedule
 =cut
 
 sub write_test_file {
-  my $test_dir = shift;
+    my $test_dir = shift;
 
-  my $t = "$test_dir/script/test002.1.sh";
-  open( my $fh, ">$t" );
-  print $fh <<EOF;
-
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
+    my $text = <<EOF;
 #HPC jobname=raw_fastqc
 #HPC module=gencore/1 gencore_dev gencore_qc
 #HPC ntasks=12
@@ -44,7 +43,7 @@ remove_tmp Sample_KO-H3K4Me3_2_R1
 
 EOF
 
-    close($fh);
+    write_file( $file, $text );
 }
 
 sub construct {
@@ -54,14 +53,9 @@ sub construct {
     my $test_dir     = $test_methods->make_test_dir();
     write_test_file($test_dir);
 
-    my $t = "$test_dir/script/test002.1.sh";
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
     MooseX::App::ParsedArgv->new(
-        argv => [
-            "submit_jobs",    "--infile",
-            $t,               "--outdir",
-            "$test_dir/logs", "--hpc_plugins",
-            "Dummy",
-        ]
+        argv => [ "submit_jobs", "--infile", $file, "--hpc_plugins", "Dummy", ]
     );
 
     my $test = HPC::Runner::Command->new_with_command();
@@ -79,6 +73,7 @@ sub test_001 : Tags(execute_array) {
     my ( $source, $dep );
 
     $test->parse_file_slurm();
+
     # $test->iterate_schedule();
 
     # # opendir DIR, $test->outdir or die "cannot open dir: $!";
@@ -89,7 +84,7 @@ sub test_001 : Tags(execute_array) {
     # my $file =  read_file($test->outdir."/001_raw_fastqc.sh");
     #
     # diag($file);
-    is_deeply($test->jobs->{raw_fastqc}->ntasks, 12);
+    is_deeply( $test->jobs->{raw_fastqc}->ntasks, 12 );
 
     chdir($cwd);
     remove_tree($test_dir);

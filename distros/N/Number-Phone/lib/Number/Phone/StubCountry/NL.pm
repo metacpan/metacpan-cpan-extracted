@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -38,22 +38,22 @@ my $formatters = [
                   'pattern' => '([1-578]\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '([1-5]\\d{2})(\\d{3})(\\d{3})',
                   'leading_digits' => '
             1[16-8]|
             2[259]|
             3[124]|
             4[17-9]|
             5[124679]
-          '
+          ',
+                  'pattern' => '([1-5]\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
                   'leading_digits' => '6[0-57-9]',
                   'pattern' => '(6)(\\d{8})'
                 },
                 {
-                  'pattern' => '(66)(\\d{7})',
-                  'leading_digits' => '66'
+                  'leading_digits' => '66',
+                  'pattern' => '(66)(\\d{7})'
                 },
                 {
                   'leading_digits' => '14',
@@ -69,36 +69,6 @@ my $formatters = [
               ];
 
 my $validators = {
-                'fixed_line' => '
-          (?:
-            1[0135-8]|
-            2[02-69]|
-            3[0-68]|
-            4[0135-9]|
-            [57]\\d|
-            8[478]
-          )\\d{7}
-        ',
-                'pager' => '66\\d{7}',
-                'voip' => '
-          (?:
-            6760|
-            85\\d{2}
-          )\\d{5}
-        ',
-                'toll_free' => '800\\d{4,7}',
-                'geographic' => '
-          (?:
-            1[0135-8]|
-            2[02-69]|
-            3[0-68]|
-            4[0135-9]|
-            [57]\\d|
-            8[478]
-          )\\d{7}
-        ',
-                'personal_number' => '',
-                'mobile' => '6[1-58]\\d{7}',
                 'specialrate' => '(90[069]\\d{4,7})|(
           140(?:
             1(?:
@@ -124,7 +94,37 @@ my $validators = {
             7\\d|
             8[458]
           )
-        )'
+        )',
+                'geographic' => '
+          (?:
+            1[0135-8]|
+            2[02-69]|
+            3[0-68]|
+            4[0135-9]|
+            [57]\\d|
+            8[478]
+          )\\d{7}
+        ',
+                'personal_number' => '',
+                'voip' => '
+          (?:
+            6760|
+            85\\d{2}
+          )\\d{5}
+        ',
+                'toll_free' => '800\\d{4,7}',
+                'pager' => '66\\d{7}',
+                'mobile' => '6[1-58]\\d{7}',
+                'fixed_line' => '
+          (?:
+            1[0135-8]|
+            2[02-69]|
+            3[0-68]|
+            4[0135-9]|
+            [57]\\d|
+            8[478]
+          )\\d{7}
+        '
               };
 my %areanames = (
   3110 => "Rotterdam",

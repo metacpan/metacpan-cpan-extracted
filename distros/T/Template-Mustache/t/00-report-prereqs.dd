@@ -7,19 +7,25 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Test::More' => '0.96',
-                                      'Test::PAUSE::Permissions' => '0',
                                       'Test::Vars' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'File::Spec' => '0',
-                                      'HTML::Entities' => '0',
+                                      'Carp' => '0',
+                                      'Escape::Houdini' => '0',
+                                      'List::AllUtils' => '0',
+                                      'Moo' => '0',
+                                      'MooseX::MungeHas' => '0',
+                                      'Parse::RecDescent' => '1.967015',
+                                      'Path::Tiny' => '0',
                                       'Scalar::Util' => '0',
-                                      'YAML::Syck' => '0',
+                                      'Text::Balanced' => '0',
+                                      'YAML::XS' => '0',
                                       'autodie' => '0',
-                                      'namespace::clean' => '0',
+                                      'perl' => 'v5.12.0',
                                       'strict' => '0',
+                                      'vars' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -28,18 +34,17 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Data::Dumper' => '0',
                                    'ExtUtils::MakeMaker' => '0',
-                                   'File::Basename' => '0',
                                    'File::Spec' => '0',
-                                   'File::Spec::Functions' => '0',
                                    'File::Temp' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0.88',
+                                   'Test::Most' => '0',
+                                   'Test::Requires' => '0',
                                    'base' => '0',
-                                   'perl' => '5.006'
+                                   'blib' => '1.01'
                                  }
                  }
      };

@@ -94,9 +94,9 @@ typedef struct {
 #define BUFFER 4096
 #define xml_error(x) do { \
 	if (context->cb.die) \
-		context->cb.die(context->ctx,"Error at char %d (%1s): %s", p-xml, *p ? p : "\\0", x); \
+		context->cb.die(context->ctx,"Error at char %ld (%1s): %s", p-xml, *p ? p : "\\0", x); \
 	else \
-		fprintf(stderr,"Error at char %d (%1s): %s\n", p-xml, *p ? p : "\\0", x); \
+		fprintf(stderr,"Error at char %ld (%1s): %s\n", p-xml, *p ? p : "\\0", x); \
 	goto fault; \
  } while (0)
 

@@ -1,3 +1,20 @@
+1.000007 2017-07-04
+
+- I should pull before releasing. :(
+
+
+1.000006 2017-07-04
+
+- Fixed tests so that they do not fail on systems without git installed.
+
+
+1.000005 2017-06-22
+
+- The namespace used for question classes is now configurable via the
+  `git.submit-work.question-namespaces` config item. This can contain multiple
+  namespaces separated by a space too.
+
+
 1.000004 2017-05-24
 
 - Documentation improvements only. No code changes.

@@ -8,7 +8,7 @@ package Future::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Exporter 'import';
 # Can't import the one from Exporter as it relies on package inheritance
@@ -639,7 +639,7 @@ sub _fmap
       !defined $_ or $_->is_ready or $_->cancel for @slots;
    });
    $future->on_cancel( sub {
-      $_->cancel for @slots;
+      !defined $_ or $_->is_ready or $_->cancel for @slots;
    });
 
    return $future;

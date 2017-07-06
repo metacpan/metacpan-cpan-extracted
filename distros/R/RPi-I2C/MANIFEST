@@ -1,0 +1,24 @@
+Changes
+examples/pi_read_a0/a0.pl
+examples/pi_read_block_from_arduino/block.pl
+examples/pi_read_byte_from_arduino/byte.pl
+examples/pi_read_from_arduino/read.pl
+examples/pi_read_word_from_arduino/word.pl
+examples/pi_write_block_to_arduino/block.pl
+examples/pi_write_byte_to_arduino/byte.pl
+examples/pi_write_to_arduino/write.pl
+examples/pi_write_word_to_arduino/word.pl
+i2c-dev.h
+I2C.xs
+lib/RPi/I2C.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

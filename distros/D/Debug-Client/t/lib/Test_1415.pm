@@ -7,7 +7,10 @@ use parent qw(Test::Class);
 use Test::More;
 use Test::Deep;
 
-use t::lib::Debugger;
+BEGIN {
+  require "./t/lib/Debugger.pm";
+  t::lib::Debugger->import;
+}
 
 # setup methods are run before every test method.
 sub load_debugger : Test(setup) {

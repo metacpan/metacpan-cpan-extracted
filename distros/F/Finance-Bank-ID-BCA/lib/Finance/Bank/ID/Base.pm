@@ -1,11 +1,11 @@
 package Finance::Bank::ID::Base;
 
-our $DATE = '2017-05-16'; # DATE
-our $VERSION = '0.45'; # VERSION
+our $DATE = '2017-07-01'; # DATE
+our $VERSION = '0.46'; # VERSION
 
 use 5.010;
 use Moo;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Dmp;
 use Data::Rmap qw(:all);
@@ -19,9 +19,9 @@ has password    => (is => 'rw');
 has logged_in   => (is => 'rw');
 has accounts    => (is => 'rw');
 has logger      => (is => 'rw',
-                    default => sub { Log::Any::IfLOG->get_logger() } );
+                    default => sub { Log::ger->get_logger() } );
 has logger_dump => (is => 'rw',
-                    default => sub { Log::Any::IfLOG->get_logger() } );
+                    default => sub { Log::ger->get_logger() } );
 
 has site => (is => 'rw');
 
@@ -183,7 +183,7 @@ sub parse_statement {
                 }
             }
             if (abs($na-$nb) >= 0.01) {
-                $log->warn(
+                log_warn(
                     "Check failed: total debit do not match ".
                         "($na in summary line vs $nb when totalled from ".
                         "$ntx transactions(s))");
@@ -200,7 +200,7 @@ sub parse_statement {
                 }
             }
             if (abs($na-$nb) >= 0.01) {
-                $log->warn(
+                log_warn(
                     "Check failed: total credit do not match ".
                         "($na in summary line vs $nb when totalled from ".
                         "$ntx transactions(s))");
@@ -272,7 +272,7 @@ Finance::Bank::ID::Base - Base class for Finance::Bank::ID::BCA etc
 
 =head1 VERSION
 
-This document describes version 0.45 of Finance::Bank::ID::Base (from Perl distribution Finance-Bank-ID-BCA), released on 2017-05-16.
+This document describes version 0.46 of Finance::Bank::ID::Base (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-01.
 
 =head1 SYNOPSIS
 

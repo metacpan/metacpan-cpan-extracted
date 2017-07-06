@@ -1,6 +1,13 @@
 Revision history for Perl extension File-ShareDir
 
-1.02	2014-05-12
+1.104	2017-06-29
+    - Fix RT#120833: Fails tests when no "." in @INC reported by Kent
+      Fredric <kentnlATcpan.org>.
+    - avoid tracking bundled prereqs - use inc::latest tooling from
+      List::MoreUtils...
+    - bundle reasonable LICENSE file and README.md
+
+1.102	2014-05-12
     - Fix RT#95572 "necessary test files not copied into blib"
       Thanks to Graham Knop for fixing and Zefram for reporting
     - Explicitely require warnings as runtime prerequisite

@@ -1,10 +1,14 @@
 #!/usr/bin/perl
 
 package Catalyst::Authentication::Store::Htpasswd::User;
+# ABSTRACT: A user object representing an entry in an htpasswd file.
+
 use base qw/Catalyst::Authentication::User Class::Accessor::Fast/;
 
 use strict;
 use warnings;
+
+our $VERSION = '1.006';
 
 BEGIN { __PACKAGE__->mk_accessors(qw/_user _store/) }
 
@@ -50,11 +54,11 @@ sub roles {
 
 sub AUTOLOAD {
 	my $self = shift;
-	
+
 	( my $method ) = ( our $AUTOLOAD =~ /([^:]+)$/ );
 
 	return if $method eq "DESTROY";
-	
+
 	$self->_user->$method;
 }
 
@@ -64,15 +68,20 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Catalyst::Authentication::Store::Htpasswd::User - A user object
-representing an entry in an htpasswd file.
+Catalyst::Authentication::Store::Htpasswd::User - A user object representing an entry in an htpasswd file.
+
+=head1 VERSION
+
+version 1.006
 
 =head1 DESCRIPTION
 
 This object wraps an L<Authen::Htpasswd::User> object. An instance of it will be returned
-by C<< $c->user >> when using L<Catalyst::Authentication::Store::Htpasswd>. Methods 
+by C<< $c->user >> when using L<Catalyst::Authentication::Store::Htpasswd>. Methods
 not defined in this module are passed through to the L<Authen::Htpasswd::User> object. The
 object stringifies to the username.
 
@@ -80,8 +89,8 @@ object stringifies to the username.
 
 =head2 new($store,$user)
 
-Creates a new object from a store object, normally an instance of 
-L<Catalyst::Authentication::Store::Htpasswd::Backend>, and a user object,
+Creates a new object from a store object, normally an instance of
+L<Catalyst::Plugin::Authentication::Store::Htpasswd::Backend>, and a user object,
 normally an instance of L<Authen::Htpasswd::User>.
 
 =head2 id
@@ -109,20 +118,26 @@ Returns data about which featurs this user module supports.
 
 Returns the underlieing L<Authen::Htpasswd::User> object for this user
 
-=head1 AUTHORS
+=head1 SUPPORT
 
-Yuval Kogman C<nothingmuch@woobling.org>
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Authentication-Store-Htpasswd>
+(or L<bug-Catalyst-Authentication-Store-Htpasswd@rt.cpan.org|mailto:bug-Catalyst-Authentication-Store-Htpasswd@rt.cpan.org>).
 
-David Kamholz C<dkamholz@cpan.org>
+There is also a mailing list available for users of this distribution, at
+L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst>.
 
-Tomas Doran C<bobtfish@bobtfish.net>
+There is also an irc channel available for users of this distribution, at
+L<C<#catalyst> on C<irc.perl.org>|irc://irc.perl.org/#catalyst>.
 
-=head1 COPYRIGHT & LICENSE
+=head1 AUTHOR
 
-	Copyright (c) 2005 the aforementioned authors. All rights
-	reserved. This program is free software; you can redistribute
-	it and/or modify it under the same terms as Perl itself.
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2005 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-

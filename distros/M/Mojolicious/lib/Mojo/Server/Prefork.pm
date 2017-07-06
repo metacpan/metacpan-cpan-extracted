@@ -8,11 +8,13 @@ use Mojo::Util 'steady_time';
 use POSIX 'WNOHANG';
 use Scalar::Util 'weaken';
 
-has accepts => 10000;
-has cleanup => 1;
-has [qw(graceful_timeout heartbeat_timeout)] => 20;
+has accepts            => 10000;
+has cleanup            => 1;
+has graceful_timeout   => 60;
+has heartbeat_timeout  => 30;
 has heartbeat_interval => 5;
 has pid_file           => sub { path(tmpdir, 'prefork.pid')->to_string };
+has spare              => 2;
 has workers            => 4;
 
 sub DESTROY { unlink $_[0]->pid_file if $_[0]->cleanup }
@@ -91,7 +93,11 @@ sub _manage {
 
   # Spawn more workers if necessary and check PID file
   if (!$self->{finished}) {
-    $self->_spawn while keys %{$self->{pool}} < $self->workers;
+    my $graceful = grep { $_->{graceful} } values %{$self->{pool}};
+    my $spare = $self->spare;
+    $spare = $graceful ? $graceful > $spare ? $spare : $graceful : 0;
+    my $need = ($self->workers - keys %{$self->{pool}}) + $spare;
+    $self->_spawn while $need-- > 0;
     $self->ensure_pid_file($$);
   }
 
@@ -111,19 +117,19 @@ sub _manage {
     next unless my $w = $self->{pool}{$pid};
 
     # No heartbeat (graceful stop)
-    $log->error("Worker $pid has no heartbeat, restarting")
+    $log->error("Worker $pid has no heartbeat ($ht seconds), restarting")
       and $w->{graceful} = $time
       if !$w->{graceful} && ($w->{time} + $interval + $ht <= $time);
 
     # Graceful stop with timeout
     my $graceful = $w->{graceful} ||= $self->{graceful} ? $time : undef;
-    $log->debug("Stopping worker $pid gracefully")
+    $log->info("Stopping worker $pid gracefully ($gt seconds)")
       and (kill 'QUIT', $pid or $self->_stopped($pid))
       if $graceful && !$w->{quit}++;
     $w->{force} = 1 if $graceful && $graceful + $gt <= $time;
 
     # Normal stop
-    $log->debug("Stopping worker $pid")
+    $log->warn("Stopping worker $pid immediately")
       and (kill 'KILL', $pid or $self->_stopped($pid))
       if $w->{force} || ($self->{finished} && !$graceful);
   }
@@ -153,7 +159,7 @@ sub _spawn {
   delete $self->{reader};
   srand;
 
-  $self->app->log->debug("Worker $$ started");
+  $self->app->log->info("Worker $$ started");
   $loop->start;
   exit 0;
 }
@@ -164,7 +170,7 @@ sub _stopped {
   return unless my $w = delete $self->{pool}{$pid};
 
   my $log = $self->app->log;
-  $log->debug("Worker $pid stopped");
+  $log->info("Worker $pid stopped");
   $log->error("Worker $pid stopped too early, shutting down") and $self->_term
     unless $w->{healthy};
 }
@@ -376,7 +382,7 @@ a true value.
   $prefork    = $prefork->graceful_timeout(15);
 
 Maximum amount of time in seconds stopping a worker gracefully may take before
-being forced, defaults to C<20>. Note that this value should usually be a little
+being forced, defaults to C<60>. Note that this value should usually be a little
 larger than the maximum amount of time you expect any one request to take.
 
 =head2 heartbeat_interval
@@ -392,7 +398,7 @@ Heartbeat interval in seconds, defaults to C<5>.
   $prefork    = $prefork->heartbeat_timeout(2);
 
 Maximum amount of time in seconds before a worker without a heartbeat will be
-stopped gracefully, defaults to C<20>. Note that this value should usually be a
+stopped gracefully, defaults to C<30>. Note that this value should usually be a
 little larger than the maximum amount of time you expect any one operation to
 block the event loop.
 
@@ -403,6 +409,16 @@ block the event loop.
 
 Full path of process id file, defaults to C<prefork.pid> in a temporary
 directory.
+
+=head2 spare
+
+  my $spare = $prefork->spare;
+  $prefork  = $prefork->spare(4);
+
+Temporarily spawn up to this number of additional workers if there is a need,
+defaults to C<2>. This allows for new workers to be started while old ones are
+still shutting down gracefully, drastically reducing the performance cost of
+worker restarts.
 
 =head2 workers
 

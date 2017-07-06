@@ -7,7 +7,7 @@ use Carp 'carp';
 use v5.10.1;
 
 our @CARP_NOT;
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 our $DEFAULT_KEY_SIZE = 512;
 our $MAX_GEN_ROUNDS = 100;
@@ -35,13 +35,13 @@ use Exporter 'import';
 our @EXPORT_OK = qw(b64url_encode b64url_decode);
 
 # Primitive for Math::Prime::Util
-sub random_nbit_prime;
+sub random_nbit_prime ($);
 
 our $GENERATOR;
 
 # Load Math::Prime::Util and Math::Random::Secure
 BEGIN {
-  if (eval q{use Math::Prime::Util 0.21 'random_nbit_prime'; 1;}) {
+  if (eval q{use Math::Prime::Util 'random_nbit_prime'; 1;}) {
     our $GENERATOR = 1;
   };
 };
@@ -842,7 +842,8 @@ L<Math::Prime::Util::GMP> and L<Math::Random::ISAAC::XS>
 =head1 KNOWN BUGS AND LIMITATIONS
 
 The signing and verification is not guaranteed to be
-compatible with other implementations!
+compatible with other implementations, as the specification
+changed over time!
 
 
 =head1 SEE ALSO

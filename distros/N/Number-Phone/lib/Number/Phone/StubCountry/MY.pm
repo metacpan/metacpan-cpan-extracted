@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -34,28 +34,41 @@ my $formatters = [
                   'leading_digits' => '3'
                 },
                 {
+                  'pattern' => '([18]\\d)(\\d{3})(\\d{3,4})',
                   'leading_digits' => '
             1[02-46-9][1-9]|
             8
-          ',
-                  'pattern' => '([18]\\d)(\\d{3})(\\d{3,4})'
+          '
                 },
                 {
-                  'pattern' => '(1)([36-8]00)(\\d{2})(\\d{4})',
-                  'leading_digits' => '1[36-8]0'
+                  'leading_digits' => '1[36-8]0',
+                  'pattern' => '(1)([36-8]00)(\\d{2})(\\d{4})'
                 },
                 {
                   'leading_digits' => '11',
                   'pattern' => '(11)(\\d{4})(\\d{4})'
                 },
                 {
-                  'pattern' => '(15[49])(\\d{3})(\\d{4})',
-                  'leading_digits' => '15'
+                  'leading_digits' => '15',
+                  'pattern' => '(15[49])(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
+                'geographic' => '
+          (?:
+            3[2-9]\\d|
+            [4-9][2-9]
+          )\\d{6}
+        ',
                 'specialrate' => '(1600\\d{6})',
+                'personal_number' => '',
+                'fixed_line' => '
+          (?:
+            3[2-9]\\d|
+            [4-9][2-9]
+          )\\d{6}
+        ',
                 'mobile' => '
           1(?:
             1[1-5]\\d{2}|
@@ -67,22 +80,9 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'toll_free' => '1[378]00\\d{6}',
-                'geographic' => '
-          (?:
-            3[2-9]\\d|
-            [4-9][2-9]
-          )\\d{6}
-        ',
-                'personal_number' => '',
-                'pager' => '',
                 'voip' => '154\\d{7}',
-                'fixed_line' => '
-          (?:
-            3[2-9]\\d|
-            [4-9][2-9]
-          )\\d{6}
-        '
+                'toll_free' => '1[378]00\\d{6}',
+                'pager' => ''
               };
 
     sub new {

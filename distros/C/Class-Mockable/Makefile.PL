@@ -4,8 +4,9 @@ WriteMakefile(
   NAME         => 'Class::Mockable',
     META_MERGE => {
         license => 'other',
-        resource => {
-	    repository => 'https://github.com/DrHyde/perl-modules-Class-Mockable'
+        resources => {
+	    repository => 'https://github.com/DrHyde/perl-modules-Class-Mockable',
+	    bugtracker => 'https://github.com/DrHyde/perl-modules-Class-Mockable/issues',
         }
     },
   VERSION_FROM => 'lib/Class/Mockable.pm',

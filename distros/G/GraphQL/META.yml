@@ -4,7 +4,7 @@ author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::Exception: '0'
+  Test::Exception: '0.42'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -28,4 +28,4 @@ requires:
   perl: '5.014'
 resources:
   repository: https://github.com/graphql-perl/graphql-perl
-version: '0.04'
+version: '0.05'

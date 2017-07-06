@@ -1,3 +1,14 @@
+/*
+ * API.xs file for WiringPi::API Perl distribution
+ *
+ * Copyright (c) 2017 by Steve Bertrand
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the same terms as Perl itself, either Perl version 5.18.2 or, at your option,
+ * any later version of Perl 5 you may have available.
+ *
+ */
+
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -16,6 +27,24 @@
 #include <sr595.h>
 
 #define PERL_NO_GET_CONTEXT
+
+char* serialGets(int fd, char* buf, int nbytes){
+    int bytes_read = 0;
+
+    while (bytes_read < nbytes){
+        int result = read(fd, buf + bytes_read, nbytes - bytes_read);
+        
+        if (0 >= result){
+            if (0 > result){
+                exit(-1);
+            }
+            break;
+        }
+        bytes_read += result;
+    }
+
+    return buf;
+}
 
 void spiDataRW(int channel, SV* byte_ref, int len){
 
@@ -396,12 +425,10 @@ spiDataRW (channel, byte_ref, len)
         temp = PL_markstack_ptr++;
         spiDataRW(channel, byte_ref, len);
         if (PL_markstack_ptr != temp) {
-          /* truly void, because dXSARGS not invoked */
           PL_markstack_ptr = temp;
-          XSRETURN_EMPTY; /* return empty stack */
+          XSRETURN_EMPTY;
         }
-        /* must have used dXSARGS; list context implied */
-        return; /* assume stack size is correct */
+        return;
 
 # I2C
 
@@ -436,3 +463,34 @@ int wiringPiI2CWriteReg16 (fd, reg, data)
     int fd
     int reg
     int data
+
+# serial interface
+
+int serialOpen (device, baud)
+    char* device
+    int baud
+
+void serialClose (fd)
+    int fd
+
+void serialFlush (fd)
+    int fd
+
+void serialPutchar (fd, c)
+    int fd
+    unsigned char c
+
+void serialPuts (fd, s)
+    int fd
+    char* s
+
+int serialDataAvail (fd)
+    int fd
+
+int serialGetchar (fd)
+    int fd
+
+char* serialGets(fd, buf, nbytes)
+    int fd
+    char* buf
+    int nbytes

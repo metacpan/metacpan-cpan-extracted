@@ -3,9 +3,9 @@ use 5.010;
 use strict;
 use warnings;
 use Test::More;
-use Cassandra::Client::Protocol qw/:constants pack_int pack_long/;
+use Cassandra::Client;
+use Cassandra::Client::Protocol qw/:constants pack_int pack_long pack_metadata unpack_metadata2 unpack_metadata/;
 use Cassandra::Client::Encoder 'make_encoder';
-use Cassandra::Client::Decoder 'make_decoder';
 
 # Add some junk into our Perl magic variables
 local $"= "junk join string ,";
@@ -17,23 +17,26 @@ sub check_encdec {
     eval {
         $expected= $row unless defined $expected;
 
+        my $metadata= pack_metadata($rowspec);
+        my ($decoder)= unpack_metadata2($metadata);
+        ok($decoder) or diag('No decoder');
+
         my $encoder= make_encoder($rowspec);
         ok($encoder) or diag('No encoder');
-        my $decoder= make_decoder($rowspec);
-        ok($decoder) or diag('No decoder');
+
         my $encoded= $encoder->($row);
         ok(length $encoded) or diag('Encoding failed');
         HACK: { # Turns the encoded parameter list into something our decoders understand
             substr($encoded, 0, 2, '');
             $encoded= pack_int(1).$encoded;
         }
-        my $decoded= $decoder->($encoded);
+        my $decoded= $decoder->decode($encoded, 0);
         is_deeply($decoded->[0], $expected);
 
         1;
     } or do {
         my $error= $@ || '??';
-        ok(0) or diag $error;
+        ok(0) or diag($error);
     };
 }
 
@@ -203,13 +206,15 @@ check_simple([TYPE_INET], [undef, qw/
                                      1::1
                                      127.0.0.1
                                      1.2.3.4
-                                     ::123
+                                     255.255.255.255
+                                     ::a:b:123
                                      123::123
                                      1::1
                                      1::
                                      ::1
                                     /]);
 check_enc([TYPE_INET], "1.2.3.4", "\1\2\3\4");
+check_enc([TYPE_INET], "255.255.255.255", "\xff\xff\xff\xff");
 check_enc([TYPE_INET], "::1", "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\1");
 
 # List
@@ -220,7 +225,8 @@ check_enc([TYPE_LIST, [ TYPE_INT ] ], [ 1, 2, 3 ], "\0\0\0\3\0\0\0\4\0\0\0\1\0\0
 check_simple([TYPE_MAP, [ TYPE_INT ], [ TYPE_BOOLEAN ] ], [
                                                             { 1 => !1, 2 => !0 },
                                                           ]);
-check_enc([TYPE_MAP, [ TYPE_INT ], [ TYPE_BOOLEAN ] ], { 1 => !1, 2 => !0 }, "\0\0\0\2\0\0\0\4\0\0\0\1\0\0\0\1\0\0\0\0\4\0\0\0\2\0\0\0\1\1");
+check_enc([TYPE_MAP, [ TYPE_INT ], [ TYPE_BOOLEAN ] ], { 2 => !0 }, "\0\0\0\1\0\0\0\4\0\0\0\2\0\0\0\1\1");
+check_enc([TYPE_MAP, [ TYPE_INT ], [ TYPE_BOOLEAN ] ], { 1 => !1 }, "\0\0\0\1\0\0\0\4\0\0\0\1\0\0\0\1\0");
 
 # Set
 check_simple([TYPE_SET, [ TYPE_INT ]], [
@@ -246,8 +252,8 @@ check_simple([TYPE_LIST, [TYPE_MAP, [TYPE_INT], [TYPE_BOOLEAN]]], [
                                                                     [ { 1 => !1, 2 => !0 } ]
                                                                   ]);
 check_enc([TYPE_LIST, [TYPE_MAP, [TYPE_INT], [TYPE_BOOLEAN]]],
-    [ { 1 => !1, 2 => !0} ],
-    pack("H*", '000000010000001e000000020000000400000001000000010000000004000000020000000101')
+    [ { 1 => !1 } ],
+    pack("H*", '00000001000000110000000100000004000000010000000100')
 );
 
 # set<frozen<map<int,boolean>>>
@@ -255,8 +261,8 @@ check_simple([TYPE_SET, [TYPE_MAP, [TYPE_INT], [TYPE_BOOLEAN]]], [
                                                                     [ { 1 => !1, 2 => !0 } ],
                                                                  ]);
 check_enc([TYPE_SET, [TYPE_MAP, [TYPE_INT], [TYPE_BOOLEAN]]],
-    [ { 1 => !1, 2 => !0 } ],
-    pack('H*', '000000010000001e000000020000000400000001000000010000000004000000020000000101')
+    [ { 1 => !1 } ],
+    pack('H*', '00000001000000110000000100000004000000010000000100')
 );
 
 # map<int,frozen<list<int>>>
@@ -264,8 +270,8 @@ check_simple([TYPE_MAP, [TYPE_INT], [TYPE_LIST, [TYPE_INT]]], [
                                                                 { 1 => [2], 2 => [3] }
                                                               ]);
 check_enc([TYPE_MAP, [TYPE_INT], [TYPE_LIST, [TYPE_INT]]],
-    { 1 => [2], 2 => [3] },
-    pack('H*', '0000000200000004000000010000000c00000001000000040000000200000004000000020000000c000000010000000400000003')
+    { 1 => [2] },
+    pack('H*', '0000000100000004000000010000000c000000010000000400000002')
 );
 
 

@@ -13,10 +13,17 @@ sub new {
 }
 
 sub display { croak "read-only" if @_ > 1; $_[0]{display} }
+
 sub xid     { croak "read-only" if @_ > 1; $_[0]{xid} }
 *id= *xid;
-*dpy= *display;
+
 sub autofree { my $self= shift; $self->{autofree}= shift if @_; $self->{autofree} }
+
+sub summarize {
+    my $self= shift;
+    my $type= (split '::', ref $self)[-1];
+    return $type.'-'.$self->xid;
+}
 
 1;
 
@@ -42,6 +49,13 @@ Whether this object should control the lifespan of the remote resource,
 by calling an Xlib Free/Destroy function if it goes out of scope.
 The default is False, since this base class has no idea how to release
 any resources.
+
+=head1 METHODS
+
+=head2 summarize
+
+Return a human-readable string describing the object.  The text is subject
+to change, and may be customized for the specific subclass.
 
 =head1 AUTHOR
 

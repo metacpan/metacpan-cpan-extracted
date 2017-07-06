@@ -6,7 +6,7 @@ use Dancer::Plugin::DBIC;
 use Dancer::Plugin::Auth::Extensible;
 
 use App::Netdisco::Web::Plugin;
-use App::Netdisco::Util::DNS 'hostnames_resolve_async';
+use App::Netdisco::Util::FastResolver 'hostnames_resolve_async';
 
 register_admin_task({
   tag => 'timedoutdevices',
@@ -33,7 +33,7 @@ ajax '/ajax/content/admin/timedoutdevices' => require_role admin => sub {
       next unless defined $row->{last_defer};
       $row->{last_defer} =~ s/\.\d+//;
     }
-    my $results = hostnames_resolve_async(\@set, [2,2,2]);
+    my $results = hostnames_resolve_async(\@set, [2]);
 
     content_type('text/html');
     template 'ajax/admintask/timedoutdevices.tt', {

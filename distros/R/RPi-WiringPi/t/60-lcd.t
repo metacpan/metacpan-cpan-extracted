@@ -1,10 +1,16 @@
 use warnings;
 use strict;
 
-use LWP::Simple;
+use lib 't/';
+
+use RPiTest qw(check_pin_status);
 use RPi::WiringPi;
 use RPi::WiringPi::Constant qw(:all);
 use Test::More;
+
+$SIG{__DIE__} = sub {
+    like shift, qr/Maximum number of LCD/, "initializing too many LCDs error ok";
+};
 
 if (! $ENV{PI_BOARD}){
     warn "\n*** PI_BOARD is not set! ***\n";
@@ -20,7 +26,6 @@ my $continue = 1;
 $SIG{INT} = sub { $continue = 0; };
 
 my $pi = RPi::WiringPi->new;
-my $lcd = $pi->lcd;
 
 my %args = (
     cols => 16,
@@ -38,7 +43,7 @@ my %args = (
     d7 => 0,
 );
 
-$lcd->init(%args);
+my $lcd = $pi->lcd(%args);
 
 $lcd->position(0, 0);
 $lcd->print("hello, world!"); 
@@ -51,5 +56,20 @@ sleep 2;
 $lcd->clear;
 
 is 1, 1, "ok";
+
+
+my $ok = eval {
+    while (1){
+        $lcd->init(%args);
+        $lcd->position(0, 0);
+    }
+    1;
+};
+
+is $ok, undef, "initializing too many LCD objects dies ok";
+
+$pi->cleanup;
+
+check_pin_status();
 
 done_testing();

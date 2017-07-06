@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mail-Box-POP3",
    "no_index" : {
@@ -50,5 +50,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.001"
+   "version" : "3.002"
 }

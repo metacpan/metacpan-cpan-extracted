@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!perl
 
 use 5.010001;
 use strict;
@@ -6,7 +6,7 @@ use warnings;
 
 #use Getopt::Long;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 my $Env;
 my @Cmd;
@@ -15,8 +15,8 @@ sub parse_cmdline {
     #Getopt::Long::Configure("nopass_through");
     my $usage = <<USAGE;
 Usage:
-  $0 [ENV] [command] [command options ...]
-  $0 --help
+  exec-if-not-env [ENV] [command] [command options ...]
+  exec-if-not-env --help
 For more details, see the manpage/documentation.
 USAGE
 
@@ -57,7 +57,7 @@ exec-if-not-env - Execute command if certain environment variable is false
 
 =head1 VERSION
 
-version 0.01
+This document describes version 0.02 of exec-if-not-env (from Perl distribution App-ExecIf), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -70,14 +70,6 @@ or false (with the notion of false follows Perl, i.e undefined, C<''>, and C<0>
 are false).
 
 =head1 DESCRIPTION
-
-=head1 OPTIONS
-
-=over
-
-=item * --help, -h
-
-=back
 
 =head1 EXIT CODES
 
@@ -93,13 +85,13 @@ Yes, you can also do something like this in bash:
 
 But using this utility is simpler and more portable.
 
-=head1 TODO
+=head1 OPTIONS
 
-=head1 SEE ALSO
+=over
 
-L<App::ExecIf>
+=item * --help, -h
 
-L<exec-if-env>
+=back
 
 =head1 HOMEPAGE
 
@@ -117,13 +109,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<App::ExecIf>
+
+L<exec-if-env>
+
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2017, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

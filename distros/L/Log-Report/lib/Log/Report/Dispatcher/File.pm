@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Dispatcher::File;
 use vars '$VERSION';
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 use base 'Log::Report::Dispatcher';
 
@@ -50,6 +50,23 @@ sub init($)
     $self;
 }
 
+
+
+sub close()
+{   my $self = shift;
+    $self->SUPER::close
+        or return;
+
+    my $to = $self->{to};
+    my @close
+      = ref $to eq 'CODE' ? values %{$self->{LRDF_out}}
+      : $self->{LRDF_filename} ? $self->{LRDF_output}
+      : ();
+
+    $_->close for @close;
+    $self;
+}
+
 #-----------
 
 sub filename() {shift->{LRDF_filename}}
@@ -86,23 +103,8 @@ sub output($)
     $self->{LRDF_output} = $to;
 }
 
+
 #-----------
-
-sub close()
-{   my $self = shift;
-    $self->SUPER::close
-        or return;
-
-    my $to = $self->{to};
-    my @close
-      = ref $to eq 'CODE' ? values %{$self->{LRDF_out}}
-      : $self->{LRDF_filename} ? $self->{LRDF_output}
-      : ();
-
-    $_->close for @close;
-    $self;
-}
-
 
 sub rotate($)
 {   my ($self, $old) = @_;

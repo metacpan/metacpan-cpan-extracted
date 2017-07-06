@@ -3,6 +3,7 @@ use warnings;
 
 use Test::Fatal;
 use Test::More;
+use Test::Warnings qw/:all/;
 use Fcntl ':flock';    # import LOCK_* constants
 use Path::Tiny;
 
@@ -102,6 +103,46 @@ subtest "usage" => sub {
     $slave_1->read_slot(0);
     ok !$slave_1->update(0, 0 => 7), "successfull private update (no succes of shared data update, as we don't provide values for it)";
     is_deeply [$slave_1->read_slot(0)], [[11, 12, 13, 14], [7, 99]], "assure that we get the last values we have written";
+};
+
+subtest "edge-cases" => sub {
+    $locked = 0;
+    my $master = $create->();
+    my ($slave_1, $slave_2) = map { $attach->() } (0 .. 1);
+    like(exception { $slave_1->read_slot(2) }, qr/wrong index/, "the code died in attempt to read row out of scope",);
+
+    like(exception { $slave_1->read_slot(-1) }, qr/wrong index/, "the code died in attempt to read row out of scope",);
+
+    like(exception { $slave_1->update(2, [1, 2, 3, 4]) }, qr/wrong index/, "the code died in attempt to write row out of scope",);
+
+    like(exception { $slave_1->update(-1, [1, 2, 3, 4]) }, qr/wrong index/, "the code died in attempt to write row out of scope",);
+
+    $slave_1->read_slot(0);
+    like(exception { $slave_1->update(0, 2 => 5) }, qr/wrong private index/, "the code died in attempt to write private datea out of row",);
+
+    like(exception { $slave_1->update(0, -1 => 5) }, qr/wrong private index/, "the code died in attempt to write private datea out of row",);
+
+    like(
+        exception { $slave_1->update(0, [1, 2, 3]) },
+        qr/values size mismatch slot size/,
+        "the code died in attempt to update shared datas with wrong vector size",
+    );
+
+    like(
+        exception { $slave_1->update(0, [1, 2, 3, 4, 5]) },
+        qr/values size mismatch slot size/,
+        "the code died in attempt to update shared datas with wrong vector size",
+    );
+
+    # manually set spin lock to some value(5) (should be zero, by default)
+    $slave_1->_score_board->set(0, 0, 5);
+    my $operation_result;
+    like(
+        warning { $operation_result = $slave_1->update(0, [1, 2, 3, 4]) },
+        qr/failed to acquire spin lock/,
+        "warning emitted when spinlock wasn't acquired"
+    );
+    ok !$operation_result;
 
 };
 

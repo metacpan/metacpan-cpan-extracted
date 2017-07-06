@@ -16,6 +16,7 @@ lib/Text/NumericData/App/txdfromtcad.pm
 lib/Text/NumericData/App/txdhistogram.pm
 lib/Text/NumericData/App/txdmean.pm
 lib/Text/NumericData/App/txdnorm.pm
+lib/Text/NumericData/App/txdodeint.pm
 lib/Text/NumericData/App/txdrecycle.pm
 lib/Text/NumericData/App/txdrows.pm
 lib/Text/NumericData/App/txdsort.pm
@@ -43,6 +44,7 @@ script/txdhistogram
 script/txdinfo
 script/txdmean
 script/txdnorm
+script/txdodeint
 script/txdrecycle
 script/txdrows
 script/txdsort
@@ -61,6 +63,7 @@ t/15-txdmean.t
 t/16-txdnorm.t
 t/17-txdsort.t
 t/18-txdrecycle.t
+t/19-txdodeint.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

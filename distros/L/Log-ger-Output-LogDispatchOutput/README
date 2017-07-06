@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     use Log::ger::Output LogDispatchOutput => (
+         output => 'Screen', # choose Log::Dispatch::Screen
+         args => {stderr=>1, newline=>1},
+     );
+
+DESCRIPTION
+
+    This output sends logs to a Log::Dispatch output.
+
+CONFIGURATION
+
+ output
+
+ args
+
+SEE ALSO
+
+    Log::ger::Output::LogDispatch
+
+    Log::ger
+
+    Log::Dispatch
+

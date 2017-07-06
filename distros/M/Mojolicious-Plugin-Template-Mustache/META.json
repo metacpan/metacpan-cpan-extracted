@@ -1,0 +1,73 @@
+{
+   "abstract" : "Mojolicious Plugin",
+   "author" : [
+      "Cyrill Novgorodcev <cynovg@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mojolicious-Plugin-Template-Mustache",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "0",
+            "Template::Mustache" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Mojolicious::Plugin::Template::Mustache" : {
+         "file" : "lib/Mojolicious/Plugin/Template/Mustache.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cynovg/Mojolicious-Plugin-Template-Mustache/issues"
+      },
+      "homepage" : "https://github.com/cynovg/Mojolicious-Plugin-Template-Mustache",
+      "repository" : {
+         "url" : "git://github.com/cynovg/Mojolicious-Plugin-Template-Mustache.git",
+         "web" : "https://github.com/cynovg/Mojolicious-Plugin-Template-Mustache"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:CYNOVG",
+   "x_contributors" : [
+      "Novgorodcev Cyrill <cynovg@gmail.com>",
+      "Kirill Novgorodcev <novgorodtsev.kirill@220-volt.ru>"
+   ]
+}

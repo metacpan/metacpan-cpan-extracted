@@ -4,21 +4,23 @@ Dist::Zilla::Plugin::Covenant - add the author's pledge to the distribution
 
 # VERSION
 
-version 0.1.1
+version 0.1.2
 
 # SYNOPSIS
 
 In dist.ini:
 
-    [Covenant]
-    version = 1
-    pledge_file = AUTHOR_PLEDGE
+```
+[Covenant]
+version = 1
+pledge_file = AUTHOR_PLEDGE
+```
 
 # DESCRIPTION
 
 `Dist::Zilla::Plugin::Covenant` adds the file
-'_AUTHOR\_PLEDGE_' to the distribution. The author
-as defined in _dist.ini_ is taken as being the pledgee.
+'_AUTHOR\_PLEDGE_' to the distribution. The author(s)
+as defined in _dist.ini_ is taken as being the pledgee(s).
 
 The _META_ file of the distribution is also modified to
 include a _x\_author\_pledge_ stanza.
@@ -29,7 +31,7 @@ include a _x\_author\_pledge_ stanza.
 
 Version of the pledge to use. 
 
-Defaults to '1'.
+Defaults to '1' (the only version currently existing).
 
 ## pledge\_file
 

@@ -2,12 +2,11 @@ package App::cpm::Resolver::MetaDB;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 use HTTP::Tiny;
 use CPAN::Meta::YAML;
 use App::cpm::version;
-use App::cpm::Logger;
 
 sub new {
     my ($class, %option) = @_;

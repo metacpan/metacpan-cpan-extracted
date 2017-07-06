@@ -1,7 +1,7 @@
 ---
 abstract: 'Get currency information for different currencies'
 author:
-  - 'David D Lowe <daviddlowe.flimm@gmail.com>'
+  - 'Ed Freyfogle <edf@opencagedata.com>'
 build_requires:
   Test::Exception: '0'
   Test::More: '0'
@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,8 +26,7 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/Flimm/perl5-Data-MoneyCurrency.git
-version: '0.02'
+version: '0.03'
 x_bugtracker:
   web: https://github.com/Flimm/perl5-Data-MoneyCurrency/issues
 x_homepage: https://github.com/Flimm/perl5-Data-MoneyCurrency
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

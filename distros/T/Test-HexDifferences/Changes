@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::HexDifferences.
 
+1.001 Tue Jul  4 08:22:06 2017
+- build dist with nmake instead of Module::Build
+
 1.000  Sun Jul  5 15:43:06 2015
 - use Test::Diff directly
 - added prototypes

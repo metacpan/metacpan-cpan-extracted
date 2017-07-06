@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Deep;
@@ -110,7 +110,6 @@ FOO
                                 fallback_version_provider => '=inc::SimpleVersionProvider',
                                 _fallback_version_provider_args => { some_other_arg => 'oh hai' },
                             },
-                            # TODO, in [RewriteVersion]
                             #'Dist::Zilla::Plugin::RewriteVersion' => {
                             #    global => bool(0),
                             #    skip_version_provider => bool(0),
@@ -126,7 +125,6 @@ FOO
                         config => superhashof({
                             'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => {
                             },
-                            # TODO, in [BumpVersionAfterRelease]
                             #'Dist::Zilla::Plugin::BumpVersionAfterRelease' => {
                             #    global => bool(0),
                             #    munge_makefile_pl => bool(0),

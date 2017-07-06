@@ -22,7 +22,7 @@ use lib qw(t/util);
 use lib qw(lib);
 
 use File::Temp qw(tempfile);
-use Test::More (tests => 69);
+use Test::More (tests => 68);
 use TestClientUtils qw(get_test_client get_test_manager_account_client);
 use TestAPIUtils;
 use Data::Uniqid qw(uniqid);
@@ -156,8 +156,6 @@ ok(get_expanded_text_ads($client, $search_ad_group_id),
   "Test of get_expanded_text_ads example");
 require qw(examples/v201705/basic_operations/get_keywords.pl);
 ok(get_keywords($client, $search_ad_group_id), "Test of get_keywords example");
-require qw(examples/v201705/basic_operations/get_text_ads.pl);
-ok(get_text_ads($client, $search_ad_group_id), "Test of get_text_ads example");
 require qw(examples/v201705/basic_operations/pause_ad.pl);
 ok(pause_ad($client, $search_ad_group_id, $search_text_ad_id),
   "Test of pause_ad example");

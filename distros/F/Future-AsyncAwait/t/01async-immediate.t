@@ -7,7 +7,7 @@ use Test::More;
 
 use Future;
 
-use Future::AsyncAwait qw( async );
+use Future::AsyncAwait;
 
 # immediate done ANON scalar
 {

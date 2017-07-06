@@ -112,3 +112,6 @@ Revision history for POE-Filter-SSL
 0.30	08.04.2016
 	Fixed bug passing dhparamem
 
+0.31	30.06.2017
+	OpenSSL 1.1.0
+

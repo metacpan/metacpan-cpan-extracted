@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use FindBin;
+use FindBin '$Bin';
 use Test::More;
 use Image::PNG::Libpng ':all';
 use Image::PNG::Const ':all';
@@ -8,7 +8,7 @@ use Image::PNG::Const ':all';
 # Test reading a background.
 
 my $png = create_read_struct ();
-open my $fh, "<:raw", "$FindBin::Bin/libpng/bgyn6a16.png" or die $!;
+open my $fh, "<:raw", "$Bin/libpng/bgyn6a16.png" or die $!;
 init_io ($png, $fh);
 read_png ($png);
 close $fh or die $!;
@@ -33,7 +33,7 @@ for my $k (@expect) {
 
 # Test writing a background.
 
-my $bKGD_file = "$FindBin::Bin/bKGD-test.png";
+my $bKGD_file = "$Bin/bKGD-test.png";
 my $wpng = create_write_struct ();
 open my $wfh, ">:raw", $bKGD_file or die $!;
 init_io ($wpng, $wfh);

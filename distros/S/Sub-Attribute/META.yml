@@ -3,16 +3,19 @@ abstract: 'Reliable subroutine attribute handlers'
 author:
   - 'Goro Fuji (gfx) <gfuji(at)cpan.org>.'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  ExtUtils::ParseXS: 2.21
+  Class::Trigger: 0.14
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
   MRO::Compat: 0.09
-  Test::More: 0.62
+  Test::More: 0.88
   parent: 0.221
 configure_requires:
   Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.42
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 3.18
 distribution_type: module
-generated_by: 'Module::Install version 0.91'
+dynamic_config: 1
+generated_by: 'Module::Install version 1.18'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,10 +29,10 @@ no_index:
     - t
     - xt
 requires:
-  XSLoader: 0.1
+  XSLoader: 0.02
   parent: 0.2
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/gfx/Perl-Sub-Attribute.git
-version: 0.05
+  repository: git://github.com/DrHyde/perl-modules-Sub-Attribute.git
+version: '0.06'

@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/hideo55/p5-Algorithm-HyperLogLog.png?branch=master)](https://travis-ci.org/hideo55/p5-Algorithm-HyperLogLog)
+[![Build Status](https://travis-ci.org/hideo55/p5-Algorithm-HyperLogLog.svg?branch=master)](https://travis-ci.org/hideo55/p5-Algorithm-HyperLogLog)
 # NAME
 
 Algorithm::HyperLogLog - Implementation of the HyperLogLog cardinality estimation algorithm

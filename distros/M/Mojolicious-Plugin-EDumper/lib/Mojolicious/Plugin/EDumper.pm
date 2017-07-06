@@ -1,18 +1,20 @@
 package Mojolicious::Plugin::EDumper;
 
 use Mojo::Base 'Mojolicious::Plugin';
-use Encode qw(decode);
-use Data::Recursive::Encode;
+#~ use Encode qw(decode);
+#~ use Data::Recursive::Encode;
 
-our $VERSION = '0.00003';
+our $VERSION = '0.00004';
 
 =pod
 
 =encoding utf8
 
-Доброго всем
 
-¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
+=head1 ¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
+Доброго всем, соответственно
 
 
 =head1 NAME
@@ -77,11 +79,27 @@ sub register {
   my $helper = delete $conf->{helper} || 'edumper';
   $app->helper($helper => sub {
     shift;
-    decode $enc,
-      Data::Dumper->new(Data::Recursive::Encode->encode($enc, \@_),)
-      ->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(0)->Dump;
+    #~ decode $enc,
+      #~ Data::Dumper->new(Data::Recursive::Encode->encode($enc, \@_),)
+      #~ ->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(0)->Dump;
+      
+      Data::Dumper->new(\@_)
+        ->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(0)->Dump
+        =~ s/(\\x\{[\da-f]+\})/eval '"'.$1.'"'/eigr;
+      
   });
   return $self;
 }
+
+#~ sub _decode_utf8 {
+    #~ my ($self, $val) = @_;
+ 
+    #~ if (Encode::is_utf8($val)) {
+        #~ return $val;
+    #~ }
+    #~ else {
+        #~ return Encode::decode(utf8 => $val);
+    #~ }
+#~ }
 
 1;

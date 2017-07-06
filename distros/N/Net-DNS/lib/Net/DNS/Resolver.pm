@@ -1,9 +1,9 @@
 package Net::DNS::Resolver;
 
 #
-# $Id: Resolver.pm 1564 2017-05-03 08:42:49Z willem $
+# $Id: Resolver.pm 1576 2017-06-19 12:39:09Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1564 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1576 $)[1];
 
 =head1 NAME
 
@@ -70,34 +70,39 @@ recursion is desired, etc.
 	debug	    => 1
 	);
 
-Returns a resolver object.  If no arguments are supplied, new()
+Returns a resolver object.  If no arguments are supplied, C<new()>
 returns an object having the default configuration.
 
 On Unix and Linux systems,
 the default values are read from the following files,
 in the order indicated:
 
-    /etc/resolv.conf
-    $HOME/.resolv.conf
-    ./.resolv.conf
+=over
+
+F</etc/resolv.conf>,
+F<$HOME/.resolv.conf>,
+F<./.resolv.conf>
+
+=back
+
 
 The following keywords are recognised in resolver configuration files:
 
-=over 4
+=over
 
-=item domain
+B<nameserver> address
 
-The default domain.
+IP address of a name server that the resolver should query.
 
-=item search
+B<domain> localdomain
 
-A space-separated list of domains to put in the search list.
+The domain suffix to be appended to a short non-absolute name.
 
-=item nameserver
+B<search> domain ...
 
-A space-separated list of nameservers to query.
+A space-separated list of domains in the desired search path.
 
-=item options
+B<options> option:value ...
 
 A space-separated list of key:value items.
 
@@ -109,77 +114,32 @@ variables may contain configuration information; see L</ENVIRONMENT>.
 
 Note that the domain and searchlist keywords are mutually exclusive.
 If both are present, the resulting behaviour is unspecified.
+If neither is present, the domain is determined from the local hostname.
 
 On Windows systems, an attempt is made to determine the system defaults
 using the registry.  Systems with many dynamically configured network
 interfaces may confuse L<Net::DNS>.
 
 
-You can include a configuration file of your own when creating a
-resolver object:
-
     # Use my own configuration file
     $resolver = new Net::DNS::Resolver( config_file => '/my/dns.conf' );
 
-This is supported on both Unix and Windows.
-
+You can include a configuration file of your own when creating a
+resolver object.  This is supported on both Unix and Windows.
 
 If a custom configuration file is specified at first instantiation,
-both the system configuration and environment variables are ignored.
+all other configuration files and environment variables are ignored.
 
-Explicit arguments to new() override the corresponding configuration
-variables.  The following arguments are supported:
 
-=over 4
+    # Set options in the constructor
+    $resolver = new Net::DNS::Resolver(
+	nameservers => [ '10.1.1.128', '10.1.2.128' ],
+	recurse	    => 0
+	);
 
-=item nameservers
-
-A reference to an array of nameservers to query.
-
-=item domain
-
-Domain name suffix to be appended to queries of unqualified names.
-
-=item searchlist
-
-A reference to an array of domains to search for unqualified names.
-
-=item debug
-
-=item defnames
-
-=item dnsrch
-
-=item dnssec
-
-=item igntc
-
-=item persistent_tcp
-
-=item persistent_udp
-
-=item port
-
-=item recurse
-
-=item retrans
-
-=item retry
-
-=item srcaddr
-
-=item srcport
-
-=item tcp_timeout
-
-=item udp_timeout
-
-=item usevc
-
-=back
-
-For more information on any of these options, please consult the method
-of the same name.
+Explicit arguments to C<new()> override the corresponding configuration
+variables.  The argument list consists of a sequence of (name=>value)
+pairs, each interpreted as an invocation of the corresponding method.
 
 
 =head2 print
@@ -197,19 +157,19 @@ Prints the resolver state on the standard output.
     $packet = $resolver->query( 'example.com', 'MX' );
     $packet = $resolver->query( 'annotation.example.com', 'TXT', 'IN' );
 
-Performs a DNS query for the given name; the search list is not
-applied.  If the name does not contain any dots and C<defnames>
-is true, the default domain will be appended.
+Performs a DNS query for the given name; the search list is not applied.
+If C<defnames> is true, and the number of dots is less than C<ndots>,
+the default domain will be appended unless name is absolute.
 
 The record type and class can be omitted; they default to A and IN.
 If the name looks like an IP address (IPv4 or IPv6),
 then a query within in-addr.arpa or ip6.arpa will be performed.
 
 Returns a L<Net::DNS::Packet> object, or C<undef> if no answers were found.
-The reason for failure may be determined using errorstring().
+The reason for failure may be determined using C<errorstring()>.
 
 If you need to examine the response packet, whether it contains
-any answers or not, use the send() method instead.
+any answers or not, use the C<send()> method instead.
 
 
 =head2 search
@@ -223,32 +183,21 @@ any answers or not, use the send() method instead.
 Performs a DNS query for the given name, applying the searchlist if
 appropriate.  The search algorithm is as follows:
 
-=over 4
+Unless the number of dots is less than C<ndots>,
+perform an initial query using the unmodified name.
 
-=item 1.
-
-If the name contains at least one dot, try it as is.
-
-=item 2.
-
-If the name does not end in a dot, try appending each item in the
-search list to the name.  This is only done if C<dnsrch> is true.
-
-=item 3.
-
-If the name does not contain any dots, try it as is.
-
-=back
+If C<dnsrch> is true and the name has no terminal dot,
+try appending each suffix in the search list.
 
 The record type and class can be omitted; they default to A and IN.
 If the name looks like an IP address (IPv4 or IPv6),
 then a query within in-addr.arpa or ip6.arpa will be performed.
 
 Returns a L<Net::DNS::Packet> object, or C<undef> if no answers were found.
-The reason for failure may be determined using errorstring().
+The reason for failure may be determined using C<errorstring()>.
 
 If you need to examine the response packet, whether it contains
-any answers or not, use the send() method instead.
+any answers or not, use the C<send()> method instead.
 
 
 =head2 send
@@ -301,8 +250,8 @@ is not returned to the caller.
 
 In deferrence to RFC1035(6.3), a complete zone transfer is expected
 to return all records in the zone or nothing at all.
-When no resource records are returned by axfr(),
-the reason for failure may be determined using errorstring().
+When no resource records are returned by C<axfr()>,
+the reason for failure may be determined using C<errorstring()>.
 
 Here is an example that uses a timeout and TSIG verification:
 
@@ -354,18 +303,18 @@ A and IN.  If the name looks like an IP address (IPv4 or IPv6),
 then a query within in-addr.arpa or ip6.arpa will be performed.
 
 Returns an opaque handle which is passed to subsequent invocations of
-the C<bgbusy> and C<bgread> methods.
+the C<bgbusy()> and C<bgread()> methods.
 Errors are indicated by returning C<undef> in which case
-the reason for failure may be determined using errorstring().
+the reason for failure may be determined using C<errorstring()>.
 
 The program may determine when the handle is ready for reading by
-calling C<bgbusy>.
+calling C<bgbusy()>.
 
-The response L<Net::DNS::Packet> object is obtained by calling C<bgread>.
+The response L<Net::DNS::Packet> object is obtained by calling C<bgread()>.
 
 B<BEWARE>:
 Programs should make no assumptions about the nature of the handles
-returned by C<bgsend> which should be used strictly as described here.
+returned by C<bgsend()> which should be used strictly as described here.
 
 
 =head2 bgread
@@ -373,7 +322,7 @@ returned by C<bgsend> which should be used strictly as described here.
     $packet = $resolver->bgread($handle);
 
 Reads the answer from a background query.
-The argument is the handle returned by C<bgsend>.
+The argument is the handle returned by C<bgsend()>.
 
 Returns a L<Net::DNS::Packet> object or C<undef> if no response was
 received or timeout occurred. 
@@ -390,7 +339,7 @@ received or timeout occurred.
     $packet = $resolver->bgread($handle);
 
 Returns true while awaiting the response or for the transaction to time out.
-The argument is the handle returned by C<bgsend>.
+The argument is the handle returned by C<bgsend()>.
 
 Truncated UDP packets will be retried over TCP transparently while
 continuing to assert busy to the caller.
@@ -402,7 +351,7 @@ continuing to assert busy to the caller.
 	...
     }
 
-C<bgisready> is the logical complement of C<bgbusy> which is retained
+C<bgisready()> is the logical complement of C<bgbusy()> which is retained
 for backward compatibility.
 
 
@@ -412,7 +361,7 @@ for backward compatibility.
     $resolver->debug(1);
 
 Get or set the debug flag.
-If set, calls to C<search>, C<query>, and C<send> will print
+If set, calls to C<search()>, C<query()>, and C<send()> will print
 debugging information on the standard output.
 The default is false.
 
@@ -423,8 +372,8 @@ The default is false.
     $resolver->defnames(0);
 
 Get or set the defnames flag.
-If true, calls to C<query> will append the default domain to names
-that contain no dots.
+If true, calls to C<query()> will append the default domain to
+resolve names that are not fully qualified.
 The default is true.
 
 
@@ -434,7 +383,7 @@ The default is true.
     $resolver->dnsrch(0);
 
 Get or set the dnsrch flag.
-If true, calls to C<search> will apply the search list to resolve
+If true, calls to C<search()> will apply the search list to resolve
 names that are not fully qualified.
 The default is true.
 
@@ -450,7 +399,7 @@ If false, the query will be retried using TCP.
 The default is false.
 
 
-=head2 nameservers
+=head2 nameserver, nameservers
 
     @nameservers = $resolver->nameservers();
     $resolver->nameservers( '192.0.2.1', '192.0.2.2', '2001:DB8::3' );
@@ -558,7 +507,6 @@ The default is 0, meaning any port.
 
 Get or set the TCP timeout in seconds.
 The default is 120 seconds (2 minutes).
-A timeout of C<undef> means indefinite.
 
 
 =head2 udp_timeout
@@ -566,9 +514,8 @@ A timeout of C<undef> means indefinite.
     print 'UDP timeout: ', $resolver->udp_timeout, "\n";
     $resolver->udp_timeout(10);
 
-Get or set the UDP timeout in seconds.
-The default is C<undef>, which means that the retry and retrans
-settings will be used to perform the retries until they exhausted.
+Get or set the bgsend() UDP timeout in seconds.
+The default is 30 seconds.
 
 
 =head2 udppacketsize
@@ -576,9 +523,10 @@ settings will be used to perform the retries until they exhausted.
     print "udppacketsize: ", $resolver->udppacketsize, "\n";
     $resolver->udppacketsize(2048);
 
-udppacketsize will set or get the packet size. If set to a value
-greater than the default DNS packet size, an EDNS extension will be
-added indicating support for UDP fragment reassembly.
+Get or set the UDP packet size.
+If set to a value greater than the default DNS packet size,
+an EDNS extension will be added indicating support for
+large UDP datagram.
 
 
 =head2 usevc
@@ -613,7 +561,7 @@ response to a query.
     print 'query status: ', $resolver->errorstring, "\n";
 
 Returns a string containing error information from the most recent method call.
-errorstring() is meaningful only when interrogated immediately after an error.
+C<errorstring()> is meaningful only when interrogated immediately after an error.
 
 
 =head2 dnssec
@@ -626,9 +574,9 @@ and to add a EDNS0 record as required by RFC2671 and RFC3225.
 The actions of, and response from, the remote nameserver is
 determined by the settings of the AD and CD flags.
 
-Calling the dnssec() method with a non-zero value will also set the
+Calling the C<dnssec()> method with a non-zero value will also set the
 UDP packet size to the default value of 2048. If that is too small or
-too big for your environment, you should call the udppacketsize()
+too big for your environment, you should call the C<udppacketsize()>
 method immediately after.
 
    $resolver->dnssec(1);		# DNSSEC using default packetsize
@@ -647,7 +595,7 @@ but the L<Net::DNS::SEC> library has not been installed.
 Gets or sets the AD bit for dnssec queries.  This bit indicates that
 the caller is interested in the returned AD (authentic data) bit but
 does not require any dnssec RRs to be included in the response.
-The default value is 0.
+The default value is false.
 
 
 =head2 cdflag
@@ -660,7 +608,7 @@ Gets or sets the CD bit for dnssec queries.  This bit indicates that
 authentication by upstream nameservers should be suppressed.
 Any dnssec RRs required to execute the authentication procedure
 should be included in the response.
-The default value is 0.
+The default value is false.
 
 
 =head2 tsig
@@ -750,12 +698,12 @@ The Net::DNS::Resolver library will enable IPv6 transport if the
 appropriate library (L<IO::Socket::IP> or L<IO::Socket::INET6>) is
 available and the destination nameserver has an IPv6 address.
 
-The force_v4(), force_v6(), prefer_v4 and prefer_v6() methods with a
-non-zero argument may be used to configure transport selection.
+The C<force_v4()>, C<force_v6()>, C<prefer_v4()>, and C<prefer_v6()> methods
+with non-zero argument may be used to configure transport selection.
 
-The behaviour of the nameserver() method illustrates the transport
+The behaviour of the C<nameserver()> method illustrates the transport
 selection mechanism.  If, for example, IPv6 is not available or IPv4
-transport has been forced, the nameserver() method will only return
+transport has been forced, the C<nameserver()> method will only return
 IPv4 addresses:
 
     $resolver->nameservers( '192.0.2.1', '192.0.2.2', '2001:DB8::3' );

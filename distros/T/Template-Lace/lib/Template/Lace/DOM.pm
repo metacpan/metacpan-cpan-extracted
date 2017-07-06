@@ -30,11 +30,13 @@ sub overlay {
   $self->replace($overlay_dom);
 }
 
-sub wrap_at_content {
-  my ($self, $new) = @_;
+sub wrap_with {
+  my ($self, $new, $target) = @_;
+  $target ||= '#content';
   $self->overlay(sub {
-    $new->at('#content')
-      ->replace($self);
+    $new->at($target)
+      ->content($self);
+    return $new;
   });
 }
 
@@ -49,23 +51,49 @@ sub repeat {
   } @items;
 
   # Might be a faster way to do this...
-  $self->parent->append_content($_) for @nodes;
-  $self->remove;
+  $self->replace(join '', @nodes);
   return $self;
 }
 
 sub smart_content {
   my ($self, $data) = @_;
   if($self->tag eq 'input') {
-    $self->attr(value=>$data);
-  } else {
+    if((ref($data)||'') eq 'HASH') {
+      if(exists($data->{selected})) {
+        $data->{selected} = 'on';
+      }
+      $self->attr($data);
+    } else {
+      if(($self->attr('type')||'') eq 'checkbox') {
+        $self->boolean_attribute_helper('checked', $data);
+      } else {
+        $self->attr(value=>$data);
+      }
+    }
+  } elsif($self->tag eq 'option') {
+    if((ref($data)||'') eq 'HASH') {
+      $self->attr(value=>$data->{value});
+      $self->attr(selected=>'on') if $data->{selected};
+      $self->content(escape_html($data->{content}));
+    } else {
+      $self->attr(value=>$data);
+      $self->content(escape_html($data));
+    }
+  } elsif($self->tag eq 'optgroup') {
+    $self->attr(label=>escape_html($data->{label}));
+    if(my $option_dom = $self->at('option')) {
+      $option_dom->fill($data->{options});
+    } else {
+      warn "optgroup with no options."
+    }
+  }else {
     $self->content(escape_html($data));
   }
   return $self;
 }
 
 sub fill {
-  my ($self, $data, $is_loop) = @_;
+  my ($self, $data, $is_loop, $is_form) = @_;
   if(ref \$data eq 'SCALAR') {
     $self->smart_content($data);
   } elsif(ref $data eq 'CODE') {
@@ -78,7 +106,15 @@ sub fill {
       )
     {
       $self->at('li')
-        ->fill($data, $is_loop);
+        ->fill($data, $is_loop, $is_form);
+    } elsif(($self->tag||'') eq 'select') {
+      if(my $optgroup = $self->at('optgroup')) {
+        $optgroup->fill($data, $is_loop, $is_form);
+      } elsif(my $option = $self->at('option')) {
+        $option->fill($data, $is_loop, $is_form);
+      } else {
+        warn "Found 'select' without option or optgroup";
+      }   
     } else {
       $self->repeat(sub {
         my ($dom, $datum, $index) = @_;
@@ -86,15 +122,58 @@ sub fill {
       }, @$data);
     }
   } elsif(ref $data eq 'HASH') {
-    foreach my $match (keys %{$data}) {
-      if(!$is_loop) {
-        my $dom = $self->at("#$match");
-        $dom->fill($data->{$match}, $is_loop) if $dom;
+    if(
+      (($self->tag||'') eq 'option')
+        and exists($data->{content})
+        and exists($data->{value})
+    ) {
+      $self->smart_content($data);
+    } elsif(
+        (($self->tag||'') eq 'optgroup')
+        and exists($data->{options})
+        and exists($data->{label})
+    ) {
+      $self->smart_content($data);
+    } elsif(
+        (($self->tag||'') eq 'input')
+        and exists($data->{value})
+    ) {
+      $self->smart_content($data);
+    } else {
+      foreach my $match (keys %{$data}) {
+        if(!$is_loop) {
+          my $dom;
+          if($dom = $self->at("#$match")) {
+            $is_form = 1 if $dom->tag eq 'form';
+            $dom->fill($data->{$match}, $is_loop, $is_form);
+            next;
+          } elsif($dom = $self->at("*[data-lace-id='$match']")) {
+            $is_form = 1 if $dom->tag eq 'form';
+            $dom->fill($data->{$match}, $is_loop, $is_form);
+            next;
+          }
+        }
+        $self->find(".$match")->each(sub {
+            my ($dom, $count) = @_;
+            $is_form = 1 if $dom->tag eq 'form';
+            $dom->fill($data->{$match}, $is_loop, $is_form);
+        });
+        if($is_form) {
+          # Sorry, I'll come up with less suck when I can.
+          $self->find("input[name='$match']")->each(sub {
+              my ($dom, $count) = @_;
+              $dom->fill($data->{$match}, $is_loop, $is_form);
+          });
+          $self->find("select[name='$match']")->each(sub {
+              my ($dom, $count) = @_;
+              $dom->fill($data->{$match}, $is_loop, $is_form);
+          });
+          $self->find("textarea[name='$match']")->each(sub {
+              my ($dom, $count) = @_;
+              $dom->fill($data->{$match}, $is_loop, $is_form);
+          });
+        }
       }
-      $self->find(".$match")->each(sub {
-          my ($dom, $count) = @_;
-          $dom->fill($data->{$match}, $is_loop);
-      });
     }
   } elsif(Scalar::Util::blessed $data) {
     my @fields = $data->meta->get_attribute_list;
@@ -111,6 +190,26 @@ sub fill {
   } else {
     die "method 'fill' does not recognize these arguments.";
   }
+}
+
+sub append_js_src_uniquely {
+  my ($self, $src, $attrs) = @_;
+  unless($self->at("script[src='$src']")) {
+    my $extra_attrs = join ' ', map { "$_='$attrs->{$_}'"  } keys %{$attrs||+{}};
+    $self->at('head')
+     ->append_content("<script type='text/javascript' src='$src' $extra_attrs></script>");
+  }
+  return $self;
+}
+
+sub append_css_href_uniquely {
+  my ($self, $href, $attrs) = @_;
+  unless($self->at("link[href='$href']")) {
+    my $extra_attrs = join ' ', map { "$_='$attrs->{$_}'"  } keys %{$attrs||+{}};
+    $self->at('head')
+     ->append_content("<link rel='stylesheet' href='$href' $extra_attrs />");
+  }
+  return $self;
 }
 
 sub append_style_uniquely {
@@ -185,7 +284,7 @@ sub _do_attr {
     || ($attr eq 'selected')
     || ($attr eq 'hidden')
   ) {
-    $self->attr($attr=>'on');
+    $self->attr($attr=>'on') if $val;
   } else {
     $self->attr($attr=>$val);
   }
@@ -202,8 +301,11 @@ sub _do {
       $self->_do_attr($maybe_attr => $action);
     }
   } elsif(!ref $action) {
-    my $escaped = escape_html $action;
-    $self->content($escaped);
+    if(defined $action) {
+      $self->smart_content($action);
+    } else {
+      $self->remove;
+    }
   } else {
     $self->fill($action);
   }
@@ -246,11 +348,20 @@ sub headers { shift->attribute_helper('headers', @_) }
 sub size { shift->attribute_helper('size', @_) }
 sub value { shift->attribute_helper('value', @_) }
 
+sub multiple {
+  my $self = shift;
+  $self->attr(multiple=>'multiple');
+  return $self;
+}
+
 sub class {
   my ($self, @proto) = @_;
   if(ref($proto[0]) eq 'HASH') {
     my $classes = join ' ', grep { $proto[0]->{$_} } keys %{$proto[0]};
     return $self->attribute_helper('class', $classes);
+  } elsif(ref($proto[0]) eq 'ARRAY') {
+    my $classes = join ' ', @{$proto[0]};
+    return $self->attribute_helper('class', $classes);    
   } else {
     return $self->attribute_helper('class',@proto);
   }
@@ -304,6 +415,19 @@ sub form { shift->tag_helper_by_id('form', @_) }
 sub ul { shift->list_helper_by_id('ul', @_) }
 sub ol { shift->list_helper_by_id('ol', @_) }
 sub dl { shift->tag_helper_by_id('dl', @_) }
+
+sub select {
+  my ($self, $name, $proto) = @_;
+  my $tag = $name=~/^\.#/ ? "$name" : "select[name=$name]";
+  return $self->unique_tag_helper($tag, $proto);
+}
+
+sub radio {
+  my ($self, $name, $proto) = @_;
+  my $tag = $name=~/^\.#/ ? "$name" : "input[type='radio'][name=$name]";
+  return $self->unique_tag_helper($tag, $proto);
+
+}
 
 sub at_id {
   my ($self, $id, $data) = @_;
@@ -412,6 +536,48 @@ Returns example:
 
 Useful to encapsulate a lot of the work when you want to apply a standard
 layout to a web page or section there of.
+
+=wrap_with 
+
+Makes it easier to wrap a current DOM with a 'layout' DOM.  Layout DOM
+replaces original.  Example
+
+    my $master = Template::Lace::DOM->new(qq[
+      <html>
+        <head>
+          <title></title>
+        </head>
+        <body id="content">
+        </body>
+      </html>
+    ]);
+
+    my $inner = Template::Lace::DOM->new(qq[
+      <h1>Hi</h1>
+      <p>This is a test of the emergency broadcasting networl</p>
+    ]);
+
+    $inner->wrap_with($master)
+      ->title('Wrapped');
+
+    print $inner;
+
+Returns:
+
+    <html>
+      <head>
+        <title>Wrapped</title>
+      </head>
+      <body id="content">
+        <h1>Hi</h1>
+        <p>This is a test of the emergency broadcasting networl</p>
+      </body>
+    </html>
+
+By default we match the wrapping DOM ($master in the given example) at the '#content' id
+for the template.  You can specify an alternative match point by passing it as a second
+argument to C<wrap_with>.
+
 
 =repeat
 
@@ -534,9 +700,65 @@ Produces:
       </dl>
     </section>
 
+In addition we also match and fill form elements based on the C<name>
+attribute, even automatically unrolling arrayrefs of hashrefs correctly
+for C<select> and C<input[type='radio']>.  HOWEVER you must first match
+a form element (by id or class), for example:
+
+    my $dom = Template::Lace::DOM->new(q[
+      <section>
+        <form id='login'>
+          <input type='text' name='user' />
+          <input type='checkbox' name='toggle'/>
+          <input type='radio' name='choose' />
+          <select name='cars'>
+            <option value='value1'>Value</option>
+          </select>
+        </form>
+      </section>]);
+
+    $dom->at('html')
+      ->fill(+{
+        login => +{
+          user => 'Hi User',
+          toggle => 'on',
+          choose => [
+            +{id=>'id1', value=>1},
+            +{id=>'id2', value=>2, selected=>1},
+          ],
+          cars => [
+            +{ value=>'honda', content=>'Honda' },
+            +{ value=>'ford', content=>'Ford', selected=>1 },
+            +{ value=>'gm', content=>'General Motors' },
+          ],
+        },
+      });
+
+    print $dom;
+
+Would return:
+
+    <section>
+      <form id="login">
+        <input name="user" type="text" value="Hi User">
+        <input name="toggle" type="checkbox" value="on">
+        <input id="id1" name="choose" type="radio" value="1">
+        <input id="id2" name="choose" selected="on" type="radio" value="2"> 
+        <select name="cars">
+          <option value="honda">Honda</option>
+          <option selected="on" value="ford">Ford</option>
+          <option value="gm">General Motors</option>
+        </select>
+      </form>
+    </section>
+
+This is done because lookup by C<name> globally would impact performance 
+and return too many false positives.
+
 In general C<fill> will try to do the right thing, even coping with
-list tags such as C<ol> and <ul> correctly.  You maye find it more
-magical than you like.  Also using this introduces a required structural
+list tags such as C<ol>, C<ul> and input type tags (including C<select> and
+Radio input tags) correctly.  You maye find it more magical than you like.
+Also using this introduces a required structural
 binding between you Model class and the ids and classes of tags in your
 templates.  You might find this a great convention or fragile binding
 depending on your outlook.
@@ -549,7 +771,7 @@ You might want to see L</LIST HELPERS> as well.
 
 =head2 append_link_uniquely
 
-Appends a style, script or link to the header 'uniquely' (that is we
+Appends a style, script or link tag to the header 'uniquely' (that is we
 don't append it if its already there).  The means used to determine
 uniqueness is first to check for an exising id attribute, and then
 in the case of scripts we look at the src tag, or the href tag for
@@ -561,6 +783,45 @@ future we may add some type of md5 checksum on content when that exists.
 Useful when you have a lot of components that need supporting scripts
 or styles and you want to make sure you only add the required supporting
 code once.
+
+Examples:
+
+    $dom->append_style_uniquely(qq[
+       <style id='four'>
+         body h4 { border: 1px }
+        </style>]);
+
+B<NOTE> This should be the entire tag element.
+
+=head2 append_css_href_uniquely
+
+=head2 append_js_src_uniquely
+
+Similar to the previous group of helpers L</append_link_uniquely>, etc. but
+instead of taking the entire tag this just wants a URI which is either the
+src attribute for a C<script> tag, or the href attribute of a C<link> tag.
+Useful for quickly adding common assets to your pages.  URIs are added uniquely
+so you don't have to worry about checking for the presence it first.
+
+    $dom->append_js_src_uniquely('/js/common1.js')
+      ->append_js_src_uniquely('/js/common2.js')
+      ->append_js_src_uniquely('/js/common2.js')
+
+Would render similar to:
+
+    <html>
+      <head>
+        <title>Wrapped</title>
+        <script src="/js/common1.js" type="text/javascript"></script>
+        <script src="/js/common2.js" type="text/javascript"></script>
+      </head>
+      <body id="content">
+        <h1>Hi</h1>
+        <p>This is a test of the emergency broadcasting networl</p>
+      </body>
+    </html>
+
+We append these to the last node inside the C<head> element content.
 
 =head2 do
 
@@ -699,6 +960,8 @@ Example
 
 =head2 hidden
 
+=head2 multiple
+
 These attribute helpers have a special feature, since its basically a boolean attribute
 will check the passed value for its truth state, setting the attribute value to 'on'
 when true, but NOT setting the attribute at all if its false.
@@ -718,6 +981,8 @@ values are true will be added.  For example:
 Returns:
 
     <html><div class="completed">aaa</div></html>
+
+If you instead use an arrayref, all the classes are just added.
 
 Useful to reduce some boilerplate.
 
@@ -951,6 +1216,101 @@ Returns:
         <dd id="age">32</dd>
       </dl>
     </section>
+
+=head2 select
+
+The C<select> tag for the purposes of filling its C<options> is
+treated as a type of list tag.
+
+    my $dom = Template::Lace::DOM->new(q[
+      <form>
+        <select name='cars'>
+          <option>Example</options>
+        </select>
+      </form>]);
+
+    $dom->select('cars', [
+      +{ value=>'honda', content=>'Honda' },
+      +{ value=>'ford', content=>'Ford', selected=>1 },
+      +{ value=>'gm', content=>'General Motors' },
+    ]);
+
+    print $dom;
+
+Returns:
+
+    <select name="cars">
+      <option value="honda">Honda</option>
+      <option selected="on" value="ford">Ford</option>
+      <option value="gm">General Motors</option>
+    </select>
+
+Please note that match 'id' is on the C<name> attribute of the C<select>
+tag, not of the C<id> attribute as it is on other list helper types.
+
+You can also populate option groups as in the following:
+
+    my $dom = Template::Lace::DOM->new(q[
+      <select name='jobs'>
+        <optgroup label='Example'>
+          <option>Example</option>
+        </optgroup>
+      </select>]);
+
+    $dom->select('jobs', [
+      +{
+        label=>'Easy',
+        options => [
+          +{ value=>'slacker', content=>'Slacker' },
+          +{ value=>'couch_potato', content=>'Couch Potato' },
+        ],
+      },
+      +{
+        label=>'Hard',
+        options => [
+          +{ value=>'digger', content=>'Digger' },
+          +{ value=>'brain', content=>'Brain Surgeon' },
+        ],
+      },
+    ]);
+
+    print $dom;
+
+Would return:
+
+    <select name="jobs">    
+      <optgroup label="Easy">
+        <option value="slacker">Slacker</option>
+        <option value="couch_potato">Couch Potato</option>
+      </optgroup>
+      <optgroup label="Hard">
+        <option value="digger">Digger</option>
+        <option value="brain">Brain Surgeon</option>
+      </optgroup>
+    </select>
+
+=head1 radio
+
+List helper for a radio input type.  Example
+
+    my $dom = Template::Lace::DOM->new("
+      <form>
+        <input type='radio' name='choose' />
+      </form>");
+
+    $dom->radio('choose',[
+      +{id=>'id1', value=>1},
+      +{id=>'id2', value=>2, selected=>1},
+      ]);
+
+    print $dom;
+
+Returns;
+
+    <form>
+      <input id="id1" name="choose" type="radio" value="1">
+      <input id="id2" name="choose" type="radio" value="2" selected="on">
+    </form>
 
 =head1 GENERAL TAG HELPERS
 

@@ -23,7 +23,7 @@ requires:
   HTTP::Request::Common: '0'
   LWP::UserAgent: '0'
   List::MoreUtils: '0'
-  Log::Any: '0'
+  Log::ger: '0.011'
   Perinci::Object: '0.26'
   Regexp::Wildcards: '0'
   String::Wildcard::Bash: '0.03'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=WWW-PAUSE-Simple
   homepage: https://metacpan.org/release/WWW-PAUSE-Simple
   repository: git://github.com/perlancar/perl-WWW-PAUSE-Simple.git
-version: '0.38'
+version: '0.43'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -301,7 +301,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.23'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -363,10 +363,6 @@ x_Dist_Zilla:
           type: x_spec
       name: DevelopX_spec
       version: '6.008'
-    -
-      class: Dist::Zilla::Plugin::Acme::CPANLists::Whitelist
-      name: Acme::CPANLists::Whitelist
-      version: '0.02'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

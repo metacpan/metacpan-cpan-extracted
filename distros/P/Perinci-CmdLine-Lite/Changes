@@ -1,3 +1,42 @@
+1.75     2017-06-28 (PERLANCAR)
+
+         - No functional changes since last dev release.
+
+
+1.74_004 2017-06-21 (PERLANCAR)
+
+        - Remove Log::Any support. To show logs from Log::Any, install
+          Log::Any::Adapter::LogGer and run CLI scripts with
+          PERL5OPT=-MLog::Any::Adapter=LogGer.
+
+
+1.74_003 2017-06-19 (PERLANCAR)
+
+        - Really replace Log::Any with Log::ger, previous couple of commits were
+          screwed up.
+
+
+1.74_002 2017-06-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - Forgot to update the summaries for --log-level, --debug, et al about
+          not having to use LOG=1 etc crap.
+
+        - UPDATE: this release was broken.
+
+
+1.74_001 2017-06-19 (PERLANCAR)
+
+	- [Experimental] Switch from Log::Any to Log::ger. Log::ger provides
+          smaller startup overhead and will allow us to change levels during
+          program run. The effect of this switch is that logs produced by
+          modules that use Log::Any won't show by default; to show Log::Any logs
+          run your CLI scripts with LOG_ANY=1.
+
+        - UPDATE: this release was broken.
+
+
 1.74    2017-06-17 (PERLANCAR)
 
 	- [Bugfix] Don't check deps when in completion/dump mode.

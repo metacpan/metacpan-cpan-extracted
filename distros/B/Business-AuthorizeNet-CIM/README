@@ -13,9 +13,15 @@ SYNOPSIS
 
 DESCRIPTION
 
-    Authorize.Net Customer Information Manager (CIM) Web Services API for
-    http://developer.authorize.net/api/cim/, read
-    http://www.authorize.net/support/CIM_XML_guide.pdf for more details.
+    Authorize.Net Customer Information Manager (CIM) Web Services API
+    features are described at
+    http://developer.authorize.net/api/reference/features/customer_profiles.html,
+    the API reference is at
+    http://developer.authorize.net/api/reference/#customer-profiles.
+    Another useful (but deprecated) reference is
+    http://www.authorize.net/support/CIM_XML_guide.pdf, and the reference
+    XML schema is at
+    https://api.authorize.net/xml/v1/schema/AnetApiSchema.xsd.
 
  METHODS
 
@@ -446,5 +452,95 @@ DESCRIPTION
             customerShippingAddressId => $customerShippingAddressId,
     
             cardCode => $cardCode, # Optional
+        );
+
+ Transaction Reporting
+
+    Authorize.Net has a section of the CIM API for reporting on
+    transactions. This section of the API must be enabled for the merchant
+    in the portal.
+
+      http://developer.authorize.net/api/reference/features/transaction_reporting.html
+      https://developer.authorize.net/api/reference/index.html#transaction-reporting
+
+  Paging and Sorting Options
+
+    API methods that return lists are paged, and the default page size is
+    the maximum (1000 records). However, sorting and paging options can be
+    provided, as described in Authorize.Net's api documentation. Sorting
+    and paging can be independently provided, but each requires that both
+    its key-value pairs be specified.
+
+      sorting => { orderBy => 'id', orderDescending => 'false' },
+      paging  => { limit => 100, offset => 1 },
+
+    N.B. offsets begin at 1.
+
+  getMerchantDetailsRequest
+
+    returns details about the merchant (payment methods, currencies, et
+    al).
+
+      https://developer.authorize.net/api/reference/index.html#transaction-reporting-get-merchant-details
+    
+        my $resp = $cim->getMerchantDetailsRequest;
+
+  getTransactionDetailsRequest
+
+    Return details about a specific transaction: status, payment method,
+    auth and settled amounts, settle date, profile ids, et al. transId is
+    required.
+
+      https://developer.authorize.net/api/reference/index.html#transaction-reporting-get-transaction-details
+    
+        my $resp = $cim->getTransactionDetailsRequest(
+            transId => $transId,
+            refId   => $refId,    # Optional
+        );
+
+  getTransactionListForCustomerRequest
+
+    Get transactions for a specific customer profile or customer payment
+    profile. customerProfileId is required. If the payment profile id is
+    omitted, transactions for all payment profiles belonging to that
+    customer are returned. Paging and sorting options can be specified.
+
+        my $resp = $cim->getTransactionListForCustomerRequest(
+            customerProfileId        => $customerProfileId,
+            customerPaymentProfileId => $customerPaymentProfileId,  # Optional
+    
+            refId   => $refId,    # Optional
+        );
+
+  getUnsettledTransactionListRequest
+
+    Get data for unsettled transactions. No parameters are required. Paging
+    and sorting options can be specified.
+
+        my $resp = $cim->getUnsettledTransactionListRequest(
+            refId   => $refId,    # Optional
+        );
+
+  getSettledBatchListRequest
+
+    returns Batch ID, Settlement Time, & Settlement State for all settled
+    batches with a range of dates. If you specify includeStatistics, you
+    also receive batch statistics by payment type and batch totals. All
+    inputs are optional.
+
+        my $resp = $cim->getSettledBatchListRequest(
+            includeStatistics => 'true',                   # Optional
+            firstSettlementDate => '2010-09-21T16:00:00',  # Optional
+            lastSettlementDate  => '2010-10-01T00:00:00',  # Optional
+        );
+
+  getTransactionListRequest
+
+    Returns data for transactions in a specified batch. batchId is required
+    input. Paging and sorting options can be specified.
+
+        my $resp = $cim->getTransactionListRequest(
+            batchId => $batchId,
+            refId   => $refId,    # Optional
         );
 

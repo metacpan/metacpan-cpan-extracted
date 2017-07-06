@@ -1,7 +1,7 @@
 package LWP::UserAgent::Patch::LogRequestContent;
 
-our $DATE = '2016-10-07'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-06-26'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,8 +13,8 @@ use base qw(Module::Patch);
 our %config;
 
 my $p_simple_request = sub {
-    require Log::Any::IfLOG;
-    my $log = Log::Any::IfLOG->get_logger;
+    require Log::ger;
+    my $log = Log::ger->get_logger;
 
     my $ctx  = shift;
     my $orig = $ctx->{orig};
@@ -24,14 +24,16 @@ my $p_simple_request = sub {
 
     if ($log->is_trace && $request && ref($request) && $request->can('method')) {
 
-        # there is no equivalent of caller_depth in Log::Any, so we do this only
-        # for Log4perl
-        local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1
-            if $Log::{"Log4perl::"};
+        # XXX use equivalent for Log::ger
+
+        # # there is no equivalent of caller_depth in Log::Any, so we do this only
+        # # for Log4perl
+        # local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1
+        #     if $Log::{"Log4perl::"};
 
         my $content = $request->content;
-        $log->tracef("HTTP request body (len=%d):\n%s\n\n",
-                     length($content), $content);
+        $log->trace("HTTP request body (len=%d):\n%s\n\n",
+                    length($content), $content);
 
     }
 
@@ -67,7 +69,7 @@ LWP::UserAgent::Patch::LogRequestContent - Log HTTP request content (body)
 
 =head1 VERSION
 
-This document describes version 0.03 of LWP::UserAgent::Patch::LogRequestContent (from Perl distribution LWP-UserAgent-Patch-LogRequestContent), released on 2016-10-07.
+This document describes version 0.04 of LWP::UserAgent::Patch::LogRequestContent (from Perl distribution LWP-UserAgent-Patch-LogRequestContent), released on 2017-06-26.
 
 =head1 SYNOPSIS
 
@@ -77,7 +79,7 @@ This document describes version 0.03 of LWP::UserAgent::Patch::LogRequestContent
 
 Sample script and output:
 
- % TRACE=1 perl -MLog::Any::App
+ % TRACE=1 perl -MLog::ger::Output=Screen
    -MNet::HTTP::Methods::Patch::LogRequest \
    -MLWP::UserAgent::Patch::LogRequestContent \
    -MLWP::UserAgent \
@@ -96,13 +98,13 @@ Sample script and output:
  Content-Length: 7
  Content-Type: application/x-www-form-urlencoded
 
-Or you can also use via L<Log::Any::For::LWP>.
+Or you can also use via L<Log::ger::For::LWP>.
 
 =head1 DESCRIPTION
 
 This module patches LWP::UserAgent (which is used by LWP::Simple,
 WWW::Mechanize, among others) so that HTTP request contents are logged using
-L<Log::Any>.
+L<Log::ger>.
 
 =for Pod::Coverage ^(patch_data)$
 
@@ -140,7 +142,7 @@ being sent to servers.
 
 Use L<LWP::UserAgent::Patch::LogResponse> to log HTTP responses.
 
-L<Log::Any::For::LWP> bundles all three mentioned patches in a single convenient
+L<Log::ger::For::LWP> bundles all three mentioned patches in a single convenient
 package.
 
 =head1 AUTHOR
@@ -149,7 +151,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

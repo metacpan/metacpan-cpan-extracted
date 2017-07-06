@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.31';
+$Map::Tube::VERSION   = '3.32';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Core library as Role (Moo) to process map data.
 
 =head1 VERSION
 
-Version 3.31
+Version 3.32
 
 =cut
 
@@ -84,6 +84,7 @@ documented in L<Map::Tube::Cookbook>.
 =cut
 
 has [qw(name name_to_id plugins _active_link _other_links _line_stations _common_lines)] => (is => 'rw');
+has experimental => (is => 'ro', default => sub { 0 });
 has nodes  => (is => 'rw', isa => NodeMap);
 has lines  => (is => 'rw', isa => Lines  );
 has tables => (is => 'rw', isa => Tables );
@@ -838,7 +839,7 @@ sub _get_next_link {
     my $active_links = $self->{_active_links};
     my @common_lines = common_lines($active_links->[0], $active_links->[1]);
 
-    if (scalar(@{$self->{_common_lines}})) {
+    if ($self->{experimental} && scalar(@{$self->{_common_lines}})) {
         @common_lines = (@{$self->{_common_lines}}, @common_lines);
     }
 

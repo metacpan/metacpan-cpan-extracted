@@ -6,7 +6,7 @@ use Cwd 'abs_path';
 use Exporter 'import';
 use Panda::Install::Payload;
 
-our $VERSION = '1.2.7';
+our $VERSION = '1.2.8';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args/;
 our @EXPORT;
@@ -608,7 +608,11 @@ sub _module_info_write {
             chmod $mode, $file;
         }
     }
-    open my $fh, '>', $file or die "Cannot open $file for writing: $!";
+    open my $fh, '>', $file or do {
+        warn "Cannot open $file for writing: $!, \033[1;31mbinary deps info won't be synced!\033[0m\n";
+        sleep 2;
+        return;
+    };
     print $fh $content;
     close $fh;
     

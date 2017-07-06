@@ -1,6 +1,6 @@
 package Template::Lace;
 
-our $VERSION = '0.005';
+our $VERSION = '0.007';
 
 1;
 

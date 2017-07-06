@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 35;
+use Test::More tests => 34;
 
 use Struct::Path qw(spath);
 
@@ -248,16 +248,3 @@ is_deeply(
 
 # original structure must remain unchanged
 ok($frozen_s eq freeze($s_mixed));
-
-### set tests ###
-@r = spath($s_mixed, [ {keys => ['c']} ]);
-${$r[0]} = "vc_replaced";
-is_deeply(
-    $s_mixed,
-    {
-        a => [{a2a => {a2aa => 0},a2b => {a2ba => undef},a2c => {a2ca => []}},['a0','a1']],
-        b => {ba => 'vba',bb => 'vbb'},
-        c => 'vc_replaced'
-    },
-    "replace {c}"
-);

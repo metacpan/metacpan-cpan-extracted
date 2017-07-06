@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,51 +17,76 @@ name: Text-NumericData
 provides:
   Text::NumericData:
     file: lib/Text/NumericData.pm
-    version: '2.002000'
+    version: '2.003002'
   Text::NumericData::App:
     file: lib/Text/NumericData/App.pm
+    version: '1'
   Text::NumericData::App::txdbaseline:
     file: lib/Text/NumericData/App/txdbaseline.pm
+    version: '1'
   Text::NumericData::App::txdcalc:
     file: lib/Text/NumericData/App/txdcalc.pm
+    version: '1'
   Text::NumericData::App::txdcolumns:
     file: lib/Text/NumericData/App/txdcolumns.pm
+    version: '1'
   Text::NumericData::App::txdconstruct:
     file: lib/Text/NumericData/App/txdconstruct.pm
+    version: '1'
   Text::NumericData::App::txdcontract:
     file: lib/Text/NumericData/App/txdcontract.pm
+    version: '1'
   Text::NumericData::App::txdderiv:
     file: lib/Text/NumericData/App/txdderiv.pm
+    version: '1'
   Text::NumericData::App::txdextrema:
     file: lib/Text/NumericData/App/txdextrema.pm
+    version: '1'
   Text::NumericData::App::txdfilter:
     file: lib/Text/NumericData/App/txdfilter.pm
+    version: '1'
   Text::NumericData::App::txdfromafors:
     file: lib/Text/NumericData/App/txdfromafors.pm
+    version: '1'
   Text::NumericData::App::txdfromtcad:
     file: lib/Text/NumericData/App/txdfromtcad.pm
+    version: '1'
   Text::NumericData::App::txdhistogram:
     file: lib/Text/NumericData/App/txdhistogram.pm
+    version: '1'
   Text::NumericData::App::txdmean:
     file: lib/Text/NumericData/App/txdmean.pm
+    version: '1'
   Text::NumericData::App::txdnorm:
     file: lib/Text/NumericData/App/txdnorm.pm
+    version: '1'
+  Text::NumericData::App::txdodeint:
+    file: lib/Text/NumericData/App/txdodeint.pm
+    version: '1'
   Text::NumericData::App::txdrecycle:
     file: lib/Text/NumericData/App/txdrecycle.pm
+    version: '1'
   Text::NumericData::App::txdrows:
     file: lib/Text/NumericData/App/txdrows.pm
+    version: '1'
   Text::NumericData::App::txdsort:
     file: lib/Text/NumericData/App/txdsort.pm
+    version: '1'
   Text::NumericData::App::txdstatistics:
     file: lib/Text/NumericData/App/txdstatistics.pm
+    version: '1'
   Text::NumericData::Calc:
     file: lib/Text/NumericData/Calc.pm
+    version: '1'
   Text::NumericData::File:
     file: lib/Text/NumericData/File.pm
+    version: '1'
   Text::NumericData::FileCalc:
     file: lib/Text/NumericData/FileCalc.pm
+    version: '1'
   Text::NumericData::Stat:
     file: lib/Text/NumericData/Stat.pm
+    version: '1'
 requires:
   Config::Param: '3'
   Math::Spline: '0'
@@ -70,4 +95,5 @@ requires:
   perl: '5.006'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.002000'
+version: '2.003002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

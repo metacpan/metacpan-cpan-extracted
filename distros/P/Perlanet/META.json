@@ -4,7 +4,7 @@
       "Dave Cross <dave@mag-sol.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4222",
    "keywords" : [
       "aggregate",
       "aggregator",
@@ -65,47 +65,37 @@
    "provides" : {
       "Perlanet" : {
          "file" : "lib/Perlanet.pm",
-         "version" : "0.58"
+         "version" : "v1.1.0"
       },
       "Perlanet::Entry" : {
-         "file" : "lib/Perlanet/Entry.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Entry.pm"
       },
       "Perlanet::Feed" : {
-         "file" : "lib/Perlanet/Feed.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Feed.pm"
       },
       "Perlanet::Simple" : {
-         "file" : "lib/Perlanet/Simple.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Simple.pm"
       },
       "Perlanet::Trait::Cache" : {
-         "file" : "lib/Perlanet/Trait/Cache.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Trait/Cache.pm"
       },
       "Perlanet::Trait::FeedFile" : {
-         "file" : "lib/Perlanet/Trait/FeedFile.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Trait/FeedFile.pm"
       },
       "Perlanet::Trait::OPML" : {
-         "file" : "lib/Perlanet/Trait/OPML.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Trait/OPML.pm"
       },
       "Perlanet::Trait::Scrubber" : {
-         "file" : "lib/Perlanet/Trait/Scrubber.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Trait/Scrubber.pm"
       },
       "Perlanet::Trait::TemplateToolkit" : {
-         "file" : "lib/Perlanet/Trait/TemplateToolkit.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Trait/TemplateToolkit.pm"
       },
       "Perlanet::Trait::Tidy" : {
-         "file" : "lib/Perlanet/Trait/Tidy.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Trait/Tidy.pm"
       },
       "Perlanet::Trait::YAMLConfig" : {
-         "file" : "lib/Perlanet/Trait/YAMLConfig.pm",
-         "version" : "0.58"
+         "file" : "lib/Perlanet/Trait/YAMLConfig.pm"
       }
    },
    "release_status" : "stable",
@@ -119,5 +109,6 @@
       },
       "x_MailingList" : "http://lists.mag-sol.com/mailman/listinfo/perlanet"
    },
-   "version" : "0.58"
+   "version" : "v1.1.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

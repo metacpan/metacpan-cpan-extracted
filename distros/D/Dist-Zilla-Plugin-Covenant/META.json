@@ -4,29 +4,25 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-Plugin-Covenant",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "version" : "0.9901"
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -37,25 +33,31 @@
             "Dist::Zilla::Role::Plugin" : "0",
             "Dist::Zilla::Role::TextTemplate" : "0",
             "Moose" : "0",
-            "strict" : "0",
+            "experimental" : "0",
+            "perl" : "v5.20.0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::DZil" : "0",
-            "Test::More" : "0.88",
-            "perl" : "5.006"
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "strict" : "0"
          }
       }
    },
    "provides" : {
       "Dist::Zilla::Plugin::Covenant" : {
          "file" : "lib/Dist/Zilla/Plugin/Covenant.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       }
    },
    "release_status" : "stable",
@@ -70,13 +72,14 @@
          "web" : "https://github.com/yanick/Dist-Zilla-Plugin-Covenant"
       }
    },
-   "version" : "0.1.1",
+   "version" : "0.1.2",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
    "x_contributors" : [
       "Apocalypse <APOCAL@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

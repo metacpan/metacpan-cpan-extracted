@@ -1,7 +1,7 @@
 package App::CPANMetaUtils;
 
-our $DATE = '2017-03-04'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2017-06-26'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to CPAN Meta
@@ -18,13 +18,21 @@ App::CPANMetaUtils - CLI utilities related to CPAN Meta
 
 =head1 VERSION
 
-This document describes version 0.008 of App::CPANMetaUtils (from Perl distribution App-CPANMetaUtils), released on 2017-03-04.
+This document describes version 0.009 of App::CPANMetaUtils (from Perl distribution App-CPANMetaUtils), released on 2017-06-26.
 
 =head1 DESCRIPTION
 
 This distribution contains CLI utilities related to CPAN Meta:
 
-# INSERT_EXECS_LIST
+=over
+
+=item * L<convert-cpan-meta>
+
+=item * L<gen-cpan-meta>
+
+=item * L<validate-cpan-meta>
+
+=back
 
 =head1 HOMEPAGE
 

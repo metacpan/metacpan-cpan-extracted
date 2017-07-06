@@ -21,9 +21,10 @@ requires:
   File::Slurp::Tiny: 0
   LWP: 6.08
   Log::Report: 1.05
+  Net::HTTP: 6.16
   Test::More: 0.54
   Time::HiRes: 0
-  XML::Compile: 1.51
+  XML::Compile: 1.58
   XML::Compile::Cache: 1.03
   XML::Compile::Tester: 0.90
-version: 3.21
+version: 3.22

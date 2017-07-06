@@ -1,4 +1,4 @@
-# Copyrights 2013-2017 by [Mark Overmeer].
+# Copyrights 2016-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -7,7 +7,7 @@ use strict;
 
 package String::Print;
 use vars '$VERSION';
-$VERSION = '0.90';
+$VERSION = '0.92';
 
 
 #use Log::Report::Optional 'log-report';
@@ -16,8 +16,20 @@ use Encode            qw/is_utf8 decode/;
 use Unicode::GCString ();
 use HTML::Entities    qw/encode_entities/;
 use Scalar::Util      qw/blessed reftype/;
+use POSIX             qw/strftime/;
+use Date::Parse       qw/str2time/;
 
-my @default_modifiers   = ( qr/%\S+/ => \&_format_printf );
+my @default_modifiers   =
+  ( qr/\%\S+/       => \&_modif_format
+  , qr/BYTES\b/     => \&_modif_bytes
+  , qr/YEAR\b/      => \&_modif_year
+  , qr/DT\([^)]*\)/ => \&_modif_dt
+  , qr/DT\b/        => \&_modif_dt
+  , qr/DATE\b/      => \&_modif_date
+  , qr/TIME\b/      => \&_modif_time
+  , qr!//(?:\"[^"]*\"|\'[^']*\'|\w+)! => \&_modif_undef
+  );
+
 my %default_serializers =
   ( UNDEF     => sub { 'undef' }
   , ''        => sub { $_[1]   }
@@ -30,8 +42,8 @@ my %default_serializers =
      sub { my $v = $_[1];
            join ', ', map "$_ => ".($v->{$_} // 'undef'), sort keys %$v;
          }
- # CODE value has different purpose
- );
+  # CODE value has different purpose
+  );
 
 my %predefined_encodings =
 (   HTML =>
@@ -42,6 +54,7 @@ my %predefined_encodings =
 
 
 sub new(@) { my $class = shift; (bless {}, $class)->init( {@_} ) }
+
 sub init($)
 {   my ($self, $args) = @_;
 
@@ -55,6 +68,7 @@ sub init($)
       = { %default_serializers, (ref $s eq 'ARRAY' ? @$s : %$s) };
 
     $self->encodeFor($args->{encode_for});
+	$self->{SP_missing} = $args->{missing_key} || \&_reportMissingKey;
     $self;
 }
 
@@ -120,10 +134,12 @@ sub encodeFor($)
 sub sprinti($@)
 {   my ($self, $format) = (shift, shift);
     my $args = @_==1 ? shift : {@_};
+    # $args may be a blessed HASH, for instance a Log::Report::Message
 
     $args->{_join} //= ', ';
+    local $args->{_format} = $format;
 
-    my @frags = split /\{([^}]*)\}/,
+    my @frags = split /\{([^}]*)\}/,   # enforce unicode
         is_utf8($format) ? $format : decode(latin1 => $format);
 
     my @parts;
@@ -165,9 +181,19 @@ sub _expand($$$)
 {   my ($self, $key, $modifier, $args) = @_;
 
     my $value;
-    if(index($key, '.') != -1)
+    if(index($key, '.')== -1)
+    {   # simple value
+        $value = exists $args->{$key} ? $args->{$key}
+          : $self->_missingKey($key, $args);
+        $value = $value->($self, $key, $args)
+            while ref $value eq 'CODE';
+    }
+    else
     {   my @parts = split /\./, $key;
-        $value    = $args->{shift @parts};
+		my $key   = shift @parts;
+        $value = exists $args->{$key} ? $args->{$key}
+          : $self->_missingKey($key, $args);
+
         $value = $value->($self, $key, $args)
             while ref $value eq 'CODE';
 
@@ -193,14 +219,9 @@ sub _expand($$$)
                while ref $value eq 'CODE';
         }
     }
-    else
-    {   $value = $args->{$key};
-        $value = $value->($self, $key, $args)
-            while ref $value eq 'CODE';
-    }
 
     my $mod;
- STACKED:
+  STACKED:
     while(length $modifier)
     {   my @modif = @{$self->{SP_modif}};
         while(@modif)
@@ -217,13 +238,35 @@ sub _expand($$$)
     $seri ? $seri->($self, $value, $args) : "$value";
 }
 
-# See dedicated section in explanation in DETAILS
-sub _format_printf($$$$)
-{   my ($self, $format, $value, $args) = @_;
+sub _missingKey($$)
+{   my ($self, $key, $args) = @_;
+	$self->{SP_missing}->($self, $key, $args);
+}
 
-    # be careful, often $format doesn't eat strings
-    defined $value
-        or return 'undef';
+sub _reportMissingKey($$)
+{   my ($self, $key, $args) = @_;
+
+    my $depth = 0;
+	my ($filename, $linenr);
+    while((my $pkg, $filename, $linenr) = caller $depth++)
+    {   last unless
+            $pkg->isa(__PACKAGE__)
+         || $pkg->isa('Log::Report::Minimal::Domain');
+    }
+
+	warn $self->sprinti
+      ( "Missing key '{key}' in format '{format}', file {fn} line {line}\n"
+      , key => $key, format => $args->{_format}
+      , fn => $filename, line => $linenr
+      );
+
+    undef;
+}
+
+# See dedicated section in explanation in DETAILS
+sub _modif_format($$$$)
+{   my ($self, $format, $value, $args) = @_;
+    defined $value && length $value or return undef;
 
     use locale;
     if(ref $value eq 'ARRAY')
@@ -272,12 +315,105 @@ sub _format_printf($$$$)
     :                   (' ' x $pad) . $s->as_string;
 }
 
+# See dedicated section in explanation in DETAILS
+sub _modif_bytes($$$)
+{   my ($self, $format, $value, $args) = @_;
+    defined $value && length $value or return undef;
+
+	return sprintf("%3d  B", $value) if $value < 1000;
+
+    my @scale = qw/kB MB GB TB PB EB ZB/;
+	$value /= 1024;
+
+	while(@scale > 1 && $value > 999)
+    {   shift @scale;
+        $value /= 1024;
+    }
+
+    return sprintf "%3d $scale[0]", $value + 0.5
+        if $value > 9.949;
+
+	sprintf "%3.1f $scale[0]", $value;
+}
+
+# Be warned: %F and %T (from C99) are not supported on Windows
+my %dt_format =
+  ( ASC     => '%a %b %e %H:%M:%S %Y'
+  , ISO     => '%Y-%m-%dT%H:%M:%S%z'
+  , RFC2822 => '%a, %d %b %Y %H:%M:%S %z'
+  , RFC822  => '%a, %d %b %y %H:%M:%S %z'
+  , FT      => '%Y-%m-%d %H:%M:%S'
+  );
+
+sub _modif_year($$$)
+{   my ($self, $format, $value, $args) = @_;
+    defined $value && length $value or return undef;
+
+	return $value
+        if $value !~ /\D/ && $value < 2200;
+
+	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
+	defined $stamp or return "year not found in '$value'";
+
+    strftime "%Y", localtime($stamp);
+}
+
+sub _modif_date($$$)
+{   my ($self, $format, $value, $args) = @_;
+    defined $value && length $value or return undef;
+
+	return sprintf("%4d-%02d-%02d", $1, $2, $3)
+        if $value =~ m!^\s*([0-9]{4})[:/.-]([0-9]?[0-9])[:/.-]([0-9]?[0-9])\s*$!
+        || $value =~ m!^\s*([0-9]{4})([0-9][0-9])([0-9][0-9])\s*$!;
+
+	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
+	defined $stamp or return "date not found in '$value'";
+
+    strftime "%Y-%m-%d", localtime($stamp);
+}
+
+sub _modif_time($$$)
+{   my ($self, $format, $value, $args) = @_;
+    defined $value && length $value or return undef;
+
+	return sprintf "%02d:%02d:%02d", $1, $2, $3||0
+        if $value =~ m!^\s*(0?[0-9]|1[0-9]|2[0-3])\:([0-5]?[0-9])(?:\:([0-5]?[0-9]))?\s*$!
+        || $value =~ m!^\s*(0[0-9]|1[0-9]|2[0-3])([0-5][0-9])(?:([0-5][0-9]))?\s*$!;
+
+	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
+	defined $stamp or return "time not found in '$value'";
+
+    strftime "%H:%M:%S", localtime($stamp);
+}
+
+sub _modif_dt($$$)
+{   my ($self, $format, $value, $args) = @_;
+	defined $value && length $value or return undef;
+
+	my $kind    = ($format =~ m/DT\(([^)]*)\)/ ? $1 : undef) || 'FT';
+	my $pattern = $dt_format{$kind}
+        or return "dt format $kind not known";
+
+	my $stamp = $value =~ /\D/ ? str2time($value) : $value;
+	defined $stamp or return "dt not found in '$value'";
+
+    strftime $pattern, localtime($stamp);
+}
+
+
+sub _modif_undef($$$)
+{   my ($self, $format, $value, $args) = @_;
+    return $value if defined $value && length $value;
+    $format =~ m!//"([^"]*)"|//'([^']*)'|//(\w*)! ? $+ : undef;
+}
+
 
 sub printi($$@)
 {   my $self = shift;
     my $fh   = ref $_[0] eq 'GLOB' ? shift : select;
     $fh->print($self->sprinti(@_));
 }
+
 
 
 sub printp($$@)

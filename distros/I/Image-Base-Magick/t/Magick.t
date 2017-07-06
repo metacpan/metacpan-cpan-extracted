@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Image-Base-Magick.
 #
@@ -41,12 +41,20 @@ BEGIN { MyTestHelpers::nowarnings() }
 
 my $have_image_magick = eval { require Image::Magick; 1 };
 if ($have_image_magick) {
-  MyTestHelpers::diag ("Image::Magick VERSION $Image::Magick::VERSION");
+  # something in Image::Magick circa 6.97 broke its Image::Magick->VERSION,
+  # so watch out for undef
+  my $im_version = Image::Magick->VERSION;
+  MyTestHelpers::diag ("Image::Magick VERSION ".(defined $im_version ? $im_version : "[undef]"));
+  if (! defined $im_version) {
+    $im_version = eval { Image::Magick::Q16->VERSION };
+    if (defined $im_version) {
+      MyTestHelpers::diag ("Image::Magick::Q16 VERSION $im_version");
+    }
+  }
 
   # Demand 6.6 or higher for bug fixes.  But not Image::Magick->VERSION(6.6)
   # as that provokes badness when non-numeric $VERSION='6.6.0'.
-  my $im_version = Image::Magick->VERSION;
-  if ($im_version =~ /([0-9]*(\.[0-9]*)?)/) {
+  if (defined $im_version && $im_version =~ /([0-9]*(\.[0-9]*)?)/) {
     my $im_two_version = $1;
     if ($im_two_version < 6.6) {
       MyTestHelpers::diag ("Image::Magick 6.6 not available -- im_version $im_version im_two_version $im_two_version");
@@ -67,7 +75,7 @@ require Image::Base::Magick;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 4;
+my $want_version = 5;
 ok ($Image::Base::Magick::VERSION,
     $want_version,
     'VERSION variable');

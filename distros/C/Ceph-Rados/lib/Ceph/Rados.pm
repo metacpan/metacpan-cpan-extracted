@@ -9,7 +9,7 @@ use Ceph::Rados::IO;
 
 our @ISA = qw();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()

@@ -6,22 +6,22 @@ use strict;
 use Net::SSH::Perl::Buffer;
 use base qw( Net::SSH::Perl::Buffer );
 
-use Net::SSH::Perl::Util qw( :ssh2mp );
+use Math::Int64 qw( :native_if_available net_to_int64 int64_to_net );
 
 sub new {
-    return shift->SUPER::new(@_, MP => 'SSH2');
+    return shift->SUPER::new(@_);
 }
 
 sub get_int64 {
     my $buf = shift;
     my $off = defined $_[0] ? shift : $buf->{offset};
     $buf->{offset} += 8;
-    bin2mp( $buf->bytes($off, 8) );
+    net_to_int64( $buf->bytes($off, 8) );
 }
 
 sub put_int64 {
     my $buf = shift;
-    $buf->{buf} .= mp2bin($_[0], 8);
+    $buf->{buf} .= int64_to_net($_[0]);
 }
 
 sub get_attributes {

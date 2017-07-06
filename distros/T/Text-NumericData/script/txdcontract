@@ -16,6 +16,11 @@ txdcontract - contract a data file by computing the mean over n input rows to pr
 
 txdcontract 2 < 100rows.dat > 50rows.dat
 
+A partial bin at the end is dropped. When you choose value-based binning, there
+will always be some data dropped at the end. That way, you only get mean values
+that actually represent a full interval/bin. Furthermore, the input data is
+assumed to be sorted according to the column chosen for value-based binning.
+
 =head1 PARAMETERS
 
 These are the general rules for specifying parameters to this program:
@@ -33,6 +38,18 @@ There are also different operators than just "=" available, notably ".=", "+=", 
 The available parameters are these, default values (in Perl-compatible syntax) at the time of generating this document following the long/short names:
 
 =over 2
+
+=item B<bincol>, B<c> (scalar)
+
+	''
+
+bin by values in given column instead of contracting by row count
+
+=item B<binsize>, B<b> (scalar)
+
+	1
+
+size of one bin
 
 =item B<black> (scalar)
 
@@ -149,6 +166,6 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2005-2016 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+Copyright (c) 2005-2017 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
 
 =cut

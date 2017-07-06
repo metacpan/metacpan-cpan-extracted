@@ -1,0 +1,25 @@
+History for Dist-Zilla-Plugin-AuthorsFromGit
+
+0.005 2017-07-04
+
+  * Add commit blacklisting
+
+0.004 2017-07-03
+
+  * Add a log message with the plugin version
+  * Require a version of LMU that has sort_by
+
+0.003 2017-07-03
+
+  * Let "git log" follow across file renames
+  * Add github metadata
+
+0.002 2017-07-02
+
+  * Fix a POD formatting bug
+  * Add documentation
+
+0.001 2017-07-01
+
+  * Initial version that shows some functionality. Treat carefully.
+    Badly needs documentation.

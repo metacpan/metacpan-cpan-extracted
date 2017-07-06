@@ -1,12 +1,12 @@
 package Perinci::CmdLine::Inline;
 
-our $DATE = '2017-01-19'; # DATE
-our $VERSION = '0.50'; # VERSION
+our $DATE = '2017-07-04'; # DATE
+our $VERSION = '0.53'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use Data::Dmp;
 use JSON::MaybeXS ();
@@ -31,8 +31,8 @@ sub _add_module {
     my ($cd, $mod) = @_;
     return unless $cd->{gen_args}{pack_deps};
     return if $cd->{module_srcs}{$mod};
-    $log->infof("Adding source code of module %s ...", $mod);
-    $log->warnf("%s is a core module", $mod) if Module::CoreList::More->is_still_core($mod);
+    log_info("Adding source code of module %s ...", $mod);
+    log_warn("%s is a core module", $mod) if Module::CoreList::More->is_still_core($mod);
     my $path = module_path(module => $mod) or die "Can't load module '$mod'";
     local $/;
     open my($fh), "<", $path or die "Can't read file '$path': $!";
@@ -89,19 +89,16 @@ sub _gen_read_env {
 sub _gen_enable_log {
     my ($cd) = @_;
 
-    _add_module($cd, 'Log::Any::Adapter::Screen');
-    _add_module($cd, 'Log::Any::Adapter'); # required by Log::Any::Adapter::Screen
-    _add_module($cd, 'Log::Any'); # required by Log::Any::Adapter
-    _add_module($cd, 'Log::Any::Manager'); # required by Log::Any
-    _add_module($cd, 'Log::Any::Proxy::Null'); # required by Log::Any
-    _add_module($cd, 'Log::Any::Adapter::Util'); # required by Log::Any
+    _add_module($cd, 'Log::ger');
+    _add_module($cd, 'Log::ger::Output');
+    _add_module($cd, 'Log::ger::Output::Screen');
+    _add_module($cd, 'Log::ger::Util');
 
     my @l;
 
     push @l, "### enable logging\n";
-    push @l, 'require Log::Any; my $log = Log::Any->get_logger;', "\n";
-    push @l, 'require Log::Any::Adapter;', "\n";
-    push @l, 'Log::Any::Adapter->set("Screen", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },);', "\n";
+    push @l, 'require Log::ger::Output; Log::ger::Output->set("Screen", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[0] },);', "\n";
+    push @l, 'require Log::ger; Log::ger->import;', "\n";
     push @l, "\n";
 
     join("", @l);
@@ -120,7 +117,7 @@ sub _gen_read_config {
     _add_module($cd, "Data::Sah::Normalize"); # required by Perinci::CmdLine::Util::Config
     _add_module($cd, "Perinci::Sub::Normalize"); # required by Perinci::CmdLine::Util::Config
     _add_module($cd, "Sah::Schema::rinci::function_meta"); # required by Perinci::Sub::Normalize
-    push @l2, '$log->tracef("Reading config file(s) ...");', "\n" if $cd->{gen_args}{log};
+    push @l2, 'log_trace("Reading config file(s) ...");', "\n" if $cd->{gen_args}{log};
     push @l2, '  require Perinci::CmdLine::Util::Config;', "\n";
     push @l2, "\n";
     push @l2, '  my $res = Perinci::CmdLine::Util::Config::read_config(', "\n";
@@ -347,7 +344,7 @@ sub _gen_pci_check_args {
                             _add_module($cd, $mod_rec->{name});
                         }
                         my $mod_is_core = Module::CoreList::More->is_still_core($mod_rec->{name});
-                        $log->warnf("Validation code requires non-core module '%s'", $mod_rec->{name})
+                        log_warn("Validation code requires non-core module '%s'", $mod_rec->{name})
                             unless $mod_is_core && !$cd->{module_srcs}{$mod_rec->{name}} &&
                             !($cd->{gen_args}{allow_prereq} && grep { $_ eq $mod_rec->{name} } @{$cd->{gen_args}{allow_prereq}});
                         # skip modules that we already require at the
@@ -440,25 +437,22 @@ sub _gen_common_opt_handler {
                     '\n"; ';
         push @l, 'exit 0';
     } elsif ($co eq 'log_level') {
-        push @l, 'if ($_[1] eq "trace") { Log::Any::Adapter->set("Screen", min_level=>"trace", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },) } ';
-        push @l, 'if ($_[1] eq "debug") { Log::Any::Adapter->set("Screen", min_level=>"debug", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },) } ';
-        push @l, 'if ($_[1] eq "info" ) { Log::Any::Adapter->set("Screen", min_level=>"info" , formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },) } ';
-        push @l, 'if ($_[1] eq "error") { Log::Any::Adapter->set("Screen", min_level=>"error", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },) } ';
-        push @l, 'if ($_[1] eq "fatal") { Log::Any::Adapter->set("Screen", min_level=>"fatal", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },) } ';
-        push @l, 'if ($_[1] eq "none")  { Log::Any::Adapter->set("Screen", min_level=>"none" , formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },) } ';
+        push @l, 'if ($_[1] eq "trace") { require Log::ger::Util; Log::ger::Util::set_level("trace") } ';
+        push @l, 'if ($_[1] eq "debug") { require Log::ger::Util; Log::ger::Util::set_level("debug") } ';
+        push @l, 'if ($_[1] eq "info" ) { require Log::ger::Util; Log::ger::Util::set_level("info" ) } ';
+        push @l, 'if ($_[1] eq "error") { require Log::ger::Util; Log::ger::Util::set_level("warn" ) } ';
+        push @l, 'if ($_[1] eq "fatal") { require Log::ger::Util; Log::ger::Util::set_level("debug") } ';
+        push @l, 'if ($_[1] eq "none")  { require Log::ger::Util; Log::ger::Util::set_level("off"  ) } ';
+        push @l, 'if ($_[1] eq "off")   { require Log::ger::Util; Log::ger::Util::set_level("off"  ) } ';
         push @l, '$_pci_r->{log_level} = $_[1];';
     } elsif ($co eq 'trace') {
-        push @l, 'Log::Any::Adapter->set("Screen", min_level=>"trace", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },); ';
-        push @l, '$_pci_r->{log_level} = "trace";';
+        push @l, 'require Log::ger::Util; Log::ger::Util::set_level("trace"); $_pci_r->{log_level} = "trace";';
     } elsif ($co eq 'debug') {
-        push @l, 'Log::Any::Adapter->set("Screen", min_level=>"debug", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },); ';
-        push @l, '$_pci_r->{log_level} = "debug";';
+        push @l, 'require Log::ger::Util; Log::ger::Util::set_level("debug"); $_pci_r->{log_level} = "debug";';
     } elsif ($co eq 'verbose') {
-        push @l, 'Log::Any::Adapter->set("Screen", min_level=>"info" , formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },); ';
-        push @l, '$_pci_r->{log_level} = "info";';
+        push @l, 'require Log::ger::Util; Log::ger::Util::set_level("info" ); $_pci_r->{log_level} = "info" ;';
     } elsif ($co eq 'quiet') {
-        push @l, 'Log::Any::Adapter->set("Screen", min_level=>"error", formatter => sub { '.dmp("$cd->{script_name}: ").' . $_[1] },); ';
-        push @l, '$_pci_r->{log_level} = "error";';
+        push @l, 'require Log::ger::Util; Log::ger::Util::set_level("error"); $_pci_r->{log_level} = "error";';
     } elsif ($co eq 'subcommands') {
         my $scs_text = "Available subcommands:\n";
         for (sort keys %{ $cd->{metas} }) {
@@ -500,7 +494,7 @@ sub _gen_get_args {
 
     _add_module($cd, "Getopt::Long::EvenLess");
     push @l, "require Getopt::Long::EvenLess;\n";
-    push @l, '$log->tracef("Parsing command-line arguments ...");', "\n" if $cd->{gen_args}{log};
+    push @l, 'log_trace("Parsing command-line arguments ...");', "\n" if $cd->{gen_args}{log};
 
     if ($cd->{gen_args}{subcommands}) {
 
@@ -605,6 +599,8 @@ sub _gen_get_args {
                                 push @l, 'if ($mentioned_args{\'', $specmeta->{arg}, '\'}++) { push @{ $_pci_args{\'', $specmeta->{arg}, '\'} }, $_[1] } else { $_pci_args{\'', $specmeta->{arg}, '\'} = [$_[1]] }';
                             } elsif ($specmeta->{is_json}) {
                                 push @l, '$_pci_args{\'', $specmeta->{arg}, '\'} = _pci_json()->decode($_[1]);';
+                            } elsif ($specmeta->{is_neg}) {
+                                push @l, '$_pci_args{\'', $specmeta->{arg}, '\'} = 0;';
                             } else {
                                 push @l, '$_pci_args{\'', $specmeta->{arg}, '\'} = $_[1];';
                             }
@@ -1304,7 +1300,7 @@ _
         $cd->{vars}{'$_pci_meta_result_type'} = undef;
         $cd->{vars}{'$_pci_meta_result_type_is_simple'} = undef;
         push @l, "{\n";
-        push @l, '$log->tracef("Calling function ...");', "\n" if $cd->{gen_args}{log};
+        push @l, 'log_trace("Calling function ...");', "\n" if $cd->{gen_args}{log};
         push @l, 'my $sc_name = $_pci_r->{subcommand_name};' . "\n";
         push @l, '$_pci_args{-cmdline} = Perinci::CmdLine::Inline::Object->new(@{', dmp([%args]), '});', "\n"
             if $args{pass_cmdline_object};
@@ -1332,7 +1328,7 @@ _
         # generate code to format & display result
         push @l, "### format & display result\n\n";
         push @l, "{\n";
-        push @l, '$log->tracef("Displaying result ...");', "\n" if $cd->{gen_args}{log};
+        push @l, 'log_trace("Displaying result ...");', "\n" if $cd->{gen_args}{log};
         push @l, 'my $fres;', "\n";
         push @l, 'my $save_res; if (exists $_pci_r->{res}[3]{"cmdline.result"}) { $save_res = $_pci_r->{res}[2]; $_pci_r->{res}[2] = $_pci_r->{res}[3]{"cmdline.result"} }', "\n";
         push @l, 'my $is_success = $_pci_r->{res}[0] =~ /\A2/ || $_pci_r->{res}[0] == 304;', "\n";
@@ -1553,7 +1549,7 @@ Perinci::CmdLine::Inline - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.50 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2017-01-19.
+This document describes version 0.53 of Perinci::CmdLine::Inline (from Perl distribution Perinci-CmdLine-Inline), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -1607,7 +1603,11 @@ values are subroutines' source codes.
 =head1 FUNCTIONS
 
 
-=head2 gen_inline_pericmd_script(%args) -> [status, msg, result, meta]
+=head2 gen_inline_pericmd_script
+
+Usage:
+
+ gen_inline_pericmd_script(%args) -> [status, msg, result, meta]
 
 Generate inline Perinci::CmdLine CLI script.
 
@@ -1880,7 +1880,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

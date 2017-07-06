@@ -1,6 +1,6 @@
 #! /usr/bin/env polyperl
 
-use 5.014; use warnings;
+use 5.012; use warnings;
 
 use lib qw< dlib ../dlib >;
 use Test::Expr;

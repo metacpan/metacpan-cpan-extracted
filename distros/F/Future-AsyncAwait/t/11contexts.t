@@ -7,9 +7,9 @@ use Test::More;
 
 use Future;
 
-use Future::AsyncAwait qw( async );
+use Future::AsyncAwait;
 
-# if
+# if await in cond
 {
    async sub with_if_cond
    {
@@ -22,15 +22,37 @@ use Future::AsyncAwait qw( async );
    }
 
    my $f1 = Future->new;
-   my $f2 = with_if_cond( $f1 );
+   my $fret = with_if_cond( $f1 );
 
-   ok( !$f2->is_ready, '$f2 not immediate with_if_cond' );
+   ok( !$fret->is_ready, '$fret not immediate with_if_cond' );
 
    $f1->done( 1 );
-   is( scalar $f2->get, "true", '$f2 now ready after done' );
+   is( scalar $fret->get, "true", '$fret now ready after done' );
 }
 
-# while
+# if await in body
+{
+   async sub with_if_body
+   {
+      if( $_[0] ) {
+         return await $_[1];
+      }
+      else {
+         return "immediate";
+      }
+   }
+
+   my $f1 = Future->new;
+   my $fret = with_if_body( 1, $f1 );
+
+   $f1->done( "defer" );
+   is( scalar $fret->get, "defer", '$fret now ready after done in if body' );
+
+   $fret = with_if_body( 0, undef );
+
+   is( scalar $fret->get, "immediate", '$fret now ready after done in if body immediate' );
+}
+
 # foreach LIST
 # foreach @ARRAY
 # foreach 'a..'c'

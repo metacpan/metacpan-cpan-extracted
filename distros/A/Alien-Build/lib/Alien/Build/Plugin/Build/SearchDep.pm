@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Text::ParseWords qw( shellwords );
 
 # ABSTRACT: Add dependencies to library and header search path
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 has aliens => {};
@@ -93,7 +93,7 @@ Alien::Build::Plugin::Build::SearchDep - Add dependencies to library and header 
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -124,6 +124,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

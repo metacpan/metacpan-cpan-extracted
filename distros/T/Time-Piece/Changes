@@ -1,6 +1,12 @@
 Revision history for Time-Piece
 
 
+1.3201  2017-06-22
+        - Fix compile errors on MS
+        - Use macro for buf sizes
+        - Remove some compile warnings
+        - SP of by 1 in _crt_localtime
+
 1.32    2017-06-20
         - Since 1.31:
         - New truncate() method

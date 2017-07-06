@@ -180,51 +180,51 @@ For instance
 
 will scan for
 
-   [% loc("msgid", key => value, ...) %]
-   [% loc('msgid', key => value, ...) %]
-   [% loc("msgid|plural", count, key => value, ...) %]
-
-   [% INCLUDE
-        title = loc('something')
-    %]
-
-   [% | loc(n => name) %]hi {n}[% END %]
-   [% 'hi {n}' | loc(n => name) %]
+  [% loc("msgid", key => value, ...) %]
+  [% loc('msgid', key => value, ...) %]
+  [% loc("msgid|plural", count, key => value, ...) %]
+ 
+  [% INCLUDE
+       title = loc('something')
+   %]
+ 
+  [% | loc(n => name) %]hi {n}[% END %]
+  [% 'hi {n}' | loc(n => name) %]
 
 For TT1, the brackets can either be '[%...%]' or '%%...%%'.  The function
 name is treated case-sensitive.  Some people prefer 'l()' or 'L()'.
 
 The code needed
 
-   # during initiation of the webserver, once in your script (before fork)
-   my $lexicons   = 'some-directory-for-translation-tables';
-   my $translator = Log::Report::Translator::POT->new(lexicons => $lexicons);
-   my $domain     = textdomain $textdomain;
-   $domain->configure(translator => $translator);
+  # during initiation of the webserver, once in your script (before fork)
+  my $lexicons   = 'some-directory-for-translation-tables';
+  my $translator = Log::Report::Translator::POT->new(lexicons => $lexicons);
+  my $domain     = textdomain $textdomain;
+  $domain->configure(translator => $translator);
 
-   # your standard template driver
-   sub handler {
-      ...
-      my $vars      = { ...all kinds of values... };
-      $vars ->{loc} = \&translate;           # <--- this is extra
+  # your standard template driver
+  sub handler {
+     ...
+     my $vars      = { ...all kinds of values... };
+     $vars->{loc}  = \&translate;           # <--- this is extra
 
-      my $output    = '';
-      my $templater = Template->new(...);
-      $templater->process($template_fn, $vars, \$output);
-      print $output;
-   }
+     my $output    = '';
+     my $templater = Template->new(...);
+     $templater->process($template_fn, $vars, \$output);
+     print $output;
+  }
 
-   # anywhere in the same file
-   sub translate {
-       my $textdomain = ...;   # your choice when running xgettext-perl
-       my $lang       = ...;   # how do you figure that out?
-       my $msg = Log::Report::Message->fromTemplateToolkit($textdomain, @_);
-       $msg->toString($lang);
-   }
+  # anywhere in the same file
+  sub translate {
+    my $textdomain = ...;   # your choice when running xgettext-perl
+    my $lang       = ...;   # how do you figure that out?
+    my $msg = Log::Report::Message->fromTemplateToolkit($textdomain, @_);
+    $msg->toString($lang);
+  }
 
 To generate the pod tables, run in the shell something like
 
-   xgettext-perl -p $lexicons --template TT2-loc \
+  xgettext-perl -p $lexicons --template TT2-loc \
       --domain $textdomain  $templates_dir
 
 If you want to implement your own extractor --to avoid C<xgettext-perl>--
@@ -248,7 +248,7 @@ Let's say that the translation of some of the sentences on the website depend
 on the gender of the addressed person.  An example of the use in a TT2
 template:
 
-  [% loc("{name<gender} forgot his key", name => person.name %]
+  [% loc("{name<gender} forgot his key", name => person.name) %]
 
 The extraction script F<xgettext-perl> will expand this into two records
 in the PO file, respectively with msgctxt attribute 'gender=male' and
@@ -282,14 +282,14 @@ Maybe 'user_gender' is more maintainable)
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Lexicon distribution version 1.06,
-built on September 21, 2016. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report-Lexicon distribution version 1.08,
+built on June 29, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 
-Copyrights 2007-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2007-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
 

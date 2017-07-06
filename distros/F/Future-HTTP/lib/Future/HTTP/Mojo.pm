@@ -8,7 +8,7 @@ no warnings 'experimental::signatures';
 use feature 'signatures';
 
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.07';
 
 has ua => (
     is => 'lazy',
@@ -81,7 +81,7 @@ sub _request($self, $method, $url, %options) {
         if( $headers->{Status} =~ /^2../ ) {
             $res->done($body, $headers);
         } else {
-            $res->fail($body, $headers);
+            $res->fail('error when connecting', $headers);
         }
     });
     

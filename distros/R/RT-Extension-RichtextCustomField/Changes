@@ -1,5 +1,9 @@
 Revision history for RT-Extension-RichtextCustomField
 
+0.03 2017-06-21
+ - Add comprehensive tests
+ - Upgrade Module::Install and other included modules
+
 0.02 2017-06-16
  - Fix fatal typo
 

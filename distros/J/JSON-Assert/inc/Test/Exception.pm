@@ -7,7 +7,9 @@ use Test::Builder;
 use Sub::Uplevel qw( uplevel );
 use base qw( Exporter );
 
-our $VERSION = '0.32';
+our $VERSION = '0.43';
+$VERSION = eval $VERSION;
+
 our @EXPORT = qw(dies_ok lives_ok throws_ok lives_and);
 
 my $Tester = Test::Builder->new;
@@ -22,7 +24,7 @@ sub import {
     $self->export_to_level( 1, $self, $_ ) foreach @EXPORT;
 }
 
-#line 83
+#line 90
 
 sub _quiet_caller (;$) { ## no critic Prototypes
     my $height = $_[0];
@@ -97,17 +99,17 @@ sub _exception_as_string {
 };
 
 
-#line 206
+#line 213
 
 
 sub throws_ok (&$;$) {
     my ( $coderef, $expecting, $description ) = @_;
     unless (defined $expecting) {
-      require Carp;
-      Carp::croak( "throws_ok: must pass exception class/object or regex" ); 
+        require Carp;
+        Carp::croak( "throws_ok: must pass exception class/object or regex" ); 
     }
     $description = _exception_as_string( "threw", $expecting )
-    	unless defined $description;
+        unless defined $description;
     my $exception = _try_as_caller( $coderef );
     my $regex = $Tester->maybe_regex( $expecting );
     my $ok = $regex 
@@ -125,7 +127,7 @@ sub throws_ok (&$;$) {
 };
 
 
-#line 254
+#line 261
 
 sub dies_ok (&;$) {
     my ( $coderef, $description ) = @_;
@@ -136,27 +138,27 @@ sub dies_ok (&;$) {
 }
 
 
-#line 293
+#line 300
 
 sub lives_ok (&;$) {
     my ( $coderef, $description ) = @_;
     my $exception = _try_as_caller( $coderef );
     my $ok = $Tester->ok( ! _is_exception( $exception ), $description );
-	$Tester->diag( _exception_as_string( "died:", $exception ) ) unless $ok;
+    $Tester->diag( _exception_as_string( "died:", $exception ) ) unless $ok;
     $@ = $exception;
     return $ok;
 }
 
 
-#line 333
+#line 340
 
 sub lives_and (&;$) {
     my ( $test, $description ) = @_;
     {
-        local $Test::Builder::Level = $Test::Builder::Level + 1;
         my $ok = \&Test::Builder::ok;
         no warnings;
         local *Test::Builder::ok = sub {
+            local $Test::Builder::Level = $Test::Builder::Level + 1;
             $_[2] = $description unless defined $_[2];
             $ok->(@_);
         };
@@ -172,6 +174,6 @@ sub lives_and (&;$) {
     return;
 }
 
-#line 502
+#line 513
 
 1;

@@ -2,6 +2,7 @@
 ^\.
 ^debian
 ^dep
+^bm_
 
 # No temp files
 ~$

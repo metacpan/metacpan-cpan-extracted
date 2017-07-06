@@ -1,3 +1,10 @@
+0.46    2017-07-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::ger.
+
+
 0.45    2017-05-16 (PERLANCAR)
 
 	- Remove skip_NEXT and skip_problematic options. These options were

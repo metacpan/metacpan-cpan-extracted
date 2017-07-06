@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,51 +15,60 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
-SHA1 67e81153d7f731aaedbc3e7fd2bf0dacb8979873 Changes
-SHA1 79098a6707d8fef99b6910c140c9fb0311f1417b MANIFEST
-SHA1 b758f740af57256154bbf4e1f8a760a1b9f9dfe1 MANIFEST.SKIP
-SHA1 2e1c19f15ba59e25f5e4746e695db4ddc01f82cf META.yml
-SHA1 63eeac9e9e9875711f3495e5b3bdfd188b78f799 Makefile.PL
-SHA1 b5edd1e9d6dcfbf16b2c38f46457f4b5d6c4d1ef debian/changelog
-SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
-SHA1 9e6b4e979f907fff6bdfabf5395603e0f35c6008 debian/control
-SHA1 17edfd014c5372014e4ea0a32d880e24ab5ad842 debian/copyright
-SHA1 4029ecfcc1d6450010f9bf8333a682bf8b8f3fe2 debian/rules
+SHA1 ead02ff8f6e001530fc95042c11bcc54297a09e1 Changes
+SHA1 3d9b6544e86a445817ec34b22da1f1a0ac39e3dd MANIFEST
+SHA1 9b875407d60f086714a3ca39de8ef195c106d889 MANIFEST.SKIP
+SHA1 31d7bf7495960d5230f1d90b5743c7b84fc3a578 META.json
+SHA1 4c4865292ee339dfc5b64ce9a3d9b075d57d01f5 META.yml
+SHA1 d09f56f83c164a42f682bae427c7f95ef9335b6a Makefile.PL
+SHA1 6895c2b6ecfa45454ace234b027d58f7f16023e7 debian/changelog
+SHA1 b6abd567fa79cbe0196d093a067271361dc6ca8b debian/compat
+SHA1 5bace99aa0634d72e73dbbddc122d7b174ae7e74 debian/control
+SHA1 01a1c50d81c528dc39a982b0a858941235d7c2c3 debian/copyright
+SHA1 98b6378d9c4cbd792fb0958f8c178bccc43ec070 debian/rules
 SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
 SHA1 59459e3ec9ad1d8c54f4c847ee6b43904f5593f3 debian/watch
 SHA1 c200a930c4e1cace7ec1a7d3c0d72c543bad2142 devel/graphics-magick.pl
 SHA1 49ceae4a565ad90297afaca877ef401cb8ec29f8 devel/magick.pl
 SHA1 6e68745c9de9f171cbc68a2a8f28163cfbe7fe45 devel/txt.pl
-SHA1 355b182e01f918114bc6c85967b2de758e1dc9fe inc/MyMakeMakerExtras.pm
-SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
-SHA1 262277d0865df4015178f85b0232c89c1a3c326b lib/Image/Base/Magick.pm
+SHA1 b730581639170517868e7e6b216b5d03c9dc7c9c lib/Image/Base/Magick.pm
 SHA1 2cb65d8c3845e15b620c88215f2e235425cd7616 t/Magick-use.t
-SHA1 76bcd1c4fb02b554129178610b31c1f8b612d191 t/Magick-weaken.t
-SHA1 687cc56fafac0080bee3ac8fb302f684e3632099 t/Magick.t
-SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
-SHA1 d176409a7bac83bd32e3c50b1d994ecafb771c90 t/MyTestImageBase.pm
-SHA1 811028548aa4b360b5086d1af3150f9dde348aa6 xt/0-META-read.t
+SHA1 4173c957dd5889676f37dd681720889246bb09f2 t/Magick-weaken.t
+SHA1 7f737668e6d9beb29989ec3efb940ef004ca09ec t/Magick.t
+SHA1 165fa1519ab2a986d52a69c14d410b17f9dfdcb1 t/MyTestHelpers.pm
+SHA1 d11cadd787f3581aeff4f60521d795d4b242aed9 t/MyTestImageBase.pm
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
 SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
 SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
 SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
 SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
-SHA1 ec454b1b524d2d0b35e5a7d8292ad13d82becab5 xt/0-Test-YAML-Meta.t
-SHA1 2fb2ce60ce5c740d1eb7e3b55a96f3ccb84d38c3 xt/0-file-is-part-of.t
-SHA1 daba2840c7f128371d42516619a0e04fee2f5ff4 xt/0-no-debug-left-on.t
+SHA1 aeeab05c346c11824a2bb2cc3f3bdb0c522604e2 xt/0-Test-YAML-Meta.t
+SHA1 4a897c9b09f37290f507d151e84b6a3c8defd496 xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
 SHA1 d405780372d9acc81809fa2784175cea33f9c806 xt/dummy/Image/Base.pm
 SHA1 06bdbff15286191362d354c072fb0498713469ce xt/dummy/Image/Magick.pm
-SHA1 84a47c1d71fd58797a2754030998dfb673b62811 xtools/my-check-copyright-years.sh
+SHA1 51069b694ce78fde7d42ed539322fae579948d40 xtools/my-check-copyright-years.sh
 SHA1 bfb75ffb7a834c345288e01f561b12695f191d12 xtools/my-check-file-part-of.sh
-SHA1 1f28ea8151b0f8554e5ab4e5bbcf1c5371f788eb xtools/my-check-spelling.sh
-SHA1 fad81dac3edf7be728f70b50d772571ff31f1bdb xtools/my-deb.sh
+SHA1 31654c66643286a8b578cdce5af05ab1c7bdf680 xtools/my-check-spelling.sh
+SHA1 f8eada68e38ca3f44a69afa32c090e7ac343f0bb xtools/my-deb.sh
 SHA1 2db0a23176de55a8ee8f1643f239aeaa2bcf4fa1 xtools/my-diff-prev.sh
 SHA1 e4a15f9b4bcf1d087de2d9ed8e87bf92b0469a6c xtools/my-manifest.sh
-SHA1 4db9c30b1fc96b04a794218ca19561b368f59679 xtools/my-pc.sh
+SHA1 eec6a78c6ed57242d151597b048df6ea5efc5cc4 xtools/my-pc.sh
 SHA1 7b1e948c88915689b3782d872ef9b92a2912c593 xtools/my-tags.sh
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+Version: GnuPG v1
 
-iD8DBQFQgbjGLFMCIV9q3ToRArkOAJ0R0J1ObcN6b2iK6TGwLDBzDZ6sMACgsCqC
-CJc6D+O+jsnryn12yqmJYhI=
-=Y3ct
+iQIcBAEBAgAGBQJZVzG+AAoJEPjQtOfS0hGRPb4P/jMeThMj7OAhUX3HJuZQvrfY
+gv7kt8EqXmG4F000u6jIn9av6xyib0p6uCf6eAJy5iZH61pJHfV07376jURz9iLB
+HaL0fpsG6xeZXQsNCZ4ZW8PDbyaRkkC/8JNxIxxTwTbAcpESf1Ybmwe+0RXxbAoK
+M0iG9clpXRvvIZHmTjtC5uubEtCOa9ydQFgr6Lt2ZbxDHRQO7hkFK+HAevjB080E
+3T4R2xVD+tQVGTajJq96T/Vq39Fi1KOt0oVhUMJmmPEthJnfiAj2KLiP/GpwB57V
+FT/IVuOmti5W7PVFO1FwuEJlgZ3Eva8uXsXDARo0ikVEcRI8fgamVrKJOdMqC5RI
+Sf+qS5H7rrTqrin781jeH9Uu0GxumHRO5lOCHiXTt4adFe3DkKlR363Z71MDKsYM
+TFAN5hDVblaMQvU9ffcYVAXQKUWUHI0JuflV6LtiNuMNyv4M5WcljTt/p7J4XEN9
+R0I9krndzjWQeTsjC62J/cAT3Y1pR5Omy4aEVYz04zwlOcXWTWHaATxw87PCvdWQ
+BL7DTQU3ioXFWVUBzq8HTPyCUEVOXDW5uxslgBK7mLPpdCTKizG/CQvOYSB2v6UL
+F+EIGekxjjWpE0NB4K8IsaGhsWBmSk41Ly55GsvB2R/v4ZgGikkmEG19Z+YGAf7t
+2i4kG5Oq+lpB0cdtFVP6
+=JsVI
 -----END PGP SIGNATURE-----

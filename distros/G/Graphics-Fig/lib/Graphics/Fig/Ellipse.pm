@@ -15,16 +15,20 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Ellipse;
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use strict;
 use warnings;
 use Carp;
 use Math::Trig;
-use Regexp::Common qw /number/;
 use Graphics::Fig::Color;
 use Graphics::Fig::Matrix;
 use Graphics::Fig::Parameters;
+
+#
+# RE_INT: regular expression matching an integer
+#
+my $RE_INT = "(?:(?:[-+]?)(?:[0123456789]+))";
 
 #
 # Graphics::Fig::Ellipse::generalToCanonical
@@ -79,7 +83,7 @@ sub _convertCircleSubtype {
     if ($value eq "diameter") {
 	return 4;
     }
-    if ($value =~ m/^$RE{num}{int}$/) {
+    if ($value =~ m/^$RE_INT$/) {
 	if ($value != 3 && $value != 4) {
 	    croak("${prefix}: ${value}: error: " .
 	    	    "expected integer between 3 and 4");
@@ -108,7 +112,7 @@ sub _convertEllipseSubtype {
     if ($value eq "diameters") {
 	return 2;
     }
-    if ($value =~ m/^$RE{num}{int}$/) {
+    if ($value =~ m/^$RE_INT$/) {
 	if ($value != 1 && $value != 2) {
 	    croak("${prefix}: ${value}: error: " .
 	    	    "expected integer between 1 and 2");

@@ -3,7 +3,7 @@ abstract: 'Scenarios to benchmark C::Blocks'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
-  Bencher::Backend: '1.034'
+  Bencher::Backend: '1.039'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
@@ -21,7 +21,7 @@ requires:
   C::Blocks: '0'
   C::Blocks::Types: '0'
   File::Temp: '0'
-  Log::Any: '0'
+  Log::ger: '0.011'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-CBlocks
   homepage: https://metacpan.org/release/Bencher-Scenarios-CBlocks
   repository: git://github.com/perlancar/perl-Bencher-Scenarios-CBlocks.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -105,7 +105,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.54'
+      version: '0.55'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -130,6 +130,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -273,7 +277,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.05'
+              version: '0.06'
             -
               class: Pod::Weaver::Plugin::Bencher::Scenario
               name: -Bencher::Scenario
@@ -299,7 +303,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.23'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -353,10 +357,6 @@ x_Dist_Zilla:
           type: requires
       name: Prereqs
       version: '6.008'
-    -
-      class: Dist::Zilla::Plugin::Acme::CPANLists::Whitelist
-      name: Acme::CPANLists::Whitelist
-      version: '0.02'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

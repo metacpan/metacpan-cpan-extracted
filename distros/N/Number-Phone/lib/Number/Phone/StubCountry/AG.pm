@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173053;
+our $VERSION = 1.20170702164946;
 
 my $formatters = [
                 {
@@ -34,16 +34,13 @@ my $formatters = [
               ];
 
 my $validators = {
-                'mobile' => '
+                'geographic' => '
           268(?:
-            464|
-            7(?:
-              2\\d|
-              3[246]|
-              64|
-              7[0-689]|
-              8[02-68]
-            )
+            4(?:
+              6[0-38]|
+              84
+            )|
+            56[0-2]
           )\\d{4}
         ',
                 'specialrate' => '(900[2-9]\\d{6})',
@@ -58,7 +55,19 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'geographic' => '
+                'mobile' => '
+          268(?:
+            464|
+            7(?:
+              2\\d|
+              3[246]|
+              64|
+              7[0-689]|
+              8[02-68]
+            )
+          )\\d{4}
+        ',
+                'fixed_line' => '
           268(?:
             4(?:
               6[0-38]|
@@ -67,6 +76,7 @@ my $validators = {
             56[0-2]
           )\\d{4}
         ',
+                'voip' => '26848[01]\\d{4}',
                 'toll_free' => '
           8(?:
             00|
@@ -78,17 +88,7 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'voip' => '26848[01]\\d{4}',
-                'pager' => '26840[69]\\d{4}',
-                'fixed_line' => '
-          268(?:
-            4(?:
-              6[0-38]|
-              84
-            )|
-            56[0-2]
-          )\\d{4}
-        '
+                'pager' => '26840[69]\\d{4}'
               };
 use Number::Phone::NANP::Data;
 sub areaname {

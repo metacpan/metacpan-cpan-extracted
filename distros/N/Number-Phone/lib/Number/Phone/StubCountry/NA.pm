@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -30,29 +30,22 @@ my $formatters = [
                   'pattern' => '(8\\d)(\\d{3})(\\d{4})'
                 },
                 {
-                  'pattern' => '(6\\d)(\\d{3})(\\d{3,4})',
-                  'leading_digits' => '6'
+                  'leading_digits' => '6',
+                  'pattern' => '(6\\d)(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'leading_digits' => '88',
-                  'pattern' => '(88)(\\d{3})(\\d{3})'
+                  'pattern' => '(88)(\\d{3})(\\d{3})',
+                  'leading_digits' => '88'
                 },
                 {
-                  'pattern' => '(870)(\\d{3})(\\d{3})',
-                  'leading_digits' => '870'
+                  'leading_digits' => '870',
+                  'pattern' => '(870)(\\d{3})(\\d{3})'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(8701\\d{5})',
-                'mobile' => '
-          (?:
-            60|
-            8[125]
-          )\\d{7}
-        ',
-                'toll_free' => '',
                 'personal_number' => '',
+                'specialrate' => '(8701\\d{5})',
                 'geographic' => '
           6(?:
             1(?:
@@ -146,13 +139,14 @@ my $validators = {
             )
           )\\d{4}
         ',
+                'pager' => '',
+                'toll_free' => '',
                 'voip' => '
           8(?:
             3\\d{2}|
             86
           )\\d{5}
         ',
-                'pager' => '',
                 'fixed_line' => '
           6(?:
             1(?:
@@ -245,6 +239,12 @@ my $validators = {
               7[01]
             )
           )\\d{4}
+        ',
+                'mobile' => '
+          (?:
+            60|
+            8[125]
+          )\\d{7}
         '
               };
 my %areanames = (

@@ -2,13 +2,17 @@
 abstract: 'Catmandu modules for working with PICA+ data'
 author:
   - 'Johann Rolschewski <rolschewski@gmail.com>'
-build_requires: {}
+build_requires:
+  File::Temp: '0.2304'
+  IO::File: '1.14'
+  Test::Exception: '0.43'
+  Test::More: '1.001003'
 configure_requires:
   Module::Build::Tiny: '0.034'
 conflicts:
   Catmandu::SRU: '< 0.032'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,24 +20,29 @@ meta-spec:
 name: Catmandu-PICA
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 recommends:
   Catmandu::SRU: '0.032'
 requires:
-  Catmandu: '0.9504'
+  Catmandu: '1.0601'
+  Moo: '1.0'
   PICA::Data: '0.30'
+  PICA::Parser: '0.585'
+  PICA::Path: '0.31'
 resources:
   bugtracker: https://github.com/gbv/Catmandu-PICA/issues
   homepage: https://github.com/gbv/Catmandu-PICA
   repository: https://github.com/gbv/Catmandu-PICA.git
-version: '0.19'
+version: '0.20'
 x_contributors:
+  - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'E. Choroba <choroba@matfyz.cz>'
   - 'Jakob Voß <jakob.voss@gbv.de>'
   - 'Johann Rolschewski <jorol@cpan.org>'
   - 'Julian Ladisch <julianladisch@users.noreply.github.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

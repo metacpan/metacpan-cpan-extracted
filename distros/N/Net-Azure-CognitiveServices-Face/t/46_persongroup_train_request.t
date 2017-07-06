@@ -11,7 +11,7 @@ can_ok $pg, qw/_train_request/;
 my $req = $pg->_train_request('machida_pm');
 
 isa_ok $req, 'HTTP::Request';
-is $req->uri, "https://api.projectoxford.ai/face/v1.0/persongroups/machida_pm/train";
+is $req->uri, "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/train";
 is $req->method, 'POST';
 is $req->header('Content-Type'), 'application/json';
 is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';

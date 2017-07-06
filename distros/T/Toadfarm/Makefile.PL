@@ -6,7 +6,7 @@ WriteMakefile(
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/Toadfarm.pm',
   VERSION_FROM => 'lib/Toadfarm.pm',
-  EXE_FILES => [qw(  )],
+  EXE_FILES => [qw()],
   META_MERGE => {
     resources => {
       bugtracker => 'https://github.com/jhthorsen/toadfarm/issues',

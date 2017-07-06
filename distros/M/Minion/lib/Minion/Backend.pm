@@ -14,6 +14,7 @@ sub job_info     { croak 'Method "job_info" not implemented by subclass' }
 sub list_jobs    { croak 'Method "list_jobs" not implemented by subclass' }
 sub list_workers { croak 'Method "list_workers" not implemented by subclass' }
 sub lock         { croak 'Method "lock" not implemented by subclass' }
+sub note         { croak 'Method "note" not implemented by subclass' }
 sub receive      { croak 'Method "receive" not implemented by subclass' }
 
 sub register_worker {
@@ -55,6 +56,7 @@ Minion::Backend - Backend base class
   sub list_jobs         {...}
   sub list_workers      {...}
   sub lock              {...}
+  sub note              {...}
   sub receive           {...}
   sub register_worker   {...}
   sub remove_job        {...}
@@ -171,6 +173,12 @@ L<Minion/"backoff"> after the first attempt, defaults to C<1>.
 
 Delay job for this many seconds (from now), defaults to C<0>.
 
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
+
 =item parents
 
   parents => [$id1, $id2, $id3]
@@ -265,6 +273,12 @@ Epoch time job was delayed to.
   finished => 784111777
 
 Epoch time job was finished.
+
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
 
 =item parents
 
@@ -387,6 +401,12 @@ Number of shared locks with the same name that can be active at the same time,
 defaults to C<1>.
 
 =back
+
+=head2 note
+
+  $backend->note($job_id, foo => 'bar');
+
+Change a metadata field for a job.
 
 =head2 receive
 

@@ -16,13 +16,12 @@ package Finance::QuoteHist::Generic;
 use strict;
 use Carp;
 
+use vars qw($VERSION);
+$VERSION = "1.22";
+
 use LWP::UserAgent;
 use HTTP::Request;
 use Date::Manip;
-
-use vars qw($VERSION);
-
-$VERSION = '1.21';
 
 my $CSV_XS_Class = 'Text::CSV_XS';
 my $CSV_PP_Class = 'Text::CSV_PP';
@@ -75,6 +74,7 @@ my @Scalar_Flags = qw(
   granularity
   auto_proxy
   row_filter
+  ua_params
 );
 my $SF_pat = join('|', @Scalar_Flags);
 
@@ -90,7 +90,7 @@ my $HF_pat = join('|', @Hash_Flags);
 sub new {
   my $that  = shift;
   my $class = ref($that) || $that;
-  my(@pass, %parms, $k, $v);
+  my(%parms, $k, $v);
   while (($k,$v) = splice(@_, 0, 2)) {
     if ($k eq 'start_date' || $k eq 'end_date' && $v !~ /^\s*$/) {
       $parms{$k} = __PACKAGE__->date_standardize($v);
@@ -148,8 +148,7 @@ sub new {
   elsif ($parms{auto_proxy}) {
     $ua_params->{env_proxy} = 1 if $ENV{http_proxy};
   }
-  delete $parms{env_proxy};
-  $self->{ua} = LWP::UserAgent->new(%$ua_params);
+  $self->{ua} ||= LWP::UserAgent->new(%$ua_params);
 
   if ($self->granularity !~ /^d/i) {
     $start_date = $self->snap_start_date($start_date);
@@ -409,8 +408,8 @@ sub getter {
           if ($target_mode eq 'split') {
             if (@{$rows->[0]} == 2) {
               foreach (@$rows) {
-                if ($_->[-1] =~ /split\s+(\d+):(\d+)/is) {
-                  splice(@$_, -1, 1, $1, $2);
+                if ($_->[-1] =~ /(split\s+)?(\d+)\D+(\d+)/is) {
+                  splice(@$_, -1, 1, $2, $3);
                 }
               }
             }
@@ -1327,7 +1326,7 @@ Different sites have different formats and different limitations on how
 many quotes are returned for each query. See Finance::QuoteHist::Yahoo
 for an example of how to do this.
 
-For more complicated sites, such as Yahoo, overriding additonal methods
+For more complicated sites, such as Yahoo, overriding additional methods
 might be necessary for dealing with things such as splits and dividends.
 
 =head1 METHODS
@@ -1595,7 +1594,7 @@ Matthew P. Sisk, E<lt>F<sisk@mojotoad.com>E<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2000-2013 Matthew P. Sisk. All rights reserved. All wrongs
+Copyright (c) 2000-2017 Matthew P. Sisk. All rights reserved. All wrongs
 revenged. This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

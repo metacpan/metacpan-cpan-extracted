@@ -1,9 +1,8 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # Check conversions from Geo::Point objects to GML2.
 use warnings;
 use strict;
 
-use lib 'lib', '../XMLCompile/lib';
 use Test::More;
 use XML::Compile::Tester;
 
@@ -44,29 +43,29 @@ my $poly  = Geo::Space->new($line);
 #$gml->printIndex(\*STDERR);
 
 my $data  = $gml->GPtoGML($poly, srs => 'EPGS:4326');
+#warn Dumper $data;
 my $expected =
 {
-  'gml_MultiPolygon' => {
-    'srsName' => 'EPGS:4326',
-    'seq_gml_polygonMember' => [
-      {
-        'gml_polygonMember' => {
-          'gml_Polygon' => {
-            'gml_innerBoundaryIs' => [],
-            'gml_outerBoundaryIs' => {
-              'gml_LinearRing' => {
-                'srsName' => 'EPGS:4326',
-                'gml_coordinates' => {
-                  'ts' => ' ',
-                  'cs' => ',',
-                  '_' => '6.139263,53.477199 5.359165,53.588759 4.5753,53.695178 4.224426,52.762039 4.990792,52.656849 5.753162,52.54677 6.139263,53.477199'
-                }
+  gml_MultiPolygon => {
+    srsName => 'EPGS:4326',
+    seq_gml_polygonMember => [ {
+      gml_polygonMember => {
+        srsName => 'EPGS:4326',
+        gml_Polygon => {
+          gml_innerBoundaryIs => [],
+          gml_outerBoundaryIs => {
+            gml_LinearRing => {
+              srsName => 'EPGS:4326',
+              gml_coordinates => {
+                ts => ' ',
+                cs => ',',
+                _ => '6.139263,53.477199 5.359165,53.588759 4.5753,53.695178 4.224426,52.762039 4.990792,52.656849 5.753162,52.54677 6.139263,53.477199'
               }
             }
           }
         }
       }
-    ]
+    } ]
   },
 };
 
@@ -82,7 +81,8 @@ my $xml = $w->($doc, $expected);   # $expected===$data
 
 compare_xml($xml, <<'_XML');
 <gml:multiExtentOf xmlns:gml="http://www.opengis.net/gml"
-    xmlns:xlink="http://www.w3.org/1999/xlink">
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <gml:MultiPolygon srsName="EPGS:4326">
     <gml:polygonMember>
       <gml:Polygon>

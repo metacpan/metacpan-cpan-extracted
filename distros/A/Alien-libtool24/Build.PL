@@ -32,12 +32,12 @@ my %module_build_args = (
     "File::chdir" => 0,
     "perl" => "5.006"
   },
-  "dist_abstract" => "Built or find libtool 2.4.x",
+  "dist_abstract" => "(Deprecated) Built or find libtool 2.4.x",
   "dist_author" => [
     "Graham Ollis <plicease\@cpan.org>"
   ],
   "dist_name" => "Alien-libtool24",
-  "dist_version" => "0.04",
+  "dist_version" => "0.05",
   "license" => "perl",
   "module_name" => "Alien::libtool24",
   "recursive_test_files" => 1,

@@ -3,9 +3,6 @@ package Perlanet::Feed;
 use strict;
 use warnings;
 
-use 5.6.0;
-our $VERSION = '0.58';
-
 use Moose;
 use XML::Feed;
 

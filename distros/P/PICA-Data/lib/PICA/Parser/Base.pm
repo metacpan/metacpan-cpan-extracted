@@ -2,7 +2,7 @@ package PICA::Parser::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Carp qw(croak);
 
@@ -12,9 +12,11 @@ sub new {
 
     my $input = $options{fh} || \*STDIN;
 
-    my $self = bless { 
-        bless => !!$options{bless},
+    my $self = bless {
+        bless  => !!$options{bless},
+        strict => !!$options{strict},
     }, $class;
+
 
     # check for file or filehandle
     my $ishandle = eval { fileno($input); };

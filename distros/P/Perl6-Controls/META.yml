@@ -20,5 +20,6 @@ no_index:
 requires:
   Keyword::Declare: '0.001'
   Test::More: '0'
+  experimentals: '0'
   perl: '5.01'
-version: '0.000003'
+version: '0.000006'

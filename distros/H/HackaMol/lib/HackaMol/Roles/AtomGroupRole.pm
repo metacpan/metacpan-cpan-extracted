@@ -1,5 +1,5 @@
 package HackaMol::Roles::AtomGroupRole;
-$HackaMol::Roles::AtomGroupRole::VERSION = '0.040';
+$HackaMol::Roles::AtomGroupRole::VERSION = '0.043';
 #ABSTRACT: Role for a group of atoms
 use Moose::Role;
 use Carp;
@@ -390,7 +390,7 @@ HackaMol::Roles::AtomGroupRole - Role for a group of atoms
 
 =head1 VERSION
 
-version 0.040
+version 0.043
 
 =head1 SYNOPSIS
 

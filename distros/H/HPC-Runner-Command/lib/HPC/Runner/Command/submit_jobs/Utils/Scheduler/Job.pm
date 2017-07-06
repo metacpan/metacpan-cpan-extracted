@@ -15,7 +15,7 @@ with 'HPC::Runner::Command::submit_jobs::Utils::Scheduler::Directives';
 
 =cut
 
-has deps => (
+has 'deps' => (
     default => sub { [] },
     traits  => ['Array'],
     is      => 'rw',
@@ -32,7 +32,7 @@ has deps => (
     },
 );
 
-has cmds => (
+has 'cmds' => (
     traits  => ['Array'],
     is      => 'rw',
     isa     => 'ArrayRef',
@@ -58,7 +58,7 @@ has 'cmd_counter' => (
     },
 );
 
-has hpc_meta => (
+has 'hpc_meta' => (
     traits  => ['Array'],
     is      => 'rw',
     isa     => 'ArrayRef',
@@ -74,7 +74,7 @@ has hpc_meta => (
     },
 );
 
-has scheduler_ids => (
+has 'scheduler_ids' => (
     traits  => ['Array'],
     is      => 'rw',
     isa     => 'ArrayRef',
@@ -88,7 +88,21 @@ has scheduler_ids => (
     },
 );
 
-has submission_failure => (
+has 'lognames' => (
+    traits  => ['Array'],
+    is      => 'rw',
+    isa     => 'ArrayRef',
+    default => sub { [] },
+    handles => {
+        all_lognames    => 'elements',
+        add_lognames    => 'push',
+        has_lognames    => 'count',
+        count_lognames  => 'count',
+        has_no_lognames => 'is_empty',
+    },
+);
+
+has 'submission_failure' => (
   is => 'rw',
   isa => 'Bool',
   traits => ['Bool'],
@@ -98,7 +112,7 @@ has submission_failure => (
   },
 );
 
-has batches => (
+has 'batches' => (
     traits => ['Array'],
     is     => 'rw',
     isa =>
@@ -114,7 +128,6 @@ has batches => (
 );
 
 ##Batches are groups of commands
-
 has batch_indexes => (
     traits  => ['Array'],
     is      => 'rw',

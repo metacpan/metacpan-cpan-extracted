@@ -6,13 +6,14 @@ package WWW::Mechanize;
 use strict;
 use warnings;
 
-our $VERSION = 1.84;
+our $VERSION = '1.86';
 
 use Tie::RefHash;
 use HTTP::Request 1.30;
 use LWP::UserAgent 5.827;
 use HTML::Form 1.00;
 use HTML::TokeParser;
+use Scalar::Util qw(tainted);
 
 use base 'LWP::UserAgent';
 
@@ -1349,11 +1350,11 @@ sub _taintedness {
     # will almost always work on the first try.
     # (Unless, of course, taint checking has been turned off!)
     $_taintbrush = substr("$0$^X", 0, 0);
-    return $_taintbrush if _is_tainted( $_taintbrush );
+    return $_taintbrush if tainted( $_taintbrush );
 
     # Let's try again. Maybe somebody cleaned those.
     $_taintbrush = substr(join('', grep { defined } @ARGV, %ENV), 0, 0);
-    return $_taintbrush if _is_tainted( $_taintbrush );
+    return $_taintbrush if tainted( $_taintbrush );
 
     # If those don't work, go try to open some file from some unsafe
     # source and get data from them.  That data is tainted.
@@ -1363,7 +1364,7 @@ sub _taintedness {
             my $data;
             if ( defined sysread $fh, $data, 1 ) {
                 $_taintbrush = substr( $data, 0, 0 );
-                last if _is_tainted( $_taintbrush );
+                last if tainted( $_taintbrush );
             }
         }
     }
@@ -1373,12 +1374,6 @@ sub _taintedness {
 
     return $_taintbrush;
 }
-
-sub _is_tainted {
-    no warnings qw(void uninitialized);
-
-    return !eval { join('', shift), kill 0; 1 };
-} # _is_tainted
 
 
 
@@ -1647,7 +1642,7 @@ WWW::Mechanize - Handy web browsing in a Perl object
 
 =head1 VERSION
 
-version 1.84
+version 1.86
 
 =head1 SYNOPSIS
 
@@ -2036,7 +2031,7 @@ L<HTML::HeadParser>.  Returns undef if the content is not HTML.
 Returns the content that the mech uses internally for the last page
 fetched. Ordinarily this is the same as
 C<< $mech->response()->decoded_content() >>,
-but this may differ for HTML documents if L</update_html> is
+but this may differ for HTML documents if L<< update_html|/$mech->update_html( $html ) >> is
 overloaded (in which case the value passed to the base-class
 implementation of same will be returned), and/or extra named arguments
 are passed to I<content()>:
@@ -2625,7 +2620,7 @@ of the click.
 
 =head2 $mech->submit()
 
-Submits the page, without specifying a button to click.  Actually,
+Submits the current form, without specifying a button to click.  Actually,
 no button is clicked at all.
 
 Returns an L<HTTP::Response> object.

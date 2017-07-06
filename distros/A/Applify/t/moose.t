@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use lib qw(lib);
+use lib 'lib';
 use Test::More;
 use Applify ();
 
@@ -18,7 +18,7 @@ plan skip_all => 'Moose is not available' unless (eval 'use Moose; 1');
     $INC{'My/Class.pm'} = 'MOCK';
   ] or die $@;
 
-  local @ARGV = qw/ --o-bar 24 --o-foo 42 /;
+  local @ARGV = qw(--o-bar 24 --o-foo 42);
   my $app = eval q[
     use Applify;
     extends 'My::Class';
@@ -33,7 +33,7 @@ plan skip_all => 'Moose is not available' unless (eval 'use Moose; 1');
 
   $app->run;
 
-  can_ok($app, qw/ run o_foo o_bar exit_value do_stuff /);
+  can_ok($app, qw(run o_foo o_bar exit_value do_stuff));
   is($app->exit_value, 123, 'exit_value == 123');
   is($app->o_bar,      24,  'o_bar == 24');
   is($app->o_foo,      42,  'o_foo == 42');

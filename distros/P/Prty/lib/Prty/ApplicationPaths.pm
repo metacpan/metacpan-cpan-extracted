@@ -3,7 +3,7 @@ package Prty::ApplicationPaths;
 use strict;
 use warnings;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use Cwd ();
 use Hash::Util ();
@@ -18,20 +18,20 @@ Prty::ApplicationPaths - Ermittele Pfade einer Unix-Applikation
 
 =head1 SYNOPSIS
 
-    # Homedir: <prefix>/opt/<application>
+    # Homedir: <prefix>/opt/<application> (<prefix> kann leer sein)
     
     use FindBin qw/$Bin/;
-    use lib "$Bin/../lib/perl5";           # d.h. $depth == 1
+    use lib "$Bin/../lib/perl5";  # .. d.h. $depth == 1
     use Prty::ApplicationPaths;
     
-    my $app = Prty::ApplicationPaths->new($depth);
+    my $app = Prty::ApplicationPaths->new;
     
-    my $name = $app->name;                 # <application>
-    my $prefix = $app->prefix($subPath);   # <prefix>
+    my $name = $app->name;        # <application>
+    my $prefix = $app->prefix;    # <prefix>
     
-    my $homeDir = $app->homeDir($subPath); # <prefix>/opt/<application>
-    my $etcDir = $app->etcDir($subPath);   # <prefix>/etc/opt/<application>
-    my $varDir = $app->varDir($subPath);   # <prefix>/var/opt/<application>
+    my $homeDir = $app->homeDir;  # <prefix>/opt/<application>
+    my $etcDir = $app->etcDir;    # <prefix>/etc/opt/<application>
+    my $varDir = $app->varDir;    # <prefix>/var/opt/<application>
 
 =head1 DESCRIPTION
 
@@ -39,8 +39,7 @@ Die Klasse ermöglicht einer Perl-Applikation unter Unix ohne
 hartkodierte absolute Pfade auszukommen. Alle Pfade, unter denen
 sich die verschiedenen Teile der Applikation (opt-, etc-,
 var-Bereich) im Dateisystem befinden, werden von der Klasse aus
-dem Pfad des ausgeführten Programms und aus
-Installations-Konventionen hergeleitet.
+dem Pfad des ausgeführten Programms hergeleitet.
 
 Das Layout entspricht der opt-Installationsstruktur eines
 Unix-Systems:
@@ -361,7 +360,7 @@ Trennzeichens erlaubt:
 
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

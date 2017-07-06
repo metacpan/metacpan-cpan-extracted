@@ -1,0 +1,29 @@
+SYNOPSIS
+
+    In Rinci metadata:
+
+     args => {
+         foo => {
+             ...
+             'x.completion' => [filename => {file_regex_filter=>qr/\.(yaml|yml)$/i}],
+         },
+         ...
+     },
+     ...
+
+DESCRIPTION
+
+    This is a module to support an experimental (and temporary?) way to
+    ease writing completion routine. Instead of putting a coderef in
+    completion or element_completion property in argument specification,
+    you put $name or [$name, \%args] in x.completion or
+    x.element_completion or x.index_completion attributes. $name is the
+    name of Perinci::Sub::XCompletion::* submodule to use, and \%args is
+    arguments.
+
+    But you can also use a coderef as usual.
+
+SEE ALSO
+
+    Perinci::Sub::Complete
+

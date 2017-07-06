@@ -22,8 +22,8 @@ use Prima qw(Application Buttons GLWidget);
 use OpenGL qw(:glfunctions :glconstants);
 
 my $win32     = $^O =~ /win32/i;
-my $show_off  = $::application->get_system_value( sv::LayeredWidgets );
 my $composite = $::application->get_system_value( sv::CompositeDisplay );
+my $show_off  = $::application->get_system_value( sv::LayeredWidgets ) && $composite;
 my $gl_buffer = 1;
 
 sub icosahedron
@@ -114,7 +114,7 @@ sub init
 sub display
 {
 	my $config = shift;
-	glClearColor(0,0,0,0);
+	glClearColor(0,0.0000001,0,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 	glRotatef(23*sin($config-> {spin}*3.14/180),1,0,0);
@@ -163,7 +163,12 @@ sub create_gl_widget
 			glEnable(GL_DEPTH_TEST);
 			glRotatef(0.12,1,0,0);
 		},
-		onPaint      => sub { display($config) },
+		onPaint   => sub {
+			my ($self, $canvas) = @_;
+			$self->gl_paint_state ?
+				display($config) :
+				$canvas->clear;
+		},
 		onMouseDown  => sub { $config->{grab} = 1 },
 		onMouseUp    => sub { $config->{grab} = 0 },
 	);
@@ -188,6 +193,7 @@ sub create_window
 		layered => $show_off,
 		buffered => 0,
 		backColor => 0,
+		onSysHandle => sub { reset_gl($config{widget}, \%config) },
 		menuItems => [
 			['~Options' => [
 				['*' => '~Rotate' => 'Ctrl+R' => '^R' => sub { 
@@ -206,10 +212,6 @@ sub create_window
 				'~Layered' => 'Ctrl+Y' => '^Y' => sub { 
 					my $self = shift;
 					$self->layered( $self-> menu-> toggle( shift ));
-					$config{widget}-> send_to_back;
-					$config{widget}-> gl_destroy;
-					$config{widget}-> gl_create( %{$config{widget}->gl_config} );
-					reset_gl($config{widget} , \%config);
 				}],
 				['' => '~Buffered' => sub {
 					my $self = shift;

@@ -1,5 +1,13 @@
 Revision history for Future
 
+0.35    2017/06/23 20:37:57
+        [CHANGES]
+         * Link to YAPC::EU talk video in SEE ALSO
+
+        [BUGFIXES]
+         * Handle cancelled/completed slots when fmap is cancelled (RT120469)
+           (thanks tm604)
+
 0.34    2016/10/02 18:40:06
         [CHANGES]
          * Added Future::Mutex

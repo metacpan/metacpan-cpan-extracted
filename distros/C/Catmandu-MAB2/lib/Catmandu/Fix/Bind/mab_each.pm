@@ -1,11 +1,11 @@
 package Catmandu::Fix::Bind::mab_each;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Moo;
 use Catmandu::Util;
 
-with 'Catmandu::Fix::Bind';
+with 'Catmandu::Fix::Bind', 'Catmandu::Fix::Bind::Group';
 
 has done => (is => 'ro');
 
@@ -16,7 +16,7 @@ sub unit {
 }
 
 sub bind {
-    my ($self,$mvar,$func,$name,$fixer) = @_;
+    my ($self,$mvar,$code) = @_;
 
     return $mvar if $self->done;
 
@@ -28,7 +28,7 @@ sub bind {
 
         $mvar->{record} = [$row];
 
-        my $fixed = $fixer->fix($mvar);
+        my $fixed = $code->($mvar);
 
         push @new , @{$fixed->{record}} if defined($fixed) && exists $fixed->{record};
     }

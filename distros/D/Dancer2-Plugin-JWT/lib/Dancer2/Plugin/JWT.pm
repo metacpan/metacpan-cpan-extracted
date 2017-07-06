@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Dancer2::Plugin::JWT;
 # ABSTRACT: JSON Web Token made simple for Dancer2
-$Dancer2::Plugin::JWT::VERSION = '0.009';
+$Dancer2::Plugin::JWT::VERSION = '0.011';
 use Dancer2::Plugin;
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use URI;

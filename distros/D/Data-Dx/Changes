@@ -11,3 +11,10 @@ Revision history for Data-Dx
 
 0.000003  Tue Jun 20 06:11:06 2017
 
+
+
+0.000004  Thu Jul  6 13:05:28 2017
+
+    Now works with Perl 5.12 or greater
+    (under Keyword::Declare 0.001003 or later)
+

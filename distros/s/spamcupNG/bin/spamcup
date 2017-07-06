@@ -10,7 +10,7 @@ use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
 use SpamcupNG qw(main_loop get_browser read_config %MAP);
 
-our $VERSION = '0.4'; #VERSION
+our $VERSION = '0.6'; #VERSION
 # Delay between HTTP requests. Adjust this if Spamcop.net asks!
 use constant DELAY => 5;
 

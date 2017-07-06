@@ -14,11 +14,11 @@ BEGIN {
 }
 
 {
-   # from common::sense 3.7
+   # from common::sense 3.74
    use strict qw(vars subs);
    no warnings;
    use warnings qw(FATAL closed threads internal debugging pack malloc portable prototype
-                   inplace io pipe unpack deprecated glob digit printf
+                   inplace io pipe unpack glob digit printf
                    layer reserved taint closure semicolon);
    no warnings qw(exec newline unopened);
 
@@ -165,6 +165,11 @@ linux	TCP_INFO	11
 linux	TCP_QUICKACK	12
 linux	TCP_CONGESTION	13
 linux	TCP_MD5SIG	14
+linux	TCP_FASTOPEN	23
+linux	MSG_DONTWAIT	0x0040
+linux	MSG_NOSIGNAL	0x4000
+linux	MSG_MORE	0x8000
+linux	MSG_FASTOPEN	0x20000000
 netbsd	TCP_MAXSEG	2
 netbsd	TCP_KEEPIDLE	3
 netbsd	TCP_NOPUSH	4
@@ -174,15 +179,17 @@ netbsd	TCP_KEEPINIT	7
 netbsd	TCP_NOOPT	8
 netbsd	TCP_MD5SIG	0x10
 netbsd	TCP_CONGESTION	0x20
-cygwin  TCP_MAXSEG      0x02
-cygwin  TCP_NOPUSH      0x04
-cygwin  TCP_NOOPT       0x08
+netbsd	MSG_NOSIGNAL	0x0400
+cygwin	TCP_MAXSEG	0x02
+cygwin	TCP_NOPUSH	0x04
+cygwin	TCP_NOOPT	0x08
 freebsd	TCP_MAXSEG	0x02
 freebsd	TCP_NOPUSH	0x04
 freebsd	TCP_NOOPT	0x08
 freebsd	TCP_MD5SIG	0x10
 freebsd	TCP_INFO	0x20
 freebsd	TCP_CONGESTION	0x40
+freebsd	MSG_NOSIGNAL	0x20000
 solaris	TCP_CORK	0x18
 solaris	TCP_LINGER2	0x1C
 solaris	TCP_INIT_CWND	0x15

@@ -1,0 +1,10 @@
+name = "Mojolicious-Plugin-Template-Mustache"
+badges = ["metacpan"]
+authority="cpan:CYNOVG"
+
+module_maker="ModuleBuildTiny"
+
+license="gpl_3"
+[release]
+pause_config = "/home/cynovg/.pause"
+

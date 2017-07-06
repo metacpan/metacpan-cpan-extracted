@@ -151,51 +151,53 @@ sub _on_status_change ($self) {
 }
 
 sub _find_proxy ( $self, $connect, $ban_id ) {
-    state $q = $self->storage->dbh->query(
+    my $dbh = $self->storage->dbh;
+
+    state $q = $dbh->prepare(
         <<'SQL'
-            SELECT hostport
-            FROM proxy
-            LEFT JOIN proxy_connect ON proxy.id = proxy_connect.proxy_id
+            SELECT "hostport"
+            FROM "proxy"
+            LEFT JOIN "proxy_connect" ON "proxy"."id" = "proxy_connect"."proxy_id"
             WHERE
-                proxy.connect_error = 0
-                AND proxy.source_enabled = 1
-                AND proxy.weight > 0
+                "proxy"."connect_error" = 0
+                AND "proxy"."source_enabled" = 1
+                AND "proxy"."weight" > 0
                 AND (
-                    proxy_connect.connect_id IS NULL          -- not tested connection
+                    "proxy_connect"."connect_id" IS NULL          -- not tested connection
                     OR (
-                        proxy_connect.connect_id = ?          -- or tested connection with required id
-                        AND proxy_connect.proxy_type > 0      -- and positive test result
+                        "proxy_connect"."connect_id" = ?          -- or tested connection with required id
+                        AND "proxy_connect"."proxy_type" > 0      -- and positive test result
                     )
                 )
-            ORDER BY proxy.weight ASC
+            ORDER BY "proxy"."weight" ASC
             LIMIT 1
 SQL
     );
 
-    state $q_ban_check = $self->storage->dbh->query(
+    state $q_ban_check = $dbh->prepare(
         <<'SQL'
-                SELECT hostport
+                SELECT "hostport"
                 FROM
-                ( SELECT id, hostport, weight
-                        FROM proxy
-                        LEFT JOIN proxy_connect ON proxy.id = proxy_connect.proxy_id
+                ( SELECT "id", "hostport", "weight"
+                        FROM "proxy"
+                        LEFT JOIN "proxy_connect" ON "proxy"."id" = "proxy_connect"."proxy_id"
                         WHERE
-                            proxy.connect_error = 0
-                            AND proxy.source_enabled = 1
-                            AND proxy.weight > 0
+                            "proxy"."connect_error" = 0
+                            AND "proxy"."source_enabled" = 1
+                            AND "proxy"."weight" > 0
                             AND (
-                                proxy_connect.connect_id IS NULL          -- not tested connection
+                                "proxy_connect"."connect_id" IS NULL          -- not tested connection
                                 OR (
-                                    proxy_connect.connect_id = ?          -- or tested connection with required id
-                                    AND proxy_connect.proxy_type > 0      -- and positive test result
+                                    "proxy_connect"."connect_id" = ?          -- or tested connection with required id
+                                    AND "proxy_connect"."proxy_type" > 0      -- and positive test result
                                 )
                             )
-                ) proxy
-                LEFT JOIN proxy_ban ON proxy.id = proxy_ban.proxy_id
+                ) "proxy"
+                LEFT JOIN "proxy_ban" ON "proxy"."id" = "proxy_ban"."proxy_id"
                 WHERE
-                    proxy_ban.ban_id IS NULL
-                    OR proxy_ban.ban_id != ?                               -- ban id is not match
-                ORDER BY proxy.weight ASC
+                    "proxy_ban"."ban_id" IS NULL
+                    OR "proxy_ban"."ban_id" != ?                               -- ban id is not match
+                ORDER BY "proxy"."weight" ASC
                 LIMIT 1
 SQL
     );
@@ -203,14 +205,14 @@ SQL
     my $res;
 
     if ( defined $ban_id ) {
-        $res = $q_ban_check->selectval( [ $self->storage->_connect_id->{ $connect->[3] }, $ban_id ] );
+        $res = $dbh->selectrow( $q_ban_check, [ $self->storage->_connect_id->{ $connect->[3] }, $ban_id ] );
     }
     else {
-        $res = $q->selectval( [ $self->storage->_connect_id->{ $connect->[3] } ] );
+        $res = $dbh->selectrow( $q, [ $self->storage->_connect_id->{ $connect->[3] } ] );
     }
 
     if ($res) {
-        return $self->list->{ $res->$* };
+        return $self->list->{ $res->{hostport} };
     }
     else {
         return;
@@ -226,7 +228,7 @@ SQL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 206, 209             | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 208, 211             | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

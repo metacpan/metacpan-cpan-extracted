@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010_000;
 
-our $VERSION = '2.036000';
+our $VERSION = '2.036005';
 use App::Netdisco::Configuration;
 
 use Module::Find ();
@@ -219,7 +219,8 @@ run for each installation:
  # restart web service (if you run it)
  ~/bin/netdisco-web restart
  
- # restart job daemon (if you run it)
+ # stop old daemon and start new backend worker (wherever you run them)
+ ~/bin/netdisco-daemon stop
  ~/bin/netdisco-backend restart
 
 =head1 Tips and Tricks

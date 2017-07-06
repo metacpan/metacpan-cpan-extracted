@@ -95,7 +95,7 @@ for (1..$rounds) {
         my $t0= -time();
         my @futures;
         for (1..$num) {
-            push @futures, $client->future_execute($select_query, [ $_, $_ * 2 ]);
+            push @futures, $client->future_execute($select_query, [ $_ ]);
         }
         $_->() for @futures;
         my $diff= time() + $t0;

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XS.xs
+t/Device-HID-XS.t
+lib/Device/HID/XS.pm

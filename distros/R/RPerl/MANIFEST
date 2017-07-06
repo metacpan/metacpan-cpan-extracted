@@ -1045,6 +1045,14 @@ lib/RPerl/Test/Operator06RegularExpressionMatch/program_00_bad_05.pl
 lib/RPerl/Test/Operator06RegularExpressionMatch/program_00_bad_06.pl
 lib/RPerl/Test/Operator06RegularExpressionMatch/program_00_bad_07.pl
 lib/RPerl/Test/Operator06RegularExpressionMatch/program_00_good.pl
+lib/RPerl/Test/Operator06RegularExpressionMatch/program_01_good.cpp.CPPOPS_CPPTYPES
+lib/RPerl/Test/Operator06RegularExpressionMatch/program_01_good.pl
+lib/RPerl/Test/Operator06RegularExpressionMatch/program_02_good.pl
+lib/RPerl/Test/Operator06RegularExpressionMatch/program_10_bad_00.pl.DISABLED_NEED_PROPER_TESTS
+lib/RPerl/Test/Operator06RegularExpressionMatch/program_10_bad_01.pl
+lib/RPerl/Test/Operator06RegularExpressionMatch/program_10_good.cpp.CPPOPS_CPPTYPES
+lib/RPerl/Test/Operator06RegularExpressionMatch/program_10_good.pl
+lib/RPerl/Test/Operator06RegularExpressionMatch/program_11_good.pl
 lib/RPerl/Test/Operator07ArithmeticMultiplyDivideModulo/program_00_bad_00.pl
 lib/RPerl/Test/Operator07ArithmeticMultiplyDivideModulo/program_00_bad_01.pl
 lib/RPerl/Test/Operator07ArithmeticMultiplyDivideModulo/program_00_bad_02.pl
@@ -1954,6 +1962,10 @@ script/development/grammar_decrement.pl
 script/development/grammar_increment.pl
 script/development/grammar_medium_recompile.sh
 script/development/grammar_recompile.sh
+script/development/jpcre2_manual_full.cpp
+script/development/jpcre2_manual_full_build.sh
+script/development/jpcre2_manual_short.cpp
+script/development/jpcre2_manual_short_build.sh
 script/development/learning_rperl_generate.sh
 script/development/namespaces_regenerate.pl
 script/development/pod2rperlhtml.pl

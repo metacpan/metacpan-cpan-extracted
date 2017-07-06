@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Bus;
-$Lab::Bus::VERSION = '3.550';
+$Lab::Bus::VERSION = '3.552';
 use strict;
 
 use Lab::Generic;

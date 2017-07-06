@@ -5,6 +5,7 @@ use Cwd;
 use IPC::Open3;
 use IO::Select;
 use Symbol;
+use Try::Tiny;
 
 =head3 process_submit_command
 
@@ -23,6 +24,8 @@ sub process_submit_command {
     my $command = "";
 
     my $logname = $self->create_log_name($counter);
+
+    $self->jobs->{$self->current_job}->add_lognames($logname);
 
     $command = "sleep 20\n";
     $command .= "cd " . getcwd() . "\n";
@@ -50,8 +53,11 @@ sub process_submit_command {
       . $self->jobs->{ $self->current_job }->procs . " \\\n"
       . "\t--logname "
       . $logname . " \\\n"
+      . "\t--data_tar "
+      . $self->data_tar . " \\\n"
       . "\t--process_table "
       . $self->process_table;
+
 
     #TODO Update metastring to give array index
     my $metastr =
@@ -171,28 +177,29 @@ sub submit_to_scheduler {
     my $self           = shift;
     my $submit_command = shift;
 
-    my ( $infh, $outfh, $errfh );
+    my ( $infh, $outfh, $errfh, $exitcode, $cmdpid, $stdout, $stderr );
     $errfh = gensym();
-    my $cmdpid;
-    eval {
-        $cmdpid =
-          open3( $infh, $outfh, $errfh, "$submit_command " . $self->slurmfile );
+    try {
+        $cmdpid = open3( $infh, $outfh, $errfh, $submit_command );
+    }
+    catch {
+        $exitcode = $?;
+        $self->app_log->fatal( 'Cmd failed : ' . $submit_command );
+        $self->app_log->fatal( 'Cmd failed with exitcode ' . $exitcode );
+        return [ $exitcode, '', $@ ];
     };
-    die $@ if $@;
+
+    return unless $cmdpid;
 
     my $sel = new IO::Select;    # create a select object
     $sel->add( $outfh, $errfh ); # and add the fhs
-    my ( $stdout, $stderr );
 
     while ( my @ready = $sel->can_read ) {
         foreach my $fh (@ready) {    # loop through them
             my $line;
             my $len = sysread $fh, $line, 4096;
-            if ( not defined $len ) {
-
-                #Something weird happened
-            }
-            elsif ( $len == 0 ) {
+            next unless defined $len;
+            if ( $len == 0 ) {
                 $sel->remove($fh);
                 close($fh);
             }
@@ -208,12 +215,11 @@ sub submit_to_scheduler {
     }
 
     waitpid( $cmdpid, 1 );
-    my $exitcode = $?;
+    $exitcode = $?;
 
     $sel->remove($outfh);
     $sel->remove($infh);
 
-    sleep(5);
     return ( $exitcode, $stdout, $stderr );
 }
 

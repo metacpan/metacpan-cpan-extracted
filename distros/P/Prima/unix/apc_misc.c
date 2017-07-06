@@ -1034,9 +1034,10 @@ apc_show_message( const char * message, Bool utf8)
 	XMoveResizeWindow( DISP, md. w, 
 		appPos.x + ( appSz.x - winSz.x) / 2, appPos.y + ( appSz.y - winSz.y) / 2, winSz.x, winSz.y);
 	XNoOp( DISP);
-	XFlush( DISP);
-	while ( md. active && !guts. applicationClose) 
+	while ( md. active && !guts. applicationClose) {
+		XFlush( DISP);
 		prima_one_loop_round( WAIT_ALWAYS, false);
+	}
 	
 	XFreeGC( DISP, md. gc);
 	XDestroyWindow( DISP, md. w);
@@ -1136,8 +1137,8 @@ apc_sys_get_value( int v)  /* XXX one big XXX */
 		break;
 	case svXPointer:		return guts. cursor_width;
 	case svYPointer:		return guts. cursor_height;
-	case svXScrollbar:		return 16;
-	case svYScrollbar:		return 16;
+	case svXScrollbar:		return 19;
+	case svYScrollbar:		return 19;
 	case svXCursor:		return 1;
 	case svAutoScrollFirst:	return guts. scroll_first;
 	case svAutoScrollNext:	return guts. scroll_next;
@@ -1245,12 +1246,12 @@ apc_system_action( const char *s)
 				return duplicate_string( buf);
 			return duplicate_string("");
 		} else if ( strncmp( s, "gtk2.OpenFile.", 14) == 0) {
-#ifdef WITH_GTK2
 			s += 14;
-			return prima_gtk_openfile(( char*) s);
-#else
-			return nil;
+#ifdef WITH_GTK2
+			if ( guts. use_gtk ) 
+				return prima_gtk_openfile(( char*) s);
 #endif
+			return nil;
 		}
 		break;
 	case 'r':

@@ -42,17 +42,25 @@ software (or you want to use interrupts), you should do some pre-configuration
 of your system. Note that the system installed Perl does not use threads, which
 is required for interrupts to function.
 
-As your normal, every day user, install L<perlbrew|http://perlbrew.pl>, Then
-install an instance of Perl, and switch to it:
+As your normal, every day user, install L<perlbrew|http://perlbrew.pl>:
 
-    perlbrew install perl-5.24.0
-    perlbrew switch perl-5.24.0
+    \wget -O - https://install.perlbrew.pl | bash
+    echo "source /home/pi/perl5/perlbrew/etc/bashrc" >> ~/.bashrc
+
+First thing to do is to install the appropriate `cpanm` version:
+
+    perlbrew install-cpanm
+
+Then, install an instance of Perl, and switch to it:
+
+    perlbrew install perl-5.26.0
+    perlbrew switch perl-5.26.0
 
 To use C<sudo> to run your scripts within the appropriate Perl
 installation, you need to modify the C</etc/sudoers> file. Prepend the string
 value for the C<secure_path> directive to include the path to the new
 C<perlbrew> managed perl, followed by a colon. For example:
-C</home/pi/perl5/perlbrew/perls/perl-5.24.0/bin:>. Leave the existing part of
+C</home/pi/perl5/perlbrew/perls/perl-5.26.0/bin:>. Leave the existing part of
 the string in place.
 
 Now, you can do everything with the normal user account, using their personal
@@ -180,6 +188,66 @@ obviously want to be doing other things while waiting for that button press.
 NOTE: If you receive errors about the handler callback not being found, simply
 specify the callback with the full package (eg. C<'main::handler'>).
 
+=head1 I2C BUS
+
+Allows you to read and write to devices on the I2C bus using the external
+L<RPi::I2C> distribution. Please refer to that documentation for full usage
+instructions.
+
+=head2 Instantiation and communication
+
+    my $device_addr = 0x04;
+
+    my $device = $pi->i2c($device_addr);
+
+    # read a single byte at the default register address
+
+    print $device->read;
+
+    # read a single byte at a specified register
+
+    print $device->read_byte(0x15);
+
+    # read a block of five bytes (register param optional, not shown)
+
+    my @bytes = $device->read_block(5);
+
+    # write a byte
+
+    $device->write(255);
+
+    # write a byte to a register location
+
+    $device->write_byte(255, 0x0A);
+
+    # write a block of bytes (register param left out again)
+
+    $device->write_block([1, 2, 3, 4]);
+
+=head1 SERIAL BUS
+
+Allows you to perform basic read and write operations on a standard serial
+interface using the L<RPi::Serial> library. See that documentation for full
+usage information.
+
+    my $dev  = "/dev/ttyAMA0";
+    my $baud = 115200;
+
+    my $ser = $pi->serial($dev, $baud);
+
+    $ser->putc(5);
+
+    my $char = $ser->getc;
+
+    $ser->puts("hello, world!");
+
+    my $num_bytes = 12;
+    my $str  = $ser->gets($num_bytes);
+
+    $ser->flush;
+
+    my $bytes_available = $ser->avail;
+
 =head1 SERIAL PERIPHERAL INTERFACE (SPI) BUS
 
 =head2 Set up and communication
@@ -255,7 +323,7 @@ documentation for full configuration and usage instructions.
         cs      => $dac_cs_pin
     );
 
-    my ($dacA, $dacB) = (0, 0);
+    my ($dacA, $dacB) = (0, 1);
 
     $dac->set($dacA, 4095); # 100% output
     $dac->set($dacB, 0);    # 0% output
@@ -364,8 +432,6 @@ NOTE: When in 4-bit mode, although you're setting C<d0> through C<d3> pins
 up and leaving C<d4> through C<d7> as C<0>, the wiring must connect to LCD pins
 C<d4> through C<d7>. Look at LCD pin 4-7 as LCD pin 0-3 when in 4-bit mode.
 
-    my $lcd = $pi->lcd;
-
     my %lcd_args = (
         rows  => 2,     # number of display rows, 2 or 4
         cols  => 16,    # number of display columns 16 or 20
@@ -380,7 +446,7 @@ C<d4> through C<d7>. Look at LCD pin 4-7 as LCD pin 0-3 when in 4-bit mode.
         d7    => 11     # GPIO pins
     );
 
-    $lcd->init(%lcd_args);
+    my $lcd = $pi->lcd(%lcd_args);
 
 =head2 Display operations
 
@@ -491,15 +557,41 @@ First off, please review the C<t/README> file for the GPIO pins we use for the
 test physical configuration, and set up the Pi according to the
 L<unit test diagram|https://stevieb9.github.io/rpi-wiringpi/breadboard/brewbuild_test_platform_bb.jpg>.
 
+=head3 Base information
+
 Before running the tests, you need to set a special environment variable so that
 we know we're on a Pi board. This ensures CPAN testers won't run the tests
 across all of its platforms:
 
     export RPI_BOARD=1
 
+Personally, I set all the environment variables in my C</etc/environment> file.
+
 There are a couple of test files that require root privileges, but we handle
 this internally by re-running the file with C<sudo> enabled. This allows all
 tests but these couple to be run as a standard user.
+
+=head3 Arduino/I2C
+
+For testing the L<RPi::I2C> module, we have a dedicated Arduino sketch in the
+C<docs/sketch> directory that we test against. Install the sketch, hook up the
+I2C between the Pi and the Arduino, and connect a ground pin on the Arduino to
+the ground bus on the Pi.
+
+You then set the following environment variable:
+
+    export RPI_ARDUINO=1
+
+These tests skip by default.
+
+=head3 Serial Port Testing
+
+To test the serial port L<RPi::Serial> library, you must have a loopback
+between the Tx and Rx pins, and:
+
+    export RPI_SERIAL=1
+
+These tests will skip by default otherwise.
 
 =head2 Automated with L<Test::BrewBuild>
 
@@ -520,14 +612,14 @@ repository commit checksum differs from the remote. To bypass this check and
 execute a test run every cycle regardless if the checksums differ or not, send
 in the C<--csum|-c> flag to C<bbtester>:
 
-    bbtester start -a --c
+    bbtester start -a -c
 
 Next, run a C<bbdispatch> run against the local tester in C<--auto> mode. The
 C<-a> flag with no parameters runs continuously, sleeping for a default of 60
 seconds between runs. Simply send in an integer value that represents a certain
 number of runs if desired.
 
-    bbdispatch -r https://github.com/stevieb9/rpi-wiringpi -a
+    bbdispatch -t localhost -r https://github.com/stevieb9/rpi-wiringpi -a
 
 To use the LCD functionality which displays the last date/time that a test run
 succeeded, along with the last commit tested and it's result (PASS/FAIL), set
@@ -543,10 +635,24 @@ numbers that the LCD is connected to:
 To make it work. I set this one in C</etc/environment> as well. You then need to
 restart the dispatcher with the C<--rpi> or the equivalent C<-R> flag:
 
-    bbdispatch -r https://github.com/stevieb9/rpi-wiringpi -a 0 --rpi
+    bbdispatch -t localhost -r https://stevieb9/rpi-wiringpi -a --rpi
 
 The C<--rpi> flag is rather hidden (but it *is* documented subtly), as this is
 a feature that most likely I'll be the only consumer of.
+
+=head1 DEVELOPMENT
+
+Section that describes some particulars when developing or adding new external
+devices to L<RPi::WiringPi>. This section is new, and very incomplete. I'll
+add things as I think of them.
+
+=head2 Pins
+
+Any time you accept a pin number to pass along to an external module for use,
+you *must* call C<$self->register_pin($pin_num)> in order to have the cleanup
+functionality tidy things up properly. Neglecting to do this will prevent the
+cleanup regimen from knowing about these pins, and therefore will be left in an
+inconsistent state, possibly causing damage on a different run.
 
 =head1 AUTHOR
 

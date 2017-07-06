@@ -15,7 +15,7 @@ my $rmq_connect_opts = {
     port  => 5672,
     user  => 'guest',
     pass  => 'guest',
-    vhost => 'test',
+    vhost => '/',
 };
 
 my $exchange = {

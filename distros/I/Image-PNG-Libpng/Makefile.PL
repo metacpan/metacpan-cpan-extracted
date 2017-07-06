@@ -6,14 +6,18 @@ use ExtUtils::Constant;
 use 5.008001;
 
 use lib 'inc';
+use CheckForLibPng;
 
-use Devel::CheckLib;
+my $vars = check_for_libpng (undef);
 
-check_lib_or_exit (lib => 'png', header => 'png.h');
+if (! $vars) {
+    print STDERR "Libpng may not be present on this system.\n";
+    exit;
+}
 
 WriteMakefile (
     NAME         => 'Image::PNG::Libpng',
-    VERSION      => '0.43',
+    VERSION      => '0.44',
     ABSTRACT     => 'Perl interface to libpng',
     OBJECT       => 'Libpng.o',
     LIBS         => '-lpng',
@@ -44,3 +48,6 @@ ExtUtils::Constant::WriteConstants(
     XS_FILE      => 'const-xs.inc',
 );
 
+# Local variables:
+# mode: perl
+# End:

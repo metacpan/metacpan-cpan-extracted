@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR::Avoided;
 
-our $DATE = '2017-06-19'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2017-07-01'; # DATE
+our $VERSION = '0.23'; # VERSION
 
 our @Module_Lists = (
     {
@@ -105,6 +105,22 @@ documentation of <pm:Cpanel::JSON::XS> for more details on those.
 _
                 alternate_modules => ['Cpanel::JSON::XS'],
             },
+            {
+                module => 'Module::Path',
+                summary => '',
+                description => <<'_',
+
+It's a nice little concept and module, and often useful. But the decision like
+defaulting to doing abs_path()
+(https://rt.cpan.org/Public/Bug/Display.html?id=100979), which complicates the
+module, makes its behavior different than Perl's require(), as well as opens the
+can of worms of ugly filesytem details, has prompted me to release an
+alternative. Module::Path::More also has the options to find .pod and/or .pmc
+file, and find all matches instead of the first.
+
+_
+                alternate_modules => ['Module::Path::More'],
+            },
         ],
     },
 );
@@ -124,7 +140,7 @@ Acme::CPANLists::PERLANCAR::Avoided - Modules I'm currently avoiding
 
 =head1 VERSION
 
-This document describes version 0.22 of Acme::CPANLists::PERLANCAR::Avoided (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-06-19.
+This document describes version 0.23 of Acme::CPANLists::PERLANCAR::Avoided (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-01.
 
 =head1 MODULE LISTS
 
@@ -209,6 +225,19 @@ documentation of L<Cpanel::JSON::XS> for more details on those.
 
 
 Alternate modules: L<Cpanel::JSON::XS>
+
+=item * L<Module::Path>
+
+It's a nice little concept and module, and often useful. But the decision like
+defaulting to doing abs_path()
+(https://rt.cpan.org/Public/Bug/Display.html?id=100979), which complicates the
+module, makes its behavior different than Perl's require(), as well as opens the
+can of worms of ugly filesytem details, has prompted me to release an
+alternative. Module::Path::More also has the options to find .pod and/or .pmc
+file, and find all matches instead of the first.
+
+
+Alternate modules: L<Module::Path::More>
 
 =back
 

@@ -1,5 +1,5 @@
-Lyrics-Fetcher-LyricsTranslate version 0.002
-============================================
+Lyrics-Fetcher-LyricsTranslate version 0.002001
+===============================================
 
 This module tries to get translated lyrics from
 http://lyricstranslate.com. It searches for a translation of the given
@@ -26,7 +26,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2016 by Marius Gavrilescu
+Copyright (C) 2016-2017 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.0 or,

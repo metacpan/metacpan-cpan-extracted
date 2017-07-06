@@ -1,14 +1,19 @@
 
 package String::CRC32;
 
+use strict;
+use warnings;
+
 require Exporter;
 require DynaLoader;
 
+use vars qw/ @ISA $VERSION @EXPORT_OK @EXPORT /;
+
 @ISA = qw(Exporter DynaLoader);
 
-$VERSION = 1.5;
+$VERSION = 1.600;
 
-# Items to export into callers namespace by default
+# Items to export into caller's namespace by default
 @EXPORT = qw(crc32);
 
 # Other items we are prepared to export if requested

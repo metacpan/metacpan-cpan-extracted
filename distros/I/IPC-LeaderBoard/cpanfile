@@ -13,4 +13,5 @@ on configure => sub {
 on test => sub {
     requires 'Test::Fatal';
     requires 'Test::More';
+    requires 'Test::Warnings';
 };

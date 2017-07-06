@@ -7,13 +7,14 @@ use 5.010001;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Collection of CLI utilities related to App::FatPacker",
+  "ABSTRACT" => "Collection of CLI utilities related to fatpacking",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "App-FatPackUtils",
   "EXE_FILES" => [
+    "bin/fatpack-extract",
     "bin/fatpack-info",
     "bin/fatpack-modules",
     "bin/update-fatpack-snippets"
@@ -29,13 +30,14 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::hash" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "ExtUtils::MakeMaker" => 0,
+    "File::Path" => 0,
     "File::Slurper" => 0,
     "File::Temp" => 0,
     "File::Which" => 0,
-    "Log::Any::IfLOG" => "0.07",
+    "Log::ger" => "0.011",
     "Module::FatPack" => "0.16",
     "Perinci::CmdLine::Any" => 0,
-    "Perinci::CmdLine::Base" => "1.66",
+    "Perinci::CmdLine::Base" => "1.75",
     "Perinci::Object" => "0.26",
     "Perinci::Sub::ArgEntity::filename" => 0,
     "Perinci::Sub::ArgEntity::modulename" => 0,
@@ -49,7 +51,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,16 +66,17 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::hash" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "ExtUtils::MakeMaker" => 0,
+  "File::Path" => 0,
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "File::Which" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::Any::IfLOG" => "0.07",
+  "Log::ger" => "0.011",
   "Module::FatPack" => "0.16",
   "Perinci::CmdLine::Any" => 0,
-  "Perinci::CmdLine::Base" => "1.66",
+  "Perinci::CmdLine::Base" => "1.75",
   "Perinci::Object" => "0.26",
   "Perinci::Sub::ArgEntity::filename" => 0,
   "Perinci::Sub::ArgEntity::modulename" => 0,

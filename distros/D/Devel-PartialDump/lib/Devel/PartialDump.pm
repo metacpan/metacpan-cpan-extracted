@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Devel::PartialDump; # git description: v0.17-22-g89868be
+package Devel::PartialDump; # git description: v0.19-3-ga398185
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Partial dumping of data structures, optimized for argument printing.
 # KEYWORDS: development debugging dump dumper diagnostics deep data structures
-# vim: set ts=8 sts=4 sw=4 tw=78 et :
 
-our $VERSION = '0.18';
+our $VERSION = '0.20';
 
 use Carp ();
 use Scalar::Util qw(looks_like_number reftype blessed);
@@ -42,7 +42,7 @@ use Sub::Exporter -setup => {
 sub replacement_caller_info {
     my $i = shift(@_) + 1;
 
-    package DB; # git description: v0.17-22-g89868be
+    package DB; # git description: v0.19-3-ga398185
     my %call_info;
     @call_info{
     qw(pack file line sub has_args wantarray evaltext is_require)
@@ -327,7 +327,7 @@ Devel::PartialDump - Partial dumping of data structures, optimized for argument 
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -587,13 +587,24 @@ has been reached.
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-PartialDump>
+(or L<bug-Devel-PartialDump@rt.cpan.org|mailto:bug-Devel-PartialDump@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.perl.org/list/moose.html>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#moose> on C<irc.perl.org>|irc://irc.perl.org/#moose>.
+
 =head1 AUTHOR
 
 יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Florian Ragwitz Steven Lee Jesse Luehrs David Golden Leo Lapworth
+=for stopwords Karen Etheridge Florian Ragwitz Steven Lee Leo Lapworth Jesse Luehrs David Golden Paul Howarth
 
 =over 4
 
@@ -611,6 +622,10 @@ Steven Lee <stevenwh.lee@gmail.com>
 
 =item *
 
+Leo Lapworth <web@web-teams-computer.local>
+
+=item *
+
 Jesse Luehrs <doy@tozt.net>
 
 =item *
@@ -619,11 +634,11 @@ David Golden <dagolden@cpan.org>
 
 =item *
 
-Leo Lapworth <web@web-teams-computer.local>
+Paul Howarth <paul@city-fan.org>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2008 by יובל קוג'מן (Yuval Kogman).
 

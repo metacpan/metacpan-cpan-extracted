@@ -36,6 +36,7 @@ WriteMakefile1(
           url  => 'git://github.com/rschupp/Module-ScanDeps.git',
           web  => 'https://github.com/rschupp/Module-ScanDeps',
         },
+        MailingList => 'par@perl.org',
       },
       no_index => {
         package => [qw( Module::ScanDeps::Cache Module::ScanDeps::DataFeed )],

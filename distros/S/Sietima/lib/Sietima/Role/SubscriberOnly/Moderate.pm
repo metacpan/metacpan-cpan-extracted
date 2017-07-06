@@ -5,7 +5,7 @@ use Email::Stuffer;
 use Email::MIME;
 use namespace::clean;
 
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: moderate messages from non-subscribers
 
 
@@ -133,7 +133,7 @@ Sietima::Role::SubscriberOnly::Moderate - moderate messages from non-subscribers
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

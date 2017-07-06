@@ -9,6 +9,6 @@ use HTML::Scrubber;
 
 my $scrubber = HTML::Scrubber->new;
 $scrubber->default(1);
-is( $scrubber->scrub('<hr/><hr><hr /><hr></hr>'), '<hr /><hr><hr /><hr></hr>', "correct result" );
+is( $scrubber->scrub('<hr/><hr><hr /><hr></hr>'), '<hr /><hr><hr /><hr>', "correct result" );
 
 done_testing;

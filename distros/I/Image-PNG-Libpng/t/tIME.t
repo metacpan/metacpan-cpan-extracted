@@ -3,7 +3,7 @@
 
 use warnings;
 use strict;
-use FindBin;
+use FindBin '$Bin';
 use Image::PNG::Libpng ':all';
 use Image::PNG::Const ':all';
 use Test::More;
@@ -50,7 +50,7 @@ my @tests = (
 );
 
 for my $test (@tests) {
-    my $png = read_png_file ("$FindBin::Bin/libpng/$test->{file}.png");
+    my $png = read_png_file ("$Bin/libpng/$test->{file}.png");
     my $time = $png->get_tIME ();
     ok ($time, "Got time from $test->{file}");
     for my $k (@fields) {

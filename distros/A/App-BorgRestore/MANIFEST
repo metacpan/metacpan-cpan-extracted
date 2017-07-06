@@ -17,5 +17,7 @@ t/01_untaint.t
 t/02_parsing.t
 t/03_timespec.t
 t/04_find_archives.t
+t/05_pod.t
+t/06_pod_coverage.t
 META.yml
 MANIFEST

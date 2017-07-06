@@ -9,7 +9,10 @@ local $| = 1;
 
 use Test::More tests => 10;
 use Test::Deep;
-use t::lib::Debugger;
+BEGIN {
+  require "./t/lib/Debugger.pm";
+  t::lib::Debugger->import;
+}
 
 # Testing step_in (s) and show_line (.) on a simple script
 

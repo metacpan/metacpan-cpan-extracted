@@ -1,0 +1,117 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 8b0ba8c7e16430a02c2eb4c0b94ed0fda06880ca Changes
+SHA1 48053faafd0eb8e1d868a70963e81b6a9336149f MANIFEST
+SHA1 7dccfa260be041c3852b4722ec9c11dfcb1e80e9 META.json
+SHA1 261e7583acb234315f3d2e93e97573ac5028e2f7 META.yml
+SHA1 c05aeeed963f8fd463de9649b7f5c6ed987b2633 Makefile.PL
+SHA1 c83013eac9c28f0de5419e400b73d7ad18dcee3d README
+SHA1 9d3f4cb58324179c53eae8fb7806d78059025907 Scrypt.xs
+SHA1 c92f1b0c6aa2a1deb36ef483ad65ec6381830a0f lib/Authen/Passphrase/Scrypt.pm
+SHA1 b7a1aba3cbf230cd3de6d5105258587f6a8484fd ppport.h
+SHA1 c39f0710ba68c745c80424200af1b1311aaa6587 scrypt-1.2.1/BUILDING
+SHA1 636868c08fcf7219c89f8a61f5b0223768c2a641 scrypt-1.2.1/COPYRIGHT
+SHA1 68a2371877a29cf15e7c3eeee3aa4774dbaad7fe scrypt-1.2.1/FORMAT
+SHA1 4c17b5d52cab5ebd45abe28d290761ce9350c00b scrypt-1.2.1/Makefile.in
+SHA1 47d975f9bf083d9322249de8a49ff3de9c5c003c scrypt-1.2.1/autotools/Makefile.am
+SHA1 6c4e2d29c61bd1eb950c7e0c58b11540eec848e2 scrypt-1.2.1/autotools/configure.ac
+SHA1 bd59743e475ef3fa5ac10601b3477ee74cd5e794 scrypt-1.2.1/config.aux/ar-lib
+SHA1 03a05e37267c2f1c9fea4f2a6a15f8a7beb91c0d scrypt-1.2.1/config.aux/compile
+SHA1 44f711c72acb3fb13ece5b665aaf9d6449ad2574 scrypt-1.2.1/config.aux/depcomp
+SHA1 b99fec102eb24bffd53ab61fc30d59e810f116a2 scrypt-1.2.1/config.aux/install-sh
+SHA1 fced81554799feb0f10fb56e3a06acb92c7ce7b0 scrypt-1.2.1/config.aux/missing
+SHA1 412581c6c2ae3c238a2be9f45d37e8bc223e6025 scrypt-1.2.1/config.h.in
+SHA1 e0003caf8c2b7fa04891e5ac3b16d45eaca25616 scrypt-1.2.1/configure
+SHA1 b5588c3f39ca8b219eb82057f750e31543657dee scrypt-1.2.1/lib/README
+SHA1 04ae16ed357be7bd139f6900c15123ca51c5db59 scrypt-1.2.1/lib/crypto/crypto_scrypt-ref.c
+SHA1 10bb2f114861df1be6728ce0e95b809bdeaddc8f scrypt-1.2.1/lib/crypto/crypto_scrypt.c
+SHA1 bc0f0daa069fd51cbc0f108c82d4d1e70684743e scrypt-1.2.1/lib/crypto/crypto_scrypt.h
+SHA1 d0b04cf3ad43b225c34daf1d834c4ed2a102dcda scrypt-1.2.1/lib/crypto/crypto_scrypt_smix.c
+SHA1 522e54930286c5979f5a4abeaf594438e4f49aea scrypt-1.2.1/lib/crypto/crypto_scrypt_smix.h
+SHA1 721822b65977552e674329be012039b24b8e8ceb scrypt-1.2.1/lib/crypto/crypto_scrypt_smix_sse2.c
+SHA1 810ddd3ff293b88285a0c69e96ab5a148a1f706f scrypt-1.2.1/lib/crypto/crypto_scrypt_smix_sse2.h
+SHA1 1b6ff2fbc242412c6650d39dab7403a0f4f0cc2e scrypt-1.2.1/lib/scryptenc/scryptenc.c
+SHA1 173f989d88d17ea5f4e77c8d0607aaaeddeb6b07 scrypt-1.2.1/lib/scryptenc/scryptenc.h
+SHA1 123aeb8d8bf1e3c1c020b50ce8f298992a6efb1d scrypt-1.2.1/lib/scryptenc/scryptenc_cpuperf.c
+SHA1 9ee0328a4be08d10a7e8c1f138c2f59727703ee9 scrypt-1.2.1/lib/scryptenc/scryptenc_cpuperf.h
+SHA1 d0b73e17835eacc3e899a3f17a509d250d09b021 scrypt-1.2.1/lib/util/memlimit.c
+SHA1 e715e695c40ae3aa16ca07c39315e6b796bcc201 scrypt-1.2.1/lib/util/memlimit.h
+SHA1 19a40f0ba2010c7953870f5ef46f1653d1bc0de7 scrypt-1.2.1/libcperciva/alg/sha256.c
+SHA1 54cd88f91cd84df43f16228ea54f9538bd8c38f5 scrypt-1.2.1/libcperciva/alg/sha256.h
+SHA1 e511df2bba2b1f902b51f17ad9929f66d3a22abf scrypt-1.2.1/libcperciva/cpusupport/Build/cpusupport-X86-AESNI.c
+SHA1 6adf5ac82489cfb680dfd95cea15e7019e53242b scrypt-1.2.1/libcperciva/cpusupport/Build/cpusupport-X86-CPUID.c
+SHA1 3934f0257b311e4009e44a42710646dfd0a3491a scrypt-1.2.1/libcperciva/cpusupport/Build/cpusupport-X86-SSE2.c
+SHA1 07ba053fbfc98dce2dfea099d810245683754720 scrypt-1.2.1/libcperciva/cpusupport/Build/cpusupport.sh
+SHA1 4bcff2083d0bce6def56bfcba530e20583fb1463 scrypt-1.2.1/libcperciva/cpusupport/cpusupport.h
+SHA1 0cee504d5ab166d72243a2be1ffc70014cca43f4 scrypt-1.2.1/libcperciva/cpusupport/cpusupport_x86_aesni.c
+SHA1 0979cd753f3b9c3a952b65c6a1b7a9d7b27ffb90 scrypt-1.2.1/libcperciva/cpusupport/cpusupport_x86_sse2.c
+SHA1 47fa24b89e8370953e39c407e7f842ab41d0da8d scrypt-1.2.1/libcperciva/crypto/crypto_aes.c
+SHA1 d182f5c463c1d9c028cd6e963682403053c0a2d2 scrypt-1.2.1/libcperciva/crypto/crypto_aes.h
+SHA1 49f711002308a196863ba686c11ccc8759fe6086 scrypt-1.2.1/libcperciva/crypto/crypto_aes_aesni.c
+SHA1 96657812df947674cf9382d06f3232cf4a8febb1 scrypt-1.2.1/libcperciva/crypto/crypto_aes_aesni.h
+SHA1 40e30141fec7a67af1a6ead2cd6000c1767dc31a scrypt-1.2.1/libcperciva/crypto/crypto_aesctr.c
+SHA1 b475e6ef37095bbef89626911662aad38e7fea77 scrypt-1.2.1/libcperciva/crypto/crypto_aesctr.h
+SHA1 a3389286fd105a5f4fefa6d4f1a22641bfadf0f0 scrypt-1.2.1/libcperciva/crypto/crypto_entropy.c
+SHA1 8326ea1764072a37b51cb566dacb45b846b4cd3e scrypt-1.2.1/libcperciva/crypto/crypto_entropy.h
+SHA1 6fa61065299d2154462262a1e18e676dddb083f6 scrypt-1.2.1/libcperciva/util/asprintf.c
+SHA1 d262347960a4a6a7a6dd8b46b55a5ff57ddfd0a4 scrypt-1.2.1/libcperciva/util/asprintf.h
+SHA1 929da8ff0ad0f2d6686b4aa5296c1b4d6a6150aa scrypt-1.2.1/libcperciva/util/entropy.c
+SHA1 630da02878627edb8df45a8a471416df1147ea43 scrypt-1.2.1/libcperciva/util/entropy.h
+SHA1 237dfadb34e63e7f1694dcc472a26bfdda642772 scrypt-1.2.1/libcperciva/util/getopt.c
+SHA1 26056163bbcc26a8d737563a5d9f018fc10fec2a scrypt-1.2.1/libcperciva/util/getopt.h
+SHA1 627cfa4f229ffe02d6f940a77c427357c222f8b2 scrypt-1.2.1/libcperciva/util/humansize.c
+SHA1 dacf76bb476b30eb70556ae356f38cc0fd4c7735 scrypt-1.2.1/libcperciva/util/humansize.h
+SHA1 f5d75cc4c332fe8c3020ff20c1ed13f8b76f03e7 scrypt-1.2.1/libcperciva/util/insecure_memzero.c
+SHA1 3385b6009d2ed70e5606c1320fbd25f1d63d856f scrypt-1.2.1/libcperciva/util/insecure_memzero.h
+SHA1 19ea2797c310379adeb8aa7f4c8f089d073ba7b0 scrypt-1.2.1/libcperciva/util/readpass.c
+SHA1 05cca5cce2dc65dfd3dde8026202c47428f5052c scrypt-1.2.1/libcperciva/util/readpass.h
+SHA1 af437f1d6bbf6586e305a550ddd565df81f01c04 scrypt-1.2.1/libcperciva/util/sysendian.h
+SHA1 bb86bed0c83e11f4da1f8af80267329f180ff107 scrypt-1.2.1/libcperciva/util/warnp.c
+SHA1 5836c30c722a6f9f5813861f7ab45620bbbf1ca1 scrypt-1.2.1/libcperciva/util/warnp.h
+SHA1 220052a7b3dd5cae8e4c5e7c768382ce64b31186 scrypt-1.2.1/main.c
+SHA1 e3e6ab21182b5091a9176752b65a3994961548db scrypt-1.2.1/scrypt.1
+SHA1 873db1c015ac482a6da8ffe50b0592f92320e2d7 scrypt-1.2.1/scrypt_platform.h
+SHA1 86792135a39088c190bc7e40dbc6c9831e1e48cd scrypt-1.2.1/tests/01-known-values.sh
+SHA1 74e762b83547ee9af861bafa0c86f4cc14d43e99 scrypt-1.2.1/tests/02-decrypt-reference-file.sh
+SHA1 785ef0b0046c466f4e8ef923f587854d54ade1c5 scrypt-1.2.1/tests/03-encrypt-decrypt-file.sh
+SHA1 0d6c219ec80d6e0f9e4f9c53125df8eea334fdc1 scrypt-1.2.1/tests/04-force-resources.sh
+SHA1 a8e4c237fee7a2d8a38899d443cfbeff762159fd scrypt-1.2.1/tests/05-system-scrypt-encrypt-decrypt.sh
+SHA1 f973d0043ea462caef155c6df29d75ab48f3828c scrypt-1.2.1/tests/shared_test_functions.sh
+SHA1 625693776a36a26ee870ae2f81219355f82da58f scrypt-1.2.1/tests/test_scrypt.c
+SHA1 6c8df90681e1eaf27155c3e1cbe4c982bd84635c scrypt-1.2.1/tests/test_scrypt.good
+SHA1 58f825c7b4a5b7af53a61c3af6cc8e868ff434b8 scrypt-1.2.1/tests/test_scrypt.sh
+SHA1 37b2486e6e9d30d875f78f1bc6278f683a1ff747 scrypt-1.2.1/tests/test_scrypt_good.enc
+SHA1 cfdcec6a5a0f54530349003a2d5a179b9e6be12e scrypt-1.2.1/tests/valgrind/potential-memleaks.c
+SHA1 212df546182472b267f0c7b5648998bf8aa287aa t/Authen-Passphrase-Scrypt.t
+SHA1 65bcfc1edde3d76c937b0d9e85c6b3c7e077fbc8 typemap
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAllWv64QHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYqutD/sEXBFFizvRApJbpGe5jl5iiKUiXK7zACoJ
+MNfNtn7q30kXFm8izXCfSO2VDRRvVOdfCtMdHdPqk3gwKgZMCIN6q+FdzQc5ouPi
+nHRitHlfwexHzgLf3HgWwilbVfyREtXrergGnJCf9RxC3lQlo3MIjY78U1xM32KA
+JtODlpJEiYpOvUaqaVdXzRA5iyvaTKGPSi7Bx86y6KzmMgo8en14HJErvOoiYoYv
+q+5STUPumNMO54rfBX7ykcnIand4RlMmU2XNH+SSn0fNVGUYCSOvy57IKbMGl+83
+QWB0AWlrN1DChyAnO08NSVYJtsXJ9895jRccZUIf9bW+Od4ZCj4Fu0fvqEzUyRRk
+1hmkbBHfvi2F7jFI2fwHDR+X325MTWdgpp1Hs5Hgei6n38QcxXvjytFUCXdz4Xo6
+0kE3ClolfoKn7iy4AyIv96zX6pVLa/9GOC7v5+GaOYYCKK9iiPartsf65iHoJt9l
+lOShVvH+Etu8UJj6r/F/ePRgElqPGixIJzdDzPEizagkXKk9G2d/YtsaQZh3U78O
+y+9McxMrey7k725ox871KpBRr1KNqsI2MCKnL47TU8mgTdudcCNH1ygaHE88caMj
+klT8hihx4ECAUFbtN/sTZBj27vnhp8jOktRdD3Le/rEeADEaY0QZPUquXxBJONNC
+8tvvriMSBA==
+=kjaC
+-----END PGP SIGNATURE-----

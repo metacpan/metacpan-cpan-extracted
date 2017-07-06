@@ -4,7 +4,7 @@
       "Hideaki Ohno <hide.o.j55 {at} gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v1.0.0",
+   "generated_by" : "Minilla/v3.0.12",
    "license" : [
       "perl_5"
    ],
@@ -35,9 +35,7 @@
       },
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38",
+            "Module::Build" : "0.4005",
             "Module::Build::XSUtil" : "0.09"
          }
       },
@@ -65,11 +63,11 @@
    "provides" : {
       "Algorithm::HyperLogLog" : {
          "file" : "lib/Algorithm/HyperLogLog.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "Algorithm::HyperLogLog::PP" : {
          "file" : "lib/Algorithm/HyperLogLog/PP.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       }
    },
    "release_status" : "stable",
@@ -83,7 +81,7 @@
          "web" : "https://github.com/hideo55/p5-Algorithm-HyperLogLog"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_contributors" : [
       "Damian Gryski <damian@gryski.com>",
       "hideo55 <hide.o.j55@gmail.com>"

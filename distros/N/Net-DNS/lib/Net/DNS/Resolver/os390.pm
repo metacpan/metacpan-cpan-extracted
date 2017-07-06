@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::os390;
 
 #
-# $Id: os390.pm 1565 2017-05-05 22:00:01Z willem $
+# $Id: os390.pm 1579 2017-06-26 11:36:57Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1565 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1579 $)[1];
 
 
 =head1 NAME
@@ -18,33 +18,48 @@ use warnings;
 use base qw(Net::DNS::Resolver::Base);
 
 
-use Sys::Hostname;
-
-my ($host) = split /[.]/, uc hostname();
-
-my @resolv_conf = ( "//'$host.TCPPARMS(TCPDATA)'", "/etc/resolv.conf" );
+local $ENV{PATH} = '/bin:/usr/bin';
+my $sysname = eval {`sysvar SYSNAME 2>/dev/null`} || '';
+chomp $sysname;
 
 
-my @config_path;
+my %RESOLVER_SETUP;			## placeholders for unimplemented search list elements
+
+my @dataset = (				## plausible places to seek resolver configuration
+	$RESOLVER_SETUP{GLOBALTCPIPDATA},
+	$ENV{RESOLVER_CONFIG},					# MVS dataset or Unix file name
+	"/etc/resolv.conf",
+	$RESOLVER_SETUP{SYSTCPD},
+	"//TCPIP.DATA",						# <username>.TCPIP.DATA
+	"//'${sysname}.TCPPARMS(TCPDATA)'",
+	"//'SYS1.TCPPARMS(TCPDATA)'",
+	$RESOLVER_SETUP{DEFAULTTCPIPDATA},
+	"//'TCPIP.TCPIP.DATA'"
+	);
+
+
 my $dotfile = '.resolv.conf';
-push( @config_path, $ENV{HOME} ) if exists $ENV{HOME};
-push( @config_path, '.' );
-
-my @config_file = grep -f $_ && -o _, map "$_/$dotfile", @config_path;
+my @dotpath = grep defined, $ENV{HOME}, '.';
+my @dotfile = grep -f $_ && -o _, map "$_/$dotfile", @dotpath;
 
 
-sub _untaint {
-	map { m/^(.*)$/; $1 } grep defined, @_;
-}
+my %option = (				## map MVS config option names
+	NSPORTADDR	   => 'port',
+	RESOLVERTIMEOUT	   => 'retrans',
+	RESOLVERUDPRETRIES => 'retry',
+	SORTLIST	   => 'sortlist',
+	);
 
 
 sub _init {
 	my $defaults = shift->_defaults;
+	my %stop;
+	local $ENV{PATH} = '/bin:/usr/bin';
 
-	foreach my $conf (@resolv_conf) {
+	foreach my $dataset ( Net::DNS::Resolver::Base::_untaint( grep defined, @dataset ) ) {
 		eval {
-			local *FILE;
-			open( FILE, $conf ) or die;
+			local *FILE;				# "cat" able to read MVS dataset
+			open( FILE, qq[cat "$dataset" 2>/dev/null |] ) or die "$dataset: $!";
 
 			my @nameserver;
 			my @searchlist;
@@ -55,37 +70,69 @@ sub _init {
 				s/^\s+//;			# strip leading white space
 				next unless $_;			# skip empty line
 
-				/^($host:)?(NSINTERADDR|NAMESERVER)/oi && do {
+				next if m/^\w+:/ && !m/^$sysname:/oi;
+				s/^\w+:\s*//;			# discard qualifier
+
+
+				m/^(NSINTERADDR|nameserver)/i && do {
 					my ( $keyword, @ip ) = grep defined, split;
 					push @nameserver, @ip;
 					next;
 				};
 
 
-				/^($host:)?(DOMAINORIGIN|DOMAIN)/oi && do {
-					my ( $keyword, $domain ) = grep defined, split;
-					$defaults->domain( _untaint $domain );
+				m/^(DOMAINORIGIN|domain)/i && do {
+					my ( $keyword, @domain ) = grep defined, split;
+					$defaults->domain(@domain) unless $stop{domain}++;
 					next;
 				};
 
 
-				/^($host:)?SEARCH/oi && do {
+				m/^search/i && do {
 					my ( $keyword, @domain ) = grep defined, split;
 					push @searchlist, @domain;
 					next;
 				};
 
+
+				m/^option/i && do {
+					my ( $keyword, @option ) = grep defined, split;
+					foreach (@option) {
+						my ( $attribute, @value ) = split m/:/;
+						$defaults->_option( $attribute, @value )
+								unless $stop{$attribute}++;
+					}
+					next;
+				};
+
+
+				m/^RESOLVEVIA/i && do {
+					my ( $keyword, $value ) = grep defined, split;
+					$defaults->_option( 'usevc', $value eq 'TCP' )
+							unless $stop{usevc}++;
+					next;
+				};
+
+
+				m/^\w+\s*/ && do {
+					my ( $keyword, @value ) = grep defined, split;
+					my $attribute = $option{uc $keyword} || next;
+					$defaults->_option( $attribute, @value )
+							unless $stop{$attribute}++;
+				};
 			}
 
 			close(FILE);
 
-			$defaults->nameservers( _untaint @nameserver );
-			$defaults->searchlist( _untaint @searchlist );
+			$defaults->nameserver(@nameserver) if @nameserver && !$stop{nameserver}++;
+			$defaults->searchlist(@searchlist) if @searchlist && !$stop{search}++;
 		};
+		warn $@ if $@;
 	}
 
+	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
 
-	map $defaults->_read_config_file($_), @config_file;
+	map $defaults->_read_config_file($_), @dotfile;
 
 	$defaults->_read_env;
 }

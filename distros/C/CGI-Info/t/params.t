@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 161;
+use Test::Most tests => 164;
 use Test::NoWarnings;
 use File::Spec;
 
@@ -81,6 +81,11 @@ PARAMS: {
 	$i = new_ok('CGI::Info');
 	%p = %{$i->params()};
 	ok($p{fred} eq '&lt;script&gt;alert(123)&lt;/script&gt;');
+
+	# SQL Injection is prevented
+	$ENV{'QUERY_STRING'} = "foo=bar&userName=' OR '1'='1&fred=wilma";
+	$i = new_ok('CGI::Info');
+	ok(!defined($i->params()));
 
 	$ENV{'QUERY_STRING'} = '<script>alert(123)</script>=wilma';
 	$i = new_ok('CGI::Info');
@@ -211,7 +216,7 @@ EOF
 	ok($p{country} eq '44');
 	ok($p{datafile} =~ /^hello.txt_.+/);
 	$filename = File::Spec->catfile($tmpdir, $p{datafile});
-	ok(-e $filename);
+	ok(-e $filename) || diag("$filename doesn't exist");
 	ok(-r $filename);
 	unlink($filename);
 	close $fin;
@@ -445,6 +450,7 @@ EOF
 	ok(!$i->is_mobile());
 	ok(!$i->is_search_engine());
 	ok($i->is_robot());
+	ok($i->status() == 200);
 
 	eval {
 		$i->reset();

@@ -5,7 +5,7 @@ use base 'PDF::API2::Outline';
 use strict;
 use warnings;
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 use PDF::API2::Basic::PDF::Utils;
 

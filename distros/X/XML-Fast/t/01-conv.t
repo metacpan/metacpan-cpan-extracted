@@ -6,7 +6,7 @@ BEGIN {
 	my $add = 0;
 	eval {require Test::NoWarnings;Test::NoWarnings->import; ++$add; 1 }
 		or diag "Test::NoWarnings missed, skipping no warnings test";
-	plan tests => 26 + $add;
+	plan tests => 27 + $add;
 	eval {require Data::Dumper;Data::Dumper::Dumper(1)}
 		and *dd = sub ($) { Data::Dumper->new([$_[0]])->Indent(0)->Terse(1)->Quotekeys(0)->Useqq(1)->Purity(1)->Dump }
 		or  *dd = \&explain;
@@ -180,6 +180,14 @@ our $data;
 		$data = xml2hash($xml1, array => 1),
 		{root => [{'-at' => 'key',nest => [{'#text' => 'firstmidlast',vv => [''],v => ['a',{'-at' => 'a','#text' => 'b'}]}]}]},
 		'array => 1 (1)',
+	or diag explain($data),"\n";
+}
+
+{
+	is_deeply
+		$data = xml2hash("<handshake/>"),
+		{ handshake => '' },
+		'empty root',
 	or diag explain($data),"\n";
 }
 __END__

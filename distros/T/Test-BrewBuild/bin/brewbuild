@@ -5,7 +5,7 @@ use strict;
 use Carp qw(croak);
 use Test::BrewBuild;
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 # we let BrewBuild manage the argument list so that the other scripts can
 # simply pass in the args directly and use the API instead of wrapping around
@@ -301,6 +301,15 @@ set if a lower version is installed.
 
 Optional module name of the exec command plugin to use. You can also specify a
 file name if the module is not installed.
+
+The default plugin if not specified is L<Test::BrewBuild::Plugin::DefaultExec>.
+There are a few other plugins found in this distribution's author's CPAN
+collection.
+
+One very similar to this one that performs the same actions but enables CPAN
+Author tests (C<RELEASE_TESTING=1>) and attempts to install distributions
+related to these tests is L<Test::BrewBuild::Plugin::Author>. This may be worth
+setting in the configuration file.
 
 =head2 -a, --args
 

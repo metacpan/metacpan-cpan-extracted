@@ -141,6 +141,10 @@ function setDisplayedVersion() {
   if(sbody) { sbody.parentNode.replaceChild(srows,sbody); }
 }
 
+function callStatistics() {
+  OpenThought.CallUrl('/cgi-bin/reports-statistics.cgi', 'dist_pref' );
+}
+
 function callSummary() {
   OpenThought.CallUrl('/cgi-bin/reports-summary.cgi', 'dist_pref', 'perlmat_pref', 'patches_pref', 'oncpan_pref', 'distmat_pref', 'perlver_pref', 'osname_pref' );
 }
@@ -180,5 +184,7 @@ function init() {
   readCookies();
   loadVersionDropdown();
   selectReports(distvers);
+
+  callStatistics();
   callSummary();
 }

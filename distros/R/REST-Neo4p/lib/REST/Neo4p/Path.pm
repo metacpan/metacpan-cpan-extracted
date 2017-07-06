@@ -5,8 +5,7 @@ use Carp qw(croak carp);
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Path::VERSION = '0.3012';
-  $REST::Neo4p::Path::VERSION = '0.3012';
+  $REST::Neo4p::Path::VERSION = '0.3020';
 }
 
 sub new {
@@ -145,7 +144,7 @@ L<REST::Neo4p::Query>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2015 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

@@ -15,6 +15,7 @@
 package Google::Ads::Common::HTTPTransport;
 
 use strict;
+use warnings;
 use version;
 use base qw(SOAP::WSDL::Transport::HTTP);
 

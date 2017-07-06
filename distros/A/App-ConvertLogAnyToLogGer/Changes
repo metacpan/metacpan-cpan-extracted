@@ -1,0 +1,10 @@
+0.002   2017-07-03 (PERLANCAR)
+
+	- Add utility: detect-log-any-usage.
+
+	- [dist] Fix dzil plugin ordering.
+
+
+0.001   2017-07-03 (PERLANCAR)
+
+        - First release.

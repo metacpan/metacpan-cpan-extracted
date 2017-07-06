@@ -1,7 +1,7 @@
-# $Id: 06-update.t 1408 2015-10-06 20:35:56Z willem $  -*-perl-*-
+# $Id: 06-update.t 1571 2017-06-03 20:14:15Z willem $  -*-perl-*-
 
 use strict;
-use Test::More tests => 84;
+use Test::More tests => 85;
 
 use Net::DNS;
 
@@ -37,18 +37,26 @@ my $rdata  = "10.1.2.3";
 
 {
 	my $packet = new Net::DNS::Update( $zone, $class );
-	my ($z) = ( $packet->zone )[0];
+	my ($z) = $packet->zone;
 
 	ok( $packet, 'new() returned packet' );
 	is( $packet->header->opcode, 'UPDATE', 'header opcode correct' );
-	is( $z->zname,		     $zone,    'zname correct' );
+	is( $z->zname,		     $zone,    'zname from explicit argument' );
 	is( $z->zclass,		     $class,   'zclass correct' );
 	is( $z->ztype,		     'SOA',    'ztype correct' );
 }
 
 
 {
-	local $ENV{'LOCALDOMAIN'};				# overides config files
+	Net::DNS::Resolver->domain($zone);			# overides config files
+	my $packet = new Net::DNS::Update();
+	my ($z) = $packet->zone;
+	is( $z->zname, $zone, 'zname from resolver defaults' );
+}
+
+
+{
+	Net::DNS::Resolver->domain('');				# overides config files
 	my $packet = eval { new Net::DNS::Update(undef); };
 	my $exception = $1 if $@ =~ /^(.+)\n/;
 	ok( $exception ||= '', "argument undefined\t[$exception]" );

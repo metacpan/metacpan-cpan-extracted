@@ -17,6 +17,11 @@ cpm - a fast CPAN module installer
   # install modules into local/
   > cpm install Module1 Module2 ...
 
+  # install Plack, and at the same time, keep builds of CPAN distributions in ~/.perl-cpm/builds
+  > cpm install --prebuilt Plack
+  # install the prebuilts in ~/.perl-cpm/builds
+  > cd another-dir; cpm install --prebuilt Plack
+
   # install modules with verbose messages
   > cpm install -v Module
 
@@ -41,6 +46,9 @@ cpm - a fast CPAN module installer
   # use darkpan first, and if it fails, use metadb and normal CPAN
   > cpm install --resolver 02packages,http://example.com/darkpan --resolver metadb Your::Module
 
+  # specify types/phases in cpanfile by "--with-*" and "--without-*" options
+  > cpm install --with-recommends --without-test
+
 =head1 OPTIONS
 
   -w, --workers=N
@@ -51,6 +59,9 @@ cpm - a fast CPAN module installer
         install modules into current @INC instead of local/
   -v, --verbose
         verbose mode; you can see what is going on
+      --prebuilt, --no-prebuilt
+        save builds for CPAN distributions; and later, install the prebuilts if available
+        you can also set $ENV{PERL_CPM_PREBUILT} true to enable this option
       --target-perl=VERSION  (EXPERIMENTAL)
         install modules as if verison is your perl is VERSION
       --mirror=URL
@@ -67,20 +78,25 @@ cpm - a fast CPAN module installer
         run test cases, default: no
       --man-pages
         generate man pages
-      --with-develop (EXPERIMENTAL)
-        install dependencies of phase 'develop' in cpanfile too
-      --with-recommends (EXPERIMENTAL)
-        install dependencies of type 'recommends' in cpanfile too
-      --with-suggests (EXPERIMENTAL)
-        install dependencies of type 'suggests' in cpanfile too
       --retry, --no-retry
         retry configure/build/test/install if fails, default: retry
       --configure-timeout=sec, --build-timeout=sec, --test-timeout=sec
         specify configure/build/test timeout second, default: 60sec, 3600sec, 1800sec
+      --show-progress, --no-show-progress
+        show progress, default: on
   -V, --version
         show version
   -h, --help
         show this help
+      --with-requires,   --without-requires   (default: with)
+      --with-recommends, --without-recommends (default: without)
+      --with-suggests,   --without-suggests   (default: without)
+      --with-configure,  --without-configure  (default: without)
+      --with-build,      --without-build      (default: with)
+      --with-test,       --without-test       (default: with)
+      --with-runtime,    --without-runtime    (default: with)
+      --with-develop,    --without-develop    (default: without)
+        specify types/phases of dependencies in cpanfile to be installed
 
 =head1 COPYRIGHT AND LICENSE
 

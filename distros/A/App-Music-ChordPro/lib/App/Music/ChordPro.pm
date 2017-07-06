@@ -4,7 +4,7 @@ use 5.010;
 
 package App::Music::ChordPro;
 
-our $VERSION = "0.76";
+our $VERSION = "0.77";
 
 =head1 NAME
 
@@ -612,8 +612,9 @@ sub app_setup {
           "even-pages-number-left|L",   # Even pages numbers on left
           "odd-pages-number-left",      # Odd pages numbers on left
           "lyrics-only|l",              # Only prints lyrics
-          "chord-grids|G!",             # En[dis]ables printing of chord grids
-          "easy-chord-grids|g!",        # Do[esn't] print grids for built-in "easy" chords.
+          "G" => sub { $clo->{'chord-grids'} = 0 },
+          "chord-grids!",               # En[dis]ables printing of chord grids
+          "easy-chord-grids|g!",        # Do[esn't] print grids for built-in "easy" chords. Ignored.
           "page-number-logical|n",      # Numbers logical pages, not physical
           "page-size|P=s",              # Specifies page size [letter, a4 (default)]
           "single-space|a!",            # Automatic single space lines without chords
@@ -889,7 +890,7 @@ Built-in 'Adobe Core Fonts':
   Helvetica-BoldOblique
   Helvetica-Oblique
 
-Buitl-in 'Windows Fonts':
+Built-in 'Windows Fonts':
 
   Georgia                             Webdings
   Georgia,Bold                        Wingdings

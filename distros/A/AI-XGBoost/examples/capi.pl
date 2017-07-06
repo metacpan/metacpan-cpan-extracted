@@ -13,7 +13,7 @@ for my $iter (0 .. 10) {
     XGBoosterUpdateOneIter($booster, $iter, $dtrain);
 }
 
-my $predictions = XGBoosterPredict($booster, $dtest, 0, 0);
+my $predictions = XGBoosterPredict($booster, $dtest);
 # say join "\n", @$predictions;
 
 XGBoosterFree($booster);

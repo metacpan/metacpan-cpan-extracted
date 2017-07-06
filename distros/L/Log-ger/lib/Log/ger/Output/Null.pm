@@ -1,19 +1,17 @@
 package Log::ger::Output::Null;
 
-our $DATE = '2017-06-21'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '0.012'; # VERSION
 
-use Log::ger ();
-
-sub PRIO_create_log_routine { 50 }
-
-sub create_log_routine {
-    $Log::ger::_log_is_null = 1;
-    [sub {0}];
-}
-
-sub import {
-    Log::ger::add_plugin('create_log_routine', __PACKAGE__, 'replace');
+sub get_hooks {
+    return {
+        create_log_routine => [
+            __PACKAGE__, 50,
+            sub {
+                $Log::ger::_logger_is_null = 1;
+                [sub {0}];
+            }],
+    };
 }
 
 1;
@@ -31,7 +29,7 @@ Log::ger::Output::Null - Null output
 
 =head1 VERSION
 
-version 0.004
+version 0.012
 
 =head1 SYNOPSIS
 

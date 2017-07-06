@@ -19,11 +19,11 @@ Struct::Path - Path for nested structures where path is also a structure
 
 =head1 VERSION
 
-Version 0.70
+Version 0.71
 
 =cut
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 =head1 SYNOPSIS
 
@@ -184,6 +184,10 @@ Returns list of references from structure.
 
 =over 4
 
+=item assign C<< <value> >>
+
+Assign provided value to substructures pointed by path.
+
 =item delete C<< <true|false> >>
 
 Delete specified by path items from structure.
@@ -192,10 +196,11 @@ Delete specified by path items from structure.
 
 Dereference result items.
 
-=item expand C<< <true|false> >>
+=item expand C<< <"append"|true|false> >>
 
-Expand structure if specified in path items does't exists. All newly created items
-initialized by C<undef>.
+Expand structure if specified in path items doesn't exists. All newly created
+items initialized by C<undef>. Arrays will be growed smoothly if C<append> as
+value used (experimental).
 
 =item paths C<< <true|false> >>
 
@@ -243,6 +248,8 @@ sub spath($$;@) {
                         croak "[$_] doesn't exists (step #$sc)" if ($opts{strict});
                         next;
                     }
+                    $_ = @{${$refs->[-1]}} if ($opts{expand} and
+                        $_ > @{${$refs->[-1]}} and $opts{expand} eq 'append');
                     push @next, [@{$path}, [$_]], [@{$refs}, \${$refs->[-1]}->[$_]];
                 }
 
@@ -299,6 +306,7 @@ sub spath($$;@) {
     my @out;
     while (@level) {
         ($path, $refs) = splice @level, 0, 2;
+        ${$refs->[-1]} = $opts{assign} if (exists $opts{assign});
         if ($opts{stack}) {
             map { $_ = ${$_} } @{$refs} if ($opts{deref});
         } else {

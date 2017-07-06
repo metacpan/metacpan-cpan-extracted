@@ -10,6 +10,7 @@ my $default_access_key_id = 'Me';
 my $default_secret_access_key = '__secret__';
 my $tester_access_key_id = "Tester$default_access_key_id";
 my $tester_secret_access_key = "__tester$default_secret_access_key";
+
 print $fh <<"EOS";
 [default]
 aws_access_key_id = $default_access_key_id
@@ -33,9 +34,10 @@ subtest 'Default profile' => sub {
 
 subtest 'Specific profile' => sub {
     my $config = AWS::CLI::Config::config('tester');
+
     is($config->aws_access_key_id, $tester_access_key_id, 'access_key_id');
     is($config->aws_secret_access_key, $tester_secret_access_key, 'secret_access_key');
-    is($config->{s3}->{addressing_style}, 'path', 'nested value');
+    is($config->s3->{addressing_style}, 'path', 'nested value');
 };
 
 subtest 'Undefined profile' => sub {

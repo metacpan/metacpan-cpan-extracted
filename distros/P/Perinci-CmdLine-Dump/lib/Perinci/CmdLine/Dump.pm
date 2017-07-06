@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Dump;
 
-our $DATE = '2017-06-17'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-06-24'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
@@ -62,6 +62,20 @@ _
             schema => ['bool', is=>1],
             cmdline_aliases => {D=>{}},
         },
+        method => {
+            schema => ['str*', in=>['patch', 'self-dump']],
+            description => <<'_',
+
+The `patch` method is using monkey-patching to replace run() with a routine that
+dumps the object and exit. This has a disadvantage of exiting too early, for
+example some attributes like `common_opts` is filled during run(). Another
+method is `self-dump` that requires <pm:Perinci::CmdLine::Lite> version 1.73 or
+later.
+
+The default is to use `self-dump`, but `patch` for /main/.
+
+_
+        },
     },
 };
 sub dump_pericmd_script {
@@ -108,8 +122,18 @@ sub dump_pericmd_script {
     my $tag = UUID::Random::generate();
     my ($stdout, $stderr, $exit) = Capture::Tiny::capture(
         sub {
-            local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
-            system $^X, $filename;
+            my $meth = $args{method} // 'self-dump';
+            if ($meth eq 'self-dump') {
+                local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
+                system $^X, $filename;
+            } else {
+                my @cmd = (
+                    $^X, (map {"-I$_"} @$libs),
+                    "-MPerinci::CmdLine::Base::Patch::DumpAndExit=-tag,$tag",
+                    $filename, "--version",
+                );
+                system @cmd;
+            }
         },
     );
 
@@ -143,9 +167,18 @@ sub dump_pericmd_script {
         local @INC = (@$libs, @INC);
         (undef, undef, undef) = Capture::Tiny::capture(
             sub {
-                local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
-                do $filename;
-            }
+                my $meth = $args{method} // 'patch';
+                if ($meth eq 'self-dump') {
+                    local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
+                    do $filename;
+                } else {
+                    eval q{
+package main;
+use Perinci::CmdLine::Base::Patch::DumpAndExit -tag=>'$tag',-exit_method=>'die';
+do "$filename";
+};
+                }
+            },
         );
         $res->[3]{'func.meta'} = \%main::SPEC;
     }
@@ -156,6 +189,7 @@ sub dump_pericmd_script {
 
 {
     no strict 'refs';
+    no warnings 'once';
     # old name, deprecated
     *dump_perinci_cmdline_script = \&dump_pericmd_script;
 }
@@ -175,7 +209,7 @@ Perinci::CmdLine::Dump - Run a Perinci::CmdLine-based script but only to dump th
 
 =head1 VERSION
 
-This document describes version 0.09 of Perinci::CmdLine::Dump (from Perl distribution Perinci-CmdLine-Dump), released on 2017-06-17.
+This document describes version 0.10 of Perinci::CmdLine::Dump (from Perl distribution Perinci-CmdLine-Dump), released on 2017-06-24.
 
 =for Pod::Coverage ^(dump_perinci_cmdline_script)$
 
@@ -224,6 +258,16 @@ Path to the script.
 =item * B<libs> => I<array[str]>
 
 Libraries to unshift to @INC when running script.
+
+=item * B<method> => I<str>
+
+The C<patch> method is using monkey-patching to replace run() with a routine that
+dumps the object and exit. This has a disadvantage of exiting too early, for
+example some attributes like C<common_opts> is filled during run(). Another
+method is C<self-dump> that requires L<Perinci::CmdLine::Lite> version 1.73 or
+later.
+
+The default is to use C<self-dump>, but C<patch> for /main/.
 
 =item * B<skip_detect> => I<bool>
 

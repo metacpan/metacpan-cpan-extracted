@@ -2,13 +2,12 @@
 use 5.008001; # sane UTF-8 support
 use strict;
 use warnings;
-package YAML::Tiny;
-# git description: v1.63-12-g5dd832a
-$YAML::Tiny::VERSION = '1.64';
+package YAML::Tiny; # git description: v1.69-8-g2c1e266
 # XXX-INGY is 5.8.1 too old/broken for utf8?
 # XXX-XDG Lancaster consensus was that it was sufficient until
 # proven otherwise
 
+our $VERSION = '1.70';
 
 #####################################################################
 # The YAML::Tiny API.
@@ -514,7 +513,7 @@ sub _load_hash {
         }
 
         if ( exists $hash->{$key} ) {
-            die \"YAML::Tiny found a duplicate key '$key' in line '$lines->[0]'";
+            warn "YAML::Tiny found a duplicate key '$key' in line '$lines->[0]'";
         }
 
         # Do we have a value?
@@ -571,10 +570,8 @@ sub _dump_file {
     if ( _can_flock() ) {
         # Open without truncation (truncate comes after lock)
         my $flags = Fcntl::O_WRONLY()|Fcntl::O_CREAT();
-        sysopen( $fh, $file, $flags );
-        unless ( $fh ) {
-            $self->_error("Failed to open file '$file' for writing: $!");
-        }
+        sysopen( $fh, $file, $flags )
+            or $self->_error("Failed to open file '$file' for writing: $!");
 
         # Use no translation and strict UTF-8
         binmode( $fh, ":raw:encoding(UTF-8)");
@@ -872,4 +869,4 @@ delete $YAML::Tiny::{refaddr};
 
 __END__
 
-#line 1490
+#line 1487

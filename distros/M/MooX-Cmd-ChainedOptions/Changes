@@ -1,16 +1,36 @@
 Revision history for MooX-Cmd-ChainedOptions
 
-0.03	2015-03-27T14:00:54-0400
+0.04      2017-06-22 15:19:57-04:00 America/New_York
+
+  [BUILD FIX]
+
+   * tests failed on case-insensitive file systems
+   * switch to Dist::Zilla
+   * switch to Test2
+
+
+0.03_02  2015-03-29T09:47:52-0400
+
+  [DEPENDENCY FIX]
+    * try to fix CPANTesters breakage by requiring MooX::Cmd >= 0.009
+      http://www.cpantesters.org/cpan/report/ebc8e620-d5e7-11e4-9bdf-cbba55c8bd36
+
+0.03_01 2015-03-28T23:07:04-0400
+
+  [DEPENDENCY FIX]
+    * requires Moo >= 1.001 for non-sub default values
+
+0.03    2015-03-27T14:00:54-0400
 
   [BUG FIX]
     * croak called without load of Carp
 
-0.02	2015-03-25T17:14:15-0400
+0.02    2015-03-25T17:14:15-0400
 
   [BUILD]
     * fix dependency requirements in cpanfile
 
-0.01	2015-03-25T13:54:51-0400
+0.01    2015-03-25T13:54:51-0400
 
     * Initial release.
 

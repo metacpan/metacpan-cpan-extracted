@@ -3,7 +3,8 @@ abstract: 'Build external dependencies for use in CPAN'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Test2::Suite: '0.000060'
+  Test2::Mock: '0.000060'
+  Test2::V0: '0.000060'
   Test::More: '0.94'
   perl: '5.008001'
 configure_requires:
@@ -38,9 +39,10 @@ resources:
   bugtracker: https://github.com/plicease/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/plicease/Alien-Build.git
-version: '0.45'
+version: '0.52'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'
   - 'Roy Storey'
+  - 'Ilya Pavlov'
 x_serialization_backend: 'YAML::Tiny version 1.70'

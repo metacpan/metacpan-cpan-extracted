@@ -13,7 +13,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 has 'ispell_argv' => ( is => 'ro', default => q{} );
 has 'ispell_cmd'  => ( is => 'ro', default => 'ispell' );
@@ -65,7 +65,7 @@ Code::TidyAll::Plugin::PodSpell - Use Pod::Spell + ispell with tidyall
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 

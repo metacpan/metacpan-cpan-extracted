@@ -1,4 +1,4 @@
-# Copyrights 2007-2016 by [Mark Overmeer].
+# Copyrights 2007-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Translator::Gettext;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 use base 'Log::Report::Translator';
 

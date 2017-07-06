@@ -15,6 +15,7 @@
 package Google::Ads::Common::OAuth2ServiceAccountsHandler;
 
 use strict;
+use warnings;
 use version;
 use base qw(Google::Ads::Common::OAuth2BaseHandler);
 
@@ -269,6 +270,8 @@ JSON keyfile):
   # Refer to the documentation of the L<json_file> property.
   oAuth2ServiceAccountJSONFile => "json-file-path",
 }
+
+=back
 
 =head2 is_auth_enabled
 

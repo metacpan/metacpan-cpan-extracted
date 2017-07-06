@@ -1,3 +1,4 @@
+use lib '.';
 use inc::Module::Install 1.08;
 
 name 'Debug-Client';

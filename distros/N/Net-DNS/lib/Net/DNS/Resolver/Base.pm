@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1564 2017-05-03 08:42:49Z willem $
+# $Id: Base.pm 1573 2017-06-12 11:03:59Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1564 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1573 $)[1];
 
 
 #
@@ -40,9 +40,9 @@ use constant SOCKS => scalar eval 'require Config; $Config::Config{usesocks}';
 
 
 # Allow taint tests to be optimised away when appropriate.
-use constant UTIL  => defined eval 'require Scalar::Util';
 use constant UNCND => $] < 5.008;	## eval '${^TAINT}' breaks old compilers
-use constant TAINT => UTIL && ( UNCND || eval '${^TAINT}' );
+use constant TAINT => UNCND || eval '${^TAINT}';
+use constant TESTS => TAINT && defined eval 'require Scalar::Util';
 
 
 use strict;
@@ -63,6 +63,7 @@ use constant PACKETSZ => 512;
 #
 {
 	my $defaults = bless {
+		nameservers	=> [qw(::1 127.0.0.1)],
 		nameserver4	=> ['127.0.0.1'],
 		nameserver6	=> ['::1'],
 		port		=> 53,
@@ -77,6 +78,7 @@ use constant PACKETSZ => 512;
 		recurse		=> 1,
 		defnames	=> 1,
 		dnsrch		=> 1,
+		ndots		=> 1,
 		debug		=> 0,
 		tcp_timeout	=> 120,
 		udp_timeout	=> 30,
@@ -88,7 +90,8 @@ use constant PACKETSZ => 512;
 		udppacketsize	=> 0,	# value bounded below by PACKETSZ
 		force_v4	=> ( IPv6 ? 0 : 1 ),
 		force_v6	=> 0,	# only relevant if IPv6 is supported
-		prefer_v4	=> ( IPv6 ? 1 : 0 ),
+		prefer_v4	=> 0,
+		prefer_v6	=> 0,
 		},
 			__PACKAGE__;
 
@@ -99,8 +102,8 @@ use constant PACKETSZ => 512;
 
 # These are the attributes that the user may specify in the new() constructor.
 my %public_attr = (
-	map( {$_ => $_} keys %{&_defaults}, qw(domain nameserver nameservers prefer_v6 srcaddr) ),
-	map( {$_ => 0} qw(nameserver4 nameserver6 srcaddr4 srcaddr6) ),
+	map( ( $_ => $_ ), keys %{&_defaults}, qw(domain nameserver srcaddr) ),
+	map( ( $_ => 0 ), qw(nameserver4 nameserver6 srcaddr4 srcaddr6) ),
 	);
 
 
@@ -112,12 +115,11 @@ sub new {
 	my $self;
 	my $base = $class->_defaults;
 	my $init = $initial;
-	$initial ||= bless {%$base}, $class;
+	$initial ||= [%$base];
 	if ( my $file = $args{config_file} ) {
-		$self = bless {%$initial}, $class;
-		$self->_read_config_file($file);		# user specified config
-		$self->nameserver( map { m/^(.*)$/; $1 } $self->nameserver );
-		$self->searchlist( map { m/^(.*)$/; $1 } $self->searchlist );
+		my $conf = bless {@$initial}, $class;
+		$conf->_read_config_file($file);		# user specified config
+		$self = bless {_untaint(%$conf)}, $class;
 		%$base = %$self unless $init;			# define default configuration
 
 	} elsif ($init) {
@@ -146,28 +148,35 @@ my %resolv_conf = (			## map traditional resolv.conf option names
 	timeout	 => 'retrans',
 	);
 
-my %env_option = (			## any resolver attribute except as listed below
+my %res_option = (			## any resolver attribute plus those listed above
 	%public_attr,
 	%resolv_conf,
-	map { $_ => 0 } qw(nameserver nameservers domain searchlist),
 	);
+
+sub _option {
+	my ( $self, $name, @value ) = @_;
+	my $attribute = $res_option{lc $name} || return;
+	push @value, 1 unless scalar @value;
+	$self->$attribute(@value);
+}
+
+
+sub _untaint {
+	return TAINT ? map ref($_) ? [_untaint(@$_)] : do { /^(.*)$/; $1 }, @_ : @_;
+}
+
 
 sub _read_env {				## read resolver config environment variables
 	my $self = shift;
 
-	$self->nameservers( map split, $ENV{RES_NAMESERVERS} ) if exists $ENV{RES_NAMESERVERS};
+	$self->nameservers( map split, $ENV{RES_NAMESERVERS} ) if defined $ENV{RES_NAMESERVERS};
 
-	$self->domain( $ENV{LOCALDOMAIN} ) if exists $ENV{LOCALDOMAIN};
+	$self->domain( $ENV{LOCALDOMAIN} ) if defined $ENV{LOCALDOMAIN};
 
-	$self->searchlist( map split, $ENV{RES_SEARCHLIST} ) if exists $ENV{RES_SEARCHLIST};
+	$self->searchlist( map split, $ENV{RES_SEARCHLIST} ) if defined $ENV{RES_SEARCHLIST};
 
-	if ( exists $ENV{RES_OPTIONS} ) {
-		foreach ( map split, $ENV{RES_OPTIONS} ) {
-			my ( $name, $val ) = split( m/:/, $_, 2 );
-			my $attribute = $env_option{$name} || next;
-			$val = 1 unless defined $val;
-			$self->$attribute($val);
-		}
+	foreach ( map split, $ENV{RES_OPTIONS} || '' ) {
+		$self->_option( split m/:/ );
 	}
 }
 
@@ -176,11 +185,11 @@ sub _read_config_file {			## read resolver config file
 	my $self = shift;
 	my $file = shift;
 
-	my @ns;
-
 	local *FILE;
+	open( FILE, $file ) or croak "$file: $!";
 
-	open( FILE, $file ) or croak "Could not open $file: $!";
+	my @nameserver;
+	my @searchlist;
 
 	local $_;
 	while (<FILE>) {
@@ -188,18 +197,7 @@ sub _read_config_file {			## read resolver config file
 
 		/^nameserver/ && do {
 			my ( $keyword, @ip ) = grep defined, split;
-			push @ns, @ip;
-			next;
-		};
-
-		/^option/ && do {
-			my ( $keyword, @option ) = grep defined, split;
-			foreach (@option) {
-				my ( $name, $val ) = split( m/:/, $_, 2 );
-				my $attribute = $resolv_conf{$name} || next;
-				$val = 1 unless defined $val;
-				$self->$attribute($val);
-			}
+			push @nameserver, @ip;
 			next;
 		};
 
@@ -210,15 +208,23 @@ sub _read_config_file {			## read resolver config file
 		};
 
 		/^search/ && do {
-			my ( $keyword, @searchlist ) = grep defined, split;
-			$self->searchlist(@searchlist);
+			my ( $keyword, @domain ) = grep defined, split;
+			push @searchlist, @domain;
 			next;
+		};
+
+		/^option/ && do {
+			my ( $keyword, @option ) = grep defined, split;
+			foreach (@option) {
+				$self->_option( split m/:/ );
+			}
 		};
 	}
 
 	close(FILE);
 
-	$self->nameservers(@ns);
+	$self->nameservers(@nameserver) if @nameserver;
+	$self->searchlist(@searchlist)	if @searchlist;
 }
 
 
@@ -227,22 +233,21 @@ sub string {
 	$self = $self->_defaults unless ref($self);
 
 	my @nslist = $self->nameservers();
-	my $domain = $self->domain;
+	my ($force)  = ( grep( $self->{$_}, qw(force_v6 force_v4) ),   'force_v4' );
+	my ($prefer) = ( grep( $self->{$_}, qw(prefer_v6 prefer_v4) ), 'prefer_v4' );
 	return <<END;
 ;; RESOLVER state:
-;; domain	= $domain
-;; searchlist	= @{$self->{searchlist}}
 ;; nameservers	= @nslist
+;; searchlist	= @{$self->{searchlist}}
 ;; defnames	= $self->{defnames}	dnsrch		= $self->{dnsrch}
+;; igntc	= $self->{igntc}	usevc		= $self->{usevc}
+;; recurse	= $self->{recurse}	port		= $self->{port}
 ;; retrans	= $self->{retrans}	retry		= $self->{retry}
-;; recurse	= $self->{recurse}	igntc		= $self->{igntc}
-;; usevc	= $self->{usevc}	port		= $self->{port}
 ;; tcp_timeout	= $self->{tcp_timeout}	persistent_tcp	= $self->{persistent_tcp}
 ;; udp_timeout	= $self->{udp_timeout}	persistent_udp	= $self->{persistent_udp}
-;; prefer_v4	= $self->{prefer_v4}	force_v4	= $self->{force_v4}
-;; debug	= $self->{debug}	force_v6	= $self->{force_v6}
+;; ${prefer}	= $self->{$prefer}	${force}	= $self->{$force}
+;; debug	= $self->{debug}	ndots		= $self->{ndots}
 END
-
 }
 
 
@@ -270,54 +275,56 @@ sub nameservers {
 	my $self = shift;
 	$self = $self->_defaults unless ref($self);
 
-	my ( @ipv4, @ipv6 );
+	my @ip;
 	foreach my $ns ( grep defined, @_ ) {
-		do { push @ipv6, $ns; next } if _ipv6($ns);
-		do { push @ipv4, $ns; next } if _ipv4($ns);
+		if ( _ipv4($ns) || _ipv6($ns) ) {
+			push @ip, $ns;
 
-		my $defres = ref($self)->new( debug => $self->{debug} );
-		$defres->{persistent} = $self->{persistent};
+		} else {
+			my $defres = ref($self)->new( debug => $self->{debug} );
+			$defres->{persistent} = $self->{persistent};
 
-		my $names  = {};
-		my $packet = $defres->search( $ns, 'A' );
-		my @iplist = _cname_addr( $packet, $names );
+			my $names  = {};
+			my $packet = $defres->search( $ns, 'A' );
+			my @iplist = _cname_addr( $packet, $names );
 
-		if (IPv6) {
-			$packet = $defres->search( $ns, 'AAAA' );
-			push @iplist, _cname_addr( $packet, $names );
+			if (IPv6) {
+				$packet = $defres->search( $ns, 'AAAA' );
+				push @iplist, _cname_addr( $packet, $names );
+			}
+
+			$self->errorstring( $defres->errorstring );
+
+			my %unique = map( ( $_ => $_ ), @iplist );
+
+			my @address = values(%unique);		# tainted
+			carp "unresolvable name: $ns" unless scalar @address;
+
+			push @ip, @address;
 		}
-
-		$self->errorstring( $defres->errorstring );
-
-		my %address = map { ( $_ => $_ ) } @iplist;	# tainted
-		my @unique = values %address;
-		carp "unresolvable name: $ns" unless @unique;
-		push @ipv4, grep _ipv4($_), @unique;
-		push @ipv6, grep _ipv6($_), @unique;
 	}
 
-	unless ( defined wantarray ) {
-		$self->{nameserver4} = \@ipv4;
-		$self->{nameserver6} = \@ipv6;
-		return;
-	}
-
-	if ( scalar @_ ) {
+	if ( scalar(@_) || !defined(wantarray) ) {
+		my @ipv4 = grep _ipv4($_), @ip;
+		my @ipv6 = grep _ipv6($_), @ip;
+		$self->{nameservers} = \@ip;
 		$self->{nameserver4} = \@ipv4;
 		$self->{nameserver6} = \@ipv6;
 	}
 
-	my @ns4 = $self->force_v6 ? () : @{$self->{nameserver4}};
-	my @ns6 = $self->force_v4 ? () : @{$self->{nameserver6}};
-	my @returnval = $self->{prefer_v4} ? ( @ns4, @ns6 ) : ( @ns6, @ns4 );
+	my @ns4 = $self->{force_v6} ? () : @{$self->{nameserver4}};
+	my @ns6 = $self->{force_v4} ? () : @{$self->{nameserver6}};
+	my @nameservers = @{$self->{nameservers}};
+	@nameservers = ( @ns4, @ns6 ) if $self->{prefer_v4} || !scalar(@ns6);
+	@nameservers = ( @ns6, @ns4 ) if $self->{prefer_v6} || !scalar(@ns4);
 
-	return @returnval if scalar @returnval;
+	return @nameservers if scalar @nameservers;
 
 	my $error = 'no nameservers';
 	$error = 'IPv4 transport disabled' if scalar(@ns4) < scalar @{$self->{nameserver4}};
 	$error = 'IPv6 transport disabled' if scalar(@ns6) < scalar @{$self->{nameserver6}};
 	$self->errorstring($error);
-	return @returnval;
+	return @nameservers;
 }
 
 sub nameserver { &nameservers; }				# uncoverable pod
@@ -360,14 +367,15 @@ sub query {
 	my $self = shift;
 	my $name = shift || '.';
 
-	# resolve name containing no dots or colons by appending domain
-	my @sfix = ( $self->{defnames} && $name !~ m/[:.]/ ) ? $self->domain : ();
+	my @sfix;
+
+	if ( $self->{defnames} && ( ( $name =~ tr/././ ) < $self->{ndots} ) ) {
+		@sfix = $self->domain unless $name =~ m/:|\.\d*$/;
+	}
+
 	my $fqdn = join '.', $name, @sfix;
-
 	$self->_diag( 'query(', $fqdn, @_, ')' );
-
 	my $packet = $self->send( $fqdn, @_ ) || return;
-
 	return $packet->header->ancount ? $packet : undef;
 }
 
@@ -378,16 +386,14 @@ sub search {
 	return $self->query(@_) unless $self->{dnsrch};
 
 	my $name = shift || '.';
-	my @sfix = $self->searchlist;
-	my @list = $name =~ m/[.]/ ? ( undef, @sfix ) : ( @sfix, undef );
 
-	foreach my $suffix ( $name =~ m/:|\.\d*$/ ? undef : @list ) {
+	my @sfix = ( $name =~ m/:|\.\d*$/ ) ? () : @{$self->{searchlist}};
+	my ( $domain, @etc ) = ( $name =~ tr/././ ) < $self->{ndots} ? (@sfix) : ( undef, @sfix );
+
+	foreach my $suffix ( $domain, @etc ) {
 		my $fqname = $suffix ? join( '.', $name, $suffix ) : $name;
-
 		$self->_diag( 'search(', $fqname, @_, ')' );
-
 		my $packet = $self->send( $fqname, @_ ) || next;
-
 		return $packet->header->ancount ? $packet : next;
 	}
 
@@ -498,7 +504,7 @@ NAMESERVER: foreach my $ns (@ns) {
 
 			# handle failure to detect taint inside socket->send()
 			die 'Insecure dependency while running with -T switch'
-					if TAINT && Scalar::Util::tainted($dst_sockaddr);
+					if TESTS && Scalar::Util::tainted($dst_sockaddr);
 
 			$select->add($socket);
 
@@ -599,7 +605,7 @@ sub _bgsend_udp {
 
 		# handle failure to detect taint inside $socket->send()
 		die 'Insecure dependency while running with -T switch'
-				if TAINT && Scalar::Util::tainted($dst_sockaddr);
+				if TESTS && Scalar::Util::tainted($dst_sockaddr);
 
 		my $expire = time() + $self->{udp_timeout};
 		${*$socket}{net_dns_bg} = [$expire, $packet];
@@ -619,9 +625,7 @@ sub bgbusy {
 	my ( $expire, $query, $read ) = @$appendix;
 	return if ref($read);
 
-	unless ( IO::Select->new($handle)->can_read(0.2) ) {
-		return time() <= $expire;
-	}
+	return time() <= $expire unless IO::Select->new($handle)->can_read(0);
 
 	return if $self->{igntc};
 	return unless $handle->socktype() == SOCK_DGRAM;
@@ -644,7 +648,10 @@ sub bgisready {				## historical
 
 
 sub bgread {
-	while (&bgbusy) { next; }				# side effect: TCP retry
+	my ( $self, $handle ) = @_;
+	while (&bgbusy) {					# side effect: TCP retry
+		IO::Select->new($handle)->can_read(0.02);	# cut CPU by 3 orders of magnitude
+	}
 	&_bgread;
 }
 
@@ -1032,30 +1039,26 @@ sub dnssec {
 
 sub force_v6 {
 	my $self = shift;
-	return $self->{force_v6} unless scalar @_;
-	my $value = shift;
-	$self->force_v4(0) if $value;
-	$self->{force_v6} = $value ? 1 : 0;
+	my $value = scalar(@_) ? shift() : $self->{force_v6};
+	$self->{force_v6} = $value ? do { $self->{force_v4} = 0; 1 } : 0;
 }
 
 sub force_v4 {
 	my $self = shift;
-	return $self->{force_v4} unless scalar @_;
-	my $value = shift;
-	$self->force_v6(0) if $value;
-	$self->{force_v4} = $value ? 1 : 0;
+	my $value = scalar(@_) ? shift() : $self->{force_v4};
+	$self->{force_v4} = $value ? do { $self->{force_v6} = 0; 1 } : 0;
 }
 
 sub prefer_v6 {
 	my $self = shift;
-	$self->{prefer_v4} = shift() ? 0 : 1 if scalar @_;
-	$self->{prefer_v4} ? 0 : 1;
+	my $value = scalar(@_) ? shift() : $self->{prefer_v6};
+	$self->{prefer_v6} = $value ? do { $self->{prefer_v4} = 0; 1 } : 0;
 }
 
 sub prefer_v4 {
 	my $self = shift;
-	return $self->{prefer_v4} unless scalar @_;
-	$self->{prefer_v4} = shift() ? 1 : 0;
+	my $value = scalar(@_) ? shift() : $self->{prefer_v4};
+	$self->{prefer_v4} = $value ? do { $self->{prefer_v6} = 0; 1 } : 0;
 }
 
 
@@ -1130,7 +1133,7 @@ sub AUTOLOAD {				## Default method
 	*{$AUTOLOAD} = sub {
 		my $self = shift;
 		$self = $self->_defaults unless ref($self);
-		$self->{$name} = shift if scalar @_;
+		$self->{$name} = shift || 0 if scalar @_;
 		return $self->{$name};
 	};
 
@@ -1179,7 +1182,7 @@ Copyright (c)2003,2004 Chris Reinhardt.
 
 Portions Copyright (c)2005 Olaf Kolkman.
 
-Portions Copyright (c)2014,2015 Dick Franks.
+Portions Copyright (c)2014-2017 Dick Franks.
 
 All rights reserved.
 

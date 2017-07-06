@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Log;
-$Lab::Moose::Instrument::Log::VERSION = '3.550';
+$Lab::Moose::Instrument::Log::VERSION = '3.552';
 use Moose::Role;
 use Carp;
 use namespace::autoclean;

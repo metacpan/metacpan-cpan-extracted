@@ -1,5 +1,22 @@
 Revision history for Text-NumericData
 
+2.003002
+	- Re-release with correct metadata (build system misuse).
+
+2.003001
+	- Actually install txdodeint script from Makefile.PL.
+
+2.003000
+	- New tool: txdodeint for numerical integration.
+	- Fix txdcalc help mentioning --line instead of the correct --lin.
+	- Enhancements on txdrows, adding --ranges and more robust handling
+	  of expressions (adding parentheses around the user-provided code). Of
+	  course this is only for avoiding accidents. Intentionally malicious code
+	  will always do malicious things (use of Safe compartments will be
+	  considered in the future).
+	- The script txdcontract can now do binning according coordinate values,
+	  not just line numbers.
+
 2.002000
 	- Officially added txdhistogram tool.
 	- Re-release after realising that the MANIFEST was missing the added tool

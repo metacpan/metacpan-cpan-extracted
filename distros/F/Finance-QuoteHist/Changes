@@ -1,5 +1,10 @@
 Revision history for Perl extension Finance::QuoteHist.
 
+1.26  Tue Jun 27 14:19:13 EDT 2017
+    - Fixed Yahoo module to handle the site's obfuscation
+    - updated test data
+    - removed defunct StockNod
+
 1.24  Mon Aug  3 15:55:29 EDT 2015
     - removed some deprecated Date::Manip config statements
     - removed outmoded fetchers

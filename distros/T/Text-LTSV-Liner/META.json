@@ -1,10 +1,10 @@
 {
    "abstract" : "Line filter of LTSV text",
    "author" : [
-      "YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>"
+      "IKEDA Kiyoshi <yasutake.kiyoshi@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v0.13.0",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -28,15 +28,14 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -55,7 +54,7 @@
    "provides" : {
       "Text::LTSV::Liner" : {
          "file" : "lib/Text/LTSV/Liner.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -69,5 +68,10 @@
          "web" : "https://github.com/key-amb/perl-Text-LTSV-Liner"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_contributors" : [
+      "YASUTAKE Kiyoshi <quee.amb@gmail.com>",
+      "xaicron <xaicron@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

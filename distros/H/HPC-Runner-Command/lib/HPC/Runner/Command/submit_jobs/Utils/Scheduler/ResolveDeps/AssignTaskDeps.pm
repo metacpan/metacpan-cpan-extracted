@@ -30,6 +30,7 @@ sub update_job_scheduler_deps_by_task {
         $self->batch_scheduler_ids_by_task;
     }
 
+    ##TODO consider changing this to each schedule
     $self->update_job_deps;
 }
 
@@ -64,13 +65,13 @@ sub dep_scheduler_ids_by_task {
     my $dep_indices = shift;
 
     for ( my $y = 0 ; $y < scalar @{$dep_indices} ; $y++ ) {
-        ##This is the batch_index
+        ##This is the current_batch_index
 
         my $batch_ref =
           $self->check_find_dep_indexes_cache( $self->current_job, $y );
 
         for ( my $z = 0 ; $z < scalar @{ $dep_indices->[$y] } ; $z++ ) {
-          #This is the index of the dependency batch
+           #This is the dependency_batch_index
 
             my $dep_index = $dep_indices->[$y]->[$z];
             my $dep_ref =
@@ -83,10 +84,27 @@ sub dep_scheduler_ids_by_task {
 
             $self->push_array_deps($array_dep);
         }
-
     }
 
     $self->clean_array_deps;
+}
+
+=head3 assign_scheduler_deps
+
+Jobs should only depend upon all jobs they need - not all jobs from the previous dep
+
+=cut
+
+sub assign_scheduler_deps {
+    my $self               = shift;
+    my $batch_scheduler_id = shift;
+    my $dep_scheduler_id   = shift;
+    # my $batch_task_index   = shift;
+    # my $dep_task_index     = shift;
+
+    my $array_dep = [ $batch_scheduler_id, $dep_scheduler_id, ];
+
+    return $array_dep;
 }
 
 sub check_find_dep_indexes_cache {

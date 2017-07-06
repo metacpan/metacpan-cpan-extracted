@@ -5,7 +5,7 @@ use strict;
 use Getopt::Long;
 use Test::BrewBuild::Dispatch;
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 my %args;
 my $help;
@@ -151,6 +151,11 @@ This option will override anything in the configuration file.
 By default, if a repository isn't specified in the config file, we'll attempt
 to locate the repository information from the current working directory.
 
+The full path to the repo is necessary eg: 
+C<https://example.com/user/repo-name>. If you are using Github, you can omit
+the URL portion as we'll automatically prepend C<https://github.com/> if you
+simply send in C<user/repo-name>.
+
 Set this to the repo link to override both.
 
 =head2 -d, --debug
@@ -168,8 +173,7 @@ This command tells the dispatcher to throw tests at the Testers continuously.
 With no argument or an argument of C<1>, we'll run forever. Any other integer
 will run in auto mode for that many cycles.
 
-Note that you *must* be inside of a repository directory at this time to use
-this feature. It currently *DOES NOT* work with the C<--repo> flag.
+The C<--repo|-r> parameter is *mandatory* when in auto mode.
 
 =head2 -R, --rpi
 

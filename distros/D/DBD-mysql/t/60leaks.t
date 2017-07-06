@@ -26,8 +26,12 @@ eval { require Storable };
 $have_storable = $@ ? 0 : 1;
 
 my ($dbh, $sth);
-$dbh = DbiTestConnect($test_dsn, $test_user, $test_password,
-                                            { RaiseError => 1, PrintError => 1, AutoCommit => 0 });
+eval {$dbh= DBI->connect($test_dsn, $test_user, $test_password,
+                                            { RaiseError => 1, PrintError => 1, AutoCommit => 0 });};
+if ($@) {
+        plan skip_all =>
+                "no database connection";
+}
 $dbh->disconnect;
 plan tests => 27 * 2;
 
@@ -47,7 +51,7 @@ for my $mysql_server_prepare (0, 1) {
 
 note "Testing memory leaks with mysql_server_prepare=$mysql_server_prepare\n";
 
-$dbh= DbiTestConnect($test_dsn, $test_user, $test_password,
+$dbh= DBI->connect($test_dsn, $test_user, $test_password,
                    { RaiseError => 1, PrintError => 1, AutoCommit => 0, mysql_server_prepare => $mysql_server_prepare, mysql_server_prepare_disable_fallback => 1 });
 
 ok $dbh->do("DROP TABLE IF EXISTS dbd_mysql_t60leaks");
@@ -70,12 +74,16 @@ $not_ok = 0;
 $prev_size= undef;
 
 for (my $i = 0;    $i < $COUNT_CONNECT;    $i++) {
-    $dbh2 = DBI->connect($test_dsn, $test_user, $test_password,
+    eval {$dbh2 = DBI->connect($test_dsn, $test_user, $test_password,
                                { RaiseError => 1, 
                                  PrintError => 1,
                                  AutoCommit => 0,
                                  mysql_server_prepare => $mysql_server_prepare,
-                               });
+                               });};
+    if ($@) {
+        $not_ok++;
+        last;
+    }
 
     if ($i % 100    ==    99) {
         $size = size();

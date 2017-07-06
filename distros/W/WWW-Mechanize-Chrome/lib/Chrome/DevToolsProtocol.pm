@@ -1,4 +1,5 @@
 package Chrome::DevToolsProtocol;
+use 5.010; # for //
 use strict;
 use Filter::signatures;
 no warnings 'experimental::signatures';
@@ -12,11 +13,7 @@ use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 
 use vars qw<$VERSION>;
-$VERSION = '0.01';
-
-# DOM access
-# https://chromedevtools.github.io/devtools-protocol/tot/DOM/
-# http://localhost:9222/json
+$VERSION = '0.04';
 
 sub _build_log( $self ) {
     require Log::Log4perl;
@@ -38,7 +35,7 @@ sub new($class, %args) {
     $args{ receivers } ||= {};
     $args{ on_message } ||= undef;
     $args{ one_shot } ||= [];
-    $args{ collector } ||= {};
+    $args{ listener } ||= {};
 
     $self
 };
@@ -51,7 +48,7 @@ sub endpoint( $self ) {
 }
 sub json( $self ) { $self->{json} }
 sub ua( $self ) { $self->{ua} }
-sub collector( $self ) { $self->{collector} }
+sub listener( $self ) { $self->{listener} }
 sub tab( $self ) { $self->{tab} }
 sub transport( $self ) { $self->{transport} }
 sub future( $self ) { $self->transport->future }
@@ -65,8 +62,23 @@ sub on_message( $self, $new_message=0 ) {
     $self->{on_message}
 }
 
-sub set_collector( $self, $event, $callback ) {
-    $self->collector->{ $event } = $callback;
+sub add_listener( $self, $event, $callback ) {
+    my $listener = Chrome::DevToolsProtocol::EventListener->new(
+        protocol => $self,
+        callback => $callback,
+        event    => $event,
+    );
+    $self->listener->{ $event } ||= [];
+    push @{ $self->listener->{ $event }}, $listener;
+    $listener
+}
+
+sub remove_listener( $self, $listener ) {
+    my $event = $listener->{event};
+    $self->listener->{ $event } ||= [];
+    @{$self->listener->{ $event }} = grep { $_ != $listener }
+                                     grep { defined $_ }
+                                     @{$self->listener->{ $event }};
 }
 
 sub log( $self, $level, $message, @args ) {
@@ -201,6 +213,10 @@ sub close( $self ) {
     };
 };
 
+sub sleep( $self, $seconds ) {
+    $self->transport->sleep($seconds);
+};
+
 sub DESTROY( $self ) {
     delete $self->{ua};
     $self->close;
@@ -217,12 +233,21 @@ sub one_shot( $self, @events ) {
 };
 
 sub on_response( $self, $connection, $message ) {
-    my $response = $self->json->decode( $message );
+    my $response = eval { $self->json->decode( $message ) };
+    if( $@ ) {
+        $self->log('error', $@ );
+        return;
+    };
 
     if( ! exists $response->{id} ) {
         # Generic message, dispatch that:
+        if( my $error = $response->{error} ) {
+            $self->log('error', "Error response from Chrome", $error );
+            return;
+        };
 
         (my $handler) = grep { exists $_->{events}->{ $response->{method} } and ${$_->{future}} } @{ $self->{one_shot}};
+        my $handled;
         if( $handler ) {
             $self->log( 'trace', "Dispatching one-shot event", $response );
             ${ $handler->{future} }->done( $response );
@@ -230,11 +255,23 @@ sub on_response( $self, $connection, $message ) {
             # Remove the handler we just invoked
             @{ $self->{one_shot}} = grep { $_ and ${$_->{future}} and $_ != $handler } @{ $self->{one_shot}};
 
-        } elsif( my $collector = $self->collector->{ $response->{method} } ) {
-            $self->log( 'trace', "Collecting event", $response );
-            $collector->( $response );
+            $handled++;
+        };
 
-        } elsif( $self->on_message ) {
+        if( my $listeners = $self->listener->{ $response->{method} } ) {
+            if( $self->{log}->is_trace ) {
+                $self->log( 'trace', "Notifying listeners", $response );
+            } else {
+                $self->log( 'debug', sprintf "Notifying listeners for '%s'", $response->{method} );
+            };
+            for my $listener (@$listeners) {
+                $listener->notify( $response );
+            };
+
+            $handled++;
+        };
+
+        if( $self->on_message ) {
             if( $self->{log}->is_trace ) {
                 $self->log( 'trace', "Dispatching message", $response );
             } else {
@@ -242,7 +279,10 @@ sub on_response( $self, $connection, $message ) {
             };
             $self->on_message->( $response );
 
-        } else {
+            $handled++;
+        };
+
+        if( ! $handled ) {
             if( $self->{log}->is_trace ) {
                 $self->log( 'trace', "Ignored message", $response );
             } else {
@@ -259,9 +299,9 @@ sub on_response( $self, $connection, $message ) {
 
         } elsif( $response->{error} ) {
             $self->log( 'debug', "Replying to error $response->{id}", $response );
-            $receiver->die( join "\n", $response->{error}->{message},$response->{error}->{data},$response->{error}->{code} );
+            $receiver->die( join "\n", $response->{error}->{message},$response->{error}->{data} // '',$response->{error}->{code} // '');
         } else {
-            $self->log( 'debug', "Replying to $response->{id}", $response );
+            $self->log( 'trace', "Replying to $response->{id}", $response );
             $receiver->done( $response->{result} );
         };
     };
@@ -294,6 +334,47 @@ sub json_get($self, $domain, %options) {
     });
 };
 
+sub _send_packet( $self, $response, $method, %params ) {
+    my $id = $self->next_sequence;
+    if( $response ) {
+        $self->{receivers}->{ $id } = $response;
+    };
+
+    my $payload = eval {
+        $self->json->encode({
+            id     => 0+$id,
+            method => $method,
+            params => \%params
+        });
+    };
+    if( my $err = $@ ) {
+        $self->log('error', $@ );
+    };
+
+    $self->log( 'trace', "Sent message", $payload );
+    my $result = eval {
+        $self->transport->send( $payload );
+    };
+    if( my $err = $@ ) {
+        $self->log('error', $@ );
+    };
+    $result
+}
+
+=head2 C<< $chrome->send_packet >>
+
+  $chrome->send_packet('Page.handleJavaScriptDialog',
+      accept => JSON::true,
+  );
+
+Sends a JSON packet to the remote end
+
+=cut
+
+sub send_packet( $self, $topic, %params ) {
+    $self->_send_packet( undef, $topic, %params )
+}
+
 =head2 C<< $chrome->send_message >>
 
   my $future = $chrome->send_message('DOM.querySelectorAll',
@@ -308,17 +389,8 @@ has sent a response to this query.
 =cut
 
 sub send_message( $self, $method, %params ) {
-    my $id = $self->next_sequence;
-    my $payload = $self->json->encode({
-        id => $id,
-        method => $method,
-        params => \%params
-    });
-
     my $response = $self->future;
-    $self->log( 'trace', "Sent message", $payload );
-    $self->transport->send( $payload );
-    $self->{receivers}->{ $id } = $response;
+    $self->_send_packet( $response, $method, %params );
     $response
 }
 
@@ -416,9 +488,43 @@ sub close_tab( $self, $tab ) {
     my $url = $self->build_url( domain => 'close/' . $tab->{id} );
     $self->ua->http_get( $url, headers => { 'Connection' => 'close' } )
     ->catch(
-        sub{ use Data::Dumper; warn Dumper \@_; Future->done }
-    );
+        sub{ #use Data::Dumper; warn Dumper \@_;
+             Future->done
+        });
 };
+
+package
+    Chrome::DevToolsProtocol::EventListener;
+use strict;
+use Carp 'croak';
+use Scalar::Util 'weaken';
+use Filter::signatures;
+no warnings 'experimental::signatures';
+use feature 'signatures';
+
+sub new( $class, %args ) {
+    croak "Need a callback" unless $args{ callback };
+    croak "Need a DevToolsProtocol in protocol" unless $args{ protocol };
+
+    weaken $args{ protocol };
+
+    bless {
+        %args,
+    } => $class
+}
+
+sub notify( $self, @info ) {
+    $self->{callback}->( @info )
+}
+
+sub unregister( $self ) {
+    $self->{protocol}->remove_listener( $self )
+        if $self->{protocol}; # it's a weak ref so it might have gone away already
+}
+
+sub DESTROY {
+    $_[0]->unregister
+}
 
 1;
 

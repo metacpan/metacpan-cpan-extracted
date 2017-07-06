@@ -1,0 +1,27 @@
+SYNOPSIS
+
+     use Log::ger::Format 'Flogger';
+     use Log::ger;
+
+    After that:
+
+     log_error 'simple!';
+     log_warn [ 'slightly %s complex', 'more' ];
+     log_info [ 'and inline some data: %s', { look => 'data!' } ];
+     log_debug [ 'and we can defer evaluation of %s if we want', sub { 'stuff' } ];
+     log_trace sub { 'while avoiding sprintfiness, if needed' };
+
+    To install only for current package:
+
+     use Log::ger::Format;
+     Log::ger::Format->set_for_current_package('Flogger');
+     use Log::ger;
+
+DESCRIPTION
+
+SEE ALSO
+
+    Log::ger
+
+    String::Flogger
+

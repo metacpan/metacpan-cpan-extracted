@@ -24,7 +24,7 @@ do { my $x = {
                                         'MIME::Base64' => '0'
                                       },
                       'requires' => {
-                                      'Future' => '0.34',
+                                      'Future' => '0.35',
                                       'List::UtilsBy' => '0.10',
                                       'Log::Any' => '1.045',
                                       'Log::Any::Adapter' => '1.045',
@@ -33,7 +33,7 @@ do { my $x = {
                                       'Scalar::Util' => '1.47',
                                       'Syntax::Keyword::Try' => '0.04',
                                       'Variable::Disposition' => '0.004',
-                                      'curry' => '0',
+                                      'curry' => '1.001',
                                       'indirect' => '0',
                                       'namespace::clean' => '0.27',
                                       'parent' => '0'

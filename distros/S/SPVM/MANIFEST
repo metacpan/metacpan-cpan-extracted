@@ -26,7 +26,9 @@ SPVM.xs
 spvm_api.h
 spvm_array.c
 spvm_array.h
+spvm_array_object.h
 spvm_base.h
+spvm_base_object.h
 spvm_bytecode.c
 spvm_bytecode.h
 spvm_bytecode_array.c
@@ -41,6 +43,9 @@ spvm_constant.c
 spvm_constant.h
 spvm_constant_pool.c
 spvm_constant_pool.h
+spvm_constant_pool_field.h
+spvm_constant_pool_package.h
+spvm_constant_pool_sub.h
 spvm_descriptor.c
 spvm_descriptor.h
 spvm_dumper.c
@@ -67,6 +72,7 @@ spvm_my_var.c
 spvm_my_var.h
 spvm_name_info.c
 spvm_name_info.h
+spvm_object.h
 spvm_op.c
 spvm_op.h
 spvm_op_checker.c
@@ -77,6 +83,7 @@ spvm_runtime.c
 spvm_runtime.h
 spvm_runtime_allocator.c
 spvm_runtime_allocator.h
+spvm_runtime_api.c
 spvm_runtime_api.h
 spvm_sub.c
 spvm_sub.h
@@ -88,6 +95,7 @@ spvm_type.c
 spvm_type.h
 spvm_util_allocator.c
 spvm_util_allocator.h
+spvm_value.h
 spvm_var.c
 spvm_var.h
 spvm_yacc.c

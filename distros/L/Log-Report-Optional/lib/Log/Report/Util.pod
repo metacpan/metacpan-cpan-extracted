@@ -9,6 +9,13 @@ Log::Report::Util - helpful routines to Log::Report
  Log::Report::Util
    is a Exporter
 
+=head1 SYNOPSIS
+
+ my ($language, $territory, $charset, $modifier)
+    = parse_locale 'nl_BE.utf-8@home';
+
+ my @take = expand_reasons 'INFO-ERROR,PANIC';
+
 =head1 DESCRIPTION
 
 This module collects a few functions and definitions which are shared
@@ -123,23 +130,16 @@ For instance, backslash-t is replaced by a tab character.
 
 =back
 
-=head1 SYNOPSYS
-
- my ($language, $territory, $charset, $modifier)
-    = parse_locale 'nl_BE.utf-8@home';
-
- my @take = expand_reasons 'INFO-ERROR,PANIC';
-
 =head1 SEE ALSO
 
-This module is part of Log-Report-Optional distribution version 1.02,
-built on January 18, 2016. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report-Optional distribution version 1.03,
+built on June 27, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 
-Copyrights 2013-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2013-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
 

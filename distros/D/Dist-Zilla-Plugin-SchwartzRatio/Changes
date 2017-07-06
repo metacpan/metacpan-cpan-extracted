@@ -1,5 +1,28 @@
 Revision history for Dist-Zilla-Plugin-SchwartzRatio
 
-0.2.0 2012-03-19
- - release the Kraken!
+0.3.2 2017-07-05
+  - drop the requirement to perl 5.14.
 
+  [ STATISTICS ]
+    - code churn: 4 files changed, 25 insertions(+), 16 deletions(-)
+
+0.3.1 2017-07-04
+  [ DOCUMENTATION ]
+    - Fix typo (GH#3, brian greenfield)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 16 insertions(+), 4 deletions(-)
+
+0.3.0 2017-07-03
+  [ DOCUMENTATION ]
+    - Mention pause-cleanup as a companion tool. (GH#1)
+
+  [ ENHANCEMENTS ]
+    - Use MetaCPAN::Client instead of scraping the CPAN Search webpage like
+      a savage. (GH#2)
+
+  [ STATISTICS ]
+    - code churn: 9 files changed, 212 insertions(+), 363 deletions(-)
+
+0.2.0 2012-03-19
+  - release the Kraken!

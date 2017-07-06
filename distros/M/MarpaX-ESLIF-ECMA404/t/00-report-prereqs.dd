@@ -7,7 +7,6 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
-                                      'English' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
@@ -19,6 +18,7 @@ do { my $x = {
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',

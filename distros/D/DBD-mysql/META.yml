@@ -10,7 +10,6 @@ build_requires:
 configure_requires:
   DBI: '1.609'
   Data::Dumper: '0'
-  Devel::CheckLib: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -31,7 +30,7 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-mysql
-version: '4.042'
+version: '4.043'
 x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Alexey Molchanov <alexey.molchanov@portaone.com>'
@@ -47,12 +46,11 @@ x_contributors:
   - 'Daisuke Murase <typester@cpan.org>'
   - 'Damyan Ivanov <dmn@debian.org>'
   - 'Daniël van Eeden <daniel.vaneeden@booking.com>'
-  - 'Dave Lambley <davel@isosceles.(none)>'
   - 'David Farrell <davidnmfarrell@gmail.com>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'
   - 'Giovanni Bechis <giovanni@bigio.snb.it>'
   - 'Graham Ollis <plicease@cpan.org>'
-  - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
+  - 'H.Merijn Brand <h.m.brand@xs4all.nl>'
   - 'Hanno <hanno@gentoo.org>'
   - 'James McCoy <jamessan@jamessan.com>'
   - 'Jim Winstead <jimw@trainedmonkey.com>'

@@ -150,7 +150,8 @@ sub _parse_sync_data {
         return;
     }
     elsif($json->{BaseResponse}{Ret} !=0){
-        $self->warn("收到无法识别消息，已将其忽略");
+        $self->warn("收到无法识别消息代码[$json->{BaseResponse}{Ret}]，已将其忽略");
+        $self->emit(unknown_retcode=>$json->{BaseResponse}{Ret});
         return;
     }
     $self->sync_key($json->{SyncKey}) if $json->{SyncKey}{Count}!=0;
@@ -340,7 +341,7 @@ sub _parse_sync_data {
                     if($e->{MsgType} == 10000){#群提示信息
                         $msg->{type} = "group_notice";
                     }
-                    elsif( $msg->{content}=~/^(\@.+):<br\/>(.*)$/s ){
+                    elsif( $msg->{content}=~/^(\@.+?):<br\/>(.*)$/s ){
                         my ($member_id,$content) = ($1,$2);
                         if(defined $member_id and defined $content){
                                 $msg->{sender_id} = $member_id;

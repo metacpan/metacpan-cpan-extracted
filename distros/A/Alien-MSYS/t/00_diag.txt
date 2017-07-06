@@ -1,7 +1,0 @@
-Archive::Zip
-File::HomeDir
-File::ShareDir
-HTTP::Tiny
-Module::Build
-Test::More
-Win32::Shortcut

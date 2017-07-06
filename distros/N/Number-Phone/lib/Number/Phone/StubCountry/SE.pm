@@ -22,14 +22,15 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
-                  'pattern' => '(8)(\\d{2,3})(\\d{2,3})(\\d{2})',
-                  'leading_digits' => '8'
+                  'leading_digits' => '8',
+                  'pattern' => '(8)(\\d{2,3})(\\d{2,3})(\\d{2})'
                 },
                 {
+                  'pattern' => '([1-69]\\d)(\\d{2,3})(\\d{2})(\\d{2})',
                   'leading_digits' => '
             1[013689]|
             2[0136]|
@@ -38,8 +39,7 @@ my $formatters = [
             54|
             6[03]|
             90
-          ',
-                  'pattern' => '([1-69]\\d)(\\d{2,3})(\\d{2})(\\d{2})'
+          '
                 },
                 {
                   'leading_digits' => '
@@ -101,27 +101,27 @@ my $formatters = [
                   'leading_digits' => '7'
                 },
                 {
-                  'leading_digits' => '7',
-                  'pattern' => '(77)(\\d{2})(\\d{2})'
+                  'pattern' => '(77)(\\d{2})(\\d{2})',
+                  'leading_digits' => '7'
                 },
                 {
                   'pattern' => '(20)(\\d{2,3})(\\d{2})',
                   'leading_digits' => '20'
                 },
                 {
-                  'pattern' => '(9[034]\\d)(\\d{2})(\\d{2})(\\d{3})',
-                  'leading_digits' => '9[034]'
+                  'leading_digits' => '9[034]',
+                  'pattern' => '(9[034]\\d)(\\d{2})(\\d{2})(\\d{3})'
                 },
                 {
-                  'pattern' => '(9[034]\\d)(\\d{4})',
-                  'leading_digits' => '9[034]'
+                  'leading_digits' => '9[034]',
+                  'pattern' => '(9[034]\\d)(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})',
                   'leading_digits' => '
             25[245]|
             67[3-6]
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 }
               ];
 
@@ -211,7 +211,6 @@ my $validators = {
             )\\d{5,6}
           )
         ',
-                'toll_free' => '20\\d{4,7}',
                 'specialrate' => '(
           77(?:
             0\\d{3}(?:\\d{3})?|
@@ -225,7 +224,9 @@ my $validators = {
             44
           )[1-8]\\d{3,6}
         )',
-                'mobile' => '7[02369]\\d{7}',
+                'toll_free' => '20\\d{4,7}',
+                'pager' => '74[02-9]\\d{6}',
+                'voip' => '',
                 'fixed_line' => '
           1(?:
             0[1-8]\\d{6}|
@@ -310,8 +311,7 @@ my $validators = {
             )\\d{5,6}
           )
         ',
-                'voip' => '',
-                'pager' => '74[02-9]\\d{6}'
+                'mobile' => '7[02369]\\d{7}'
               };
 my %areanames = (
   4611 => "Norrköping",

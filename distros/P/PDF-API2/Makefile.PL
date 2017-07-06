@@ -20,7 +20,10 @@ my %WriteMakefileArgs = (
     "Compress::Zlib" => "1.0",
     "Font::TTF" => 0
   },
-  "VERSION" => "2.031",
+  "TEST_REQUIRES" => {
+    "Test::Memory::Cycle" => 0
+  },
+  "VERSION" => "2.032",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,7 +32,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Compress::Zlib" => "1.0",
-  "Font::TTF" => 0
+  "Font::TTF" => 0,
+  "Test::Memory::Cycle" => 0
 );
 
 

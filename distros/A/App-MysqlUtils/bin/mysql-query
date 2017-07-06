@@ -1,16 +1,16 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/MysqlUtils/mysql_query
-# and generated automatically using Perinci::CmdLine::Gen version 0.45
+# and generated automatically using Perinci::CmdLine::Gen version 0.46
 
-our $DATE = '2017-06-17'; # DATE
+our $DATE = '2017-07-03'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any;
+use Log::ger;
 
 BEGIN { no warnings; $ENV{LOG_LEVEL} //= 'info'; }
 
@@ -39,7 +39,7 @@ mysql-query - Run query and return table result
 
 =head1 VERSION
 
-This document describes version 0.007 of mysql-query (from Perl distribution App-MysqlUtils), released on 2017-06-17.
+This document describes version 0.008 of mysql-query (from Perl distribution App-MysqlUtils), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -148,23 +148,23 @@ Do not read environment for default options.
 
 =item B<--debug>
 
-Set log level to debug (note: you also need to set LOG=1 to enable logging, or use DEBUG=1).
+Shortcut for --log-level=debug.
 
 =item B<--log-level>=I<s>
 
-Set log level (note: you also need to set LOG=1 to enable logging).
+Set log level.
 
 =item B<--quiet>
 
-Set log level to quiet (note: you also need to set LOG=1 to enable logging, or use QUIET=1).
+Shortcut for --log-level=error.
 
 =item B<--trace>
 
-Set log level to trace (note: you also need to set LOG=1 to enable logging, or use TRACE=1).
+Shortcut for --log-level=trace.
 
 =item B<--verbose>
 
-Set log level to info (note: you also need to set LOG=1 to enable logging, or use VERBOSE=1).
+Shortcut for --log-level=info.
 
 =back
 

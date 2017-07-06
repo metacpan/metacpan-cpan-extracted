@@ -47,6 +47,11 @@ sub get_all_disapproved_ads {
       operator => "IN",
       values   => [$ad_group_id]});
 
+  my $disapproved_predicate = Google::Ads::AdWords::v201705::Predicate->new({
+      field    => "CombinedApprovalStatus",
+      operator => "EQUALS",
+      values   => ["DISAPPROVED"]});
+
   # Create selector.
   my $paging = Google::Ads::AdWords::v201705::Paging->new({
     startIndex    => 0,
@@ -54,7 +59,7 @@ sub get_all_disapproved_ads {
   });
   my $selector = Google::Ads::AdWords::v201705::Selector->new({
       fields     => ["Id", "PolicySummary"],
-      predicates => [$ad_group_predicate],
+      predicates => [$ad_group_predicate, $disapproved_predicate],
       ordering   => [
         Google::Ads::AdWords::v201705::OrderBy->new({
             field     => "Id",
@@ -75,19 +80,17 @@ sub get_all_disapproved_ads {
     )->process_entries(
     sub {
       my ($ad_group_ad) = @_;
+      $disapproved_ad_count++;
       my $policy_summary = $ad_group_ad->get_policySummary();
-      if ($policy_summary->get_combinedApprovalStatus() eq "DISAPPROVED") {
-        $disapproved_ad_count++;
-        printf "Ad with ID %d and type '%s' was disapproved with the " .
-          "following policy topic entries:\n", $ad_group_ad->get_ad()->get_id(),
-          $ad_group_ad->get_ad()->get_Ad__Type();
-        foreach
-          my $policy_topic_entry (@{$policy_summary->get_policyTopicEntries()})
-        {
-          printf "  topic id: %s, topic name: '%s'\n",
-            $policy_topic_entry->get_policyTopicId(),
-            $policy_topic_entry->get_policyTopicName();
-        }
+      printf "Ad with ID %d and type '%s' was disapproved with the " .
+        "following policy topic entries:\n", $ad_group_ad->get_ad()->get_id(),
+        $ad_group_ad->get_ad()->get_Ad__Type();
+      foreach
+        my $policy_topic_entry (@{$policy_summary->get_policyTopicEntries()})
+      {
+        printf "  topic id: %s, topic name: '%s'\n",
+          $policy_topic_entry->get_policyTopicId(),
+          $policy_topic_entry->get_policyTopicName();
       }
     });
 

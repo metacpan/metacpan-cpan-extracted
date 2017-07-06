@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use Prty::Path;
 use Prty::ImagePool::Directory;
@@ -274,7 +274,7 @@ sub images {
 
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

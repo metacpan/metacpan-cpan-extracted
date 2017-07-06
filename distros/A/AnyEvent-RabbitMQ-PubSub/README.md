@@ -46,9 +46,9 @@ AnyEvent::RabbitMQ::PubSub - Publish and consume RabbitMQ messages.
     $consumer->consume(
         $cv,
         sub {
-            my ($self, $msg) = @_;
+            my ($consumer, $msg) = @_;
             print 'received ', $msg->{body}->payload, "\n";
-            $self->channel->ack();
+            $consumer->ack($msg);
             $cv->send();
         },
     );

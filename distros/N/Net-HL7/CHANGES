@@ -1,6 +1,10 @@
 Change history
 --------------
 
+0.82:
+* More robust check on message when initialized from string. Patch provided
+  by Alexander Haderer
+
 0.81:
 * Change in the licence. The Beer-ware license was considered non-free by the
   Fedora legal department, given that it would require you to give is beer in 

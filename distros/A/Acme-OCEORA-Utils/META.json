@@ -1,0 +1,45 @@
+{
+   "abstract" : "The great new Acme::OCEORA::Utils!",
+   "author" : [
+      "Eisaku Ando <ando@jcom.zaq.ne.jp>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4222",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Acme-OCEORA-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Acme::OCEORA::Utils" : {
+         "file" : "lib/Acme/OCEORA/Utils.pm",
+         "version" : "0.03"
+      },
+      "Tie::Cycle" : {
+         "file" : "lib/Tie/Cycle.pm",
+         "version" : "1.224"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ]
+   },
+   "version" : "0.03"
+}

@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.6.1');
+our $VERSION = version->new('0.6.3');
 
 requires 'repos';
 requires 'verbose';
@@ -61,19 +61,16 @@ Group::Git::Cmd::State - Quick state of each repository (branch name and changes
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::State version 0.6.1.
-
+This documentation refers to Group::Git::Cmd::State version 0.6.3.
 
 =head1 SYNOPSIS
 
-   use Group::Git::Cmd::State;
-
-   # Brief but working code example(s) here showing the most common usage(s)
-   # This section will be as far as many users bother reading, so make it as
-   # educational and exemplary as possible.
-
+   group-git state
 
 =head1 DESCRIPTION
+
+This command allows the quick finding out of state (i.e. the branch name and
+weather there are uncommitted changes) for each repository.
 
 =head1 SUBROUTINES/METHODS
 

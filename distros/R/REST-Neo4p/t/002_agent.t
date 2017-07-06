@@ -57,6 +57,10 @@ foreach my $mod (@agent_modules) {
 	    $not_connected = 1;
 	    diag "Authorization err (bad pass?)";
 	}
+	elsif ( $e = Exception::Class->caught() ) {
+	    $not_connected = 1;
+	    diag "Error (undetermined)";
+	}
 	SKIP : {
 	    skip 'no local connection to neo4j',11 if $not_connected;
 	    is $ua->node, join('/',$TEST_SERVER, qw(db data node)), 

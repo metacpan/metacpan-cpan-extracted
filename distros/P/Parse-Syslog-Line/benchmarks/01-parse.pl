@@ -29,38 +29,30 @@ my $stub = sub {
     parse_syslog_line(shift @copy);
 };
 my $results = timethese(50_000, {
+    'DateTimeCreate' => sub {
+        local $Parse::Syslog::Line::DateTimeCreate  = 1;
+        $stub->('DateTimeCreate');
+    },
     'Defaults' => sub {
         $stub->('Defaults');
     },
-    'Defaults w/normalize' => sub {
+    'NormalizeToUTC' => sub {
         local $Parse::Syslog::Line::NormalizeToUTC  = 1;
-        $stub->('Defaults w/normalize');
+        $stub->('NormalizeToUTC');
     },
-    'EpochOnly' => sub {
-        local $Parse::Syslog::Line::DateTimeCreate  = 0;
-        local $Parse::Syslog::Line::EpochCreate     = 1;
-        $stub->('Epoch Only');
-    },
-    'Recommended' => sub {
-        local $Parse::Syslog::Line::DateTimeCreate  = 0;
-        local $Parse::Syslog::Line::EpochCreate     = 1;
+    'PruneEmpty' => sub {
         local $Parse::Syslog::Line::PruneEmpty      = 1;
-        $stub->('Recommended');
+        $stub->('PruneEmpty');
     },
-    'Ignore Timezones' => sub {
-        local $Parse::Syslog::Line::DateTimeCreate  = 0;
-        local $Parse::Syslog::Line::IgnoreTimeZones = 1;
-        $stub->('Ignore Timezones');
-    },
-    'Minimalistic Data' => sub {
+    'No Dates, Pruned' => sub {
         local $Parse::Syslog::Line::DateParsing     = 0;
         local $Parse::Syslog::Line::PruneRaw        = 1;
         local $Parse::Syslog::Line::PruneEmpty      = 1;
-        $stub->('Minimalistic Data');
+        $stub->('No Dates, Pruned');
     },
-    'No Date Parsing' => sub {
+    'No Dates' => sub {
         local $Parse::Syslog::Line::DateParsing     = 0;
-        $stub->('No Date Parsing');
+        $stub->('No Dates');
     },
 });
 
@@ -82,31 +74,13 @@ my $utc_stub = sub {
     parse_syslog_line( shift @copy );
 };
 my $results_pure = timethese(50_000, {
-    'Pure UTC log' => sub {
+    'NormalizeToUTC' => sub {
         local $Parse::Syslog::Line::NormalizeToUTC  = 1;
-        local $Parse::Syslog::Line::DateTimeCreate  = 0;
-        local $Parse::Syslog::Line::EpochCreate     = 0;
-        local $Parse::Syslog::Line::IgnoreTimezones = 0;
-
-        $utc_stub->('Pure UTC log');
+        $utc_stub->('NormalizeToUTC');
     },
-
-    'Defaults' => sub {
-        local $Parse::Syslog::Line::NormalizeToUTC  = 0;
+    'DateTimeCreate' => sub {
         local $Parse::Syslog::Line::DateTimeCreate  = 1;
-        local $Parse::Syslog::Line::EpochCreate     = 0;
-        local $Parse::Syslog::Line::IgnoreTimezones = 0;
-
         $utc_stub->('Defaults');
-    },
-
-    'Defaults w/normalize' => sub {
-        local $Parse::Syslog::Line::NormalizeToUTC  = 1;
-        local $Parse::Syslog::Line::DateTimeCreate  = 1;
-        local $Parse::Syslog::Line::EpochCreate     = 0;
-        local $Parse::Syslog::Line::IgnoreTimezones = 0;
-
-        $utc_stub->('Defaults w/Normalize');
     },
     'No Date Parsing' => sub {
         local $Parse::Syslog::Line::DateParsing     = 0;

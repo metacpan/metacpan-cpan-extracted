@@ -9,8 +9,7 @@ isa_ok $script->_option_parser, 'Getopt::Long::Parser';
 
 {
   local $TODO = 'need to define config for Getopt::Long';
-  is_deeply($script->_option_parser->{'settings'}, [qw( no_auto_help pass_through )],
-    'Getopt::Long has correct config');
+  is_deeply($script->_option_parser->{'settings'}, [qw(no_auto_help pass_through)], 'Getopt::Long has correct config');
 }
 
 eval { $script->option(undef) };

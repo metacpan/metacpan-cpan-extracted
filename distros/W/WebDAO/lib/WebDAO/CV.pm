@@ -5,13 +5,14 @@
 #       AUTHOR:  Aliaksandr P. Zahatski, <zag@cpan.org>
 #===============================================================================
 package WebDAO::CV;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use URI;
 use Data::Dumper;
 use strict;
 use warnings;
 use HTTP::Body;
 use WebDAO::Base;
+use WebDAO::Util;
 use base qw( WebDAO::Base );
 
 __PACKAGE__->mk_attr(status=>200, _parsed_cookies=>undef);
@@ -271,6 +272,20 @@ sub set_header {
 
 Method for output headers
 
+    $self->response->get_request->set_header(
+        'Set-Cookie',
+        {
+            path    => '/',
+            domain  => '.example.com',
+            name    => 'userid',
+            value   => $self->_current_user->id,
+            expires => time() + 60 * 60 * 24 * 1,    # 1 day
+            secure => 1,
+            httpOnly = >1
+
+        }
+    );
+
 =cut
 
 sub print_headers {
@@ -289,17 +304,28 @@ sub print_headers {
        foreach my $c ( @$cookies ) {
           my $hvalue;
           if (ref($c) eq 'HASH') {
-            my $path = $c->{path} || '/';
 #            Set-Cookie: srote=ewe&1&1&2; path=$path
-            $hvalue = "$c->{name}=$c->{value}; path=$path";
+            $hvalue = "$c->{name}=$c->{value}";
+            my $path = $c->{path} || '/';
+            $hvalue .="; path=$path";
+            if ( my $domain = $c->{domain} ) {
+                $hvalue .= "; domain=$domain"
+            }
             if (my $expires = $c->{expires}) {
-            my @MON  = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
-            my @WDAY = qw( Sun Mon Tue Wed Thu Fri Sat );
-            my($sec, $min, $hour, $mday, $mon, $year, $wday) = gmtime($expires);
-            $year += 1900;
-            $expires = sprintf("%s, %02d-%s-%04d %02d:%02d:%02d GMT",
+              $expires = WebDAO::Util::expire_calc($expires);
+              my @MON  = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
+              my @WDAY = qw( Sun Mon Tue Wed Thu Fri Sat );
+              my($sec, $min, $hour, $mday, $mon, $year, $wday) = gmtime($expires);
+              $year += 1900;
+              $expires = sprintf("%s, %02d-%s-%04d %02d:%02d:%02d GMT",
                        $WDAY[$wday], $mday, $MON[$mon], $year, $hour, $min, $sec);
-            $hvalue .=" ;expires=$expires";
+              $hvalue .="; expires=$expires";
+            }
+            if ( $c->{ secure } ) {
+                $hvalue .= "; secure"
+            }
+            if ($c->{httponly}) {
+                $hvalue .= "; HttpOnly"
             }
           } else { $hvalue = $c }
           push @cookies_headers, "Set-Cookie", $hvalue;

@@ -1,11 +1,10 @@
 package Lab::Instrument::Cryogenic_SMS;
-$Lab::Instrument::Cryogenic_SMS::VERSION = '3.550';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Cryogenic SMS magnet power supply
+$Lab::Instrument::Cryogenic_SMS::VERSION = '3.552';
 use strict;
 use Lab::Instrument;
 
-#use Lab::Instrument::MagnetSupply;
-
-#our @ISA=('Lab::Instrument::MagnetSupply');
 our @ISA = ('Lab::Instrument');
 
 # does not use any magnet supply specific code yet
@@ -186,17 +185,28 @@ sub read_messages {
 
 1;
 
+__END__
+
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Lab::Instrument::Cryogenic - Cryogenic SMS120 superconducting magnet supply
+Lab::Instrument::Cryogenic_SMS - Cryogenic SMS magnet power supply
 
-  (c)           David Borowsky
-      2013      Andreas K. Hüttel
-  
+=head1 VERSION
+
+version 3.552
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team.
+  Copyright 2013-2015  Andreas K. Huettel
+            2016       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -8,7 +8,7 @@ use warnings;
 
 package Mail::Server;
 use vars '$VERSION';
-$VERSION = '3.002';
+$VERSION = '3.003';
 
 use base 'Mail::Reporter';
 

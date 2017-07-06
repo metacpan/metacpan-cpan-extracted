@@ -8,7 +8,7 @@ use strict;
 
 package Log::Report;
 use vars '$VERSION';
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 use base 'Exporter';
 
@@ -293,14 +293,14 @@ sub try(&@)
     pop @nested_tries;
 
     my $is_exception = blessed $err && $err->isa('Log::Report::Exception');
-    if($err && !$is_exception && !$disp->wasFatal)
+    if(!$is_exception && $err && !$disp->wasFatal)
     {   ($err, my($opts, $reason, $text))
            = Log::Report::Die::die_decode($err, on_die => $disp->die2reason);
         $disp->log($opts, $reason, __$text);
     }
 
     $disp->died($err)
-        if $err && ($is_exception ? $err->isFatal : 1);
+        if $is_exception ? $err->isFatal : $err;
 
     $@ = $disp;
 
@@ -321,38 +321,43 @@ sub failure(@) {report FAILURE => @_}
 sub panic(@)   {report PANIC   => @_}
 
 
-sub _default_domain(@) { pkg2domain $_[0] }
 
 sub __($)
-{   $lrm->new
+{   my ($cpkg, $fn, $linenr) = caller;
+    $lrm->new
       ( _msgid  => shift
-      , _domain => _default_domain(caller)
+      , _domain => pkg2domain($cpkg)
+      , _use    => "$fn line $linenr"
       );
 } 
 
 
 # label "msgid" added before first argument
 sub __x($@)
-{   @_%2 or error __x"even length parameter list for __x at {where}",
-        where => join(' line ', (caller)[1,2]);
+{   my ($cpkg, $fn, $linenr) = caller;
+    @_%2 or error __x"even length parameter list for __x at {where}",
+        where => "$fn line $linenr";
 
     my $msgid = shift;
     $lrm->new
-     ( _msgid  => $msgid
-     , _expand => 1
-     , _domain => _default_domain(caller)
-     , @_
-     );
+      ( _msgid  => $msgid
+      , _expand => 1
+      , _domain => pkg2domain($cpkg)
+      , _use    => "$fn line $linenr"
+      , @_
+      );
 } 
 
 
 sub __n($$$@)
 {   my ($single, $plural, $count) = (shift, shift, shift);
+    my ($cpkg, $fn, $linenr) = caller;
     $lrm->new
      ( _msgid  => $single
      , _plural => $plural
      , _count  => $count
-     , _domain => _default_domain(caller)
+     , _domain => pkg2domain($cpkg)
+     , _use    => "$fn line $linenr"
      , @_
      );
 }
@@ -360,12 +365,14 @@ sub __n($$$@)
 
 sub __nx($$$@)
 {   my ($single, $plural, $count) = (shift, shift, shift);
+    my ($cpkg, $fn, $linenr) = caller;
     $lrm->new
      ( _msgid  => $single
      , _plural => $plural
      , _count  => $count
      , _expand => 1
-     , _domain => _default_domain(caller)
+     , _domain => pkg2domain($cpkg)
+     , _use    => "$fn line $linenr"
      , @_
      );
 }
@@ -373,12 +380,14 @@ sub __nx($$$@)
 
 sub __xn($$$@)   # repeated for prototype
 {   my ($single, $plural, $count) = (shift, shift, shift);
+    my ($cpkg, $fn, $linenr) = caller;
     $lrm->new
      ( _msgid  => $single
      , _plural => $plural
      , _count  => $count
      , _expand => 1
-     , _domain => _default_domain(caller)
+     , _domain => pkg2domain($cpkg)
+     , _use    => "$fn line $linenr"
      , @_
      );
 }
@@ -487,11 +496,19 @@ sub translator($;$$$$)
 
 
 sub textdomain(@)
-{   # used for testing
-    return delete $reporter->{textdomains}{$_[0]}
-        if @_==2 && $_[1] eq 'DELETE';
+{   if(@_==1 && blessed $_[0])
+    {   my $domain = shift;
+        $domain->isa('Log::Report::Domain') or panic;
+        return $reporter->{textdomains}{$domain->name} = $domain;
+    }
 
-    my $name   = (@_%2 ? shift : _default_domain(caller)) || 'default';
+    if(@_==2)
+    {    # used for 'maintenance' and testing
+    	return delete $reporter->{textdomains}{$_[0]} if $_[1] eq 'DELETE';
+    	return $reporter->{textdomains}{$_[0]} if $_[1] eq 'EXISTS';
+    }
+
+    my $name   = (@_%2 ? shift : pkg2domain((caller)[0])) || 'default';
     my $domain = $reporter->{textdomains}{$name}
         ||= Log::Report::Domain->new(name => $name);
 
@@ -499,6 +516,7 @@ sub textdomain(@)
     $domain;
 }
 
+#--------------
 
 sub needs(@)
 {   my $thing = shift;

@@ -175,6 +175,7 @@ sub _vmem_usage {
 	my @last = `$cmd`;
 	my $consider_vmem_retry_reason =
 		  ($last[-1] =~ /Out of memory\!/)            ? "found stderr: $last[-1]"
+		: ($last[-1] =~ /MemoryError/)                ? "found stderr: $last[-1]"
 		: ($last[-2] =~ /^Error: cannot allocate vector of size /
 			&& $last[-1] =~ /Execution halted/)       ? "found stderr: $last[-2]"
 	    : ($pct >= $self->retry_mem_percent)          ? "exceeded allocated memory limit (or close enough to the limit)"

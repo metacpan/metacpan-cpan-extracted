@@ -99,9 +99,10 @@ sub build_equal_batch_tags {
 
 =head3 check_equal_batch_tags
 
-If they are the same each element depends upon the same element from the other array
+If they are the same AND unique each element depends upon the same element from
+the other array
 
-This will probably be true most of the time
+TODO - add back in this method to check for unique
 
 =cut
 
@@ -114,6 +115,7 @@ sub check_equal_batch_tags {
     if ( scalar @{$batch_tags} != scalar @{$dep_tags} ) {
         return 0;
     }
+
     my $comp = Array::Compare->new;
     for ( my $x = 0 ; $x < scalar @{$batch_tags} ; $x++ ) {
         my $tbatch_tags = $batch_tags->[$x];

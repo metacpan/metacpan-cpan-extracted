@@ -9,7 +9,7 @@ use Path::Class    qw( dir );
 use Carp           qw( confess );
 
 # ABSTRACT: Minting profile for Plicease
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 
 # this is basically the 5.x version of profile_dir from
@@ -44,7 +44,7 @@ Dist::Zilla::MintingProfile::Author::Plicease - Minting profile for Plicease
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    Version 0.191
+    Version 0.200
 
 SYNOPSIS
 
@@ -49,8 +49,7 @@ ACCESSORS
 
     The id of the site. E.g., Germany is 77.
 
-    https://developer.ebay.com/DevZone/merchandising/docs/Concepts/SiteIDTo
-    GlobalID.html
+    https://developer.ebay.com/DevZone/merchandising/docs/Concepts/SiteIDToGlobalID.html
 
   xsd_file
 
@@ -184,8 +183,8 @@ CONVENIENCE METHODS
 
  ebay_site_code_types (internal)
 
-    http://developer.ebay.com/devzone/XML/docs/Reference/ebay/types/SiteCod
-    eType.html turned into an hashref to map the site name to an id.
+    http://developer.ebay.com/devzone/XML/docs/Reference/ebay/types/SiteCodeType.html
+    turned into an hashref to map the site name to an id.
 
  ebay_sites_name_to_id
 
@@ -195,8 +194,7 @@ CONVENIENCE METHODS
  ebay_sites_id_to_name
 
     Return an hashref for mapping ebay site id to its name. #
-    http://developer.ebay.com/devzone/XML/docs/Reference/ebay/types/SiteCod
-    eType.html
+    http://developer.ebay.com/devzone/XML/docs/Reference/ebay/types/SiteCodeType.html
 
 AUTHOR
 

@@ -19,7 +19,7 @@ WriteMakefile(
         'Data::Dump'        => 0,
     },
     ABSTRACT_FROM     => 'lib/Ceph/Rados.pm', # retrieve abstract from module
-    AUTHOR            => 'Alex <alex@openimp.net>',
+    AUTHOR            => 'Alex <alex@openimp.com>',
     LIBS              => ['-lrados'], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'

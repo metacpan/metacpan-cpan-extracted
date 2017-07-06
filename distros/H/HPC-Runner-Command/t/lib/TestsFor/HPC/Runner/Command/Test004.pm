@@ -9,15 +9,16 @@ use File::Path qw(make_path remove_tree);
 use IPC::Cmd qw[can_run];
 use Data::Dumper;
 use Capture::Tiny ':all';
+use File::Spec;
+use File::Slurp;
 
 extends 'TestMethods::Base';
 
 sub write_test_file {
     my $test_dir = shift;
 
-    open( my $fh, ">$test_dir/script/test001.1.sh" );
-
-    print $fh <<EOF;
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
+    my $text = <<EOF;
 #HPC partition=debug
 #HPC walltime=01:00:00
 #HPC cpus_per_task=1
@@ -32,7 +33,7 @@ echo "hello again from job 3" && sleep 5
 
 EOF
 
-    close($fh);
+    write_file( $file, $text );
 }
 
 sub construct {
@@ -43,10 +44,10 @@ sub construct {
 
     my $cwd = getcwd();
 
-    my $t = "$test_dir/script/test001.1.sh";
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
 
     MooseX::App::ParsedArgv->new(
-        argv => [ "submit_jobs", "--infile", $t, "--hpc_plugins", "Slurm", ]
+        argv => [ "submit_jobs", "--infile", $file, "--hpc_plugins", "Slurm", ]
     );
 
     my $test = HPC::Runner::Command->new_with_command();
@@ -54,13 +55,12 @@ sub construct {
     $test->log( $test->init_log );
 
     return $test;
-
 }
 
 sub test_001 : Tags(submit_jobs) {
 
     my $cwd      = getcwd();
-    my $test = construct();
+    my $test     = construct();
     my $test_dir = getcwd();
 
     my ( $stdout, $stderr ) = capture { $test->execute() };
@@ -72,7 +72,7 @@ sub test_001 : Tags(submit_jobs) {
     ##like( $stdout, qr/With Slurm jobid/, 'With Slurm Job id' );
 
     #if ($stderr) {
-        #ok(0);
+    #ok(0);
     #}
     ok(1);
 

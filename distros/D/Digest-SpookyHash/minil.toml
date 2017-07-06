@@ -1,4 +1,5 @@
 name = "Digest-SpookyHash"
+module_maker="ModuleBuild"
 [build]
 build_class = "builder::MyBuilder"
 [no_index]

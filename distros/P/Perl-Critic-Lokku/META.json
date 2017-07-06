@@ -4,7 +4,7 @@
       "David D Lowe <flimm@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,6 +54,7 @@
          "web" : "https://github.com/lokku/Perl-Critic-Lokku"
       }
    },
-   "version" : "0.002"
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

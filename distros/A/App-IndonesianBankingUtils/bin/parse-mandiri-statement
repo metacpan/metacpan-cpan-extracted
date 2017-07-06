@@ -1,8 +1,8 @@
 #!perl
 
-our $DATE = '2017-05-16'; # DATE
+our $DATE = '2017-07-01'; # DATE
 our $DIST = 'App-IndonesianBankingUtils'; # DIST
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 use 5.010;
 use strict;
@@ -50,7 +50,7 @@ parse-mandiri-statement - Parse BCA internet banking statement
 
 =head1 VERSION
 
-This document describes version 0.09 of parse-mandiri-statement (from Perl distribution App-IndonesianBankingUtils), released on 2017-05-16.
+This document describes version 0.10 of parse-mandiri-statement (from Perl distribution App-IndonesianBankingUtils), released on 2017-07-01.
 
 =head1 SYNOPSIS
 

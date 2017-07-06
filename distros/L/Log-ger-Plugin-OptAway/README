@@ -1,0 +1,37 @@
+SYNOPSIS
+
+     use Log::ger::Plugin->set('OptAway');
+     use Log::ger;
+
+    Co demonstrate the effect of optimizing away:
+
+     % perl -MLog::ger -MO=Deparse -e'log_warn "foo\n"; log_debug "bar\n"'
+     log_warn("foo\n");
+     log_debug("bar\n");
+     -e syntax OK
+    
+     % perl -MLog::ger::Plugin=OptAway -MLog::ger -MO=Deparse -e'log_warn "foo\n"; log_debug "bar\n"'
+     log_warn("foo\n");
+     '???';
+     -e syntax OK
+
+DESCRIPTION
+
+    This plugin replaces logging statements that are higher than the
+    current level ($Log::ger::Current_Level) into a no-op statement using
+    B::CallChecker magic at compile-time. The logging statements will
+    become no-op and will have zero run-time overhead.
+
+    By default, since $Current_Level is pre-set at 3 (warn) then
+    log_info(), log_debug(), and log_trace() calls will be turned into
+    no-op.
+
+    Caveats:
+
+      * must be done at compile-time
+
+      * only works when you are using procedural style
+
+      * once optimized away, subsequent logger reinitialization at run-time
+      won't take effect
+

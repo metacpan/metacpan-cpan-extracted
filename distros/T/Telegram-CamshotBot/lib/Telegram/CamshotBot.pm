@@ -3,14 +3,12 @@
 # ABSTRACT: Telegram bot that send you a snapshot from IP camera using ffmpeg (don't forget to install it!)
 
 
-
-
-
 package Telegram::CamshotBot;
-$Telegram::CamshotBot::VERSION = '0.01';
+$Telegram::CamshotBot::VERSION = '0.03';
 use Telegram::CamshotBot::Util qw(first_existing_file random_caption abs_path_of_sample_mojo_conf fev);
 use Mojolicious::Lite;
 use Mojolicious::Plugin::JSONConfig;
+use Mojolicious::Plugin::Webtail;
 use WWW::Telegram::BotAPI;
 use Date::Format;
 use Telegram::Bot::Message;
@@ -32,7 +30,7 @@ print "Using config: ".$config_file_path."\n";
 
 my $config_values = plugin 'JSONConfig' => { file => $config_file_path };
 
-plugin( 'Webtail', file => $config_values->{log_file} ); # https://metacpan.org/pod/Mojolicious::Plugin::Webtail
+  plugin( 'Webtail', file => $ENV{CAMSHOTBOT_WEBTAIL_LOG_FILE} || $config_values->{log_file} ); # https://metacpan.org/pod/Mojolicious::Plugin::Webtail
 
 # BEGIN { $ENV{TELEGRAM_BOTAPI_DEBUG}=1 };
 
@@ -44,8 +42,14 @@ my $stream_url = $ENV{CAMSHOTBOT_STREAM_URL} || $config_values->{stream_url};
 my $ffmpeg_cmd = 'ffmpeg -hide_banner -loglevel panic -i '.$stream_url.' -f image2 -vframes 1 '.$screenshot_file if ($stream_url);
 my ($camera_ip) = ($stream_url  =~ /($RE{net}{IPv4})/) if ($stream_url);
 my $bot_domain = $ENV{VIRTUAL_HOST} || $ENV{LETSENCRYPT_HOST} || $ENV{CAMSHOTBOT_DOMAIN} || $config_values->{bot_domain};
-my $polling_flag = $ENV{CAMSHOTBOT_POLLING} || $config_values->{polling};
-my $docker_flag = $ENV{CAMSHOTBOT_FFMPEG_DOCKER} || $config_values->{ffmpeg_docker};
+my $polling_flag = $ENV{CAMSHOTBOT_POLLING} || $config_values->{polling}; # 0 or not set -> webhook, 1 -> polling
+my $polling_timeout = 3; # default
+if ($polling_flag) {
+  $polling_timeout = $ENV{CAMSHOTBOT_POLLING_TIMEOUT} || $config_values->{polling_timeout};
+} else {
+  $polling_timeout = undef;
+}
+my $docker_flag = $ENV{CAMSHOTBOT_FFMPEG_DOCKER} || $config_values->{ffmpeg_docker}; # any value to send cached image
 
 if ($telegram_token) { # maybe add
   $api = WWW::Telegram::BotAPI->new (
@@ -71,7 +75,7 @@ helper answer => sub {
 
 
   ###### Loggging
-	if ($config_values->{debug}) {
+	if ($ENV{CAMSHOTBOT_TELEGRAM_DEBUG} || $config_values->{debug}) {
 		# full log, convenient if you need to restict chat_id's and check what's wrong
 		app->log->info("Update from Telegram API: ".Dumper $update);
 		app->log->info("Update parsed by Telegram::Bot::Message: ".Dumper $mo);
@@ -137,14 +141,14 @@ helper check_for_updates => sub {
 
 	$h->{updates_in_queue}{update_ids} = \@u_ids;
 
-	$c->setWebhook() if !($config_values->{polling}); # set Webhook again if needed
+	$c->setWebhook() if !($polling_flag); # set Webhook again if needed
 
 	return $h;
 };
 
 helper setWebhook => sub {
 	my $c = shift;
-	return $api->setWebhook({ url => 'https://'.$bot_domain.'/'.$config_values->{telegram_api_token} });
+	return $api->setWebhook({ url => 'https://'.$bot_domain.'/'.$telegram_token });
 };
 
 
@@ -191,9 +195,9 @@ get '/debug' => sub {
 if ($telegram_token && $polling_flag) {
 
 	my $res = $api->deleteWebhook();
-	app->log->info("Webhook was deleted. Starting polling with ".$config_values->{polling_timeout}."secs timeout ...") if $res;
+	app->log->info("Webhook was deleted. Starting polling with ".$polling_timeout."secs timeout ...") if $res;
 
-	Mojo::IOLoop->recurring($config_values->{polling_timeout} => sub {
+	Mojo::IOLoop->recurring($polling_timeout => sub {
 
 		my @updates = @{$api->getUpdates->{result}};
 
@@ -201,6 +205,7 @@ if ($telegram_token && $polling_flag) {
 			for my $u (@updates) {
 				#app->build_controller->answer($u); # Mojolicious::Lite ->  Mojolicious::Controller -> Mojolicious::Helper
         app->answer($u); # Mojolicious::Lite ->  Mojolicious::Controller -> Mojolicious::Helper
+        $api->getUpdates({ offset => $u->{update_id} + 1.0 }); # clear buffer
 			}
 		}
 
@@ -217,6 +222,7 @@ if ($telegram_token) {
   app->log->info("Unprocessed update ids (for offset debug): ".join(',', @{$queue->{update_ids}}) );
 }
 
+push @{app->commands->namespaces}, 'Telegram::CamshotBot::Command';
 app->start;
 
 1;
@@ -233,27 +239,7 @@ Telegram::CamshotBot - Telegram bot that send you a snapshot from IP camera usin
 
 =head1 VERSION
 
-version 0.01
-
-=head1 ENVIRONMENT VARIABLES
-
-To get list of all environment variables:
-
-  grep -o -P "CAMSHOTBOT_\w+" lib/Telegram/CamshotBot.pm | sort -u
-
-List (useful for Docker):
-
-  CAMSHOTBOT_CONFIG
-  CAMSHOTBOT_DOMAIN
-  CAMSHOTBOT_FFMPEG_DOCKER
-  CAMSHOTBOT_LAST_SHOT_FILENAME
-  CAMSHOTBOT_POLLING
-  CAMSHOTBOT_STREAM_URL
-  CAMSHOTBOT_TELEGRAM_API_TOKEN
-
-To check which variables are set you can run
-
-  printenv | grep CAMSHOTBOT_* | sort -u
+version 0.03
 
 =head1 RUNNING
 
@@ -261,9 +247,9 @@ Docker way
 
   wget https://raw.githubusercontent.com/pavelsr/camshotbot/master/docker-compose.yml.example > docker-compose.yml
 
-then edit CAMSHOTBOT_* variables
+then edit CAMSHOTBOT_* variables and change network if needed
 
-  docker-compose up
+  docker-compose up -d
 
 Standalone way
 
@@ -276,11 +262,56 @@ Add all essential variables:  telegram_api_token, stream_url, bot_domain
 
   camshotbot daemon
 
+For performance you can run ffmpeg in a separate "caching" docker container.
+String below will output a single image that is continuously overwritten with new images
+
+  docker run -d -it -v $(pwd):/tmp/workdir --network=host jrottenberg/ffmpeg:3.3-alpine -hide_banner -loglevel error -i rtsp://10.132.193.9//ch0.h264 -f image2 -vf fps=1/3 -y -update 1 latest.jpg
+
+For more details please see docker-compose.yml.example
+
+!! ATTENTION ! Bot is working correctly only if version of Telegram::CamshotBot >= 0.03.
+There are some critical errors in previous versions, sorry for that.
+
+=head1 ENVIRONMENT VARIABLES
+
+Environment variables are always checked firstly, before any config files
+
+To get list of all available environment variables plese run after git clone:
+
+  grep -o -P "CAMSHOTBOT_\w+" lib/Telegram/CamshotBot.pm | sort -u
+
+Actual List (useful for Docker deployment):
+
+  CAMSHOTBOT_CONFIG
+  CAMSHOTBOT_DOMAIN
+  CAMSHOTBOT_FFMPEG_DOCKER
+  CAMSHOTBOT_LAST_SHOT_FILENAME
+  CAMSHOTBOT_POLLING
+  CAMSHOTBOT_POLLING_TIMEOUT
+  CAMSHOTBOT_STREAM_URL
+  CAMSHOTBOT_TELEGRAM_API_TOKEN
+  CAMSHOTBOT_TELEGRAM_DEBUG
+  CAMSHOTBOT_WEBTAIL_LOG_FILE
+
+Check more details about their usage at docker-compose.yml.example
+
+To check which variables are set you can run
+
+  printenv | grep CAMSHOTBOT_* | sort -u
+
+For setting environment variable you can use
+
+  export CAMSHOTBOT_POLLING=1
+
 =head1 DEVELOPMENT
 
-If you want to run unit test without dzil test
+If you want to run unit tests without dzil test
 
-  prove -l -v t  or perl -Ilib
+  prove -l -v t
+
+or
+
+  perl -Ilib
 
 =head1 AUTHOR
 

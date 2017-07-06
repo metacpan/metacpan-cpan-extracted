@@ -25,11 +25,16 @@ t/030_pm.t
 t/040_txt.t
 t/050_multi.t
 t/060_sub_dir.t
+t/070_blank_index.t
 t_data/test1.zip
+t_data/test2.zip
 t_data/tmp/bar.pm
 t_data/tmp/baz.txt
 t_data/tmp/foo.yml
 t_data/tmp/index.yml
 t_data/tmp/qux.any
 t_data/tmp/sub_dir/foo.yml
-t_data/update_test_archive.sh
+t_data/tmp2/baz.txt
+t_data/tmp2/index.yml
+t_data/update_test1_archive.sh
+t_data/update_test2_archive.sh

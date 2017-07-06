@@ -15,16 +15,22 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Spline;
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use strict;
 use warnings;
 use Carp;
 use Math::Trig;
 use Image::Info qw(image_info);
-use Regexp::Common qw (number);
 use Graphics::Fig::Color;
 use Graphics::Fig::Parameters;
+
+#
+# RE_REAL regular expression matching a floating point number
+#
+my $RE_REAL = "(?:(?i)(?:[-+]?)(?:(?=[.]?[0123456789])(?:[0123456789]*)" .
+	      "(?:(?:[.])(?:[0123456789]{0,}))?)(?:(?:[E])(?:(?:[-+]?)" .
+	      "(?:[0123456789]+))|))";
 
 #
 # Graphics::Fig::Spline::validateControlPoint
@@ -33,7 +39,7 @@ sub validateControlPoint {
     my $prefix = shift;
     my $value  = shift;
 
-    if (!($value =~ m/^\s*($RE{num}{real})/)) {
+    if (!($value =~ m/^\s*($RE_REAL)/)) {
 	croak("${prefix}: expected number");
     }
     if ($value < -1.0 || $value > 1.0) {

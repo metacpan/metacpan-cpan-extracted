@@ -15,6 +15,7 @@
 package Google::Ads::Common::OAuth2BaseHandler;
 
 use strict;
+use warnings;
 use version;
 use base qw(Google::Ads::Common::AuthHandlerInterface);
 
@@ -245,6 +246,8 @@ A hash reference with the following keys:
   oAuth2AccessToken => "secret",
   # Refer to the documentation of the L<refresh_token> property.
 }
+
+=back
 
 =head1 LICENSE AND COPYRIGHT
 

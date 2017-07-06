@@ -1,7 +1,7 @@
 DESCRIPTION
 
     This distribution provides the following command-line utilities related
-    to App::FatPacker:
+    to fatpacking:
 
     #INSERT_EXECS_LIST
 

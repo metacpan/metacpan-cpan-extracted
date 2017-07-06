@@ -1,6 +1,6 @@
 package Outthentic;
 
-our $VERSION = '0.2.35';
+our $VERSION = '0.2.37';
 
 1;
 
@@ -196,6 +196,19 @@ sub populate_config {
     close CONFIG;
 
     note("configuration populated and saved to ".story_cache_dir()."/config.json") if debug_mod12;
+
+    # it should be done once
+    # and it always true
+    # as populate_config() reach this lines
+    # only once, when config is really populated
+
+    if ( get_prop('cwd') ) {
+      unless (chdir(get_prop('cwd'))){
+        $STATUS = 0;
+        die "can't change working directory to: ".(get_prop('cwd'))." : $!";
+      }
+      print "set cwd to ".(get_prop('cwd')),"\n";
+    }
     
     return $config_data = $config_res;
     return $config_data;
@@ -1403,49 +1416,54 @@ Outthentic provides some helpers and variables:
 
 =over
 
-=item -
+=item *
 
 centos5
 
 
-=item -
+=item *
 
 centos6
 
 
-=item -
+=item *
 
 centos7
 
 
-=item -
+=item *
 
 ubuntu
 
 
-=item -
+=item *
 
 debian
 
 
-=item -
+=item *
 
 minoca
 
 
-=item -
+=item *
 
 archlinux
 
 
-=item -
+=item *
 
 fedora
 
 
-=item -
+=item *
 
 amazon
+
+
+=item *
+
+alpine
 
 
 =back
@@ -1601,6 +1619,18 @@ C<--root>
 =back
 
 Root directory of outthentic project. If root parameter is not set current working directory is assumed as project root directory.
+
+=over
+
+=item *
+
+C<--cwd>
+
+
+
+=back
+
+Sets working directory when strun executes. Default value is unset. Optional.
 
 =over
 
@@ -1861,6 +1891,12 @@ C<SPARROW_ROOT> - if set, used as prefix for test root directory.
 =item *
 
 C<SPARROW_NO_COLOR> - disable color output (see --nocolor option of C<strun>)
+
+
+
+=item *
+
+C<OUTTHENTIC_CWD> - sets working directory for strun, see strun's C<--cwd> parameter
 
 
 

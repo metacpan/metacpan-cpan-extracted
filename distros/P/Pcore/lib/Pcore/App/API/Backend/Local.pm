@@ -21,7 +21,7 @@ requires(
     '_auth_user_session',
 );
 
-has dbh => ( is => 'ro', isa => ConsumerOf ['Pcore::DBH'], required => 1 );
+has dbh => ( is => 'ro', isa => ConsumerOf ['Pcore::Handle::DBI'], required => 1 );
 
 has _hash_rpc   => ( is => 'ro', isa => InstanceOf ['Pcore::Util::PM::RPC'],       init_arg => undef );
 has _hash_cache => ( is => 'ro', isa => InstanceOf ['Pcore::Util::Hash::RandKey'], init_arg => undef );

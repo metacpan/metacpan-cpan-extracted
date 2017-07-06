@@ -1,5 +1,11 @@
 Revision history for CGI-Info
 
+0.63	Wed Jul  5 20:57:31 EDT 2017
+	When preventing SQL injection or XSS, don't return any parameters, since
+		it's best to assume everything is poisoned
+	Added max_upload_size to new()
+	OPTIONS shouldn't get through to CGI::Info, so disallow it
+
 0.62	Wed 21 Dec 09:28:36 EST 2016
 	Added status() method
 	Set maximum file upload size to 512K

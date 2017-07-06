@@ -1,7 +1,7 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'perl' => '5.012000'
+                                    'perl' => '5.014000'
                                   }
                   },
        'configure' => {
@@ -14,6 +14,7 @@ do { my $x = {
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
+                                      'Test::Pod::LinkCheck' => '0',
                                       'Test::Synopsis' => '0',
                                       'Test::Version' => '1'
                                     }
@@ -21,10 +22,10 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'List::Util' => '1.29',
-                                      'Tickit' => '0.60',
+                                      'Tickit' => '0.63',
                                       'Tickit::Widget' => '0',
                                       'Tickit::Widget::Menu' => '0',
-                                      'Tickit::WidgetRole::Movable' => '0.002',
+                                      'Tickit::WidgetRole::Movable' => '0.003',
                                       'Variable::Disposition' => '0',
                                       'curry::weak' => '0',
                                       'parent' => '0'

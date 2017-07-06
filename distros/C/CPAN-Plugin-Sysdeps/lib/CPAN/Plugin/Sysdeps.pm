@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 use Hash::Util 'lock_keys';
 use List::Util 'first';
@@ -207,7 +207,7 @@ sub _detect_linux_distribution_lsb_release {
 sub _detect_linux_distribution_fallback {
     if (open my $fh, '<', '/etc/redhat-release') {
 	my $contents = <$fh>;
-	if ($contents =~ m{^(CentOS|RedHat) Linux release (\d+)\S* \((.*?)\)}) {
+	if ($contents =~ m{^(CentOS|RedHat) (Linux )?release (\d+)\S* \((.*?)\)}) {
 	    return {linuxdistro => $1, linuxdistroversion => $2, linuxdistrocodename => $3};
 	}
     }
@@ -825,12 +825,16 @@ configured to use the plugin, then C<cpan_smoke_modules> will also use
 this configuration. But it's also possible to use
 C<cpan_smoke_modules> without changes to C<CPAN/MyConfig.pm>, and even
 with an uninstalled C<CPAN::Plugin::Sysdeps>. This is especially
-interesting when testing changes in the Mapping.pm file. An sample
+interesting when testing changes in the Mapping.pm file. A sample
 run:
 
     cd .../path/to/CPAN-Plugin-Sysdeps
     perl Makefile.PL && make all test
-    env PERL5OPT="-Mblib=$(pwd)" cpan_smoke_modules -perl pistachio-perl --cpanconf-unchecked plugin_list=CPAN::Plugin::Sysdeps Imager
+    env PERL5OPT="-Mblib=$(pwd)" cpan_smoke_modules -perl /path/to/perl --sysdeps Imager
+
+Or alternatively without any interactive questions:
+
+    env PERL5OPT="-Mblib=$(pwd)" cpan_smoke_modules -perl /path/to/perl --sysdeps-batch Imager
 
 =head1 NOTES, LIMITATIONS, BUGS, TODO
 
@@ -880,9 +884,16 @@ removed, at least on Debian systems.
 
 =item * Support for more OS and Linux distributions
 
-The default mapping has support for FreeBSD and Debian-like systems
-(but details are missing for distributions like Ubuntu or Mint).
-Support for other systems is missing.
+Best supported systems are FreeBSD and Debian-like systems (but
+details may be missing for distributions like Ubuntu or Mint). Support
+for Fedora-like systems and Mac OS X systems is fair, for Windows
+quite limited and for other systems missing.
+
+=item * Support for cpanm
+
+To my knowledge there's no hook support in cpanm. Maybe things will
+change in cpanm 2.0. But it's always possible to use the
+L<cpan-sysdeps> script.
 
 =item * Should gnukfreebsd be handled like debian?
 

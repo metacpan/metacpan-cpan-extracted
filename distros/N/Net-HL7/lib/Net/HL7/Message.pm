@@ -1,13 +1,3 @@
-################################################################################
-#
-# File      : Message.pm
-# Author    : Duco Dokter
-# Created   : Mon Nov 11 17:37:11 2002
-# Version   : $Id: Message.pm,v 1.21 2015/01/29 15:30:11 wyldebeast Exp $ 
-# Copyright : D.A.Dokter, Wyldebeast & Wunderliebe
-#
-################################################################################
-
 package Net::HL7::Message;
 
 use 5.004;
@@ -91,12 +81,12 @@ message string, undef is returned.
 =cut
 
 sub new {
-    
+
     my $class = shift;
     bless my $self = {}, $class;
-    
+
     $self->_init(@_) || return undef;
-    
+
     return $self;
 }
 
@@ -122,98 +112,108 @@ sub _init {
     # If an HL7 string is given to the constructor, parse it.
     if ($hl7str) {
 
-	my @segments = split("[\n\\" . $self->{SEGMENT_SEPARATOR} . "]", $hl7str);
+        my @segments = split("[\n\\" . $self->{SEGMENT_SEPARATOR} . "]",
+                             $hl7str);
 
-	# the first segment should be the control segment
-	#
-	$segments[0] =~ /^([A-Z0-9]{3})(.)(.)(.)(.)(.)(.)/;
+        # the first segment should be the control segment
+        #
+        $segments[0] =~ /^([A-Z0-9]{3})(.)(.)(.)(.)(.)(.)/;
 
-	my ($hdr, $fldSep, $compSep, $repSep, $esc, $subCompSep, $fldSepCtrl) = 
-	    ($1, $2, $3, $4, $5, $6, $7);
+        my ($hdr, $fldSep, $compSep, $repSep, $esc, $subCompSep, $fldSepCtrl) =
+            ($1, $2, $3, $4, $5, $6, $7);
 
-	# Check whether field separator is repeated after 4 control characters
+        # check for MSH
+        if( not defined $hdr or $hdr ne 'MSH' ) {
+            return undef;
+        }
 
-	if ($fldSep ne $fldSepCtrl) {
+        # Check whether field separator is repeated after 4 control characters
 
-	    return undef;
-	}
+        if (not defined $fldSep or not defined $fldSepCtrl or
+            $fldSep ne $fldSepCtrl) {
 
-	# Set field separator based on control segment
-	$self->{FIELD_SEPARATOR}        = $fldSep;
-	
-	# Set other separators
-	$self->{COMPONENT_SEPARATOR}    = $compSep; 
-	$self->{SUBCOMPONENT_SEPARATOR} = $subCompSep;
-	$self->{ESCAPE_CHARACTER}       = $esc;
-	$self->{REPETITION_SEPARATOR}   = $repSep;
-	
-	# Do all segments
-	#
-	for (my $i = 0; $i < @segments; $i++) {
-	    
-	    my @fields = split('\\' . $self->{FIELD_SEPARATOR}, $segments[$i]);
+            return undef;
+        }
 
-	    my $name = shift(@fields);
+        # Set field separator based on control segment
+        $self->{FIELD_SEPARATOR}        = $fldSep;
 
-	    # Now decompose fields if necessary, into refs to arrays
-	    #
-	    for (my $j = 0; $j < @fields; $j++) {
+        # Set other separators
+        $self->{COMPONENT_SEPARATOR}    = $compSep;
+        $self->{SUBCOMPONENT_SEPARATOR} = $subCompSep;
+        $self->{ESCAPE_CHARACTER}       = $esc;
+        $self->{REPETITION_SEPARATOR}   = $repSep;
 
-		# Skip control field
-		if ($i == 0 && $j == 0) {
-		    
-		    next;
-		}
-		
-		my @comps = split('\\' . $self->{COMPONENT_SEPARATOR}, $fields[$j]);
-		
-		for (my $k = 0; $k < @comps; $k++) {
+        # Do all segments
+        #
+        for (my $i = 0; $i < @segments; $i++) {
 
-		    my @subComps = split('\\' . $self->{SUBCOMPONENT_SEPARATOR}, $comps[$k]);
-			
-		    # Make it a ref or just the value
-		    if (@subComps <= 1) {
-			$comps[$k] = $subComps[0];
-		    }
-		    else {
-			$comps[$k] = \@subComps;
-		    }
+            my @fields = split('\\' . $self->{FIELD_SEPARATOR}, $segments[$i]);
 
-		}
+            my $name = shift(@fields);
 
-		if (@comps <= 1) {
-		    $fields[$j] = $comps[0];
-		}
-		else {
-		    $fields[$j] = \@comps;
-		}
-	    }
-
-	    my $seg;
-
-	    # untaint
-	    my $segClass = "";
-
-	    if ($name =~ /^[A-Z][A-Z0-9]{2}$/) {
-		$segClass = "Net::HL7::Segments::$name";
-		$segClass =~ /^(.*)$/;
-		$segClass = $1;
-	    }
-
-	    # Let's see whether it's a special segment
+            # Now decompose fields if necessary, into refs to arrays
             #
-	    if ( $segClass && eval("require $segClass;") ) {
-		unshift(@fields, $self->{FIELD_SEPARATOR});
-		$seg = eval{ "$segClass"->new(\@fields); };
-	    }
-	    else {
-		$seg = new Net::HL7::Segment($name, \@fields);
-	    }
-	    
-	    $seg || return undef;
+            for (my $j = 0; $j < @fields; $j++) {
 
-	    $self->addSegment($seg);
-	}
+                # Skip control field
+                if ($i == 0 && $j == 0) {
+
+                    next;
+                }
+
+                my @comps = split('\\' . $self->{COMPONENT_SEPARATOR},
+                                  $fields[$j]);
+
+                for (my $k = 0; $k < @comps; $k++) {
+
+                    my @subComps = split('\\' .
+                                         $self->{SUBCOMPONENT_SEPARATOR},
+                                         $comps[$k]);
+
+                    # Make it a ref or just the value
+                    if (@subComps <= 1) {
+                        $comps[$k] = $subComps[0];
+                    }
+                    else {
+                        $comps[$k] = \@subComps;
+                    }
+
+                }
+
+                if (@comps <= 1) {
+                    $fields[$j] = $comps[0];
+                }
+                else {
+                    $fields[$j] = \@comps;
+                }
+            }
+
+            my $seg;
+
+            # untaint
+            my $segClass = "";
+
+            if ($name =~ /^[A-Z][A-Z0-9]{2}$/) {
+                $segClass = "Net::HL7::Segments::$name";
+                $segClass =~ /^(.*)$/;
+                $segClass = $1;
+            }
+
+            # Let's see whether it's a special segment
+            #
+            if ( $segClass && eval("require $segClass;") ) {
+                unshift(@fields, $self->{FIELD_SEPARATOR});
+                $seg = eval{ "$segClass"->new(\@fields); };
+            }
+            else {
+                $seg = new Net::HL7::Segment($name, \@fields);
+            }
+
+            $seg || return undef;
+
+            $self->addSegment($seg);
+        }
     }
 
     return 1;
@@ -229,12 +229,12 @@ instance of L<Net::HL7::Segment|Net::HL7::Segment>.
 
 =cut
 
-sub addSegment { 
+sub addSegment {
 
     my ($self, $segment) = @_;
 
     if (@{ $self->{SEGMENTS} } == 0) {
-	$self->_resetCtrl($segment);
+  $self->_resetCtrl($segment);
     }
 
     push( @{ $self->{SEGMENTS} }, $segment);
@@ -260,31 +260,31 @@ sub insertSegment {
 
     if ($idx == 0) {
 
-	$self->_resetCtrl($segment);
-	unshift(@{ $self->{SEGMENTS} }, $segment);
-    } 
+  $self->_resetCtrl($segment);
+  unshift(@{ $self->{SEGMENTS} }, $segment);
+    }
     elsif ($idx == @{ $self->{SEGMENTS} }) {
 
-	push(@{ $self->{SEGMENTS} }, $segment);
+  push(@{ $self->{SEGMENTS} }, $segment);
     }
     else {
-	@{ $self->{SEGMENTS} } = 
-	    (@{ $self->{SEGMENTS} }[0..$idx-1],
-	     $segment,
-	     @{ $self->{SEGMENTS} }[$idx..@{ $self->{SEGMENTS} } -1]
-	     );
+  @{ $self->{SEGMENTS} } =
+      (@{ $self->{SEGMENTS} }[0..$idx-1],
+       $segment,
+       @{ $self->{SEGMENTS} }[$idx..@{ $self->{SEGMENTS} } -1]
+       );
     }
 }
 
 
-=pod 
+=pod
 
 =item B<getSegmentByIndex($index)>
 
 Return the segment specified by $index. Segment count within the
 message starts at 0.
 
-=cut 
+=cut
 
 sub getSegmentByIndex {
 
@@ -300,7 +300,7 @@ sub getSegmentByIndex {
 
 Return an array of all segments with the given name
 
-=cut 
+=cut
 
 sub getSegmentsByName {
 
@@ -309,14 +309,14 @@ sub getSegmentsByName {
     my @segments = ();
 
     foreach (@{ $self->{SEGMENTS} }) {
-	($_->getName() eq $name) && push(@segments, $_);
+  ($_->getName() eq $name) && push(@segments, $_);
     }
 
     return @segments;
 }
 
 
-=pod 
+=pod
 
 =item B<removeSegmentByIndex($index)>
 
@@ -354,9 +354,9 @@ sub setSegment {
 
     if ($segment->getName() eq "MSH" && $idx == 0) {
 
-	$self->_resetCtrl($segment);
+  $self->_resetCtrl($segment);
     }
-    
+
     @{ $self->{SEGMENTS} }[$idx] = $segment;
 }
 
@@ -368,19 +368,19 @@ sub _resetCtrl {
     my ($self, $segment) = @_;
 
     if ($segment->getField(1)) {
-	$self->{FIELD_SEPARATOR} = $segment->getField(1);
+  $self->{FIELD_SEPARATOR} = $segment->getField(1);
     }
-    
+
     if ($segment->getField(2) =~ /(.)(.)(.)(.)/) {
-	
-	$self->{COMPONENT_SEPARATOR}    = $1;
-	$self->{REPETITION_SEPARATOR}   = $2;
-	$self->{ESCAPE_CHARACTER}       = $3;
-	$self->{SUBCOMPONENT_SEPARATOR} = $4;
+
+  $self->{COMPONENT_SEPARATOR}    = $1;
+  $self->{REPETITION_SEPARATOR}   = $2;
+  $self->{ESCAPE_CHARACTER}       = $3;
+  $self->{SUBCOMPONENT_SEPARATOR} = $4;
     }
-    
+
     if ($segment->getField(12)) {
-	$self->{HL7_VERSION} = $segment->getField(12);
+  $self->{HL7_VERSION} = $segment->getField(12);
     }
 }
 
@@ -413,24 +413,24 @@ the default segment separator, but '\n' instead.
 =cut
 
 sub toString {
-    
+
     my ($self, $pretty) = @_;
     my $msg = "";
 
     # Make sure MSH(1) and MSH(2) are ok, even if someone has changed
-    # these values 
-    # 
+    # these values
+    #
     my $msh = $self->{SEGMENTS}->[0];
 
     $self->_resetCtrl($msh);
 
     for (my $i = 0; $i < @{ $self->{SEGMENTS} }; $i++) {
-	
+
         $msg .= $self->getSegmentAsString($i);
 
         $pretty ? ($msg .= "\n") : ($msg .= $self->{SEGMENT_SEPARATOR});
     }
-    
+
     return $msg;
 }
 
@@ -454,19 +454,19 @@ sub getSegmentAsString {
     $seg || return undef;
 
     my $segStr = $seg->getName() . $self->{FIELD_SEPARATOR};
-    
+
     my $start = $seg->getName() eq "MSH" ? 2 : 1;
 
     {
         no warnings;
-	
+
         foreach ($start..$seg->size()) {
-            
+
             $segStr .= $self->getSegmentFieldAsString($index, $_);
             $segStr .= $self->{FIELD_SEPARATOR};
         }
     }
-	
+
     return $segStr;
 }
 
@@ -479,7 +479,7 @@ sub getSegmentAsString {
 =cut
 
 sub getSegmentFieldAsString {
- 
+
     my ($self, $segIndex, $fldIndex) = @_;
 
     my $seg = $self->getSegmentByIndex($segIndex);

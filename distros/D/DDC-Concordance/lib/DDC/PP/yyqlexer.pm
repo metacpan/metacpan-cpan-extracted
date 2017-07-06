@@ -349,10 +349,10 @@ sub yylex {
 	elsif ($$bufr =~ m/\G#</p)				{ $type = 'HASH_LESS'; }	##-- hash+less: max distance
 	elsif ($$bufr =~ m/\G#>/p)				{ $type = 'HASH_GREATER'; }	##-- hash+greater: min distance
 	elsif ($$bufr =~ m/\G\$\./p)				{ $type = 'DOLLAR_DOT'; }	##-- positional anchor pseudo-index
-	elsif ($$bufr =~ m/\G\:{/p)				{ $type = 'COLON_LBRACE'; }	##-- theusaurus-query operator
-	elsif ($$bufr =~ m/\G\@{/p)				{ $type = 'AT_LBRACE'; }	##-- literal-set operator
-	elsif ($$bufr =~ m/\G\*{/p)				{ $type = 'STAR_LBRACE'; }	##-- prefix-set opener
-	elsif ($$bufr =~ m/\G}\*/p)				{ $type = 'RBRACE_STAR'; }	##-- suffix-set closer
+	elsif ($$bufr =~ m/\G\:\{/p)				{ $type = 'COLON_LBRACE'; }	##-- theusaurus-query operator
+	elsif ($$bufr =~ m/\G\@\{/p)				{ $type = 'AT_LBRACE'; }	##-- literal-set operator
+	elsif ($$bufr =~ m/\G\*\{/p)				{ $type = 'STAR_LBRACE'; }	##-- prefix-set opener
+	elsif ($$bufr =~ m/\G\}\*/p)				{ $type = 'RBRACE_STAR'; }	##-- suffix-set closer
 	elsif ($$bufr =~ m/\G[!.,:;=@%^#~\/]/p)			{ $type = ${^MATCH}; } ##-- single-char punctuation operators
 	elsif ($$bufr =~ m/\G[\[\]{}()<>]/p)			{ $type = ${^MATCH}; } ##-- parentheses
 	elsif ($$bufr =~ m/\G\"/p)				{ $type = ${^MATCH}; } ##-- double-quotes

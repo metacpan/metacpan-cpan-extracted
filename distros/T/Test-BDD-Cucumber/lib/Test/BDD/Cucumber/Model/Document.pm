@@ -1,6 +1,7 @@
 package Test::BDD::Cucumber::Model::Document;
-$Test::BDD::Cucumber::Model::Document::VERSION = '0.52';
-use Moose;
+$Test::BDD::Cucumber::Model::Document::VERSION = '0.53';
+use Moo;
+use Types::Standard qw( Str ArrayRef InstanceOf );
 use Test::BDD::Cucumber::Model::Line;
 
 =head1 NAME
@@ -9,7 +10,7 @@ Test::BDD::Cucumber::Model::Document - Model to represent a feature file on disk
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -23,7 +24,7 @@ The filename from which the document was loaded.
 
 =cut
 
-has 'filename' => ( is => 'ro', isa => 'Str' );
+has 'filename' => ( is => 'ro', isa => Str );
 
 =head2 content
 
@@ -31,7 +32,7 @@ The file contents, as a string
 
 =cut
 
-has 'content' => ( is => 'ro', isa => 'Str' );
+has 'content' => ( is => 'ro', isa => Str );
 
 =head2 lines
 
@@ -43,7 +44,7 @@ objects
 has 'lines' => (
     is      => 'rw',
     default => sub { [] },
-    isa     => 'ArrayRef[Test::BDD::Cucumber::Model::Line]'
+    isa     => ArrayRef[InstanceOf['Test::BDD::Cucumber::Model::Line']]
 );
 
 =head1 OTHER

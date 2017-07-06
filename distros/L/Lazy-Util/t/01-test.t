@@ -127,4 +127,15 @@ is($l_v->get(),    undef, 'code ref is still exhausted');
 is(scalar @values, 1,     '@values not emptied');
 is($values[0],     'd',   'Value left in @values is d');
 
+@values = ('b', 'c', 'd');
+$l_v = l_concat sub { shift @values };
+is($l_v->exhausted(), 0, '$l_v is not exhausted');
+$l_v->unget('a');
+is($l_v->get(), 'a', '$l_v returned a which was unget()ed');
+is($l_v->get(), 'b', '$l_v returned b which was used to check for exhaustion');
+is($l_v->get(), 'c', 'Second value from code ref was c');
+is($l_v->get(), 'd', 'Third value from code ref was d');
+is($l_v->exhausted(), 1, '$l_v is exhausted');
+is(scalar @values, 0, '@values emptied');
+
 done_testing;

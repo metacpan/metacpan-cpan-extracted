@@ -48,6 +48,10 @@ MODULES
 
       * Catmandu::Fix::marc_add
 
+      * Catmandu::Fix::marc_append
+
+      * Catmandu::Fix::marc_replace_all
+
       * Catmandu::Fix::marc_remove
 
       * Catmandu::Fix::marc_xml
@@ -58,6 +62,10 @@ MODULES
 
       * Catmandu::Fix::marc_set
 
+      * Catmandu::Fix::marc_copy
+
+      * Catmandu::Fix::marc_paste
+
       * Catmandu::Fix::Bind::marc_each
 
       * Catmandu::Fix::Condition::marc_match
@@ -65,6 +73,8 @@ MODULES
       * Catmandu::Fix::Condition::marc_has
 
       * Catmandu::Fix::Condition::marc_has_many
+
+      * Catmandu::Fix::Condition::marc_spec_has
 
       * Catmandu::Fix::Inline::marc_map
 

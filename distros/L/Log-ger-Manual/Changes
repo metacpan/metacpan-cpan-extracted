@@ -1,0 +1,45 @@
+0.012   2017-07-03 (PERLANCAR)
+
+        - Set prereq version Log::ger to 0.012.
+
+        - Initial write-up of ForLog4perl.
+
+        - Add some FAQ items to ForLogAny.
+
+        - Document create_layouter phase.
+
+        - Fixes.
+
+
+0.011   2017-06-30 (PERLANCAR)
+
+	- Update to Log::ger 0.011 (new create_logml_routine phase, changes
+	  in hook argument 'routines').
+
+
+0.010    2017-06-26 (PERLANCAR)
+
+         - Set prereq version Log::ger to 0.010.
+
+         - Mention layout (Log::ger 0.009+).
+
+         - Document init_args as per-target stash.
+
+         - Add glossary.
+
+
+0.007    2017-06-26 (PERLANCAR)
+
+         - Set prereq version Log::ger to 0.007.
+
+         - Add some FAQ items.
+
+
+0.006    2017-06-24 (PERLANCAR)
+
+         - Add more documentation to ForLogAny, mention Log::ger::Like::LogAny.
+
+
+0.005    2017-06-23 (PERLANCAR)
+
+         - First release.

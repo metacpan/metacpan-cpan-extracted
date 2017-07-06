@@ -7,7 +7,7 @@ use Test::More;
 
 use Future;
 
-use Future::AsyncAwait qw( async );
+use Future::AsyncAwait;
 
 use List::Util qw( sum );
 
@@ -21,12 +21,12 @@ use List::Util qw( sum );
    }
 
    my $f1 = Future->new;
-   my $f2 = with_scalar( $f1 );
+   my $fret = with_scalar( $f1 );
 
-   ok( !$f2->is_ready, '$f2 is not immediate with_scalar' );
+   ok( !$fret->is_ready, '$fret is not immediate with_scalar' );
 
    $f1->done;
-   is( scalar $f2->get, "true", '$f2 now ready after done' );
+   is( scalar $fret->get, "true", '$fret now ready after done' );
 }
 
 # single array
@@ -39,12 +39,28 @@ use List::Util qw( sum );
    }
 
    my $f1 = Future->new;
-   my $f2 = with_array( $f1 );
+   my $fret = with_array( $f1 );
 
-   ok( !$f2->is_ready, '$f2 is not immediate with_array' );
+   ok( !$fret->is_ready, '$fret is not immediate with_array' );
 
    $f1->done;
-   is( scalar $f2->get, 6, '$f2 now ready after done' );
+   is( scalar $fret->get, 6, '$fret now ready after done' );
+}
+
+# outside
+{
+   my $capture = "outer";
+
+   my $closure = async sub {
+      await $_[0];
+      return $capture;
+   };
+
+   my $f1 = Future->new;
+   my $fret = $closure->( $f1 );
+
+   $f1->done;
+   is( scalar $fret->get, "outer", '$fret now ready after done for closure' );
 }
 
 done_testing;

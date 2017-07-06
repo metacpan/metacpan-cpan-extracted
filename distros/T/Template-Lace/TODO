@@ -1,18 +1,10 @@
+------
+$dom->fill_form_fields($item);  
+-------
+
 --
 ## Need to cope with the loop...
 ## could solve with a subtemplate or dom->adopt
-
-<li class=[.listclass]>
-  ...
-</li>
-
-
-sub listclass {
-  my ($self, $li) = @_;
-  return $self->completed ? 'completed : undef;
-}
-
--- Catalyst 'subrequest' handler example
 
 my $component_handler_registry = Template::Lace::ComponentHandlerRegistry->new;
 
@@ -255,62 +247,99 @@ sub list_todos {
   }, $self->person->todos);
 }
 
-
-===
-
-# We need some way to set the value to a component
-sub process_dom {
-  my ($self, $dom) = @_;
-  $dom->form('#login', sub {
-    $_->input = $self
-      ->ctx
-      ->view('Input', value=>$self->fif->{user}, err=>$self->err->{user})
-  });
-
-} 
-
-  $_->input = Helpers->input( value=>$self->fif->{user}, err=>$self->err->{user})
-
-+++++
 =======
 
-
 <section id="todos">
-    <p>
-      Hi there <span data-person='name'>PERSON</span>! Here's you're work list!
+    <p data-lace='$.info>
+      Hi there <span data-person='name'>
+        <a data-person@href='resumelink'>
+          PERSON
+        </a></span>! Here's you're work list!
     </p>
       <ol>
-        <li data-lace='$.list-todos'>
-          <span data-todo='title'>THING TODO</span>
+        <li data-lace='@.list-todos'>
+          <span data-todo='title Str'>THING TODO</span>
         </li>
       </ol>
 </section>
 
 package MyApp::Lace::Todos;
 
-sub dispatch { 
-  my ($self, $name, @args) = @_;
-  return $self->display(@args) if $name eq 'count';
-}
-
-sub display {
-  my ($self, $dom) = @_;
-  $dom->data('person', 
-    name => $self->person->name,
-    todos => sub { $self->list_todos($_) },
-  );
+sub info {
+  $_{person}
+    ->name($_->person->name)
+    ->resumelink($_->person->resume_link);
 }
 
 sub list_todos {
-  my ($self, $dom) = @_;
-  $dom->repeat(sub {
-    my ($dom, $todo) = @_;
-    $dom->data('todo', name => $todo->name)
-  }, $self->person->todos);
+  return $_->person
+    ->todos
+    ->map(sub {
+      $_{todo}->clone
+        ->title($_->title);
+    });
+}
+
+---
+<li class=[.listclass]>
+  ...
+</li>
+
+
+sub listclass {
+  my ($self, $li) = @_;
+  return $self->completed ? 'completed : undef;
 }
 
 ##===
 
 Placeholders
 <lace:person>Example</lace:person>
+
+
+<ui-checkbox label=(
+  <label>asdsd</label>
+  ) />
+
+
+---
+
+sub template {qq[
+  <ol>
+    <view-todo task=$.task />
+  </ol>
+]}
+
+sub process_dom {
+  my ($self, $dom) = @_;
+  $dom->component('view-todo')
+    ->first
+    ->repeat(sub {
+        my ($dom, $task) = @_;
+        $dom->process_component({task=>$task})
+      }, $self->tasks);
+}
+
+---
+
+sub template { '<ol></ol>' }
+
+sub process_dom {
+  my ($self, $dom) = @_;
+  $dom->append_child($self->ctx->view('Todo', task=>$_)
+    for @{$self->tasks};
+}
+
+----
+
+sub template {qq[
+  <ol>
+    <view-todo task=@.tasks />
+  </ol>
+]}
+
+sub process_dom {
+  my ($self, $dom) = @_;
+}
+
 

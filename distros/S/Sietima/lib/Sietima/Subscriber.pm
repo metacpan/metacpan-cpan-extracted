@@ -8,7 +8,7 @@ use Email::Address;
 use List::AllUtils qw(any);
 use namespace::clean;
 
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: a subscriber to a mailing list
 
 
@@ -66,7 +66,7 @@ Sietima::Subscriber - a subscriber to a mailing list
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 DESCRIPTION
 

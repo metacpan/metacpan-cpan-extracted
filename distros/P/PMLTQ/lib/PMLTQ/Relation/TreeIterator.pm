@@ -1,6 +1,6 @@
 package PMLTQ::Relation::TreeIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::TreeIterator::VERSION = '1.3.2';
+$PMLTQ::Relation::TreeIterator::VERSION = '1.4.0';
 # ABSTRACT: Evaluates condition on the whole tree of given node
 
 use 5.006;
@@ -70,7 +70,7 @@ PMLTQ::Relation::TreeIterator - Evaluates condition on the whole tree of given n
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 AUTHORS
 

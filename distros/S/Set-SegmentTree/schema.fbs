@@ -1,0 +1,20 @@
+namespace Set.SegmentTree;
+
+file_identifier "RTRE";
+
+table node {
+  min: int;
+  low : int;
+  max : int;
+  high : int;
+  split : int;
+  segments : [string];
+}
+
+table ValueLookup {
+  root : int;
+  nodes: [node];
+  created : int;
+}
+
+root_type ValueLookup;

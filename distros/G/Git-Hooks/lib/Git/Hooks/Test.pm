@@ -1,17 +1,19 @@
 package Git::Hooks::Test;
-$Git::Hooks::Test::VERSION = '1.16.0';
+# ABSTRACT: Git::Hooks testing utilities
+$Git::Hooks::Test::VERSION = '2.0.1';
 ## no critic (RequireExplicitPackage)
 ## no critic (ErrorHandling::RequireCarping)
 use 5.010;
 use strict;
 use warnings;
+use Carp;
 use Config;
 use Exporter qw/import/;
 use Path::Tiny;
 use File::pushd;
 use URI::file;
-use Git::More;
-use Error ':try';
+use Git::Repository 'GitHooks';
+use Try::Tiny;
 use Test::More;
 use Cwd;
 
@@ -46,7 +48,7 @@ my $T = Path::Tiny->tempdir(
     CLEANUP  => exists $ENV{REPO_CLEANUP} ? $ENV{REPO_CLEANUP} : 1,
 );
 
-chdir $T or die "Can't chdir $T: $!";
+chdir $T or croak "Can't chdir $T: $!";
 END { chdir '/' }
 
 my $tmpldir = $T->child('templates');
@@ -56,12 +58,7 @@ mkdir $tmpldir, 0777 or BAIL_OUT("can't mkdir $tmpldir: $!");
     mkdir $hooksdir, 0777 or BAIL_OUT("can't mkdir $hooksdir: $!");
 }
 
-my $git_version;
-try {
-    $git_version = Git::command_oneline('version');
-} otherwise {
-    $git_version = 'unknown';
-};
+my $git_version = eval { Git::Repository->version } || 'unknown';
 
 sub newdir {
     my $num = 1 + Test::Builder->new()->current_test();
@@ -72,7 +69,7 @@ sub newdir {
 
 sub install_hooks {
     my ($git, $extra_perl, @hooks) = @_;
-    my $hooks_dir = path($git->repo_path())->child('hooks');
+    my $hooks_dir = path($git->git_dir())->child('hooks');
     my $hook_pl   = $hooks_dir->child('hook.pl');
     {
         ## no critic (RequireBriefOpen)
@@ -164,7 +161,7 @@ sub new_repos {
 
     mkdir $repodir, 0777 or BAIL_OUT("can't mkdir $repodir: $!");
     {
-        open my $fh, '>', $filename or die BAIL_OUT("can't open $filename: $!");
+        open my $fh, '>', $filename or croak BAIL_OUT("can't open $filename: $!");
         say $fh "first line";
         close $fh;
     }
@@ -181,31 +178,43 @@ sub new_repos {
             # need to pass the argument. Then we have to go back to
             # where we were.
             my $dir = pushd($repodir);
-            Git::command(qw/init -q/, "--template=$tmpldir");
+            Git::Repository->run(qw/init -q/, "--template=$tmpldir");
 
-            $repo = Git::More->repository(Directory => '.');
+            $repo = Git::Repository->new();
 
-            $repo->command(config => 'user.email', 'myself@example.com');
-            $repo->command(config => 'user.name',  'My Self');
+            $repo->run(qw/config user.email myself@example.com/);
+            $repo->run(qw/config user.name/, 'My Self');
         }
 
-        open my $err_h, '>', $T->child('stderr');
-        Git::command(
-            [qw/clone -q --bare --no-hardlinks/, "--template=$tmpldir", $repodir, $clonedir],
-            { STDERR => $err_h },    # do not complain about cloning an empty repo
-        );
-        close $err_h;
+        {
+            my $cmd = Git::Repository->command(
+                qw/clone -q --bare --no-hardlinks/, "--template=$tmpldir", $repodir, $clonedir,
+            );
 
-        $clone = Git::More->repository(Repository => $clonedir);
+            my $my_stderr = $cmd->stderr;
 
-        $repo->command(qw/remote add clone/, $clonedir);
+            open my $err_h, '>', $T->child('stderr')
+                or croak "Can't open '@{[$T->child('stderr')]}' for writing: $!\n";
+            while (<$my_stderr>) {
+                $err_h->print($_);
+            }
+            close $err_h;
 
-        return ($repo, $filename, $clone, $T);
-    } otherwise {
-        my $E = shift;
+            $cmd->close();
+            croak "Can't git-clone $repodir into $clonedir" unless $cmd->exit() == 0;
+        }
+
+        $clone = Git::Repository->new(git_dir => $clonedir);
+
+        $repo->run(qw/remote add clone/, $clonedir);
+
+        ($repo, $filename, $clone, $T);
+    } catch {
+        my $E = $_;
         my $exception = "$E";   # stringify it
         if (-s $stderr) {
-            open my $err_h, '<', $stderr;
+            open my $err_h, '<', $stderr
+                or croak "Can't open '$stderr' for reading: $!\n";
             local $/ = undef;   # slurp mode
             $exception .= 'STDERR=';
             $exception .= <$err_h>;
@@ -217,6 +226,7 @@ sub new_repos {
         $exception =~ s/\n/;/g;
         local $, = ':';
         BAIL_OUT("Error setting up repos for test: Exception='$exception'; CWD=$T; git-version=$git_version; \@INC=(@INC).\n");
+        ();
     };
 }
 
@@ -225,8 +235,8 @@ sub new_commit {
 
     $file->append($msg || 'new commit');
 
-    $git->command(add => $file);
-    $git->command(commit => '-q', '-m', $msg || 'commit');
+    $git->run(add => $file);
+    $git->run(qw/commit -q -m/, $msg || 'commit');
 
     return;
 }
@@ -236,37 +246,16 @@ sub new_commit {
 # list containing: (a) a boolean indication of success, (b) the exit
 # code, (c) the command's STDOUT, and (d) the command's STDERR.
 sub test_command {
-    my ($git, $cmd, @args) = @_;
+    my ($git, $command, @args) = @_;
 
-    ## no critic (RequireBriefOpen)
+    my $cmd = $git->command($command, @args);
 
-    # Redirect STDERR to a temporary file
-    open my $oldstderr, '>&', \*STDERR
-        or die "Can't dup STDERR: $!";
-    open STDERR, '>', 'stderr'
-        or die "Can't redirect STDERR to temporary directory: $!";
+    my $stdout = do { local $/ = undef; readline($cmd->stdout); };
+    my $stderr = do { local $/ = undef; readline($cmd->stderr); };
 
-    my ($stdout, $exception);
+    $cmd->close;
 
-    try {
-        $stdout = $git->command($cmd, @args);
-        $stdout = '' unless defined $stdout;
-    } otherwise {
-        $exception = "$_[0]"; # stringify the exception
-    };
-
-    # Redirect STDERR back to its original value
-    open STDERR, '>&', $oldstderr
-        or die "Can't redirect STDERR back to its original value: $!";
-
-    # Grok the subcomand's STDERR
-    my $stderr = path('stderr')->slurp;
-
-    if (defined $exception) {
-        return (0, $?, $exception, $stderr);
-    } else {
-        return (1, 0, $stdout, $stderr);
-    }
+    return ($cmd->exit() == 0, $cmd->exit(), $stdout, $stderr);
 }
 
 sub test_ok {
@@ -337,11 +326,11 @@ __END__
 
 =head1 NAME
 
-Git::Hooks::Test
+Git::Hooks::Test - Git::Hooks testing utilities
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =for Pod::Coverage install_hooks new_commit new_repos newdir test_command test_nok test_nok_match test_ok test_ok_match
 

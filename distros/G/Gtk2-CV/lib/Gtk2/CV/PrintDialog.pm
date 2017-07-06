@@ -66,6 +66,9 @@ sub new {
       $_[0]->destroy;
    });
 
+   $d->get_widget ("PrintDialog")->response ("ok")
+      if $self->{autook};
+
    $self;
 }
 

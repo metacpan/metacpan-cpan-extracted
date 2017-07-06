@@ -4,7 +4,7 @@ use strict;
 use vars qw(@ISA $VERSION);
 use Carp;
 
-$VERSION = '1.01';
+$VERSION = "1.24";
 
 use Finance::QuoteHist::Generic;
 @ISA = qw(Finance::QuoteHist::Generic);
@@ -148,7 +148,7 @@ Matthew P. Sisk, E<lt>F<sisk@mojotoad.com>E<gt>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007-2010 Matthew P. Sisk. All rights reserved. All wrongs
+Copyright (c) 2007-2017 Matthew P. Sisk. All rights reserved. All wrongs
 revenged. This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

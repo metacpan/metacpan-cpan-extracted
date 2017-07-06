@@ -7,7 +7,7 @@ use constant _win => $^O eq 'MSWin32';
 use Path::Tiny ();
 
 # ABSTRACT: Autoconf plugin for Alien::Build
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 has with_pic       => 1;
@@ -26,8 +26,7 @@ sub init
   
   my $intr = $meta->interpolator;
 
-  $meta->before_hook(
-    $_ => sub {
+  my $set_autoconf_prefix = sub {
     my($build) = @_;
     my $prefix = $build->install_prop->{prefix};
     if(_win)
@@ -36,8 +35,11 @@ sub init
       $prefix =~ s!^([a-z]):!/$1!i if _win;
     }
     $build->install_prop->{autoconf_prefix} = $prefix;
-    },
-  ) for qw( build build_ffi );
+  };
+
+  $meta->before_hook(
+    build_ffi => $set_autoconf_prefix,
+  );
 
   # FFI mode undocumented for now...
 
@@ -58,7 +60,8 @@ sub init
       my $orig = shift;
       my $build = shift;
 
-      my $prefix = $build->install_prop->{prefix};
+      $set_autoconf_prefix->($build);
+      my $prefix = $build->install_prop->{autoconf_prefix};
       
       $intr->replace_helper(
         configure => sub {
@@ -125,7 +128,7 @@ Alien::Build::Plugin::Build::Autoconf - Autoconf plugin for Alien::Build
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -189,6 +192,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,15 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.007   June 28 2017
+        - Fixed a bug where certain input types got a value even where there
+          wasn't one.
+        - Some new DOM helpers and documented others that existed but where not
+          in the POD yet, added some tests;
+
+0.006   22 June 2017
+        - Fixed missing test dependencies
+        - New helper methods on Template::Lace::DOM for working with forms
+
 0.005   22 May 2017
         - Fixed the AutoTemplate role
 

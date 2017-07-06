@@ -1,12 +1,12 @@
 use warnings;
 use strict;
 use Test::More;
-use FindBin;
+use FindBin '$Bin';
 use Image::PNG::Libpng ':all';
 use Image::PNG::Const ':all';
 my $png = create_read_struct ();
 $png->set_keep_unknown_chunks (PNG_HANDLE_CHUNK_ALWAYS);
-open my $file, "<:raw", "$FindBin::Bin/logo_icon128.v101.png";
+open my $file, "<:raw", "$Bin/logo_icon128.v101.png";
 $png->init_io ($file);
 $png->read_png ();
 my $chunks = $png->get_unknown_chunks ();

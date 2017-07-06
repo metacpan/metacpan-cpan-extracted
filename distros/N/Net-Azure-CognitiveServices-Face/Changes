@@ -1,5 +1,9 @@
 Revision history for Perl extension Net-Azure-CognitiveServices-Face
 
+0.02 2017-06-27T02:25:48Z
+
+    - add endpoint method for changing api
+
 0.01 2016-12-05T10:20:38Z
 
     - original version

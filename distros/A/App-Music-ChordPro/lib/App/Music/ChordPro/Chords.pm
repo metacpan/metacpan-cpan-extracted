@@ -481,6 +481,7 @@ sub chord_info {
     return +{
 	     name    => $chord,
 	     strings => [ @{$info}[0..$s-1] ],
+	     @$info > $s+3 ? ( fingers => [ @{$info}[$s+3..2*$s+2] ] ) : (),
 	     base    => $info->[$s]-1,
 	     builtin => $info->[$s+1] == CHORD_BUILTIN,
 	     system  => "",
@@ -493,8 +494,8 @@ sub chordcompare($$) {
     my ( $chorda, $chordb ) = @_;
     my ( $a0, $arest ) = $chorda =~ /^([A-G][b#]?)(.*)/;
     my ( $b0, $brest ) = $chordb =~ /^([A-G][b#]?)(.*)/;
-    $a0 = $chordorderkey{$a0}//die("XX $a");
-    $b0 = $chordorderkey{$b0}//die("XX $b");
+    $a0 = $chordorderkey{$a0}//return 0;
+    $b0 = $chordorderkey{$b0}//return 0;
     return $a0 <=> $b0 if $a0 != $b0;
     $a0++ if $arest =~ /^m(?:in)?(?!aj)/;
     $b0++ if $brest =~ /^m(?:in)?(?!aj)/;
@@ -532,17 +533,23 @@ sub list_chords {
     foreach my $chord ( @$chords ) {
 	my $info = chord_info($chord);
 	next unless $info;
-	push( @s,
-	      sprintf( "{%s: %-15.15s base-fret %2d    ".
-		       "frets   %s}",
-		       $origin eq "chord" ? "chord" : "define",
-		       $info->{name}, $info->{base} + 1,
-		       @{ $info->{strings} }
-		       ? join("",
-			      map { sprintf("%-4s", $_) }
-			      map { $_ < 0 ? "X" : $_ }
-			      @{ $info->{strings} } )
-		       : ("    " x strings() ) ) )
+	my $s = sprintf( "{%s: %-15.15s base-fret %2d    ".
+			 "frets   %s",
+			 $origin eq "chord" ? "chord" : "define",
+			 $info->{name}, $info->{base} + 1,
+			 @{ $info->{strings} }
+			 ? join("",
+				map { sprintf("%-4s", $_) }
+				map { $_ < 0 ? "X" : $_ }
+				@{ $info->{strings} } )
+			 : ("    " x strings() ));
+	$s .= join("", "    fingers ",
+		   map { sprintf("%-4s", $_) }
+		   map { $_ < 0 ? "X" : $_ }
+		   @{ $info->{fingers} } )
+	  if $info->{fingers} && @{ $info->{fingers} };
+	$s .= "}";
+	push( @s, $s );
     }
     \@s;
 }
@@ -600,14 +607,18 @@ sub reset_song_chords {
 
 # Add a user defined chord.
 sub add_song_chord {
-    my ( $name, $base, $frets ) = @_;
-    unless ( @$frets == strings() ) {
+    my ( $name, $base, $frets, $fingers ) = @_;
+    if ( @$frets != strings() ) {
+	return scalar(@$frets) . " strings";
+    }
+    if ( $fingers && @$fingers && @$fingers != strings() ) {
 	return scalar(@$frets) . " strings";
     }
     unless ( $base > 0 && $base < 12 ) {
 	return "base-fret $base out of range";
     }
-    $song_chords{$name} = [ @$frets, $base, CHORD_SONG, CHORD_HARD ];
+    $song_chords{$name} = [ @$frets, $base, CHORD_SONG, CHORD_HARD,
+			    $fingers && @$fingers ? @$fingers : () ];
     return;
 }
 
@@ -787,6 +798,13 @@ sub identify {
 
     # First some basic simplifications.
     $rem =~ tr/\x{266d}\x{266f}\x{0394}\x{f8}\x{b0}/b#^h0/;
+
+    # Split off the duration, if present.
+    if ( $rem =~ m;^(.*):(\d\.*)?(?:x(\d+))?$; ) {
+	$rem = $1;
+	$info{duration} = $2 // 1;
+	$info{repeat} = $3;
+    }
 
     # Split off the bass part, if present.
     my $bass = "";

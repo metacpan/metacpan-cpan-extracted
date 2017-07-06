@@ -1,5 +1,16 @@
 Revision history for DBIx-SchemaChecksum
 
+1.101	2017-06-28T09:02:57
+    - explictly state File::HomeDir as a dependency (thanks CPANtesters)
+    - more doc fixes
+
+
+1.100   2017-06-25T22:13:35
+    - finally implement NewChangesFile
+    - add lots of docs
+    - some various minor cleanups
+
+
 1.006   2016-02-17T10:50:05
     - fix a deadly bad usage of try/catch (Thomas Klausner)
     - show_update_path now can dump the whole path as scripts or one concated file (Thomas Klausner)

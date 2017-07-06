@@ -84,15 +84,17 @@ run_me(
 
 # EPL
 run_me(
-	{   license => 'AGPL-3+ and/or Apache-2.0+ and/or LGPL-2.1+ or GPL-3+',
-		corpus  => 'EPL_and_more/Base64Coder.java'
+	{   license =>
+			'AGPL-3+ and/or Apache-2.0+ and/or EPL-1.0+ and/or LGPL-2.1+ or GPL-3+',
+		corpus => 'EPL_and_more/Base64Coder.java'
 	}
 );
 TODO: {
 	local $TODO = 'not yet handled';
 	run_me(
-		{   license => 'AGPL-3+ or Apache-2.0+ or GPL-3+ or LGPL-2.1+',
-			corpus  => 'EPL_and_more/Base64Coder.java'
+		{   license =>
+				'AGPL-3+ or Apache-2.0+ or EPL-1.0+ or GPL-3+ or LGPL-2.1+',
+			corpus => 'EPL_and_more/Base64Coder.java'
 		}
 	);
 }

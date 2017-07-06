@@ -1,5 +1,8 @@
 Revision history for Perl extension Math::Int2Base.
 
+1.01  Fri Jun 30 14:07:04 EDT 2017
+    - no warnings 'numeric' for negative repeat count
+
 1.00  Tue Jul  5 11:51:01 EDT 2011
     - stopped using const -- no particular gain
 

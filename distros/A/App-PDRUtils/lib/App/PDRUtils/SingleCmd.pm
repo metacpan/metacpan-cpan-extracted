@@ -1,12 +1,12 @@
 package App::PDRUtils::SingleCmd;
 
-our $DATE = '2016-12-28'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use App::PDRUtils::DistIniCmd;
 use Function::Fallback::CoreOrPP qw(clone);
@@ -57,7 +57,7 @@ sub create_cmd_from_dist_ini_cmd {
             parsed_dist_ini => $iod,
         );
         if ($res->[0] == 200) {
-            $log->infof("%s%s",
+            log_info("%s%s",
                         $fargs{-dry_run} ? "[DRY-RUN] " : "",
                         $res->[1]);
             if ($fargs{-dry_run}) {
@@ -67,7 +67,7 @@ sub create_cmd_from_dist_ini_cmd {
             }
             undef $res->[2];
         } else {
-            $log->tracef("%d - %s", $res->[0], $res->[1]);
+            log_trace("%d - %s", $res->[0], $res->[1]);
         }
 
         # move final result so users can see it
@@ -94,7 +94,7 @@ App::PDRUtils::SingleCmd - Common stuffs for App::PDRUtils::SingleCmd::*
 
 =head1 VERSION
 
-This document describes version 0.09 of App::PDRUtils::SingleCmd (from Perl distribution App-PDRUtils), released on 2016-12-28.
+This document describes version 0.10 of App::PDRUtils::SingleCmd (from Perl distribution App-PDRUtils), released on 2017-07-03.
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,31 +1,39 @@
-#
-# This file is part of MooX-Options
-#
-# This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
-#
-# This is free software; you can redistribute it and/or modify it under
-# the same terms as the Perl 5 programming language system itself.
-#
 package MooX::Options::Role;
 
-# ABSTRACT: role that is apply to your object
 use strict;
-use warnings;
+use warnings FATAL => 'all';
+
 ## no critic (ProhibitExcessComplexity)
 
-our $VERSION = '4.023';    # VERSION
+our $VERSION = "4.100";
 
+=head1 NAME
+
+MooX::Options::Role - role that is apply to your object
+
+=head1 USAGE
+
+Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrade your module. But it is useless alone.
+
+=cut
+
+use Carp qw/croak/;
+use Module::Runtime qw(use_module);
 use MooX::Options::Descriptive;
 use Scalar::Util qw/blessed/;
-use Locale::TextDomain 'MooX-Options';
 
 ### PRIVATE
 
 sub _option_name {
     my ( $name, %data ) = @_;
     my $cmdline_name = join( '|', grep {defined} ( $name, $data{short} ) );
+    ## no critic (RegularExpressions::RequireExtendedFormatting)
+    $cmdline_name =~ m/[^\w]$/
+        and croak
+        "cmdline argument '$cmdline_name' should end with a word character";
     $cmdline_name .= '+' if $data{repeatable} && !defined $data{format};
     $cmdline_name .= '!' if $data{negativable};
+    $cmdline_name .= '!' if $data{negatable};
     $cmdline_name .= '=' . $data{format} if defined $data{format};
     return $cmdline_name;
 }
@@ -57,16 +65,26 @@ sub _options_prepare_descriptive {
         push @options, [] if $data{spacer_after};
 
         push @{ $all_options{$name} }, $name;
+        croak
+            "There is already an option '$data{short}' - can't use it to shorten '$name'"
+            if $data{short} and exists $options_data->{ $data{short} };
+        croak
+            "There is already an abbreviation '$data{short}' - can't use it to shorten '$name'"
+            if $data{short} and defined $all_options{ $data{short} };
+        push @{ $all_options{ $data{short} } }, $name
+            if $data{short};
+
         for ( my $i = 1; $i <= length($name); $i++ ) {
             my $long_short = substr( $name, 0, $i );
             push @{ $all_options{$long_short} }, $name
-                if !exists $options_data->{$long_short};
+                unless exists $options_data->{$long_short}
+                or defined $all_options{$long_short};
         }
 
         if ( defined $data{autosplit} ) {
             if ( !$data_record_loaded ) {
-                require Data::Record;
-                require Regexp::Common;
+                use_module("Data::Record");
+                use_module("Regexp::Common");
                 Regexp::Common->import;
                 $data_record_loaded = 1;
             }
@@ -75,13 +93,6 @@ sub _options_prepare_descriptive {
                     unless => $Regexp::Common::RE{quoted}
                 }
             );
-            if ( my $short = $data{short} ) {
-                $has_to_split{$short} = $has_to_split{ ${name} };
-            }
-            for ( my $i = 1; $i <= length($name); $i++ ) {
-                my $long_short = substr( $name, 0, $i );
-                $has_to_split{$long_short} = $has_to_split{ ${name} };
-            }
         }
     }
 
@@ -121,63 +132,55 @@ sub _options_fix_argv {
 
         my $original_long_option = $all_options->{$arg_name_without_dash};
         if ( defined $original_long_option ) {
-            if ( @$original_long_option == 1 ) {
-                $original_long_option = $original_long_option->[0];
-            }
-            else {
-                $original_long_option = undef;
-            }
+            ## no critic (ErrorHandling::RequireCarping)
+            # uncoverable branch false
+            @$original_long_option == 1
+                or die
+                "Internal error, duplicate map for abbreviation detected!";
+            $original_long_option = $original_long_option->[0];
         }
 
         my $arg_name = $dash;
 
         if ( defined $negative && defined $original_long_option ) {
-            if ( exists $option_data->{$original_long_option}
-                && $option_data->{$original_long_option}{negativable} )
-            {
-                $arg_name .= 'no-';
-            }
-            else {
-                $arg_name .= 'no_';
-            }
+            $arg_name .=
+                $option_data->{$original_long_option}{negatable}
+                ? 'no-'
+                : 'no_';
         }
 
         $arg_name .= $arg_name_without_dash;
 
-        if ( my $rec = $has_to_split->{$arg_name_without_dash} ) {
-            if ( $arg_values = shift @ARGV ) {
-                my $autorange
-                    = defined $original_long_option
-                    && exists $option_data->{$original_long_option}
-                    && $option_data->{$original_long_option}{autorange};
-                foreach my $record ( $rec->records($arg_values) ) {
+        if ( defined $original_long_option
+            && ( defined( my $arg_value = shift @ARGV ) ) )
+        {
+            my $autorange = $option_data->{$original_long_option}{autorange};
+            my $argv_processor = sub {
 
-                    #remove the quoted if exist to chain
-                    $record =~ s/^['"]|['"]$//gx;
-                    if ($autorange) {
-                        push @new_argv,
-                            map { $arg_name => $_ }
-                            _expand_autorange($record);
-                    }
-                    else {
-                        push @new_argv, $arg_name, $record;
-                    }
+                #remove the quoted if exist to chain
+                $_[0] =~ s/^['"]|['"]$//gx;
+                if ($autorange) {
+                    push @new_argv,
+                        map { $arg_name => $_ } _expand_autorange( $_[0] );
                 }
+                else {
+                    push @new_argv, $arg_name, $_[0];
+                }
+
+            };
+
+            if ( my $rec = $has_to_split->{$original_long_option} ) {
+                foreach my $record ( $rec->records($arg_value) ) {
+                    $argv_processor->($record);
+                }
+            }
+            else {
+                $argv_processor->($arg_value);
             }
         }
         else {
             push @new_argv, $arg_name;
-
-            # if option has an argument, we keep the argument untouched
-            if ( defined $original_long_option
-                && ( my $opt_data = $option_data->{$original_long_option} ) )
-            {
-                if ( $opt_data->{format} ) {
-                    push @new_argv, shift @ARGV;
-                }
-            }
         }
-
     }
 
     return @new_argv;
@@ -190,11 +193,9 @@ sub _expand_autorange {
     my ( $left_figure, $autorange_found, $right_figure )
         = $arg_value =~ /^(\d*)(\.\.)(\d*)$/x;
     if ($autorange_found) {
-        $left_figure = $right_figure
-            if !defined $left_figure || !length($left_figure);
-        $right_figure = $left_figure
-            if !defined $right_figure || !length($right_figure);
-        if ( defined $left_figure && defined $right_figure ) {
+        $left_figure  = $right_figure unless length($left_figure);
+        $right_figure = $left_figure  unless length($right_figure);
+        if ( length $left_figure && length $right_figure ) {
             push @expanded_arg_value, $left_figure .. $right_figure;
         }
     }
@@ -204,8 +205,21 @@ sub _expand_autorange {
 ### PRIVATE
 
 use Moo::Role;
+with "MooX::Locale::Passthrough";
 
 requires qw/_options_data _options_config/;
+
+=head1 METHODS
+
+These methods will be composed into your class
+
+=head2 new_with_options
+
+Same as new but parse ARGV with L<Getopt::Long::Descriptive>
+
+Check full doc L<MooX::Options> for more details.
+
+=cut
 
 sub new_with_options {
     my ( $class, %params ) = @_;
@@ -231,7 +245,14 @@ sub new_with_options {
     if ( ref( my $command_commands = $params{command_commands} ) eq 'HASH' ) {
         $class->can('around')->(
             _options_sub_commands => sub {
-                return [ sort keys %$command_commands ];
+                return [
+                    ## no critic (BuiltinFunctions::RequireBlockMap)
+                    map +{
+                        name    => $_,
+                        command => $command_commands->{$_},
+                    },
+                    sort keys %$command_commands
+                ];
             }
         );
     }
@@ -261,8 +282,8 @@ sub new_with_options {
     elsif ( $@ =~ /^Missing\srequired\sarguments:\s(.*)\sat\s/x ) {
         my @missing_required = split /,\s/x, $1;
         print STDERR
-            join( "\n", ( map { $_ . " is missing" } @missing_required ),
-            '' );
+            join( "\n",
+            ( map { $_ . " is missing" } @missing_required ), '' );
     }
     elsif ( $@ =~ /^(.*?)\srequired/x ) {
         print STDERR "$1 is missing\n";
@@ -276,6 +297,16 @@ sub new_with_options {
     %cmdline_params = $class->parse_options( h => 1 );
     return $class->options_usage( 1, $cmdline_params{h} );
 }
+
+=head2 parse_options
+
+Parse your options, call L<Getopt::Long::Descriptive> and convert the result for the "new" method.
+
+It is use by "new_with_options".
+
+=cut
+
+my $decode_json;
 
 sub parse_options {
     my ( $class, %params ) = @_;
@@ -301,17 +332,18 @@ sub parse_options {
 
     # create usage str
     my $usage_str = $options_config{usage_string};
-    $usage_str = __x( "USAGE: {prog_name} %o", prog_name => $prog_name )
+    $usage_str = sprintf( $class->__("USAGE: %s %s"),
+        $prog_name, " [-h] [" . $class->__("long options ...") . "]" )
         if !defined $usage_str;
 
     my ( $opt, $usage ) = describe_options(
         ($usage_str),
         @$options,
         [],
-        [ 'usage', __ "show a short help message" ],
-        [ 'h',     __ "show a compact help message" ],
-        [ 'help',  __ "show a long help message" ],
-        [ 'man',   __ "show the manual" ],
+        [ 'usage', $class->__("show a short help message") ],
+        [ 'h',     $class->__("show a compact help message") ],
+        [ 'help',  $class->__("show a long help message") ],
+        [ 'man',   $class->__("show the manual") ],
         ,
         @flavour
     );
@@ -332,10 +364,20 @@ sub parse_options {
             my $val = $opt->$name();
             if ( defined $val ) {
                 if ( $data{json} ) {
-                    require JSON::MaybeXS;
+                    defined $decode_json
+                        or $decode_json = eval {
+                        use_module("JSON::MaybeXS");
+                        JSON::MaybeXS->can("decode_json");
+                        };
+                    defined $decode_json
+                        or $decode_json = eval {
+                        use_module("JSON::PP");
+                        JSON::PP->can("decode_json");
+                        };
+                    ## no critic (ErrorHandling::RequireCarping)
+                    $@ and die $@;
                     if (!eval {
-                            $cmdline_params{$name}
-                                = JSON::MaybeXS::decode_json($val);
+                            $cmdline_params{$name} = $decode_json->($val);
                             1;
                         }
                         )
@@ -370,6 +412,14 @@ sub parse_options {
     return %cmdline_params;
 }
 
+=head2 options_usage
+
+Display help message.
+
+Check full doc L<MooX::Options> for more details.
+
+=cut
+
 sub options_usage {
     my ( $class, $code, @messages ) = @_;
     my $usage;
@@ -397,6 +447,12 @@ sub options_usage {
     return;
 }
 
+=head2 options_help
+
+Display long usage message
+
+=cut
+
 sub options_help {
     my ( $class, $code, $usage ) = @_;
     $code = 0 if !defined $code;
@@ -416,6 +472,12 @@ sub options_help {
     exit($code) if $code >= 0;
     return;
 }
+
+=head2 options_short_usage
+
+Display quick usage message, with only the list of options
+
+=cut
 
 sub options_short_usage {
     my ( $class, $code, $usage ) = @_;
@@ -437,6 +499,12 @@ sub options_short_usage {
     return;
 }
 
+=head2 options_man
+
+Display a pod like a manual
+
+=cut
+
 sub options_man {
     my ( $class, $usage, $output ) = @_;
     local @ARGV = ();
@@ -446,13 +514,13 @@ sub options_man {
         $usage = $cmdline_params{man};
     }
 
-    require Path::Class;
-    Path::Class->VERSION(0.32);
-    my $man_file = Path::Class::file( Path::Class::tempdir( CLEANUP => 1 ),
+    use_module( "Path::Class", "0.32" );
+    my $man_file
+        = Path::Class::file( Path::Class::tempdir( CLEANUP => 1 ),
         'help.pod' );
     $man_file->spew( iomode => '>:encoding(UTF-8)', $usage->option_pod );
 
-    require Pod::Usage;
+    use_module("Pod::Usage");
     Pod::Usage::pod2usage(
         -verbose => 2,
         -input   => $man_file->stringify,
@@ -475,64 +543,33 @@ sub _options_sub_commands {
 
 ### PRIVATE NEED TO BE EXPORTED
 
-1;
+=head1 SUPPORT
 
-__END__
+You can find documentation for this module with the perldoc command.
 
-=pod
+    perldoc MooX::ConfigFromFile
 
-=head1 NAME
+You can also look for information at:
 
-MooX::Options::Role - role that is apply to your object
+=over 4
 
-=head1 VERSION
+=item * RT: CPAN's request tracker (report bugs here)
 
-version 4.023
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-ConfigFromFile>
 
-=head1 METHODS
+=item * AnnoCPAN: Annotated CPAN documentation
 
-=head2 new_with_options
+L<http://annocpan.org/dist/MooX-ConfigFromFile>
 
-Same as new but parse ARGV with L<Getopt::Long::Descriptive>
+=item * CPAN Ratings
 
-Check full doc L<MooX::Options> for more details.
+L<http://cpanratings.perl.org/d/MooX-ConfigFromFile>
 
-=head2 parse_options
+=item * Search CPAN
 
-Parse your options, call L<Getopt::Long::Descriptive> and convert the result for the "new" method.
+L<http://search.cpan.org/dist/MooX-ConfigFromFile/>
 
-It is use by "new_with_options".
-
-=head2 options_usage
-
-Display help message.
-
-Check full doc L<MooX::Options> for more details.
-
-=head2 options_help
-
-Display long usage message
-
-=head2 options_short_usage
-
-Display quick usage message, with only the list of options
-
-=head2 options_man
-
-Display a pod like a manual
-
-=head1 USAGE
-
-Don't use MooX::Options::Role directly. It is used by L<MooX::Options> to upgrade your module. But it is useless alone.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-https://github.com/celogeek/MooX-Options/issues
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+=back
 
 =head1 AUTHOR
 
@@ -542,7 +579,10 @@ celogeek <me@celogeek.com>
 
 This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This software is copyright (c) 2017 by Jens Rehsack.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+1;

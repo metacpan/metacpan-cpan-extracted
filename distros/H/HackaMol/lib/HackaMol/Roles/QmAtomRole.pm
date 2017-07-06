@@ -1,5 +1,5 @@
 package HackaMol::Roles::QmAtomRole;
-$HackaMol::Roles::QmAtomRole::VERSION = '0.040';
+$HackaMol::Roles::QmAtomRole::VERSION = '0.043';
 #ABSTRACT: simple role that provides attributes needed for setting up quantum chemistry calculations
 use Moose::Role;
 
@@ -41,7 +41,7 @@ HackaMol::Roles::QmAtomRole - simple role that provides attributes needed for se
 
 =head1 VERSION
 
-version 0.040
+version 0.043
 
 =head1 SYNOPSIS
 

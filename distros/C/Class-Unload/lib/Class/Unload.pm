@@ -1,6 +1,6 @@
 package Class::Unload;
 # ABSTRACT: Unload a class
-$Class::Unload::VERSION = '0.09';
+$Class::Unload::VERSION = '0.11';
 use warnings;
 use strict;
 no strict 'refs'; # we're fiddling with the symbol table
@@ -26,6 +26,10 @@ sub unload {
     my $inc_file = join( '/', split /(?:'|::)/, $class ) . '.pm';
     delete $INC{ $inc_file };
 
+    if (Class::Inspector->loaded('Class::MOP')) {
+        Class::MOP::remove_metaclass_by_name($class);
+    }
+
     return 1;
 }
 
@@ -44,7 +48,7 @@ Class::Unload - Unload a class
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -63,7 +67,7 @@ version 0.09
 =head2 unload $class
 
 Unloads the given class by clearing out its symbol table and removing it
-from %INC.
+from %INC.  If it's a L<Moose> class, the metaclass is also removed.
 
 =head1 SEE ALSO
 
@@ -80,7 +84,7 @@ Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>;
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Dagfinn Ilmari Mannsåker.
+This software is copyright (c) 2017 by Dagfinn Ilmari Mannsåker.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

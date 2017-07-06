@@ -10,11 +10,11 @@ use DateTime::Format::Duration;
 use Cwd;
 use File::Path qw(make_path);
 use File::Spec;
+use File::Slurp;
 
 use MooseX::App::Role;
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
-
-# with 'HPC::Runner::Command::Utils::Base';
+use Path::Tiny;
 
 =head1 HPC::Runner::Command::Utils::Log
 
@@ -35,17 +35,15 @@ option 'logdir' => (
     coerce   => 1,
     lazy     => 1,
     required => 1,
-
-    # default  => \&set_logdir,
-    default => sub {
+    default  => sub {
         my $self = shift;
         $self->set_logdir;
     },
-    documentation =>
-q{Directory where logfiles are written. Defaults to current_working_directory/prunner_current_date_time/log1 .. log2 .. log3'},
+    documentation => 'Directory where logfiles are written.'
+      . ' Defaults to current_working_directory/prunner_current_date_time/log1 .. log2 .. log3',
     trigger => sub {
         my $self = shift;
-        my $val = shift;
+        my $val  = shift;
         $self->_make_the_dirs($val);
     },
 );
@@ -57,11 +55,11 @@ Show process_id in each log file. This is useful for aggregating logs
 =cut
 
 option 'show_processid' => (
-    is      => 'rw',
-    isa     => 'Bool',
-    default => 0,
-    documentation =>
-q{Show the process ID per logging message. This is useful when aggregating logs.}
+    is            => 'rw',
+    isa           => 'Bool',
+    default       => 0,
+    documentation => 'Show the process ID per logging message. '
+      . 'This is useful when aggregating logs.',
 );
 
 =head3 process_table
@@ -73,27 +71,29 @@ We also want to write all cmds and exit codes to a table
 =cut
 
 option 'process_table' => (
-    isa     => 'Str',
+    isa     => Path,
     is      => 'rw',
     lazy    => 1,
-    handles => {
-        add_process_table     => 'append',
-        prepend_process_table => 'prepend',
-        clear_process_table   => 'clear',
-    },
+    coerce  => 1,
     default => sub {
-        my $self          = shift;
-        my $process_table = $self->logdir . "/001-task_table.md";
+        my $self = shift;
+        make_path( $self->logdir );
+        my $process_table =
+          File::Spec->catdir( $self->logdir, "001-task_table.md" );
+        $process_table = path($process_table);
+        $process_table->touchpath;
 
-        open( my $pidtablefh, ">>" . $process_table )
-          or die $self->app_log->fatal("Couldn't open process file $!\n");
-
-        print $pidtablefh
+        my $header =
 "|| Version || Scheduler Id || Jobname || Task Tags || ProcessID || ExitCode || Duration ||\n";
-        close($pidtablefh);
+        write_file( $process_table, { append => 1 }, $header )
+          or $self->app_log->warn("Couldn't open process file! $!\n");
+
         return $process_table;
     },
-    lazy => 1,
+    trigger => sub {
+        my $self = shift;
+        $self->process_table->touchpath;
+    },
 );
 
 =head3 tags
@@ -144,13 +144,14 @@ has 'dt' => (
     lazy    => 1,
 );
 
+##TODO Put this in its own class
 ##Application log
 has 'app_log' => (
     is      => 'rw',
     lazy    => 1,
     default => sub {
-        my $self      = shift;
-        my $file_name = $self->logdir . '/main.log';
+        my $self = shift;
+        my $file_name = File::Spec->catdir( $self->logdir, 'main.log' );
         $self->_make_the_dirs( $self->logdir );
         my $log_conf = q(
 log4perl.category = DEBUG, FILELOG, Screen
@@ -205,34 +206,26 @@ sub set_logdir {
 
     if ( $self->has_version ) {
         if ( $self->has_project ) {
-
             $logdir =
-                "hpc-runner/"
-              . $self->version . "/"
-              . $self->project . "/logs" . "/"
-              . $self->set_logfile . "-"
-              . $self->logname;
+              File::Spec->catdir( 'hpc-runner', $self->version, $self->project,
+                'logs', $self->set_logfile . '-' . $self->logname );
         }
         else {
             $logdir =
-                "hpc-runner/"
-              . $self->version . "/logs" . "/"
-              . $self->set_logfile . "-"
-              . $self->logname;
+              File::Spec->catdir( 'hpc-runner', $self->version,
+                'logs', $self->set_logfile . '-' . $self->logname );
         }
     }
     else {
         if ( $self->has_project ) {
             $logdir =
-                "hpc-runner/"
-              . $self->project
-              . "/logs/"
-              . $self->set_logfile . "-"
-              . $self->logname;
+              File::Spec->catdir( 'hpc-runner', $self->project,
+                'logs', $self->set_logfile . '-' . $self->logname );
         }
         else {
             $logdir =
-              "hpc-runner/logs/" . $self->set_logfile . "-" . $self->logname;
+              File::Spec->catdir( 'hpc-runner',
+                'logs', $self->set_logfile . '-' . $self->logname );
         }
     }
 
@@ -266,10 +259,10 @@ sub init_log {
 
     Log::Log4perl->easy_init(
         {
-            level  => $TRACE,
-            utf8   => 1,
-            mode   => 'append',
-            file   => ">>" . $self->logdir . "/" . $self->logfile,
+            level => $TRACE,
+            utf8  => 1,
+            mode  => 'append',
+            file  => ">>" . File::Spec->catdir( $self->logdir, $self->logfile ),
             layout => '%d: %p %m%n '
         }
     );

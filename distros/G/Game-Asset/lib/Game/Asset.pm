@@ -22,8 +22,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Asset;
-$Game::Asset::VERSION = '0.5';
+$Game::Asset::VERSION = '0.6';
 # ABSTRACT: Load assets (images, music, etc.) for games
+use v5.010;
 use strict;
 use warnings;
 use Moose;
@@ -80,7 +81,7 @@ sub BUILDARGS
     my $zip = $class->_read_zip( $file );
     $args->{'_zip'} = $zip;
 
-    my $index = $class->_read_index( $zip, $file );
+    my $index = $class->_read_index( $zip, $file ) // {};
     $args->{mappings} = {
         yml => 'Game::Asset::YAML',
         txt => 'Game::Asset::PlainText',

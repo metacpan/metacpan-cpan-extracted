@@ -64,7 +64,7 @@
    "provides" : {
       "Continual::Process" : {
          "file" : "lib/Continual/Process.pm",
-         "version" : "v0.2.0"
+         "version" : "v0.2.1"
       },
       "Continual::Process::Helper" : {
          "file" : "lib/Continual/Process/Helper.pm"
@@ -99,7 +99,7 @@
          "web" : "https://github.com/JaSei/Continual-Process"
       }
    },
-   "version" : "0.2.0",
+   "version" : "0.2.1",
    "x_authority" : "cpan:JASEI",
    "x_contributors" : [
       "Miroslav Tynovsky <tynovsky@avast.com>",

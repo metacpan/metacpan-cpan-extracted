@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Future::AsyncAwait',
    requires => {
       'Future' => 0,
-      'perl' => '5.014', # PL_keyword_plugin
+      'perl' => '5.024', # PL_keyword_plugin, PERL_CONTEXT->blk_oldsaveix
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

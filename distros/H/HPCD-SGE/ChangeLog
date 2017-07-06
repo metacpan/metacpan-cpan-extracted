@@ -1,3 +1,5 @@
+0.49 - added another error text to detect memory overru failure
+
 0.48 - log the reason that triggered vmem retry testing
 
 0.47 - adjust memory retry increment and usage reporting when multiple cpus
@@ -7,7 +9,7 @@
 	   value for the slots allocated)
 
 0.46 - documented retry_mem_percent attribute, added another error text to
-       detect memocry overrun failure
+       detect memory overrun failure
 
 0.45 - changed the magic number 99 to a stage attribute that can be set to
        allow causing retry with additional memory for a different threshold

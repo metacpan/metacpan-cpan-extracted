@@ -6,7 +6,7 @@ use feature 'signatures';
 use WWW::Mechanize::Plugin::Selector;
 use HTTP::Response;
 use HTTP::Headers;
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed weaken);
 use File::Basename;
 use Carp qw(croak carp);
 use WWW::Mechanize::Link;
@@ -14,10 +14,9 @@ use IO::Socket::INET;
 use Chrome::DevToolsProtocol;
 use MIME::Base64 'decode_base64';
 use Data::Dumper;
-use Scalar::Util 'weaken';
 
 use vars qw($VERSION %link_spec @CARP_NOT);
-$VERSION = '0.01';
+$VERSION = '0.04';
 
 =head1 NAME
 
@@ -30,7 +29,7 @@ WWW::Mechanize::Chrome - automate the Chrome browser
 
   Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
   my $mech = WWW::Mechanize::Chrome->new();
-  $mech->get('http://google.com');
+  $mech->get('https://google.com');
 
   $mech->eval_in_page('alert("Hello Chrome")');
   my $png= $mech->content_as_png();
@@ -51,9 +50,18 @@ The default is to have HTTP errors fatal,
 as that makes debugging much easier than expecting
 you to actually check the results of every action.
 
+=item B<host>
+
+Specify the host where Chrome listens
+
+  host => 'localhost'
+
+Most likely you don't want to have Chrome listening on an outside port
+on a machine connected to the internet.
+
 =item B<port>
 
-Specify the port where Chrome should listen
+Specify the port of Chrome to connect to
 
   port => 9222
 
@@ -65,9 +73,15 @@ A premade L<Log::Log4perl> object
 
 Specify the path to the Chrome executable.
 
-The default is C<chrome> as found via C<$ENV{PATH}>.
-You can also provide this information from the outside
+The default is C<chrome> on Windows and C<google-chrome> elsewhere, as found via
+C<$ENV{PATH}>.
+You can also provide this information from the outside to the class
 by setting C<$ENV{CHROME_BIN}>.
+
+=item B<start_url>
+
+Launch Chrome with the given URL. Normally you would use
+the C<< ->get >> method instead.
 
 =item B<launch_arg>
 
@@ -75,10 +89,37 @@ Specify additional parameters to the Chrome executable.
 
   launch_arg => [ "--some-new-parameter=foo" ],
 
-=item B<cookie_file>
+Interesting parameters might be
 
-Cookies are not directly persisted. If you pass in a path here,
-that file will be used to store or retrieve cookies.
+    '--window-size=1280x1696'
+    '--ignore-certificate-errors'
+
+=item B<profile>
+
+Profile directory for this session. If not given, Chrome will use your current
+user profile.
+
+=item B<incognito>
+
+Launch Chrome in incognito mode.
+
+=item B<data_directory>
+
+The base data directory for this session. If not given, Chrome will use your
+current base directory.
+
+  use File::Temp 'tempdir';
+  my $mech = WWW::Mechanize::Chrome->new(
+      data_directory => tempdir(),        # create a fresh Chrome every time
+  );
+
+=item B<startup_timeout>
+
+  startup_timeout => 20,
+
+The maximum number of seconds to wait until Chrome is ready. This helps on slow
+systems where Chrome takes some time starting up. The process will try every
+second to connect to Chrome.
 
 =item B<driver>
 
@@ -91,14 +132,22 @@ for testing with C<use warnings qw(fatal)>.
 
 =back
 
+You can override the class to implement the transport from the outside by
+setting C<< $ENV{WWW_MECHANIZE_CHROME_TRANSPORT} >> to the transport class.
+This is mostly used for testing but can be useful to exclude the underlying
+websocket implementation(s) as source of bugs.
+
 =cut
 
 sub build_command_line {
     my( $class, $options )= @_;
 
-    #$options->{ "log" } ||= 'OFF';
+    # Chrome.exe on Windows
+    # google-chrome on Linux (etc?)
+    my $default_exe = $^O =~ /mswin/i ? 'chrome'
+                                      : 'google-chrome';
 
-    $options->{ launch_exe } ||= $ENV{CHROME_BIN} || 'chrome';
+    $options->{ launch_exe } ||= $ENV{CHROME_BIN} || $default_exe;
     $options->{ launch_arg } ||= [];
 
     $options->{port} ||= 9222;
@@ -107,13 +156,24 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--remote-debugging-port=$options->{ port }";
     };
 
+    if ($options->{incognito}) {
+        push @{ $options->{ launch_arg }}, "--incognito";
+    };
+
+    if ($options->{data_directory}) {
+        push @{ $options->{ launch_arg }}, "--user-data-dir=$options->{ data_directory }";
+    };
+
     if ($options->{profile}) {
-        push @{ $options->{ launch_arg }}, "--user-data-dir=$options->{ profile }";
+        push @{ $options->{ launch_arg }}, "--profile-directory=$options->{ profile }";
     };
 
     push @{ $options->{ launch_arg }}, "--headless"
         if $options->{ headless };
     push @{ $options->{ launch_arg }}, "--disable-gpu"; # temporarily needed for now
+
+    $options->{start_url} ||= 'about:blank';
+    push @{ $options->{ launch_arg }}, "$options->{start_url}";
 
     my $program = ($^O =~ /mswin/i and $options->{ launch_exe } =~ /\s/)
                   ? qq("$options->{ launch_exe }")
@@ -189,7 +249,7 @@ sub spawn_child( $self, $localhost, @cmd ) {
     };
 
     # Just to give Chrome time to start up, make sure it accepts connections
-    $self->_wait_for_socket_connection( $localhost, $self->{port}, $self->{wait} || 20);
+    $self->_wait_for_socket_connection( $localhost, $self->{port}, $self->{startup_timeout} || 20);
     return $pid
 }
 
@@ -219,8 +279,13 @@ sub new($class, %options) {
         $options{ frames }= 1;
     };
 
+    $options{ js_events } ||= [];
+    if( ! exists $options{ transport }) {
+        $options{ transport } ||= $ENV{ WWW_MECHANIZE_CHROME_TRANSPORT };
+    };
+
     my $self= bless \%options => $class;
-    my $localhost = '127.0.0.1';
+    my $host = $options{ host } || '127.0.0.1';
     $self->{log} ||= $self->_build_log;
 
     unless ( defined $options{ port } ) {
@@ -231,11 +296,11 @@ sub new($class, %options) {
     unless ($options{pid} or $options{reuse}) {
         my @cmd= $class->build_command_line( \%options );
         $self->log('debug', "Spawning", \@cmd);
-        $self->{pid} = $self->spawn_child( $localhost, @cmd );
+        $self->{pid} = $self->spawn_child( $host, @cmd );
         $self->{ kill_pid } = 1;
 
         # Just to give Chrome time to start up, make sure it accepts connections
-        $self->_wait_for_socket_connection( $localhost, $self->{port}, $self->{wait} || 20);
+        $self->_wait_for_socket_connection( $host, $self->{port}, $self->{startup_timeout} || 20);
     }
 
     if( $options{ tab } and $options{ tab } eq 'current' ) {
@@ -248,7 +313,7 @@ sub new($class, %options) {
     eval {
         $options{ driver } ||= Chrome::DevToolsProtocol->new(
             'port' => $options{ port },
-            host => $localhost,
+            host => $host,
             auto_close => 0,
             error_handler => sub {
                 #warn ref$_[0];
@@ -260,7 +325,6 @@ sub new($class, %options) {
                 croak $_[1]
             },
             transport => $options{ transport },
-            #log => sub {},
             log => $options{ log },
         );
         # Synchronously connect here, just for easy API compatibility
@@ -277,10 +341,21 @@ sub new($class, %options) {
         die $@;
     }
 
+    my $s = $self;
+    weaken $s;
+    my $collect_JS_problems = sub( $msg ) {
+        $s->_handleConsoleAPICall( $msg->{params} )
+    };
+    $self->{consoleAPIListener} =
+        $self->add_listener( 'Runtime.consoleAPICalled', $collect_JS_problems );
+    $self->{exceptionThrownListener} =
+        $self->add_listener( 'Runtime.exceptionThrown', $collect_JS_problems );
+
     Future->wait_all(
-        $self->driver->send_message('Page.enable'),
-        $self->driver->send_message('Network.enable'),
-    )->get; # we need to get DOMLoaded events and Network events
+        $self->driver->send_message('Page.enable'),    # capture DOMLoaded
+        $self->driver->send_message('Network.enable'), # capture network
+        $self->driver->send_message('Runtime.enable'), # capture console messages
+    )->get;
 
     if( ! exists $options{ tab }) {
         $self->get('about:blank'); # Reset to clean state, also initialize our frame id
@@ -288,6 +363,38 @@ sub new($class, %options) {
 
     $self
 };
+
+=head2 C<< $mech->add_listener >>
+
+  my $url_loaded = $mech->add_listener('Network.responseReceived', sub {
+      my( $info ) = @_;
+      warn "Loaded URL $info->{response}->{url}: $info->{response}->{status}";
+  });
+
+Returns a listener object. If that object is discarded, the listener callback
+will be removed.
+
+Calling this method in void context croaks.
+
+=cut
+
+sub add_listener( $self, $event, $callback ) {
+    if( ! defined wantarray ) {
+        croak "->add_listener called in void context";
+    };
+    return $self->driver->add_listener( $event, $callback )
+}
+
+sub _handleConsoleAPICall( $self, $msg ) {
+    if( $self->{report_js_errors}) {
+        my $desc = $msg->{exceptionDetails}->{exception}->{description};
+        my $loc  = $msg->{exceptionDetails}->{stackTrace}->{callFrames}->[0]->{url};
+        my $line = $msg->{exceptionDetails}->{stackTrace}->{callFrames}->[0]->{lineNumber};
+        my $err = "$desc at $loc line $line";
+        $self->log('error', $err);
+    };
+    push @{$self->{js_events}}, $msg;
+}
 
 sub frameId( $self ) {
     $self->{frameId}
@@ -375,29 +482,72 @@ sub autodie {
 
 sub allow {
     my($self,%options)= @_;
+
+    my @await;
+    if( exists $options{ javascript } ) {
+        my $disabled = !$options{ javascript } ? JSON::true : JSON::false;
+        push @await,
+            $self->driver->send_message('Emulation.setScriptExecutionDisabled', value => $disabled );
+    };
+
+    Future->wait_all( @await )->get;
 }
 
-=head2 C<< $mech->js_alerts() >>
+=head2 C<< $mech->on_dialog( $cb ) >>
 
-  print for $mech->js_alerts();
+  $mech->on_dialog( sub {
+      my( $mech, $dialog ) = @_;
+      warn $dialog->{message};
+      $mech->handle_dialog( 1 ); # click "OK" / "yes" instead of "cancel"
+  });
 
-An interface to the Javascript Alerts
-
-Returns the list of alerts
-
-=cut
-
-sub js_alerts { @{ shift->eval_in_chrome('return this.alerts') } }
-
-=head2 C<< $mech->clear_js_alerts() >>
-
-    $mech->clear_js_alerts();
-
-Clears all saved alerts
+A callback for Javascript dialogs (C<< alert() >>, C<< prompt() >>, ... )
 
 =cut
 
-sub clear_js_alerts { shift->eval_in_chrome('this.alerts = [];') }
+sub on_dialog( $self, $cb ) {
+    my $s = $self;
+    weaken $s;
+    if( $cb ) {
+        $self->{ on_dialog_listener } =
+        $self->add_listener('Page.javascriptDialogOpening', sub( $ev ) {
+            if( $s->{ on_dialog }) {
+                $self->log('debug', sprintf 'Javascript %s: %s', $ev->{params}->{type}, $ev->{params}->{message});
+                $s->{ on_dialog }->( $s, $ev->{params} );
+            };
+        });
+    } else {
+        delete $self->{ on_dialog_listener };
+    };
+    $self->{ on_dialog } = $cb;
+}
+
+=head2 C<< $mech->handle_dialog( $accept, $prompt = undef ) >>
+
+  $mech->on_dialog( sub {
+      my( $mech, $dialog ) = @_;
+      warn "[Javascript $dialog->{type}]: $dialog->{message}";
+      $mech->handle_dialog( 1 ); # click "OK" / "yes" instead of "cancel"
+  });
+
+Closes the current Javascript dialog. Depending on
+
+=cut
+
+sub handle_dialog( $self, $accept, $prompt = undef ) {
+    my $v = $accept ? JSON::true : JSON::false;
+    $self->log('debug', sprintf 'Dismissing Javascript dialog with %d', $accept);
+    my $f;
+    $f = $self->driver->send_message(
+        'Page.handleJavaScriptDialog',
+        accept => $v,
+        promptText => (defined $prompt ? $prompt : 'generic message'),
+    )->then( sub {
+        # We deliberately ignore the result here
+        # to avoid deadlock of Futures
+        undef $f;
+    });
+};
 
 =head2 C<< $mech->js_errors() >>
 
@@ -415,10 +565,7 @@ C<js_console_messages> instead.
 
 sub js_errors {
     my ($self) = @_;
-    my $errors= $self->eval_in_chrome(<<'JS');
-        return this.errors
-JS
-    @$errors
+    @{$self->{js_events}}
 }
 
 =head2 C<< $mech->clear_js_errors() >>
@@ -431,27 +578,9 @@ Clears all Javascript messages from the console
 
 sub clear_js_errors {
     my ($self) = @_;
-    my $errors= $self->eval_in_chrome(<<'JS');
-        this.errors= [];
-JS
-
+    @{$self->{js_events}} = ();
+    $self->driver->send_message('Runtime.discardConsoleEntries')->get;
 };
-
-=head2 C<< $mech->confirm( 'Really do this?' [ => 1 ]) >>
-
-Records a confirmation (which is "1" or "ok" by default), to be used
-whenever javascript fires a confirm dialog. If the message is not found,
-the answer is "cancel".
-
-=cut
-
-sub confirm
-{
-    my ( $self, $msg, $affirmative ) = @_;
-    $affirmative = 1 unless defined $affirmative;
-    $affirmative = $affirmative ? 'true' : 'false';
-    $self->eval_in_chrome("this.confirms['$msg']=$affirmative;");
-}
 
 =head2 C<< $mech->eval_in_page( $str, @args ) >>
 
@@ -766,12 +895,48 @@ sub httpRequestFromChromeRequest( $self, $event ) {
     );
 };
 
+sub getResponseBody( $self, $requestId ) {
+    $self->log('debug', "Fetching response body for $requestId");
+    return
+        $self->driver->send_message('Network.getResponseBody', requestId => $requestId)
+        ->then(sub {
+        $self->log('debug', "Have body", @_);
+        my ($body_obj) = @_;
+
+        my $body = $body_obj->{body};
+        $body = decode_base64( $body )
+            if $body_obj->{base64Encoded};
+        Future->done( $body )
+    });
+}
+
 sub httpResponseFromChromeResponse( $self, $res ) {
+    $self->log('debug', sprintf "Status %d",$res->{params}->{response}->{status});
     my $response = HTTP::Response->new(
         $res->{params}->{response}->{status} || 200, # is 0 for files?!
         $res->{params}->{response}->{statusText},
         HTTP::Headers->new( %{ $res->{params}->{response}->{headers} }),
     );
+
+    # Also fetch the response body and include it in the response
+    # as we can't do that lazily...
+    # This is nasty, as we will fill in the response lazily and the user has
+    # no way of knowing when we have filled in the response body
+    # The proper way might be to return a proxy object...
+    my $requestId = $res->{params}->{requestId};
+
+    my $full_response_future;
+
+    my $s = $self;
+    weaken $s;
+    $full_response_future = $self->getResponseBody( $requestId )->then( sub( $body ) {
+        $s->log('debug', "Response body arrived");
+        $response->content( $body );
+        undef $full_response_future;
+        Future->done
+    });
+    #$response->content_ref( \$body );
+    $response
 };
 
 sub httpResponseFromChromeNetworkFail( $self, $res ) {
@@ -996,6 +1161,22 @@ sub reset_headers( $self ) {
     $self->_set_extra_headers();
 };
 
+=head2 C<< $mech->block_urls() >>
+
+    $mech->block_urls( '//facebook.com/js/conversions/tracking.js' );
+
+Sets the list of blocked URLs. These URLs will not be retrieved by Chrome
+when loading a page. This is useful to eliminate tracking images or to test
+resilience in face of bad network conditions.
+
+=cut
+
+sub block_urls( $self, @urls ) {
+    $self->driver->send_message( 'Network.setBlockedUrls',
+        urls => \@urls
+    )->get;
+}
+
 =head2 C<< $mech->res() >> / C<< $mech->response(%options) >>
 
     my $response = $mech->response(headers => 0);
@@ -1108,6 +1289,21 @@ sub forward( $self, %options ) {
     }, navigates => 1, %options);
 }
 
+=head2 C<< $mech->stop() >>
+
+    $mech->stop();
+
+Stops all loading in Chrome, as if you pressed C<ESC>.
+
+This function is mostly of use in callbacks or in a timer callback from your
+event loop.
+
+=cut
+
+sub stop( $self ) {
+    $self->driver->send_message('Page.stopLoading')->get;
+}
+
 =head2 C<< $mech->uri() >>
 
     print "We are at " . $mech->uri;
@@ -1117,14 +1313,15 @@ Returns the current document URI.
 =cut
 
 sub uri( $self ) {
-    URI->new( $self->document->get->{root}->{documentURL} )
+    my $d = $self->document->get;
+    URI->new( $d->{root}->{documentURL} )
 }
 
 =head1 CONTENT METHODS
 
 =head2 C<< $mech->document() >>
 
-    print $self->document->get->{nodeId}
+    print $self->document->get->{nodeId};
 
 Returns the document object as a Future.
 
@@ -1380,10 +1577,10 @@ sub make_link {
     if (defined $url) {
         my $res = WWW::Mechanize::Link->new({
             tag   => $tag,
-            name  => $node->{name},
+            name  => $node->get_attribute('name'),
             base  => $base,
             url   => $url,
-            text  => $node->{innerHTML},
+            text  => $node->get_attribute('innerHTML'),
             attrs => {},
         });
 
@@ -1700,10 +1897,6 @@ sub follow_link {
     }
 }
 
-# We need to trace the path from the root element to every webelement
-# because stupid GhostDriver/Selenium caches elements per document,
-# and not globally, keyed by document. Switching the implied reference
-# document makes lots of API calls fail :-(
 sub activate_parent_container {
     my( $self, $doc )= @_;
     $self->activate_container( $doc, 1 );
@@ -1844,7 +2037,7 @@ sub _performSearch( $self, %args ) {
             my $searchResults;
             my $searchId = $results->{searchId};
             my @childNodes;
-            $self->driver->set_collector('DOM.setChildNodes', sub( $ev ) {
+            my $setChildNodes = $self->add_listener('DOM.setChildNodes', sub( $ev ) {
                 push @childNodes, @{ $ev->{params}->{nodes} };
             });
             my $childNodes = $self->driver->one_shot('DOM.setChildNodes');
@@ -1863,7 +2056,7 @@ sub _performSearch( $self, %args ) {
             #    );
             #}
             )->then( sub( $response ) {
-                $self->driver->set_collector('DOM.setChildNodes', undef );
+                undef $setChildNodes;
                 my %nodes = map {
                     $_->{nodeId} => $_
                 } @childNodes;
@@ -1967,7 +2160,6 @@ sub xpath( $self, $query, %options) {
     if( $options{ document }) {
         warn sprintf "Document %s", $options{ document }->{id};
     };
-    #my $original_frame= $self->current_frame;
 
     DOCUMENTS: {
         my $doc= $options{ document } || $self->document->get;
@@ -2001,21 +2193,6 @@ sub xpath( $self, $query, %options) {
 
             @found = map { my @r = $_->get; @r ? map { $_->get } @r : () } @found;
             push @res, @found;
-
-            # A small optimization to return if we already have enough elements
-            # We can't do this on $return_first as there might be more elements
-            #if( @res and $options{ return_first } and grep { $_->{resultSize} } @res ) {
-            #    @res= grep { $_->{resultSize} } @res;
-            #    last DOCUMENTS;
-            #};
-            #warn Dumper \@documents;
-            if ($options{ frames } and not $options{ node }) {
-                #warn ">Expanding below " . $doc->get_tag_name() . ' - ' . $doc->get_attribute('title');
-                #local $nesting .= "--";
-                my @d; # = $self->expand_frames( $options{ frames }, $doc );
-                #warn sprintf("Found %s %s pointing to %s", $_->get_tag_name, $_->{id}, $_->get_attribute('src')) for @d;
-                push @documents, @d;
-            };
         };
     };
 
@@ -2507,6 +2684,42 @@ sub field {
     );
 }
 
+=head2 C<< $mech->upload( $selector, $value ) >>
+
+  $mech->upload( user_picture => 'C:/Users/Joe/face.png' );
+
+Sets the file upload field with the name given in C<$selector> to the given
+file. The filename must be an absolute path and filename in the local
+filesystem.
+
+The method understands very basic CSS selectors in the value for C<$selector>,
+like the C<< ->field >> method.
+
+=cut
+
+sub upload($self,$name,$value) {
+    my %options;
+
+    my @fields = $self->_field_by_name(
+                     name => $name,
+                     user_info => "upload field with name '$name'",
+                     %options );
+    $value = [$value]
+        if ! ref $value;
+
+    # Stringify all files:
+    @$value = map { "$_" } @$value;
+
+    if( @fields ) {
+        $self->driver->send_message('DOM.setFileInputFiles',
+            nodeId => 0+$fields[0]->nodeId,
+            files => $value,
+            )->get;
+    }
+
+}
+
+
 =head2 C<< $mech->value( $selector_or_element, [%options] ) >>
 
     print $mech->value( 'user' );
@@ -2524,6 +2737,9 @@ in favour of the C<< ->field >> method.
 For fields that can have multiple values, like a C<select> field,
 the method is context sensitive and returns the first selected
 value in scalar context and all values in list context.
+
+Note that this method does not support file uploads. See the C<< ->upload >>
+method for that.
 
 =cut
 
@@ -2661,8 +2877,14 @@ by C<< $mech->current_form >>.
 sub submit($self,$dom_form = $self->current_form) {
     if ($dom_form) {
         # We should prepare for navigation here as well
+        # The __proto__ invocation is so we can have a HTML form field entry
+        # named "submit"
         $self->_mightNavigate( sub {
-            $self->driver->send_message('Runtime.callFunctionOn', objectId => $dom_form->objectId, functionDeclaration => 'function() { var action = this.action; var isCallable = action && typeof(action) === "function"; if( isCallable) { action() } else { this.submit() }}' );
+            $self->driver->send_message(
+                'Runtime.callFunctionOn',
+                objectId => $dom_form->objectId,
+                functionDeclaration => 'function() { var action = this.action; var isCallable = action && typeof(action) === "function"; if( isCallable) { action() } else { this.__proto__.submit.apply(this) }}'
+            );
         });
 
         $self->clear_current_form;
@@ -2794,121 +3016,6 @@ sub do_set_fields {
     }
 };
 
-=head2 C<< $mech->expand_frames( $spec ) >>
-
-  my @frames = $mech->expand_frames();
-
-Expands the frame selectors (or C<1> to match all frames)
-into their respective Chrome nodes according to the current
-document. All frames will be visited in breadth first order.
-
-This is mostly an internal method.
-
-=cut
-
-sub expand_frames {
-    my ($self, $spec, $document) = @_;
-    $spec ||= $self->{frames};
-    my @spec = ref $spec ? @$spec : $spec;
-    $document ||= $self->document;
-
-    if (! ref $spec and $spec !~ /\D/ and $spec == 1) {
-        # All frames
-        @spec = qw( frame iframe );
-    };
-
-    # Optimize the default case of only names in @spec
-    my @res;
-    if (! grep {ref} @spec) {
-        @res = $self->selector(
-                        \@spec,
-                        document => $document,
-                        frames => 0, # otherwise we'll recurse :)
-                    );
-    } else {
-        @res =
-            map { #warn "Expanding $_";
-                    ref $_
-                  ? $_
-                  # Just recurse into the above code path
-                  : $self->expand_frames( $_, $document );
-            } @spec;
-    }
-
-    @res
-};
-
-
-=head2 C<< $mech->current_frame >>
-
-    my $last_frame= $mech->current_frame;
-    # Switch frame somewhere else
-
-    # Switch back
-    $mech->activate_container( $last_frame );
-
-Returns the currently active frame as a WebElement.
-
-This is mostly an internal method.
-
-See also
-
-L<http://code.google.com/p/selenium/issues/detail?id=4305>
-
-Frames are currently not really supported.
-
-=cut
-
-sub current_frame {
-    my( $self )= @_;
-    my @res;
-    my $current= $self->make_WebElement( $self->eval('window'));
-    warn sprintf "Current_frame: bottom: %s", $current->{id};
-
-    # Now climb up until the root window
-    my $f= $current;
-    my @chain;
-    while( $f= $self->driver->execute_script('return arguments[0].frameElement', $f )) {
-        $f= $self->make_WebElement( $f );
-        unshift @res, $f;
-        warn sprintf "One more level up, now in %s",
-            $f->{id};
-        warn $self->driver->execute_script('return arguments[0].title', $res[0]);
-        unshift @chain,
-            sprintf "Frame chain: %s %s", $res[0]->get_tag_name, $res[0]->{id};
-        # Activate that frame
-        $self->switch_to_parent_frame();
-        warn "Going up once more, maybe";
-    };
-    warn "Chain complete";
-    warn $_
-        for @chain;
-
-    # Now fake the element into
-    my $el= $self->make_WebElement( $current );
-    for( @res ) {
-        warn sprintf "Path has (web element) id %s", $_->{id};
-    };
-    $el->{__path}= \@res;
-    $el
-}
-
-sub switch_to_parent_frame {
-    #use JSON;
-    my ( $self ) = @_;
-
-    $self->{driver}->{commands}->{'switchToParentFrame'}||= {
-        'method' => 'POST',
-        'url' => "session/:sessionId/frame/parent"
-    };
-
-    #my $json_null = JSON::null;
-    my $params;
-    #$id = ( defined $id ) ? $id : $json_null;
-
-    my $res    = { 'command' => 'switchToParentFrame' };
-    return $self->driver->_execute_command( $res, $params );
-}
 
 =head1 CONTENT RENDERING METHODS
 
@@ -2931,21 +3038,38 @@ This method is specific to WWW::Mechanize::Chrome.
 
 =cut
 
-sub _content_as_png {
-    my ($self, $rect) = @_;
-    $rect ||= {};
+sub _as_raw_png( $self, $image ) {
+    my $data;
+    $image->write( data => \$data, type => 'png' );
+    $data
+}
 
+sub _content_as_png($self, $rect={}, $target={} ) {
     $self->driver->send_message('Page.captureScreenshot', format => 'png' )->then( sub( $res ) {
-        return Future->done( decode_base64( $res->{data} ))
+        require Imager;
+        my $img = Imager->new ( data => decode_base64( $res->{data} ), format => 'png' );
+        # Cut out the wanted part
+        if( scalar keys %$rect) {
+            $img = $img->crop( %$rect );
+        };
+        # Resize image to width/height
+        if( scalar keys %$target) {
+            my %args;
+            $args{ ypixels } = $target->{ height }
+                if $target->{height};
+            $args{ xpixels } = $target->{ width }
+                if $target->{width};
+            $args{ scalefactor } = $target->{ scalex } || $target->{scaley};
+            $img = $img->scale( %args );
+        };
+        return Future->done( $img )
     });
 };
 
 
-sub content_as_png {
-    my ($self, $rect) = @_;
-    $rect ||= {};
-
-    return $self->_content_as_png( $self, $rect )->get;
+sub content_as_png($self, $rect={}, $target={}) {
+    my $img = $self->_content_as_png( $rect, $target )->get;
+    return $self->_as_raw_png( $img );
 };
 
 =head2 C<< $mech->viewport_size >>
@@ -3018,9 +3142,21 @@ sub render_element {
     my $cliprect = $self->element_coordinates( $element );
     my $res = Future->wait_all(
         #$self->driver->send_message('Emulation.setVisibleSize', width => int $cliprect->{width}, height => int $cliprect->{height} ),
-        $self->driver->send_message('Emulation.forceViewport', 'y' => int $cliprect->{top}, 'x' => int $cliprect->{left}, scale => 1.0 ),
+        $self->driver->send_message(
+            'Emulation.forceViewport',
+            'y' => int $cliprect->{top},
+            'x' => int $cliprect->{left},
+            scale => 1.0
+        ),
     )->then(sub {
-        $self->_content_as_png()
+        $self->_content_as_png()->then( sub( $img ) {
+            my $element = $img->crop(
+                left => 0,
+                top => 0,
+                width => $cliprect->{width},
+                height => $cliprect->{height});
+            Future->done( $self->_as_raw_png( $element ));
+        })
     })->get;
 
     Future->wait_all(
@@ -3160,6 +3296,86 @@ sub report_js_errors
     Carp::carp("javascript error: @errors") ;
 }
 
+=head1 DEBUGGING METHODS
+
+This module can collect the screencasts that Chrome can produce. The screencasts
+are sent to your callback which either feeds them to C<ffmpeg> to create a video
+out of them or dumps them to disk as sequential images.
+
+  sub saveFrame {
+      my( $mech, $framePNG ) = @_;
+      # just ignore this frame
+  }
+
+  $mech->setScreenFrameCallback( \&saveFrame );
+  ... do stuff ...
+  $mech->setScreenFrameCallback( undef ); # stop recording
+
+=cut
+
+sub _handleScreencastFrame( $self, $frame ) {
+    # Meh, this one doesn't get a response I guess. So, not ->send_message, just
+    # send a JSON packet to acknowledge the frame
+    my $ack;
+    $ack = $self->driver->send_message(
+        'Page.screencastFrameAck',
+        sessionId => 0+$frame->{params}->{sessionId} )->then(sub {
+            $self->log('trace', 'Screencast frame acknowledged');
+            $frame->{params}->{data} = decode_base64( $frame->{params}->{data} );
+            $self->{ screenFrameCallback }->( $self, $frame->{params} );
+            # forget ourselves
+            undef $ack;
+    });
+}
+
+sub setScreenFrameCallback( $self, $callback, %options ) {
+    $self->{ screenFrameCallback } = $callback;
+
+    $options{ format } ||= 'png';
+    $options{ everyNthFrame } ||= 1;
+
+    my $action;
+    my $s = $self;
+    weaken $s;
+    if( $callback ) {
+        $self->{ screenFrameCallbackCollector } = sub( $frame ) {
+            $s->_handleScreencastFrame( $frame );
+        };
+        $self->{ screenCastFrameListener } =
+            $self->add_listener('Page.screencastFrame', $self->{ screenFrameCallbackCollector });
+        $action = $self->driver->send_message(
+            'Page.startScreencast',
+            format => $options{ format },
+            everyNthFrame => 0+$options{ everyNthFrame }
+        );
+    } else {
+        $action = $self->driver->send_message('Page.stopScreencast')->then( sub {
+            # well, actually, we should only reset this after we're sure that
+            # the last frame has been processed. Maybe we should send ourselves
+            # a fake event for that, or maybe Chrome tells us
+            delete $self->{ screenCastFrameListener };
+            Future->done(1);
+        });
+    }
+    $action->get
+}
+
+=head2 C<< $mech->sleep >>
+
+  $mech->sleep( 2 ); # wait for things to settle down
+
+Suspends the progress of the program while still handling messages from
+Chrome.
+
+The main use of this method is to give Chrome enough time to send all its
+screencast frames and to catch up before shutting down the connection.
+
+=cut
+
+sub sleep( $self, $seconds ) {
+    $self->driver->sleep( $seconds )->get;
+}
+
 package WWW::Mechanize::Chrome::Node;
 use strict;
 use Moo 2;
@@ -3168,7 +3384,7 @@ no warnings 'experimental::signatures';
 use feature 'signatures';
 
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.04';
 
 has 'attributes' => (
     is => 'lazy',
@@ -3211,6 +3427,14 @@ sub get_attribute( $self, $attribute ) {
         $html =~ s!\A<[^>]+>!!;
         $html =~ s!<[^>]+>\z!!;
         return $html
+
+    } elsif( $attribute eq 'innerHTML' ) {
+        my $html = $self->driver->send_message('DOM.getOuterHTML', nodeId => 0+$self->nodeId )->get->{outerHTML};
+
+        # Strip first and last tag in a not so elegant way
+        $html =~ s!\A<[^>]+>!!;
+        $html =~ s!<[^>]+>\z!!;
+        return $html
     } else {
 
         return $self->attributes->{ $attribute }
@@ -3218,7 +3442,9 @@ sub get_attribute( $self, $attribute ) {
 }
 
 sub get_tag_name( $self ) {
-    $self->nodeName
+    my $tag = $self->nodeName;
+    $tag =~ s!\..*!!; # strip away the eventual classname
+    $tag
 }
 
 sub get_text( $self ) {
@@ -3311,11 +3537,19 @@ Selenium does not support POST requests
 
 =head1 INSTALLING
 
-=head2 Install the C<Chrome> executable
+=head2 Install the C<chrome> executable
 
 Test it has been installed on your system:
 
+On unixish systems, the executable is named C<chrome-browser>. Check
+that Chrome starts:
+
 C<< chrome-browser --version >>
+
+On Windows, the executable is named C<chrome.exe> and doesn't output
+information to the console. Check that Chrome starts:
+
+C<< chrome >>
 
 =head1 SEE ALSO
 
@@ -3324,6 +3558,10 @@ C<< chrome-browser --version >>
 =item *
 
 L<https://developer.chrome.com/devtools/docs/debugging-clients> - the Chrome DevTools homepage
+
+=item *
+
+L<https://github.com/GoogleChrome/lighthouse> - Google Lighthouse, the main client
 
 =item *
 
@@ -3351,7 +3589,8 @@ L<https://perlmonks.org/>.
 
 =head1 TALKS
 
-I've given no talks about this module yet at Perl conferences.
+I've given a German talk at GPW 2017, see L<http://act.yapc.eu/gpw2017/talk/7027>
+and L<https://corion.net/talks> for the slides.
 
 =head1 BUG TRACKER
 

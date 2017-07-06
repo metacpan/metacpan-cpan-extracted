@@ -44,7 +44,8 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Fatal' => '0',
-                                   'Test::More' => '0.94'
+                                   'Test::More' => '0.94',
+                                   'Test::Warnings' => '0'
                                  }
                  }
      };

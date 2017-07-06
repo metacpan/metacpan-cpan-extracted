@@ -2,7 +2,7 @@
 #
 #  DESCRIPTION:  Set of  service subs
 #
-#       AUTHOR:  Aliaksandr P. Zahatski, <zahatski@gmail.com>
+#       AUTHOR:  Aliaksandr P. Zahatski, <zag@cpan.org>
 #===============================================================================
 package WebDAO::Util;
 use strict;
@@ -10,7 +10,7 @@ use warnings;
 use Carp;
 use WebDAO::Engine;
 use WebDAO::Session;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head2  load_module <package>
 
@@ -60,7 +60,7 @@ to hash:
 sub _parse_str_to_hash {
     my $str = shift;
     return unless $str;
-    my %hash = map { split( /=/, $_ ) } split( /;/, $str );
+    my %hash = map { split( /=/, $_ ) } split( /\s*;\s*/, $str );
     foreach ( values %hash ) {
         s/^\s+//;
         s/\s+^//;
@@ -117,6 +117,56 @@ sub get_classes {
 
     \%defaults;
    
+}
+
+=head2  expire_calc <time shift str>
+
+Calculate time from str
+
+ expire_calc('+1d') # current time() + 1 day
+ expire_calc('+1y') # current time() + 1 year
+ expire_calc('+1M') # current time() + 1 Month
+ expire_calc('+1m') # current time() + 1 minute
+
+return :  <unix_timestamp>
+
+=cut
+
+# This internal routine creates an expires time exactly some number of
+# hours from the current time.  It incorporates modifications from 
+# Mark Fisher
+
+sub expire_calc {
+    my($time) = @_;
+    my(%mult) = ('s'=>1,
+                 'm'=>60,
+                 'h'=>60*60,
+                 'd'=>60*60*24,
+                 'M'=>60*60*24*30,
+                 'y'=>60*60*24*365);
+    # format for time can be in any of the forms...
+    # "now" -- expire immediately
+    # "+180s" -- in 180 seconds
+    # "+2m" -- in 2 minutes
+    # "+12h" -- in 12 hours
+    # "+1d"  -- in 1 day
+    # "+3M"  -- in 3 months
+    # "+2y"  -- in 2 years
+    # "-3m"  -- 3 minutes ago(!)
+    # If you don't supply one of these forms, we assume you are
+    # specifying the date yourself
+    my($offset);
+    if (!$time || (lc($time) eq 'now')) {
+      $offset = 0;
+    } elsif ($time=~/^\d+/) {
+      return $time;
+    } elsif ($time=~/^([+-]?(?:\d+|\d*\.\d*))([smhdMy])/) {
+      $offset = ($mult{$2} || 1)*$1;
+    } else {
+      return $time;
+    }
+    my $cur_time = time; 
+    return ($cur_time+$offset);
 }
 
 

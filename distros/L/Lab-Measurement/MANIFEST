@@ -2,6 +2,8 @@
 COPYING
 COPYING.Artistic
 COPYING.GPL-2
+Changes
+HACKING
 MANIFEST
 MANIFEST.SKIP
 META.json
@@ -148,7 +150,6 @@ lib/Lab/Instrument/Yokogawa7651.pm
 lib/Lab/Instrument/YokogawaGS200.pm
 lib/Lab/Measurement.pm
 lib/Lab/Measurement/Backends.pod
-lib/Lab/Measurement/Changes.pod
 lib/Lab/Measurement/Developer/Write-A-Source-Driver.pod
 lib/Lab/Measurement/Installation.pod
 lib/Lab/Measurement/KeyboardHandling.pm
@@ -267,6 +268,7 @@ t/XPRESS/Sweep-Voltage.yml
 t/pod.t
 'utilities/labview/LV Socket Com.txt'
 'utilities/labview/LV Socket Com.vi'
+weaver.ini
 xt/critic/lib.t
 xt/critic/moose.t
 xt/critic/tests.t

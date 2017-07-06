@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150005'
 keywords:
   - aggregate
   - aggregator
@@ -27,37 +27,27 @@ name: Perlanet
 provides:
   Perlanet:
     file: lib/Perlanet.pm
-    version: '0.58'
+    version: v1.1.0
   Perlanet::Entry:
     file: lib/Perlanet/Entry.pm
-    version: '0.58'
   Perlanet::Feed:
     file: lib/Perlanet/Feed.pm
-    version: '0.58'
   Perlanet::Simple:
     file: lib/Perlanet/Simple.pm
-    version: '0.58'
   Perlanet::Trait::Cache:
     file: lib/Perlanet/Trait/Cache.pm
-    version: '0.58'
   Perlanet::Trait::FeedFile:
     file: lib/Perlanet/Trait/FeedFile.pm
-    version: '0.58'
   Perlanet::Trait::OPML:
     file: lib/Perlanet/Trait/OPML.pm
-    version: '0.58'
   Perlanet::Trait::Scrubber:
     file: lib/Perlanet/Trait/Scrubber.pm
-    version: '0.58'
   Perlanet::Trait::TemplateToolkit:
     file: lib/Perlanet/Trait/TemplateToolkit.pm
-    version: '0.58'
   Perlanet::Trait::Tidy:
     file: lib/Perlanet/Trait/Tidy.pm
-    version: '0.58'
   Perlanet::Trait::YAMLConfig:
     file: lib/Perlanet/Trait/YAMLConfig.pm
-    version: '0.58'
 recommends:
   CHI: '0'
   Compress::Zlib: '0'
@@ -84,4 +74,5 @@ resources:
   homepage: http://code.mag-sol.com/Perlanet/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/perlanet.git
-version: '0.58'
+version: v1.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

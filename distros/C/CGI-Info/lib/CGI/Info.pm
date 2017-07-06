@@ -18,11 +18,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.62
+Version 0.63
 
 =cut
 
-our $VERSION = '0.62';
+our $VERSION = '0.63';
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,10 @@ Takes optional parameter logger, an object which is used for warnings
 Takes optional parameter cache, an object which is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a L<CHI> object.
+
+Takes optional parameter max_upload, which is the maximum file size you can upload
+(-1 for no limit), the default is 512MB.
+
 =cut
 
 our $stdin_data;	# Class variable storing STDIN in case the class
@@ -79,6 +83,7 @@ sub new {
 		_allow => $args{allow} ? $args{allow} : undef,
 		_expect => $args{expect} ? $args{expect} : undef,
 		_upload_dir => $args{upload_dir} ? $args{upload_dir} : undef,
+		_max_upload_size => $args{max_upload_size} || 512 * 1024,
 		_logger => $args{logger},
 		_syslog => $args{syslog},
 		_cache => $args{cache},	# e.g. CHI
@@ -447,7 +452,7 @@ CGI::Info will put the request into the params element 'XML', thus:
 	use CGI::Info;
 	...
 	my $info = CGI::Info->new();
-	my $paramsref = $info->params();
+	my $paramsref = $info->params();	# See BUGS below
 	my $xml = $$paramsref{'XML'};
 	# ... parse and process the XML request in $xml
 
@@ -532,7 +537,7 @@ sub params {
 			return;
 		}
 		my $content_length = $ENV{'CONTENT_LENGTH'};
-		if($content_length > 512 * 1042) {	# Set maximum posts
+		if(($self->{_max_upload_size} >= 0) && ($content_length > $self->{_max_upload_size})) {	# Set maximum posts
 			# TODO: Design a way to tell the caller to send HTTP
 			# status 413
 			$self->{_status} = 413;
@@ -645,8 +650,10 @@ sub params {
 				warning => "POST: Invalid or unsupported content type: $content_type: $buffer",
 			});
 		}
-	} elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
-		return;
+	# } elsif($ENV{'REQUEST_METHOD'} eq 'OPTIONS') {
+		# return;
+	# } elsif($ENV{'REQUEST_METHOD'} eq 'DELETE') {
+		# return;
 	} else {
 		# TODO: Design a way to tell the caller to send HTTP
 		# status 405
@@ -725,14 +732,14 @@ sub params {
 						$self->{_logger}->warn("SQL injection attempt blocked for '$value'");
 					}
 				}
-				next;
+				return;
 			}
 			if(($value =~ /((\%3C)|<)((\%2F)|\/)*[a-z0-9\%]+((\%3E)|>)/ix) ||
 			   ($value =~ /((\%3C)|<)[^\n]+((\%3E)|>)/i)) {
 				if($self->{_logger}) {
 					$self->{_logger}->warn("XSS injection attempt blocked for '$value'");
 				}
-				next;
+				return;
 			}
 		}
 		if(length($value) > 0) {
@@ -987,8 +994,7 @@ sub is_mobile {
 		return 1;
 	}
 
-	if($ENV{'HTTP_USER_AGENT'}) {
-		my $agent = $ENV{'HTTP_USER_AGENT'};
+	if(my $agent = $ENV{'HTTP_USER_AGENT'}) {
 		if($agent =~ /.+(Android|iPhone).+/) {
 			$self->{_is_mobile} = 1;
 			return 1;
@@ -1080,6 +1086,9 @@ sub as_string {
 		} else {
 			$rc = "$_=$value";
 		}
+	}
+	if($rc && $self->{_logger}) {
+		$self->{_logger}->debug("is_string: returning '$rc'");
 	}
 
 	return defined($rc) ? $rc : '';
@@ -1300,7 +1309,7 @@ sub is_robot {
 			# Mine
 			'http://www.seokicks.de/robot.html',
 		);
-		if(grep(/^$referrer/, @crawler_lists)) {
+		if(($referrer =~ /\)/) || (grep(/^$referrer/, @crawler_lists))) {
 			if($self->{_logger}) {
 				$self->{_logger}->debug("is_robot: blocked trawler $referrer");
 			}
@@ -1357,8 +1366,7 @@ Is the visitor a search engine?
 
     use CGI::Info;
 
-    my $info = CGI::Info->new();
-    if($info->is_search_engine()) {
+    if(CGI::Info->new()->is_search_engine()) {
 	# display generic information about yourself
     } else {
 	# allow the user to pick and choose something to display
@@ -1486,10 +1494,10 @@ Deprecated - use cookie() instead.
 
 	use CGI::Info;
 
-	my $info = CGI::Info->new();
-	my $name = $info->get_cookie(cookie_name => 'name');
+	my $i = CGI::Info->new();
+	my $name = $i->get_cookie(cookie_name => 'name');
 	print "Your name is $name\n";
-	my $address = $info->get_cookie('address');
+	my $address = $i->get_cookie('address');
 	print "Your address is $address\n";
 =cut
 
@@ -1538,8 +1546,7 @@ API is the same as "param", it will replace the "get_cookie" method in the futur
 
 	use CGI::Info;
 
-	my $info = CGI::Info->new();
-	my $name = $info->get_cookie(name);
+	my $name = CGI::Info->new()->get_cookie(name);
 	print "Your name is $name\n";
 =cut
 
@@ -1629,6 +1636,11 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+params() returns a ref which means that calling routines can change the hash
+for other routines.
+Take a local copy before making amendments to the table if you don't want unexpected
+things to happen.
+
 =head1 SEE ALSO
 
 L<HTTP::BrowserDetect>
@@ -1638,7 +1650,6 @@ L<HTTP::BrowserDetect>
 You can find documentation for this module with the perldoc command.
 
     perldoc CGI::Info
-
 
 You can also look for information at:
 
@@ -1662,16 +1673,12 @@ L<http://search.cpan.org/dist/CGI-Info/>
 
 =back
 
-
-
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Nigel Horne.
+Copyright 2010-2017 Nigel Horne.
 
 This program is released under the following licence: GPL
 
-
 =cut
 
-1; # End of CGI::Info
+1;

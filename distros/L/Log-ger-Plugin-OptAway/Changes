@@ -1,0 +1,20 @@
+0.003   2017-06-23 (PERLANCAR)
+
+	- Adjust to Log::ger 0.005.
+
+
+0.003    2017-06-23 (PERLANCAR) (unreleased)
+
+         - Rename dist from Log-ger-OptAway to Log-ger-Plugin-OptAway.
+
+         - Adjust to Log::ger 0.005.
+
+
+0.002    2017-06-21 (PERLANCAR)
+
+         - Adjust to Log::ger 0.002.
+
+
+0.001    2017-06-19 (PERLANCAR)
+
+         - First release.

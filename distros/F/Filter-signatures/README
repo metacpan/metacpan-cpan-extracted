@@ -1,111 +1,55 @@
 NAME
 
-    Filter::signatures - very simplicistic signatures for Perl < 5.20
+Filter::signatures - very simplicistic signatures for Perl < 5.20
 
-SYNOPSIS
+DESCRIPTION
 
-        use Filter::signatures;
-        no warnings 'experimental::signatures'; # does not raise an error
-        use feature 'signatures'; # this now works on <5.16 as well
-    
-        sub hello( $name ) {
-            print "Hello $name\n";
-        }
-    
-        hello("World");
-    
-        sub hello2( $name="world" ) {
-            print "Hello $name\n";
-        }
-        hello2(); # Hello world
+This module implements a backwards compatibility shim for formal Perl subroutine
+signatures that were introduced to the Perl core with Perl 5.20.
 
-CAVEATS
 
-    This implements a very simplicistic transform to allow for using very
-    simplicistic named formal arguments in subroutine declarations. This
-    module does not implement warning if more parameters than expected are
-    passed in.
+INSTALLATION
 
-    The module also implements default values for unnamed parameters by
-    splitting the formal parameters on /,/ and assigning the values if @_
-    contains fewer elements than expected. Function calls as default values
-    may work by accident. Commas within default values happen to work due
-    to the design of Filter::Simple, which removes them for the application
-    of this filter.
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    Note that this module inherits all the bugs of Filter::Simple and
-    potentially adds some of its own. Most notable is that Filter::Simple
-    sometimes will misinterpret the division operator / as a leading
-    character to starting a regex match:
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-        my $wait_time = $needed / $supply;
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-    This will manifest itself through syntax errors appearing where
-    everything seems in order. The hotfix is to add a comment to the code
-    that "closes" the misinterpreted regular expression:
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-        my $wait_time = $needed / $supply; # / for Filter::Simple
-
-    A better hotfix is to upgrade to Perl 5.20 or higher and use the native
-    signatures support there. No other code change is needed, as this
-    module will disable its functionality when it is run on a Perl
-    supporting signatures.
-
- eval
-
-    It seems that Filter::Simple does not trigger when using code such as
-
-      eval <<'PERL';
-          use Filter::signatures;
-          use feature 'signatures';
-    
-          sub foo (...) {
-          }
-      PERL
-
-    So, creating subroutines with signatures from strings won't work with
-    this module. The workaround is to upgrade to Perl 5.20 or higher.
-
-ENVIRONMENT
-
-    If you want to force the use of this module even under versions of Perl
-    that have native support for signatures, set
-    $ENV{FORCE_FILTER_SIGNATURES} to a true value before the module is
-    imported.
-
-SEE ALSO
-
-    "Signatures" in perlsub
-
-    signatures - a module that doesn't use a source filter but optree
-    modification instead
-
-    Sub::Signatures
 
 REPOSITORY
 
-    The public repository of this module is
-    http://github.com/Corion/filter-signatures.
+The public repository of this module is
+L<http://github.com/Corion/filter-signatures>.
 
 SUPPORT
 
-    The public support forum of this module is https://perlmonks.org/.
+The public support forum of this module is
+L<https://perlmonks.org/>.
 
 BUG TRACKER
 
-    Please report bugs in this module via the RT CPAN bug queue at
-    https://rt.cpan.org/Public/Dist/Display.html?Name=Filter-signatures or
-    via mail to filter-signatures-Bugs@rt.cpan.org.
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Filter-signatures>
+or via mail to L<filter-signatures-Bugs@rt.cpan.org>.
 
 AUTHOR
 
-    Max Maischein corion@cpan.org
-
-COPYRIGHT (c)
-
-    Copyright 2015-2016 by Max Maischein corion@cpan.org.
+Max Maischein C<corion@cpan.org>
 
 LICENSE
 
-    This module is released under the same terms as Perl itself.
+This module is released under the same terms as Perl itself.
 
+COPYRIGHT (c)
+
+Copyright 2015-2016 by Max Maischein C<corion@cpan.org>.

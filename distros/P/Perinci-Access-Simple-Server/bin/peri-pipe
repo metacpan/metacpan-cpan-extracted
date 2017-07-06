@@ -1,14 +1,16 @@
 #!perl
 
-use 5.010;
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.25'; # VERSION
+
+use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.24'; # VERSION
+use Log::ger::LevelFromEnv;
+use Log::ger::Output 'Screen';
 
 require Perinci::Access::Simple::Server::Pipe;
-require Log::Any::App;
-Log::Any::App::init();
 
 Perinci::Access::Simple::Server::Pipe->new->run;
 
@@ -28,7 +30,7 @@ peri-pipe - Default Riap::Simple server over pipe
 
 =head1 VERSION
 
-This document describes version 0.24 of peri-pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2016-03-16.
+This document describes version 0.25 of peri-pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -64,7 +66,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

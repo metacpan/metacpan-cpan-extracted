@@ -2,7 +2,7 @@ package # hidden from PAUSE indexer
 Test::Expr;
 our $VERSION = '0.000001';
 
-use 5.014; use warnings; use autodie;
+use 5.012; use warnings; use autodie;
 use Keyword::Declare;
 use Test::More;
 use Data::Dump;

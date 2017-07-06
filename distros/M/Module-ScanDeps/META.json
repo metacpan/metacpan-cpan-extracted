@@ -4,7 +4,7 @@
       "Audrey Tang <cpan@audreyt.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -58,8 +58,9 @@
          "type" : "git",
          "url" : "git://github.com/rschupp/Module-ScanDeps.git",
          "web" : "https://github.com/rschupp/Module-ScanDeps"
-      }
+      },
+      "x_MailingList" : "par@perl.org"
    },
-   "version" : "1.23",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.24",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

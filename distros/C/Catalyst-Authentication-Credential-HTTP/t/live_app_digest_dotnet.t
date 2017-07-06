@@ -1,29 +1,18 @@
-#!/usr/bin/perl
 use strict;
 use warnings;
 use FindBin qw/$Bin/;
 use lib "$Bin/lib";
 use Test::More;
-BEGIN {
-    do {
-        eval { require Test::WWW::Mechanize::Catalyst }
-        and
-        Test::WWW::Mechanize::Catalyst->VERSION('0.51')
-    }
-      or plan skip_all =>
-      "Test::WWW::Mechanize::Catalyst is needed for this test";
-    eval { require Catalyst::Plugin::Cache }
-      or plan skip_all =>
-      "Catalyst::Plugin::Cache is needed for this test";
-    eval { require Cache::FileCache }
-      or plan skip_all =>
-      "Cache::FileCache is needed for this test";
-    plan tests => 19;
-}
+use Test::Needs {
+    'Test::WWW::Mechanize::Catalyst' => '0.51',
+    'Catalyst::Plugin::Cache' => '0',
+    'Cache::FileCache' => undef,
+};
+
+plan tests => 19;
+
 use Digest::MD5;
 use HTTP::Request;
-use Test::More;
-use Test::WWW::Mechanize::Catalyst;
 
 sub do_test {
     my ($username, $uri, $emulate_dotnet, $fail) = @_;

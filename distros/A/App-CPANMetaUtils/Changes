@@ -1,3 +1,10 @@
+0.009   2017-06-26 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Forgot to use DZP:InsertExecsList.
+
+
 0.008   2017-03-04 (PERLANCAR)
 
 	- No functional changes.

@@ -1,5 +1,8 @@
 Revision history for Perl module Net::Whois::Raw.
 
+2.99009  Jun 24 2017 Gregory Oschwald
+    - Do not warn if newsrv is undefined 
+
 2.99008  Jun 7 2017 Alexander Nalobin
     - can bypass recursing to custom servers ($Net::Whois::Raw::Data::whois_servers_no_recurse)
 

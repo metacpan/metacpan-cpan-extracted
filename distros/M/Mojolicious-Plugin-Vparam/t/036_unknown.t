@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests => 14;
+use Test::More tests => 16;
 use Encode qw(decode encode);
 
 
@@ -39,10 +39,15 @@ note 'unknown';
         is $self->verror('unknown1'), 'Value is not defined',
             'unknown1 int is in erros';
 
-        is $self->vparam( unknown2 => 'bool' ),  undef,
-            'unknown2 undefined';
+        is $self->vparam( unknown2 => 'bool' ),  0,
+            'unknown2 0';
         is $self->verror('unknown2'), 0,
             'unknown2 bool not in erros';
+
+        is $self->vparam( unknown_logic => 'logic' ),  undef,
+            'unknown logic undefined';
+        is $self->verror('unknown_logic'), 'Value is not defined',
+            'unknown logic in erros';
 
         is $self->vparam( unknown3 => 'str' ),  undef,
             'unknown3 undefined';

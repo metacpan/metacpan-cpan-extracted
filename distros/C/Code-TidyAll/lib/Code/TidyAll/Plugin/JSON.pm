@@ -7,7 +7,7 @@ use JSON::MaybeXS ();
 
 use Moo;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 extends 'Code::TidyAll::Plugin';
 
@@ -46,7 +46,7 @@ documents with tidyall
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 

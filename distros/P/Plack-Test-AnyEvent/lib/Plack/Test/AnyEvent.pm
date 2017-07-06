@@ -1,6 +1,6 @@
 ## no critic (RequireUseStrict)
 package Plack::Test::AnyEvent;
-$Plack::Test::AnyEvent::VERSION = '0.06';
+$Plack::Test::AnyEvent::VERSION = '0.07';
 ## use critic (RequireUseStrict)
 use strict;
 use warnings;
@@ -159,7 +159,7 @@ Plack::Test::AnyEvent - Run Plack::Test on AnyEvent-based PSGI applications
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -330,7 +330,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/hoelzro/plack-test-anyevent/issues
+L<https://github.com/hoelzro/plack-test-anyevent/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

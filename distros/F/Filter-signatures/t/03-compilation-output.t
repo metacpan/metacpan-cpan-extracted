@@ -115,4 +115,6 @@ is $_, <<'RESULT', "RT #xxxxxx Single-line functions work";
 sub foo { my ($bar,$baz)=@_; print "Yey\n"; }
 RESULT
 
-done_testing;
+if( $Test::More::VERSION > 0.87 ) { # 5.8.x compatibility
+    done_testing();
+};

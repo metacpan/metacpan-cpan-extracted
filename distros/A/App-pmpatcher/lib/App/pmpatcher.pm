@@ -1,12 +1,12 @@
 package App::pmpatcher;
 
-our $DATE = '2016-11-27'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use IPC::System::Options qw(system);
 use String::ShellQuote;
@@ -25,7 +25,7 @@ my `patches` directory:
     pm-OrePAN-Archive-0.08-support_no_index_file.patch
     pm-Pod-Elemental-PerlMunger-0.200002-DATA_encoding_fix.patch
 
-These patches might be pending merge by the module maintainer, or of private
+These patches might be pending merge by the module maintainer, or are of private
 nature so might never be merged, or of any other nature. Applying module patches
 to an installation is a lightweight alternative to creating a fork for each of
 these modules.
@@ -49,6 +49,7 @@ Then, to apply all the patches, you just call:
 
 Example result:
 
+    % pmpatcher
     +--------------------------------------------------------------+--------+---------+
     | item_id                                                      | status | message |
     +--------------------------------------------------------------+--------+---------+
@@ -99,7 +100,7 @@ sub pmpatcher {
         or return [400, "Please specify patches_dir"];
     $patches_dir =~ s!/\z!!; # convenience
 
-    $log->tracef("Opening patches_dir '%s' ...", $patches_dir);
+    log_trace("Opening patches_dir '%s' ...", $patches_dir);
     opendir my($dh), $patches_dir
         or return [500, "Can't open patches_dir '$patches_dir': $!"];
 
@@ -108,14 +109,14 @@ sub pmpatcher {
   FILE:
     for my $fname (sort readdir $dh) {
         next if $fname eq '.' || $fname eq '..';
-        $log->tracef("Considering file '%s' ...", $fname);
+        log_trace("Considering file '%s' ...", $fname);
         unless ($fname =~ /\A
                            pm-
                            (\w+(?:-\w+)*)-
                            ([0-9][0-9._]*)-
                            ([^.]+)
                            \.patch\z/x) {
-            $log->tracef("Skipped file '%s' (doesn't match pattern)", $fname);
+            log_trace("Skipped file '%s' (doesn't match pattern)", $fname);
             next FILE;
         }
         my ($mod0, $ver, $topic) = ($1, $2, $3);
@@ -124,14 +125,14 @@ sub pmpatcher {
 
         my $mod_path = Module::Path::More::module_path(module=>$mod_pm);
         unless ($mod_path) {
-            $log->infof("Skipping patch '%s' (module %s not installed)",
+            log_info("Skipping patch '%s' (module %s not installed)",
                         $fname, $mod);
             next FILE;
         }
-        my $mod_dir = $mod_path; $mod_dir =~ s!(.+)[/\\].+!$1!;
+        (my $mod_dir = $mod_path) =~ s!(.+)[/\\].+!$1!;
 
         open my($fh), "<", "$patches_dir/$fname" or do {
-            $log->errorf("Skipping patch '%s' (can't open file: %s)",
+            log_error("Skipping patch '%s' (can't open file: %s)",
                          $fname, $!);
             $envres->add_result(500, "Can't open: $!", {item_id=>$fname});
             next FILE;
@@ -149,7 +150,7 @@ sub pmpatcher {
         );
 
         if ($?) {
-            $log->errorf("Skipping patch '%s' (can't patch(1) to detect applied: %s)",
+            log_error("Skipping patch '%s' (can't patch(1) to detect applied: %s)",
                          $fname, $?);
             $envres->add_result(
                 500, "Can't patch(1) to detect applied: $?", {item_id=>$fname});
@@ -163,7 +164,7 @@ sub pmpatcher {
 
         if ($args{reverse}) {
             if (!$already_applied) {
-                $log->infof("Skipping patch '%s' (already reversed)", $fname);
+                log_info("Skipping patch '%s' (already reversed)", $fname);
                 $envres->add_result(
                     304, "Already reversed", {item_id=>$fname});
                 next FILE;
@@ -182,7 +183,7 @@ sub pmpatcher {
                      ),
                 );
                 if ($?) {
-                    $log->errorf("Skipping patch '%s' (can't patch(2b) to reverse-apply: %s)",
+                    log_error("Skipping patch '%s' (can't patch(2b) to reverse-apply: %s)",
                                  $fname, $?);
                     $envres->add_result(
                         500, "Can't patch(2b) to reverse-apply: $?", {item_id=>$fname});
@@ -191,7 +192,7 @@ sub pmpatcher {
             }
         } else {
             if ($already_applied) {
-                $log->infof("Skipping patch '%s' (already applied)", $fname);
+                log_info("Skipping patch '%s' (already applied)", $fname);
                 $envres->add_result(
                     304, "Already applied", {item_id=>$fname});
                 next FILE;
@@ -210,7 +211,7 @@ sub pmpatcher {
                      ),
                 );
                 if ($?) {
-                    $log->errorf("Skipping patch '%s' (can't patch(2) to apply: %s)",
+                    log_error("Skipping patch '%s' (can't patch(2) to apply: %s)",
                                  $fname, $?);
                     $envres->add_result(
                         500, "Can't patch(2) to apply: $?", {item_id=>$fname});
@@ -246,7 +247,7 @@ App::pmpatcher - Apply a set of module patches on your Perl installation
 
 =head1 VERSION
 
-This document describes version 0.04 of App::pmpatcher (from Perl distribution App-pmpatcher), released on 2016-11-27.
+This document describes version 0.05 of App::pmpatcher (from Perl distribution App-pmpatcher), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -257,7 +258,11 @@ See L<pmpatcher> CLI.
 =head1 FUNCTIONS
 
 
-=head2 pmpatcher(%args) -> [status, msg, result, meta]
+=head2 pmpatcher
+
+Usage:
+
+ pmpatcher(%args) -> [status, msg, result, meta]
 
 Apply a set of module patches on your Perl installation.
 
@@ -268,7 +273,7 @@ my C<patches> directory:
  pm-OrePAN-Archive-0.08-support_no_index_file.patch
  pm-Pod-Elemental-PerlMunger-0.200002-DATA_encoding_fix.patch
 
-These patches might be pending merge by the module maintainer, or of private
+These patches might be pending merge by the module maintainer, or are of private
 nature so might never be merged, or of any other nature. Applying module patches
 to an installation is a lightweight alternative to creating a fork for each of
 these modules.
@@ -292,6 +297,7 @@ C<~/pmpatcher.conf> to save you from having to type the option repeatedly.)
 
 Example result:
 
+ % pmpatcher
  +--------------------------------------------------------------+--------+---------+
  | item_id                                                      | status | message |
  +--------------------------------------------------------------+--------+---------+
@@ -374,7 +380,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

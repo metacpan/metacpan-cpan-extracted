@@ -12,8 +12,13 @@ use Exporter::Easy (
               XGDMatrixFree
               XGBoosterCreate
               XGBoosterUpdateOneIter
+              XGBoosterBoostOneIter
               XGBoosterPredict
               XGBoosterFree
+              XGBoosterDumpModel
+              XGBoosterDumpModelEx
+              XGBoosterDumpModelWithFeatures
+              XGBoosterDumpModelExWithFeatures
               )
         ]
     ]
@@ -22,7 +27,7 @@ use AI::XGBoost::CAPI::RAW;
 use FFI::Platypus;
 use Exception::Class ( 'XGBoostException' );
 
-our $VERSION = '0.004';    # VERSION
+our $VERSION = '0.005';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost C API https://github.com/dmlc/xgboost
 
@@ -68,8 +73,37 @@ sub XGBoosterUpdateOneIter {
     return ();
 }
 
+sub XGBoosterBoostOneIter {
+    my ( $booster, $train_matrix, $gradient, $hessian ) = @_;
+    my $out_result = 0;
+    _CheckCall(
+                AI::XGBoost::CAPI::RAW::XGBoosterBoostOneIter(
+                                                        $booster, $train_matrix, $gradient, $hessian, scalar(@$gradient)
+                )
+    );
+    return ();
+}
+
+sub XGBoosterEvalOneIter {
+    my ( $booster, $iter, $matrices, $matrices_names ) = @_;
+    my $out_result                     = 0;
+    my $number_of_matrices             = scalar @$matrices;
+    my $ffi                            = FFI::Platypus->new();
+    my $array_of_opaque_matrices_names = [ map { $ffi->cast( string => "opaque", $_ ) } @$matrices_names ];
+    _CheckCall(
+                AI::XGBoost::CAPI::RAW::XGBoosterEvalOneIter(
+                                                            $booster, $iter, $matrices, $array_of_opaque_matrices_names,
+                                                            $number_of_matrices, \$out_result
+                )
+    );
+    $out_result = $ffi->cast( opaque => "opaque[$number_of_matrices]", $out_result );
+    return [ map { $ffi->cast( opaque => "string", $_ ) } @$out_result ];
+}
+
 sub XGBoosterPredict {
     my ( $booster, $data_matrix, $option_mask, $ntree_limit ) = @_;
+    $option_mask //= 0;
+    $ntree_limit //= 0;
     my $out_len    = 0;
     my $out_result = 0;
     _CheckCall(
@@ -79,6 +113,74 @@ sub XGBoosterPredict {
     );
     my $ffi = FFI::Platypus->new();
     return $ffi->cast( opaque => "float[$out_len]", $out_result );
+}
+
+sub XGBoosterDumpModel {
+    my ( $booster, $feature_map, $with_stats ) = @_;
+    $feature_map //= "";
+    $with_stats  //= 1;
+    my $out_len    = 0;
+    my $out_result = 0;
+    _CheckCall(
+           AI::XGBoost::CAPI::RAW::XGBoosterDumpModel( $booster, $feature_map, $with_stats, \$out_len, \$out_result ) );
+    my $ffi = FFI::Platypus->new();
+    $out_result = $ffi->cast( opaque => "opaque[$out_len]", $out_result );
+    return [ map { $ffi->cast( opaque => "string", $_ ) } @$out_result ];
+}
+
+sub XGBoosterDumpModelEx {
+    my ( $booster, $feature_map, $with_stats, $format ) = @_;
+    $feature_map //= "";
+    $with_stats  //= 1;
+    my $out_len    = 0;
+    my $out_result = 0;
+    _CheckCall(
+                AI::XGBoost::CAPI::RAW::XGBoosterDumpModelEx(
+                                                   $booster, $feature_map, $with_stats, $format, \$out_len, \$out_result
+                )
+    );
+    my $ffi = FFI::Platypus->new();
+    $out_result = $ffi->cast( opaque => "opaque[$out_len]", $out_result );
+    return [ map { $ffi->cast( opaque => "string", $_ ) } @$out_result ];
+}
+
+sub XGBoosterDumpModelWithFeatures {
+    my ( $booster, $feature_names, $feature_types, $with_stats ) = @_;
+    $with_stats //= 1;
+    my $out_len                       = 0;
+    my $out_result                    = 0;
+    my $ffi                           = FFI::Platypus->new();
+    my $number_of_features            = scalar @$feature_names;
+    my $array_of_opaque_feature_names = [ map { $ffi->cast( string => "opaque", $_ ) } @$feature_names ];
+    my $array_of_opaque_feature_types = [ map { $ffi->cast( string => "opaque", $_ ) } @$feature_types ];
+    _CheckCall(
+                AI::XGBoost::CAPI::RAW::XGBoosterDumpModelWithFeatures( $booster, $number_of_features,
+                                                                        $array_of_opaque_feature_names,
+                                                                        $array_of_opaque_feature_types,
+                                                                        $with_stats, \$out_len, \$out_result
+                )
+    );
+    $out_result = $ffi->cast( opaque => "opaque[$out_len]", $out_result );
+    return [ map { $ffi->cast( opaque => "string", $_ ) } @$out_result ];
+}
+
+sub XGBoosterDumpModelExWithFeatures {
+    my ( $booster, $feature_names, $feature_types, $with_stats, $format ) = @_;
+    my $out_len                       = 0;
+    my $out_result                    = 0;
+    my $ffi                           = FFI::Platypus->new();
+    my $number_of_features            = scalar @$feature_names;
+    my $array_of_opaque_feature_names = [ map { $ffi->cast( string => "opaque", $_ ) } @$feature_names ];
+    my $array_of_opaque_feature_types = [ map { $ffi->cast( string => "opaque", $_ ) } @$feature_types ];
+    _CheckCall(
+                AI::XGBoost::CAPI::RAW::XGBoosterDumpModelExWithFeatures( $booster, $number_of_features,
+                                                                          $array_of_opaque_feature_names,
+                                                                          $array_of_opaque_feature_types,
+                                                                          $with_stats, $format, \$out_len, \$out_result
+                )
+    );
+    $out_result = $ffi->cast( opaque => "opaque[$out_len]", $out_result );
+    return [ map { $ffi->cast( opaque => "string", $_ ) } @$out_result ];
 }
 
 sub XGBoosterFree {
@@ -113,7 +215,7 @@ AI::XGBoost::CAPI - Perl wrapper for XGBoost C API https://github.com/dmlc/xgboo
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -132,7 +234,7 @@ version 0.004
      XGBoosterUpdateOneIter($booster, $iter, $dtrain);
  }
  
- my $predictions = XGBoosterPredict($booster, $dtest, 0, 0);
+ my $predictions = XGBoosterPredict($booster, $dtest);
  # say join "\n", @$predictions;
  
  XGBoosterFree($booster);
@@ -248,6 +350,10 @@ training data
 
 =back
 
+=head2 XGBoosterBoostOneIter
+
+=head2 XGBoosterEvalOneIter
+
 =head2 XGBoosterPredict
 
 Make prediction based on train matrix
@@ -296,6 +402,14 @@ when the parameter is set to 0, we will use all the trees
 =back
 
 Returns an arrayref with the predictions corresponding to the rows of data matrix
+
+=head2 XGBoosterDumpModel
+
+=head2 XGBoosterDumpModelEx
+
+=head2 XGBoosterDumpModelWithFeatures
+
+=head2 XGBoosterDumpModelExWithFeatures
 
 =head2 XGBoosterFree
 

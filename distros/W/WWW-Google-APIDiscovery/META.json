@@ -40,6 +40,20 @@
          }
       }
    },
+   "provides" : {
+      "WWW::Google::APIDiscovery" : {
+         "file" : "lib/WWW/Google/APIDiscovery.pm",
+         "version" : "0.23"
+      },
+      "WWW::Google::APIDiscovery::API" : {
+         "file" : "lib/WWW/Google/APIDiscovery/API.pm",
+         "version" : "0.23"
+      },
+      "WWW::Google::APIDiscovery::API::Metadata" : {
+         "file" : "lib/WWW/Google/APIDiscovery/API/Metadata.pm",
+         "version" : "0.23"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -48,6 +62,6 @@
          "web" : "https://github.com/manwar/WWW-Google-APIDiscovery"
       }
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

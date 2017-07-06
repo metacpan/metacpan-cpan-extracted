@@ -86,4 +86,4 @@ $proc = Continual::Process::Instance->new(
     }
 );
 
-ok(!$proc->is_alive(), 'proccess is death after destrcution');
+ok(!$proc->is_alive(), 'proccess is death after destruction');

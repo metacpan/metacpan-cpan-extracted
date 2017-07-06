@@ -11,7 +11,7 @@ can_ok $person, qw/_list_request/;
 my $req = $person->_list_request("machida_pm");
 
 isa_ok $req, 'HTTP::Request';
-is $req->uri, "https://api.projectoxford.ai/face/v1.0/persongroups/machida_pm/persons";
+is $req->uri, "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/persons";
 is $req->method, 'GET';
 is $req->header('Content-Type'), 'application/json';
 is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';

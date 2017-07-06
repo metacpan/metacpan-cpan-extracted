@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::Systemd::Section::Install
 # ABSTRACT:  Configuration class Systemd::Section::Install
+
 =encoding utf8
 
 =head1 NAME
@@ -21,7 +22,7 @@ here must have the same suffix (i.e. type) as the unit file name. This option ma
 in which case all listed names are used. At installation time, systemctl enable will create
 symlinks from these names to the unit filename. Note that not all unit types support such alias names, and this
 setting is not supported for them. Specifically, mount, slice, swap, and automount units do not support
-aliasing. I<< Optional. Type list of uniline.  >> 
+aliasing. I< Optional. Type list of uniline.  > 
 
 =head2 WantedBy
 
@@ -52,7 +53,7 @@ systemctl enable getty@tty2.service
 creating a
 getty.target.wants/getty@tty2.service
 link to getty@.service.
-I<< Optional. Type uniline.  >> 
+I< Optional. Type list of uniline.  > 
 
 =head2 Also
 
@@ -65,7 +66,7 @@ install/uninstall units listed in this option as well.
 
 This option may be used more than once, or a
 space-separated list of unit names may be
-given. I<< Optional. Type uniline.  >> 
+given. I< Optional. Type list of uniline.  > 
 
 =head2 DefaultInstance
 
@@ -73,7 +74,7 @@ In template unit files, this specifies for
 which instance the unit shall be enabled if the template is
 enabled without any explicitly set instance. This option has
 no effect in non-template unit files. The specified string
-must be usable as instance identifier. I<< Optional. Type uniline.  >> 
+must be usable as instance identifier. I< Optional. Type uniline.  > 
 
 =head2 RequiredBy
 
@@ -104,7 +105,7 @@ systemctl enable getty@tty2.service
 creating a
 getty.target.wants/getty@tty2.service
 link to getty@.service.
-I<< Optional. Type uniline.  >> 
+I< Optional. Type list of uniline.  > 
 
 =head1 SEE ALSO
 

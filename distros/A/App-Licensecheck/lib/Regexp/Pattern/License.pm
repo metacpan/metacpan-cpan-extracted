@@ -11,11 +11,11 @@ Regexp::Pattern::License - Regular expressions for legal licenses
 
 =head1 VERSION
 
-Version v3.0.29
+Version v3.0.30
 
 =cut
 
-our $VERSION = version->declare("v3.0.29");
+our $VERSION = version->declare("v3.0.30");
 
 =head1 DESCRIPTION
 
@@ -45,6 +45,8 @@ Patterns each covering a single license.
 =item * apafml
 
 =item * artistic
+
+=item * artistic_2
 
 =item * beerware
 
@@ -208,12 +210,13 @@ our %RE = (
 	afl => {
 		name    => 'AFL',
 		summary => 'Academic Free License',
-		pat     => qr/$the?(?:Academic Free License(?: \(AFL\))?|AFL)/,
+		pat => qr/(?:$the?Academic Free License(?: \(AFL\))?|${the}AFL\b)/,
 	},
 	agpl => {
 		name    => 'AGPL',
 		summary => 'GNU Affero General Public License',
-		pat     => qr/$the?$gnu?(?:Affero $gpl(?: \(AGPL\))?$by_fsf?|AGPL)/,
+		pat =>
+			qr/(?:$the?$gnu?Affero $gpl(?: \(AGPL\))?$by_fsf?|(?:$the$gnu?|$gnu)AGPL)/,
 	},
 	aladdin => {
 		name    => 'Aladdin',
@@ -235,6 +238,11 @@ our %RE = (
 		name    => 'Artistic',
 		summary => 'Artistic License',
 		pat     => qr/$the?Artistic License/,
+	},
+	artistic_2 => {
+		name    => 'Artistic-2.0',
+		summary => 'Artistic License (v2.0)',
+		pat     => qr/is governed by this Artistic License\./,
 	},
 	beerware => {
 		name    => 'Beerware',
@@ -335,7 +343,7 @@ our %RE = (
 		name    => 'CDDL',
 		summary => 'Common Development and Distribution License',
 		pat =>
-			qr/$the?(?:(?:Common Development and Distribution License|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE)(?: \(CDDL\))?|CDDL)/,
+			qr/(?:$the?(?:Common Development and Distribution License|COMMON DEVELOPMENT AND DISTRIBUTION LICENSE)(?: \(CDDL\))?|${the}CDDL\b)/,
 	},
 	cecill => {
 		name    => 'CECILL',
@@ -398,7 +406,7 @@ our %RE = (
 	epl => {
 		name    => 'EPL',
 		summary => 'Eclipse Public License',
-		pat     => qr/$the?(?:Eclipse Public License(?: \(EPL\))?|EPL)/,
+		pat => qr/(?:$the?Eclipse Public License(?: \(EPL\))?|${the}EPL\b)/,
 	},
 	eurosym => {
 		name => 'Eurosym',
@@ -432,7 +440,7 @@ our %RE = (
 		name    => 'GFDL',
 		summary => 'GNU Free Documentation License',
 		pat =>
-			qr/$the?$gnu?(?:Free Documentation License(?: \(GFDL\))?$by_fsf?|GFDL)/,
+			qr/(?:$the?$gnu?Free Documentation License(?: \(GFDL\))?$by_fsf?|(?:$the$gnu?|$gnu)GFDL)/,
 	},
 	gfdl_niv => {
 		name    => 'GFDL-NIV',
@@ -440,12 +448,13 @@ our %RE = (
 		summary =>
 			'GNU Free Documentation License, with no Front-Cover or Back-Cover Texts or Invariant Sections',
 		pat =>
-			qr/$the?$gnu?(?:Free Documentation License(?: \(GFDL\))?$by_fsf?[,;]? $niv|GFDL-NIV)/,
+			qr/(?:$the?$gnu?Free Documentation License(?: \(GFDL\))?$by_fsf?[,;]? $niv|(?:$the$gnu?|$gnu)GFDL-NIV)/,
 	},
 	gpl => {
 		name    => 'GPL',
 		summary => 'The GNU General Public License',
-		pat     => qr/$the?$gnu?(?:$gpl(?: \(GPL\))?$by_fsf?|GPL)/,
+		pat =>
+			qr/(?:$the?$gnu?$gpl(?: \(GPL\))?$by_fsf?|(?:$the$gnu?|$gnu)GPL)/,
 	},
 	isc => {
 		name => 'ISC',
@@ -462,12 +471,12 @@ our %RE = (
 		name    => 'LGPL',
 		summary => 'The GNU Lesser General Public License',
 		pat =>
-			qr/$the?$gnu?(?:(?:Library|Lesser(?: \(Library\))?) $gpl(?: \(LGPL\))?$by_fsf?|LGPL)/,
+			qr/(?:$the?$gnu?(?:Library|Lesser(?: \(Library\))?) $gpl(?: \(LGPL\))?$by_fsf?|(?:$the$gnu?|$gnu)LGPL)/,
 	},
 	llgpl => {
 		name    => 'LLGPL',
 		summary => 'Lisp Lesser General Public License',
-		pat     => qr/$the?(?:Lisp Lesser $gpl(?: \(LLGPL\))?|\bLLGPL\b)/,
+		pat     => qr/(?:$the?Lisp Lesser $gpl(?: \(LLGPL\))?|${the}LLGPL\b)/,
 	},
 	libpng => {
 		name => 'Libpng',
@@ -575,19 +584,19 @@ END
 		name    => 'MPL',
 		summary => 'Mozilla Public License',
 		pat =>
-			qr/$the?(?:Mozilla Public License(?: \(\"?(?:https?:?\/\/mozilla.org\/)?MPL\"?\))?(?: (?:as )?published by $the{0,2}Mozilla Foundation)?|MPL)/,
+			qr/(?:$the?Mozilla Public License(?: \(\"?(?:https?:?\/\/mozilla.org\/)?MPL\"?\))?(?: (?:as )?published by $the{0,2}Mozilla Foundation)?|${the}MPL\b)/,
 	},
 	ms_pl => {
 		name    => 'MS-PL',
 		caption => 'Ms-PL',
 		pat =>
-			qr/$the?(?:Microsoft Permissive License(?: \(Ms-PL\))?|Ms-PL)/,
+			qr/(?:$the?Microsoft Public License(?: \(Ms-PL\))?|${the}Ms-PL\b)/,
 	},
 	ms_rl => {
 		name    => 'MS-RL',
 		caption => 'Ms-RL',
 		pat =>
-			qr/$the?(?:Microsoft Reciprocal License(?: \(Ms-RL\))?|Ms-RL)/,
+			qr/(?:$the?Microsoft Reciprocal License(?: \(Ms-RL\))?|${the}Ms-RL\b)/,
 	},
 	ntp => {
 		name => 'NTP',
@@ -631,7 +640,7 @@ END
 		name    => 'QPL',
 		summary => '$the?Q Public License',
 		pat =>
-			qr/$the?(?:Q Public License(?: \(QPL\))?$by_fsf?|QPL)/,
+			qr/(?:$the?Q Public License(?: \(QPL\))?$by_fsf?|${the}QPL\b)/,
 	},
 	rpsl => {
 		name    => 'RPSL',
@@ -643,7 +652,7 @@ END
 		name    => 'SGI-B',
 		caption => 'SGI Free Software License B',
 		pat =>
-			qr/$the?(?:SGI (?:Free Software License|FREE SOFTWARE LICENSE) B(?: \(SGI-B\))?$by_fsf?|(?:SGI )?FreeB\b|SGI-B)/,
+			qr/(?:$the?SGI (?:Free Software License|FREE SOFTWARE LICENSE) B(?: \(SGI-B\))?$by_fsf?|(?:SGI )?FreeB\b|${the}SGI-B\b)/,
 	},
 	unicode_strict => {
 		name    => 'Unicode-strict',
@@ -660,7 +669,7 @@ END
 		name    => 'WTFPL',
 		caption => 'do What The Fuck you want to Public License',
 		pat =>
-			qr/$the?(?:[Dd]o What The Fuck [Yy]ou [Ww]ant [Tt]o Public License|DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE(?: \(WTFPL\))?|WTFPL)/,
+			qr/(?:$the?[Dd]o What The Fuck [Yy]ou [Ww]ant [Tt]o Public License|DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE(?: \(WTFPL\))?|${the}WTFPL\b)/,
 	},
 	zlib => {
 		name    => 'Zlib',
@@ -837,7 +846,7 @@ $RE{'mit'} = {
 	name    => 'MIT~unspecified',
 	caption => 'MIT (unspecified)',
 	tags    => ['group'],
-	pat     => qr/$the?MIT/,
+	pat     => qr/${the}MIT\b/,
 };
 
 =encoding UTF-8

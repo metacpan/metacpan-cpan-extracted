@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,18 +15,18 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 5cdd9c62f88c915be8de8f49130e70f1ce0e4c9c COPYING.LIB
-SHA1 08dec31c0bf31ada0518860c94008c2305714756 Changes
+SHA1 01de61d8e8cebe605181d2faf87f1170341be3f0 Changes
 SHA1 3ab76d26c7e955bc300ee25d7d699a73f46dd6bc GMP.xs
 SHA1 a13106f5eaaa9cb6413e35192f5b406dfa907df4 INSTALL
 SHA1 505b15d429518390a904f67c0a16b30421b27513 LICENSE
-SHA1 b400830c3cd46eda8a4ce586c4f34035673034c7 MANIFEST
-SHA1 fc1ee524fe99f408e816ff5178966737061a5ae6 META.json
-SHA1 e946088785022a367fff2d132a7afa75d77131d9 META.yml
-SHA1 79beedacb48b1e9c4ee4c8a44b9600a6f502829a Makefile.PL
+SHA1 83a7348c77b57c6f14be63e2b212a2df191b7bd0 MANIFEST
+SHA1 b1f58d38ed72544f4211387d7d112165f7ffe806 META.json
+SHA1 b31f7ca2dccb9c42966fc3f201f3813f34e07cfd META.yml
+SHA1 36a95ba6df0b4184f85d3d658b034426a26cfd41 Makefile.PL
 SHA1 8281d135960d8d8ae696604566aa05dfdf9c01a1 README
 SHA1 10054a2739cf6ad88e47d6068e27ef2734ea9da6 dist.ini
-SHA1 93df12070df5320afd1d1cb849ad21059c8dd627 lib/Math/GMP.pm
-SHA1 a41849f77a6a62579e90afec128a54a81545c116 t/00-compile.t
+SHA1 ba3ae32c10d864d4c03e90118fc8cbf4cfe5d67f lib/Math/GMP.pm
+SHA1 7299c8683376450d58263748a0d285f32a408d2f t/00-compile.t
 SHA1 7ffc23e0289dd10bdae575f3ea8af90321471a97 t/01_gmppm.t
 SHA1 17882d8bc8733a127ef6904c8c183f107b9bf55d t/02_init_from_float.t
 SHA1 bedfa86eb4b3c2c723290db01cf05adcf7fa4d29 t/check-funcs-ret-value--rt92593.t
@@ -37,11 +37,11 @@ SHA1 46a33d87e8640e65dafb83b5e32ff5bed2e6ce73 xt/99_spellcheck.t
 SHA1 762b0b761deaff9c2821400917698ded8983cc65 xt/99_yaml.t
 SHA1 a6d8370909ec0e0755d4bd691eb81d722cf94430 xt/author/pod-coverage.t
 SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
-SHA1 be46df7b4505c457afe0c4759dc584484f4bb06b xt/release/cpan-changes.t
+SHA1 199b3d456352d36185a3f28aaf40efb0475dacab xt/release/cpan-changes.t
 SHA1 14536f057aaf4de4cce2ab99f74845a79efc7618 xt/release/trailing-space.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAliSIBIACgkQz3l/NN3wsUnJ8QCggGoUm+8TYPYLwsU5KQgixxue
-8GwAn3BZ6i727LhpGLzt7/Krd0rIg18p
-=pBnv
+iEYEARECAAYFAllPWhAACgkQz3l/NN3wsUl4EQCePwY+nf+sXGBAoSYQItlIEUYw
+QegAn3Ql7TDB/VF0D5nU69vUYKuURZsm
+=N6aD
 -----END PGP SIGNATURE-----

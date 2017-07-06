@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use LWP::UserAgent ();
 use Prty::Option;
@@ -27,13 +27,13 @@ L<Prty::Hash>
 
 =head1 DESCRIPTION
 
-Ein Objekt der Klasse repräsentiert einen Client, der über das
+Ein Objekt der Klasse repräsentiert einen Client, der über die
 L<Confluence REST API|https://docs.atlassian.com/confluence/REST/latest/> mit einem
 Confluence-Server kommunizieren kann.
 
 Die Implementierung der Klasse stellt die maßgeblichen Mechnismen
 zur Kommunikation mit dem Server zur Verfügung, realisiert
-z.Zt. jedoch nur einen kleinen Ausschnitt der Funktionalität des
+z.Zt. jedoch nur einen kleinen Ausschnitt der Funktionalität der
 Confluence REST API. Die Implementierung wird nach Bedarf
 erweitert.
 
@@ -584,7 +584,7 @@ sub url {
 
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

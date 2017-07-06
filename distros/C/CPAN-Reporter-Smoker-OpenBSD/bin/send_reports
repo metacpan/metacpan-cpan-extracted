@@ -1,0 +1,191 @@
+#!perl
+use warnings;
+use strict;
+use Test::Reporter 1.62;
+use Test::Reporter::Transport::Socket 0.32;
+use Term::ProgressBar 2.18;
+use Getopt::Long;
+use Pod::Usage 1.69;
+use Set::Tiny 0.04;
+use File::Spec;
+our $VERSION = '0.007'; # VERSION
+
+my ($help, $reports, $host, $version, $port, $GRADE);
+$help = $version = 0;
+$port = 8080;
+$host = 'localhost';
+GetOptions(
+    'help'         => \$help,
+    'host=s'       => \$host,
+    'reports:s'    => \$reports,
+    'port=i'       => \$port,
+    'grade=s'      => \&grades_handler,
+    'version'      => \$version
+) or pod2usage(1);
+
+pod2usage( -exitval => 0, -verbose => 2 ) if $help;
+
+if ($version) {
+    print "send_reports - version $VERSION\n";
+    exit(0);
+}
+
+pod2usage( -exitval => 1, -verbose => 2 ) unless(defined($reports));
+
+my $sender = Test::Reporter->new(
+    transport => 'Socket',
+    transport_args => [
+        host => $host,
+        port => $port
+    ],
+);
+my $sent_counter = 0;
+my $files_ref = read_reports($reports, $GRADE);
+my $progress = Term::ProgressBar->new( { count => scalar( @{$files_ref} ) });
+
+foreach my $report(@{$files_ref}) {
+
+    if (-z $report) {
+        warn "report $report has zero bytes lenght, skipping...\n";
+        next;
+    }
+
+    $progress->update( $sent_counter ) if ( submit( $sender, $report ) );
+}
+
+sub grades_handler {
+    my ($opt_name, $opt_value) = @_;
+    # See CPAN::Reporter for grades definitions
+    my $grades = Set::Tiny(qw(pass fail unknown na));
+    die "Invalid grade value passed as parameter: '$opt_value'" unless($grades->has($opt_value));
+    $GRADE = $opt_value;
+}
+
+sub submit {
+    my ($sender,$report) = @_;
+
+    if ( $sender->read($report)->send ) {
+        $sent_counter++;
+        unlink $report or warn "failed to remove $report: $!";
+        return 1;
+    } else {
+        die $sender->errstr();
+    }
+
+}
+
+sub read_reports {
+    my ($dir, $grade_filter) = @_;
+    opendir(my $input,$dir) or die "cannot read $dir: $!";
+    my @files;
+   
+    if ( defined($grade_filter) and ($grade_filter ne '') ) {
+        my $grade_regex = qr/^$grade_filter/;
+        print "Sending only reports with grade $grade_filter...\n";
+        while(readdir($input)) {
+            push(@files, File::Spec->catfile($dir,$_)) if ( $_ =~ $grade_regex );
+        }
+    } else {
+        while(readdir($input)) {
+            push(@files, File::Spec->catfile($dir,$_));
+        }
+        # removing "dot" files
+        shift(@files);
+        shift(@files);
+    }
+
+    close($input);
+    return \@files;
+}
+
+__END__
+
+=head1 send_reports
+
+send_reports - script to send CPAN::Reporter reports stored as files in a directory
+
+=head1 SYNOPSIS
+
+    send_reports --grade pass
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+Print a brief help message and exits.
+
+=item B<--host>
+
+The hostname to where to send the reports. Optional, defaults to localhost.
+
+=item B<--reports>
+
+The complete path to the directory where the report files are located. Required.
+
+=item B<--port>
+
+The port number to metabase-relayd server. Optional, defaults to 8080.
+
+=item B<--grade>
+
+A grade filter to decide which reports to send. See L<CPAN::Reporter> for grades definitions.
+
+Any test file that corresponds to the grade passed as parameter will be sent through the metabase-relayd server.
+
+=item B<--version>
+
+Prints this program version and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+send_reports is a Perl program to send offline CPAN Smoker tests to a L<metabase-relayd> server.
+
+You can setup your CPAN Reporter to save the files to the filesystem instead sending it through HTTP/HTTPS directly. This have some advantages:
+
+=over
+
+=item *
+
+You can review tests before actually sending them. This is useful for Smokers, for instance, when you're not yet sure if the configuration is correct.
+
+=item *
+
+You can release the smoker very quickly when submitting a report. This usually is faster than sending through HTTP/HTTPS.
+
+=item *
+
+You can selective report your tests. For instance, you might be unsure about sending tests with "unknown" grade, sou you skip than.
+
+=back
+
+This program requires that somewhere near your machine you have a L<metabase-relayd> server running. This script will use L<Test::Reporter::Transport::Socket> to
+send the reports. Reports are sent pretty quickly (depending on how busy is the metabase-relayd).
+
+=head1 AUTHOR
+
+Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 of Alceu Rodrigues de Freitas Junior, arfreitas@cpan.org
+
+This file is part of CPAN OpenBSD Smoker.
+
+CPAN OpenBSD Smoker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CPAN OpenBSD Smoker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with CPAN OpenBSD Smoker.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

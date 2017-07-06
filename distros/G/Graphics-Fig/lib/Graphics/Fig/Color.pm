@@ -15,7 +15,7 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Color;
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use strict;
 use warnings;

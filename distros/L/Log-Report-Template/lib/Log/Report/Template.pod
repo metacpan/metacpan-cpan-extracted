@@ -1,0 +1,528 @@
+=encoding utf8
+
+=head1 NAME
+
+Log::Report::Template - template toolkit with translations
+
+=head1 INHERITANCE
+
+ Log::Report::Template
+   is a Template
+
+=head1 SYNOPSIS
+
+  use Log::Report::Template;
+  my $templater = Log::Report::Template->new(%config);
+  $templater->addTextdomain(name => "Tic", lexicon => ...);
+  $templater->process('template_file.tt', \%vars);
+
+=head1 DESCRIPTION
+
+This module extends Template, which is the core of Template Toolkit.
+The main addition is support for translations via the translation
+framework offered by L<Log::Report|Log::Report>.
+
+You add translations to a template system, by adding calls to some
+translation function (by default called 'loc()') to your template text.
+That function will perform dark magic to collect the translation from
+translation tables, and fill in values.  For instance:
+
+  <div>Price: [% price %]</div>          # no translation
+  <div>[% loc("Price: {price}") %]</div> # translation optional
+
+It's quite a lot of work to make your templates translatable.
+Please read the L</DETAILS> section before you start using this module.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Log::Report::Template-E<gt>B<new>(%options)
+
+Create a new translator object.  You may pass the options as HASH or
+PAIRS.  By convension, all Template Toolkit options are in capitals.
+Read Template::Config about what they mean.  Extension options are
+all in lower-case.
+
+In a web-environment, you want to start this before your webserver starts
+forking.
+
+ -Option           --Default
+  modifiers          []
+  processing_errors  'NATIVE'
+  template_syntax    'HTML'
+
+=over 2
+
+=item modifiers => ARRAY
+
+Add a list of modifiers to the default set.  Modifiers are part of the
+formatting process, when values get inserted in the translated string.
+Read L</"Formatter value modifiers">.
+
+=item processing_errors => 'NATIVE'|'EXCEPTION'
+
+The Template toolkit infrastructure handles errors carefully: C<undef> is
+returned and you need to call L<error()|Log::Report::Template/"Template (Toolkit) base-class"> to collect it.
+
+=item template_syntax => 'UNKNOWN'|'HTML'
+
+Linked to L<String::Print::new(encode_for)|String::Print/"Constructors">: the output of the translation
+is HTML encoded.  Read L</"Translation into HTML">
+
+=back
+
+=back
+
+=head2 Attributes
+
+=over 4
+
+=item $obj-E<gt>B<formatter>()
+
+Get the C<String::Print> object which formats the messages.
+
+=back
+
+=head2 Handling text domains
+
+=over 4
+
+=item $obj-E<gt>B<addTextdomain>(%options)
+
+Create a new L<Log::Report::Template::Textdomain|Log::Report::Template::Textdomain> object.
+See its C<new()> method for the options.
+
+Additional facts about the options: you may specify C<only_in_directory>
+as a path. Those directories must be in the INCLUDE_PATH as well.
+The (domain) C<name> must be unique, and the C<function> not yet in use.
+
+example: 
+
+  my $domain = $templater->addTextdomain(
+    name     => 'my-project',
+    function => 'loc',   # default
+    lexicon  => $dir,    # location of translation tables
+  );
+
+=item $obj-E<gt>B<extract>(%options)
+
+Extract message ids from the templates, and register them to the lexicon.
+Read section L</"Extracting PO-files"> how to use this method.
+
+ -Option        --Default
+  charset         'UTF-8'
+  filename_match  qr/\.tt2?$/
+  filenames       undef
+  show_stats      <false>
+  write_tables    <true>
+
+=over 2
+
+=item charset => CHARSET
+
+=item filename_match => RegEx
+
+Process all files from the INCLUDE_PATH directories which match this
+regular expression.
+
+=item filenames => FILENAME|ARRAY
+
+By default, all filenames from the INCLUDE_PATH directories which match
+the C<filename_match> are processed, but you may explicitly create a
+subset by hand.
+
+=item show_stats => BOOLEAN
+
+Show statistics about the processing of the template files.
+
+=item write_tables => BOOLEAN
+
+When false, the po-files will not get updated.
+
+=back
+
+=back
+
+=head2 Template filters
+
+Some common activities in templates are harder when translation is
+needed.  A few TT filters are provided to easy the process.
+
+=over 4
+
+=item Filter: cols
+
+A typical example of an HTML component which needs translation is
+
+  <tr><td>Price:</td><td>20 £</td></tr>
+
+Both the price text as value need to be translated.  In plain perl
+(with Log::Report) you would write
+
+  __x"Price: {price £}", price => $product->price    # or
+  __x"Price: {p.price £}", p => $product;
+
+In HTML, there seems to be the need for two separate translations,
+may in the program code.  This module (actually L<String::Print|String::Print>)
+can be trained to convert money during translation, because '£'
+is a modifier.  The translation for Dutch (via a PO table) could be
+
+   "Prijs: {p.price €}"
+
+SO: we want to get both table fields in one translation.  Try this:
+
+  <tr>[% loc("Price:\t{p.price £}" | cols %]</tr>
+
+In the translation table, you have to place the tabs (backslash-t) as
+well.
+
+There are two main forms of C<cols>.  The first form is the containerizer:
+pass 'cols' a list of container names.  The fields in the input string
+(as separated by tabs) are wrapped in the named container.  The last
+container name will be reused for all remaining columns.  By default,
+everything is wrapped in 'td' containers.
+
+  "a\tb\tc" | cols             <td>a</td><td>b</td><td>c</td>
+  "a\tb\tc" | cols('td')       same
+  "a\tb\tc" | cols('th', 'td') <th>a</th><td>b</td><td>c</td>
+  "a"       | cols('div')      <div>a</div>
+  loc("a")  | cols('div')      <div>xxxx</div>
+
+The second form has one pattern, which contains (at least one) '$1'
+replacement positions.  Missing columns for positional parameters
+will be left blank.
+
+  "a\tb\tc" | cols('#$3#$1#')  #c#a#
+  "a"       | cols('#$3#$1#')  ##a#
+  loc("a")  | cols('#$3#$1#')  #mies#aap#
+
+=item Filter: br
+
+Some translations will produce more than one line of text.  Add
+'<br>' after each of them.
+
+  [% loc('intro-text') | br %]
+  [% | br %][% intro_text %][% END %]
+
+=back
+
+=head2 Formatter value modifiers
+
+Modifiers simplify the display of values.  Read the section about
+modifiers in L<String::Print|String::Print>.  Here, only some examples are shown.
+
+You can achieve the same transformation with TT vmethods, or with the
+perl code which drives your website.  The advantange is that you can
+translate them.  And they are quite readible.
+
+=over 4
+
+=item POSIX format C<%-10s>, C<%2.4f>, etc
+
+Exactly like format of the perl's internal C<printf()> (which is
+actually being called to do the formatting)
+
+Examples:
+
+ # pi in two decimals
+ [% loc("π = {pi %.2f}", pi => 3.14157) %]
+
+ # show int, no fraction. filesize is a template variable
+ [% loc("file size {size %d}", size => filesize + 0.5) %]
+
+=item BYTES
+
+Convert a file size into a nice human readible format.
+
+Examples:
+
+  # filesize and fn are passed as variables to the templater
+  [% loc("downloaded {size BYTES} {fn}\n", size => fs, fn => fn) %]
+  # may produce:   "  0 B", "25 MB", "1.5 GB", etc
+
+=item Time-formatting YEAR, DATE, TIME, DT
+
+Accept various time syntaxes as value, and translate them into
+standard formats: year only, date in YYYY-MM-DD, time as 'HH::MM::SS',
+and various DateTime formats:
+
+Examples:
+
+  # shows 'Copyright 2017'
+  [% loc("Copyright {today YEAR}", today => '2017-06-26') %]
+ 
+  # shows 'Created: 2017-06-26'
+  [% loc("Created: {now DATE}", now => '2017-06-26 00:24:15') %]
+  
+  # shows 'Night: 00:24:15'
+  [% loc("Night: {now TIME}", now => '2017-06-26 00:24:15') %]
+  
+  # shows 'Mon Jun 26 00:28:50 CEST 2017'
+  [% loc("Stamp: {now DT(ASC)}", now => 1498429696) %]
+
+=item Default //"string", //'string', or //word
+
+When a parameter has no value or is an empty string, the word or
+string will take its place.
+
+  [% loc("visitors: {count //0}", count => 3) %]
+  [% loc("published: {date DT//'not yet'}", date => '') %]
+  [% loc("copyright: {year//2017 YEAR}", year => '2018') %]
+  [% loc("price: {price//5 EUR}", price => product.price %]
+  [% loc("price: {price EUR//unknown}", price => 3 %]
+
+=back
+
+=head2 Template (Toolkit) base-class
+
+The details of the following functions can be found in the Template
+manual page.  They are included here for reference only.
+
+=over 4
+
+=item $obj-E<gt>B<error>()
+
+If the 'processing_errors' option is 'NATIVE' (default), you have to
+collect the error like this:
+
+ $tt->process($template_fn, $vars, ...)
+    or die $tt->error;
+
+When the 'procesing_errors' option is set to 'EXCEPTION', the error is
+translated into a L<Log::Report::Exception|Log::Report::Exception>:
+
+  use Log::Report;
+  try { $tt->process($template_fn, $vars, ...) };
+  print $@->wasFatal if $@;
+
+In the latter solution, the try() is probably only on the level of the
+highest level: the request handler which catches all kinds of serious
+errors at once.
+
+=item $obj-E<gt>B<process>( $template, [\%vars, $output, \%options] )
+
+Process the C<$template> into C<$output>, filling in the C<%vars>.
+
+=back
+
+=head1 DETAILS
+
+=head2 Textdomains
+
+This module uses standard gettext PO-translation tables via the
+L<Log::Report::Lexicon|Log::Report::Lexicon> distribution.  An important role here is
+for the 'textdomain': the name of the set of translation tables.
+
+For code, you say "use Log::Report '<textdomain>;" in each related
+module (pm file).  We cannot do achieve comparible syntax with
+Template Toolkit: you must specify the textdomain before the
+templates get processed.
+
+Your website may contain multiple separate sets of templates.  For
+instance, a standard website implementation with some local extensions.
+The only way to get that to work, is by using different translation
+functions: one textdomain may use 'loc()', where an other uses 'L()'.
+
+=head2 Supported syntax
+
+=head3 Translation syntax
+
+Let say that your translation function is called 'loc', which is the
+default name.  Then, you can use that name as simple function:
+
+  [% loc("msgid", key => value, ...) %]
+  [% loc('msgid', key => value, ...) %]
+  [% loc("msgid|plural", count, key => value, ...) %]
+ 
+  [% INCLUDE
+       title = loc('something')
+   %]
+
+But also as filter.  Although filters and functions work differently
+internally in Template Toolkit, it is convenient to permit both syntaxes.
+
+  [% | loc(key => value, ...) %]msgid[% END %]
+  [% 'msgid' | loc(key => value) %]
+  [% "msgid" | loc(key => value) %]
+
+As examples
+
+  [% loc("hi {n}", n => name) %]
+  [% | loc(n => name) %]hi {n}[% END %]
+  [% "hi {n}" | loc(n => name) %]
+
+These syntaxes work exacly like translations with Log::Report for your
+Perl programs.  Compare this with:
+
+  __x"hi {n}", n => name;    # equivalent to
+  __x("hi {n}", n => name);  # replace __x() by loc()
+
+=head3 Translation syntax, more magic
+
+With TT, we can add a simplificition which we cannot offer for Perl
+translations: TT variables are dynamic and stored in the stash which
+we can access.  Therefore, we can lookup "accidentally" missed parameters.
+
+  [% SET name = 'John Doe' %]
+  [% loc("Hi {name}", name => name) %]  # looks silly
+  [% loc("Hi {name}") %]                # uses TT stash directly
+
+Sometimes, computation of objects is expensive: you never know.  So, you
+may try to avoid repeated computation.  In the follow example, "soldOn"
+is collected/computed twice:
+
+  [% IF product.soldOn %]
+  <td>[% loc("Sold on {product.soldOn DATE}")</td>
+  [% END %]
+
+The performance is predictable optimal with:
+
+  [% sold_on = product.soldOn; IF sold_on %]
+  <td>[% loc("Sold on {sold_on DATE}")</td>
+  [% END %]
+
+=head3 Translation into HTML
+
+Usually, when data is passed from the program's internal to the template,
+it should get encoded into HTML to escape some characters.  Typical TT
+code:
+
+  Title&gt; [% title | html %]
+
+When your insert is produced by the localizer, you can do this as well
+(set C<template_syntax> to 'UNKNOWN' first)
+
+  [% loc("Title> {t}", t => title) | html %]
+
+The default TT syntax is 'HTML', which will circumvent the need to
+use the html filter.  In that default case, you only say:
+
+  [% loc("Title> {t}", t => title) %]
+  [% loc("Title> {title}") %]  # short form, see previous section
+
+When the title is already escaped for HTML, you can circumvent that
+by using tags which end on 'html':
+
+  [% loc("Title> {t_html}", t_html => title) %]
+
+  [% SET title_html = html(title) %]
+  [% loc("Title> {title_html}") %]
+
+=head2 Extracting PO-files
+
+You may define a textdomain without doing any translations (yet)  However,
+when you start translating, you will need to maintain translation tables
+which are in PO-format.  PO-files can be maintained with a wide variety
+of tools, for instance poedit, Pootle, virtaal, GTranslator, Lokalize,
+or Webtranslateit.
+
+=head3 Setting-up translations
+
+Start with desiging a domain structure.  Probably, you want to create
+a separate domain for the templates (external texts in many languages)
+and your Perl program (internal texts with few languages).
+
+Pick a lexicon directory, which is also inside your version control setup,
+for instance your GIT repository.  Some po-editors can work together
+with various version control systems.
+
+Now, start using this module.  There are two ways: either by creating it
+as object, or by extension.
+
+  ### As object
+  # Somewhere in your code
+  use Log::Report::Template;
+  my $templater = Log::Report::Template->new(%config);
+  $templater->addTextdomain(...);
+
+  $templater->process('template_file.tt', \%vars); # runtime
+  $templater->extract(...);    # rarely, "off-line"
+
+Some way or another, you want to be able to share the creation of the
+templater and configuration of the textdomain between the run-time use
+and the irregular (off-line) extraction of msgids.
+
+The alternative is via extension:
+
+  ### By extension
+  # Somewhere in your code:
+  use My::Template;
+  my $templater = My::Template->new;
+  $templater->process('template_file.tt', \%vars);
+  
+  # File lib/My/Template.pm
+  package My::Template;
+  use parent 'Log::Report::Template';
+
+  sub init($) {
+     my ($self, $args) = @_;
+     # add %config into %$args
+     $self->SUPER::init($args);
+     $self->addTextdomain(...);
+     $self;
+  }
+
+  1;
+
+The second solution requires a little bit of experience with OO, but is
+easier to maintain and to share.
+
+=head3 adding a new language
+
+The first time you run L<extract()|Log::Report::Template/"Handling text domains">, you will see a file being created
+in C<$lexicon/$textdomain-$charset.po>.  That file will be left empty:
+copy it to start a new translation.
+
+There are many ways to structure PO-files.  Which structure used, is
+detected automatically by L<Log::Report::Lexicon|Log::Report::Lexicon>.  My personal preference 
+is C<$lexicon/$textdomain/$language-$charset.po>.  On Unix-like systems,
+you would do:
+
+  # Start a new language
+  mkdir mylexicon/mydomain
+  cp mylexicon/mydomain-utf8.po mylexicon/mydomain/nl_NL-utf8.po 
+  
+  # fill the nl_NL-utf8.po file with the translation
+  poedit mylexicon/mydomain/nl_NL-utf8.po
+  
+  # add the file to your version control system
+  git add mylexicon/mydomain/nl_NL-utf8.po
+  
+Now, when your program sets the locale to 'nl-NL', it should start
+translating to Dutch.  If it doesn't, it is not always easy to
+figure-out what is wrong...
+
+=head3 Keeping translations up to date
+
+You have to call L<extract()|Log::Report::Template/"Handling text domains"> when msgids have changed or added,
+to have the PO-tables updated.  The language specific tables will
+get updated automatically... look for msgids which are 'fuzzy'
+(need update)
+
+You may also use the external program C<xgettext-perl>, which is
+shipped with the L<Log::Report::Lexicon|Log::Report::Lexicon> distribution.
+
+=head3 More performance via MO-files
+
+PO-files are quite large.  You can reduce the translation table size by
+creating a binary "MO"-file for each of them. L<Log::Report::Lexicon|Log::Report::Lexicon>
+will prefer mo files, if it encounters them, but generation is not (yet)
+organized via Log::Report components.  Search for "msgfmt" as separate
+tool or CPAN module.
+
+=head1 SEE ALSO
+
+This module is part of Log-Report-Template distribution version 0.12,
+built on July 05, 2017. Website: F<http://perl.overmeer.net/log-report/>
+
+=head1 LICENSE
+
+Copyrights 2017 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
+

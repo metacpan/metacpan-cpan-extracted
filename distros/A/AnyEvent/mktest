@@ -16,6 +16,7 @@ cat <<EOF
 68_poe          AnyEvent::Impl::POE $^W = 0;
 69_ev           AnyEvent::Impl::EV
 70_uv           AnyEvent::Impl::UV
+71_prima	AnyEvent::Impl::Prima
 EOF
 ) | while read base module extra; do
    for test in 01 02 03 04 05 07 09; do

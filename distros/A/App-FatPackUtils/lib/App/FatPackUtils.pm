@@ -1,12 +1,12 @@
 package App::FatPackUtils;
 
-our $DATE = '2016-12-29'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-07-04'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 
 1;
-# ABSTRACT: Collection of CLI utilities related to App::FatPacker
+# ABSTRACT: Collection of CLI utilities related to fatpacking
 
 __END__
 
@@ -16,20 +16,24 @@ __END__
 
 =head1 NAME
 
-App::FatPackUtils - Collection of CLI utilities related to App::FatPacker
+App::FatPackUtils - Collection of CLI utilities related to fatpacking
 
 =head1 VERSION
 
-This document describes version 0.08 of App::FatPackUtils (from Perl distribution App-FatPackUtils), released on 2016-12-29.
+This document describes version 0.11 of App::FatPackUtils (from Perl distribution App-FatPackUtils), released on 2017-07-04.
 
 =head1 DESCRIPTION
 
 This distribution provides the following command-line utilities related to
-L<App::FatPacker>:
+fatpacking:
 
 =over
 
+=item * L<fatpack-extract>
+
 =item * L<fatpack-info>
+
+=item * L<fatpack-modules>
 
 =item * L<update-fatpack-snippets>
 
@@ -63,7 +67,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -26,27 +26,27 @@ BEGIN { use_ok( 'String::Interpolate::Shell', 'strinterp' ); }
 {
     my $tpl = '${q}';
     my $text = strinterp( $tpl, {},
-			{
-			 undef_value => 'ignore'
-			} );
+                        {
+                         undef_value => 'ignore'
+                        } );
     is( $text, $tpl, 'value ignore' );
 }
 
 {
     my $tpl = 'here lies ${q}';
     my $text = strinterp( $tpl, {},
-			{
-			 undef_value => 'remove'
-			} );
+                        {
+                         undef_value => 'remove'
+                        } );
     is( $text, 'here lies ', 'value remove' );
 }
 
 {
     eval {
-	strinterp( '$q', {},
-		 {
-		  undef_verbosity => 'fatal'
-		 } );
+        strinterp( '$q', {},
+                 {
+                  undef_verbosity => 'fatal'
+                 } );
     };
     ok( $@ ne '', 'verbosity fatal' );
 }
@@ -63,10 +63,10 @@ BEGIN { use_ok( 'String::Interpolate::Shell', 'strinterp' ); }
       or die( "error reopening stderr\n" );
 
     eval {
-	strinterp( '$q', {},
-		 {
-		  undef_verbosity => 'warn'
-		 } );
+        strinterp( '$q', {},
+                 {
+                  undef_verbosity => 'warn'
+                 } );
     };
     close STDERR;
 

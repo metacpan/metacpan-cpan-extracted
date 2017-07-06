@@ -13,7 +13,7 @@ use Mojo::URL;
 
 # PODNAME: yars_balance
 # ABSTRACT: Fix all files
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 sub _recurse 
@@ -48,9 +48,41 @@ sub _recurse
 
 sub _rebalance_dir
 {
-  my($yars, $client, $disk, $server) = @_;
+  my($yars, $client, $disk, $server, $opt) = @_;
 
   my $root = dir( $disk->{root} );
+  
+  my $cleanup_file = $opt->{backup}
+    ? sub {
+        my($filename, $md5) = @_;
+        my $dir = $root->subdir('balance-backup', @$md5);
+        $dir->mkpath;
+        my $to = $dir->file($filename->basename);
+        rename "$filename", "$to"
+          or warn "unable to rename $filename => $to $!";
+      }
+    : sub {
+      my($filename) = @_;
+      unlink "$filename"
+        or warn "error removing $filename";
+    };
+  
+  my $compute_md5_as_list = sub {
+    my($filename) = @_;
+    # compute the md5 to ensure that the file isn't corrupt
+    my $md5 = digest_file_hex("$filename", "MD5");
+    my @md5 = ($md5 =~ /(..)/g);
+            
+    # verify that the file itself is in the right place
+    my $expected_file = $root->subdir(@md5, $filename->basename);
+    if("$expected_file" ne "$filename")
+    {
+      warn "file: $filename (md5 $md5) is stored at $filename instead of $expected_file.  May be corrupt.";
+      return;
+    }
+    ($md5, @md5);
+  };
+  
   foreach my $dir (sort grep { $_->basename =~ /^[a-f0-9]{1,2}$/ } $root->children)
   {
     my $expected_dir = $yars->tools->disk_for($dir->basename);
@@ -59,7 +91,7 @@ sub _rebalance_dir
     # server.  If it returns undef it should be uploaded to a different server.
     # so we do either a filesystem level move, or a http remote move for each
     # file in the stashed directory.
-        
+
     if(defined $expected_dir)
     {
       $expected_dir = dir( $expected_dir );
@@ -70,19 +102,10 @@ sub _rebalance_dir
       _recurse $dir, sub {
         my($from) = @_;
         say 'LCL ', $from->basename;
-            
-        # compute the md5 to ensure that the file isn't corrupt
-        my $md5 = digest_file_hex("$from", "MD5");
-        my @md5 = ($md5 =~ /(..)/g);
-            
-        # verify that the file itself is in the right place
-        my $expected_file = $root->subdir(@md5, $from->basename);
-        if("$expected_file" ne "$from")
-        {
-          warn "file: $from (md5 $md5) is stored at $from instead of $expected_file.  May be corrupt.";
-          return;
-        }
-
+        
+        my($md5, @md5) = $compute_md5_as_list->($from);
+        return unless $md5;
+           
         # temporary filename to copy to first
         my(undef,$tmp) = $expected_dir->subdir('tmp')->tempfile( "balanceXXXXXX", SUFFIX => '.tmp' );
         $tmp = file($tmp);
@@ -112,8 +135,8 @@ sub _rebalance_dir
           warn "error moving $tmp => $to $!";
           return;
         };
-            
-        unlink "$from";
+        
+        $cleanup_file->($from, \@md5);
       };
     }
     else
@@ -121,6 +144,10 @@ sub _rebalance_dir
       _recurse $dir, sub {
         my($file) = @_;
         say 'RMT ', $file->basename;
+
+        my($md5,@md5) = $compute_md5_as_list->($file);
+        return unless $md5;
+
         $client->upload('--nostash' => 1, "$file") or do {
           warn "unable to upload $file @{[ $client->errorstring ]}";
           return;
@@ -137,11 +164,8 @@ sub _rebalance_dir
         {
           die "uploaded to the same server, probably configuration mismatch!";
         }
-          
-        unlink "$file" or do {
-          warn "unable to unlink $file $!";
-          return;
-        };
+        
+        $cleanup_file->($file, \@md5);
       };
     }
   }
@@ -152,9 +176,11 @@ sub main
   my $class = shift;
   local @ARGV = @_;
   my $threads = 1;
+  my $backup = 0;
   
   GetOptions(
     'threads|t=i' => \$threads,
+    'backup|b' => \$backup,
     'help|h' => sub { pod2usage({ -verbose => 2 }) },
     'version' => sub {
       say 'Yars version ', ($Yars::Command::yars_fast_balance::VERSION // 'dev');
@@ -204,7 +230,7 @@ sub main
     next unless $yars->config->url eq $server->{url};
     foreach my $disk (@{ $server->{disks} })
     {
-      push @work_list, [$yars,$client,$disk,$server];
+      push @work_list, [$yars,$client,$disk,$server, { backup => $backup } ];
     }
   }
 

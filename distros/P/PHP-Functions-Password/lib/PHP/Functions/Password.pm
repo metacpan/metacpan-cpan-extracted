@@ -1,5 +1,5 @@
 package PHP::Functions::Password;
-# $Id: Password.pm,v 1.5 2017/06/22 09:13:48 cmanley Exp $
+# $Id: Password.pm,v 1.7 2017/06/24 13:25:32 cmanley Exp $
 use strict;
 use warnings;
 use Carp qw(croak);
@@ -23,7 +23,7 @@ our %EXPORT_TAGS = (
 	'consts'	=> [ grep /^PASSWORD_/, @EXPORT_OK ],
 	'funcs'		=> [ grep /^password_/, @EXPORT_OK ],
 );
-our $VERSION = sprintf '%d.%02d', q{$Revision: 1.5 $} =~ m/ (\d+) \. (\d+) /xg;
+our $VERSION = sprintf '%d.%02d', q{$Revision: 1.7 $} =~ m/ (\d+) \. (\d+) /xg;
 
 use constant PASSWORD_BCRYPT => 1;
 use constant PASSWORD_DEFAULT => PASSWORD_BCRYPT;
@@ -141,7 +141,10 @@ with difference that the $algo argument is optional and defaults to PASSWORD_DEF
 sub password_hash {
 	my $proto = @_ && UNIVERSAL::isa($_[0],__PACKAGE__) ? shift : __PACKAGE__;
 	my $password = shift;
-	my $algo = shift(@_) // PASSWORD_DEFAULT;
+	my $algo = shift;
+	unless(defined($algo)) {
+		$algo = PASSWORD_DEFAULT;
+	}
 	($algo == PASSWORD_BCRYPT) || croak("Unsupported algorithm $algo");
 	my %options = @_ && ref($_[0]) ? %{$_[0]} : @_;
 	my $salt = $options{'salt'} || $proto->_en_base64(Crypt::OpenSSL::Random::random_bytes(16));
@@ -188,7 +191,6 @@ sub password_needs_rehash {
 
 
 
-
 =item password_verify($password, $crypted)
 
 The same as L<http://php.net/manual/en/function.password-verify.php>.
@@ -218,8 +220,6 @@ sub password_verify {
 }
 
 =back
-
-
 
 
 
@@ -276,7 +276,6 @@ sub needs_rehash {
 
 
 
-
 =item verify($password, $crypted)
 
 Alias of C<verify($password, $crypted)>.
@@ -291,8 +290,6 @@ sub verify {
 =back
 
 =cut
-
-
 
 
 
@@ -316,6 +313,7 @@ sub _bcrypt {
 	);
 	return '$' . SIG_BCRYPT . '$' . $cost . '$' . $salt_base64 . $proto->_en_base64($hash);
 }
+
 
 
 
@@ -347,6 +345,7 @@ sub _bcrypt_hash {
 
 
 
+
 # From Crypt::Eksblowfish::Bcrypt.
 # Decodes an octet string that was textually encoded using the form of base64 that is conventionally used with bcrypt.
 sub _de_base64 {
@@ -362,6 +361,7 @@ sub _de_base64 {
 
 
 
+
 # From Crypt::Eksblowfish::Bcrypt.
 # Encodes the octet string textually using the form of base64 that is conventionally used with bcrypt.
 sub _en_base64 {
@@ -371,6 +371,7 @@ sub _en_base64 {
 	$text =~ tr#A-Za-z0-9+/=#./A-Za-z0-9#d;
 	return $text;
 }
+
 
 
 

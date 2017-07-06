@@ -1,6 +1,7 @@
 package Test::BDD::Cucumber::Model::Line;
-$Test::BDD::Cucumber::Model::Line::VERSION = '0.52';
-use Moose;
+$Test::BDD::Cucumber::Model::Line::VERSION = '0.53';
+use Moo;
+use Types::Standard qw( Int InstanceOf Str );
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ Test::BDD::Cucumber::Model::Line - Model to represent a line in a feature file
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -22,7 +23,7 @@ The line number this line represents
 
 =cut
 
-has 'number' => ( is => 'rw', isa => 'Int' );
+has 'number' => ( is => 'rw', isa => Int );
 
 =head2 document
 
@@ -30,7 +31,7 @@ The L<Test::BDD::Cucumber::Model::Document> object this line belongs to.
 
 =cut
 
-has 'document' => ( is => 'rw', isa => 'Test::BDD::Cucumber::Model::Document' );
+has 'document' => ( is => 'rw', isa => InstanceOf['Test::BDD::Cucumber::Model::Document'] );
 
 =head2 raw_content
 
@@ -38,7 +39,7 @@ The content of the line, unmodified
 
 =cut
 
-has 'raw_content' => ( is => 'rw', isa => 'Str' );
+has 'raw_content' => ( is => 'rw', isa => Str );
 
 =head1 METHODS
 

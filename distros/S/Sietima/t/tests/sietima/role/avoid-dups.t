@@ -21,7 +21,7 @@ subtest 'in cc' => sub {
 subtest 'in to' => sub {
     test_sending(
         sietima => $s,
-        mail => { to => $s->return_path . ' one@users.example.com' },
+        mail => { to => $s->return_path . ', one@users.example.com' },
         to => ['two@users.example.com'],
     );
 };

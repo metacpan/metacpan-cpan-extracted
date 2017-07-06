@@ -1,0 +1,48 @@
+{
+   "abstract" : "work with Mac plists at a low level, fast",
+   "author" : [
+      "Darren M. Kulp, C<< <kulp @ cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 0.680, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Mac-PropertyList-SAX",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "HTML::Entities" : "0",
+            "HTML::Entities::Numbered" : "0.04",
+            "LWP" : "0",
+            "MIME::Base64" : "0",
+            "Mac::PropertyList" : "1.29",
+            "Object::MultiType" : "0.02",
+            "Test::More" : "0.42",
+            "XML::SAX::Base" : "0",
+            "XML::SAX::Expat" : "0.4",
+            "XML::SAX::ParserFactory" : "0",
+            "constant" : "1.06",
+            "enum" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.86"
+}

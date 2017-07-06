@@ -29,6 +29,9 @@ struct SuspendedFrame {
     struct {
       OP *retop;
     } eval;
+    struct {
+      LOOP *loopop;
+    } loop;
   };
 };
 
@@ -107,8 +110,8 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     PL_markstack_ptr = PL_markstack + cx->blk_oldmarksp;
   }
 
-  I32 savelen = PL_savestack_ix - cx->blk_oldsaveix;
-  if(savelen) {
+  I32 old_saveix = cx->blk_oldsaveix;
+  while(PL_savestack_ix > old_saveix) {
     /* Useful references
      *   scope.h
      *   scope.c: Perl_leave_scope()
@@ -117,21 +120,23 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
     /* TODO: cope with more things
      * Right now all we can handle is a single SAVEt_ALLOC that implies zero size
      */
-    if(savelen > 1)
-      croak("TODO: PL_savestack is longer than expected");
-
     UV uv = PL_savestack[PL_savestack_ix].any_uv;
     U8 type = (U8)uv & SAVE_MASK;
 
-    if(type != SAVEt_ALLOC)
-      croak("TODO: Top of PL_savestack is not SAVEt_ALLOC but %d", type);
+    switch(type) {
+      case SAVEt_ALLOC: {
+        U8 size = (type >> SAVE_TIGHT_SHIFT);
+        if(size > 0)
+          croak("TODO: Handle SAVEt_ALLOC of non-zero size %d", size);
 
-    UV size = (type >> SAVE_TIGHT_SHIFT);
-    if(size > 0)
-      croak("TODO: Handle SAVEt_ALLOC of non-zero size %d", size);
+        /* At this point we know it's safe to just ignore it */
+        PL_savestack_ix--;
+        break;
+      }
 
-    /* At this point we know it's safe to just ignore it */
-    PL_savestack_ix--;
+      default:
+        croak("TODO: Top of PL_savestack is not SAVEt_ALLOC but %d", type);
+    }
   }
 
   if(cx->blk_oldsaveix != PL_savestack_ix)
@@ -147,6 +152,8 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
   PADNAME **padnames;
   PAD *pad;
 
+  state->frames = NULL;
+
   for(cxix = cxstack_ix; cxix; cxix--) {
     PERL_CONTEXT *cx = &cxstack[cxix];
     if(CxTYPE(cx) == CXt_SUB)
@@ -161,9 +168,16 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
     suspend_block(frame, cx);
 
     /* ref:
-     *   https://perl5.git.perl.org/perl.git/blob/b4972372a75776de3c9e6bd234a398d103677
+     *   https://perl5.git.perl.org/perl.git/blob/HEAD:/cop.h
      */
     switch(CxTYPE(cx)) {
+      case CXt_LOOP_PLAIN: {
+        frame->type = CXt_LOOP_PLAIN;
+        frame->loop.loopop = cx->blk_loop.my_op;
+
+        continue;
+      }
+
       case CXt_EVAL: {
         if(!(cx->cx_type & CXp_TRYBLOCK))
           croak("TODO: handle CXt_EVAL without CXp_TRYBLOCK");
@@ -258,6 +272,12 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
     PERL_CONTEXT *cx;
 
     switch(frame->type) {
+      case CXt_LOOP_PLAIN:
+        cx = cx_pushblock(CXt_LOOP_PLAIN, G_VOID, PL_stack_sp, PL_savestack_ix);
+        /* don't call cx_pushloop_plain() because it will get this wrong */
+        cx->blk_loop.my_op = frame->loop.loopop;
+        break;
+
       case CXt_EVAL:
         cx = cx_pushblock(CXt_EVAL|CXp_TRYBLOCK, frame->gimme,
           PL_stack_sp, PL_savestack_ix);
@@ -493,11 +513,9 @@ static OP *pp_await(pTHX)
 
   SuspendedState *state = suspendedstate_get(curcv);
 
-  if(state) {
+  if(state && state->awaiting_future) {
     I32 orig_height;
 
-    if(!state->awaiting_future)
-      croak("TODO: pp_await() with state while not awaiting");
     f = state->awaiting_future;
     state->awaiting_future = NULL;
 
@@ -528,6 +546,7 @@ static OP *pp_await(pTHX)
     croak("Expected a blessed object reference to await");
 
   if(future_is_ready(f)) {
+    assert(CvDEPTH(curcv) > 0);
     /* This might throw */
     future_get_to_stack(f, GIMME_V);
     return PL_op->op_next;

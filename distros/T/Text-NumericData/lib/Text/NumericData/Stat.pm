@@ -7,6 +7,12 @@ use Text::NumericData::File;
 
 use strict;
 
+# This is just a placeholder because of a past build system bug.
+# The one and only version for Text::NumericData is kept in
+# the Text::NumericData module itself.
+our $VERSION = '1';
+$VERSION = eval $VERSION;
+
 # Generate a statistics file out of given input file.
 # Gives and takes Text::NumericData::File objects.
 # This could be a method of Text::NumericData::File, but it doesn't have to.

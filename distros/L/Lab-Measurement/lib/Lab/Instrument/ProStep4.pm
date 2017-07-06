@@ -1,5 +1,5 @@
 package Lab::Instrument::ProStep4;
-$Lab::Instrument::ProStep4::VERSION = '3.550';
+$Lab::Instrument::ProStep4::VERSION = '3.552';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Lab::Instrument;

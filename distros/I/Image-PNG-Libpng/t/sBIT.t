@@ -1,12 +1,12 @@
 use warnings;
 use strict;
 use Test::More;
-use FindBin;
+use FindBin '$Bin';
 use Image::PNG::Libpng ':all';
 use Data::Dumper;
 
 my $file = 's38i3p04';
-my $ffile = "$FindBin::Bin/libpng/$file.png";
+my $ffile = "$Bin/libpng/$file.png";
 my $png = read_png_file ($ffile);
 ok ($png);
 #    print Dumper ($png);

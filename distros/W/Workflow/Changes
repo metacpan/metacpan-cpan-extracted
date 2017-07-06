@@ -1,5 +1,22 @@
 Revision history for Perl extension Workflow
 
+1.45 2017-06-29 Maintenance release, update not required
+
+- Addressing issue #13, moved Data::UUID from recommendatiions to
+  prerequisites/requirements section
+
+
+1.44 2017-06-28 Maintenance release, update recommended
+
+- Yet another PR from Oliver Welter providing improvements to exception
+  handling in relation to condition validation
+
+- Exchanged use of: Dist::Zilla::Plugin::GitHub::Meta for Dist::Zilla::Plugin::GithubMeta
+  to specify a proper homepage attribute
+
+  Ref: https://metacpan.org/pod/Dist::Zilla::Plugin::GithubMeta
+
+
 1.43 2017-06-02 Maintenance release, update recommended
 
 - PR from Oliver Welter providing improvements to logging in relation to

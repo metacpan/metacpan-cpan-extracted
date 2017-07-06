@@ -7,7 +7,7 @@ my $meta = {
   "abstract"           => "simple license checker for source files",
   "author"             => ["Jonas Smedegaard (JONASS) <jonass\@cpan.org>"],
   "dynamic_config"     => 0,
-  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150010",
+  "generated_by"       => "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
   "keywords"           => ["Licensing", "Sourcecode"],
   "license"            => ["gpl_3"],
   "meta-spec"          => {
@@ -51,9 +51,9 @@ my $meta = {
                             },
                           },
   "provides"           => {
-                            "App::Licensecheck"               => { file => "lib/App/Licensecheck.pm", version => "v3.0.29" },
-                            "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.0.29" },
-                            "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.0.29" },
+                            "App::Licensecheck"               => { file => "lib/App/Licensecheck.pm", version => "v3.0.30" },
+                            "Regexp::Pattern::License"        => { file => "lib/Regexp/Pattern/License.pm", version => "v3.0.30" },
+                            "Regexp::Pattern::License::Parts" => { file => "lib/Regexp/Pattern/License/Parts.pm", version => "v3.0.30" },
                           },
   "release_status"     => "stable",
   "resources"          => {
@@ -68,7 +68,7 @@ my $meta = {
                                             },
                             x_identifier => "http://purl.org/NET/cpan-uri/dist/App-Licensecheck/project",
                           },
-  "version"            => "v3.0.29",
+  "version"            => "v3.0.30",
   "x_contributors"     => ["Paul Wise <pabs\@debian.org>"],
   "x_help_wanted"      => ["documenter", "tester"],
   "x_provides_scripts" => { licensecheck => { file => "bin/licensecheck" } },

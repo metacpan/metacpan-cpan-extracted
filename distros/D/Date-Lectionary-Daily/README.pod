@@ -1,0 +1,80 @@
+
+=head1 NAME
+
+Date::Lectionary
+
+=head1 SYNOPSIS
+
+    use Time::Piece;
+    use Date::Lectionary::Daily;
+
+    my $dailyReading = Date::Lectionary::Daily->new('date' => Time::Piece->strptime("2017-12-24", "%Y-%m-%d"));
+    say $dailyReading->readings->{evening}->{1}; #First lesson for evening prayer
+
+=head1 DESCRIPTION
+
+Date::Lectionary::Daily takes a Time::Piece date and returns ACNA readings for morning and evening prayer for that date.
+
+=head2 ATTRIBUTES
+
+=head3 date
+
+The Time::Piece object date given at object construction.
+
+=head3 week
+
+More to come.
+
+=head3 readings
+
+More to come.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Lectionary-Daily> -- and tested via TravisCI.
+
+=for html <a href='https://travis-ci.org/marmanold/Date-Lectionary-Daily'><img src='https://travis-ci.org/marmanold/Date-Lectionary-Daily.svg?branch=master' /></a>
+
+=for html <a href='https://coveralls.io/github/marmanold/Date-Lectionary-Daily?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary-Daily/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Date::Lectionary::Daily
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary-Daily
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Date-Lectionary-Daily
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Date-Lectionary-Daily
+
+    Search CPAN
+        http://search.cpan.org/dist/Date-Lectionary-Daily
+
+=head1 ACKNOWLEDGEMENTS
+
+Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2017 Michael Wayne Arnold
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

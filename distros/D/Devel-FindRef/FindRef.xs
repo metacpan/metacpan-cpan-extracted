@@ -6,13 +6,13 @@
   (PERL_REVISION > (a)                                          \
    || (PERL_REVISION == (a)                                     \
        && (PERL_VERSION > (b)                                   \
-           || (PERL_VERSION == (b) && PERLSUBVERSION >= (c)))))
+           || (PERL_VERSION == (b) && PERL_SUBVERSION >= (c)))))
 
 #if !PERL_VERSION_ATLEAST (5,8,9)
 # define SVt_LAST 16
 #endif
 
-#if !PERL_VERSION_ATLEAST (5,10,0)
+#ifndef SvPAD_OUR
 # define SvPAD_OUR(dummy) 0
 #endif
 
@@ -22,10 +22,25 @@
 #endif
 
 #ifndef PadARRAY
-# define PadARRAY(pad)    AvARRAY (pad)
+typedef AV PADNAMELIST;
+typedef SV PADNAME;
+# define PadnamePV(sv) SvPVX (sv)
+# define PadnameLEN(sv) SvCUR (sv)
+# define PadARRAY(pad) AvARRAY (pad)
 # define PadlistARRAY(pl) ((PAD **)AvARRAY (pl))
 #endif
 
+#ifndef PadMAX
+# define PadMAX(pad) AvFILLp (pad)
+#endif
+
+#ifndef padnamelist_fetch
+# define padnamelist_fetch(a,b) *av_fetch (a, b, FALSE)
+#endif
+
+#ifndef PadlistNAMES
+# define PadlistNAMES(padlist) *PadlistARRAY (padlist)
+#endif
 
 #define res_pair(text)						\
   do {								\
@@ -103,13 +118,16 @@ find_ (SV *target_ref)
 
                     if (SvTYPE (sv) >= SVt_PVMG)
                       {
+#if !PERL_VERSION_ATLEAST (5,21,6)
                         if (SvTYPE (sv) == SVt_PVMG && SvPAD_OUR (sv))
                           {
                             /* I have no clue what this is */
                             /* maybe some placeholder for our variables for eval? */
                             /* it doesn't seem to reference anything, so we should be able to ignore it */
                           }
-                        else if (SvMAGICAL (sv)) /* name-pads use SvMAGIC for other purposes */
+                        else
+#endif
+                        if (SvMAGICAL (sv)) /* name-pads use SvMAGIC for other purposes */
                           {
                             MAGIC *mg = SvMAGIC (sv);
 
@@ -166,7 +184,7 @@ find_ (SV *target_ref)
 
                                 /* Anonymous subs have a padlist but zero depth */
                                 /* some hacks switch CvANON off, so we just blindly assume a minimum of 1 */
-                                  if (!depth)
+                                  if (!depth && !PERL_VERSION_ATLEAST (5,21,6))
                                     depth = 1;
 
                                   while (depth)
@@ -179,14 +197,14 @@ find_ (SV *target_ref)
                                       if (PadARRAY (pad)[0] == targ)
                                         res_pair ("the argument array for");
 
-                                      for (i = AvFILLp (pad) + 1; --i; )
-                                        if (AvARRAY (pad)[i] == targ)
+                                      for (i = PadMAX (pad) + 1; --i; )
+                                        if (PadARRAY (pad)[i] == targ)
                                           {
                                             /* Values from constant functions are stored in the pad without any name */
-                                            SV *name_sv = PadARRAY (PadlistARRAY (padlist)[0])[i];
+                                            PADNAME *name = padnamelist_fetch (PadlistNAMES (padlist), i);
 
-                                            if (name_sv && SvPOK (name_sv))
-                                              res_pair (form ("the lexical '%s' in", SvPVX (name_sv)));
+                                            if (name && PadnamePV (name) && *PadnamePV (name))
+                                              res_pair (form ("the lexical '%s' in", PadnamePV (name)));
                                             else
                                               res_pair ("an unnamed lexical in");
                                           }

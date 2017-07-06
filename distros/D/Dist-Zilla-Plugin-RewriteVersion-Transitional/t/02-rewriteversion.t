@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Deep;
@@ -12,10 +12,12 @@ delete $ENV{RELEASE_STATUS};
 delete $ENV{TRIAL};
 delete $ENV{V};
 
-# this version adds "from Foo-Bar-0.001.tar.gz" comments unconditionally
+# version 0.010 adds "from Foo-Bar-0.001.tar.gz" comments unconditionally;
+# version 0.011 disables that behaviour by default
 use Dist::Zilla::Plugin::RewriteVersion;
 plan skip_all => 'These tests break with Dist::Zilla::Plugin::RewriteVersion 0.010'
-    if eval { Dist::Zilla::Plugin::RewriteVersion->VERSION('0.010'); 1 };
+    if eval { Dist::Zilla::Plugin::RewriteVersion->VERSION('0.010'); 1 }
+        and not eval { Dist::Zilla::Plugin::RewriteVersion->VERSION('0.011'); 1 };
 
 my $tzil = Builder->from_config(
     { dist_root => 'does-not-exist' },
@@ -78,7 +80,6 @@ cmp_deeply(
                     config => superhashof({
                         'Dist::Zilla::Plugin::RewriteVersion::Transitional' => {
                         },
-                        # TODO, in [RewriteVersion]
                         #'Dist::Zilla::Plugin::RewriteVersion' => {
                         #    global => bool(0),
                         #    skip_version_provider => bool(0),
@@ -92,7 +93,6 @@ cmp_deeply(
                     config => superhashof({
                         'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => {
                         },
-                        # TODO, in [BumpVersionAfterRelease]
                         #'Dist::Zilla::Plugin::BumpVersionAfterRelease' => {
                         #    global => bool(0),
                         #    munge_makefile_pl => bool(0),

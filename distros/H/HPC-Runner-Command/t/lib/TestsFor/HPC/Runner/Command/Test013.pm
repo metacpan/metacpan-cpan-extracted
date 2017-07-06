@@ -13,6 +13,7 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use Slurp;
 use File::Slurp;
+use File::Spec;
 
 extends 'TestMethods::Base';
 
@@ -25,9 +26,8 @@ Test for non linear task deps
 sub write_test_file {
     my $test_dir = shift;
 
-    my $t = "$test_dir/script/test002.1.sh";
-    open( my $fh, ">$t" );
-    print $fh <<EOF;
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
+    my $text = <<EOF;
 #TASK tags=Sample_PAG008_V4_E2
 gzip -f Sample_PAG008_V4_E2_read1_trimmomatic_1PE.fastq
 
@@ -41,7 +41,7 @@ gzip -f Sample_PAG008_V4_E2_read2_trimmomatic_1SE.fastq
 gzip -f Sample_PAG008_V4_E2_read2_trimmomatic_1PE.fastq
 EOF
 
-    close($fh);
+    write_file( $file, $text );
 }
 
 sub construct {
@@ -51,10 +51,10 @@ sub construct {
     my $test_dir     = $test_methods->make_test_dir();
     write_test_file($test_dir);
 
-    my $t = "$test_dir/script/test002.1.sh";
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
     MooseX::App::ParsedArgv->new(
         argv => [
-            "execute_job", "--infile", $t, '--commands', 1,
+            "execute_job", "--infile", $file, '--commands', 1,
             '--batch_index_start', 1,
         ]
     );
@@ -131,7 +131,7 @@ sub test_003 : Tags(use_batches) {
     ];
 
     is_deeply( $cmds, $expect_cmds, 'Commands pass' );
-    
+
     chdir($cwd);
     remove_tree($test_dir);
 }
@@ -148,10 +148,9 @@ sub test_004 : Tags(use_batches) {
     my $fh = IO::File->new( $test->infile, q{<} );
     my $cmds = $test->parse_cmd_file($fh);
 
-    my $expect_cmds = [
-            "#TASK tags=Sample_PAG008_V4_E2\n"
-          . "gzip -f Sample_PAG008_V4_E2_read2_trimmomatic_1PE.fastq\n"
-    ];
+    my $expect_cmds =
+      [     "#TASK tags=Sample_PAG008_V4_E2\n"
+          . "gzip -f Sample_PAG008_V4_E2_read2_trimmomatic_1PE.fastq\n" ];
     is_deeply( $cmds, $expect_cmds, 'Commands pass' );
 
     chdir($cwd);

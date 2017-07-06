@@ -1,6 +1,6 @@
 package PMLTQ::Relation::PDT::AEChildIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::PDT::AEChildIterator::VERSION = '1.3.2';
+$PMLTQ::Relation::PDT::AEChildIterator::VERSION = '1.4.0';
 # ABSTRACT: Effective child relation iterator on a-nodes for PDT like treebanks
 
 use strict;
@@ -38,7 +38,7 @@ PMLTQ::Relation::PDT::AEChildIterator - Effective child relation iterator on a-n
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 AUTHORS
 

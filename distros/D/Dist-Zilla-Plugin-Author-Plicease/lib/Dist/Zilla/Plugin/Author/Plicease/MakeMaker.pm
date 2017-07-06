@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 
 # ABSTRACT: munge the AUTHOR section
-our $VERSION = '2.15'; # VERSION
+our $VERSION = '2.16'; # VERSION
 
 
 extends 'Dist::Zilla::Plugin::MakeMaker';
@@ -39,7 +39,7 @@ Dist::Zilla::Plugin::Author::Plicease::MakeMaker - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.15
+version 2.16
 
 =head1 SYNOPSIS
 

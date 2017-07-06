@@ -1,23 +1,22 @@
 ---
-abstract: "simple flexible means of converting the output of PHP's serialize() into the equivalent Perl memory structure, and vice versa - XS version."
+abstract: 'simple flexible means of converting the output'
 author:
   - 'Darren Kulp <kulp@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: PHP-Serialization-XS
 no_index:
   directory:
     - t
     - inc
 requires:
-  PHP::Serialization: '0.33'
-version: '0.08'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  PHP::Serialization: 0.33
+version: 0.10

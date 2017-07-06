@@ -26,7 +26,7 @@ sub configure {
   $prefork->max_requests($c->{requests}) if $c->{requests};
   defined $c->{$_} and $prefork->$_($c->{$_})
     for qw(accepts backlog graceful_timeout heartbeat_interval),
-    qw(heartbeat_timeout inactivity_timeout listen pid_file workers);
+    qw(heartbeat_timeout inactivity_timeout listen pid_file spare workers);
 }
 
 sub run {
@@ -123,15 +123,15 @@ sub _manage {
   if ($self->{upgrade} && !$self->{finished}) {
 
     # Fresh start
+    my $ut = $self->upgrade_timeout;
     unless ($self->{new}) {
-      $log->info('Starting zero downtime software upgrade');
+      $log->info("Starting zero downtime software upgrade ($ut seconds)");
       die "Can't fork: $!" unless defined(my $pid = $self->{new} = fork);
       exec $^X, $ENV{HYPNOTOAD_EXE} or die "Can't exec: $!" unless $pid;
     }
 
     # Timeout
-    kill 'KILL', $self->{new}
-      if $self->{upgrade} + $self->upgrade_timeout <= steady_time;
+    kill 'KILL', $self->{new} if $self->{upgrade} + $ut <= steady_time;
   }
 }
 
@@ -337,6 +337,15 @@ value of L<Mojo::Server/"reverse_proxy">.
 
 Number of keep-alive requests per connection, defaults to the value of
 L<Mojo::Server::Daemon/"max_requests">.
+
+=head2 spare
+
+  spare => 4
+
+Temporarily spawn up to this number of additional workers if there is a need,
+defaults to the value of L<Mojo::Server::Prefork/"spare">. This allows for new
+workers to be started while old ones are still shutting down gracefully,
+drastically reducing the performance cost of worker restarts.
 
 =head2 upgrade_timeout
 

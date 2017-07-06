@@ -1,52 +1,79 @@
 {
-   "abstract" : "Perl interface to Cassandra's native protocol",
+   "abstract" : "Perl library for accessing Cassandra using its binary network protocol",
    "author" : [
       "Tom van der Woerdt <tvdw@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Cassandra-Client",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "AnyEvent" : "0",
-            "Compress::LZ4" : "0.20",
-            "Compress::Snappy" : "0.23",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::PPPort" : "3.23",
+            "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Clone" : "0.36",
             "Devel::GlobalDestruction" : "0.11",
-            "EV" : "4.0",
+            "EV" : "4",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "IO::Socket::INET" : "0",
+            "List::Util" : "0",
+            "Math::BigInt" : "0",
             "Net::SSLeay" : "1.63",
-            "Promises" : "0.94",
+            "POSIX" : "0",
+            "Promises" : "0.93",
             "Ref::Util" : "0.008",
-            "Sub::Current" : "0.02",
-            "perl" : "5.01"
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "Sub::Current" : "0",
+            "Time::HiRes" : "0",
+            "XSLoader" : "0",
+            "constant" : "0",
+            "if" : "0",
+            "overload" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Compress::LZ4" : "0",
+            "Compress::Snappy" : "0",
+            "Data::Dumper" : "0",
+            "Devel::Cycle" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tvdw/perl-dbd-cassandra.git",
+         "web" : "https://github.com/tvdw/perl-dbd-cassandra"
+      }
+   },
+   "version" : "0.13",
+   "x_authority" : "cpan:TVDW",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
 }
+

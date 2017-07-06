@@ -1,20 +1,20 @@
 package Perinci::Access::HTTP::Client;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.24'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any '$log';
+use Log::ger;
 
 use Perinci::AccessUtil qw(strip_riap_stuffs_from_res);
 use Scalar::Util qw(blessed);
 
 use parent qw(Perinci::Access::Base);
 
-my @logging_methods = Log::Any->logging_methods();
+my @logging_levels = keys %Log::ger::Levels;
 
 sub new {
     my $class = shift;
@@ -48,7 +48,7 @@ sub request {
     my ($self, $action, $server_url, $extra, $copts) = @_;
     $extra //= {};
     $copts //= {};
-    $log->tracef(
+    log_trace(
         "=> %s\::request(action=%s, server_url=%s, extra=%s)",
         __PACKAGE__, $action, $server_url, $extra);
     return [400, "Please specify server_url"] unless $server_url;
@@ -89,9 +89,11 @@ sub request {
                         $self->{log_callback}->($chdata);
                     } else {
                         $chdata =~ s/^\[(\w+)\]//;
-                        my $method = $1;
-                        $method = "error" unless $method ~~ @logging_methods;
-                        $log->$method("[$server_url] $chdata");
+                        my $level = $1;
+                        $level = "error" unless $level ~~ @logging_levels;
+                        my $logger_name = "log_$level";
+                        no strict 'refs';
+                        &{$logger_name}("[$server_url] $chdata");
                     }
                     return 1;
                 } elsif ($chtype eq 'r') {
@@ -211,7 +213,7 @@ sub request {
         return [500, "Client died: $eval_err"] if $eval_err;
 
         if ($http_res->code >= 500) {
-            $log->warnf("Network failure (%d - %s), retrying ...",
+            log_warn("Network failure (%d - %s), retrying ...",
                         $http_res->code, $http_res->message);
             $do_retry++;
         }
@@ -236,7 +238,7 @@ sub request {
 
     eval {
         #say "D:body=$ua->{__body}";
-        $log->tracef("body: %s", $ua->{__body});
+        log_trace("body: %s", $ua->{__body});
         $res = $json->decode($ua->{__body});
     };
     my $eval_err = $@;
@@ -277,7 +279,7 @@ Perinci::Access::HTTP::Client - Riap::HTTP client
 
 =head1 VERSION
 
-This document describes version 0.23 of Perinci::Access::HTTP::Client (from Perl distribution Perinci-Access-HTTP-Client), released on 2016-03-16.
+This document describes version 0.24 of Perinci::Access::HTTP::Client (from Perl distribution Perinci-Access-HTTP-Client), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -378,8 +380,8 @@ DEBUG, 5. If VERBOSE, 4. If quiet, 1. Else 0.
 =item * log_callback => CODE
 
 Pass log messages from the server to this subroutine. If not specified, log
-messages will be "rethrown" into Log::Any logging methods (e.g. $log->warn(),
-$log->debug(), etc).
+messages will be "rethrown" into Log::ger loggers (e.g. log_warn(), log_debug(),
+etc).
 
 =back
 
@@ -448,7 +450,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

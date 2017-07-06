@@ -13,9 +13,9 @@ dist.ini
 examples/functions.pl
 examples/ssl_client.pl
 examples/ssl_server.pl
-inc/matrixssl-3-9-1-open.files
-inc/matrixssl-3-9-1-open.tar.gz
-inc/patches/3-9-1-1.patch
+inc/matrixssl-3-9-3-open.files
+inc/matrixssl-3-9-3-open.tar.gz
+inc/patches/3-9-3-1.patch
 inc/patches/README
 lib/Crypt/MatrixSSL3.pm
 ppport.h

@@ -22,10 +22,11 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{4})(\\d{3,4})',
                   'leading_digits' => '
             [16]|
             2(?:
@@ -34,8 +35,7 @@ my $formatters = [
             )|
             9[024-9]|
             52[25]
-          ',
-                  'pattern' => '(\\d{4})(\\d{3,4})'
+          '
                 },
                 {
                   'pattern' => '(\\d{3})(\\d{5})',
@@ -43,13 +43,32 @@ my $formatters = [
             244|
             5(?:
               [015]|
-              66
+              6[56]
             )
           '
                 }
               ];
 
 my $validators = {
+                'personal_number' => '',
+                'geographic' => '
+          (?:
+            18\\d|
+            2(?:
+              [23]\\d{2}|
+              4(?:
+                [1-35-9]\\d|
+                44
+              )|
+              5(?:
+                0[034]|
+                [2-46]\\d|
+                5[1-3]|
+                7[1-7]
+              )
+            )
+          )\\d{4}
+        ',
                 'specialrate' => '',
                 'mobile' => '
           (?:
@@ -60,7 +79,7 @@ my $validators = {
                 22|
                 5[25]
               )|
-              66\\d
+              6[56]\\d
             )|
             6(?:
               0[034679]\\d|
@@ -81,8 +100,7 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'personal_number' => '',
-                'geographic' => '
+                'fixed_line' => '
           (?:
             18\\d|
             2(?:
@@ -101,26 +119,8 @@ my $validators = {
           )\\d{4}
         ',
                 'toll_free' => '',
-                'voip' => '',
                 'pager' => '',
-                'fixed_line' => '
-          (?:
-            18\\d|
-            2(?:
-              [23]\\d{2}|
-              4(?:
-                [1-35-9]\\d|
-                44
-              )|
-              5(?:
-                0[034]|
-                [2-46]\\d|
-                5[1-3]|
-                7[1-7]
-              )
-            )
-          )\\d{4}
-        '
+                'voip' => ''
               };
 
     sub new {

@@ -15,7 +15,7 @@ my $req = $face->_find_similar_request(
 );
 
 isa_ok $req, 'HTTP::Request';
-is $req->uri, 'https://api.projectoxford.ai/face/v1.0/findsimilars';
+is $req->uri, 'https://westus.api.cognitive.microsoft.com/face/v1.0/findsimilars';
 is $req->method, 'POST';
 is $req->header('Content-Type'), 'application/json';
 is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';

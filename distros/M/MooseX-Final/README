@@ -1,0 +1,72 @@
+NAME
+    MooseX::Final - mark a class as "final" (cannot be inherited from)
+
+SYNOPSIS
+     package Example::Phone {
+       use Moose;
+       use MooseX::Final;
+       has number => (is => 'ro', required => 1);
+       sub call { ... }
+       sub BUILD {
+         assert_final( my $self = shift );
+         ...;   # do other stuff here if required
+       }
+     }
+
+     package Example::Phone::Mobile {
+       use Moose;
+       sub send_sms { ... }
+     }
+
+     my $friend = Example::Phone::Mobile->new(number => 123);  # dies
+
+DESCRIPTION
+    This package allows you to mark a class as being "final". A final class is
+    at the top of the inheritance hierarchy. It cannot be inherited from. You
+    almost certainly don't want this. Why prevent people from inheriting from
+    your class? There's no good reason.
+
+    Nevertheless, if you have a bad reason, you can use this module to do it.
+    Despite the name, this module should work fine with Moose, Moo, Mouse,
+    Class::Tiny, and any other class builder that properly supports the
+    concept of `BUILD` methods.
+
+    This is not 100% foolproof. Subclasses can probably work around it without
+    a massive amount of difficulty. But if you're trying to subclass a class
+    that has indicated it should be final, perhaps you should think of another
+    way of achieving your aims. (Hint: delegation.)
+
+    Note that the exception is thrown when you try to *instantiate* the
+    subclass, not when you try to define the subclass.
+
+  Functions
+    `assert_final($object)`
+        Dies if $object isn't an instance of the calling class, and does not
+        respect inheritance when checking.
+
+        Call this in your `BUILD` method.
+
+        (Technically, this doesn't check `caller`, but instead figures out
+        which class to be testing against at `import` time.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Final>.
+
+SEE ALSO
+    Moose, Moo, Class::Tiny.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -43,7 +43,8 @@ sub get_all_disapproved_ads_with_awql {
 
   # Get all the disapproved ads for the given ad group.
   my $query =
-    "SELECT Id, PolicySummary WHERE AdGroupId = ${ad_group_id} ORDER BY Id";
+    "SELECT Id, PolicySummary WHERE AdGroupId = ${ad_group_id} AND " .
+    "CombinedApprovalStatus = DISAPPROVED ORDER BY Id";
 
   # Paginate through results.
   # The contents of the subroutine will be executed for each disapproved ad.
@@ -57,19 +58,17 @@ sub get_all_disapproved_ads_with_awql {
     )->process_entries(
     sub {
       my ($ad_group_ad) = @_;
+      $disapproved_ad_count++;
       my $policy_summary = $ad_group_ad->get_policySummary();
-      if ($policy_summary->get_combinedApprovalStatus() eq "DISAPPROVED") {
-        $disapproved_ad_count++;
-        printf "Ad with ID %d and type '%s' was disapproved with the " .
-          "following policy topic entries:\n", $ad_group_ad->get_ad()->get_id(),
-          $ad_group_ad->get_ad()->get_Ad__Type();
-        foreach
-          my $policy_topic_entry (@{$policy_summary->get_policyTopicEntries()})
-        {
-          printf "  topic id: %s, topic name: '%s'\n",
-            $policy_topic_entry->get_policyTopicId(),
-            $policy_topic_entry->get_policyTopicName();
-        }
+      printf "Ad with ID %d and type '%s' was disapproved with the " .
+        "following policy topic entries:\n", $ad_group_ad->get_ad()->get_id(),
+        $ad_group_ad->get_ad()->get_Ad__Type();
+      foreach
+        my $policy_topic_entry (@{$policy_summary->get_policyTopicEntries()})
+      {
+        printf "  topic id: %s, topic name: '%s'\n",
+          $policy_topic_entry->get_policyTopicId(),
+          $policy_topic_entry->get_policyTopicName();
       }
     });
 

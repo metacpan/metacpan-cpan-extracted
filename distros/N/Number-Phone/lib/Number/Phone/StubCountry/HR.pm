@@ -22,32 +22,32 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
-                  'pattern' => '(1)(\\d{4})(\\d{3})',
-                  'leading_digits' => '1'
+                  'leading_digits' => '1',
+                  'pattern' => '(1)(\\d{4})(\\d{3})'
                 },
                 {
-                  'pattern' => '([2-5]\\d)(\\d{3})(\\d{3,4})',
-                  'leading_digits' => '[2-5]'
+                  'leading_digits' => '[2-5]',
+                  'pattern' => '([2-5]\\d)(\\d{3})(\\d{3,4})'
                 },
                 {
-                  'leading_digits' => '9',
-                  'pattern' => '(9\\d)(\\d{3})(\\d{3,4})'
+                  'pattern' => '(9\\d)(\\d{3})(\\d{3,4})',
+                  'leading_digits' => '9'
                 },
                 {
-                  'pattern' => '(6[01])(\\d{2})(\\d{2,3})',
-                  'leading_digits' => '6[01]'
+                  'leading_digits' => '6[01]',
+                  'pattern' => '(6[01])(\\d{2})(\\d{2,3})'
                 },
                 {
-                  'leading_digits' => '[67]',
-                  'pattern' => '([67]\\d)(\\d{3})(\\d{3,4})'
+                  'pattern' => '([67]\\d)(\\d{3})(\\d{3,4})',
+                  'leading_digits' => '[67]'
                 },
                 {
-                  'leading_digits' => '8',
-                  'pattern' => '(80[01])(\\d{2})(\\d{2,3})'
+                  'pattern' => '(80[01])(\\d{2})(\\d{2,3})',
+                  'leading_digits' => '8'
                 },
                 {
                   'pattern' => '(80[01])(\\d{3})(\\d{3})',
@@ -66,7 +66,6 @@ my $validators = {
             5[1-3]
           )\\d{6,7}
         ',
-                'toll_free' => '80[01]\\d{4,6}',
                 'specialrate' => '(
           6(?:
             [01]\\d{0,2}|
@@ -78,6 +77,9 @@ my $validators = {
             72
           )\\d{6}
         )',
+                'toll_free' => '80[01]\\d{4,6}',
+                'pager' => '',
+                'voip' => '',
                 'mobile' => '
           9(?:
             01\\d|
@@ -97,9 +99,7 @@ my $validators = {
             4[02-47-9]|
             5[1-3]
           )\\d{6,7}
-        ',
-                'voip' => '',
-                'pager' => ''
+        '
               };
 
     sub new {

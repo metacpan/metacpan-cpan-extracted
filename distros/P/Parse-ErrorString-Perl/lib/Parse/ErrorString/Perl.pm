@@ -4,7 +4,7 @@ use v5.8.7;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.26';
 
 use Carp qw(carp cluck);
 use Pod::Find ();
@@ -57,30 +57,15 @@ sub parse_string {
 }
 
 sub _prepare_diagnostics {
-	my $self    = shift;
-	my %options = @_;
+	my $self = shift;
 
 	my $perldiag;
-	my $pod_filename;
-
-	if ( $options{lang} ) {
-		$perldiag = 'POD2::' . $options{lang} . '::perldiag';
-		$pod_filename = Pod::Find::pod_where( { -inc => 1 }, $perldiag );
-
-		if ( !$pod_filename ) {
-			carp "Could not locate localised perldiag, trying perldiag in English";
-		}
-	}
+	my $pod_filename = Pod::Find::pod_where( { -inc => 1 }, 'perldiag' );
 
 	if ( !$pod_filename ) {
-		$pod_filename = Pod::Find::pod_where( { -inc => 1 }, 'perldiag' );
-
-		if ( !$pod_filename ) {
-			carp "Could not locate perldiag, diagnostic info will no be added";
-			return;
-		}
+		carp "Could not locate perldiag, diagnostic info will no be added";
+		return;
 	}
-
 
 	my $parser = Pod::POM->new();
 	my $pom    = $parser->parse_file($pod_filename);
@@ -468,11 +453,11 @@ objects providing information for each error.
 
 =head1 SEE ALSO
 
-L<splain>
+L<splain|http://perldoc.perl.org/splain.html>
 
 =head1 ACKNOWLEDGEMENTS
 
-Part of this module is based on code from L<splain>.
+Part of this module is based on code from L<splain|http://perldoc.perl.org/splain.html>.
 
 =head1 SUPPORT
 

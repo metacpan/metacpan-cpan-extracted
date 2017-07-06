@@ -40,7 +40,8 @@ use any features available in perl itself.
 =item C<$borg_repo>
 
 This specifies the URL to the borg repo as used in other borg commands. If you
-use the $BORG_REPO environment variable leave this empty.
+use the $BORG_REPO environment variable set this to an empty string. Default:
+"backup:borg-".hostname;
 
 =item C<$cache_path_base>
 

@@ -4,20 +4,24 @@ author:
   - 'Brad Lhotsky <brad@divisionbyzero.net>'
 build_requires:
   Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::TimeZone: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  List::AllUtils: '0'
+  Storable: '0'
   Test::Deep: '0'
   Test::MockTime: '0'
   Test::More: '0'
+  Time::Moment: '0'
+  YAML: '0'
   blib: '1.01'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.010'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,20 +30,19 @@ name: Parse-Syslog-Line
 requires:
   Carp: '0'
   Const::Fast: '0'
-  DateTime: '0'
-  DateTime::Format::HTTP: '0'
-  DateTime::TimeZone: '0'
   English: '0'
   Exporter: '0'
   HTTP::Date: '0'
-  Time::Moment: '0'
+  Module::Load: '0'
+  Module::Loaded: '0'
+  POSIX: '0'
   perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   homepage: https://github.com/reyjrar/Parse-Syslog-Line
   repository: https://github.com/reyjrar/Parse-Syslog-Line.git
-version: '3.6'
+version: '3.7'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -56,66 +59,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Basic/GatherDir'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Basic/PruneCruft'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Basic/ManifestSkip'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Basic/MetaYAML'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Basic/License'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Basic/Readme'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Basic/ExtraTests'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Basic/ExecDir'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Basic/ShareDir'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Basic/MakeMaker'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Basic/Manifest'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Basic/TestRelease'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Basic/ConfirmRelease'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Basic/UploadToCPAN'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MinimumPerl
       name: MinimumPerl
@@ -127,7 +130,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -135,11 +138,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::ContributorsFromGit
       name: ContributorsFromGit
@@ -248,23 +251,23 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::Test::EOL
       config:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':ExecFiles'
             - ':InstallModules'
+            - ':ExecFiles'
             - ':TestFiles'
-          trailing_whitespace: 1
+          trailing_whitespace: '1'
       name: Test::EOL
-      version: '0.19'
+      version: '0.18'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -322,7 +325,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v3.6
+          tag: v3.7
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -345,52 +348,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.007'
+      version: '6.005'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.007'
+      version: '6.005'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.007'
+    version: '6.005'
 x_contributors:
   - 'Bartłomiej Fulanty <starlight@cpan.org>'
   - 'Csillag Tamas <cstamas@digitus.itk.ppke.hu>'
@@ -399,4 +402,3 @@ x_contributors:
   - 'Neil Bowers <neil@bowers.com>'
   - 'Shawn Wilson <swilson@korelogic.com>'
   - 'Tomohiro Hosaka <bokutin@bokut.in>'
-x_serialization_backend: 'YAML::Tiny version 1.69'

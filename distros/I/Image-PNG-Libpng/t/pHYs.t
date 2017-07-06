@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use FindBin;
+use FindBin '$Bin';
 use Image::PNG::Libpng ':all';
 use Image::PNG::Const ':all';
 use Test::More tests => 3;
@@ -8,7 +8,7 @@ use Test::More tests => 3;
 # Test reading a background.
 
 my $png = create_read_struct ();
-open my $fh, "<:raw", "$FindBin::Bin/libpng/cdun2c08.png" or die $!;
+open my $fh, "<:raw", "$Bin/libpng/cdun2c08.png" or die $!;
 init_io ($png, $fh);
 read_png ($png);
 close $fh or die $!;

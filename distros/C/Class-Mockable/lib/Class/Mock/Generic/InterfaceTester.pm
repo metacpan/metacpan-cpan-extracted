@@ -3,7 +3,7 @@ package Class::Mock::Generic::InterfaceTester;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.2000';
 
 use vars qw($AUTOLOAD);
 
@@ -51,16 +51,44 @@ and in the tests:
         ]);
     );
 
+or, more simply:
+
+    my $interface_tester = Class::Mock::Generic::InterfaceTester->new;
+    My::Module->_storage_class($interface_tester);
+    
+    # Expect this method to be called by this test.
+    $interface_tester->add_fixtures(
+        fetch => {
+            input => [customer_id => 94],
+            output => ...
+        },
+    );
+    ok(My::Module->something_that_fetches_from_storage(customer_id => 94));
+
+    # Expect these two methods to be called by this next test.
+    $interface_tester->add_fixtures(
+        update => {
+            input  => [status => 'fired', reason => 'non-payment'],
+            output => 1,
+        },
+        uuid => {
+            output => 'DEADBEEF-1234-5678-9ABC-1234567890AB',
+        }
+    );
+    ok(My::Module->something_that_updates_storage_for_non_payment);
+
 =head1 METHODS
 
 =head2 new
 
-This is the only real method.  It creates a very simple object.  Pass
-to it an arrayref of fixtures structured as above.  Any subsequent
-method calls on that object are handled by AUTOLOAD.  Note that because
+ In: \@fixtures or @fixtures
+
+This is the main method. It creates a very simple object. Pass to it a list or
+arrayref of fixtures (see L<add_fixtures> for syntax). Any subsequent method
+calls on that object are handled by AUTOLOAD. Note that because
 the constructor is Highly Magical you can even provide fixtures for a
 method called 'new()'.  The only ones you can't provide fixtures for are
-'AUTOLOAD()' and 'DESTROY()'.
+'AUTOLOAD()' and 'DESTROY()', and possibly L<add_fixtures>.
 
 For each method call, the first element is removed from the array of
 fixtures.  We then compare the name of the method that was called with
@@ -83,6 +111,50 @@ In this case, the actual parameters passed to the method will be passed to
 that code-ref for validation.  It should return true if the params are OK
 and false otherwise.  In the example, it will return true if the hash of
 args contains a 'fruit' key with value 'apple'.
+
+=head2 add_fixtures
+
+ In: \@fixtures or @fixtures
+
+Supplied with either an arrayref or a list of method call fixtures, adds them
+to the array of fixtures this object maintains internally (although see below
+for a caveat about this).
+
+At the simplest, a method call fixture is a hashref with keys
+C<method>, C<input> and C<output>. If you don't care about the input
+your method receives, you can omit that key and any input will be accepted.
+
+You can also provide a fixture as a pair of C<method> and (hashref containing
+input and output). This lets you write a series of method call fixtures as an
+apparent ordered hash, which may feel more natural. As above, you can omit
+the input field if you don't care. So the following calls are equivalent:
+
+ $interface_tester->add_fixtures(
+     [
+         {
+             method => 'do_something',
+             input  => sub { 1 },
+             output => 'Yup, done',
+         },
+         {
+             method => 'do_something_with_this',
+             input  => ['fish'],
+             output => 'Fish cooked',
+         }
+     ]
+ );
+
+ $interface_tester->add_fixtures(
+     do_something           => { output => 'Yup, done' },
+     do_something_with_this => {
+         input  => ['fish'],
+         output => 'Fish cooked',
+     },
+ );
+
+Caveat: just in case you need to test a call to a method that coincidentally
+is also called C<add_fixtures>, this method is only enabled
+if you did I<not> provide a list of fixtures to the constructor.
 
 =head2 DESTROY
 
@@ -200,6 +272,8 @@ care more about how you call external code.
 
 =cut
 
+my $_add_fixtures;
+
 sub new {
     my $class = shift;
 
@@ -211,9 +285,8 @@ sub new {
     }
 
     my $caller = (caller(1))[3];
-    return bless({
+    my $self = bless({
         called_from => $caller,
-        tests => shift,
         _origin_message => sub {
             my $method = shift;
             return sprintf(
@@ -221,14 +294,60 @@ sub new {
                 $method,
                 $caller
             )
-        }
+        },
+        tests => [],
     }, $class);
+    if (@_) {
+        $_add_fixtures->($self, @_);
+    } else {
+        $self->{_no_fixtures_in_constructor} = 1;
+    }
+    return $self;
 }
+
+# Declaring this as a coderef rather than a method so we can decide
+# whether it exists or not based on how the constructor was called,
+# for maximum backwards-compatibility.
+
+$_add_fixtures = sub {
+    my $self = shift;
+
+    # We might have been passed an arrayref or a list.
+    my @args = (ref($_[0]) eq 'ARRAY' && @_ == 1) ? @{$_[0]} : @_;
+
+    # Our fixtures might be raw hashrefs, or method name => hashref pairs.
+    # You can't mix and match.
+    my @fixtures;
+    if (ref($args[0]) eq 'HASH') {
+        @fixtures = @args;
+    } else {
+        while (my ($method, $fixture_details) = splice(@args, 0, 2)) {
+            push @fixtures, { method => $method, %$fixture_details };
+        }
+    }
+
+    # If input is omitted, we assume we don't care.
+    for (@fixtures) {
+        if (!exists $_->{input}) {
+            $_->{input} = sub { 1 };
+        }
+    }
+
+    # OK, add these fixtures.
+    push @{ $self->{tests} ||= [] }, @fixtures;
+};
 
 sub AUTOLOAD {
     (my $method = $AUTOLOAD) =~ s/.*:://;
     my $self = shift;
     my @args = @_;
+
+    # If this is the special method add_fixtures, and we didn't
+    # add fixtures in the constructor (i.e. we expect to add fixtures
+    # bit by bit rather than all at once), add fixtures to our list.
+    if ($method eq 'add_fixtures' && $self->{_no_fixtures_in_constructor}) {
+        return $_add_fixtures->($self, @args);
+    }
 
     # If we have no more tests, then we've called the mocked $thing more
     # times than expected - the code under test obviously has more outputs
@@ -303,7 +422,9 @@ sub DESTROY {
  
 =head1 AUTHOR
 
-Copyright 2012 UK2 Ltd and David Cantrell E<lt>david@cantrell.org.ukE<gt>
+Copyright 2012, 2017 UK2 Ltd and David Cantrell E<lt>david@cantrell.org.ukE<gt>
+
+Some contributions from Sam Kington
 
 This software is free-as-in-speech software, and may be used, distributed,
 and modified under the terms of either the GNU General Public Licence

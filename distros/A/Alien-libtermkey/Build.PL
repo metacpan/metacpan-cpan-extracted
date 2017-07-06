@@ -6,9 +6,9 @@ use Alien::make::Module::Build;
 
 my $build = Alien::make::Module::Build->new(
    module_name => 'Alien::libtermkey',
-   tarball => 'libtermkey-0.18.tar.gz',
+   tarball => 'libtermkey-0.20.tar.gz',
    pkgconfig_module => "termkey",
-   pkgconfig_version => "0.18",
+   pkgconfig_version => "0.20",
 
    alien_requires => [
       [ any =>
@@ -21,6 +21,9 @@ my $build = Alien::make::Module::Build->new(
       'File::Basename' => 0,
       'File::Path' => '2.07',
       'File::Spec' => 0,
+   },
+   configure_requires => {
+      'perl' => '5.010', # //
    },
    license => 'perl',
    create_makefile_pl => 'small',

@@ -18,7 +18,7 @@ use Test::BrewBuild::BrewCommands;
 use Test::BrewBuild::Dispatch;
 use Test::BrewBuild::Tester;
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 my $log;
 my $bcmd;
@@ -290,7 +290,7 @@ sub instance_remove {
         }
     }
 
-    $log->_4("removal of existing perl installs complete...");
+    $log->_4("removal of existing perl installs complete...\n");
 }
 sub revdep {
     my ($self, %args) = @_;
@@ -375,7 +375,7 @@ sub test {
 
     $self->_copy_logs;
 
-    $log->_5(__PACKAGE__ ." run finished");
+    $log->_5(__PACKAGE__ ." run finished\n");
 
     my $ret = "\n";
     $ret .= "$self->{args}{plugin_arg}\n" if $self->{args}{plugin_arg};
@@ -409,16 +409,35 @@ sub log {
 sub revdeps {
     my $self = shift;
 
+    load 'MetaCPAN::Client';
+    my $mcpan = MetaCPAN::Client->new;
+
     my $log = $log->child('revdeps');
     $log->_6('running --revdep');
 
-    my @modules;
+    my $mod;
 
     find({
             wanted => sub {
-                $log->_7("finding modules");
+                return if $mod;
+
                 if (-f && $_ =~ /\.pm$/){
-                    push @modules, $_;
+
+                    $log->_6("processing module '$_'");
+
+                    s|lib/||;
+                    s|/|-|g;
+                    s|\.pm||;
+
+                    $log->_6("module file converted to '$_'");
+
+                    my $dist;
+
+                    eval {
+                        $dist = $mcpan->distribution($_);
+                    };
+                    $mod = $_ if ref $dist;
+
                 }
             },
             no_chdir => 1,
@@ -426,15 +445,7 @@ sub revdeps {
         'lib/'
     );
 
-    my $mod = $modules[0];
-
     $log->_7("using '$mod' as the project we're working on");
-
-    $mod =~ s|lib/||;
-    $mod =~ s|/|-|g;
-    $mod =~ s|\.pm||;
-
-    $log->_7("working module translated to $mod");
 
     my @revdeps = $self->_get_revdeps($mod);
     return @revdeps;
@@ -566,8 +577,6 @@ sub _exec {
 
     my $log = $log->child('exec');
 
-    $log->_6("creating temp file");
-
     if ($self->{args}{plugin_arg}) {
         $log->_5( "" .
             "fetching instructions from the plugin with arg " .
@@ -593,6 +602,9 @@ sub _exec {
 
         my $wfh = File::Temp->new(UNLINK => 1);
         my $fname = $wfh->filename;
+
+        $log->_6("created temp file for storing output: $fname");
+
         open $wfh, '>', $fname or croak $!;
         for (@exec_cmd){
             s/\n//g;
@@ -658,6 +670,9 @@ sub _exec {
         else {
             my $wfh = File::Temp->new(UNLINK => 1);
             my $fname = $wfh->filename;
+
+            $log->_6("created temp file for storing output: $fname");
+
             open $wfh, '>', $fname or croak $!;
             for (@exec_cmd){
                 s/\n//g;

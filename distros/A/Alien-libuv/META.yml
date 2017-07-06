@@ -7,11 +7,17 @@ build_requires:
   Alien::Build: '0.40'
   Alien::Build::MM: '0.40'
   Alien::Build::Plugin::Build::Autoconf: '0'
+  Alien::Build::Plugin::Gather::IsolateDynamic: '0'
+  Alien::MSYS: '0'
+  Alien::autoconf: '0.02'
+  Alien::automake: '0.02'
+  Alien::libtool: '0.02'
   Config: '0'
   ExtUtils::MakeMaker: '6.52'
   File::Spec: '0'
   IPC::Cmd: '0'
   Test2::Suite: '0'
+  Test2::V0: '0'
   Test::Alien: '0'
   Test::More: '0.88'
 configure_requires:
@@ -36,7 +42,7 @@ no_index:
 provides:
   Alien::libuv:
     file: lib/Alien/libuv.pm
-    version: '0.001'
+    version: '0.004'
 requires:
   Alien::Base: '0'
   base: '0'
@@ -47,10 +53,10 @@ resources:
   bugtracker: https://github.com/genio/Alien-libuv/issues
   homepage: https://github.com/genio/Alien-libuv
   repository: https://github.com/genio/Alien-libuv.git
-version: '0.001'
+version: '0.004'
 x_Dist_Zilla:
   perl:
-    version: '5.026000'
+    version: '5.024001'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -61,6 +67,7 @@ x_Dist_Zilla:
             - META.json
             - Makefile.PL
             - README.md
+            - t/00-report-prereqs.t
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -237,7 +244,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -260,7 +267,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -277,7 +284,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -290,11 +297,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.001
+          tag: v0.004
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -308,7 +315,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.11.0
+          git_version: '2.11.0 (Apple Git-81)'
           repo_root: .
       name: '@Git/Push'
       version: '2.042'
@@ -414,5 +421,5 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.009'
 x_contributors:
-  - 'Chase Whitener <cwhitener@gmail.com>'
+  - 'Graham Ollis <plicease@cpan.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,35 +14,41 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 377ce610f3f31a4d29c05f1b4c1ee7e41b9785dc Changes
-SHA1 307595b5f8680ddf21f487d3615ef613178c9179 INSTALL
+SHA1 a6babcbbc5f35cdae5229c7040898570ef833a69 Changes
+SHA1 6f1f6da58ca454693d75f77433f2383c65fa910f INSTALL
 SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
-SHA1 1639d8d64670fcb5f20d3de252bca30a10a676b3 MANIFEST
-SHA1 21cd8e0e8f954dea09a94ca5bca2d752b8c32595 META.json
-SHA1 81691dd0b9610c42ee18f30bcc4c4e7c1eeee0be META.yml
-SHA1 66eaf0faa753f6e401935e0834b1422fea3da9c1 Makefile.PL
-SHA1 296dfffb76a5f266ea83a65fce0b934dc8dcb0aa README
+SHA1 d004911a9cadfe8fd5e360e300884c9ded3f6c09 MANIFEST
+SHA1 30e3ebfc0e8260c9105efa85096bec2d313de1eb META.json
+SHA1 d4198833caaea9487b60968ebf853cf1fb3f2342 META.yml
+SHA1 b1a9971fe159de01b715e5b80657b4ce95aafe24 Makefile.PL
+SHA1 75b9e47e90de79eabc6762ea40e511acebb564c6 README
 SHA1 46da63ae3787788ff155a45bb6a855d0071a4ff3 cpanfile
-SHA1 4edb7c9d4ab9096f4755518440a4af9d9e4b079e dist.ini
-SHA1 159bd4fad296dbcb1be22400b98df71ab48ba405 lib/Tickit/WidgetRole/Movable.pm
-SHA1 8655b75310e204997413622693637884bfb954c8 lib/Tickit/WidgetRole/Movable.pod
-SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
-SHA1 c3b3e953ce3f6f6d950b4138f4c019642aab1243 t/00-compile.t
-SHA1 0cabf48f373b63a4cf29081bd13a47627fc2fbb8 t/000-report-versions-tiny.t
-SHA1 f242e380d897f0430a668ea3f2938df75c0bef55 xt/author/test-eol.t
+SHA1 535f5294c92181d52f9edae054915dbaaf4d6ff8 dist.ini
+SHA1 003b830eb28cc322ec96d75b0c2c50bac2a70b3b lib/Tickit/WidgetRole/Movable.pm
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 5111cd40887db1153bc5a6fb38b8b9834b177187 t/00-compile.t
+SHA1 cb90e3ebef9226e61e81f9326df26d6a2c42f68d t/00-report-prereqs.dd
+SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 4146b75714ac972231d12d4fb93e764817a5eb0b xt/author/pod-linkcheck.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
 SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
-SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
-SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
-SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
-SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQEcBAEBAgAGBQJT74iQAAoJEFKElMNpjtyDAUwH/iP+rtDSRZQyXfVyS4b/K9bq
-IFKU3NYXSGj353i6H7scmbl8htWUPNouKvxeql7nchvx3NXH8sKll8qbohrinugH
-AcY5an2u2vJfVC1cjimuW6jMvQyk58HxrYf4d84Ei0AThQKZXqy1mw9KfMqbxnMg
-apw8w0L8srg6esCyYY6cF4efIp2RB+Sf1g9tyT5JdfzdGl3Sla3Y8xwAFS7m4pAX
-17Zg6YnxMk59TEchp5r3r5DpKYa+T9GPZw8DLsR3kYROTFAVSxLlcUf98a3HHhAO
-LSVS9Tv+KpTlJVX+mvJdxbwOX0thHHeyvuxLFfb/+kvLwkS8EshRITTWPQ0CTuE=
-=2fbs
+iQIcBAEBAgAGBQJZTrJDAAoJEG2WkcbynxAl4zIQAJFh3DZSdQeEYt7uMHaCMMce
+DhsbaXBXqpFZcmOgAFbpk+KG8b1EI10EBEFN/k41iW1yJ2v+Tn8t+hv2BbIPJMto
+vnw7xdoAifHhZk1htRn3NyCG/UlEVc7W/UBZfB6k5GEy93rZFw2A5HJJLIDEDRYs
+P4lSiTjCUpiEx67Y9nQkHJE4iiucJbMDXdg604YPPGUBQ0W+S2NN7i+aYzyvNkdl
+6MY7Ifu8mOX5lyvCWj78vns8SsopOtIxaokiTgIlGinQ4oBFVf3DOIx67bmXZHrg
+UNA1JCe8E1doPcLQ7M/KtJsP4hREX0Su9iIQNTJp7cuIGbSOFzOeG80gC6pd6X61
+60qXZECeWCBogB85JitFrL8eDFvxlssgitqSVz3yIFQ6q5MW8hgdu8HRkIItHhcN
+Fzho8WxJnH9zOc97zX0/wplKV6za4LsWusoVP/S+kKwz6creNSpsPqlsrHNuPKHf
+BhaPwt3WNYCAZQChYZQ0PTZQn9JShR1BpdFBqriP9jUgjvT7TekgA1LGaNyhQyKJ
+JRXeFpEj+Xgemy9KWUmJhmEZnMciMQRj1pZjN7OqmMAdWaH4ypiLgLqgTjqU+H3B
+NDuKeqfgURf05YyNSJDQNWLXxoui2FmxjgBUUmkDfhzSo2mDxhRf8N9tgI9pe1MD
+zGKriWv1Pgh3QSO94wFa
+=+oTu
 -----END PGP SIGNATURE-----

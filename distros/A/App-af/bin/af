@@ -11,7 +11,7 @@ use File::chdir;
 # VERSION
 
 
-package App::af::download 0.10 {
+package App::af::download 0.11 {
   use Moose;
   use namespace::autoclean;
   use MooseX::Types::Path::Tiny qw( AbsPath );
@@ -82,7 +82,58 @@ package App::af::download 0.10 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::install 0.10 {
+package App::af::probe 0.11 {
+  use Moose;
+  use namespace::autoclean;
+  use MooseX::Types::Path::Tiny qw( AbsPath );
+  use File::Temp qw( tempdir );
+  
+  with 'App::af';
+  with 'App::af::role::alienfile';
+  with 'App::af::role::libandblib';
+
+
+  has root => (
+    is       => 'ro',
+    isa      => AbsPath,
+    traits   => ['App::af::opt'],
+    opt_type => 's',
+    coerce   => 1,
+    lazy     => 1,
+    default  => sub {
+      shift->_tmp->child('root');
+    },
+  );
+  
+  has _tmp => (
+    is      => 'ro',
+    isa     => AbsPath,
+    lazy    => 1,
+    default => sub {
+      my $dir = Path::Tiny->new(tempdir( CLEANUP => 1));
+      $dir->child($_)->mkpath for qw( root stage prefix );
+      $dir;
+    },
+  );
+  
+  sub main
+  {
+    my($self) = @_;
+    
+    my $build = $self->build( root => $self->root->stringify );
+
+    $build->set_stage($self->_tmp->child('stage')->stringify);
+    $build->set_prefix($self->_tmp->child('prefix')->stringify);
+    $build->load_requires('configure');
+    my $type = $build->install_type;
+    
+    say "install type: $type";
+
+    0;
+  }
+}
+
+package App::af::install 0.11 {
   use Moose;
   use namespace::autoclean;
   use File::Temp qw( tempdir );
@@ -92,6 +143,7 @@ package App::af::install 0.10 {
   
   with 'App::af';
   with 'App::af::role::alienfile';
+  with 'App::af::role::libandblib';
   
   
   has stage => (
@@ -153,41 +205,11 @@ package App::af::install 0.10 {
     opt_type => 's{2}',
   );
   
-  has I => (
-    is       => 'ro',
-    isa      => 'ArrayRef[Str]',
-    traits   => ['App::af::opt'],
-    opt_type => 's',
-    is_array => 1,
-  );
-  
-  has blib => (
-    is       => 'ro',
-    isa      => 'Int',
-    traits   => ['App::af::opt'],
-  );
-  
   sub main
   {
     my($self) = @_;
   
     local $ENV{ALIEN_INSTALL_TYPE} = $ENV{ALIEN_INSTALL_TYPE};
-    
-    foreach my $inc (reverse @{ $self->I })
-    {
-      require lib;
-      lib->import($inc);
-    }
-    
-    if($self->blib)
-    {
-      require blib;
-      blib->import;
-    }
-
-    # make sure @INC entries are absolute, since $build
-    # may do a lot of directory changes    
-    @INC = map { ref $_ ? $_ : path($_)->absolute->stringify } @INC;
     
     if(defined $self->type)
     {
@@ -326,7 +348,7 @@ package App::af::install 0.10 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::requires 0.10 {
+package App::af::requires 0.11 {
   use Moose;
   use namespace::autoclean;
   use YAML qw( Dump );
@@ -361,7 +383,7 @@ package App::af::requires 0.10 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::missing 0.10 {
+package App::af::missing 0.11 {
   use Moose;
   use namespace::autoclean;
   use Capture::Tiny qw( capture );
@@ -420,7 +442,7 @@ package App::af::missing 0.10 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::prop 0.10 {
+package App::af::prop 0.11 {
   use Moose;
   use namespace::autoclean;
 
@@ -522,7 +544,7 @@ package App::af::prop 0.10 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::list 0.10 {
+package App::af::list 0.11 {
   use Moose;
   use namespace::autoclean;
   use Path::Tiny qw( path );
@@ -616,11 +638,12 @@ af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
  af download   --help
+ af probe      --help
  af install    --help
  af requires   --help
  af missing    --help
@@ -677,6 +700,44 @@ as simply C<curl>.
 
 The location to store the downloaded resource.  The current directory
 if not specified.
+
+=head2 probe
+
+=head3 Usage
+
+ af probe
+   [ ( -f | --file ) alienfile | ( -c | --class ) class ]
+   [ --root directory ]
+   [ --before hook command ] [ --after hook command ]
+   [ -I lib ] [ --blib ]
+
+=head3 description
+
+Probe system for existing library or tool using the given L<alienfile>.
+
+=head4 -f | --file
+
+The L<alienfile>.  If neither this option, nor C<-c> is specified, then 
+C<alienfile> in the current directory will be assumed.
+
+=head4 -c | --class
+
+Get the L<alienfile> from the already installed Alien module.    You may
+omit the C<Alien::> prefix, so for example L<Alien::curl> may be specified
+as simply C<curl>.  If you do not specify the C<--prefix> option, the
+package will replace the already installed one.
+
+=head4 --root
+
+Build in root
+
+=head4 -I
+
+Add directory to the Perl search lib (like -I on L<perl>).
+
+=head4 --blib
+
+Use the blib from the current directory.
 
 =head2 install
 

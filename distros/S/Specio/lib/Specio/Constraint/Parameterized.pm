@@ -3,7 +3,7 @@ package Specio::Constraint::Parameterized;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Role::Tiny::With;
 use Specio::OO;
@@ -80,7 +80,7 @@ Specio::Constraint::Parameterized - A class which represents parameterized const
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 

@@ -85,8 +85,8 @@ is $stdout, 'test', 'emit';
 is $stderr, 'test', 'emit_err';
 
 eval {
-   ensure_class_loaded( 'Class::Usul::Response::Table' );
-   Class::Usul::Response::Table->new;
+   ensure_class_loaded( 'Class::Usul::Response::IPC' );
+   Class::Usul::Response::IPC->new;
 };
 
 ok !exception, 'ensure_class_loaded';

@@ -1,40 +1,27 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2015 Smithsonian Astrophysical Observatory
-#
-# This file is part of MooX-Cmd-ChainedOptions
-#
-# MooX-Cmd-ChainedOptions is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or (at
-# your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package MooX::Cmd::ChainedOptions::Role;
+
+# ABSTRACT: generate per-command roles to handle chained options
 
 use strict;
 use warnings;
+
+our $VERSION = '0.04';
 
 use Package::Variant
   importing => ['Moo::Role'],
   subs      => [ 'has', 'with' ];
 
-=pod
+use namespace::clean -except => [ 'build_variant' ];
 
-=for pod-coverage
-
-=head2 make_variant
-
-=cut
+#pod =pod
+#pod
+#pod =for pod-coverage
+#pod
+#pod =head2 make_variant
+#pod
+#pod =head2 build_variant
+#pod
+#pod =cut
 sub make_variant {
 
     my ( $class, $target, $parent, $role ) = @_;
@@ -50,11 +37,25 @@ sub make_variant {
 
 1;
 
-__END__
+#
+# This file is part of MooX-Cmd-ChainedOptions
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+=pod
 
 =head1 NAME
 
 MooX::Cmd::ChainedOptions::Role - generate per-command roles to handle chained options
+
+=head1 VERSION
+
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -63,19 +64,53 @@ creates a role for each command which augments the C<_parent>
 attribute from the similar role for the next higher command in the
 command chain to handle the options from that next higher command.
 
-=head1 COPYRIGHT AND LICENSE
+=begin pod-coverage
 
-Copyright 2015 Smithsonian Astrophysical Observatory
 
-This software is released under the GNU General Public License.  You
-may find a copy at
 
-          http://www.gnu.org/licenses
 
-=cut
+=end pod-coverage
+
+=head2 make_variant
+
+=head2 build_variant
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=MooX-Cmd-ChainedOptions>.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<MooX::Cmd::ChainedOptions|MooX::Cmd::ChainedOptions>
+
+=back
 
 =head1 AUTHOR
 
-Diab Jerius (cpan:DJERIUS) <djerius@cfa.harvard.edu>
+Diab Jerius <djerius@cpan.org>
 
+=head1 COPYRIGHT AND LICENSE
 
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut
+
+__END__
+
+#pod =head1 DESCRIPTION
+#pod
+#pod This role factory builds upon L<MooX::Cmd::ChainedOptions::Base>.  It
+#pod creates a role for each command which augments the C<_parent>
+#pod attribute from the similar role for the next higher command in the
+#pod command chain to handle the options from that next higher command.

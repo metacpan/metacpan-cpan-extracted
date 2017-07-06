@@ -8,7 +8,7 @@ use warnings;
 
 package Mail::Box::POP3::Message;
 use vars '$VERSION';
-$VERSION = '3.001';
+$VERSION = '3.002';
 
 use base 'Mail::Box::Net::Message';
 

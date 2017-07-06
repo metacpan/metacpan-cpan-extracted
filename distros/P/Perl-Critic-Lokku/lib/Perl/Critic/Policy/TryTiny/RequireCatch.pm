@@ -1,5 +1,5 @@
 package Perl::Critic::Policy::TryTiny::RequireCatch;
-$Perl::Critic::Policy::TryTiny::RequireCatch::VERSION = '0.002';
+$Perl::Critic::Policy::TryTiny::RequireCatch::VERSION = '0.003';
 use strict;
 use warnings;
 use utf8;
@@ -53,7 +53,7 @@ sub violates {
 
     my $try_block = $elem->snext_sibling() or return;
     my $sib = $try_block->snext_sibling();
-    if ($sib->content ne 'catch') {
+    if (!$sib || $sib->content ne 'catch') {
         return $self->violation($DESC, $EXPL, $elem);
     }
     return;
@@ -73,7 +73,7 @@ Perl::Critic::Policy::TryTiny::RequireCatch - Always include a "catch" block whe
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 
@@ -105,14 +105,12 @@ indicate that exceptions are deliberately ignored.
         # ...
     };
 
+This policy assumes that L<Try::Tiny> is being used, and it doesn't run if it
+can't find it being imported.
+
 =head1 CONFIGURATION
 
 This Policy is not configurable except for the standard options.
-
-=head1 KNOWN BUGS
-
-This policy assumes that L<Try::Tiny> is being used, and it doesn't run if it
-can't find it being imported.
 
 =head1 AUTHOR
 
@@ -120,7 +118,7 @@ David D Lowe <flimm@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Lokku <cpan@lokku.com>.
+This software is copyright (c) 2017 by Lokku <cpan@lokku.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

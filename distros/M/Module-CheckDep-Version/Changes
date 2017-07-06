@@ -1,0 +1,23 @@
+Revision history for Module-CheckDep-Version
+
+0.05    2017-06-26
+        - fix typo in a POD link in checkdev binary
+        - fix typo in binary arg handling; was using 'ignore_all' as opposed to
+          'ignore_any'... doh!
+
+0.04    2017-06-26
+        - fixed issue where if -h is supplied to binary, we skip checking for a
+          valid author
+        - actually included the binary in MANIFEST
+
+0.03    2017-06-26
+        - added 'checkdep' binary, which is installed along with the module
+
+0.02    2017-06-26
+        - added ignore_any param, default on, if set to false, we'll ignore all
+          prereqs that have a version of 0 set
+        - added Travis CI and Coveralls.io badges to POD
+
+0.01    2017-06-26
+        First version, released on an unsuspecting world.
+

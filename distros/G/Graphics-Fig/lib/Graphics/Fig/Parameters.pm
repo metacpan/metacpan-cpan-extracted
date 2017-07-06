@@ -15,13 +15,24 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Parameters;
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use strict;
 use warnings;
 use Carp;
 use Math::Trig qw(deg2rad);
-use Regexp::Common qw /number/;
+
+#
+# RE_INT: regular expression matching an integer
+#
+my $RE_INT = "(?:(?:[-+]?)(?:[0123456789]+))";
+
+#
+# RE_REAL regular expression matching a floating point number
+#
+my $RE_REAL = "(?:(?i)(?:[-+]?)(?:(?=[.]?[0123456789])(?:[0123456789]*)" .
+	      "(?:(?:[.])(?:[0123456789]{0,}))?)(?:(?:[E])(?:(?:[-+]?)" .
+	      "(?:[0123456789]+))|))";
 
 my %ArrowStyles = (
     "stick"				=> [  0, 0 ],
@@ -214,7 +225,7 @@ sub convertAngle {
     my $result;
     my $temp;
 
-    if (!($value =~ m/^\s*($RE{num}{real})/)) {
+    if (!($value =~ m/^\s*($RE_REAL)/)) {
 	croak("${prefix}: error: ${value}: expected angle");
     }
     return deg2rad($value);
@@ -393,7 +404,7 @@ sub convertDepth {
     my $value   = shift;
     my $context = shift;
 
-    if (!($value =~ m/^$RE{num}{int}$/) || $value < 0 || $value > 999) {
+    if (!($value =~ m/^$RE_INT$/) || $value < 0 || $value > 999) {
 	croak("${prefix}: error: ${value}: expected integer from 0 to 999");
     }
     return $value;
@@ -505,7 +516,7 @@ sub convertFontSize {
     my $context = shift;
     my $temp;
 
-    if (!($value =~ s/^\s*($RE{num}{real})//) && $value <= 0) {
+    if (!($value =~ s/^\s*($RE_REAL)//) && $value <= 0) {
 	croak("${prefix}: error: ${value}: invalid font size");
     }
     return $value + 0;
@@ -526,7 +537,7 @@ sub convertInt {
     my $result;
     my $temp;
 
-    if (!($value =~ m/^\s*($RE{num}{int})/)) {
+    if (!($value =~ m/^\s*($RE_INT)/)) {
 	croak("${prefix}: error: ${value}: expected integer");
     }
     return $value;
@@ -571,7 +582,7 @@ sub convertLength {
     my $result;
     my $temp;
 
-    if (!($value =~ s/^\s*($RE{num}{real})//)) {
+    if (!($value =~ s/^\s*($RE_REAL)//)) {
 	croak("${prefix}: error: ${value}: invalid number");
     }
     $result = $1;
@@ -763,7 +774,7 @@ sub convertPositiveReal {
     my $value   = shift;
     my $context = shift;
 
-    if ($value =~ s/^($RE{num}{real})$// && $value > 0) {
+    if ($value =~ s/^($RE_REAL)$// && $value > 0) {
 	return $value;
     }
     croak("${prefix}: error: ${value}: expected positive number");
@@ -787,12 +798,12 @@ sub convertScale {
     if (ref($value) eq "ARRAY") {
 	if (scalar(@{$value}) != 2 ||
 	    !defined($u = ${$value}[0]) || !defined($v = ${$value}[1]) ||
-	    !($u =~ m/^$RE{num}{real}/) || !($v =~ m/^\s*$RE{num}{real}/)) {
+	    !($u =~ m/^$RE_REAL/) || !($v =~ m/^\s*$RE_REAL/)) {
 		croak("${prefix} error: expected scalar or [u, v] pair");
 	}
     } else {
 	if (!defined($value) || !ref($value) eq "" ||
-	    !($value =~ m/$RE{num}{real}/)) {
+	    !($value =~ m/$RE_REAL/)) {
 	    croak("${prefix} error: expected scalar or [u, v] pair");
 	}
 	$u = $value;
@@ -832,7 +843,7 @@ sub convertSplineSubtype {
     if ($value eq "closed-x") {
 	return 5;
     }
-    if ($value =~ m/^\s*($RE{num}{int})/) {
+    if ($value =~ m/^\s*($RE_INT)/) {
 	if ($value < 0 || $value > 5) {
 	    croak("${prefix}: error: ${value}: expected integer in 0..5");
 	}
@@ -891,7 +902,7 @@ sub convertTextJustification {
     if ($value eq "right") {
 	return 2;
     }
-    if (!($value =~ m/^$RE{num}{int}$/) || $value < 0 || $value > 2) {
+    if (!($value =~ m/^$RE_INT$/) || $value < 0 || $value > 2) {
 	croak("${prefix}: error: ${value}: expected " .
 	      "left|center|right");
     }
@@ -939,7 +950,7 @@ sub convertUnits {
     my $scalar  = 1.0;
     my $temp;
 
-    if ($value =~ s/^\s*($RE{num}{real})//) {
+    if ($value =~ s/^\s*($RE_REAL)//) {
 	$scalar = $1;
     }
     $value =~ s/^\s*//;

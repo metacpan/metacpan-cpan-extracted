@@ -1,6 +1,6 @@
 package PMLTQ::Command::query;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::query::VERSION = '1.3.2';
+$PMLTQ::Command::query::VERSION = '1.4.0';
 # ABSTRACT: WIP: Executes query on treebank
 
 use PMLTQ::Base 'PMLTQ::Command';
@@ -56,6 +56,7 @@ sub run {
   'no-filters',
 
   'old-api',
+  'output-json',
 
   'netgraph-query|G=s',
 
@@ -97,12 +98,13 @@ sub run {
   } elsif ($opts{btred}) {
     btred_search(@args);
   } else {
-    pmltq_http_search();
+    $self->pmltq_http_search();
   }
 }
 
 my %auth;
 sub pmltq_http_search {
+  my $self = shift;
   my @args = @_;
   my $query;
   if ($opts{query} and !@args) {
@@ -154,13 +156,13 @@ sub pmltq_http_search {
 
   my $id = $opts{'server'};
   $id ||= 'default' unless $opts{'print-servers'};
-  my ($conf,$type) = $id ? get_server_conf($configs,$id) : ();
+  my ($conf,$type) = $id ? get_server_conf($configs,$id, $opts{'old-api'}) : ();
   %auth = (
     username => $opts{username},
     password => $opts{password},
    );
   if ($opts{'auth-id'}) {
-    my ($auth) = get_server_conf($configs,$opts{'auth-id'});
+    my ($auth) = get_server_conf($configs,$opts{'auth-id'}, $opts{'old-api'});
     if ($auth) {
       $auth{$_} ||= $auth->{$_} for qw(username password);
     } else {
@@ -168,7 +170,7 @@ sub pmltq_http_search {
     }
   }
   if ($conf) {
-    $auth{$_} ||= $conf->{$_} for qw(username password);
+    $auth{$_} ||= $conf->{$_} for qw(username password baseurl);
   }
 
 
@@ -178,10 +180,11 @@ sub pmltq_http_search {
   die "Cannot query available services on a $type server";
       }
       my $result='';
-      http_search($conf->{url},$query,{ other=>1,
+      $self->http_search($conf->{url},$query,{ other=>1,
           callback => sub { $result.=$_[0] },
           debug=>$opts{debug},
           %auth,
+          'baseurl' => $conf->{baseurl}
                });
       my @services = split /\n/,$result;
       for my $srv (@services) {
@@ -224,11 +227,13 @@ sub pmltq_http_search {
 
   if ($type eq 'http') {
     #if($opts{'old-api'}){
-    http_search($conf->{url},$query,{ 'node-types'=>$opts{'node-types'},
+    $self->http_search($conf->{url},$query,{ 'node-types'=>$opts{'node-types'},
               'relations'=>$opts{'relations'},
               debug=>$opts{debug},
               %auth,
-              'old-api'=>$opts{'old-api'}
+              'old-api'=>$opts{'old-api'},
+              'output-json'=>$opts{'output-json'},
+              'baseurl' => $conf->{baseurl}
              });
     #} else { ## NEW API
     #  print STDERR "TODO NEW API\n";
@@ -251,33 +256,49 @@ sub pmltq_http_search {
 }
 
 sub get_server_conf {
-  my ($configs,$id)=@_;
+  my ($configs,$id, $oldapi)=@_;
   my ($conf,$type);
   if ($id =~ /^https?:/) {
     $type = 'http';
     $conf = {url => $id};
+    unless($oldapi) {
+      $conf->{baseurl} = $id;
+      $conf->{baseurl} =~ s@api/treebanks.*?$@@;
+    }
   } else {
     my $conf_el = first { $_->value->{id} eq $id }  SeqV($configs);
     die "Didn't find server configuration named '$id'!\nUse $0 --print-servers and then $0 --server <config-id|URL>\n"
       unless $conf_el;
     $conf = $conf_el->value;
+    unless($oldapi) {
+      $conf->{baseurl} = $conf->{url};
+      $conf->{url} = URI::WithBase->new('/',$conf->{url});
+      $conf->{url}->path_segments('api', 'treebanks', $conf->{treebank});
+      $conf->{url} = $conf->{url}->abs->as_string;
+    }
     $type = $conf_el->name;
   }
   return ($conf,$type);
 }
 
 sub http_search {
-  my ($url,$query,$opts)=@_;
+  my ($self,$url,$query,$opts)=@_;
   $opts||={};
   my $tmp = File::Temp->new( TEMPLATE => 'pmltq_XXXXX',
            TMPDIR => 1,
            UNLINK => 1,
            SUFFIX => '.txt' );
-  my $ua = LWP::UserAgent->new;
-  $ua->credentials(URI->new($url)->host_port,'PMLTQ',
-       $auth{username}, $auth{password})
-    if $opts->{username};
-  $ua->agent("PMLTQ/1.0 ");
+  my $ua;
+  if($opts->{'old-api'}) {
+    $ua = LWP::UserAgent->new;
+    $ua->credentials(URI->new($url)->host_port,'PMLTQ',
+         $auth{username}, $auth{password})
+      if $opts->{username};
+  } else {
+    $ua = $self->ua;
+    $ua->agent("PMLTQ/1.0 ");
+    $self->login($ua,\%auth) if $opts->{username};
+  }
   $url.='/' unless $url=~m{^https?://.+/$};
   my $METHOD = \&POST;
   if ($opts->{'node-types'}) {
@@ -298,7 +319,7 @@ sub http_search {
   $ua->timeout($opts{timeout}+2) if $opts{timeout};
   my $q = $query; Encode::_utf8_off($q);
   binmode STDOUT;
-  my $sub = $opts->{callback} || sub { print $_[0] };
+  my $sub = $opts->{callback} || sub { print $opts{'output-json'} ? ($_[0]) : (map {join("\t",@$_)."\n"} @{JSON::from_json($_[0])->{results}}) };
   my $res = $ua->request($METHOD->($url, 
     $opts->{'old-api'} ?
       ([
@@ -601,7 +622,7 @@ PMLTQ::Command::query - WIP: Executes query on treebank
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 SYNOPSIS
 
@@ -643,7 +664,7 @@ instances distributed over an SGE cluster).
 =item B<--server|-s> URL_or_ID
 
 If used with SQL-based engine, this option can be used to specify a
-URL (http://hostname:port) to a pmltq http server, or an ID of a
+URL (http://hostname/APIpath/treebanks/treebankID) to a pmltq http server, or an ID of a
 pre-configured SQL or HTTP server (use B<--print-servers> to get a
 list).
 

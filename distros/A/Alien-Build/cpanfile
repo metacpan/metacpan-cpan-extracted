@@ -10,7 +10,8 @@ requires "Text::ParseWords" => "3.26";
 requires "perl" => "5.008001";
 
 on 'test' => sub {
-  requires "Test2::Suite" => "0.000060";
+  requires "Test2::Mock" => "0.000060";
+  requires "Test2::V0" => "0.000060";
   requires "Test::More" => "0.94";
   requires "perl" => "5.008001";
 };

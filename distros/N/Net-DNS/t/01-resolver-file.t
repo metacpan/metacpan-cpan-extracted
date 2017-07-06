@@ -1,39 +1,66 @@
-# $Id: 01-resolver-file.t 1406 2015-10-05 08:25:49Z willem $
-
+# $Id: 01-resolver-file.t 1573 2017-06-12 11:03:59Z willem $
 
 use strict;
-use Test::More;
-
-BEGIN {
-	chdir 't/' || die "Couldn't chdir to t/\n";		# t/.resolv.conf
-	unshift( @INC, '../blib/lib', '../blib/arch' );
-}
+use File::Spec;
+use Test::More tests => 16;
 
 use Net::DNS;
 
-my $res = Net::DNS::Resolver->new;
 
-plan skip_all => 'File parsing only supported on Unix'
-		unless $res->isa('Net::DNS::Resolver::UNIX');
+local $ENV{'RES_NAMESERVERS'};
+local $ENV{'RES_SEARCHLIST'};
+local $ENV{'LOCALDOMAIN'};
+local $ENV{'RES_OPTIONS'};
 
-plan skip_all => 'Could not read configuration file'
-		unless -r '.resolv.conf' && -o _;
+my $class = 'Net::DNS::Resolver';
 
-plan tests => 7;
+my $config = File::Spec->catfile(qw(t custom.txt));		# .txt to run on Windows
+
+{
+	$class->domain('domain.default');
+	my $resolver = $class->new( config_file => $config );
+	ok( $resolver->isa($class), "new( config_file => '$config' )" );
+
+	my @servers = $resolver->nameservers;
+	ok( scalar(@servers), 'nameservers list populated' );
+	is( $servers[0], '10.0.1.128', 'nameservers list correct' );
+	is( $servers[1], '10.0.2.128', 'nameservers list correct' );
+
+	my @search = $resolver->searchlist;
+	ok( scalar(@search), 'searchlist populated' );
+	is( $search[0], 'alt.net-dns.org', 'searchlist correct' );
+	is( $search[1], 'ext.net-dns.org', 'searchlist correct' );
+
+	is( $resolver->domain, 'alt.net-dns.org', 'domain correct' );
+
+	is( $class->domain, $resolver->domain, 'initial config sets defaults' );
+}
 
 
-ok( $res->isa('Net::DNS::Resolver'), 'new() created object' );
+{
+	$class->domain('domain.default');
+	my $resolver = $class->new( config_file => $config );
+	ok( $resolver->isa($class), "new( config_file => $config )" );
 
-my @servers = $res->nameservers;
-ok( scalar(@servers), "nameservers() works" );
-is( $servers[0], '10.0.1.128', 'nameservers list correct' );
-is( $servers[1], '10.0.2.128', 'nameservers list correct' );
+	my @servers = $resolver->nameservers;
+	ok( scalar(@servers), 'nameservers list populated' );
 
-my @search = $res->searchlist;
-is( $search[0], 'net-dns.org',	   'searchlist correct' );
-is( $search[1], 'lib.net-dns.org', 'searchlist correct' );
+	my $domain = 'alt.net-dns.org';
+	my @search = $resolver->searchlist;
+	ok( scalar(@search), 'searchlist populated' );
+	is( shift(@search), $domain, 'searchlist correct' );
 
-is( $res->domain, 'net-dns.org', 'domain correct' );
+	is( $resolver->domain, $domain, 'domain correct' );
+
+	isnt( $class->domain, $resolver->domain, 'default config unchanged' );
+}
+
+
+{								# file presumed not to exist
+	eval { new $class( config_file => 'nonexist.txt' ); };
+	my $exception = $1 if $@ =~ /^(.+)\n/;
+	ok( $exception ||= '', "new( config_file => ?\t[$exception]" );
+}
 
 
 exit;

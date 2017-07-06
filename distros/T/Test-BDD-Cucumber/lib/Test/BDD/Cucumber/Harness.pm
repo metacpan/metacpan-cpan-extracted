@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness;
-$Test::BDD::Cucumber::Harness::VERSION = '0.52';
+$Test::BDD::Cucumber::Harness::VERSION = '0.53';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness - Base class for creating harnesses
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -24,9 +24,10 @@ interacting with L<Test::BDD::Cucumber::Harness::Data>.
 
 use strict;
 use warnings;
-use Moose;
+use Moo;
+use Types::Standard qw( ArrayRef );
 
-has 'results' => ( is => 'ro', default => sub { [] }, isa => 'ArrayRef' );
+has 'results' => ( is => 'ro', default => sub { [] }, isa => ArrayRef );
 
 =head2 feature
 

@@ -92,7 +92,8 @@ sub network_ok {
     }
     my $ua = LWP::UserAgent->new(%ua_parms)
       or die "Problem creating user agent\n";
-    my $request = HTTP::Request->new('HEAD', 'http://finance.yahoo.com')
+    #my $request = HTTP::Request->new('HEAD', 'https://finance.yahoo.com')
+    my $request = HTTP::Request->new('HEAD', 'https://www.google.com')
       or die "Problem creating http request object\n";
     my $response = $ua->request($request, @_);
     $Network_Up = $response->is_redirect || $response->is_success;

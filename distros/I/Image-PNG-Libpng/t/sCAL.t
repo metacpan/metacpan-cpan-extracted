@@ -1,7 +1,7 @@
 use warnings;
 use strict;
 use Test::More;
-use FindBin;
+use FindBin '$Bin';
 use Image::PNG::Const ':all';
 use Image::PNG::Libpng ':all';
 plan skip_all => "sCAL is not supported by your libpng" unless libpng_supports ('sCAL');
@@ -9,7 +9,7 @@ plan skip_all => "sCAL is not supported by your libpng" unless libpng_supports (
 # I don't have an example PNG with an sCAL chunk. So this is tested by
 # writing and then reading the file.
 
-my $file = "$FindBin::Bin/sCAL.png";
+my $file = "$Bin/sCAL.png";
 my @rows = (pack ("CCC", 0xFF, 0, 0));
 my $png = create_write_struct ();
 $png->set_IHDR ({width => 1, height => 1, bit_depth => 8,

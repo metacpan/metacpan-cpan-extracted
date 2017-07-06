@@ -90,6 +90,9 @@ sub apply_route {# meth in Plugin
   #~ $nr->over(authenticated=>$r_hash->{auth});
   # STEP ACCESS
   $nr->over(access => $r_hash);
+  my $host = eval {$r_hash->{host_re} || $r_hash->{host}};
+  $nr->over(host => $host)
+    if $host;
   
 # Controller and action in Mojolicious::Routes::Route->to
     #~ elsif ($shortcut =~ /^([\w\-:]+)?\#(\w+)?$/) {
@@ -97,17 +100,15 @@ sub apply_route {# meth in Plugin
       #~ $defaults{action}     = $2 if defined $2;
     #~ }
     
-  my %ns = (namespace => $r_hash->{namespace})
-    if $r_hash->{namespace};
-  my %controll = (controller=>$r_hash->{controller},)
-    if $r_hash->{controller};
+  my @to = ($r_hash->{namespace} ? ("namespace" => $r_hash->{namespace}) : (), 
+    $r_hash->{controller} ? ("controller"=>$r_hash->{controller},) : ());
 
   if ($r_hash->{to}) {
-    $nr->to($r_hash->{to}, %controll, %ns); 
+    $nr->to($r_hash->{to}, @to); 
   } elsif ( $r_hash->{action} ) {
     
-    if ( $r_hash->{action} =~ /#/ ) { $nr->to($r_hash->{action}, %controll, %ns); }
-    else { $nr->to( action => $r_hash->{action}, %controll, %ns,); }
+    if ( $r_hash->{action} =~ /#/ ) { $nr->to($r_hash->{action}, @to); }
+    else { $nr->to( action => $r_hash->{action}, @to,); }
     
   } elsif ( $r_hash->{callback} ) {
     
@@ -121,7 +122,8 @@ sub apply_route {# meth in Plugin
   }
   $nr->name($r_hash->{name})
     if $r_hash->{name};
-  #~ $self->app->log->debug("$pkg generate the route from data row [@{[$self->app->dumper($r_hash) =~ s/\n/ /gr]}]");
+  $self->app->log->debug("Apply DBI route [$r_hash->{request}] ". $self->app->dumper($nr->pattern->defaults) =~ s/\s*
+  \n+\s*//gr);
   return $nr;
 }
 
@@ -132,7 +134,9 @@ sub routes {
 
 sub access_explicit {# i.e. by refs table
   my ($self, $id1, $id2,) = @_;
-  return scalar $self->plugin->model('Refs')->cnt($id1, $id2);
+  my $r = $self->plugin->model('Refs')->exists($id1, $id2);
+  #~ $self->app->log->debug("Test access_explicit: ", $r);
+  return $r;
 }
 
 

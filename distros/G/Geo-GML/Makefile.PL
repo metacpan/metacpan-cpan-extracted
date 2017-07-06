@@ -2,12 +2,11 @@ use ExtUtils::MakeMaker;
 
 use 5.008;
 
-my $version = '0.16';
+my $version = '0.17';
 
 my %prereq  =
-  ( XML::Compile         => '1.28'
-  , XML::Compile::Tester => '0.04'
-  , XML::Compile::Cache  => '0.995'
+  ( XML::Compile         => '1.58'
+  , XML::Compile::Cache  => '1.05'
   , Log::Report          => '0.19'
  
   , Test::More           => '0.54'
@@ -40,13 +39,11 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/geo-gml/raw
 DISTDIR         = ../public_html/geo-gml/source
-LICENSE         = artistic
-
-EXTENDS		= ../XMLCache:../XMLCompile
+EXTENDS         = ../XMLCache:../XMLCompile
 
 # for POD
 FIRST_YEAR      = 2008
 EMAIL           = perl@overmeer.net
 WEBSITE         = http://perl.overmeer.net/geo/
-PODTAIL		= ../Geo-ogc-podtail
+PODTAIL         = ../Geo-ogc-podtail
 __POSTAMBLE

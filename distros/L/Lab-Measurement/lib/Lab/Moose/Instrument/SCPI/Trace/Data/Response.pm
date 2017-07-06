@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Trace::Data::Response;
-$Lab::Moose::Instrument::SCPI::Trace::Data::Response::VERSION = '3.550';
+$Lab::Moose::Instrument::SCPI::Trace::Data::Response::VERSION = '3.552';
 use Moose::Role;
 use Lab::Moose::Instrument qw/getter_params/;
 use Lab::Moose::Instrument::Cache;

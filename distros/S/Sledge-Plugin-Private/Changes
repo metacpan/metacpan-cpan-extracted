@@ -1,0 +1,7 @@
+Revision history for Perl extension Sledge::Plugin::Private
+
+0.02  Fri Jun 23 19:00:32 2017
+        - fixed typo in perldoc
+
+0.01  Fri Jun 23 18:00:39 2017
+        - original version

@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Loader;
-$Test::BDD::Cucumber::Loader::VERSION = '0.52';
+$Test::BDD::Cucumber::Loader::VERSION = '0.53';
 =head1 NAME
 
 Test::BDD::Cucumber::Loader - Simplify loading of Step Definition and feature files
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 

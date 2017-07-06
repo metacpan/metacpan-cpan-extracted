@@ -1,19 +1,17 @@
 ---
 abstract: 'Line filter of LTSV text'
 author:
-  - 'YASUTAKE Kiyoshi <yasutake.kiyoshi@gmail.com>'
+  - 'IKEDA Kiyoshi <yasutake.kiyoshi@gmail.com>'
 build_requires:
-  Test::More: 0.98
+  Test::More: '0.98'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Module::Build: 0.38
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v0.13.0, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Text-LTSV-Liner
 no_index:
   directory:
@@ -28,11 +26,15 @@ no_index:
 provides:
   Text::LTSV::Liner:
     file: lib/Text/LTSV/Liner.pm
-    version: 0.03
+    version: '0.04'
 requires:
-  perl: 5.008001
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/key-amb/perl-Text-LTSV-Liner/issues
   homepage: https://github.com/key-amb/perl-Text-LTSV-Liner
   repository: git://github.com/key-amb/perl-Text-LTSV-Liner.git
-version: 0.03
+version: '0.04'
+x_contributors:
+  - 'YASUTAKE Kiyoshi <quee.amb@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

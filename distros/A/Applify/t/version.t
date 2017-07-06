@@ -1,3 +1,4 @@
+use lib '.';
 use t::Helper;
 
 my $app = eval 'use Applify; app {0};' or die $@;

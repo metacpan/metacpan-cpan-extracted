@@ -2,7 +2,8 @@
 
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 11;
+use Scalar::Util 'weaken';
 
 use_ok('X11::Xlib::XVisualInfo') or die;
 sub err(&) { my $code= shift; my $ret; { local $@= ''; eval { $code->() }; $ret= $@; } $ret }
@@ -22,6 +23,10 @@ is( $struct->visual, undef, 'NULL visual is undef' );
 isa_ok( $struct2->visual, 'X11::Xlib::Visual', 'non-null visual is object' );
 
 # Clone an event via its fields:
+X11::Xlib::_sanity_check_data_structures();
+$struct->unpack;
+$struct->unpack;
+$struct->unpack;
 my $clone= new_ok( 'X11::Xlib::XVisualInfo', [$struct->unpack], 'clone event with pack(unpack)' )
     or diag explain $struct->unpack;
 is( $clone->buffer, $struct->buffer, 'clone contains identical bytes' );
@@ -29,7 +34,20 @@ is( $clone->buffer, $struct->buffer, 'clone contains identical bytes' );
 is( $clone->red_mask, 0xFF0000, 'red_mask value preserved' );
 is( $clone->blue_mask, 0x0000FF, 'blue_mask value preserved' );
 
-#my $conn= X11::Xlib->new();
-#my @visuals= map { $_->unpack } $conn->XGetVisualInfo(0, my $foo);
-#use DDP;
-#p @visuals;
+subtest associated_with_display => sub {
+    plan skip_all => "No X11 Server available"
+        unless defined $ENV{DISPLAY};
+    
+    my $conn= X11::Xlib->new();
+    ok( my @visuals= $conn->XGetVisualInfo(0, {}), 'XGetVisualInfo' );
+    is( $visuals[0]->display, $conn, 'visual info related to display' );
+    is( $visuals[0]->visual->display, $conn, 'visual from visualinfo also related to display' );
+    
+    weaken($conn);
+    ok( $conn, 'un-ref connection, still alive' );
+    undef @visuals;
+    is( $conn, undef, 'visuals were holding last ref to conn' );
+    
+    done_testing;
+};
+

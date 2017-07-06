@@ -125,6 +125,7 @@ sub register {
     if $self->app->renderer->helpers->{'authenticate'};
   
   $self->SUPER::register($self->app, $self->merge_conf->{auth});
+  $self->app->plugin('HeaderCondition');# routes host_re
   
   $self->app->routes->add_condition(access => sub {$self->cond_access(@_)});
   $access->apply_ns();
@@ -321,13 +322,13 @@ sub model {
   my $class =  load_class(namespace => $ns, module=> $name)
     or die "Model module [$name] not found at namespace [$ns] or has errors";
   
-  $class->new; # синглетоны в общем
+  $class->new(app=>$self->app); # синглетоны в общем
   
   #~ my $m = { map {$_ => load_class("Mojolicious::Plugin::RoutesAuthDBI::Model::$_")->new} qw(Profiles Namespaces Routes Refs Controllers Actions Roles Logins) };
   
 };
 
-our $VERSION = '0.830';
+our $VERSION = '0.840';
 
 =pod
 
@@ -343,7 +344,7 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.830
+0.840
 
 =head1 NAME
 

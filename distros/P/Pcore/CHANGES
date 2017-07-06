@@ -1,3 +1,16 @@
+v0.42.1 2017-07-03T12:38:22Z
+ - No issues on bugtracker were closed since the last release
+ - http switch to GET request on 302 redirect
+
+v0.42.0 2017-06-29T19:32:20Z
+ - No issues on bugtracker were closed since the last release
+ - new DBH handle architecture
+ - fix output for empty key name in dump
+ - app api use new sqlite handle
+ - proxy ported to the new sqlite driver
+ - sql pragma added, -promise pragma removed
+ - par report missed modules
+
 v0.41.0 2017-06-22T02:41:36Z
  - No issues on bugtracker were closed since the last release
  - Ref::Util added to Pcore::Util::Scalar

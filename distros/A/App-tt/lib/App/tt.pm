@@ -1,4 +1,12 @@
 package App::tt;
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -6,7 +14,7 @@ App::tt - Time tracking application
 
 =head1 VERSION
 
-0.04
+0.05
 
 =head1 DESCRIPTION
 
@@ -121,13 +129,6 @@ This command will stop tracking the current event.
   # Stop working at 16:00 instead of now
   $ tt stop 16:00
 
-=cut
-
-use strict;
-use warnings;
-
-our $VERSION = '0.04';
-
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2014, Jan Henning Thorsen
@@ -140,5 +141,3 @@ the terms of the Artistic License version 2.0.
 Jan Henning Thorsen - C<jhthorsen@cpan.org>
 
 =cut
-
-1;

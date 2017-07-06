@@ -21,6 +21,28 @@ cursor_map[] = {
 	/* crInvalid         => */   XC_X_cursor,
 };
 
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+static const char *
+xcursor_map[] = {
+	/* crArrow           => */   "left_ptr",
+	/* crText            => */   "xterm",
+	/* crWait            => */   "watch",
+	/* crSize            => */   "sizing",
+	/* crMove            => */   "fleur",
+	/* crSizeWest        => */   "left_side",
+	/* crSizeEast        => */   "right_side",
+	/* crSizeNE          => */   "sb_h_double_arrow",
+	/* crSizeNorth       => */   "top_side",
+	/* crSizeSouth       => */   "bottom_side",
+	/* crSizeNS          => */   "sb_v_double_arrow",
+	/* crSizeNW          => */   "top_left_corner",
+	/* crSizeSE          => */   "bottom_right_corner",
+	/* crSizeNE          => */   "top_right_corner",
+	/* crSizeSW          => */   "bottom_left_corner",
+	/* crInvalid         => */   "X_cursor"
+};
+#endif
+
 Cursor
 predefined_cursors[] = {
 	None,
@@ -137,17 +159,63 @@ apc_pointer_get_size( Handle self)
 	return p;
 }
 
-Bool
-apc_pointer_get_bitmap( Handle self, Handle icon)
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+static Bool
+xcursor_load( Handle self, Handle icon)
+{
+	DEFXX;
+	int id;
+	PIcon c;
+	int x, y;
+	XcursorPixel * src;
+	XcursorImage* i;
+	Byte * dst_data, * dst_mask;
+	Bool kill;
+
+	id = get_cursor( self, nil, nil, nil, nil);
+	if ( id < crDefault || id > crUser)  return false;
+
+	if ( id != crUser ) {
+		if (( i = XcursorLibraryLoadImage( xcursor_map[id] , NULL, guts. cursor_width )) == NULL)
+			return false;
+		kill = true;
+	} else {
+		i = XX-> user_xcursor;
+		kill = false;
+	}
+	
+	c = PIcon(icon);
+	CIcon(icon)-> create_empty_icon( icon, i->width, i->height, imRGB, imbpp8);
+	dst_data = c->data + c->lineSize * ( c-> h - 1 );
+	dst_mask = c->mask + c->maskLine * ( c-> h - 1 );
+	src = i->pixels;
+	for ( y = 0; y < c-> h; y++) {
+		Byte * d_data = dst_data, * d_mask = dst_mask;
+		for ( x = 0; x < c-> w; x++) {
+			*d_data++ = *src & 0xff;
+			*d_data++ = (*src >> 8) & 0xff;
+			*d_data++ = (*src >> 16) & 0xff;
+			*d_mask++ = (*src >> 24) & 0xff;
+			src++;
+		}
+		dst_mask -= c->maskLine;
+		dst_data -= c->lineSize;
+	}
+	if ( kill ) XcursorImageDestroy(i);
+	return true;
+}
+#endif
+
+static Bool
+xlib_cursor_load( Handle self, Handle icon)
 {
 	XImage *im;
-	int id;
 	Pixmap p1 = None, p2 = None;
 	Bool free_pixmap = true;
 	GC gc;
 	XGCValues gcv;
 	char c;
-	int w = guts.cursor_width, h = guts.cursor_height;
+	int id, w = guts.cursor_width, h = guts.cursor_height;
 
 	id = get_cursor( self, &p1, &p2, nil, nil);
 	if ( id < crDefault || id > crUser)  return false;
@@ -203,11 +271,11 @@ apc_pointer_get_bitmap( Handle self, Handle icon)
 	prima_copy_xybitmap( PIcon(icon)-> mask, (Byte*)im-> data,
 								PIcon(icon)-> w, PIcon(icon)-> h,
 								PIcon(icon)-> maskLine, im-> bytes_per_line);
-if ( id == crUser) {
-	int i;
-	Byte * mask = PIcon(icon)-> mask;
-	for ( i = 0; i < PIcon(icon)-> maskSize; i++) 
-		mask[i] = ~mask[i];
+	if ( id == crUser) {
+		int i;
+		Byte * mask = PIcon(icon)-> mask;
+		for ( i = 0; i < PIcon(icon)-> maskSize; i++) 
+			mask[i] = ~mask[i];
 	}   
 	XDestroyImage( im);
 	if ( free_pixmap) {
@@ -215,6 +283,16 @@ if ( id == crUser) {
 		XFreePixmap( DISP, p2);
 	}
 	return true;
+}
+
+Bool
+apc_pointer_get_bitmap( Handle self, Handle icon)
+{
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+	if (xcursor_load(self, icon))
+		return true;
+#endif
+	return xlib_cursor_load(self, icon);
 }
 
 Bool
@@ -289,12 +367,135 @@ apc_pointer_set_shape( Handle self, int id)
 	return true;
 }
 
+static Bool
+create_cursor(Handle self, Handle icon, Point hot_spot)
+{
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+	DEFXX;
+	XcursorImage* i;
+	PIcon c = PIcon(icon);
+	Bool kill;
+	int x, y;
+	XcursorPixel * dst;
+	Byte * src_data, * src_mask;
+
+	if ( hot_spot. x < 0) hot_spot. x = 0;
+	if ( hot_spot. y < 0) hot_spot. y = 0;
+	if ( hot_spot. x >= c-> w) hot_spot. x = c-> w - 1;
+	if ( hot_spot. y >= c-> h) hot_spot. y = c-> h - 1;
+	XX-> pointer_hot_spot = hot_spot;
+	if (( i = XcursorImageCreate( c-> w, c-> h )) == NULL) {
+		warn( "XcursorImageCreate(%d,%d) error", c->w, c->h);
+		return false;
+	}
+	i-> xhot = hot_spot. x;
+	i-> yhot = c-> h - hot_spot. y - 1;
+
+	if ( c-> type != imRGB || c-> maskType != imbpp8 ) {
+		icon = CIcon(icon)->dup(icon);
+		kill = true;
+		CIcon(icon)-> set_type( icon, imRGB );
+		CIcon(icon)-> set_maskType( icon, imbpp8 );
+	} else 
+		kill = false;
+	c = PIcon(icon);
+	src_data = c->data + c->lineSize * ( c-> h - 1 );
+	src_mask = c->mask + c->maskLine * ( c-> h - 1 );
+	dst = i->pixels;
+	for ( y = 0; y < c-> h; y++) {
+		Byte * s_data = src_data, * s_mask = src_mask;
+		for ( x = 0; x < c-> w; x++) {
+			*(dst++) = 
+				s_data[0]|
+				(s_data[1] << 8)|
+				(s_data[2] << 16)|
+				(*(s_mask++) << 24)
+				;
+			s_data += 3;
+		}
+		src_mask -= c->maskLine;
+		src_data -= c->lineSize;
+	}
+	if ( kill ) Object_destroy(icon);
+
+	XX-> user_pointer = XcursorImageLoadCursor(DISP, i);
+	if ( XX-> user_pointer == None) {
+		XcursorImageDestroy(i);
+		warn( "error creating cursor");
+		return false;
+	}
+	XX-> user_xcursor = i;
+
+	return true;
+
+#else
+
+	DEFXX;
+	Handle cursor;
+	Bool noSZ  = PIcon(icon)-> w != guts.cursor_width || PIcon(icon)-> h != guts.cursor_height;
+	Bool noBPP = (PIcon(icon)-> type & imBPP) != 1;
+	XColor xcb, xcw;
+	PIcon c;
+
+	if ( noSZ || noBPP) {
+		cursor = CIcon(icon)->dup(icon);
+		c = PIcon(cursor);
+		if ( cursor == nilHandle) {
+			warn( "Error duping user cursor");
+			return false;
+		}
+		if ( noSZ) {
+			CIcon(cursor)-> stretch( cursor, guts.cursor_width, guts.cursor_height);
+			if ( c-> w != guts.cursor_width || c-> h != guts.cursor_height) {
+				warn( "Error stretching user cursor");
+				Object_destroy( cursor);
+				return false;
+			}
+		}   
+		if ( noBPP) {
+			CIcon(cursor)-> set_type( cursor, imMono);
+			if ((c-> type & imBPP) != 1) {
+				warn( "Error black-n-whiting user cursor");
+				Object_destroy( cursor);
+				return false;
+			}
+		}
+	} else
+		cursor = icon;
+	if ( !prima_create_icon_pixmaps( cursor, &XX-> user_p_source, &XX-> user_p_mask)) {
+		warn( "Error creating user cursor pixmaps");
+		if ( noSZ || noBPP)
+			Object_destroy( cursor);
+		return false;
+	}
+	if ( noSZ || noBPP)
+		Object_destroy( cursor);
+	if ( hot_spot. x < 0) hot_spot. x = 0;
+	if ( hot_spot. y < 0) hot_spot. y = 0;
+	if ( hot_spot. x >= guts. cursor_width)  hot_spot. x = guts. cursor_width  - 1;
+	if ( hot_spot. y >= guts. cursor_height) hot_spot. y = guts. cursor_height - 1;
+	XX-> pointer_hot_spot = hot_spot;
+	xcb. red = xcb. green = xcb. blue = 0; 
+	xcw. red = xcw. green = xcw. blue = 0xFFFF; 
+	xcb. pixel = guts. monochromeMap[0];
+	xcw. pixel = guts. monochromeMap[1];
+	xcb. flags = xcw. flags = DoRed | DoGreen | DoBlue;
+	XX-> user_pointer = XCreatePixmapCursor( DISP, XX-> user_p_source,
+		XX-> user_p_mask, &xcw, &xcb, 
+		hot_spot. x, guts.cursor_height - hot_spot. y - 1);
+	if ( XX-> user_pointer == None) {
+		warn( "error creating cursor from pixmaps");
+		return false;
+	}
+	return true;
+#endif
+}
+
 Bool
 apc_pointer_set_user( Handle self, Handle icon, Point hot_spot)
 {
 	DEFXX;
 	Handle cursor;
-	PIcon c;
 
 	if ( XX-> user_pointer != None) {
 		XFreeCursor( DISP, XX-> user_pointer);
@@ -308,60 +509,16 @@ apc_pointer_set_user( Handle self, Handle icon, Point hot_spot)
 		XFreePixmap( DISP, XX-> user_p_mask);
 		XX-> user_p_mask = None;
 	}
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+	if ( XX-> user_xcursor != NULL) {
+		XcursorImageDestroy(XX-> user_xcursor);
+		XX-> user_xcursor = NULL;
+	}
+#endif
 	if ( icon != nilHandle) {
-		Bool noSZ  = PIcon(icon)-> w != guts.cursor_width || PIcon(icon)-> h != guts.cursor_height;
-		Bool noBPP = (PIcon(icon)-> type & imBPP) != 1;
-		XColor xcb, xcw;
-		if ( noSZ || noBPP) {
-			cursor = CIcon(icon)->dup(icon);
-			c = PIcon(cursor);
-			if ( cursor == nilHandle) {
-				warn( "Error duping user cursor");
-				return false;
-			}
-			if ( noSZ) {
-				CIcon(cursor)-> stretch( cursor, guts.cursor_width, guts.cursor_height);
-				if ( c-> w != guts.cursor_width || c-> h != guts.cursor_height) {
-					warn( "Error stretching user cursor");
-					Object_destroy( cursor);
-					return false;
-				}
-			}   
-			if ( noBPP) {
-				CIcon(cursor)-> set_type( cursor, imMono);
-				if ((c-> type & imBPP) != 1) {
-					warn( "Error black-n-whiting user cursor");
-					Object_destroy( cursor);
-					return false;
-				}
-			}
-		} else
-			cursor = icon;
-		if ( !prima_create_icon_pixmaps( cursor, &XX-> user_p_source, &XX-> user_p_mask)) {
-			warn( "Error creating user cursor pixmaps");
-			if ( noSZ || noBPP)
-				Object_destroy( cursor);
-			return false;
-		}
-		if ( noSZ || noBPP)
-			Object_destroy( cursor);
-		if ( hot_spot. x < 0) hot_spot. x = 0;
-		if ( hot_spot. y < 0) hot_spot. y = 0;
-		if ( hot_spot. x >= guts. cursor_width)  hot_spot. x = guts. cursor_width  - 1;
-		if ( hot_spot. y >= guts. cursor_height) hot_spot. y = guts. cursor_height - 1;
-		XX-> pointer_hot_spot = hot_spot;
-		xcb. red = xcb. green = xcb. blue = 0; 
-		xcw. red = xcw. green = xcw. blue = 0xFFFF; 
-		xcb. pixel = guts. monochromeMap[0];
-		xcw. pixel = guts. monochromeMap[1];
-		xcb. flags = xcw. flags = DoRed | DoGreen | DoBlue;
-		XX-> user_pointer = XCreatePixmapCursor( DISP, XX-> user_p_source,
-			XX-> user_p_mask, &xcw, &xcb, 
-			hot_spot. x, guts.cursor_height - hot_spot. y);
-		if ( XX-> user_pointer == None) {
-			warn( "error creating cursor from pixmaps");
-			return false;
-		}
+		Bool ok = create_cursor(self, icon, hot_spot);
+		if ( !ok ) return false;
+
 		if ( XX-> pointer_id == crUser && self != application) {
 			if ( guts. pointer_invisible_count < 0) {
 				if ( !XX-> flags. pointer_obscured) {

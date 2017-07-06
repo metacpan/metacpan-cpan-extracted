@@ -7,5 +7,7 @@ README
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t
+test/bit_bang.pl
+test/hw_cs.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

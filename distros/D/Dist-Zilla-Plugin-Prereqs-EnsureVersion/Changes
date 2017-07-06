@@ -1,4 +1,7 @@
-Revision history for Dist-Zilla-Plugin-Prereqs-EnsureVersion
+0.02     2017-07-04 (PERLANCAR)
+
+         - Do not die on missing ~/pmversions.ini [thanks José Joaquín Atria].
+
 
 0.01     2016-01-19 (PERLANCAR)
 

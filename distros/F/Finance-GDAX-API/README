@@ -1,0 +1,120 @@
+The module Finance::GDAX::API attempts to implement the crypto
+currency trading API of the GDAX exhange as published at
+
+https://docs.gdax.com/
+
+At the time of writing on 24-Jun-2017 all documented REST points have
+been implemented.
+
+This is a very low level implementation of the API, just to get the
+structure in place.
+
+OVERVIEW
+========
+
+The Finance::GDAX::API modules all match up to the sections in the
+GDAX API documentation.
+
+The only exceptions are Finance::GDAX::API (from which all the
+implementation classes inherit) and Finance::GDAX::API::UR These two
+modules handle the mechanics of the API requests.
+
+SECURITY
+========
+
+GDAX requires cryptographic API keys for user accounts which are
+generated within the user's account at GDAX.
+
+All API requests *MUST* set the 3 API key attributes, "key", "secret"
+and "passphrase", which are generated for you at GDAX and which you
+must keep secret.
+
+As a convience, the default values for these attributes will be
+automatically set for you if you have the corresponding environment
+variables set: "GDAX_API_KEY", "GDAX_API_SECRET" and
+"GDAX_API_PASSPHRASE".
+
+Also, by default, ALL REQUESTS ARE MARKED "DEBUG" so that no real data
+will be used, and their sandbox will be used instead. In order to use
+real data, YOU MUST SET DEBUG TO 0 TO WORK WITH REAL DATA. Please note
+that you need a completely different set of GDAX API keys for their
+debug sandbox, which is generated at their sandbox site.
+
+IN A NUTSHELL
+=============
+
+Suppose you want a list of all your GDAX account info/balances, and
+you have set your 3 environment variables to your API keys.
+
+use Finance::GDAX::API::Account;
+
+my $account = Finance::GDAX::API::Account->new( debug => 0 );
+my $list    = $account->get_all;
+
+At this point, $list will be an array that looks like:
+
+  [
+      {
+          "id": "71452118-efc7-4cc4-8780-a5e22d4baa53",
+          "currency": "BTC",
+          "balance": "0.0000000000000000",
+          "available": "0.0000000000000000",
+          "hold": "0.0000000000000000",
+          "profile_id": "75da88c5-05bf-4f54-bc85-5c775bd68254"
+      },
+      {
+          "id": "e316cb9a-0808-4fd7-8914-97829c1925de",
+          "currency": "USD",
+          "balance": "80.2301373066930000",
+          "available": "79.2266348066930000",
+          "hold": "1.0035025000000000",
+          "profile_id": "75da88c5-05bf-4f54-bc85-5c775bd68254"
+      }
+  ]
+
+These are all documented in the POD of each API implementation module.
+
+If you do not want you API keys set in environment variables, you must
+set the attributes, which are inherited into each API module. As our
+example above:
+
+my $account = Finance::GDAX::API::Account->new( debug => 0 );
+$account->key($my_key);
+$account->secret($my_secret);
+$account->passphrase($my_passphrase);
+
+(Or set them in the "new" constructor along with debug => 0)
+
+MORE SECURITY
+=============
+
+There is another convenience method inherited into all API modules for
+the variously paranoid called "external_secret" which is documented in
+Finance::GDAX::API
+
+This method will take a file name and read it in to assigns the 3 API
+keys necessary for requests that was assigned to you by GDAX.
+
+It will also optionally fork a process that will read from an external
+program that you might set up to handle your own key storage
+technology, and just accept the values via STDIN.
+
+TESTING
+=======
+
+If your GDAX API key environment variables are set, some live network
+tests will be performed using those keys. Tests always run with debug
+set, to use the sandbox, so you must make sure you are setting your
+sanbox API keys if you want to run network tests.
+
+You can also set GDAX_EXTERNAL_SECRET to be a file to read the keys
+from for testing, or you can use GDAX_EXTERNAL_SECRET_FORK and give an
+executable command that will return the keys via STDIN.
+
+TODO
+====
+
+Some of the long informational requests to GDAX have a paging aspect
+if they returned records exceed 100. This implementation of the API
+does not yet support paged records. Best to limit by time for now.
+

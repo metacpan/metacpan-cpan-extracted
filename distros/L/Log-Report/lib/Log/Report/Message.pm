@@ -7,12 +7,14 @@ use strict;
 
 package Log::Report::Message;
 use vars '$VERSION';
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 
 use Log::Report 'log-report';
 use POSIX             qw/locale_h/;
 use List::Util        qw/first/;
+use Scalar::Util      qw/blessed/;
+
 use Log::Report::Util qw/to_html/;
 
 # Work-around for missing LC_MESSAGES on old Perls and Windows
@@ -42,10 +44,10 @@ sub new($@)
 
     if($s{_msgid})
     {   $s{_append}  = defined $s{_append} ? $1.$s{_append} : $1
-            if $s{_msgid} =~ s/(\s+)$//;
+            if $s{_msgid} =~ s/(\s+)$//s;
 
         $s{_prepend}.= $1
-            if $s{_msgid} =~ s/^(\s+)//;
+            if $s{_msgid} =~ s/^(\s+)//s;
     }
     if($s{_plural})
     {   s/\s+$//, s/^\s+// for $s{_plural};
@@ -118,6 +120,7 @@ sub inClass($)
 sub toString(;$)
 {   my ($self, $locale) = @_;
     my $count  = $self->{_count} || 0;
+	$locale    = $self->{_lang} if $self->{_lang};
 
     $self->{_msgid}   # no translation, constant string
         or return (defined $self->{_prepend} ? $self->{_prepend} : '')
@@ -128,20 +131,18 @@ sub toString(;$)
     setlocale(LC_MESSAGES, $locale)
         if defined $locale && (!defined $oldloc || $locale ne $oldloc);
 
-    # create a translation
-    my $text = (textdomain $self->{_domain})
-       ->translate($self, $self->{_lang} || $locale || $oldloc);
-  
-    defined $text or return ();
+    # translate the msgid
+	my $domain = $self->{_domain};
+	$domain    = textdomain $domain
+        unless blessed $domain;
 
-    $text  =~ s/\{([^%}]+)(\%[^}]*)?\}/$self->_expand($1,$2)/ge
-        if $self->{_expand};
+    my $format = $domain->translate($self, $locale || $oldloc);
+    defined $format or return ();
 
-    $text  = "$self->{_prepend}$text"
-        if defined $self->{_prepend};
-
-    $text .= "$self->{_append}"
-        if defined $self->{_append};
+    # fill-in the fields
+	my $text = $self->{_expand}
+      ? $domain->interpolate($format, $self)
+      : ($self->{_prepend} // '') . $format . ($self->{_append} // '');
 
     setlocale(LC_MESSAGES, $oldloc)
         if defined $oldloc && (!defined $locale || $oldloc ne $locale);
@@ -149,29 +150,6 @@ sub toString(;$)
     $text;
 }
 
-sub _expand($$)
-{   my ($self, $key, $format) = @_;
-    my $value = $self->{$key} // $self->{_context}{$key};
-
-    $value = $value->($self)
-        while ref $value eq 'CODE';
-
-    defined $value
-        or return "undef";
-
-    use locale;
-    if(ref $value eq 'ARRAY')
-    {   my @values = map {defined $_ ? $_ : 'undef'} @$value;
-        @values or return '(none)';
-        return $format
-             ? join($self->{_join}, map sprintf($format, $_), @values)
-             : join($self->{_join}, @values);
-    }
-
-      $format
-    ? sprintf($format, $value)
-    : "$value";   # enforce stringification on objects
-}
 
 
 my %tohtml = qw/  > gt   < lt   " quot  & amp /;

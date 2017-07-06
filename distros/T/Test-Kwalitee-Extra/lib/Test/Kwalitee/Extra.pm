@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Run Kwalitee tests including optional indicators, especially, prereq_matches_use
-our $VERSION = 'v0.3.1'; # VERSION
+our $VERSION = 'v0.4.0'; # VERSION
 
 use version 0.77;
 use Cwd;
@@ -12,7 +12,7 @@ use Carp;
 use File::Find;
 use File::Spec;
 use Test::Builder;
-use MetaCPAN::API::Tiny;
+use MetaCPAN::Client;
 use Module::CPANTS::Analyse 0.87;
 use Module::CPANTS::Kwalitee::Prereq;
 use Module::CoreList;
@@ -119,11 +119,11 @@ sub _is_missing_check_for_old
 		next if _is_core($key, $minperlver);
 		next if $key =~ m'[$@%*&]'; # ignore entry including sigil
 		my $result = eval { $mcpan->module($key) };
-		if($@ || ! exists $result->{distribution}) {
+		if($@ || ! $result->distribution) {
 			$qerror->{$key} = 1;
 			next;
 		}
-		my $dist = $result->{distribution};
+		my $dist = $result->distribution;
 		push @$missing, $key.' in '.$dist if $val->{in_code} && $val->{in_code} != ($val->{evals_in_code} || 0) && ! exists $prereq->{$dist};
 		push @$bmissing, $key.' in '.$dist if $val->{in_tests} && $val->{in_tests} != ($val->{evals_in_tests} || 0) && ! exists $build_prereq->{$dist};
 	}
@@ -147,11 +147,11 @@ sub _is_missing_check_for_new
 			next if _is_core($key, $minperlver);
 			next if $key =~ m'[$@%*&]'; # ignore entry including sigil
 			my $result = eval { $mcpan->module($key) };
-			if($@ || ! exists $result->{distribution}) {
+			if($@ || ! $result->distribution) {
 				$qerror->{$key} = 1;
 				next;
 			}
-			my $dist = $result->{distribution};
+			my $dist = $result->distribution;
 			if($uses_keys{$uses_keys} ne 'build') {
 				push @$missing, $key.' in '.$dist if ! exists $prereq->{$dist};
 			} else { # build
@@ -183,7 +183,7 @@ sub _do_test_pmu
 			}
 		}
 	}
-	my $mcpan = MetaCPAN::API::Tiny->new;
+	my $mcpan = MetaCPAN::Client->new;
 
 	my %qerror;
 	my (%build_prereq, %prereq);
@@ -194,7 +194,7 @@ sub _do_test_pmu
 		my $result;
 		while($retry < $env->{retry}) {
 			$result = eval { $mcpan->module($val->{requires}) };
-			if($@ || ! exists $result->{distribution}) {
+			if($@ || ! $result->distribution) {
 				++$retry;
 			} else {
 				last;
@@ -204,7 +204,7 @@ sub _do_test_pmu
 			$qerror{$val->{requires}} = 1;
 			next;
 		}
-		$prereq{$result->{distribution}} = 1 if $val->{is_prereq} || $val->{is_optional_prereq};
+		$prereq{$result->distribution} = 1 if $val->{is_prereq} || $val->{is_optional_prereq};
 		$build_prereq{$result->{distribution}} = 1 if $val->{is_prereq} || $val->{is_build_prereq} || $val->{is_optional_prereq};
 	}
 
@@ -279,10 +279,13 @@ sub _get_packages_not_indexed
 		};
 
 		foreach my $directory (@{$no_index->{'directory'}}) {
-			File::Find::find(
-				$filter_pm_files,
-				File::Spec->catdir($distdir, $directory),
-			);
+			my $no_meta_directory = File::Spec->catdir($distdir, $directory);
+			if(-d $no_meta_directory) {
+				File::Find::find(
+					$filter_pm_files,
+					$no_meta_directory,
+				);
+			}
 		}
 	}
 
@@ -425,7 +428,7 @@ Test::Kwalitee::Extra - Run Kwalitee tests including optional indicators, especi
 
 =head1 VERSION
 
-version v0.3.1
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -512,7 +515,7 @@ Or mitigate wait by tentative failures to reduce retry counts like
 
 =head1 INDICATORS
 
-In L<Module::CPANTS::Analyse>, C<prereq_matches_use> requires CPANTS DB setup by L<Module::CPANTS::ProcessCPAN>. C<is_prereq> really requires information of prereq of other modules but C<prereq_matches_use> only needs mappings between modules and dists. So, this module query the mappings to MetaCPAN by using L<MetaCPAN::API::Tiny>.
+In L<Module::CPANTS::Analyse>, C<prereq_matches_use> requires CPANTS DB setup by L<Module::CPANTS::ProcessCPAN>. C<is_prereq> really requires information of prereq of other modules but C<prereq_matches_use> only needs mappings between modules and dists. So, this module query the mappings to MetaCPAN by using L<MetaCPAN::Client>.
 
 Recently, L<Module::CPANTS::Analyse> has been changed much. For actual available indicators, please consult C<Module::CPANTS::Kwalitee::*> documentation. For default configuration, indicators are treated as follows:
 
@@ -768,7 +771,7 @@ Yasutaka ATARASHI <yakex@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yasutaka ATARASHI.
+This software is copyright (c) 2017 by Yasutaka ATARASHI.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

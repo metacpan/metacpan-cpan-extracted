@@ -7,16 +7,17 @@ use vars qw($VERSION);
 use base 'Error';
 use overload ( '""' => 'stringify' );
 
-$VERSION = '2.01';
+$VERSION = '2.03';
 
 sub new {
     my $self = shift;
     my $text = '' . shift;
+    my $time = shift;
     my @args = ();
 
     local $Error::Depth = $Error::Depth + 1;
 
-    $self = $self->SUPER::new( -text => $text, @args );
+    $self = $self->SUPER::new( -text => $text, -value => $time );
 
     return $self;
 }
@@ -33,7 +34,7 @@ Test::Timer::TimeoutException - exception class for Test::Timer
 
 =head1 VERSION
 
-This documentation describes 2.01 of Test::Timer::TimeoutException
+This documentation describes 2.03 of Test::Timer::TimeoutException
 
 =head1 SYNOPSIS
 

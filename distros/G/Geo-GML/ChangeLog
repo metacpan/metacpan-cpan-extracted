@@ -3,6 +3,12 @@
 All change mades by Mark Overmeer, unless explicitly assigned to
 someone else.
 
+version 0.17: Thu 29 Jun 16:23:38 CEST 2017
+
+	Improvements:
+	- move to (new) standard documentation style
+	- fix regression tests, still warnings ;(
+
 version 0.16: Sun Jan  5 18:57:06 CET 2014
 
 	Fixes:

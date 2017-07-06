@@ -2,7 +2,7 @@ NAME
     App::docsisious - Edit DOCSIS config files on web
 
 VERSION
-    0.09
+    0.10
 
 DESCRIPTION
     App::docsisious is a Mojolicious web application for editing DOCSIS

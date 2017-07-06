@@ -84,7 +84,9 @@ apply_handler(pTHX_ pMY_CXT_ AV* const handler){
 
     PUTBACK;
 
-    PL_stack_sp -= call_sv(method, G_VOID | G_EVAL);
+    I32 retval;
+    retval = call_sv(method, G_VOID | G_EVAL);
+    PL_stack_sp -= retval;
 
     if(sv_true(ERRSV)){
         SV* const msg = sv_newmortal();

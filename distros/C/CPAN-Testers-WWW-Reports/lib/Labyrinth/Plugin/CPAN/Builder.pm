@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '3.59';
+$VERSION = '3.60';
 
 =head1 NAME
 
@@ -536,8 +536,6 @@ sub AuthorPages {
             $vars{builder}{letter}          = substr($name,0,1);
             $vars{builder}{title}           = 'Reports for distributions by ' . $name;
             $vars{builder}{distributions}   = \@dists   if(@dists);
-            $vars{builder}{perlvers}        = $cpan->mklist_perls;
-            $vars{builder}{osnames}         = $cpan->osnames;
             $vars{builder}{processed}       = time;
 
             # insert summary details
@@ -557,11 +555,12 @@ sub AuthorPages {
             $vars{content}         = 'cpan/author-reports-static.html';
             $vars{processed}       = formatDate(8);
 
-            # build other static pages
-            my $text = Transform( 'cpan/layout-static.html', \%vars );
-            overwrite_file( "$cache/$name.html", $text );
+# 2017-06-27 - Static page creation disabled, see GH#6 for more details: https://github.com/barbie/cpan-testers-www-reports/issues/6
+#            # build other static pages
+#            my $text = Transform( 'cpan/layout-static.html', \%vars );
+#            overwrite_file( "$cache/$name.html", $text );
 
-            $text = Transform( 'cpan/author.js', \%vars );
+            my $text = Transform( 'cpan/author.js', \%vars );
             overwrite_file( "$cache/$name.js", $text );
 
             overwrite_file( "$cache/$name.json", _make_json( \@reports ) );
@@ -827,15 +826,9 @@ sub DistroPages {
 
             $vars{builder}{distribution}    = $name;
             $vars{builder}{letter}          = substr($name,0,1);
-            $vars{builder}{stats_code}      = $oses;
-            $vars{builder}{stats_oses}      = \@stats_oses;
-            $vars{builder}{stats_perl}      = \@stats_perl;
-            $vars{builder}{stats_poff}      = \@stats_poff;
-            $vars{builder}{stats}           = $stats;
             $vars{builder}{title}           = $vars{title};
-            $vars{builder}{perlvers}        = $cpan->mklist_perls;
-            $vars{builder}{osnames}         = $cpan->osnames;
             $vars{builder}{processed}       = time;
+
 #$progress->( ".. .. memory data update complete for $name" ) if(defined $progress);
 
             # insert summary details
@@ -855,13 +848,15 @@ sub DistroPages {
             $vars{processed}       = formatDate(8);
 
 #$progress->( ".. .. building static pages for $name" ) if(defined $progress);
-            # build other static pages
-            $vars{content} = 'cpan/distro-reports-static.html';
-            my $text = Transform( 'cpan/layout-static.html', \%vars );
-            overwrite_file( "$cache/$name.html", $text );
-#$progress->( ".. .. Dynamic HTML page written for $name" ) if(defined $progress);
 
-            $text = Transform( 'cpan/distro.js', \%vars );
+# 2017-06-27 - Static page creation disabled, see GH#6 for more details: https://github.com/barbie/cpan-testers-www-reports/issues/6
+#            # build other static pages
+#            $vars{content} = 'cpan/distro-reports-static.html';
+#            my $text = Transform( 'cpan/layout-static.html', \%vars );
+#            overwrite_file( "$cache/$name.html", $text );
+##$progress->( ".. .. Static HTML page written for $name" ) if(defined $progress);
+
+            my $text = Transform( 'cpan/distro.js', \%vars );
             overwrite_file( "$cache/$name.js", $text );
 #$progress->( ".. .. JS page written for $name" ) if(defined $progress);
 
@@ -875,7 +870,7 @@ sub DistroPages {
             $vars{content} = 'cpan/stats-distro-static.html';
             $text = Transform( 'cpan/layout-stats-static.html', \%vars );
             overwrite_file( "$cache/$name.html", $text );
-#$progress->( ".. .. Static HTML page written for $name" ) if(defined $progress);
+#$progress->( ".. .. Statistics HTML page written for $name" ) if(defined $progress);
 
             # generate symbolic links where necessary
             if($merged->{$name}) {

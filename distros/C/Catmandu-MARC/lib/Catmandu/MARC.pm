@@ -15,7 +15,7 @@ memoize('compile_marc_path');
 memoize('parse_marc_spec');
 memoize('_get_index_range');
 
-our $VERSION = '1.13';
+our $VERSION = '1.16';
 
 sub marc_map {
     my $self      = $_[0];
@@ -207,6 +207,125 @@ sub marc_add {
     $data;
 }
 
+sub marc_append {
+    my ($self,$data,$marc_path,$value) = @_;
+    my $record = $data->{'record'};
+
+    return $data unless defined $record;
+
+    if ($value =~ /^\$\.(\S+)/) {
+        my $path = $1;
+        $value = Catmandu::Util::data_at($path,$data);
+    }
+
+    if (Catmandu::Util::is_array_ref $value) {
+        $value = $value->[-1];
+    }
+    elsif (Catmandu::Util::is_hash_ref $value) {
+        my $last;
+        for (keys %$value) {
+            $last = $value->{$_};
+        }
+        $value = $last;
+    }
+
+    my $context = $self->compile_marc_path($marc_path);
+
+    confess "invalid marc path" unless $context;
+
+    for my $field (@$record) {
+        my ($tag, $ind1, $ind2, @subfields) = @$field;
+
+        if ($context->{is_regex_field}) {
+            next unless $tag =~ $context->{field_regex};
+        }
+        else {
+            next unless $tag eq $context->{field};
+        }
+
+        if (defined $context->{ind1}) {
+            if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+                next;
+            }
+        }
+        if (defined $context->{ind2}) {
+            if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+                next;
+            }
+        }
+
+        if ($context->{subfield}) {
+            for (my $i = 0; $i < @subfields; $i += 2) {
+                if ($subfields[$i] =~ $context->{subfield}) {
+                    $field->[$i + 4] .= $value;
+                }
+            }
+        }
+        else {
+            $field->[-1] .= $value;
+        }
+    }
+
+    $data;
+}
+
+sub marc_replace_all {
+    my ($self,$data,$marc_path,$regex,$value) = @_;
+    my $record = $data->{'record'};
+
+    return $data unless defined $record;
+
+    if ($value =~ /^\$\.(\S+)/) {
+        my $path = $1;
+        $value = Catmandu::Util::data_at($path,$data);
+    }
+
+    if (Catmandu::Util::is_array_ref $value) {
+        $value = $value->[-1];
+    }
+    elsif (Catmandu::Util::is_hash_ref $value) {
+        my $last;
+        for (keys %$value) {
+            $last = $value->{$_};
+        }
+        $value = $last;
+    }
+
+    my $context = $self->compile_marc_path($marc_path, subfield_wildcard => 1);
+
+    confess "invalid marc path" unless $context;
+
+    for my $field (@$record) {
+        my ($tag, $ind1, $ind2, @subfields) = @$field;
+
+        if ($context->{is_regex_field}) {
+            next unless $tag =~ $context->{field_regex};
+        }
+        else {
+            next unless $tag eq $context->{field};
+        }
+
+        if (defined $context->{ind1}) {
+            if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+                next;
+            }
+        }
+        if (defined $context->{ind2}) {
+            if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+                next;
+            }
+        }
+
+        for (my $i = 0; $i < @subfields; $i += 2) {
+            if ($subfields[$i] =~ $context->{subfield}) {
+                $field->[$i + 4] =~ s{$regex}{$value}g;
+            }
+        }
+    }
+
+    $data;
+}
+
 sub marc_set {
     my ($self,$data,$marc_path,$value,%opts) = @_;
     my $record = $data->{'record'};
@@ -229,7 +348,7 @@ sub marc_set {
         $value = $last;
     }
 
-    my $context = $self->compile_marc_path($marc_path, subfield_default => 1);
+    my $context = $self->compile_marc_path($marc_path, subfield_wildcard => 1);
 
     confess "invalid marc path" unless $context;
 
@@ -256,7 +375,7 @@ sub marc_set {
 
         my $found = 0;
         for (my $i = 0; $i < @subfields; $i += 2) {
-            if ($subfields[$i] eq $context->{subfield}) {
+            if ($subfields[$i] =~ $context->{subfield}) {
                 if (defined $context->{from}) {
                     substr($field->[$i + 4], $context->{from}, $context->{len}) = $value;
                 }
@@ -335,7 +454,6 @@ sub marc_remove {
 
     return $data;
 }
-
 
 sub marc_spec {
     my $self      = $_[0];
@@ -919,6 +1037,234 @@ sub compile_marc_path {
     };
 }
 
+sub marc_copy {
+    my $self       = $_[0];
+    my $data       = $_[1];
+    my $marc_path  = $_[2];
+    my $marc_value = $_[3];
+
+    # $_[2] : marc_path
+    my $context = ref($marc_path) ? $marc_path : $self->compile_marc_path($_[2], subfield_wildcard => 0);
+
+    confess "invalid marc path" unless $context;
+
+    # $_[1] : data record
+    my $record         = $data->{'record'};
+
+    return wantarray ? () : undef unless (defined $record && ref($record) eq 'ARRAY');
+
+    my $fields = [];
+
+    for my $field (@$record) {
+        my ($tag, $ind1, $ind2, @subfields) = @$field;
+
+        next if (
+            ($context->{is_regex_field} == 0 && $tag ne $context->{field} )
+            ||
+            ($context->{is_regex_field} == 1 && $tag !~ $context->{field_regex} )
+        );
+
+        if (defined $context->{ind1}) {
+            if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+                next;
+            }
+        }
+        if (defined $context->{ind2}) {
+            if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+                next;
+            }
+        }
+
+        if ($context->{subfield}) {
+            my $found = 0;
+            for (my $i = 0; $i < @subfields; $i += 2) {
+                if ($subfields[$i] =~ $context->{subfield}) {
+                    if (defined($marc_value)) {
+                        $found = 1 if $subfields[$i+1] =~ /$marc_value/;
+                    }
+                    else {
+                        $found = 1;
+                    }
+                }
+            }
+            next unless $found;
+        }
+        else {
+            if (defined($marc_value)) {
+                my @sf = ();
+                for (my $i = 0; $i < @subfields; $i += 2) {
+                    push @sf , $subfields[$i+1];
+                }
+
+                my $string = join "", @sf;
+
+                next unless ($string =~ /$marc_value/);
+            }
+        }
+
+        my $f = {};
+        $f->{tag} = $field->[0];
+
+        # indicator 1
+        if(defined $field->[1]) {
+            $f->{ind1} = $field->[1];
+        } else {
+            $f->{ind1} = undef;
+        }
+
+        # indicator 2
+        if(defined $field->[2]) {
+            $f->{ind2} = $field->[2];
+        } else {
+            $f->{ind2} = undef;
+        }
+
+        # fixed fields
+        if($field->[3] eq '_') {
+            $f->{content} = $field->[4];
+            push(@$fields, $f);
+            next;
+        }
+
+        # subfields
+        for (my $i = $context->{start}; $i < @{$field}; $i += 2) {
+            push(@{$f->{subfields}}, { $field->[$i] => $field->[$i + 1] });
+        }
+
+        push(@$fields, $f);
+    }
+
+    [$fields];
+}
+
+sub marc_paste {
+    my $self       = $_[0];
+    my $data       = $_[1];
+    my $json_path  = $_[2];
+    my $marc_path  = $_[3];
+    my $marc_value = $_[4];
+
+    my $value = Catmandu::Util::data_at($json_path,$data);
+
+    return $data unless Catmandu::Util::is_array_ref($value);
+
+    my @new_parts;
+
+    for my $part (@$value) {
+        return $data unless
+                    Catmandu::Util::is_hash_ref($part) &&
+                    exists $part->{tag}  &&
+                    exists $part->{ind1} &&
+                    exists $part->{ind2} &&
+                    ( exists $part->{content} || exists $part->{subfields} );
+
+        my $tag       = $part->{tag};
+        my $ind1      = $part->{ind1} // ' ';
+        my $ind2      = $part->{ind2} // ' ';
+        my $content   = $part->{content};
+        my $subfields = $part->{subfields};
+
+        if (defined($content)) {
+            push @new_parts , [ $tag , $ind1 , $ind2 , '_' , $content ];
+        }
+        elsif (defined($subfields) && Catmandu::Util::is_array_ref($subfields)) {
+            my @tmp = ( $tag , $ind1 , $ind2 );
+
+            for my $sf (@$subfields) {
+                while (my ($key, $value) = each %$sf) {
+                    push @tmp, $key , $value;
+                }
+            }
+
+            push @new_parts , [ @tmp ];
+        }
+        else {
+            # Illegal input
+            return $data;
+        }
+    }
+
+    if (defined($marc_path)) {
+        my $context = $self->compile_marc_path($marc_path, subfield_wildcard => 0);
+
+        confess "invalid marc path" unless $context;
+
+        my @record      = @{$data->{record}};
+        my $found_match = undef;
+
+        my $field_position = -1;
+
+        for my $field (@record) {
+            $field_position++;
+            my ($tag, $ind1, $ind2, @subfields) = @$field;
+
+            if ($context->{is_regex_field}) {
+                next unless $tag =~ $context->{field_regex};
+            }
+            else {
+                next unless $tag eq $context->{field};
+            }
+
+            if (defined $context->{ind1}) {
+                if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+                    next;
+                }
+            }
+            if (defined $context->{ind2}) {
+                if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+                    next;
+                }
+            }
+
+            if ($context->{subfield}) {
+                for (my $i = 0; $i < @subfields; $i += 2) {
+                    if ($subfields[$i] =~ $context->{subfield}) {
+                        if (defined($marc_value)) {
+                            $found_match = $field_position if $subfields[$i+1] =~ /$marc_value/;
+                        }
+                        else {
+                            $found_match = $field_position;
+                        }
+                    }
+                }
+            } else {
+                if (defined($marc_value)) {
+                    my @sf = ();
+                    for (my $i = 0; $i < @subfields; $i += 2) {
+                        push @sf , $subfields[$i+1];
+                    }
+
+                    my $string = join "", @sf;
+
+                    if ($string =~ /$marc_value/) {
+                        $found_match = $field_position;
+                    }
+                    else {
+                        # don't match anything
+                    }
+                }
+                else {
+                    $found_match = $field_position;
+                }
+            }
+        }
+
+        if (defined $found_match) {
+            my @new_record = (
+                @record[0..$found_match] ,
+                @new_parts ,
+                @record[$found_match+1..$#record]
+            );
+            $data->{record} = \@new_record;
+        }
+    }
+    else {
+        push @{$data->{record}} , @new_parts;
+    }
+
+    $data;
+}
+
 1;
 
 __END__
@@ -985,6 +1331,10 @@ Catmandu::MARC - Catmandu modules for working with MARC data
 
 =item * L<Catmandu::Fix::marc_add>
 
+=item * L<Catmandu::Fix::marc_append>
+
+=item * L<Catmandu::Fix::marc_replace_all>
+
 =item * L<Catmandu::Fix::marc_remove>
 
 =item * L<Catmandu::Fix::marc_xml>
@@ -995,6 +1345,10 @@ Catmandu::MARC - Catmandu modules for working with MARC data
 
 =item * L<Catmandu::Fix::marc_set>
 
+=item * L<Catmandu::Fix::marc_copy>
+
+=item * L<Catmandu::Fix::marc_paste>
+
 =item * L<Catmandu::Fix::Bind::marc_each>
 
 =item * L<Catmandu::Fix::Condition::marc_match>
@@ -1002,6 +1356,8 @@ Catmandu::MARC - Catmandu modules for working with MARC data
 =item * L<Catmandu::Fix::Condition::marc_has>
 
 =item * L<Catmandu::Fix::Condition::marc_has_many>
+
+=item * L<Catmandu::Fix::Condition::marc_spec_has>
 
 =item * L<Catmandu::Fix::Inline::marc_map>
 

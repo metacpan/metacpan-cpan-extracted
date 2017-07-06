@@ -68,11 +68,12 @@ WriteMakefile(
         # 'Git::Repository' => '1.318', # doesn't work on windows
         'Logging::Simple' => '0.07',
         'LWP::Simple'   => 0,
-        'MetaCPAN::Client' => 0,
+        'MetaCPAN::Client' => 2.017000,
         'Module::Load' => 0,   # corelist since 5.9.4
         'Parallel::ForkManager' => 0,
         'Plugin::Simple' => '0.06',
         'Proc::Background' => 0,
+        'Test::BrewBuild::Plugin::Author' => '0.02',
         'Test::BrewBuild::Plugin::TestAgainst' => '0.06',
         'version' => 0,
     },

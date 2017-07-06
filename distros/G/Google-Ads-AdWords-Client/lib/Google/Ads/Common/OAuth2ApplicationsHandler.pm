@@ -15,6 +15,7 @@
 package Google::Ads::Common::OAuth2ApplicationsHandler;
 
 use strict;
+use warnings;
 use version;
 use base qw(Google::Ads::Common::OAuth2BaseHandler
   Google::Ads::Common::OAuthApplicationsHandlerInterface);
@@ -251,6 +252,8 @@ A hash reference with the following keys:
   # Refer to the documentation of the L<redirect_uri> property.
   oAuth2RedirectUri => "secret",
 }
+
+=back
 
 =head2 is_auth_enabled
 

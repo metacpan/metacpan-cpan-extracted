@@ -1,5 +1,8 @@
 Revision history for Perl extension Recurring-Process
 
+0.2.1 2017-06-23T07:29:31Z
+    - prepare_run accept @args instead of $args
+
 0.2.0 2016-10-24T07:10:05Z
     - windows compatibility
     - IO::Async support

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Hash::GuavaRing', $VERSION);
@@ -28,7 +28,7 @@ Hash::GuavaRing - Consistent ring hashing using guava hash
     ]
   );
 
-  my $node = $ring->get(crc32("key");
+  my $node = $ring->get(crc32("key"));
 
 =head1 DESCRIPTION
 
@@ -40,7 +40,7 @@ https://github.com/Mons/guava-hash
 
 =head1 AUTHOR
 
-Sveta Kotleta <sveta@svetakotleta.ru>
+Sveta Kotleta <ktl@cpan.org>
 
 =head1 ACKNOWLEDGEMENTS
 

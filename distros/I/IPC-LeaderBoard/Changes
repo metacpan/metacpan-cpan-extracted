@@ -1,4 +1,9 @@
-0.02      2017-02-21 02:13:25+00:00 UTC
+0.04      2017-07-03 10:00:18+08:00 Asia/Kuala_Lumpur
+  -  Additional runtime checks
+  -  Emit warning when failed to acquire spin lock after 10000 attempts
+     (befere that change it entered into endless loop aka live-lock)
+
+0.03      2017-02-21 02:13:25+00:00 UTC
   -  Switch to dzil
 
 0.02 2016-07-30 binary.com <perl@binary.com>

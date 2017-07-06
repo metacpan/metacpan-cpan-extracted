@@ -1,4 +1,7 @@
-Revision history for Net-HTTP-Methods-Patch-LogRequest
+0.10    2017-06-26 (PERLANCAR)
+
+	- Switch from Log::Any to Log::ger.
+
 
 0.09    2015-08-17 (PERLANCAR)
 

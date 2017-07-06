@@ -18,13 +18,13 @@ my %module_build_args = (
     "Patrick Hochstenbach, C<< <patrick.hochstenbach at ugent.be> >>"
   ],
   "dist_name" => "Catmandu-MARC",
-  "dist_version" => "1.13",
+  "dist_version" => "1.16",
   "license" => "perl",
   "module_name" => "Catmandu::MARC",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
-    "Catmandu" => "1.0201",
+    "Catmandu" => "1.0601",
     "JSON::XS" => "2.3",
     "List::Util" => 0,
     "MARC::File::MARCMaker" => "0.05",
@@ -46,6 +46,7 @@ my %module_build_args = (
     "Test::More" => "1.001003",
     "Test::Pod" => 0,
     "Test::Simple" => "1.001003",
+    "Test::Warn" => 0,
     "Test::Warnings" => 0,
     "XML::XPath" => "1.13"
   }
@@ -59,6 +60,7 @@ my %fallback_build_requires = (
   "Test::More" => "1.001003",
   "Test::Pod" => 0,
   "Test::Simple" => "1.001003",
+  "Test::Warn" => 0,
   "Test::Warnings" => 0,
   "XML::XPath" => "1.13"
 );

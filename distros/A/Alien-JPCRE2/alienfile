@@ -1,0 +1,30 @@
+use alienfile;
+
+our $VERSION = 0.007_000;
+
+# DEV NOTE, CORRELATION #aj00: NEED ANSWER, DOES THIS WORK AT ALL???
+configure {
+    requires 'Alien::PCRE2' => '0.006';
+};
+
+use Alien::PCRE2;
+my $pcre2_dist_dir = Alien::PCRE2->dist_dir();
+print {*STDERR} "\n\n", q{<<< DEBUG >>> in alienfile, have $pcre2_dist_dir = '}, $pcre2_dist_dir, q{'}, "\n\n";
+ 
+plugin 'PkgConfig' => 'libjpcre2';
+ 
+share {
+    requires 'Alien::PCRE2' => '0.006';  # DEV NOTE, CORRELATION #aj00: NEED ANSWER, DOES THIS WORK AT ALL???
+    plugin Download => (
+        url => 'https://wbraswell.github.io/jpcre2-mirror/',
+        filter => qr/^jpcre2-.*\.tar\.gz$/,
+        version => qr/^jpcre2-([0-9\.]+)/,
+    );
+    plugin Extract => 'tar.gz';
+    plugin 'Build::Autoconf' => ();
+    build [
+        '%{configure}' . ' --enable-cpp11 LDFLAGS=-L' . $pcre2_dist_dir . '/lib CPPFLAGS=-I' . $pcre2_dist_dir . '/include --enable-test', 
+        '%{gmake}',
+        '%{gmake} install',
+    ];
+};

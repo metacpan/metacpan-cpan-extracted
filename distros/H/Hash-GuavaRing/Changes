@@ -3,4 +3,5 @@ Revision history for Perl extension Hash::GuavaRing.
 0.01  Fri Jun  2 13:57:59 2017
 	- original version; created by h2xs 1.23 with options
 		-b v5.16.3 -n Hash::GuavaRing
-
+0.03  Fri Jun  23 15:34:51 2017
+	- fix c-function guava-hash; use long long

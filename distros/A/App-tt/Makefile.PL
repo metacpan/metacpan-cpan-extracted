@@ -6,7 +6,7 @@ WriteMakefile(
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/App/tt.pm',
   VERSION_FROM => 'lib/App/tt.pm',
-  EXE_FILES => [qw( script/tt )],
+  EXE_FILES => [qw(script/tt)],
   META_MERGE => {
     resources => {
       bugtracker => 'https://github.com/jhthorsen/app-tt/issues',

@@ -12,7 +12,26 @@ bugs:
 
 wishlist:
 	- let xgettext-perl produce mo files as well.
-	- convert TT usage example into a real TT plugin.
+
+version 1.08: Thu 29 Jun 15:02:15 CEST 2017
+
+	Fixes:
+	- textdomain() from package.
+
+version 1.07: Tue 27 Jun 16:43:28 CEST 2017
+
+	Changes:
+	- interpolated context values require "_context." prefix
+
+	Fixes:
+	- Accept END with blanks around it in piped syntax.
+
+	Improvements:
+	- spell-fix rt.cpan.org#118560 [Gregor Herrmann, Debian]
+	- receive lexicon specific code from Log::Report::Translator (part
+	  of the Log::Report distribution)
+	- warn when the msgid contains html-encoded characters, while
+	  extracting msgids from HTML.
 
 version 1.06: Wed 21 Sep 17:10:58 CEST 2016
 

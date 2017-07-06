@@ -22,7 +22,6 @@ examples/i18n_es/features/step_definitions/basic_steps.pl
 examples/pherkin.yml
 examples/tagged-digest/features/basic.feature
 examples/tagged-digest/features/step_definitions/basic_steps.pl
-harness.pl
 lib/App/pherkin.pm
 lib/TAP/Parser/SourceHandler/Feature.pm
 lib/Test/BDD/Cucumber.pm
@@ -49,7 +48,6 @@ lib/Test/BDD/Cucumber/Model/Scenario.pm
 lib/Test/BDD/Cucumber/Model/Step.pm
 lib/Test/BDD/Cucumber/Model/TagSpec.pm
 lib/Test/BDD/Cucumber/Parser.pm
-lib/Test/BDD/Cucumber/ParserOld.pm
 lib/Test/BDD/Cucumber/StepContext.pm
 lib/Test/BDD/Cucumber/StepFile.pm
 lib/Test/BDD/Cucumber/TestBuilderDelegator.pm

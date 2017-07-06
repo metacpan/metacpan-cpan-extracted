@@ -6,11 +6,11 @@ use Storable qw(dclone);
 
 # major.minor.bugfix, the latter two with 3 digits each
 # It's not pretty, but I gave up on 1.2.3 style.
-our $VERSION = '2.002000';
+our $VERSION = '2.003002';
 our $version = $VERSION;
 $VERSION = eval $VERSION;
 
-our $years = '2005-2016';
+our $years = '2005-2017';
 our $copyright = 'Copyright (c) '.$years.' Thomas Orgis, Free Software licensed under the same terms as Perl 5.10';
 our $author = 'Thomas Orgis <thomas@orgis.org>';
 

@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2016-12-29'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-07-04'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010;
 use strict;
@@ -169,13 +169,23 @@ fatpack-info - Given a fatpacked script, show various info
 
 =head1 VERSION
 
-This document describes version 0.08 of fatpack-info (from Perl distribution App-FatPackUtils), released on 2016-12-29.
+This document describes version 0.11 of fatpack-info (from Perl distribution App-FatPackUtils), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
 Usage:
 
  % fatpack-info [options] <script>
+
+Examples:
+
+Show total size of script and fatpack contents:
+
+ % fatpack-info /tmp/script.fatpack
+
+Show list of fatpacked modules (-l) along with their versions (-V):
+
+ % fatpack-info -lV `which fatpacked-script`
 
 =head1 OPTIONS
 
@@ -293,7 +303,7 @@ To activate bash completion for this script, put:
 
  complete -C fatpack-info fatpack-info
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -301,8 +311,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -310,15 +320,15 @@ To activate tcsh completion for this script, put:
 
  complete fatpack-info 'p/*/`fatpack-info`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
@@ -348,15 +358,15 @@ List of available configuration parameters:
 
 =head2 FATPACK_INFO_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/fatpack-info.conf
+F<~/.config/fatpack-info.conf>
 
-~/fatpack-info.conf
+F<~/fatpack-info.conf>
 
-/etc/fatpack-info.conf
+F</etc/fatpack-info.conf>
 
 =head1 HOMEPAGE
 
@@ -380,7 +390,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

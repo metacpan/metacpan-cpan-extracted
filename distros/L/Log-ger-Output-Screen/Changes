@@ -1,3 +1,13 @@
+0.005   2017-06-30 (PERLANCAR)
+
+	- Adjust to Log::ger 0.011.
+
+
+0.004   2017-06-23 (PERLANCAR)
+
+	- Adjust to Log::ger 0.005.
+
+
 0.003    2017-06-21 (PERLANCAR)
 
          - First release, split from Log-err.

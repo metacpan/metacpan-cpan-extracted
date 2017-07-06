@@ -9,6 +9,9 @@ WriteMakefile(
     AUTHOR => 'Dave Rolsky <autarch@urth.org>',
     ABSTRACT => 'Secure File Transfer Protocol client',
     PREREQ_PM => {
-        'Net::SSH::Perl' => '1.24',
+        'Net::SSH::Perl' => '2.12',
+        'Math::Int64' => '0.54'
     },
+    SIGN => 1,
+    LICENSE => 'gpl_2',
 );

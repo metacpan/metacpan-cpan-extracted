@@ -22,7 +22,7 @@ __PACKAGE__->config(
                 },
             },
         },
-    },   
+    },
 );
 
 __PACKAGE__->setup;

@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,9 +24,11 @@ requires:
   XML::Writer: '0'
 resources:
   repository: git://github.com/fayland/perl-Business-AuthorizeNet-CIM.git
-version: '0.14'
+version: '0.16'
 x_contributors:
+  - 'Michael Hamlin <mhamlin@liquidweb.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'paulwelscott <paulwelscott@gmail.com>'
   - 'Rhesa Rozendaal <rhesa@cpan.org>'
   - 'Ricardo Signes <rjbs@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

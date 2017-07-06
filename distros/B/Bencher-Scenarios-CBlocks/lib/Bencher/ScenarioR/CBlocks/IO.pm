@@ -1,6 +1,6 @@
 package Bencher::ScenarioR::CBlocks::IO;
 
-our $VERSION = 0.002; # VERSION
+our $VERSION = 0.003; # VERSION
 
 our $results = [
   [
@@ -8,20 +8,20 @@ our $results = [
     "OK",
     [
       {
-        errors => 0.0003,
+        errors => 6.5e-05,
         participant => "perl",
-        rate => 30,
-        samples => 7,
-        time => 30,
+        rate => 36,
+        samples => 6,
+        time => 28,
         vs_slowest => 1,
       },
       {
-        errors => 0.0001,
+        errors => 9.8e-06,
         participant => "C::Blocks",
-        rate => 49,
-        samples => 6,
-        time => 20,
-        vs_slowest => 1.4,
+        rate => 50.8,
+        samples => 7,
+        time => 19.7,
+        vs_slowest => 1.42,
       },
     ],
     {
@@ -144,7 +144,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 0,
-                                              speed                        => 2666.562,
+                                              speed                        => 2875.414,
                                               stepping                     => 4,
                                             },
                                             {
@@ -259,7 +259,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 1,
-                                              speed                        => 2606.625,
+                                              speed                        => 2620.296,
                                               stepping                     => 4,
                                             },
                                             {
@@ -374,7 +374,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 2,
-                                              speed                        => 2873.062,
+                                              speed                        => 2886.843,
                                               stepping                     => 4,
                                             },
                                             {
@@ -489,14 +489,14 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 3,
-                                              speed                        => 2651.906,
+                                              speed                        => 2725.953,
                                               stepping                     => 4,
                                             },
                                           ],
-      "func.elapsed_time"              => 0.416091918945312,
+      "func.elapsed_time"              => 0.367063999176025,
       "func.module_startup"            => undef,
       "func.module_versions"           => {
-                                            "__PACKAGE__" => 1.034,
+                                            "__PACKAGE__" => 1.039,
                                             "Bencher::Scenario::CBlocks::IO" => undef,
                                             "Benchmark::Dumb" => "0.10",
                                             "C::Blocks" => 0.41,
@@ -531,13 +531,13 @@ our $results = [
                                           },
       "func.precision"                 => 6,
       "func.scenario_module"           => "Bencher::Scenario::CBlocks::IO",
-      "func.scenario_module_md5sum"    => "c64c739bf27c0cebcab6c37ed39b7e49",
-      "func.scenario_module_mtime"     => 1485326998,
-      "func.scenario_module_sha1sum"   => "61540d45d6a2c73c7cf0b1a4352724ac9d703db4",
-      "func.scenario_module_sha256sum" => "e37d041c42c9bed8fda8fea7816166e7ab0b56e51d15333b271933c9bdd8104e",
-      "func.time_end"                  => 1485327054.66341,
+      "func.scenario_module_md5sum"    => "dd46f061dd6fca703818b92e73d9dc2c",
+      "func.scenario_module_mtime"     => 1499087486,
+      "func.scenario_module_sha1sum"   => "ad4b8bac0490a425a5b9275f3588d4c956751a50",
+      "func.scenario_module_sha256sum" => "f9e7c0ab0c4eee665af569daf170990091e88e1622efb802229be7c464695598",
+      "func.time_end"                  => 1499087541.3211,
       "func.time_factor"               => 1000,
-      "func.time_start"                => 1485327054.24732,
+      "func.time_start"                => 1499087540.95403,
       "table.field_aligns"             => ["left", "left", "number", "number", "number", "number", "number"],
       "table.field_units"              => [undef, undef, "/s", "ms"],
       "table.fields"                   => [

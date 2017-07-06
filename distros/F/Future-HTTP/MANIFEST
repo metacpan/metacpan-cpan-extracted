@@ -18,7 +18,9 @@ README
 README.mkdn
 t/00-load.t
 t/01-anyevent-http.t
-t/01-backends.t
+t/01-backends-anyevent.t
+t/01-backends-default.t
+t/01-backends-mojolicious.t
 t/01-http-tiny.t
 t/01-mojo.t
 xt/99-changes.t

@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 use strict;
 use warnings;
-use lib '.';
+use FindBin;
+use lib $FindBin::Bin;
 use t::Util;
 use Test::More;
 

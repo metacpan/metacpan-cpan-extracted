@@ -1,2 +1,5 @@
 model = Systemd
+require_backend_argument = 1
+backend_argument_info = unit name or pattern or *
 config_dir = ~/.config/systemd/user/
+support_info = https://github.com/dod38fr/config-model-systemd/issues

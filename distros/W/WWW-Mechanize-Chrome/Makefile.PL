@@ -34,7 +34,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.006',
+    MIN_PERL_VERSION => '5.010', # I use // in some places
 
     'LICENSE'=> 'perl',
 
@@ -52,24 +52,28 @@ my %module = (
         'AnyEvent::Future'   => 0,
         'AnyEvent::WebSocket::Client' => 0,
         'Log::Log4perl'      => 0, # configurable logging
-        'Future::HTTP'     => 0,
+        'Future::HTTP'     => 0.06, # fixes Mojolicious error handling
         'JSON'             => 0,
         'WWW::Mechanize::Plugin::Selector' => 0,
         'HTTP::Response'   => 0,
         'HTTP::Headers'                    => 0,
-        'Scalar::Util'                     => 0, # we need 'weaken'
+        'Scalar::Util'                     => 0, # we need 'weaken' and 'blessed'
+		'MIME::Base64'                     => 0,
         'File::Basename'                   => 0,
         'WWW::Mechanize::Link'             => 0,
         'IO::Socket::INET'                 => 0,
         'Object::Import'                   => 0,
+        # for extracting element screenshots, loaded dynamically
+        'Imager'                           => 0,
+        'Imager::File::PNG'                => 0,
     },
-    TEST_REQUIRES => { # all core anyway...
+    TEST_REQUIRES => {
         'Test::More'   => 0,
         'Data::Dumper' => 0,
-        'Mojolicious'  => 0,
+        'Mojolicious'  => 0, # We want to test both, AnyEvent and Mojolicious
         'Future::Mojo' => 0,
         'Image::Info'  => 0,
-        'Test::HTTP::LocalServer' => 0,
+        'Test::HTTP::LocalServer' => 0.59, # we also want some Javascript self-tests
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

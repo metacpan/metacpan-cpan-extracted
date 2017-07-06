@@ -1,5 +1,12 @@
 Revision history for Marketplace-Ebay
 
+0.200 Sat Jun 24 11:14:25 2017 CEST
+
+    * Add proper message to get XSD test and download latest version
+      (Stefan Hornburg/Racke).
+
+    * Add error_codes method (Marco Pessotto).
+
 0.191 Thu Aug 18 10:24:00 2016 CEST
 
     * Ebay is using XSD version 981 for the Trading API on the server,

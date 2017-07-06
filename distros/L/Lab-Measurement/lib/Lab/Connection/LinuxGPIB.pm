@@ -7,7 +7,7 @@
 # TODO: Access to GPIB attributes, device clear, ...
 
 package Lab::Connection::LinuxGPIB;
-$Lab::Connection::LinuxGPIB::VERSION = '3.550';
+$Lab::Connection::LinuxGPIB::VERSION = '3.552';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);

@@ -1,0 +1,362 @@
+==================================================
+Changes from 2016-06-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2017-06-28 23:01:03 +0000
+------------------------------------------
+
+  Change: 8cbdc00b6be8dd1281086f910a66bf8d00f735e8
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-06-28 20:00:42 +0000
+
+    POD updated 
+
+  Change: 90380f94ba80bce3267d91abf2b0c409ad5d260a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-06-28 19:58:13 +0000
+
+    Renamed the block program to dblock
+
+    Fixed permissions to on mirror_cleanup 
+
+  Change: 5f1f190e18a45287d8fdf156764cb96eefb89c66
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-06-28 19:56:20 +0000
+
+    Small bug fixes
+
+    Fixed small bugs on POD for the programs Updated the project
+    documentation Added more unit testing 
+
+  Change: c170280a3e0f0ed92d120a0a6f66db0e7a204d86
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-15 20:24:01 +0000
+
+    Bug fix on command line options
+
+    Fixed a bug with send_reports when passing --version and not getting
+    it Added the plug-in CPANFile to make it easier to install
+    dependencies 
+
+  Change: 75a7567c0d091496b8de9a32a695c8124ec967f6
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-10 19:31:01 +0000
+
+    New distro prefs
+
+    Added two new distro prefs files. Also forcing update of
+    CPAN-Reporter-Smoker-OpenBSD distro 
+
+  Change: 6171bae4c79508c9bfa74f6d4abf42747c55f87c
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2017-04-09 17:14:20 +0000
+
+    Add on going usage and FAQ 
+
+  Change: 1cb44419ba5780e9c0fdf5c5c1ad4dbbe94e7083
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-08 16:08:17 +0000
+
+    Unifying all repositories of preference files
+
+    All files will be at the same location for all smokers running. 
+
+  Change: 8c0c27b025ac589fb2cf85c8194123028e84d806
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-08 13:06:34 +0000
+
+    Merge remote-tracking branch 'refs/remotes/origin/master' 
+
+  Change: 80bd9dea0ecb2e206e7e4fc8d05d6c6a3458d38a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-08 13:02:29 +0000
+
+    Bug fixes, no hardcodes
+
+    Fixed invalid variable declarations Now using CPAN::Mini to identify
+    the configured local mirror location instead of using harcode 
+
+  Change: f1c1c0d80a2e9f508490ed2053226fcd9834d685
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-08 12:42:04 +0000
+
+    Mispelled author ID 
+
+  Change: 25da7afbbe19458364e7084ac324297c2555888e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-08 12:31:04 +0000
+
+    Merge branch 'master' of
+    https://github.com/glasswalk3r/cpan-openbsd-smoker 
+
+  Change: 1250d3dfdeffdd9f3596d75720106d8bba5cd97e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-08 12:30:28 +0000
+
+    Added TODO note 
+
+  Change: db4768f79136a8b75aa340ae8d1093a7f2f14cbd
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-08 12:18:50 +0000
+
+    Bugs fixes
+
+    Fixes YAML preferences with wrong format Added proper validation to
+    block program, fixing some bugs too Added unit test is_distro_ok sub 
+
+  Change: 9160ee6a87ab4bfaddea4cd21017b199f2b8c7b2
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-05 23:39:20 +0000
+
+    Merge remote-tracking branch 'refs/remotes/origin/master' 
+
+  Change: ad4f4d21cd6fd08385e0ed02028c6d4518fbfdda
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-05 23:38:49 +0000
+
+    Added more prefs files 
+
+  Change: 5873433dba8af694282bff8e5680c6e45cc32a20
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-05 23:35:13 +0000
+
+    Small bug fixes and Pod
+
+    - fixed a bug on the block help message - added basic command line
+    argument parsing for mirror_cleanup - added Pod for mirror_cleanup -
+    incremented distro version for release 
+
+  Change: 3f0414f4a4c316273800b5c22aa0f0c1d4c105f2
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-04 20:07:21 +0000
+
+    Merge branch 'master' of
+    https://github.com/glasswalk3r/cpan-openbsd-smoker 
+
+  Change: 06aa19a4b7feb6cacf2348aa97f1546fe4d7d526
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-04 20:06:03 +0000
+
+    Bugs fixes on block program
+
+    Variables were not properly declared Incremented the version for new
+    release 
+
+  Change: 6ef2bdd54c1a7bd7f32e19737af18e0c960057cf
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-04-04 19:55:15 +0000
+
+    Added two new distros to be blocked on CPAN Smoker 
+
+  Change: 5718a04a4a1ed858b8359263bf740e3fe5bbf8d2
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-26 12:51:28 +0000
+
+    Merge branch 'master' of github.com:glasswalk3r/cpan-openbsd-smoker 
+
+  Change: a706a49434858978ab035d8cd17b3442be8273fc
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-26 12:50:51 +0000
+
+    included more information after the box is provisioned 
+
+  Change: 31186a020c1a08dfea5ba59e961206613e0336bc
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2017-03-25 20:57:55 +0000
+
+    Update README.md 
+
+  Change: e531dcdb0d70422920bec854476a96cacc3f81f4
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2017-03-25 20:57:08 +0000
+
+    Update README.md 
+
+  Change: e8f9890da195fb10b911d7bd81fa09f09677c6fd
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-25 20:56:12 +0000
+
+    even more info 
+
+  Change: 203e94b79fbec046f1530cd910c3e9e467f4fce5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-25 20:54:21 +0000
+
+    fixed typo 
+
+  Change: adcf0126e372739843f011921a88097e13ffdbc0
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-25 20:53:10 +0000
+
+    more documentation 
+
+  Change: 3f652cdd3e9291339bc640f1b6ad7fa335019649
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-25 20:45:42 +0000
+
+    forgot to add the metabase directory 
+
+  Change: eaecc517933e36423f96031be369a74570daddcd
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2017-03-25 20:43:13 +0000
+
+    Added instructions 
+
+  Change: 1d4983727026940fa8ba94d231f8dbc919c16a20
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2017-03-24 15:30:22 +0000
+
+    Updated doc 
+
+  Change: a8439cd6674254664aa73dae24e21a6a803e74f5
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-24 15:02:02 +0000
+
+    Added documentation 
+
+  Change: 7fecc80dee50151655cf2e8c6bd966fc6451613b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-23 23:44:30 +0000
+
+    Fixes and improvements - Fixed script order on Vagrantfile - Fixed
+    bug in send_reports script - Added keyboard config on Vagrantfile -
+    Added config.vm.post_up_message to Vagrantfile, removing from
+
+    config_smoker.sh - Added CPAN::Mini::LatestDistVersion to update the
+    CPAN mirror - Added mirror_cleanup to reduce storage usage of the
+    CPAN mirror 
+
+  Change: 5520eb193bce47bf8b7b295b32f66bda1f291170
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-22 19:19:11 +0000
+
+    vagrant user pre-configured - added keyboard configuration from
+    Vagrantfile - disabled script copying (already provided by distro
+    install) - vagrant metacpan-relayd is pre-configured - vagrant user
+    perl is already configured, all modules installed - vagrant user
+    prepared to install custom distro as well - yet to implement minicpan
+    cleanup after update 
+
+  Change: e0094816d283b38a068e32293f1664f5b4a3f4c2
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-20 22:21:25 +0000
+
+    More fixes Moved basic provisioning to basic_setup.sh config_user.sh
+    now uses minicpan for all installs vagrant_user now updates from
+    Github and injects CPAN::Reporter::Smoker::OpenBSD into minicpan 
+
+  Change: 9f812dba24ae43749609a24c4aaa8b99f2c29992
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-20 19:33:11 +0000
+
+    Improvements and bug fixes Added license to Pod Added missing version
+    to module Fixed bugs on send_reports 
+
+  Change: c6e2dc714989d01cff1f644b7877e9bd44e043e6
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-20 18:37:39 +0000
+
+    Added minimum Pod 
+
+  Change: 23b6e8435c683bfba6869e996e71f8bef0c28dda
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-20 18:20:43 +0000
+
+    Removed instructions from Vagrantfile To avoid repeating it at each
+    login 
+
+  Change: b14c78d3c8a87631175e99ef90c301451128eccc
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-20 18:10:59 +0000
+
+    Bugfixes and improvements Added Pod for block program Several bug
+    fixes and improvements added to the scripts Still missing new
+    distribution with the programs added 
+
+  Change: 25d8f43d6e968cffc0ddefaa046992af5fcc1129
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-19 23:40:27 +0000
+
+    Bug fixes - added missing parameterization - changed how scripts are
+    copied - changed how dependency modules are installed (disabled
+    testing) to speed
+
+    up provisioning - added missing metabase-relayd configuration - added
+    missing CPAN::Reporter configuration for each user added - started
+    creating distribution to install related maintenance programs 
+
+  Change: 70d743ab033b340b70167a9101e89d9c6cc56d99
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-14 22:25:32 +0000
+
+    More fixes and improvements 
+
+  Change: 254df68f3034af55247f547f26f6e0096137a011
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-14 00:55:21 +0000
+
+    Some issue with unicode filename had to be fixed 
+
+  Change: 908006eb7563d23443bb34bdb73457fa3b68ac99
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-03-14 00:50:22 +0000
+
+    Added fixes and debug messages to scripts 
+
+  Change: 791f49ac15a74a227723c2d09115b28ab57afb57
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-02-28 11:20:33 +0000
+
+    Adding fixes, moved scripts to proper directory 
+
+  Change: d8c4eab41c6f69bfe2276f7a35c3518c4c854cd7
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-02-28 02:01:45 +0000
+
+    Applied required changes to integrate all scripts Still untested
+    although 
+
+  Change: 83e69831f24d494d5881ed92c0e6e7c11e8786c4
+  Author: U-ALCJUNIO-BR\alcjunio <alcjunio@ALCJUNIO-BR.br.oracle.com>
+  Date : 2017-02-27 19:34:02 +0000
+
+    Initial configuration files for Vagrant 
+
+  Change: adfb84f5e9ba3803fa99a70d96df9ebfcc944578
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2016-09-20 16:32:49 +0000
+
+    Added platform independent path to save the distro pref file 
+
+  Change: 0d8d6ac27d2a8d3fc4cef704d90eb8927facba4a
+  Author: Alceu Rodrigues de Freitas Junior
+  <arfreitas@ragadaz.spo.virtua.com.br>
+  Date : 2016-09-17 09:42:26 +0000
+
+    More prefs 
+
+  Change: b64493e1d6b503ba7881147cf03f84d702a565d9
+  Author: Alceu Rodrigues de Freitas Junior
+  <arfreitas@ragadaz.spo.virtua.com.br>
+  Date : 2016-09-11 22:15:23 +0000
+
+    removed harcodes from send_reports.pl now send_reports.pl can select
+    to send only PASSed reports adding a new distro pref 
+
+  Change: b0c34f9e038a34282750ebe966f969379ad36f1f
+  Author: Alceu Rodrigues de Freitas Junior
+  <arfreitas@dolly.spo.virtua.com.br>
+  Date : 2016-09-04 10:32:17 +0000
+
+    initial release 
+
+  Change: a462cf70ef29b1c4f4f60cafe2838a609cbc87c3
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2016-09-04 13:29:11 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

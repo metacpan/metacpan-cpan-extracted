@@ -8,10 +8,15 @@ SYNOPSIS
 
 DESCRIPTION
 
-    THIS IS EXPERIMENTAL.
+    cpm is a fast CPAN module installer, which uses Menlo in parallel.
 
-    cpm is a fast CPAN module installer, which uses Menlo in parallel. For
-    tutorial, check out App::cpm::Tutorial.
+    Moreover if --prebuilt option is enabled, cpm keeps the each builds of
+    distributions in your home directory. Then, cpm install --prebuilt will
+    use these prebuilt distributions. That is, if prebuilts are available,
+    cpm never build distributions again, just copy the prebuilts into an
+    appropriate directory. This is (of course!) inspired by Carmel.
+
+    For tutorial, check out App::cpm::Tutorial.
 
 MOTIVATION
 
@@ -86,4 +91,6 @@ SEE ALSO
     Menlo
 
     Carton
+
+    Carmel
 

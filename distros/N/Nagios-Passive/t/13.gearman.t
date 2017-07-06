@@ -3,6 +3,7 @@ use Test::More;
 use Nagios::Passive;
 use Gearman::Client;
 use POSIX qw/mkfifo/;
+use MIME::Base64 qw(encode_base64);
 
 plan skip_all => "MSWin32 not supported" if $^O eq 'MSWin32';
 
@@ -46,7 +47,7 @@ return_code=0
 output=x OK - 
 EOE
 
-is($nw->encrypted_string, << 'EOE', 'crypt ok');
+is(encode_base64($nw->encrypted_string), << 'EOE', 'crypt ok');
 RE2rSDNVWsQGPId1ViNgtRxbzpnUYFm7ELIzYfT6zasUdfOqNlPXTaMWDqjQuEBlzNUjQ/UgXmzE
 acZ5UdNCIidKAw/Y+l4DTrUenLg9pK8rowlnZT2Q6IedOt88KtomusHTYvbEFDumcHwS4l/PMlCn
 Me4JkF0KdY7RG0z3Lc0=

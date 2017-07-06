@@ -1,7 +1,17 @@
 Revision history for Mojolicious-Plugin-Vparam
 
+3.00    27-06-2017
+    - Fix version
+    
+2.2     26-06-2017
+    - Fix bool type: now only true or false
+    - Fix multijoin
+    - Add new "logic" type for true, false and undef.
+    - Now default value can be undef.
+
 2.11.1  19-06-2017
     - Fix multijoin bug for empty array
+    - THIS DEVELOPER RELEASE NOT FOR PRODUCTION!!!
 
 2.11    16-06-2017
     - Fix bug 0 for "in" filter

@@ -10,6 +10,15 @@
 
 #include "xmlfast.h"
 
+#if XML_DEBUG
+#define WHERESTR    " at %s line %d.\n"
+#define WHEREARG    __FILE__, __LINE__
+#define debug(...)   do{ fprintf(stderr, __VA_ARGS__); fprintf(stderr, WHERESTR, WHEREARG); } while(0)
+#else
+#define debug(...)
+#endif
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -78,6 +87,44 @@ typedef struct {
 	parser_state * state;
 	
 } parsestate;
+
+typedef struct {
+	// config
+	unsigned int flags;
+	unsigned int bytes;
+	unsigned int utf8;
+	
+	char  * attr; STRLEN attl;
+	char  * text;
+	char  * join;
+	char  * cdata;
+	char  * comm;
+	
+	
+	HV  * array;
+
+	// state
+	char *encoding;
+	SV   *encode;
+	unsigned int chainsize;
+	xml_node * chain;
+	HV ** hchain;
+	HV  * hcurrent; //just a pointer
+
+	SV  * pi;
+	SV  * attrname;
+	SV  * textval;
+	
+	SV  * error;
+	
+	/// new
+	I32 depth;
+	I32 ix;
+	SV  * result;
+	SV  * nested;
+	
+	
+} compstate;
 
 // hv_store to array if already have non-array value
 #define hv_store_a( hv, key, sv ) \
@@ -294,6 +341,7 @@ void on_comment(void * pctx, char * data,unsigned int length) {
 //TODO: Separate on_bytes/on_uchar for non-utf mode
 
 void on_pi_attr(parsestate *ctx) {
+	//warn("pi attr '%-.*s'", SvCUR(ctx->attrname), SvPVX(ctx->attrname));
 			if (
 				(SvCUR(ctx->attrname) == 8) &&
 				(memcmp(SvPV_nolen(ctx->attrname), "encoding", 8) == 0 )
@@ -315,7 +363,9 @@ void on_pi_attr(parsestate *ctx) {
 			} else {
 				//printf("PI %s, attr %s='%s'\n",SvPV_nolen(ctx->pi), SvPV_nolen(ctx->attrname),SvPV_nolen(ctx->textval) );
 			}
+			sv_2mortal(ctx->attrname);
 			sv_2mortal(ctx->textval);
+			ctx->attrname = ctx->textval = 0;
 }
 
 static inline SV * mkchr(UV chr) {
@@ -341,6 +391,8 @@ void on_uchar(void * pctx, wchar_t chr) {
 #endif
 	parsestate *ctx = pctx;
 	dTHX;
+	if ( !( ctx->attrname || ctx->text ) ) return;
+	
 	if (!ctx->utf8 && ctx->bytes && !UTF8_IS_INVARIANT(chr) ) {
 		if (!ctx->encode)
 			my_croak(ctx,"Can't decode entities in non-utf8, bytes mode");
@@ -386,6 +438,7 @@ void on_bytes_charset_part(void * pctx, char * data, unsigned int length) {
 	if (!pctx) croak("Context not passed to on_bytes_charset_part");
 #endif
 	parsestate *ctx = pctx;
+	if ( !( ctx->attrname || ctx->text ) ) return;
 	if (!length) return;
 	SV *tmp = newSVpvn(data, length);
 	xml_sv_decode(ctx,tmp);
@@ -405,6 +458,7 @@ void on_bytes_charset(void * pctx, char * data, unsigned int length) {
 	//if (!ctx->textval && !length) {
 	//	my_warn(ctx,"Called on_bytes with empty text and empty body");
 	//}
+	if ( !( ctx->attrname || ctx->text ) ) return;
 	SV *tmp = newSVpvn(data, length);
 	xml_sv_decode(ctx,tmp);
 	if (ctx->textval) {
@@ -434,6 +488,9 @@ void on_bytes_part(void * pctx, char * data, unsigned int length) {
 	if (!pctx) croak("Context not passed to on_bytes_part");
 #endif
 	parsestate *ctx = pctx;
+	
+	if ( !( ctx->attrname || ctx->text ) ) return;
+	
 	if (ctx->textval) {
 		if (length > 0) { sv_catpvn(ctx->textval, data, length); }
 	} else {
@@ -449,6 +506,8 @@ void on_bytes(void * pctx, char * data, unsigned int length) {
 	//if (!ctx->textval && !length) {
 	//	my_warn(ctx,"Called on_bytes with empty text and empty body");
 	//}
+	if ( !( ctx->attrname || ctx->text ) ) return;
+	
 	if (ctx->textval) {
 		if (length > 0) { sv_catpvn(ctx->textval, data, length); }
 	} else {
@@ -727,13 +786,15 @@ void on_attr_name(void * pctx, char * data,unsigned int length) {
 	if (ctx->textval) {
 		my_croak(ctx,"Have textval=%s, while called attrname\n",SvPV_nolen(ctx->textval));
 	}
+	//warn("Called attrname on %s '%-.*s'=",ctx->pi ? "pi" : "common", length,data);
 	if (ctx->attrname) {
-		my_croak(ctx,"Called attrname, while have attrname=%s\n",SvPV_nolen(ctx->attrname));
+		my_croak(ctx,"Called attrname '%-.*s'=, while have attrname='%-.*s'\n",length,data,SvCUR(ctx->attrname),SvPVX(ctx->attrname));
 	}
 	if (ctx->pi) {
 		ctx->attrname = newSVpvn(data,length);
 	} else {
 		if( ctx->attr ) {
+			//warn("What TF is attr??"); attr prefix
 			ctx->attrname = newSV(length + SvCUR(ctx->attr));
 			sv_copypv(ctx->attrname, ctx->attr);
 			sv_catpvn(ctx->attrname, data, length);
@@ -791,6 +852,287 @@ _test()
 		rv_hv_store(sv2, "test",4,test,0);
 */
 
+#ifndef HePV_nolen
+#define HePV_nolen(he)	((HeKLEN(he) == HEf_SVKEY) ? \
+				 SvPV_nolen(HeKEY_sv(he)) : \
+				 (HeKEY(he)))
+#endif
+//#define strcmp(a,b) ( a && b ? strcmp(a,b) : fprintf(stderr, "Failed to compare %s with %s at %s line %d.\n", a,b,__FILE__,__LINE__)+2 )
+#define mystrcmp(a,b) ( a && b ? strcmp(a,b) : 2 )
+
+void h2xout( char *data, compstate *p ) {
+	printf( "%*s", p->depth * 4,"" );
+	printf( "%s\n", data );
+}
+void h2xoute( char *data, compstate *p ) {
+	printf( "%*s", p->depth * 4,"" );
+	printf("e(%s)\n", data);
+}
+
+void h2xp( compstate *p, char *f, ... ) {
+	va_list va_args;
+	
+	/*
+	printf( "%*s", p->depth * 4,"" );
+	va_start(va_args,f);
+	vfprintf(stdout, f, va_args);
+	va_end(va_args);
+	*/
+	
+	va_start(va_args,f);
+	sv_vcatpvf( p->result, f, &va_args );
+	va_end(va_args);
+	
+	//printf ("\n");
+}
+void h2xpe( compstate *p, char *s ) {
+	char *b = s;
+	while (1) {
+		switch (*s) {
+			warn("%c", *s);
+			case 0:
+				if (b < s) sv_catpvf( p->result, "%-.*s", (int)(s - b), b );
+				return;
+			case '<':
+				if (b < s) sv_catpvf( p->result, "%-.*s", (int)(s - b), b );
+				sv_catpvf( p->result, "%s", "&lt;" );
+				b = s+1;
+				break;
+			case '>':
+				if (b < s) sv_catpvf( p->result, "%-.*s", (int)(s - b), b );
+				sv_catpvf( p->result, "%s", "&gt;" );
+				b = s+1;
+				break;
+			case '"':
+				if (b < s) sv_catpvf( p->result, "%-.*s", (int)(s - b), b );
+				sv_catpvf( p->result, "%s", "&quot;" );
+				b = s+1;
+				break;
+			case '\'':
+				if (b < s) sv_catpvf( p->result, "%-.*s", (int)(s - b), b );
+				sv_catpvf( p->result, "%s", "&apos;" );
+				b = s+1;
+				break;
+			case '&':
+				if (b < s) sv_catpvf( p->result, "%-.*s", (int)(s - b), b );
+				sv_catpvf( p->result, "%s", "&amp;" );
+				b = s+1;
+				break;
+			default:
+				break;
+		}
+		s++;
+	}
+}
+
+
+void kv2x ( char *key, SV *val, compstate *p );
+void kv2x ( char *key, SV *val, compstate *p ) {
+	char closed;
+	
+	HE* ent;
+	
+	char   *nkey;
+	STRLEN  i, nlen;
+	
+	AV  *av;
+	SV **avv;
+	
+	debug("key=%s, val=%s",key, SvPV_nolen(val));
+	if ( mystrcmp( key, p->text ) == 0 ) {
+		h2xpe(p, SvPV_nolen( val ));
+	}
+	else
+	if ( mystrcmp( key, p->cdata ) == 0 ) {
+		h2xp(p, "<![CDATA[");
+		h2xp(p, SvPV_nolen( val ));
+		h2xp(p, "]]>");
+	}
+	else
+	if ( p->comm && mystrcmp( key, p->comm) == 0 ) {
+		debug("comm: %s", SvPV_nolen( val ));
+		h2xp(p, "<!-- ");
+		h2xpe(p, SvPV_nolen( val ));
+		h2xp(p, " -->");
+	}
+	else {
+		if (SvROK( val )) {
+			switch ( SvTYPE( SvRV( val ) ) ) {
+				case SVt_PVHV:
+					debug("%s -> hash inside", key);
+					(void) hv_iterinit( (HV *) SvRV( val ) );
+					h2xp(p, "<%s", key);
+					closed = 0;
+					while ((ent = hv_iternext( (HV *) SvRV( val ) ))) {
+						nkey = HePV(ent, nlen);
+						if ( strncmp( nkey, p->attr, p->attl ) == 0 ) {
+							nkey += p->attl;
+							h2xp(p, " %s=\"",nkey);
+							h2xpe(p, SvPV_nolen(HeVAL(ent)));
+							h2xp(p, "\"");
+							continue;
+						}
+					}
+					
+					(void) hv_iterinit( (HV *) SvRV( val ) );
+					while ((ent = hv_iternext( (HV *) SvRV( val ) ))) {
+						nkey = HePV(ent, nlen);
+						if ( strncmp( nkey, p->attr, p->attl ) == 0 ) {
+							continue;
+						}
+						debug("Nested %s->%s", nkey, SvPV_nolen(HeVAL(ent)));
+						if (!closed) {
+							closed = 1;
+							h2xp(p,">");
+						}
+						p->depth++;
+						kv2x( nkey, HeVAL(ent), p );
+						p->depth--;
+					}
+					
+					if (!closed) {
+						h2xp(p, "/>");
+					} else {
+						h2xp(p, "</%s>",key);
+					}
+					
+					
+					break;
+				case SVt_PVAV:
+					debug("array inside (Multinode)");
+					
+					av = (AV *) SvRV( val );
+					nlen = av_len(av) + 1;
+					
+					for ( i = 0; i < nlen; i++ ) {
+						if( ( avv = av_fetch(av,i,0) ) && SvOK(*avv) ) {
+							kv2x( key, *avv, p );
+/*							
+							//printf("AV.V: %s\n",SvPV_nolen(*avv));
+							if (closed) {
+								h2xp(p, "<%s", key);
+								closed = 0;
+							}
+							if (SvROK( *avv )) {
+								switch( SvTYPE( SvRV(*avv) ) ) {
+									case SVt_PVHV:
+										//debug ("hv inside av");
+										(void) hv_iterinit( (HV *) SvRV( *avv ) );
+										while ((ent = hv_iternext( (HV *) SvRV( *avv ) ))) {
+											nkey = HePV_nolen(ent);
+											if ( strncmp( nkey, p->attr, p->attl ) == 0 ) {
+												nkey += p->attl;
+												h2xp(p, " %s='%s'",nkey, SvPV_nolen(HeVAL(ent)));
+												continue;
+											}
+										}
+										break;
+									case SVt_PVAV:
+										//Ignore attrs from AV in AV
+										//debug ("av inside av");
+										// Prohibited
+										break;
+									default:
+										debug("Unhandled svtype: %s", SvPV_nolen( *avv ));
+								}
+							} else {
+								
+							}
+							
+							h2xp(p, "</%s>", key);
+							closed = 1;
+*/
+						}
+					}
+					/*
+					debug("array inside. loop 2");
+					
+					for ( i = 0; i < nlen; i++ ) {
+						if( ( avv = av_fetch(av,i,0) ) && SvOK(*avv) ) {
+							if (SvROK( *avv )) {
+								switch( SvTYPE( SvRV(*avv) ) ) {
+									case SVt_PVHV:
+										(void) hv_iterinit( (HV *) SvRV( *avv ) );
+										while ((ent = hv_iternext( (HV *) SvRV( *avv ) ))) {
+											nkey = HePV_nolen(ent);
+											if ( strncmp( nkey, p->attr, p->attl ) == 0 ) {
+												continue;
+											}
+											
+											//
+											debug("Nested %s->%s", nkey, SvPV_nolen(HeVAL(ent)));
+											if (!closed) {
+												closed = 1;
+												h2xp(p,">");
+											}
+											p->depth++;
+											kv2x( nkey, HeVAL(ent), p );
+											p->depth--;
+										}
+										break;
+									case SVt_PVAV:
+										//AV in AV
+										debug("Array within Array is useless and not supported. Ignoring");
+										break;
+									default:
+										debug("Unhandled svtype: %s", SvPV_nolen( *avv ));
+								}
+							} else {
+								
+							}
+						}
+					}
+					*/
+					
+					break;
+				default:
+					warn("Bad reference found: %s", SvPV_nolen( SvRV(val) ));
+					break;
+			}
+		} else {
+			if (SvOK(val) && SvCUR(val)) {
+				h2xp(p, "<%s>", key);
+				h2xpe(p, SvPV_nolen(val));
+				h2xp(p, "</%s>", key);
+			} else {
+				h2xp(p, "<%s/>",key);
+			}
+		}
+	}
+}
+
+void h2x ( SV *x, compstate *p );
+void h2x ( SV *x, compstate *p ) {
+	
+	HE* ent;
+	SV *val;
+	char *key;
+	STRLEN klen;
+	
+	if (SvROK (x)) {
+		switch( SvTYPE( SvRV(x) ) ) {
+			case SVt_PVHV:
+				(void) hv_iterinit( (HV *) SvRV( x ) );
+				while ((ent = hv_iternext( (HV *) SvRV( x ) ))) {
+					key = HePV(ent, klen);
+					val = HeVAL(ent);
+					if ( strncmp( key, p->attr, strlen(p->attr) ) == 0 ) {
+						debug("Attribute %s at this level is prohibited", key);
+						continue;
+					}
+					kv2x( key, val, p );
+				}
+				break;
+			default:
+				warn("skip %s", SvPV_nolen( SvRV(x) ));
+		}
+	} else {
+		warn("skip nonref");
+	}
+}
+
+
+
 MODULE = XML::Fast		PACKAGE = XML::Fast
 
 void
@@ -817,12 +1159,14 @@ _test()
 		croak("Force exit");
 		
 
-SV*
-_xml2hash(xml,conf)
-		char *xml;
+void
+_xml2hash(xml_sv,conf)
+		SV *xml_sv;
 		HV *conf;
 	PROTOTYPE: $$
-	CODE:
+	PPCODE:
+		SvGETMAGIC(xml_sv);
+		char *xml = SvPVbyte_nolen(xml_sv);
 		SV * RV;
 		
 		parser_state state;
@@ -851,10 +1195,12 @@ _xml2hash(xml,conf)
 			}
 		}
 		
-		if ((key = hv_fetch(conf, "attr", 4, 0)) && SvPOK(*key)) {
-			ctx.attr = *key;
+		if ((key = hv_fetch(conf, "attr", 4, 0))) {
+			if (SvOK(*key) && SvCUR(*key) > 0 ) { // defined and length
+				ctx.attr = *key;
+			}
 		}
-		if ((key = hv_fetch(conf, "text", 4, 0)) && SvPOK(*key)) {
+		if ((key = hv_fetch(conf, "text", 4, 0)) && SvOK(*key)) {
 			ctx.text = *key;
 		}
 		if ((key = hv_fetch(conf, "join", 4, 0)) && SvPOK(*key)) {
@@ -944,11 +1290,9 @@ _xml2hash(xml,conf)
 			else if(ctx.text)
 				state.cb.cdata        = on_bytes;
 			
-			if(ctx.text) {
-				state.cb.bytes        = on_bytes;
-				state.cb.bytespart    = on_bytes_part;
-				state.cb.uchar        = on_uchar;
-			}
+			state.cb.bytes        = on_bytes;
+			state.cb.bytespart    = on_bytes_part;
+			state.cb.uchar        = on_uchar;
 			
 			if (!(ctx.flags & MODE_TRIM))
 				state.save_wsp     = 1;
@@ -965,4 +1309,109 @@ _xml2hash(xml,conf)
 			croak("%s", SvPV_nolen(ctx.error));
 		}
 		ST(0) = RV;
+		XSRETURN(1);
+
+void
+_hash2xml(hash,conf)
+		SV *hash;
+		HV *conf;
+	PROTOTYPE: $$
+	PPCODE:
+		compstate ctx;
+		memset(&ctx,0,sizeof(parsestate));
+		
+		SV **key;
+		if ((key = hv_fetch(conf, "order", 5, 0)) && SvTRUE(*key)) {
+			ctx.flags |= MODE_ORDER;
+		}
+		if ((key = hv_fetch(conf, "trim", 4, 0)) && SvTRUE(*key)) {
+			ctx.flags |= MODE_TRIM;
+		}
+		/*
+		if ((key = hv_fetch(conf, "bytes", 5, 0)) && SvTRUE(*key)) {
+			ctx.bytes = 1;
+		} else {
+			if ((key = hv_fetch(conf, "utf8decode", 10, 0)) && SvTRUE(*key)) {
+				ctx.utf8 = UTF8_DECODE;
+			} else {
+				ctx.utf8 = UTF8_UPGRADE;
+			}
+		}
+		*/
+		
+		if ((key = hv_fetch(conf, "attr", 4, 0)) && SvPOK(*key)) {
+			ctx.attr = SvPV_nolen(*key);
+			// warn ("Set attr to '%s'", ctx.attr);
+		} else {
+			ctx.attr = "-";
+		}
+		if ((key = hv_fetch(conf, "text", 4, 0)) && SvPOK(*key)) {
+			ctx.text = SvPV_nolen(*key);
+		} else {
+			ctx.text = "#text";
+		}
+		if ((key = hv_fetch(conf, "cdata", 5, 0)) && SvPOK(*key)) {
+			ctx.cdata = SvPV_nolen(*key);
+		} else {
+			ctx.cdata = 0;
+		}
+		if ((key = hv_fetch(conf, "comm", 4, 0)) && SvPOK(*key)) {
+			ctx.comm = SvPV_nolen(*key);
+		} else {
+			ctx.comm = 0;
+		}
+		/*
+		if ((key = hv_fetch(conf, "array", 5, 0)) && SvOK(*key)) {
+			if (SvROK(*key) && SvTYPE( SvRV(*key) ) == SVt_PVAV) {
+				AV *av = (AV *) SvRV( *key );
+				ctx.array = newHV();
+				I32 len = 0, avlen = av_len(av) + 1;
+				SV **val;
+				for ( len = 0; len < avlen; len++ ) {
+					if( ( val = av_fetch(av,len,0) ) && SvOK(*val) ) {
+						if(SvPOK(*val)) {
+							(void) hv_store( ctx.array, SvPV_nolen(*val), SvCUR(*val), newSV(0), 0 );
+						} else {
+							//my_croak(&ctx,"Bad enrty in array entry: %s",SvPV_nolen(*val));
+						}
+					}
+				}
+				
+				
+			}
+			else if (!SvROK(*key)) {
+				//printf("Remember all should be arrays\n");
+				if (SvTRUE(*key)) {
+					ctx.flags |= MODE_ARRAYS;
+				}
+			}
+			else {
+				//my_croak(&ctx,"Bad entry in array: %s",SvPV_nolen(*key));
+			}
+		}
+		
+		//ctx.flags |= TAG_MATCH;
+		
+		if (!ctx.bytes) {
+			ctx.encoding = "utf8";
+		}
+		*/
+		
+		ctx.depth  = 0;
+		ctx.ix     = 0;
+		ctx.result = sv_2mortal(newSVpv("",0));
+		//ctx.nested = newSVpv("",0);
+		ctx.attl   = strlen(ctx.attr);
+		
+		SvGROW(ctx.result,1024);
+		//SvGROW(ctx.nested,1024);
+		h2x( hash, &ctx);
+		
+		//croak("XXX: %s", SvPV_nolen(ctx.result));
+		
+		if (ctx.error) {
+			croak("%s", SvPV_nolen(ctx.error));
+		}
+		
+		ST(0) = ctx.result;
 		XSRETURN(1);

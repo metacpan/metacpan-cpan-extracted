@@ -1,5 +1,5 @@
 package Lab::Moose;
-$Lab::Moose::VERSION = '3.550';
+$Lab::Moose::VERSION = '3.552';
 use warnings;
 use strict;
 use 5.010;

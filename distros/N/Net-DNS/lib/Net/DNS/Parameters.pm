@@ -1,15 +1,15 @@
 package Net::DNS::Parameters;
 
 #
-# $Id: Parameters.pm 1561 2017-04-19 13:08:13Z willem $
+# $Id: Parameters.pm 1571 2017-06-03 20:14:15Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1561 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1571 $)[1];
 
 
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2017-04-13)
+##	(last updated 2017-06-01)
 ##
 ################################################
 
@@ -30,19 +30,20 @@ our @EXPORT = qw(
 
 
 # Registry: DNS CLASSes
-our %classbyname = (
+my @classbyname = (
 	IN   => 1,						# RFC1035
 	CH   => 3,						# Chaosnet
 	HS   => 4,						# Hesiod
 	NONE => 254,						# RFC2136
 	ANY  => 255,						# RFC1035
 	);
-our %classbyval = reverse %classbyname;
-%classbyname = ( '*' => 255, %classbyname, map lc($_), %classbyname );
+our %classbyval = reverse @classbyname;
+push @classbyname, map /^\d/ ? $_ : lc($_), @classbyname;
+our %classbyname = ( '*' => 255, @classbyname );
 
 
 # Registry: Resource Record (RR) TYPEs
-our %typebyname = (
+my @typebyname = (
 	A	   => 1,					# RFC1035
 	NS	   => 2,					# RFC1035
 	MD	   => 3,					# RFC1035
@@ -95,7 +96,7 @@ our %typebyname = (
 	NSEC3	   => 50,					# RFC5155
 	NSEC3PARAM => 51,					# RFC5155
 	TLSA	   => 52,					# RFC6698
-	SMIMEA	   => 53,					# RFC-ietf-dane-smime-16
+	SMIMEA	   => 53,					# RFC8162
 	HIP	   => 55,					# RFC8005
 	NINFO	   => 56,					#
 	RKEY	   => 57,					#
@@ -128,24 +129,26 @@ our %typebyname = (
 	TA	   => 32768,					# http://cameo.library.cmu.edu/ http://www.watson.org/~weiler/INI1999-19.pdf
 	DLV	   => 32769,					# RFC4431
 	);
-our %typebyval = reverse %typebyname;
-%typebyname = ( '*' => 255, %typebyname, map lc($_), %typebyname );
+our %typebyval = reverse @typebyname;
+push @typebyname, map /^\d/ ? $_ : lc($_), @typebyname;
+our %typebyname = ( '*' => 255, @typebyname );
 
 
 # Registry: DNS OpCodes
-our %opcodebyname = (
+my @opcodebyname = (
 	QUERY  => 0,						# RFC1035
 	IQUERY => 1,						# RFC3425
 	STATUS => 2,						# RFC1035
 	NOTIFY => 4,						# RFC1996
 	UPDATE => 5,						# RFC2136
 	);
-our %opcodebyval = reverse %opcodebyname;
-%opcodebyname = ( NS_NOTIFY_OP => 4, %opcodebyname, map lc($_), %opcodebyname );
+our %opcodebyval = reverse @opcodebyname;
+push @opcodebyname, map /^\d/ ? $_ : lc($_), @opcodebyname;
+our %opcodebyname = ( NS_NOTIFY_OP => 4, @opcodebyname );
 
 
 # Registry: DNS RCODEs
-our %rcodebyname = (
+my @rcodebyname = (
 	NOERROR	  => 0,						# RFC1035
 	FORMERR	  => 1,						# RFC1035
 	SERVFAIL  => 2,						# RFC1035
@@ -168,12 +171,13 @@ our %rcodebyname = (
 	BADTRUNC  => 22,					# RFC4635
 	BADCOOKIE => 23,					# RFC7873
 	);
-our %rcodebyval = reverse( BADSIG => 16, %rcodebyname );
-%rcodebyname = ( %rcodebyname, map lc($_), %rcodebyname );
+our %rcodebyval = reverse( BADSIG => 16, @rcodebyname );
+push @rcodebyname, map /^\d/ ? $_ : lc($_), @rcodebyname;
+our %rcodebyname = @rcodebyname;
 
 
 # Registry: DNS EDNS0 Option Codes (OPT)
-our %ednsoptionbyname = (
+my @ednsoptionbyname = (
 	LLQ		=> 1,					# http://files.dns-sd.org/draft-sekar-dns-llq.txt
 	UL		=> 2,					# http://files.dns-sd.org/draft-sekar-dns-ul.txt
 	NSID		=> 3,					# RFC5001
@@ -189,12 +193,13 @@ our %ednsoptionbyname = (
 	'KEY-TAG'	=> 14,					# RFC8145
 	DEVICEID	=> 26946,				# https://docs.umbrella.com/developer/networkdevices-api/identifying-dns-traffic2
 	);
-our %ednsoptionbyval = reverse %ednsoptionbyname;
-%ednsoptionbyname = ( %ednsoptionbyname, map lc($_), %ednsoptionbyname );
+our %ednsoptionbyval = reverse @ednsoptionbyname;
+push @ednsoptionbyname, map /^\d/ ? $_ : lc($_), @ednsoptionbyname;
+our %ednsoptionbyname = @ednsoptionbyname;
 
 
 # Registry: DNS Header Flags
-our %dnsflagbyname = (
+my @dnsflagbyname = (
 	AA => 0x0400,						# RFC1035
 	TC => 0x0200,						# RFC1035
 	RD => 0x0100,						# RFC1035
@@ -202,14 +207,16 @@ our %dnsflagbyname = (
 	AD => 0x0020,						# RFC4035 RFC6840
 	CD => 0x0010,						# RFC4035 RFC6840
 	);
-%dnsflagbyname = ( %dnsflagbyname, map lc($_), %dnsflagbyname );
+push @dnsflagbyname, map /^\d/ ? $_ : lc($_), @dnsflagbyname;
+our %dnsflagbyname = @dnsflagbyname;
 
 
 # Registry: EDNS Header Flags (16 bits)
-our %ednsflagbyname = (
+my @ednsflagbyname = (
 	DO => 0x8000,						# RFC4035 RFC3225 RFC6840
 	);
-%ednsflagbyname = ( %ednsflagbyname, map lc($_), %ednsflagbyname );
+push @ednsflagbyname, map /^\d/ ? $_ : lc($_), @ednsflagbyname;
+our %ednsflagbyname = @ednsflagbyname;
 
 
 ########
@@ -248,7 +255,7 @@ sub typebyname {
 			return $val;
 		}
 		_typespec("$name.RRNAME");
-		croak "unknown type $name" unless $typebyname{uc $name};
+		return $typebyname{uc $name} || croak "unknown type $name";
 			}
 }
 
@@ -304,16 +311,6 @@ sub ednsoptionbyval {
 }
 
 
-our $DNSEXTLANG = 'ARPA.';		## draft-levine-dnsextlang
-
-use constant DNSEXTLANG => defined eval <<'END';
-	die 'preempt failure' if $^O =~ /cygwin|MSWin32/i;
-	require IO::File;
-	local $SIG{__WARN__} = sub { };
-	new IO::File('RRTYPEgen |') or die $!;
-END
-
-
 sub register {				## register( 'TOY', 1234 )	(NOT part of published API)
 	my ( $mnemonic, $rrtype ) = map uc($_), @_;		# uncoverable pod
 	$rrtype = rand(255) + 65280 unless $rrtype;
@@ -329,22 +326,38 @@ sub register {				## register( 'TOY', 1234 )	(NOT part of published API)
 }
 
 
+use constant DNSEXTLANG => defined eval 'require Net::DNS::Extlang';
+
+our $DNSEXTLANG = DNSEXTLANG ? eval 'Net::DNS::Extlang->new()->domain' : undef;
+
 sub _typespec {				## draft-levine-dnsextlang
-	eval <<'END' if DNSEXTLANG;
+	eval <<'END' if DNSEXTLANG && $DNSEXTLANG;
 	my ($node) = @_;
+
 	require Net::DNS::Resolver;
-	my $resolver = new Net::DNS::Resolver;
+	my $resolver = new Net::DNS::Resolver();
 	my $response = $resolver->send( "$node.$DNSEXTLANG", 'TXT' );
 
 	foreach my $txt ( grep $_->type eq 'TXT', $response->answer ) {
 		my @stanza = $txt->txtdata;
-		my ( $tag, $identifier ) = @stanza;
+		my ( $tag, $identifier, @attribute ) = @stanza;
 		next unless defined($tag) && $tag =~ /^RRTYPE=\d+$/;
-		register( split /[:\s]/, $identifier );
+		register( $1, $2 ) if $identifier =~ /^(\w+):(\d+)\W*/;
 		return unless defined wantarray;
-		require 5.008009;				# support for reference in @INC
-		my @arg = map { s/\s.*$//; qq("$_") } @stanza;	# strip descriptive text
-		return new IO::File("RRTYPEgen @arg |");
+
+		my $extobj = new Net::DNS::Extlang();
+		my @nodesc = map { m/^(\S+)\s*/; $1 } $identifier, @attribute;
+		my $recipe = $extobj->xlstorerecord(@nodesc);
+		my $result = $extobj->compilerr($recipe);
+
+		my $fh	= new IO::File();
+		my $pid = open( $fh, '-|' );
+		die "fork: $!" unless defined $pid;
+
+		return $fh if $pid;				# parent
+
+		print $result;					# child
+		exit;
 	}
 	return undef;
 END

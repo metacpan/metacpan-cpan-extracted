@@ -13,7 +13,7 @@ my $req = $person->_create_request("machida_pm",
     userData => 'japan-perl',
 );
 isa_ok $req, 'HTTP::Request';
-is $req->uri, "https://api.projectoxford.ai/face/v1.0/persongroups/machida_pm/persons";
+is $req->uri, "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/persons";
 is $req->method, 'POST';
 is $req->header('Content-Type'), 'application/json';
 is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';

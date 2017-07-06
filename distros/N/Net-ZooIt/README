@@ -1,0 +1,141 @@
+# NAME
+
+Net::ZooIt - High level recipes for Apache Net::ZooKeeper
+
+# SYNOPSIS
+
+    use Net::ZooKeeper;
+    use Net::ZooIt;
+
+    Net::ZooIt::set_log_level(ZOOIT_DEBUG);
+
+    my $zk = Net::ZooKeeper->new('localhost:7000');
+    while (1) {
+        my $lock = Net::ZooIt->new_lock(zk => $zk, path => '/election');
+        last unless $lock;
+        do_stuff_when_elected();
+    }
+
+# DESCRIPTION
+
+Net::ZooIt provides high level recipes for working with ZooKeeper in Perl,
+like locks or leader election.
+
+## Net::ZooKeeper Handles
+
+Net::ZooIt methods always take a Net::ZooKeeper handle object as a parameter
+and delegate their creation to the user. Rationale: enterprises often have
+customised ways to create those handles, Net::ZooIt aims to be instantly
+usable without such customisation.
+
+## Automatic Cleanup
+
+Net::ZooIt constructors return a Net::ZooIt object, which automatically
+clean up their znodes when they go out of scope at the end of the enclosing
+block. If you want to clean up earlier, call
+
+    $zooit_obj->DESTROY;
+
+Implication: if you call Net::ZooIt constructors in void context, the
+created object goes out of scope immediately, and your znodes are deleted.
+Net::ZooIt logs a ZOOIT_ERR message in this case.
+
+## Error Handling
+
+Net::ZooIt constructors return nothing in case of errors during creation.
+
+Once you hold a lock or other resource, you're not notified of connection
+loss errors. If you need to take special action, check your Net::ZooKeeper
+handle.
+
+If you give up Net::ZooIt resources during connection loss, your znodes
+cannot be cleaned up immediately, they will enter a garbage collection queue
+and Net::ZooIt will clean them up once connection is resumed.
+
+## Logging
+
+Net::ZooIt logs to STDERR.
+Log messages are prefixed with Zulu military time, PID and the level of
+the current message: ZOOIT_DIE ZOOIT_ERR ZOOIT_WARN ZOOIT_INFO ZOOIT_DEBUG.
+
+If Net::ZooIt throws an exception, it prints a ZOOIT_DIE level message
+before dying. This allows seeing the original error message even if
+an eval {} block swallows it.
+
+# METHODS
+
+- new_lock()
+
+        my $lock = Net::ZooIt->new_lock(zk => $zk, path => '/lock');
+        my $lock = Net::ZooIt->new_lock(zk => $zk, path => '/lock', timeout => 1);
+
+    Blocks by default until the lock is acquired.
+    Returns a lock object on success, which automatically cleans up its
+    znodes when the object goes out of scope at the end of the enclosing block.
+
+    Returns nothing on errors, or when the acquisition of the lock did not
+    succeed before the specified timeout. Nonblocking lock can be achieved
+    with timeout => 0.
+
+    The method is not reentrant, calling it in a recursive function causes
+    a deadlock.
+
+    Use the same method for leader election.
+
+- new_queue()
+
+        my $queue = Net::ZooIt->new_queue(zk => $zk, path => '/queue');
+
+    Returns a queue object. DISCLAIMER! Please do not abuse ZooKeeper queues.
+    They store items in a flat way under your /queue znode,
+    which does not scale well.
+
+- put_queue()
+
+        my $success = $queue->put_queue($data);
+
+    Create queue item storing data. Returns true on success, nothing on failure.
+
+- get_queue()
+
+        my $data = $queue->get_queue;
+        my $data = $queue->get_queue(timeout => 5);
+
+    Get an item from queue. Returns data in queue item, or nothing on errors
+    or after timeout \[s\] has elapsed.
+
+# FUNCTIONS
+
+- set_log_level()
+
+        Net::ZooIt::set_log_level($level);
+
+# EXPORTS
+
+Net::ZooIt exports its log_level constants by default:
+ZOOIT_DIE ZOOIT_ERR ZOOIT_WARN ZOOIT_INFO ZOOIT_DEBUG.
+
+# SEE ALSO
+
+The Apache ZooKeeper project's home page at
+[http://zookeeper.apache.org/](http://zookeeper.apache.org/) provides a wealth of detail
+on how to develop applications using ZooKeeper.
+
+# AUTHOR
+
+SZABO Gergely, <szg@subogero.com>
+
+# LICENSE
+
+This file is licensed to you under the Apache License, Version 2.0.
+You may not use this file except in compliance with the License.
+See a copy of the License in COPYING, distributed along with this file,
+or obtain a copy at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

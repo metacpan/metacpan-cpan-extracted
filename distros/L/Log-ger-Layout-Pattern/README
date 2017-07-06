@@ -1,0 +1,38 @@
+SYNOPSIS
+
+     use Log::ger::Layout 'Pattern', format => '%d (%F:%L)> %m';
+     use Log::ger;
+
+DESCRIPTION
+
+    Known placeholder in format string:
+
+     %c Category of the logging event
+     %C Fully qualified package (or class) name of the caller
+     %d Current date in ISO8601 format (YYYY-MM-DD<T>hh:mm:ss) (localtime)
+     %D Current date in ISO8601 format (YYYY-MM-DD<T>hh:mm:ss) (GMT)
+     %F File where the logging event occurred
+     %H Hostname (if Sys::Hostname is available)
+     %l Fully qualified name of the calling method followed by the
+        callers source the file name and line number between
+        parentheses.
+     %L Line number within the file where the log statement was issued
+     %m The message to be logged
+     %M Method or function where the logging request was issued
+     %n Newline (OS-independent)
+     %p Level ("priority")of the logging event
+     %P pid of the current process
+     %r Number of seconds elapsed from program start to logging event
+     %R Number of seconds elapsed from last logging event to current
+        logging event
+               %T A stack trace of functions called
+     %% A literal percent (%) sign
+
+SEE ALSO
+
+    Log::ger
+
+    Modelled after <Log::Log4perl::Layout::Pattern> but note that full
+    compatibility or feature parity is not a goal. See also
+    Log::Log4perl::Tiny.
+

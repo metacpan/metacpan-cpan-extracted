@@ -21,8 +21,10 @@ WriteMakefile(
             },
         },
     },
-
-    LIBS              => ['-lwiringPi'],
+    BUILD_REQUIRES => {
+        'Test::More' => 1.302078,
+    },
+    LIBS              => ['-lwiringPi -lrt'],
     DEFINE            => '',
     INC               => '-I.',
 );

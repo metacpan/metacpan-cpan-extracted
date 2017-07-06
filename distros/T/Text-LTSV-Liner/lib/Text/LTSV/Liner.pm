@@ -5,7 +5,7 @@ use warnings;
 
 use Term::ANSIColor;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 sub new {
     my $class = shift;
@@ -120,11 +120,11 @@ This method is convinent if you want to use the filtered output in your codes.
 
 =head1 AUTHORS
 
-YASUTAKE Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
+IKEDA Kiyoshi E<lt>yasutake.kiyoshi@gmail.comE<gt>
 
 =head1 LICENSE
 
-Copyright (C) 2013 YASUTAKE Kiyoshi.
+Copyright (C) 2013-2017 IKEDA Kiyoshi.
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.  That means either (a) the GNU General Public

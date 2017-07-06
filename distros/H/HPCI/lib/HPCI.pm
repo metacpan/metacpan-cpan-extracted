@@ -44,7 +44,7 @@ sub _merge_hash {
 	my( $target, $new, $path ) = @_;
 	$path ||= [];
 	croak "not a hash when merging attribute hash{".join('}{',@$path)."}"
-	    unless ref($target) eq 'HASH' && ref($new) eq 'HASH';
+		unless ref($target) eq 'HASH' && ref($new) eq 'HASH';
 	while (my($k,$v) = each %$new) {
 		if (ref($v) eq 'HASH' || (exists $target->{$k} && ref($target->{$k}) eq 'HASH')) {
 			$target->{$k} //= {};
@@ -135,19 +135,19 @@ sub _trigger_mkdir {
 
 =head1 VERSION
 
-Version 0.50
+Version 0.52
 
 =cut
 
-our $VERSION = '0.50';
+our $VERSION = '0.52';
 
 our $LocalConfigFound;
 
 $LocalConfigFound = can_load( modules => { 'HPCI::LocalConfig' => undef });
 
-if( !$LocalConfigFound ) {
+if (!$LocalConfigFound) {
 	my $err = $Module::Load::Conditional::ERROR;
-	if( defined $err && $err !~ /^Could not find or check module / ) {
+	if (defined $err && $err !~ /^Could not find or check module /) {
 		print STDERR "Conditional load of HPCI::LocalConfig failed.  Error is:\n";
 		print STDERR "$err\n";
 	}

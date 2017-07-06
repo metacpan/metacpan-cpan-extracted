@@ -1,0 +1,4 @@
+name = "Acme-Undead"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

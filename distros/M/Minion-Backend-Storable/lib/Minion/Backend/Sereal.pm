@@ -1,0 +1,990 @@
+package Minion::Backend::Sereal;
+use Minion::Backend -base;
+
+our $VERSION = 7.012;
+
+use Sys::Hostname 'hostname';
+use Time::HiRes qw(time usleep);
+
+# Attributes
+
+has 'file';
+
+# Constructor
+
+sub new { shift->SUPER::new(file => shift) }
+
+# Methods
+
+sub broadcast {
+  my ($self, $command, $args, $ids) = (shift, shift, shift // [], shift // []);
+
+  my $guard = $self->_guard->_write;
+  my $inboxes = $guard->_inboxes;
+  my $workers = $guard->_workers;
+  @$ids = @$ids ? map exists($workers->{$_}), @$ids
+      : keys %$workers unless @$ids;
+
+  push @{$inboxes->{$_} //= []}, [$command, @$args] for @$ids;
+
+  return !!@$ids;
+}
+
+sub dequeue {
+  my ($self, $id, $wait, $options) = @_;
+  return ($self->_try($id, $options) or do {
+    usleep $wait * 1_000_000;
+    $self->_try($id, $options);
+  });
+}
+
+sub enqueue {
+  my ($self, $task, $args, $options) = (shift, shift, shift // [], shift // {});
+
+  my $guard = $self->_guard->_write;
+
+  my $job = {
+    args     => $args,
+    attempts => $options->{attempts} // 1,
+    created  => time,
+    delayed  => time + ($options->{delay} // 0),
+    id       => $guard->_job_id,
+    notes    => $options->{notes} // {},
+    parents  => $options->{parents} // [],
+    priority => $options->{priority} // 0,
+    queue    => $options->{queue} // 'default',
+    retries  => 0,
+    state    => 'inactive',
+    task     => $task
+  };
+  $guard->_jobs->{$job->{id}} = $job;
+
+  return $job->{id};
+}
+
+sub fail_job { shift->_update(1, @_) }
+
+sub finish_job { shift->_update(0, @_) }
+
+sub job_info {
+  my ($self, $id) = @_;
+  my $guard = $self->_guard;
+  return undef unless my $job = $guard->_jobs->{$id};
+  $job->{children} = $guard->_children($id);
+  return $job;
+}
+
+sub list_jobs {
+  my ($self, $offset, $limit, $options) = @_;
+
+  my $guard = $self->_guard;
+  my @jobs = sort { $b->{created} <=> $a->{created} }
+  grep +( (not defined $options->{queue} or $_->{queue} eq $options->{queue})
+      and (not defined $options->{state} or $_->{state} eq $options->{state})
+      and (not defined $options->{task}  or $_->{task} eq $options->{task})
+  ), values %{$guard->_jobs};
+
+  return [map +($_->{children} = $guard->_children($_->{id}) and $_), grep defined, @jobs[$offset .. ($offset + $limit - 1)]];
+}
+
+sub list_workers {
+  my ($self, $offset, $limit) = @_;
+  my $guard = $self->_guard;
+  my @workers = map { $self->_worker_info($guard, $_->{id}) }
+    sort { $b->{started} <=> $a->{started} } values %{$guard->_workers};
+  return [grep {defined} @workers[$offset .. ($offset + $limit - 1)]];
+}
+
+sub lock {
+  my ($self, $name, $duration, $options) = (shift, shift, shift, shift // {});
+  my $limit = $options->{limit} || 1;
+
+  my $guard = $self->_guard->_write;
+  my $locks = $guard->_locks->{$name} //= [];
+
+  # Delete expired locks
+  my $now = time;
+  @$locks = grep +($now < ($_ // 0)), @$locks;
+
+  # Check capacity
+  return undef unless @$locks < $limit;
+  return 1 unless $duration > 0;
+
+  # Add lock, maintaining order
+  my $this_expires = $now + $duration;
+
+  push(@$locks, $this_expires) and return 1
+    if ($locks->[$#$locks] // 0) < $this_expires;
+
+  @$locks = sort { ($a // 0) <=> ($b // 0) } (@$locks, $this_expires);
+  return 1;
+}
+
+sub note {
+  my ($self, $id, $key, $value) = @_;
+  my $guard = $self->_guard;
+  return undef unless my $job = $guard->_write->_jobs->{$id};
+  $job->{notes}{$key} = $value;
+  return 1;
+}
+
+sub receive {
+  my ($self, $id) = @_;
+  my $guard = $self->_guard->_write;
+  my $inboxes = $guard->_inboxes;
+  my $inbox = $inboxes->{$id} // [];
+  $inboxes->{$id} = [];
+  return $inbox;
+}
+
+sub register_worker {
+  my ($self, $id, $options) = (shift, shift, shift // {});
+  my $guard = $self->_guard->_write;
+  my $worker = $id ? $guard->_workers->{$id} : undef;
+  unless ($worker) {
+    $worker = {host => hostname, id => $guard->_id, pid => $$, started => time};
+    $guard->_workers->{$worker->{id}} = $worker;
+  }
+  @$worker{qw(notified status)} = (time, $options->{status} // {});
+  return $worker->{id};
+}
+
+sub remove_job {
+  my ($self, $id) = @_;
+  my $guard = $self->_guard;
+  delete $guard->_write->_jobs->{$id}
+    if my $removed = !!$guard->_job($id, qw(failed finished inactive));
+  return $removed;
+}
+
+sub repair {
+  my $self = shift;
+  my $minion = $self->minion;
+
+  # Workers without heartbeat
+  my $guard   = $self->_guard->_write;
+  my $workers = $guard->_workers;
+  my $jobs    = $guard->_jobs;
+  my $after   = time - $minion->missing_after;
+  $_->{notified} < $after and delete $workers->{$_->{id}} for values %$workers;
+
+  # Old jobs without unfinished dependents
+  $after = time - $minion->remove_after;
+  for my $job (values %$jobs) {
+    next unless $job->{state} eq 'finished' and $job->{finished} <= $after;
+    delete $jobs->{$job->{id}} unless grep +($jobs->{$_}{state} ne 'finished'),
+        @{$guard->_children($job->{id})};
+  }
+
+  # Jobs with missing worker (can be retried)
+  my @abandoned = map [@$_{qw(id retries)}],
+      grep +($_->{state} eq 'active' and not exists $workers->{$_->{worker}}),
+      values %$jobs;
+  undef $guard;
+  $self->fail_job(@$_, 'Worker went away') for @abandoned;
+
+  return;
+}
+
+sub reset { $_[0]->_guard->_save({} => $_[0]{file}) }
+
+sub retry_job {
+  my ($self, $id, $retries, $options) = (shift, shift, shift, shift // {});
+
+  my $guard = $self->_guard;
+  return undef
+    unless my $job = $guard->_job($id, qw(active failed finished inactive));
+  return undef unless $job->{retries} == $retries;
+  $guard->_write;
+  ++$job->{retries};
+  $job->{delayed} = time + $options->{delay} if $options->{delay};
+  exists $options->{$_} and $job->{$_} = $options->{$_} for qw(priority queue);
+  @$job{qw(retried state)} = (time, 'inactive');
+  delete @$job{qw(finished started worker)};
+
+  return 1;
+}
+
+sub stats {
+  my $self = shift;
+
+  my ($active, $delayed) = (0, 0);
+  my (%seen, %states);
+  my $guard = $self->_guard;
+  for my $job (values %{$guard->_jobs}) {
+    ++$states{$job->{state}};
+    ++$active if $job->{state} eq 'active' and not $seen{$job->{worker}}++;
+    ++$delayed if $job->{state} eq 'inactive'
+        and (time < $job->{delayed} or @{$job->{parents}});
+  }
+
+  return {
+    active_workers   => $active,
+    inactive_workers => keys(%{$guard->_workers}) - $active,
+    active_jobs      => $states{active}   // 0,
+    delayed_jobs     => $delayed,
+    enqueued_jobs    => $guard->_job_count,
+    failed_jobs      => $states{failed}   // 0,
+    finished_jobs    => $states{finished} // 0,
+    inactive_jobs    => $states{inactive} // 0
+  };
+}
+
+sub unlock {
+  my ($self, $name) = @_;
+
+  my $guard = $self->_guard->_write;
+  my $locks = $guard->_locks->{$name} //= [];
+  my $length = @$locks;
+  my $now = time;
+
+  my $i = 0;
+  ++$i while $i < $length and ($locks->[$i] // 0) <= $now;
+  return undef if $i >= $length;
+
+  $locks->[$i] = undef;
+  return 1;
+}
+
+sub unregister_worker {
+  my ($self, $id) = @_;
+  my $guard = $self->_guard->_write;
+  delete $guard->_inboxes->{$id};
+  delete $guard->_workers->{$id};
+}
+
+sub worker_info { $_[0]->_worker_info($_[0]->_guard, $_[1]) }
+
+sub _guard { Minion::Backend::Sereal::_Guard->new(backend => shift) }
+
+sub _try {
+  my ($self, $id, $options) = @_;
+  my $tasks = $self->minion->tasks;
+  my %queues = map +($_ => 1), @{$options->{queues} // ['default']};
+
+  my $now = time;
+  my $guard = $self->_guard;
+  my $jobs = $guard->_jobs;
+  my @ready = sort { $b->{priority} <=> $a->{priority}
+        || $a->{created} <=> $b->{created} }
+    grep +($_->{state} eq 'inactive' and $queues{$_->{queue}}
+        and $tasks->{$_->{task}} and $_->{delayed} <= $now),
+    values %$jobs;
+
+  my $job;
+  CANDIDATE: for my $candidate (@ready) {
+    $job = $candidate and last CANDIDATE
+      unless my @parents = @{$candidate->{parents} // []};
+    for my $parent (@parents) {
+      next CANDIDATE if exists $jobs->{$parent}
+          and grep +($jobs->{$parent}{state} eq $_), qw(active failed inactive)
+    }
+    $job = $candidate;
+  }
+
+  return undef unless $job;
+  $guard->_write;
+  @$job{qw(started state worker)} = (time, 'active', $id);
+  return $job;
+}
+
+sub _update {
+  my ($self, $fail, $id, $retries, $result) = @_;
+
+  my $guard = $self->_guard;
+  return undef unless my $job = $guard->_job($id, 'active');
+  return undef unless $job->{retries} == $retries;
+
+  $guard->_write;
+  @$job{qw(finished result)} = (time, $result);
+  $job->{state} = $fail ? 'failed' : 'finished';
+  undef $guard;
+
+  return 1 unless $fail and $job->{attempts} > $retries + 1;
+  my $delay = $self->minion->backoff->($retries);
+  return $self->retry_job($id, $retries, {delay => $delay});
+}
+
+sub _worker_info {
+  my ($self, $guard, $id) = @_;
+
+  return undef unless $id && (my $worker = $guard->_workers->{$id});
+  my @jobs = map $_->{id},
+      grep +($_->{state} eq 'active' and $_->{worker} eq $id),
+      values %{$guard->_jobs};
+
+  return {%$worker, jobs => \@jobs};
+}
+
+package
+    Minion::Backend::Sereal::_Guard;
+use Mojo::Base -base;
+
+use Fcntl ':flock';
+use Digest::MD5 'md5_hex';
+use Sereal::Decoder 'sereal_decode_with_object';
+use Sereal::Encoder 'sereal_encode_with_object';
+
+sub DESTROY {
+  $_[0]->_save($_[0]->_data => $_[0]{backend}{file}) if $_[0]{write};
+  flock $_[0]{lock}, LOCK_UN;
+}
+
+sub new {
+  my $self = shift->SUPER::new(@_);
+  my $path = $self->{backend}{file};
+  $self->_save({} => $path) unless -f $path;
+  open $self->{lock}, '>', "$path.lock";
+  flock $self->{lock}, LOCK_EX;
+  return $self;
+}
+
+sub _children {
+  my ($self, $id) = @_;
+  my $children = [];
+  for my $job (values %{$self->_jobs}) {
+    push @$children, $job->{id} if grep +($_ eq $id), @{$job->{parents} // []};
+  }
+  return $children;
+}
+
+sub _data { $_[0]{data} //= $_[0]->_load($_[0]{backend}{file}) }
+
+sub _id {
+  my $id;
+  do { $id = md5_hex(time . rand 999) } while $_[0]->_workers->{$id};
+  return $id;
+}
+
+sub _inboxes { $_[0]->_data->{inboxes} //= {} }
+
+sub _job {
+  my ($self, $id) = (shift, shift);
+  return undef unless my $job = $self->_jobs->{$id};
+  return grep(($job->{state} eq $_), @_) ? $job : undef;
+}
+
+sub _job_count { $_[0]->_data->{job_count} //= 0 }
+
+sub _job_id {
+  my $id;
+  do { $id = md5_hex(time . rand 999) } while $_[0]->_jobs->{$id};
+  ++$_[0]->_data->{job_count};
+  return $id;
+}
+
+sub _jobs { $_[0]->_data->{jobs} //= {} }
+
+sub _load {
+  my ($self, $path) = @_;
+  my $decoder = $self->{backend}{_guard_decoder} //= Sereal::Decoder->new;
+
+  # Borrowed from Mojo::File v7.33
+  CORE::open my $file, '<', $path or die qq{Failed to open file ($path): $!};
+  my ($payload, $ret) = ('', undef);
+  while ($ret = sysread $file, my $buffer, 131072, 0) { $payload .= $buffer }
+  die qq{Failed to read file ($path): $!} unless defined $ret;
+
+  return sereal_decode_with_object $decoder, $payload;
+}
+
+sub _locks { shift->_data->{locks} //= {} }
+
+sub _save {
+  my ($self, $content, $path) = @_;
+  my $encoder = $self->{backend}{_guard_encoder} //= Sereal::Encoder->new;
+  my $payload = sereal_encode_with_object $encoder, $content;
+
+  # Borrowed from Mojo::File v7.33
+  CORE::open my $file, '>', $path or die qq{Failed to open file ($path): $!};
+  (syswrite($file, $payload) // -1) == length $payload
+    or die qq{Failed to write file ($path): $!};
+  return;
+}
+
+sub _workers { $_[0]->_data->{workers} //= {} }
+
+sub _write { ++$_[0]{write} && return $_[0] }
+
+1;
+__END__
+
+=head1 NAME
+
+Minion::Backend::Sereal - File backend for Minion job queues.
+
+=head1 SYNOPSIS
+
+  use Minion::Backend::Sereal;
+
+  my $backend = Minion::Backend::Sereal->new('/some/path/minion.data');
+
+=head1 DESCRIPTION
+
+L<Minion::Backend::Sereal> is a highly portable file-based backend for
+L<Minion>.  It is 2--3x as fast as the L<Storable|Minion::Backend::Storable>
+backend.
+
+This version supports Minion v7.01.
+
+=head1 ATTRIBUTES
+
+L<Minion::Backend::Sereal> inherits all attributes from L<Minion::Backend> and
+implements the following new one.
+
+=head2 file
+
+  my $file = $backend->file;
+  $backend = $backend->file('/some/path/minion.data');
+
+File all data is stored in.
+
+=head1 METHODS
+
+L<Minion::Backend::Sereal> inherits all methods from L<Minion::Backend> and
+implements the following new ones.
+
+=head2 broadcast
+
+  my $bool = $backend->broadcast('some_command');
+  my $bool = $backend->broadcast('some_command', [@args]);
+  my $bool = $backend->broadcast('some_command', [@args], [$id1, $id2, $id3]);
+
+Broadcast remote control command to one or more workers.
+
+=head2 dequeue
+
+  my $job_info = $backend->dequeue($worker_id, 0.5);
+  my $job_info = $backend->dequeue($worker_id, 0.5, {queues => ['important']});
+
+Wait a given amount of time in seconds for a job, dequeue it and transition from
+C<inactive> to C<active> state, or return C<undef> if queues were empty.
+
+These options are currently available:
+
+=over 2
+
+=item queues
+
+  queues => ['important']
+
+One or more queues to dequeue jobs from, defaults to C<default>.
+
+=back
+
+These fields are currently available:
+
+=over 2
+
+=item args
+
+  args => ['foo', 'bar']
+
+Job arguments.
+
+=item id
+
+  id => '10023'
+
+Job id.
+
+=item retries
+
+  retries => 3
+
+Number of times job has been retried.
+
+=item task
+
+  task => 'foo'
+
+Task name.
+
+=back
+
+=head2 enqueue
+
+  my $job_id = $backend->enqueue('foo');
+  my $job_id = $backend->enqueue(foo => [@args]);
+  my $job_id = $backend->enqueue(foo => [@args] => {priority => 1});
+
+Enqueue a new job with C<inactive> state.
+
+These options are currently available:
+
+=over 2
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing this job will be attempted, with a delay based on
+L<Minion/"backoff"> after the first attempt, defaults to C<1>.
+
+=item delay
+
+  delay => 10
+
+Delay job for this many seconds (from now), defaults to C<0>.
+
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
+
+=item parents
+
+  parents => [$id1, $id2, $id3]
+
+One or more existing jobs this job depends on, and that need to have
+transitioned to the state C<finished> before it can be processed.
+
+=item priority
+
+  priority => 5
+
+Job priority, defaults to C<0>.  Jobs with a higher priority get performed
+first.
+
+=item queue
+
+  queue => 'important'
+
+Queue to put job in, defaults to C<default>.
+
+=back
+
+=head2 fail_job
+
+  my $bool = $backend->fail_job($job_id, $retries);
+  my $bool = $backend->fail_job($job_id, $retries, 'Something went wrong!');
+  my $bool = $backend->fail_job($job_id, $retries, {msg => 'Wrong, wrong!'});
+
+Transition from C<active> to C<failed> state, and if there are attempts
+remaining, transition back to C<inactive> with a delay based on
+L<Minion/"backoff">.
+
+=head2 finish_job
+
+  my $bool = $backend->finish_job($job_id, $retries);
+  my $bool = $backend->finish_job($job_id, $retries, 'All went well!');
+  my $bool = $backend->finish_job($job_id, $retries, {msg => 'All went well!'});
+
+Transition from C<active> to C<finished> state.
+
+=head2 job_info
+
+  my $job_info = $backend->job_info($job_id);
+
+Get information about a job, or return C<undef> if job does not exist.
+
+  # Check job state
+  my $state = $backend->job_info($job_id)->{state};
+
+  # Get job result
+  my $result = $backend->job_info($job_id)->{result};
+
+These fields are currently available:
+
+=over 2
+
+=item args
+
+  args => ['foo', 'bar']
+
+Job arguments.
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing this job will be attempted.
+
+=item children
+
+  children => ['10026', '10027', '10028']
+
+Jobs depending on this job.
+
+=item created
+
+  created => 784111777
+
+Epoch time job was created.
+
+=item delayed
+
+  delayed => 784111777
+
+Epoch time job was delayed to.
+
+=item finished
+
+  finished => 784111777
+
+Epoch time job was finished.
+
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
+
+=item parents
+
+  parents => ['10023', '10024', '10025']
+
+Jobs this job depends on.
+
+=item priority
+
+  priority => 3
+
+Job priority.
+
+=item queue
+
+  queue => 'important'
+
+Queue name.
+
+=item result
+
+  result => 'All went well!'
+
+Job result.
+
+=item retried
+
+  retried => 784111777
+
+Epoch time job has been retried.
+
+=item retries
+
+  retries => 3
+
+Number of times job has been retried.
+
+=item started
+
+  started => 784111777
+
+Epoch time job was started.
+
+=item state
+
+  state => 'inactive'
+
+Current job state, usually C<inactive>, C<active>, C<failed>, or C<finished>.
+
+=item task
+
+  task => 'foo'
+
+Task name.
+
+=item worker
+
+  worker => '154'
+
+Id of worker that is processing the job.
+
+=back
+
+=head2 list_jobs
+
+  my $batch = $backend->list_jobs($offset, $limit);
+  my $batch = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+
+Returns the same information as L</"job_info"> but in batches.
+
+These options are currently available:
+
+=over 2
+
+=item queue
+
+  queue => 'important'
+
+List only jobs in this queue.
+
+=item state
+
+  state => 'inactive'
+
+List only jobs in this state.
+
+=item task
+
+  task => 'test'
+
+List only jobs for this task.
+
+=back
+
+=head2 list_workers
+
+  my $batch = $backend->list_workers($offset, $limit);
+
+Returns the same information as L</"worker_info"> but in batches.
+
+=head2 lock
+
+  my $bool = $backend->lock('foo', 3600);
+  my $bool = $backend->lock('foo', 3600, {limit => 20});
+
+Try to acquire a named lock that will expire automatically after the given
+amount of time in seconds.
+
+These options are currently available:
+
+=over 2
+
+=item limit
+
+  limit => 20
+
+Number of shared locks with the same name that can be active at the same time,
+defaults to C<1>.
+
+=back
+
+=head2 new
+
+  my $backend = Minion::Backend::Sereal->new('/some/path/minion.data');
+
+Construct a new L<Minion::Backend::Sereal> object.
+
+=head2 note
+
+  my $bool = $backend->note($job_id, foo => 'bar');
+
+Change a metadata field for a job.
+
+=head2 receive
+
+  my $commands = $backend->receive($worker_id);
+
+Receive remote control commands for worker.
+
+=head2 register_worker
+
+  my $worker_id = $backend->register_worker;
+  my $worker_id = $backend->register_worker($worker_id);
+  my $worker_id = $backend->register_worker(
+      $worker_id, {status => {queues => ['default', 'important']}});
+
+Register worker or send heartbeat to show that this worker is still alive.
+
+These options are currently available:
+
+=over 2
+
+=item status
+
+  status => {queues => ['default', 'important']}
+
+Hash reference with whatever status information the worker would like to share.
+
+=back
+
+=head2 remove_job
+
+  my $bool = $backend->remove_job($job_id);
+
+Remove C<failed>, C<finished> or C<inactive> job from queue.
+
+=head2 repair
+
+  $backend->repair;
+
+Repair worker registry and job queue if necessary.
+
+=head2 reset
+
+  $backend->reset;
+
+Reset job queue.
+
+=head2 retry_job
+
+  my $bool = $backend->retry_job($job_id, $retries);
+  my $bool = $backend->retry_job($job_id, $retries, {delay => 10});
+
+Transition job back to C<inactive> state, already C<inactive> jobs may also be
+retried to change options.
+
+These options are currently available:
+
+=over 2
+
+=item delay
+
+  delay => 10
+
+Delay job for this many seconds (from now), defaults to C<0>.
+
+=item priority
+
+  priority => 5
+
+Job priority.
+
+=item queue
+
+  queue => 'important'
+
+Queue to put job in.
+
+=back
+
+=head2 stats
+
+  my $stats = $backend->stats;
+
+Get statistics for jobs and workers.
+
+These fields are currently available:
+
+=over 2
+
+=item active_jobs
+
+  active_jobs => 100
+
+Number of jobs in C<active> state.
+
+=item active_workers
+
+  active_workers => 100
+
+Number of workers that are currently processing a job.
+
+=item delayed_jobs
+
+  delayed_jobs => 100
+
+Number of jobs in C<inactive> state that are scheduled to run at specific time
+in the future or have unresolved dependencies.  Note that this field is
+EXPERIMENTAL and might change without warning!
+
+=item enqueued_jobs
+
+  enqueued_jobs => 100000
+
+Rough estimate of how many jobs have ever been enqueued.  Note that this field
+is EXPERIMENTAL and might change without warning!
+
+=item failed_jobs
+
+  failed_jobs => 100
+
+Number of jobs in C<failed> state.
+
+=item finished_jobs
+
+  finished_jobs => 100
+
+Number of jobs in C<finished> state.
+
+=item inactive_jobs
+
+  inactive_jobs => 100
+
+Number of jobs in C<inactive> state.
+
+=item inactive_workers
+
+  inactive_workers => 100
+
+Number of workers that are currently not processing a job.
+
+=back
+
+=head2 unlock
+
+  my $bool = $backend->unlock('foo');
+
+Release a named lock.
+
+=head2 unregister_worker
+
+  $backend->unregister_worker($worker_id);
+
+Unregister worker.
+
+=head2 worker_info
+
+  my $worker_info = $backend->worker_info($worker_id);
+
+Get information about a worker, or return C<undef> if worker does not exist.
+
+  # Check worker host
+  my $host = $backend->worker_info($worker_id)->{host};
+
+These fields are currently available:
+
+=over 2
+
+=item host
+
+  host => 'localhost'
+
+Worker host.
+
+=item jobs
+
+  jobs => ['10023', '10024', '10025', '10029']
+
+Ids of jobs the worker is currently processing.
+
+=item notified
+
+  notified => 784111777
+
+Epoch time worker sent the last heartbeat.
+
+=item pid
+
+  pid => 12345
+
+Process id of worker.
+
+=item started
+
+  started => 784111777
+
+Epoch time worker was started.
+
+=item status
+
+  status => {queues => ['default', 'important']}
+
+Hash reference with whatever status information the worker would like to share.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2014 L<Sebastian Riedel|https://github.com/kraih>.
+
+Copyright (c) 2015--2017 Sebastian Riedel & Nic Sandfield.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+=head1 CONTRIBUTORS
+
+=over 2
+
+=item L<Manuel Mausz|https://github.com/manuelm>
+
+=item L<Nils Diewald|https://github.com/Akron>
+
+=back
+
+=head1 SEE ALSO
+
+L<Minion>, L<Minion::Backend::Storable>, L<Minion::Backend::SQLite>.

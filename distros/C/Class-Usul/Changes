@@ -1,5 +1,10 @@
 Revision history for Class::Usul
 
+0.83.1    2017-07-01 12:52:53
+          - Removes obsolete Response::Table
+          - Dependency version bumps
+          - More last minute schema toolchain changes
+
 0.82.1    2017-05-13 00:07:42
           - Hate toolchain code. Create schema fix
 

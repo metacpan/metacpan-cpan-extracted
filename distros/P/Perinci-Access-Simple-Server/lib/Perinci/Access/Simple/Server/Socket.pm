@@ -1,12 +1,12 @@
 package Perinci::Access::Simple::Server::Socket;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.24'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.25'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 
 use Data::Clean::FromJSON;
 use Data::Clean::JSON;
@@ -170,7 +170,7 @@ sub _after_init {
         $args{Listen}  = 1;
         $args{Timeout} = $self->timeout;
         $args{Local}   = $path;
-        $log->infof("Binding to Unix socket %s ...", $path);
+        log_info("Binding to Unix socket %s ...", $path);
         my $sock = IO::Socket::UNIX->new(%args);
         die "Unable to bind to Unix socket $path: $@" unless $sock;
         push @server_socks, $sock;
@@ -194,7 +194,7 @@ sub _after_init {
             die "Invalid port syntax `$port`, please specify ".
                 ":N or 1.2.3.4:N";
         }
-        $log->infof("Binding to TCP socket %s ...", $port);
+        log_info("Binding to TCP socket %s ...", $port);
         my $sock = IO::Socket::INET->new(%args);
         die "Unable to bind to TCP socket $port" unless $sock;
         push @server_socks, $sock;
@@ -214,9 +214,9 @@ sub before_prefork {}
 sub _main_loop {
     my ($self) = @_;
     if ($self->_daemon->{parent_pid} == $$) {
-        $log->info("Entering main loop");
+        log_info("Entering main loop");
     } else {
-        $log->info("Child process started (PID $$)");
+        log_info("Child process started (PID $$)");
     }
     $self->_daemon->update_scoreboard({child_start_time=>time()});
 
@@ -252,7 +252,7 @@ sub _main_loop {
                 last CONN unless defined $buf;
 
                 $self->{_finish_req_time} = time();
-                $log->tracef("Received line from client: %s", $buf);
+                log_trace("Received line from client: %s", $buf);
 
                 if ($buf =~ /\Aj(.*)\015?\012/) {
                     $self->{_req_json} = $1;
@@ -325,7 +325,7 @@ sub _sysreadline {
 
 sub _write_sock {
     my ($self, $sock, $buffer) = @_;
-    $log->tracef("Sending to client: %s", $buffer);
+    log_trace("Sending to client: %s", $buffer);
     # large $buffer might need to be written in several steps, especially in
     # SSL sockets which might have smaller buffer size (like 16k)
     my $tot_written = 0;
@@ -349,7 +349,7 @@ sub _set_label_serving {
         my $sock_path = $sock->hostpath;
         $self->{_sock_peer} = $sock_path;
         my ($pid, $uid, $gid) = $sock->peercred;
-        $log->trace("Unix socket info: path=$sock_path, ".
+        log_trace("Unix socket info: path=$sock_path, ".
                         "pid=$pid, uid=$uid, gid=$gid");
         $self->_daemon->set_label("serving unix (pid=$pid, uid=$uid, ".
                                       "path=$sock_path)");
@@ -358,8 +358,8 @@ sub _set_label_serving {
         my $remote_ip   = $sock->peerhost // "127.0.0.1";
         my $remote_port = $sock->peerport;
         $self->{_sock_peer} = "$remote_ip:$remote_port";
-        if ($log->is_trace) {
-            $log->trace(join("",
+        if (log_is_trace) {
+            log_trace(join("",
                              "TCP socket info: ",
                              "server_port=$server_port, ",
                              "remote_ip=$remote_ip, ",
@@ -485,7 +485,7 @@ Perinci::Access::Simple::Server::Socket - Implement Riap::Simple server over soc
 
 =head1 VERSION
 
-This document describes version 0.24 of Perinci::Access::Simple::Server::Socket (from Perl distribution Perinci-Access-Simple-Server), released on 2016-03-16.
+This document describes version 0.25 of Perinci::Access::Simple::Server::Socket (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -660,7 +660,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

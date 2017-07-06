@@ -7,7 +7,10 @@ use warnings FATAL => 'all';
 # Turn on $OUTPUT_AUTOFLUSH
 local $| = 1;
 
-use t::lib::Debugger;
+BEGIN {
+  require "./t/lib/Debugger.pm";
+  t::lib::Debugger->import;
+}
 
 my $pid = start_script('t/eg/02-sub.pl');
 

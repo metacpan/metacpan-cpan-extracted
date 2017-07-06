@@ -8,11 +8,13 @@
 #include "ps_parser.h"
 #include "ps_parser_internal.h"
 
-#define PS_XS_PREFER_HASH  1
-#define PS_XS_PREFER_ARRAY 2
-#define PS_XS_PREFER_UNDEF 4
+enum type_preference {
+    PREFER_HASH,
+    PREFER_ARRAY,
+    PREFER_UNDEF
+};
 
-SV* _convert_recurse(const ps_node *, int, const char *);
+SV* _convert_recurse(const ps_node *, enum type_preference, const char *);
 
 #endif /* CONVERT_H_ */
 

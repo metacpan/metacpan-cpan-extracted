@@ -10,7 +10,7 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi );
@@ -303,7 +303,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -640,6 +640,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

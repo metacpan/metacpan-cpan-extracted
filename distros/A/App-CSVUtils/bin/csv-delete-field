@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/CSVUtils/csv_delete_field
-# and generated automatically using Perinci::CmdLine::Gen version 0.45
+# and generated automatically using Perinci::CmdLine::Gen version 0.46
 
-our $DATE = '2017-04-25'; # DATE
+our $DATE = '2017-07-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ csv-delete-field - Delete one or more fields from CSV file
 
 =head1 VERSION
 
-This document describes version 0.012 of csv-delete-field (from Perl distribution App-CSVUtils), released on 2017-04-25.
+This document describes version 0.013 of csv-delete-field (from Perl distribution App-CSVUtils), released on 2017-07-02.
 
 =head1 SYNOPSIS
 
@@ -64,6 +64,12 @@ See C<--field>.
 =item B<--filename>=I<s>*, B<-f>
 
 Input CSV file.
+
+=item B<--no-header>
+
+When you declare that CSV does not have header row (`--no-header`), the fields
+will be named `field1`, `field2`, and so on.
+
 
 =back
 
@@ -209,6 +215,7 @@ List of available configuration parameters:
  fields (see --field)
  filename (see --filename)
  format (see --format)
+ header (see --no-header)
  naked_res (see --naked-res)
 
 =head1 ENVIRONMENT

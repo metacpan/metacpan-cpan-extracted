@@ -8,7 +8,7 @@ use App::Spec;
 use Sietima::Runner;
 use namespace::clean;
 
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: run Sietima as a command-line application
 
 
@@ -79,7 +79,7 @@ Sietima::CmdLine - run Sietima as a command-line application
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

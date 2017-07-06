@@ -1,9 +1,13 @@
 package Template::Reverse::Util;
 
-require Exporter;
-@ISA = qw(Exporter);
-@EXPORT = qw(partition partition_by);
+# ABSTRACT: Utils
 
+require Exporter;
+our @ISA='Exporter';
+our @EXPORT = qw(partition partition_by);
+our $VERSION = '0.202'; # VERSION
+
+# port from Clojure
 sub partition{
     my($len, $step, @list) = @_;
     my @ret;
@@ -14,13 +18,17 @@ sub partition{
     return @ret;
 }
 
+# port from Clojure
 sub partition_by{
     my($funcref, @list) = @_;
     my @ret;
     my $curarr;
     foreach my $item (@list){
         if( $funcref->($item) ){
-            push(@ret, $curarr,[$item]);
+            if($curarr){
+                push(@ret, $curarr);
+            }
+            push(@ret, [$item]);   
             $curarr = [];
         }
         else{
@@ -41,11 +49,11 @@ __END__
 
 =head1 NAME
 
-Template::Reverse::Util
+Template::Reverse::Util - Utils
 
 =head1 VERSION
 
-version 0.150
+version 0.202
 
 =head1 AUTHOR
 

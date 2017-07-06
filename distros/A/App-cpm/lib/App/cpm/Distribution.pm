@@ -4,7 +4,7 @@ use warnings;
 use App::cpm::version;
 use App::cpm::Logger;
 use CPAN::DistnameInfo;
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 use constant STATE_REGISTERED      => 0b000001;
 use constant STATE_DEPS_REGISTERED => 0b000010;
@@ -34,6 +34,7 @@ for my $attr (qw(
     requirements
     ref
     static_builder
+    prebuilt
 )) {
     no strict 'refs';
     *$attr = sub {

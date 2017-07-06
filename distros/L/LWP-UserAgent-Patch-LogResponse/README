@@ -10,7 +10,7 @@ SYNOPSIS
 
     Sample script and output:
 
-     % TRACE=1 perl -MLog::Any::App -MLWP::UserAgent::Patch::LogResponse \
+     % TRACE=1 perl -MLog::ger::Output::Screen -MLWP::UserAgent::Patch::LogResponse \
        -MLWP::Simple -e'get "http://localhost:5000/"'
      [261] HTTP response header:
      200 OK
@@ -26,19 +26,22 @@ DESCRIPTION
 
     This module patches LWP::UserAgent (which is used by LWP::Simple,
     WWW::Mechanize, among others) so that HTTP responses are logged using
-    Log::Any.
+    Log::ger.
 
     Response body is logged in category LWP_Response_Body.* so it can be
     separated. For example, to dump response body dumps to directory
     instead of file:
 
-     use Log::Any::App '$log',
-        -category_level => {LWP_Response_Body => 'off'},
-        -dir            => {
-            path           => "/path/to/dir",
-            level          => 'off',
-            category_level => {LWP_Response_Body => 'trace'},
-        };
+     use Log::ger::Output Composite => (
+         category_level => {LWP_Response_Body => 'off'},
+         outputs        => {
+             Dir => {
+                 conf  => { path => "/path/to/dir" },
+                 level => 'off',
+                 category_level => {LWP_Response_Body => 'trace'},
+             },
+         }
+     );
 
 FAQ
 

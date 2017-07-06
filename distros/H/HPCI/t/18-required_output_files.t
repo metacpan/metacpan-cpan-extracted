@@ -86,7 +86,7 @@ $group = HPCI->group(
 
 $group->stage(
     name    => "echoTest",
-    command => "sleep 1;touch scratch/TOUCH_JUST_RIGHT",
+    command => "touch scratch/TOUCH_JUST_RIGHT",
     files   => {
         out => {
             req => 'scratch/TOUCH_JUST_RIGHT'
@@ -95,7 +95,7 @@ $group->stage(
 );
 $ret = $group->execute();
 
-ok (! defined( $ret->{echoTest}[0]{failure_detected} ), "Failure detection is not triggered by output file that is changed by the stage");
+ok (! defined( $ret->{echoTest}[0]{failure_detected} ), "Failure detection should not be triggered by output file that is changed by the stage");
 
 done_testing();
 clean;

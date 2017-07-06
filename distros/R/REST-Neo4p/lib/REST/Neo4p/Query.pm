@@ -14,8 +14,7 @@ use strict;
 use warnings;
 no warnings qw(once);
 BEGIN {
-  $REST::Neo4p::Query::VERSION = '0.3012';
-  $REST::Neo4p::Query::VERSION = '0.3012';
+  $REST::Neo4p::Query::VERSION = '0.3020';
 }
 
 our $BUFSIZE = 50000;
@@ -317,7 +316,7 @@ sub execute {
 sub fetchrow_arrayref { 
   my $self = shift;
   unless ( defined $self->{_iterator} ) {
-    REST::Neo4p::LocalException->throw("Can't run fetch(), query not execute()'d yet\n");
+    REST::Neo4p::LocalException->throw("Can't run fetch(), query not execute()'d yet\nCheck query object for error with err()/errstr()\n");
   }
   $self->{_iterator}->();
 }
@@ -439,6 +438,7 @@ sub _process_row {
 sub finish {
   my $self = shift;
   delete $self->{_iterator};
+  unlink $self->tmpf->filename if ($self->tmpf);
   delete $self->{_tempfile};
   return 1;
 }
@@ -635,7 +635,7 @@ L<DBD::Neo4p>, L<REST::Neo4p>, L<REST::Neo4p::Path>, L<REST::Neo4p::Agent>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2015 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

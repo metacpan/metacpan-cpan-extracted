@@ -1,3 +1,52 @@
+0.009   2017-07-02 (PERLANCAR)
+
+        - Add scenarios: LayoutStartup, InitTarget.
+
+        - Add past Log::ger versions to sample Startup benchmark.
+
+
+0.008   2017-06-30 (PERLANCAR)
+
+	- Bump Log::ger version to 0.011.
+
+	- Add scenarios: NumericLevel & StringLevel.
+
+	- Replace LGP:SingleLog with LGP:MultilevelLog.
+
+	- [Bugfix] Forgot to include Log::Log4perl::Tiny in modules.
+
+
+0.007   2017-06-30 (PERLANCAR)
+
+        - Add participants: Log::Log4perl & Log::Log4perl::Tiny.
+
+
+0.006   2017-06-28 (PERLANCAR)
+
+	- NullOutput: Add participant: Log::ger+LGP:SingleLog.
+
+
+0.005   2017-06-26 (PERLANCAR)
+
+	- Add scenario: LogGer::OutputStartup.
+
+	- LogGer::Startup: add participant Log::ger::Like::LogAny.
+
+	- Bump Log::ger version 0.005 -> 0.008.
+
+
+0.004   2017-06-23 (PERLANCAR)
+
+	- Adjust to Log::ger 0.005.
+
+	- NullOutput: Add participant: checking level with Log::Fast.
+
+
+0.003   2017-06-22 (PERLANCAR)
+
+	- Add participant for null logging: Log::Fast.
+
+
 0.002   2017-06-19 (PERLANCAR)
 
         - No functional changes.

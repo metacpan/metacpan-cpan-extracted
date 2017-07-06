@@ -7,18 +7,26 @@ use Net::Azure::CognitiveServices::Face::FaceList;
 use Net::Azure::CognitiveServices::Face::Person;
 use Net::Azure::CognitiveServices::Face::PersonGroup;
 
-our $VERSION  = "0.01";
+our $VERSION  = "0.02";
 our $AUTOLOAD;
 our $INSTANCES = {};
 our $ACCESS_KEY;
-our $ENDPOINT = 'https://api.projectoxford.ai';
+our $ENDPOINT = 'https://westus.api.cognitive.microsoft.com';
 
 sub access_key {
     my ($class, $key) = @_;
     if ($key) {
-        $ACCESS_KEY ||= $key;
+        $ACCESS_KEY = $key;
     }
     return $ACCESS_KEY;
+}
+
+sub endpoint {
+    my ($class, $url) = @_;
+    if ($url) {
+        $ENDPOINT = $url;
+    }
+    return $ENDPOINT;
 }
 
 sub AUTOLOAD {
@@ -40,6 +48,7 @@ Net::Azure::CognitiveServices::Face - A wrapper class for Face API of Azure Cogn
 =head1 SYNOPSIS
 
     use Net::Azure::CognitiveServices::Face;
+    Net::Azure::CognitiveServices::Face->endpoint('https://westus.api.cognitive.microsoft.com/face/v1.0');
     Net::Azure::CognitiveServices::Face->access_key('YOUR_ACCESS_KEY');
 
     ### Face - Detect
@@ -77,6 +86,10 @@ Net::Azure::CognitiveServices::Face provides following subclasses.
 Please see L<https://dev.projectoxford.ai/docs/services/563879b61984550e40cbbe8d/operations/563879b61984550f30395236> for more information. 
 
 =head1 METHODS
+
+=head2 endpoint
+
+Set the endpoint url for accessing to Azure Cognitive Services APIs
 
 =head2 access_key
 

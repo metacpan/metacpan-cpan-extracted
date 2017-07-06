@@ -36,8 +36,8 @@ WriteMakefile(
         'Mock::Sub' => 1.07,
     },
     PREREQ_PM => {
-        'WiringPi::API'             => 2.3608,
-        'RPi::WiringPi::Constant'   => '0.02',
+        'WiringPi::API'             => 2.3612,
+        'RPi::WiringPi::Constant'   => '1.00',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'RPi-DigiPot-MCP4XXXX-*' },

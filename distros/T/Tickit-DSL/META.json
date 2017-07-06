@@ -4,7 +4,7 @@
       "Tom Molesworth <cpan@perlsite.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,8 +40,7 @@
          "requires" : {
             "Exporter" : "0",
             "List::UtilsBy" : "0",
-            "Tickit" : "0.60",
-            "Tickit::Console" : "0.06",
+            "Tickit" : "0.63",
             "Tickit::Widget::Breadcrumb" : "0.003",
             "Tickit::Widget::Calendars" : "0.001",
             "Tickit::Widget::Choice" : "0.02",
@@ -49,7 +48,7 @@
             "Tickit::Widget::Figlet" : "0.003",
             "Tickit::Widget::FileViewer" : "0.004",
             "Tickit::Widget::FloatBox" : "0.02",
-            "Tickit::Widget::Layout::Desktop" : "0.010",
+            "Tickit::Widget::Layout::Desktop" : "0.011",
             "Tickit::Widget::Layout::Relative" : "0.005",
             "Tickit::Widget::LogAny" : "0.005",
             "Tickit::Widget::Menu" : "0.08",
@@ -61,7 +60,7 @@
             "Tickit::Widget::Statusbar" : "0.004",
             "Tickit::Widget::Tabbed" : "0.018",
             "Tickit::Widget::Table" : "0.216",
-            "Tickit::Widget::Term" : "0.002",
+            "Tickit::Widget::Term" : "0.003",
             "Tickit::Widget::Tree" : "0.114",
             "Tickit::Widget::VHBox" : "0.001",
             "Tickit::Widgets" : "0.19",
@@ -85,7 +84,7 @@
    "provides" : {
       "Tickit::DSL" : {
          "file" : "lib/Tickit/DSL.pm",
-         "version" : "0.031"
+         "version" : "0.033"
       }
    },
    "release_status" : "stable",
@@ -100,7 +99,7 @@
          "web" : "https://github.com/team-at-cpan/Tickit-DSL"
       }
    },
-   "version" : "0.031",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.033",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

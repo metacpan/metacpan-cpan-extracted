@@ -3,7 +3,7 @@ package Class::Mock::Method::InterfaceTester;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.2000';
 
 # all this pre-amble is damned near identical to C::M::G::IT. Re-factor.
 use Test::More ();

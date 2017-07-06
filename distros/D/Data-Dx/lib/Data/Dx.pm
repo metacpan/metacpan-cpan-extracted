@@ -1,10 +1,10 @@
 package Data::Dx;
 
-use 5.014;
+use 5.012;
 use utf8;
 use warnings;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 
 use Keyword::Declare;
 
@@ -32,7 +32,8 @@ sub _dx {
     my $indent = ' ' x (length($expr) + 3);
 
     # Handle unbalanced {...} in the expression...
-    my $str_expr = $expr =~ s{ ( [\\\{\}] ) }{\\$1}xmsrg;
+    my $str_expr = $expr;
+       $str_expr =~ s{ ( [\\\{\}] ) }{\\$1}xmsg;
 
     # Generate the source...
     return qq{Data::Dx::_format_data(__LINE__, __FILE__, q{$str_expr}, q{$indent}, $ref $expr);};
@@ -146,7 +147,7 @@ Data::Dx - Dump data structures with name and point-of-origin
 
 =head1 VERSION
 
-This document describes Data::Dx version 0.000003
+This document describes Data::Dx version 0.000004
 
 
 =head1 SYNOPSIS

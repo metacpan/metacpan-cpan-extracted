@@ -2,7 +2,7 @@ package App::cpm::Job;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 sub new {
     my ($class, %option) = @_;
@@ -42,6 +42,16 @@ sub distvname {
     } else {
         "UNKNOWN";
     }
+}
+
+sub distname {
+    my $self = shift;
+    $self->{_distname} ||= CPAN::DistnameInfo->new($self->distfile)->dist || 'UNKNOWN';
+}
+
+sub cpanid {
+    my $self = shift;
+    $self->{_cpanid} ||= CPAN::DistnameInfo->new($self->distfile)->cpanid || 'UNKNOWN';
 }
 
 sub type {

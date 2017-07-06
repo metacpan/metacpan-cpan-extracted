@@ -4,7 +4,7 @@
       "Hideaki Ohno <hide.o.j55 {at} gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.1.1",
+   "generated_by" : "Minilla/v3.0.12",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38",
+            "Module::Build" : "0.4005",
             "Module::Build::XSUtil" : "0"
          }
       },
@@ -61,7 +61,7 @@
    "provides" : {
       "Digest::SpookyHash" : {
          "file" : "lib/Digest/SpookyHash.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/hideo55/p5-Digest-SpookyHash"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_contributors" : [
       "hideo55 <hide.o.j55@gmail.com>"
    ]

@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use Prty::Path;
 use Prty::Option;
@@ -699,7 +699,7 @@ sub load {
             # "# eof" vom Dateiende entfernen
     
             my $fileSourceR = $fileEnt->fileSourceRef;
-            $$fileSourceR =~ s/\n+# eof\s*$/\n\n/m;
+            $$fileSourceR =~ s/\n+# eof\s*$/\n\n/;
     
             if (substr($$fileSourceR,-1,1) ne "\n") {
                 $fileEnt->error(
@@ -1291,7 +1291,7 @@ sub storage {
 
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

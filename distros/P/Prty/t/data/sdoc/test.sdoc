@@ -1,0 +1,53 @@
+= Abschnitt 1
+
+== Abschnitt 2
+
+=== Abschnitt 3
+
+==== Abschnitt 4
+
+= Inline Segmente
+
+Bold - Du machst mich B{sehr} wütend.
+
+Constant width: Instantiiere das Objekt durch C{$class->new()}.
+
+Italic - Eigentlich solltest du das I{nicht} essen.
+
+Quote - Ist das wirklich Q{richtig}?
+
+URL - Hol dir das Modul von U{http://www.cpan.org/}
+
+= Code
+
+    /opt/tsplot     - Projektvereichnis
+
+    /etc/opt/tsplot - Verzeichnis für Konfigurationsdateien
+
+    /var/opt/tsplot - Verzeichnis für Bewegungsdaten
+
+= Listen
+
+* rot
+* grün
+* blau
+
+1. Katze
+2. Maus
+3. Elefant
+
+:a:: b
+:c:: d
+:e:: f
+
+= Quote
+
+> Vertraue jenen, die nach der Wahrheit suchen, und misstraue
+> denen, die sie gefunden haben. (Andre Gide)
+
+= Table
+
+    | H1 | H2 | H3 |
+    | A1 | B1 | C1 |
+    | A2 | B2 | C2 |
+    | A3 | B3 | C3 |

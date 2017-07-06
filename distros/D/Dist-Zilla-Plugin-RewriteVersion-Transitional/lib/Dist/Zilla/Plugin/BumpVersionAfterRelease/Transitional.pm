@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 package Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional;
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Ease the transition to [BumpVersionAfterRelease] in your distribution
 # KEYWORDS: plugin version rewrite munge module
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::BumpVersionAfterRelease';
@@ -20,6 +20,7 @@ around dump_config => sub
 
     $config->{+__PACKAGE__} = {
         # TODO
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -65,7 +66,7 @@ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional - Ease the transition
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -100,14 +101,6 @@ added for the other packages, even if you are using the C<global> option.
 Configuration is the same as in
 L<[BumpVersionAfterRelease]|Dist::Zilla::Plugin::BumpVersionAfterRelease>.
 
-=head1 SUPPORT
-
-=for stopwords irc
-
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-RewriteVersion-Transitional>
-(or L<bug-Dist-Zilla-Plugin-RewriteVersion-Transitional@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-RewriteVersion-Transitional@rt.cpan.org>).
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
-
 =head1 SEE ALSO
 
 =over 4
@@ -130,11 +123,24 @@ L<Dist::Zilla::Plugin::BumpVersionAfterRelease>
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-RewriteVersion-Transitional>
+(or L<bug-Dist-Zilla-Plugin-RewriteVersion-Transitional@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-RewriteVersion-Transitional@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2014 by Karen Etheridge.
 

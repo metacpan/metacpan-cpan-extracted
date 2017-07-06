@@ -18,7 +18,7 @@ use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 use constant WIN32 => $^O eq 'MSWin32';
 
@@ -36,6 +36,16 @@ sub new {
         configure_timeout => 60,
         build_timeout => 3600,
         test_timeout => 1800,
+        with_requires => 1,
+        with_recommends => 0,
+        with_suggests => 0,
+        with_configure => 0,
+        with_build => 1,
+        with_test => 1,
+        with_runtime => 1,
+        with_develop => 0,
+        notest => 1,
+        prebuilt => $] >= 5.012 && $ENV{PERL_CPM_PREBUILT} ? 1 : 0,
         %option
     }, $class;
 }
@@ -43,11 +53,14 @@ sub new {
 sub parse_options {
     my $self = shift;
     local @ARGV = @_;
-    $self->{notest} = 1;
     my (@mirror, @resolver);
+    my $with_option = sub {
+        my $n = shift;
+        ("with-$n", \$self->{"with_$n"}, "without-$n", sub { $self->{"with_$n"} = 0 });
+    };
     GetOptions
         "L|local-lib-contained=s" => \($self->{local_lib}),
-        "V|version" => sub { $self->cmd_version },
+        "V|version" => sub { $self->cmd_version; exit },
         "color!" => \($self->{color}),
         "g|global" => \($self->{global}),
         "h|help" => sub { $self->cmd_help },
@@ -64,13 +77,14 @@ sub parse_options {
         "dev" => \($self->{dev}),
         "man-pages" => \($self->{man_pages}),
         "home=s" => \($self->{home}),
-        "with-develop" => \($self->{with_develop}),
-        "with-recommends" => \($self->{with_recommends}),
-        "with-suggests" => \($self->{with_suggests}),
         "retry!" => \($self->{retry}),
         "configure-timeout=i" => \($self->{configure_timeout}),
         "build-timeout=i" => \($self->{build_timeout}),
         "test-timeout=i" => \($self->{test_timeout}),
+        "show-progress!" => \($self->{show_progress}),
+        "prebuilt!" => \($self->{prebuilt}),
+        (map $with_option->($_), qw(requires recommends suggests)),
+        (map $with_option->($_), qw(configure build test runtime develop)),
     or exit 1;
 
     $self->{local_lib} = $self->maybe_abs($self->{local_lib}) unless $self->{global};
@@ -81,6 +95,7 @@ sub parse_options {
         $mirror = $self->normalize_mirror($mirror)
     }
     $self->{color} = 1 if !defined $self->{color} && -t STDOUT;
+    $self->{show_progress} = 1 if !WIN32 && !defined $self->{show_progress} && -t STDOUT;
     if ($target_perl) {
         die "--target-perl option conflicts with --global option\n" if $self->{global};
         die "--target-perl option can be used only if perl version >= 5.16.0\n" if $] < 5.016;
@@ -96,9 +111,13 @@ sub parse_options {
     if ($self->{sudo}) {
         !system "sudo", $^X, "-e1" or exit 1;
     }
+    if ($self->{sudo} or !$self->{notest} or $] < 5.012) {
+        $self->{prebuilt} = 0;
+    }
 
     $App::cpm::Logger::COLOR = 1 if $self->{color};
     $App::cpm::Logger::VERBOSE = 1 if $self->{verbose};
+    $App::cpm::Logger::SHOW_PROGRESS = 1 if $self->{show_progress};
     $self->{argv} = \@ARGV;
 }
 
@@ -161,9 +180,7 @@ sub cmd_help {
 }
 
 sub cmd_version {
-    my $class = ref $_[0] || $_[0];
-    printf "%s %s\n", $class, $class->VERSION;
-    exit 0;
+    print "cpm $VERSION ($0)\n";
 }
 
 sub cmd_exec {
@@ -187,16 +204,18 @@ sub cmd_install {
     File::Path::mkpath($self->{home}) unless -d $self->{home};
     my $logger = App::cpm::Logger::File->new("$self->{home}/build.log.@{[time]}");
     $logger->symlink_to("$self->{home}/build.log");
+    $logger->log("Running cpm $VERSION ($0) on perl $Config{version} built for $Config{archname} ($^X)");
+    $logger->log("Command line arguments are: @ARGV");
 
     my $master = App::cpm::Master->new(
         logger => $logger,
         inc    => $self->_inc,
+        show_progress => $self->{show_progress},
         (exists $self->{target_perl} ? (target_perl => $self->{target_perl}) : ()),
     );
 
-    # dryrun
-    $self->register_initial_job($master) or return 0;
-    $master->clear;
+    my ($packages, $dists) = $self->initial_job($master);
+    return 0 unless $packages;
 
     my $worker = App::cpm::Worker->new(
         verbose   => $self->{verbose},
@@ -207,67 +226,67 @@ sub cmd_install {
         resolver  => $self->generate_resolver,
         man_pages => $self->{man_pages},
         retry     => $self->{retry},
+        prebuilt  => $self->{prebuilt},
         configure_timeout => $self->{configure_timeout},
         build_timeout     => $self->{build_timeout},
         test_timeout      => $self->{test_timeout},
         ($self->{global} ? () : (local_lib => $self->{local_lib})),
     );
 
-    my $installed_distributions = 0;
-    my %artifact;
-    {
-        last unless $] < 5.016;
-        my $requirements = [
-            { package => 'ExtUtils::MakeMaker', version_range => '6.58' },
-            { package => 'ExtUtils::ParseXS',   version_range => '3.16' },
-        ];
-        my ($is_satisfied, @need_resolve) = $master->is_satisfied($requirements);
-        last if $is_satisfied;
-        $master->add_job(type => "resolve", package => $_->{package}, version_range => $_->{version_range})
-            for @need_resolve;
+    if ($] < 5.016) {
+        my %toolchain = ('ExtUtils::MakeMaker' => '6.58', 'ExtUtils::ParseXS' => '3.16');
+        for my $name (sort keys %toolchain) {
+            my ($req, $i);
+            my $req_range = $toolchain{$name};
+            if ( ($i) = grep { $packages->[$_]{package} eq $name } 0..$#{$packages} ) {
+                my $user = $packages->[$i];
+                my $range = eval { App::cpm::version::range_merge($user->{version_range}, $req_range) };
+                die sprintf "We have to install %s %s or later first, but you requested that of %s\n",
+                    $name, $req_range, $user->{version_range} if $@;
+                $req = { package => $name, version_range => $range, dev => $user->{dev} };
+            } else {
+                $req = { package => $name, version_range => $req_range };
+            }
+            my ($is_satisfied, @need_resolve) = $master->is_satisfied([$req]);
+            if ($is_satisfied) {
+                # nothing to do
+            } else {
+                $master->add_job(type => "resolve", %$_) for @need_resolve;
+                splice @$packages, $i, 1 if defined $i;
+            }
+        }
+
         $self->install($master, $worker, 1);
-        %artifact = (%artifact, %{$master->{_artifacts}});
-        $installed_distributions += $master->installed_distributions;
         if (my $fail = $master->fail) {
             local $App::cpm::Logger::VERBOSE = 0;
             for my $type (qw(install resolve)) {
                 App::cpm::Logger->log(result => "FAIL", type => $type, message => $_) for @{$fail->{$type}};
             }
-            warn "$installed_distributions distribution installed.\n";
-            if ($self->{_return_artifacts}) {
-                return (0, \%artifact);
-            } else {
-                warn "See $self->{home}/build.log for details.\n";
-                return 1;
-            }
+            print STDERR "\r" if $self->{show_progress};
+            warn sprintf "%d distribution installed.\n", $master->installed_distributions;
+            warn "See $self->{home}/build.log for details.\n";
+            return 1;
         }
-        $master->clear;
     }
 
-    $self->register_initial_job($master) or return 0;
+    $master->add_job(type => "resolve", %$_) for @$packages;
+    $master->add_distribution($_) for @$dists;
     $self->install($master, $worker, $self->{workers});
-
-    $installed_distributions += $master->installed_distributions;
-    %artifact = (%artifact, %{$master->{_artifacts}});
     if (my $fail = $master->fail) {
         local $App::cpm::Logger::VERBOSE = 0;
         for my $type (qw(install resolve)) {
             App::cpm::Logger->log(result => "FAIL", type => $type, message => $_) for @{$fail->{$type}};
         }
     }
-    warn "$installed_distributions distribution installed.\n";
+    print STDERR "\r" if $self->{show_progress};
+    warn sprintf "%d distribution installed.\n", $master->installed_distributions;
     $self->cleanup;
 
-    if ($self->{_return_artifacts}) {
-        my $ok = $master->fail ? 0 : 1;
-        return ($ok, \%artifact);
+    if ($master->fail) {
+        warn "See $self->{home}/build.log for details.\n";
+        return 1;
     } else {
-        if ($master->fail) {
-            warn "See $self->{home}/build.log for details.\n";
-            return 1;
-        } else {
-            return 0;
-        }
+        return 0;
     }
 }
 
@@ -324,64 +343,56 @@ sub cleanup {
     }
 }
 
-sub register_initial_job {
+sub initial_job {
     my ($self, $master) = @_;
 
-    my @package;
+    my (@package, @dist);
     for (@{$self->{argv}}) {
         my $arg = $_; # copy
+        my ($package, $dist);
         if (-d $arg || -f $arg || $arg =~ s{^file://}{}) {
             $arg = $self->maybe_abs($arg);
-            my $dist = App::cpm::Distribution->new(source => "local", uri => "file://$arg", provides => []);
-            $master->add_distribution($dist);
+            $dist = App::cpm::Distribution->new(source => "local", uri => "file://$arg", provides => []);
         } elsif ($arg =~ /(?:^git:|\.git(?:@.+)?$)/) {
             my %ref = $arg =~ s/(?<=\.git)@(.+)$// ? (ref => $1) : ();
-            my $dist = App::cpm::Distribution->new(source => "git", uri => $arg, provides => [], %ref);
-            $master->add_distribution($dist);
+            $dist = App::cpm::Distribution->new(source => "git", uri => $arg, provides => [], %ref);
         } elsif ($arg =~ m{^https?://}) {
-            my $dist = App::cpm::Distribution->new(source => "http", uri => $arg, provides => []);
-            $master->add_distribution($dist);
+            $dist = App::cpm::Distribution->new(source => "http", uri => $arg, provides => []);
         } else {
-            my ($package, $version_range, $dev);
+            my ($name, $version_range, $dev);
             # copy from Menlo
             # Plack@1.2 -> Plack~"==1.2"
             $arg =~ s/^([A-Za-z0-9_:]+)@([v\d\._]+)$/$1~== $2/;
             # support Plack~1.20, DBI~"> 1.0, <= 2.0"
             if ($arg =~ /\~[v\d\._,\!<>= ]+$/) {
-                ($package, $version_range) = split '~', $arg, 2;
+                ($name, $version_range) = split '~', $arg, 2;
             } else {
                 $arg =~ s/[~@]dev$// and $dev++;
-                $package = $arg;
+                $name = $arg;
             }
-            push @package, {package => $package, version_range => $version_range || 0, dev => $dev};
+            $package = {package => $name, version_range => $version_range || 0, dev => $dev};
         }
+        push @package, $package if $package;
+        push @dist, $dist if $dist;
     }
 
     if (!@{$self->{argv}}) {
-        my ($requirements, $dist) = $self->load_cpanfile($self->{cpanfile});
-        $master->add_distribution($_) for @$dist;
+        my ($requirements, $dists) = $self->load_cpanfile($self->{cpanfile});
+        push @dist, @$dists;
         my ($is_satisfied, @need_resolve) = $master->is_satisfied($requirements);
-        if (!@$dist and $is_satisfied) {
+        if (!@$dists and $is_satisfied) {
             warn "All requirements are satisfied.\n";
-            return 0;
+            return;
         } elsif (!defined $is_satisfied) {
             my ($req) = grep { $_->{package} eq "perl" } @$requirements;
             die sprintf "%s requires perl %s, but you have only %s\n",
                 $self->{cpanfile}, $req->{version_range}, $self->{target_perl} || $];
         } else {
-            @package = @need_resolve;
+            push @package, @need_resolve;
         }
     }
 
-    for my $p (@package) {
-        $master->add_job(
-            type => "resolve",
-            package => $p->{package},
-            version_range => $p->{version_range} || 0,
-            dev => $p->{dev},
-        );
-    }
-    return 1;
+    return (\@package, \@dist);
 }
 
 sub load_cpanfile {
@@ -389,12 +400,9 @@ sub load_cpanfile {
     require Module::CPANfile;
     my $cpanfile = Module::CPANfile->load($file);
     my $prereqs = $cpanfile->prereqs_with;
-    my $phases = [qw(build test runtime)];
-    push @$phases, 'develop' if $self->{with_develop};
-    my $types = [qw(requires)];
-    push @$types, 'recommends' if $self->{with_recommends};
-    push @$types, 'suggests' if $self->{with_suggests};
-    my $requirements = $prereqs->merged_requirements($phases, $types);
+    my @phase = grep $self->{"with_$_"}, qw(configure build test runtime develop);
+    my @type  = grep $self->{"with_$_"}, qw(requires recommends suggests);
+    my $requirements = $prereqs->merged_requirements(\@phase, \@type);
     my $hash = $requirements->as_string_hash;
 
     my (@package, @distribution);
@@ -523,9 +531,13 @@ App::cpm - a fast CPAN module installer
 =for html
 <a href="https://raw.githubusercontent.com/skaji/cpm/master/xt/demo.gif"><img src="https://raw.githubusercontent.com/skaji/cpm/master/xt/demo.gif" alt="demo" style="max-width:100%;"></a>
 
-B<THIS IS EXPERIMENTAL.>
-
 cpm is a fast CPAN module installer, which uses L<Menlo> in parallel.
+
+Moreover if C<--prebuilt> option is enabled, cpm keeps the each builds of distributions in your home directory.
+Then, C<cpm install --prebuilt> will use these prebuilt distributions.
+That is, if prebuilts are available, cpm never build distributions again, just copy the prebuilts into an appropriate directory.
+This is (of course!) inspired by L<Carmel>.
+
 For tutorial, check out L<App::cpm::Tutorial>.
 
 =head1 MOTIVATION
@@ -601,5 +613,7 @@ L<App::cpanminus>
 L<Menlo>
 
 L<Carton>
+
+L<Carmel>
 
 =cut

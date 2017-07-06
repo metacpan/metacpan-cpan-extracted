@@ -1,0 +1,19 @@
+Changes
+ignore.txt
+lib/Async/Stream.pm
+lib/Async/Stream/Item.pm
+lib/Async/Stream/Iterator.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/test.pl
+t/00-load.t
+t/10-item.t
+t/20-iterator.t
+t/30-stream.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

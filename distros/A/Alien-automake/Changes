@@ -1,0 +1,10 @@
+Revision history for Alien-automake
+
+0.03      2017-06-27 05:13:27 -0400
+  - Require Alien::m4
+
+0.02      2017-06-27 05:09:53 -0400
+  - Fix requirements for Windows
+
+0.01      2017-06-26 17:22:32 -0400
+  - initial version

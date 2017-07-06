@@ -1,0 +1,19 @@
+---
+abstract: 'a hacky drop-in replacement for redirect Printer::ESCPOS output to a PDF file instead of a printer'
+author:
+  - 'Dominic Sonntag <dominic@s5g.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Printer-ESCPOS-PDF
+requires:
+  PDF::API2: '0'
+  Printer::ESCPOS::Profiles::Generic: '0'
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

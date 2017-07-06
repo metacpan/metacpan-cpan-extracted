@@ -22,7 +22,7 @@ print <<EOF;
 
 EOF
 
-do "constants.pl.PL"
+do "./constants.pl.PL"
    or die "cannot execute constants.pl.PL: $@";
 
 WriteMakefile(

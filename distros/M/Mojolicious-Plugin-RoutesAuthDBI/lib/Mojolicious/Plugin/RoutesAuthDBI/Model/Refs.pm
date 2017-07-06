@@ -5,10 +5,10 @@ sub new {
   state $self = shift->SUPER::new(@_);
 }
 
-sub cnt {
+sub exists {
   my $self = ref($_[0]) ? shift : shift->new;
   
-  $self->dbh->selectrow_array($self->sth('cnt refs'), undef, (shift, shift));
+  $self->dbh->selectrow_array($self->sth('exists refs'), undef, (shift, shift));
 }
 
 sub refer {
@@ -28,11 +28,13 @@ sub del {
 1;
 
 __DATA__
-@@ cnt refs?cached=1
-%# check if ref between [IDs1] and [IDs2] exists
-select count(*)
+@@ exists refs?cached=1
+--- check if ref between [IDs1] and [IDs2] exists
+select EXISTS(
+select id
 from "{%= $schema %}"."{%= $tables->{refs} %}"
-where id1 = any(?) and id2 = ANY(?);
+where id1 = any(?) and id2 = ANY(?)
+);
 
 @@ ref
 select *

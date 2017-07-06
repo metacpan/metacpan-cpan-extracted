@@ -4,7 +4,7 @@
       "John Macdonald  <jmacdonald@oicr.on.ca>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4222",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
    "provides" : {
       "HPCD::SGE" : {
          "file" : "lib/HPCD/SGE.pm",
-         "version" : "0.48"
+         "version" : "0.49"
       },
       "HPCD::SGE::DRMAACheck" : {
          "file" : "lib/HPCD/SGE/DRMAACheck.pm"
@@ -85,6 +85,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.48",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "0.49",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

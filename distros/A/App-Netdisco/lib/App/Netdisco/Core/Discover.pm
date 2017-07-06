@@ -6,6 +6,7 @@ use Dancer::Plugin::DBIC 'schema';
 use App::Netdisco::Util::Device
   qw/get_device match_devicetype is_discoverable/;
 use App::Netdisco::Util::Permission 'check_acl_only';
+use App::Netdisco::Util::FastResolver 'hostnames_resolve_async';
 use App::Netdisco::Util::DNS ':all';
 use App::Netdisco::JobQueue qw/jq_queued jq_insert/;
 use NetAddr::IP::Lite ':lower';
@@ -97,6 +98,12 @@ sub set_canonical_ip {
   return if $new_ip eq $old_ip;
 
   schema('netdisco')->txn_do(sub {
+    # delete target device with the same vendor and serial number
+    schema('netdisco')->resultset('Device')->search({
+      ip => $new_ip, vendor => $device->vendor, serial => $device->serial,
+    })->delete;
+
+    # if target device exists then this will die
     $device->renumber($new_ip)
       or die "cannot renumber to: $new_ip"; # rollback
 
@@ -702,9 +709,8 @@ sub store_neighbors {
   # first allow any manually configured topology to be set
   _set_manual_topology($device, $snmp);
 
-  my $c_ip = $snmp->c_ip;
-  unless ($snmp->hasCDP or scalar keys %$c_ip) {
-      debug sprintf ' [%s] neigh - CDP/LLDP not enabled!', $device->ip;
+  if (!defined $snmp->has_topo) {
+      debug sprintf ' [%s] neigh - neighbor protocols are not enabled', $device->ip;
       return @to_discover;
   }
 
@@ -714,6 +720,16 @@ sub store_neighbors {
   my $c_id       = $snmp->c_id;
   my $c_platform = $snmp->c_platform;
   my $c_cap      = $snmp->c_cap;
+
+  # v4 and v6 neighbor tables
+  my $c_ip = ($snmp->c_ip || {});
+  my %c_ipv6 = %{ ($snmp->can('hasLLDP') and $snmp->hasLLDP)
+    ? ($snmp->lldp_ipv6 || {}) : {} };
+
+  # remove keys with undef values, as c_ip does
+  delete @c_ipv6{ grep { not defined $c_ipv6{$_} } keys %c_ipv6 };
+  # now combine them, v6 wins
+  $c_ip = { %$c_ip, %c_ipv6 };
 
   foreach my $entry (sort (List::MoreUtils::uniq( (keys %$c_ip), (keys %$c_cap) ))) {
       if (!defined $c_if->{$entry} or !defined $interfaces->{ $c_if->{$entry} }) {
@@ -728,6 +744,12 @@ sub store_neighbors {
 
       if (!defined $portrow) {
           info sprintf ' [%s] neigh - local port %s not in database!',
+            $device->ip, $port;
+          next;
+      }
+
+      if (ref $c_ip->{$entry}) {
+          error sprintf ' [%s] neigh - Error! port %s has multiple neighbors - skipping',
             $device->ip, $port;
           next;
       }
@@ -822,57 +844,20 @@ sub store_neighbors {
           }
       }
 
-      # hack for devices seeing multiple neighbors on the port
-      if (ref [] eq ref $remote_ip) {
-          debug sprintf
-            ' [%s] neigh - port %s has multiple neighbors, setting remote as self',
-            $device->ip, $port;
+      # what we came here to do.... discover the neighbor
+      debug sprintf
+        ' [%s] neigh - adding neighbor %s, type [%s], on %s to discovery queue',
+        $device->ip, $remote_ip, ($remote_type || ''), $port;
+      push @to_discover, [$remote_ip, $remote_type];
 
-          if (wantarray) {
-              foreach my $n (@$remote_ip) {
-                  debug sprintf
-                    ' [%s] neigh - adding neighbor %s, type [%s], on %s to discovery queue',
-                    $device->ip, $n, ($remote_type || ''), $port;
-                  push @to_discover, [$n, $remote_type];
-              }
-          }
-
-          # set self as remote IP to suppress any further work
-          $remote_ip = $device->ip;
-          $remote_port = $port;
+      $remote_port = $c_port->{$entry};
+      if (defined $remote_port) {
+          # clean weird characters
+          $remote_port =~ s/[^\d\/\.,()\w:-]+//gi;
       }
       else {
-          # what we came here to do.... discover the neighbor
-          if (wantarray) {
-              debug sprintf
-                ' [%s] neigh - adding neighbor %s, type [%s], on %s to discovery queue',
-                $device->ip, $remote_ip, ($remote_type || ''), $port;
-              push @to_discover, [$remote_ip, $remote_type];
-          }
-
-          # further device type discovery using MAC OUI
-          # only works once device is fully discovered (so we have a MAC addr)
-          my $neigh = get_device($remote_ip);
-          if (blessed $neigh and $neigh->in_storage and $neigh->mac) {
-              if (match_devicetype($neigh->mac, 'phone_ouis')) {
-                  $remote_type = 'IP Phone: '. $remote_type
-                    if $remote_type !~ /ip.phone/i;
-              }
-              elsif (match_devicetype($neigh->mac, 'wap_ouis')) {
-                  $remote_type = 'AP: '. $remote_type
-                    if $remote_type !~ /^AP: /;
-              }
-          }
-
-          $remote_port = $c_port->{$entry};
-          if (defined $remote_port) {
-              # clean weird characters
-              $remote_port =~ s/[^\d\/\.,()\w:-]+//gi;
-          }
-          else {
-              info sprintf ' [%s] neigh - no remote port found for port %s at %s',
-                $device->ip, $port, $remote_ip;
-          }
+          info sprintf ' [%s] neigh - no remote port found for port %s at %s',
+            $device->ip, $port, $remote_ip;
       }
 
       $portrow->update({

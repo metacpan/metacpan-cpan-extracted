@@ -23,37 +23,39 @@ SYNOPSIS
         printf "tags:\n";
         for my $tag ($bagit->list_info_tags) {
             my @values = $bagit->get_info($tag);
-            printf " $tag: %s\n" , join(", ",@values); 
+            printf " $tag: %s\n" , join(", ",@values);
         }
     
         printf "tag-sums:\n";
         for my $file ($bagit->list_tagsum) {
             my $sum = $bagit->get_tagsum($file);
-            printf " $file: %s\n" , $sum; 
+            printf " $file: %s\n" , $sum;
         }
     
         # Read the file listing as found in the manifest file
         printf "file-sums:\n";
         for my $file ($bagit->list_checksum) {
             my $sum = $bagit->get_checksum($file);
-            printf " $file: %s\n" , $sum; 
+            printf " $file: %s\n" , $sum;
         }
     
         # Read the real listing of files as found on the disk
         printf "files:\n";
         for my $file ($bagit->list_files) {
-            my $stat = [$file->data->stat];
+            my $stat = [$file->path];
             printf " name: %s\n", $file->filename;
             printf " size: %s\n", $stat->[7];
             printf " last-mod: %s\n", scalar(localtime($stat->[9]));
         }
     
         my $file = $bagit->get_file("mydata.txt");
-        my $fh   = $file->fh;
+        my $fh   = $file->open;
     
         while (<$fh>) {
            ....
         }
+    
+        close($fh);
     
         print "dirty?\n" if $bagit->is_dirty;
     
@@ -114,7 +116,13 @@ METHODS
 
  read($directory)
 
-    Open an exiting BagIt object
+    Open an exiting BagIt object and return an instance of BagIt or undef
+    on failure. In array context the read method also returns all errors as
+    an array:
+
+      my $bagit = Catmandu::BagIt->read("/data/my-bag");
+    
+      my ($bagit,@errors) = Catmandu::BagIt->read("/data/my-bag");
 
  write($directory, [%options])
 
@@ -218,6 +226,8 @@ METHODS
  add_file($filename, $string)
 
  add_file($filename, IO::File->new(...))
+
+ add_file($filaname, sub { my $io = shift; .... })
 
     Add a new file to the BagIt.
 

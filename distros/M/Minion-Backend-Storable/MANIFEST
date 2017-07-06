@@ -1,4 +1,5 @@
 Changes
+lib/Minion/Backend/Sereal.pm
 lib/Minion/Backend/Storable.pm
 LICENSE
 Makefile.PL
@@ -7,8 +8,11 @@ MANIFEST.SKIP
 README.md
 test/00-load.t
 test/10-file.t
+test/11-sereal.t
 test/20-file_lite_app.t
 test/21-file_lite_app.t
+test/40-commands.t
+test/fork-test.pl
 test/manifest.t
 test/minion_bench.pl
 test/pod.t

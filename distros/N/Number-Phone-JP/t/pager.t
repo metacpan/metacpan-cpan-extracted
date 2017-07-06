@@ -14,8 +14,6 @@ ok($tel->set_number('020 46612345')->is_valid_number, 'checking for 020 46612345
 ok($tel->set_number('020 46712345')->is_valid_number, 'checking for 020 46712345');
 ok($tel->set_number('020 46812345')->is_valid_number, 'checking for 020 46812345');
 ok($tel->set_number('020 46912345')->is_valid_number, 'checking for 020 46912345');
-ok($tel->set_number('020 49212345')->is_valid_number, 'checking for 020 49212345');
-ok($tel->set_number('020 49912345')->is_valid_number, 'checking for 020 49912345');
 ok(!$tel->set_number('020 40012345')->is_valid_number, 'checking for 020 40012345');
 ok(!$tel->set_number('020 40112345')->is_valid_number, 'checking for 020 40112345');
 ok(!$tel->set_number('020 40212345')->is_valid_number, 'checking for 020 40212345');
@@ -98,9 +96,11 @@ ok(!$tel->set_number('020 48812345')->is_valid_number, 'checking for 020 4881234
 ok(!$tel->set_number('020 48912345')->is_valid_number, 'checking for 020 48912345');
 ok(!$tel->set_number('020 49012345')->is_valid_number, 'checking for 020 49012345');
 ok(!$tel->set_number('020 49112345')->is_valid_number, 'checking for 020 49112345');
+ok(!$tel->set_number('020 49212345')->is_valid_number, 'checking for 020 49212345');
 ok(!$tel->set_number('020 49312345')->is_valid_number, 'checking for 020 49312345');
 ok(!$tel->set_number('020 49412345')->is_valid_number, 'checking for 020 49412345');
 ok(!$tel->set_number('020 49512345')->is_valid_number, 'checking for 020 49512345');
 ok(!$tel->set_number('020 49612345')->is_valid_number, 'checking for 020 49612345');
 ok(!$tel->set_number('020 49712345')->is_valid_number, 'checking for 020 49712345');
 ok(!$tel->set_number('020 49812345')->is_valid_number, 'checking for 020 49812345');
+ok(!$tel->set_number('020 49912345')->is_valid_number, 'checking for 020 49912345');

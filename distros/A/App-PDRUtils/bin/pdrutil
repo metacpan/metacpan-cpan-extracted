@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2016-12-28'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 BEGIN { $ENV{VERBOSE} //= 1 }
 
@@ -63,7 +63,7 @@ pdrutil - Collection of utilities for perl dist repos
 
 =head1 VERSION
 
-This document describes version 0.09 of pdrutil (from Perl distribution App-PDRUtils), released on 2016-12-28.
+This document describes version 0.10 of pdrutil (from Perl distribution App-PDRUtils), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -152,7 +152,7 @@ Set configuration profile to use.
 
 =item B<--debug>
 
-Set log level to debug (note: you also need to set LOG=1 to enable logging, or use DEBUG=1).
+Shortcut for --log-level=debug.
 
 =item B<--format>=I<s>
 
@@ -172,7 +172,7 @@ Set output format to json.
 
 =item B<--log-level>=I<s>
 
-Set log level (note: you also need to set LOG=1 to enable logging).
+Set log level.
 
 =item B<--naked-res>
 
@@ -205,7 +205,7 @@ Do not read environment for default options.
 
 =item B<--quiet>
 
-Set log level to quiet (note: you also need to set LOG=1 to enable logging, or use QUIET=1).
+Shortcut for --log-level=error.
 
 =item B<--subcommands>
 
@@ -213,11 +213,11 @@ List available subcommands.
 
 =item B<--trace>
 
-Set log level to trace (note: you also need to set LOG=1 to enable logging, or use TRACE=1).
+Shortcut for --log-level=trace.
 
 =item B<--verbose>
 
-Set log level to info (note: you also need to set LOG=1 to enable logging, or use VERBOSE=1).
+Shortcut for --log-level=info.
 
 =item B<--version>, B<-v>
 
@@ -358,7 +358,7 @@ To activate bash completion for this script, put:
 
  complete -C pdrutil pdrutil
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -366,8 +366,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -375,15 +375,15 @@ To activate tcsh completion for this script, put:
 
  complete pdrutil 'p/*/`pdrutil`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
@@ -411,50 +411,50 @@ List of available configuration parameters:
  log_level (see --log-level)
  naked_res (see --naked-res)
 
-=head2 Configuration for subcommand 'add-prereq'
+=head2 Configuration for subcommand add-prereq
 
  module (see --module)
  module_version (see --module-version)
  phase (see --phase)
  rel (see --rel)
 
-=head2 Configuration for subcommand 'dec-prereq-version-by'
+=head2 Configuration for subcommand dec-prereq-version-by
 
  by (see --by)
  module (see --module)
 
-=head2 Configuration for subcommand 'dec-prereq-version-to'
+=head2 Configuration for subcommand dec-prereq-version-to
 
  module (see --module)
  module_version (see --module-version)
 
-=head2 Configuration for subcommand 'inc-prereq-version-by'
+=head2 Configuration for subcommand inc-prereq-version-by
 
  by (see --by)
  module (see --module)
 
-=head2 Configuration for subcommand 'inc-prereq-version-to'
+=head2 Configuration for subcommand inc-prereq-version-to
 
  module (see --module)
  module_version (see --module-version)
 
-=head2 Configuration for subcommand 'list-prereqs'
+=head2 Configuration for subcommand list-prereqs
 
  detail (see --detail)
  module (see --module)
  phase (see --phase)
  rel (see --rel)
 
-=head2 Configuration for subcommand 'remove-prereq'
+=head2 Configuration for subcommand remove-prereq
 
  module (see --module)
 
-=head2 Configuration for subcommand 'set-prereq-version-to'
+=head2 Configuration for subcommand set-prereq-version-to
 
  module (see --module)
  module_version (see --module-version)
 
-=head2 Configuration for subcommand 'sort-prereqs'
+=head2 Configuration for subcommand sort-prereqs
 
  spacing (see --spacing)
 
@@ -462,15 +462,15 @@ List of available configuration parameters:
 
 =head2 PDRUTIL_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/pdrutil.conf
+F<~/.config/pdrutil.conf>
 
-~/pdrutil.conf
+F<~/pdrutil.conf>
 
-/etc/pdrutil.conf
+F</etc/pdrutil.conf>
 
 =head1 HOMEPAGE
 
@@ -499,7 +499,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

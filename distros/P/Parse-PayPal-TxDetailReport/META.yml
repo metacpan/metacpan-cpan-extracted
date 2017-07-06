@@ -21,7 +21,6 @@ requires:
   Exporter: '0'
   File::BOM: '0'
   IO::Scalar: '0'
-  Log::Any: '0'
   String::BOM: '0'
   Text::CSV: '0'
   perl: '5.010001'
@@ -31,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-PayPal-TxDetailReport
   homepage: https://metacpan.org/release/Parse-PayPal-TxDetailReport
   repository: git://github.com/perlancar/perl-Parse-PayPal-TxDetailReport.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -103,7 +102,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.54'
+      version: '0.55'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -128,6 +127,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -225,17 +228,13 @@ x_Dist_Zilla:
               name: '@Project::Steven/Completion::GetoptLongComplete'
               version: '0.08'
             -
-              class: Pod::Weaver::Section::Completion::GetoptLongMore
-              name: '@Project::Steven/Completion::GetoptLongMore'
-              version: '0.001'
-            -
               class: Pod::Weaver::Section::Completion::GetoptLongSubcommand
               name: '@Project::Steven/Completion::GetoptLongSubcommand'
               version: '0.04'
             -
-              class: Pod::Weaver::Section::Completion::PerinciCmdLine
-              name: '@Project::Steven/Completion::PerinciCmdLine'
-              version: '0.14'
+              class: Pod::Weaver::Section::Completion::GetoptLongMore
+              name: '@Project::Steven/Completion::GetoptLongMore'
+              version: '0.001'
             -
               class: Pod::Weaver::Section::Steven
               name: '@Project::Steven/Steven'
@@ -251,7 +250,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Project::Steven/Rinci'
-              version: '0.72'
+              version: '0.76'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Project::Steven/AppendPrepend'
@@ -267,7 +266,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Project::Steven/PERLANCAR::SortSections'
-              version: '0.04'
+              version: '0.06'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -289,7 +288,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.23'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -318,7 +317,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'

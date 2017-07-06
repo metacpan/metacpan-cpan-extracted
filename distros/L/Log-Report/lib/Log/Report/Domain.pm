@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Domain;
 use vars '$VERSION';
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 use base 'Log::Report::Minimal::Domain';
 
@@ -41,7 +41,14 @@ sub configure(%)
         %args   = (%$set, %args);
     }
 
-    # 'formatter' is handled by the base-class, but documented here.
+    # 'formatter' is mainly handled by the base-class, but documented here.
+    my $format = $args{formatter} || 'PRINTI';
+    $args{formatter} = $format = {} if $format eq 'PRINTI';
+
+    if(ref $format eq 'HASH')
+    {   $format->{missing_key} = sub {$self->_reportMissingKey(@_)};
+    }
+
     $self->SUPER::configure(%args);
 
     my $transl = $args{translator} || Log::Report::Translator->new;
@@ -75,6 +82,17 @@ sub configure(%)
     }
 
     $self;
+}
+
+sub _reportMissingKey($$)
+{   my ($self, $sp, $key, $args) = @_;
+
+    warning
+      __x"Missing key '{key}' in format '{format}', file {use}"
+      , key => $key, format => $args->{_format}
+      , use => $args->{_use};
+
+    undef;
 }
 
 
@@ -128,23 +146,27 @@ sub readConfig($)
 
 sub translate($$)
 {   my ($self, $msg, $lang) = @_;
+    my $tr    = $self->translator || $self->configure->translator;
+	my $msgid = $msg->msgid;
 
-    my ($msgid, $msgctxt);
+    # fast route when certainly no context is involved
+    return $tr->translate($msg, $lang) || $msgid
+	    if index($msgid, '<') == -1;
+
+    my $msgctxt;
     if(my $rules = $self->contextRules)
     {   ($msgid, $msgctxt)
            = $rules->ctxtFor($msg, $lang, $self->defaultContext);
     }
     else
-    {   $msgid = $msg->msgid;
-        1 while $msgid =~
+    {   1 while $msgid =~
             s/\{([^}]*)\<\w+([^}]*)\}/length "$1$2" ? "{$1$2}" : ''/e;
     }
 
     # This is ugly, horrible and worse... but I do not want to mutulate
-    # the message neither to clone it.  We do need to get rit of {<}
+    # the message neither to clone it for performance.  We do need to get
+    # rit of {<}
     local $msg->{_msgid} = $msgid;
-
-    my $tr = $self->translator || $self->configure->translator;
     $tr->translate($msg, $lang, $msgctxt) || $msgid;
 }
 

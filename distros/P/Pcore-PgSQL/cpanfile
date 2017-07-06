@@ -1,3 +1,1 @@
-requires 'Pcore',      v0.22.2;
-requires 'Pcore::DBH', v0.1.0;
-requires 'DBD::Pg';
+requires 'Pcore', v0.41.0;

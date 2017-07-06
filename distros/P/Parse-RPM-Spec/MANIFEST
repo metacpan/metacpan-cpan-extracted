@@ -9,3 +9,4 @@ t/file.spec
 lib/Parse/RPM/Spec.pm
 Makefile.PL
 META.yml
+META.json

@@ -1,12 +1,12 @@
 package WWW::PAUSE::Simple;
 
-our $DATE = '2017-05-20'; # DATE
-our $VERSION = '0.38'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.43'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 use Exporter qw(import);
 our @EXPORT_OK = qw(
                        upload_file
@@ -51,11 +51,13 @@ _
         tags    => ['common'],
     },
     # 2016-07-13 - for a few months now, PAUSE has been giving random 500 errors
-    # when uploading. i'm defaulting to a retries=3
+    # when uploading. i'm defaulting to a retries=2.
+    # 2017-06-28 - increase default to retries=7.
+    # 2017-06-28 - tone down retries to 5.
     retries => {
         summary => 'Number of retries when received 5xx HTTP error from server',
         schema  => 'int*',
-        default => 2,
+        default => 5,
         tags    => ['common'],
     },
     retry_delay => {
@@ -151,6 +153,9 @@ sub _request {
     require HTTP::Request::Common;
 
     my %args = @_;
+    # XXX schema
+    $args{retries} //= 5;
+    $args{retry_delay} //= 3;
 
     # set default for username and password from ~/.pause
     my $username = $args{username};
@@ -183,9 +188,11 @@ sub _request {
     while (1) {
         $resp = $ua->request($req);
         if ($resp->code =~ /^[5]/ && $args{retries} >= ++$tries) {
-            $log->warnf("Got error %s (%s) from server when POST-ing to %s%s, retrying (%d/%d) ...",
-                        $url, $args{note} ? " ($args{note})" : "",
-                        $resp->code, $resp->message, $tries, $args{retries});
+            log_warn("Got error %s (%s) from server when POST-ing to %s%s, retrying (%d/%d) ...",
+                     $resp->code, $resp->message,
+                     $url,
+                     $args{note} ? " ($args{note})" : "",
+                     $tries, $args{retries});
             sleep $args{retry_delay};
             next;
         }
@@ -249,11 +256,11 @@ sub upload_files {
             }
 
             if ($args{-dry_run}) {
-                $log->tracef("[dry-run] (%d/%d) Uploading %s ...", $i+1, ~~@$files, $file);
+                log_trace("[dry-run] (%d/%d) Uploading %s ...", $i+1, ~~@$files, $file);
                 goto DELAY;
             }
 
-            $log->tracef("(%d/%d) Uploading %s ...", $i+1, ~~@$files, $file);
+            log_trace("(%d/%d) Uploading %s ...", $i+1, ~~@$files, $file);
             my $httpres = _request(
                 note => "upload $file",
                 %args,
@@ -287,8 +294,8 @@ sub upload_files {
         }
         $res->[3] //= {};
         $res->[3]{item_id} = $file;
-        $log->tracef("Result of upload: %s", $res);
-        $log->warnf("Upload of %s failed: %s - %s", $file, $res->[0], $res->[1])
+        log_trace("Result of upload: %s", $res);
+        log_warn("Upload of %s failed: %s - %s", $file, $res->[0], $res->[1])
             if $res->[0] !~ /^2/;
         $envres->add_result($res->[0], $res->[1], $res->[3]);
 
@@ -297,7 +304,7 @@ sub upload_files {
             # it's the last file, no point in delaying, just exit
             last if ++$i >= @$files;
             if ($args{delay}) {
-                $log->tracef("Sleeping between files for %d second(s) ...", $args{delay});
+                log_trace("Sleeping between files for %d second(s) ...", $args{delay});
                 sleep $args{delay};
                 last;
             }
@@ -450,12 +457,12 @@ sub list_dists {
     my @dists;
     for my $file (@{$res->[2]}) {
         if ($file =~ m!/!) {
-            $log->debugf("Skipping %s: under a subdirectory", $file);
+            log_debug("Skipping %s: under a subdirectory", $file);
             next;
         }
         my ($dist, $version, $is_dev) = _parse_release_filename($file);
         unless (defined $dist) {
-            $log->debugf("Skipping %s: doesn't match release regex", $file);
+            log_debug("Skipping %s: doesn't match release regex", $file);
             next;
         }
         next if $is_dev && $newest_n;
@@ -613,8 +620,8 @@ sub _delete_or_undelete_or_reindex_files {
                 $re = qr/\A($re)\z/;
                 @files = grep {
                     if ($_ =~ $re) {
-                        $log->debugf("Excluding %s (protected, wildcard %s)",
-                                     $_, $protect_file);
+                        log_debug("Excluding %s (protected, wildcard %s)",
+                                  $_, $protect_file);
                         0;
                     } else {
                         1;
@@ -623,7 +630,7 @@ sub _delete_or_undelete_or_reindex_files {
             } else {
                 @files = grep {
                     if ($_ eq $protect_file) {
-                        $log->debugf("Excluding %s (protected)", $_);
+                        log_debug("Excluding %s (protected)", $_);
                         0;
                     } else {
                         1;
@@ -638,10 +645,10 @@ sub _delete_or_undelete_or_reindex_files {
     }
 
     if ($args{-dry_run}) {
-        $log->warnf("[dry-run] %s %s", $which, \@files);
+        log_warn("[dry-run] %s %s", $which, \@files);
         return [200, "OK (dry-run)"];
     } else {
-        $log->infof("%s %s ...", $which, \@files);
+        log_info("%s %s ...", $which, \@files);
     }
 
     my $httpres = _request(
@@ -856,7 +863,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.38 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2017-05-20.
+This document describes version 0.43 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -904,7 +911,7 @@ not yet supported.
 
 Protect some files/wildcard patterns from delete/cleanup.
 
-=item * B<retries> => I<int> (default: 2)
+=item * B<retries> => I<int> (default: 5)
 
 Number of retries when received 5xx HTTP error from server.
 
@@ -990,7 +997,7 @@ not yet supported.
 
 Protect some files/wildcard patterns from delete/cleanup.
 
-=item * B<retries> => I<int> (default: 2)
+=item * B<retries> => I<int> (default: 5)
 
 Number of retries when received 5xx HTTP error from server.
 
@@ -1070,7 +1077,7 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 2)
+=item * B<retries> => I<int> (default: 5)
 
 Number of retries when received 5xx HTTP error from server.
 
@@ -1132,7 +1139,7 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 2)
+=item * B<retries> => I<int> (default: 5)
 
 Number of retries when received 5xx HTTP error from server.
 
@@ -1190,7 +1197,7 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 2)
+=item * B<retries> => I<int> (default: 5)
 
 Number of retries when received 5xx HTTP error from server.
 
@@ -1251,7 +1258,7 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 2)
+=item * B<retries> => I<int> (default: 5)
 
 Number of retries when received 5xx HTTP error from server.
 
@@ -1322,7 +1329,7 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 2)
+=item * B<retries> => I<int> (default: 5)
 
 Number of retries when received 5xx HTTP error from server.
 
@@ -1398,7 +1405,7 @@ PAUSE password.
 If unset, default value will be searched from C<~/.pause>. Encrypted C<.pause> is
 not yet supported.
 
-=item * B<retries> => I<int> (default: 2)
+=item * B<retries> => I<int> (default: 5)
 
 Number of retries when received 5xx HTTP error from server.
 

@@ -1,7 +1,7 @@
 package Data::Graph::Util;
 
-our $DATE = '2016-06-24'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -87,7 +87,7 @@ Data::Graph::Util - Utilities related to graph data structure
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Graph::Util (from Perl distribution Data-Graph-Util), released on 2016-06-24.
+This document describes version 0.003 of Data::Graph::Util (from Perl distribution Data-Graph-Util), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -121,7 +121,8 @@ None are exported by default, but they are exportable.
 =head2 toposort(\%graph[ , \@nodes ]) => sorted list
 
 Perform a topological sort on graph (currently using the Kahn algorithm). Will
-return the nodes of the graph sorted topologically.
+return the nodes of the graph sorted topologically. Will die if graph cannot be
+sorted, e.g. when graph is cyclic.
 
 If C<\@nodes> is specified, will instead return C<@nodes> sorted according to
 the topological order. Duplicates are allowed and not removed. Nodes not
@@ -168,7 +169,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

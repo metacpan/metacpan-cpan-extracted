@@ -1,6 +1,6 @@
 =head1 NAME
 
-String::CRC32 - Perl interface for cyclic redundency check generation
+String::CRC32 - Perl interface for cyclic redundancy check generation
 
 =head1 SYNOPSIS
 
@@ -19,7 +19,7 @@ String::CRC32 - Perl interface for cyclic redundency check generation
 
 =head1 DESCRIPTION
 
-The B<CRC32> module calculates CRC sums of 32 bit lenghts.
+The B<CRC32> module calculates CRC sums of 32 bit lengths.
 It generates the same CRC values as ZMODEM, PKZIP, PICCHECK and
 many others.
 
@@ -30,7 +30,7 @@ the checksum of files as well as strings.
 
     $crc = crc32("some string");
 
-  results in the same as
+results in the same as
 
     $crc = crc32(" string", crc32("some"));
 
@@ -43,15 +43,17 @@ You may even check files:
     $crc = crc32(*SOMEFILE);
     close(SOMEFILE);
 
-A init value may also been supplied in the above example.
+A init value may also have been supplied in the above example.
 
 =head1 AUTHOR
 
 Soenke J. Peters <peters__perl@opcenter.de>
 
-Please be so kind as to report any bugs/suggestions to the above address.
+Current maintainer: LEEJO 
 
-=head1 COPYRIGHT
+Address bug reports and comments to: L<https://github.com/leejo/string-crc32/issues>
+
+=head1 LICENSE
 
 CRC algorithm code taken from CRC-32 by Craig Bruce. 
 The module stuff is inspired by a similar perl module called 

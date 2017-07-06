@@ -164,7 +164,6 @@ static short                           marpaESLIF_canb(pTHX_ SV *svp, char *meth
 static void                            marpaESLIF_call_methodv(pTHX_ SV *interfacep, char *methods, SV *argsvp);
 static SV                             *marpaESLIF_call_methodp(pTHX_ SV *interfacep, char *methods);
 static SV                             *marpaESLIF_call_actionp(pTHX_ SV *interfacep, char *methods, AV *avp, marpaESLIFValue_t *marpaESLIFValuep, int rulei, short *av_undefbp);
-static SV                             *marpaESLIF_call_actionv(pTHX_ SV *interfacep, char *methods, AV *avp);
 static IV                              marpaESLIF_call_methodi(pTHX_ SV *interfacep, char *methods);
 static short                           marpaESLIF_call_methodb(pTHX_ SV *interfacep, char *methods);
 static void                            marpaESLIF_genericLoggerCallbackv(void *userDatavp, genericLoggerLevel_t logLeveli, const char *msgs);
@@ -468,45 +467,6 @@ static SV *marpaESLIF_call_actionp(pTHX_ SV *interfacep, char *methods, AV *avp,
 
 
   return rcp;
-}
-
-/*****************************************************************************/
-static SV *marpaESLIF_call_actionv(pTHX_ SV *interfacep, char *methods, AV *avp)
-/*****************************************************************************/
-{
-  static const char *funcs = "marpaESLIF_call_actionv";
-  SSize_t avsizel = (avp != NULL) ? av_len(avp) + 1 : 0;
-  SSize_t aviteratorl;
-  dSP;
-
-  /*
-    fprintf(stderr, "START marpaESLIF_call_actionv(pTHX_ SV *svp, \"%s\", AV *avp)\n", methods);
-  */
-  ENTER;
-  SAVETMPS;
-
-  PUSHMARK(SP);
-  EXTEND(SP, 1 + avsizel);
-  PUSHs(sv_2mortal(newSVsv(interfacep)));
-  for (aviteratorl = 0; aviteratorl < avsizel; aviteratorl++) {
-    SV **svpp = av_fetch(avp, aviteratorl, 0); /* We manage ourself the avp, SV's are real */
-    if (svpp == NULL) {
-      MARPAESLIF_CROAK("av_fetch returned NULL");
-    }
-    PUSHs(sv_2mortal(newSVsv(*svpp)));
-  }
-  PUTBACK;
-
-  call_method(methods, G_DISCARD);
-
-  SPAGAIN;
-
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
-  /*
-    fprintf(stderr, "END marpaESLIF_call_actionv(pTHX_ SV *svp, \"%s\", AV *avp)\n", methods);
-  */
 }
 
 /*****************************************************************************/

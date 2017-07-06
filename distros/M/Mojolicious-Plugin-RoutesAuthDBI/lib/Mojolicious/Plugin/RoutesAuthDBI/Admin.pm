@@ -623,7 +623,7 @@ sub new_route_c {# показать список контроллеров
   my ($ns) = $c->vars('ns');
   $ns = $Init->plugin->model('Namespaces')->namespace($ns && $ns =~ /\D/ ? (undef, $ns) : ($ns, undef,))
     || {namespace => $ns};
-  my $list = $ns->{id} ? $Init->plugin->model('Controllers')->controllers_ns_id($ns->{id}, $ns->{id}) : ['спейс пропускается'];
+  my $list = $Init->plugin->model('Controllers')->controllers_ns_id(($ns->{id}) x 2);
   $c->render(format=>'txt', text=><<TXT);
 $pkg
 
@@ -747,6 +747,7 @@ $pkg
 
 * request (request=GET POST /foo/:bar)
 * name (name=foo_bar)
+- host_re (regexp for HeaderCondition plugin)
 - to (to=Foo->bar or to=->bar)
 - descr (descr=пояснение такое)
 - auth (auth=1) (auth='only')

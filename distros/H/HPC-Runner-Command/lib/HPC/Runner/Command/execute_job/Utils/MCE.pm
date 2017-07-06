@@ -1,6 +1,8 @@
 package HPC::Runner::Command::execute_job::Utils::MCE;
 
 use MooseX::App::Role;
+use namespace::autoclean;
+
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
 
 with 'HPC::Runner::Command::execute_job::Base';
@@ -57,6 +59,12 @@ has 'read_command' => (
     }
 );
 
+=head3 single_node
+
+Enable this option if you want to run from a single node or workstation
+
+=cut
+
 option 'single_node' => (
     traits  => ['Bool'],
     is      => 'rw',
@@ -64,7 +72,8 @@ option 'single_node' => (
     default => 0,
     handles => {
         'not_single_node' => 'not',
-    }
+    },
+    documentation => 'Run a job from a single node or workstation.',
 );
 
 =head3 jobname
@@ -84,6 +93,7 @@ option 'jobname' => (
              $ENV{SLURM_JOB_NAME}
           || $ENV{SBATCH_JOB_NAME}
           || $ENV{PBS_JOBNAME}
+          || $ENV{JOB_NAME}
           || 'job';
     },
     predicate => 'has_jobname',
@@ -172,10 +182,11 @@ sub run_mce {
 
     #End MCE specific
 
-    my $dt2      = DateTime->now( time_zone => 'local' );
+    my $dt2 = DateTime->now( time_zone => 'local' );
     my $duration = $dt2 - $dt1;
-    my $format   = DateTime::Format::Duration->new( pattern =>
-          '%e days, %H hours, %M minutes, %S seconds' );
+    my $format =
+      DateTime::Format::Duration->new(
+        pattern => '%e days, %H hours, %M minutes, %S seconds' );
 
     $self->log_main_messages( 'info',
         "Total execution time " . $format->format_duration($duration) );
@@ -328,8 +339,10 @@ sub add_pool {
     my $self = shift;
     $self->log_main_messages( 'debug', "Enqueuing command:\n\t" . $self->cmd );
 
-    $self->queue->enqueue( $self->counter, $self->cmd )
-      if $self->has_cmd;
+    ##Task ID is the counter for the array
+    $self->task_id( $self->counter ) if $self->can('task_id');
+
+    $self->queue->enqueue( $self->counter, $self->cmd );
     $self->clear_cmd;
     $self->inc_counter;
 }

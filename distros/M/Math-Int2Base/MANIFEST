@@ -5,3 +5,4 @@ README
 t/Math-Int2Base.t
 lib/Math/Int2Base.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

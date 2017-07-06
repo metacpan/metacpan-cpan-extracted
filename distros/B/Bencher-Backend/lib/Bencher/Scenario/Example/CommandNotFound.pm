@@ -1,7 +1,7 @@
 package Bencher::Scenario::Example::CommandNotFound;
 
-our $DATE = '2017-02-20'; # DATE
-our $VERSION = '1.036'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '1.039'; # VERSION
 
 our $scenario = {
     participants => [
@@ -28,7 +28,7 @@ Bencher::Scenario::Example::CommandNotFound - An example scenario: command not f
 
 =head1 VERSION
 
-This document describes version 1.036 of Bencher::Scenario::Example::CommandNotFound (from Perl distribution Bencher-Backend), released on 2017-02-20.
+This document describes version 1.039 of Bencher::Scenario::Example::CommandNotFound (from Perl distribution Bencher-Backend), released on 2017-07-02.
 
 =head1 SYNOPSIS
 

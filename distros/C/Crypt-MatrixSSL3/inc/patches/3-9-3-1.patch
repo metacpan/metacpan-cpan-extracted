@@ -1,0 +1,127 @@
+diff --git a/matrixssl/matrixsslConfig.h b/matrixssl/matrixsslConfig.h
+index 976d4eb..155c1f6 100644
+--- a/matrixssl/matrixsslConfig.h
++++ b/matrixssl/matrixsslConfig.h
+@@ -96,20 +96,20 @@ extern "C" {
+ //#define USE_TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+ 
+ /** Ephemeral Diffie-Hellman ciphersuites, with RSA certificates */
+-#define USE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+-#define USE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA
++//#define USE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA
++//#define USE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+ /* TLS 1.2 ciphers */
+-#define USE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA256
+-#define USE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA256
++//#define USE_TLS_DHE_RSA_WITH_AES_128_CBC_SHA256
++//#define USE_TLS_DHE_RSA_WITH_AES_256_CBC_SHA256
+ 
+ /** Non-Ephemeral RSA keys/certificates */
+-#define USE_TLS_RSA_WITH_AES_128_CBC_SHA/**< @security NIST_SHALL */
+-#define USE_TLS_RSA_WITH_AES_256_CBC_SHA/**< @security NIST_SHOULD */
++//#define USE_TLS_RSA_WITH_AES_128_CBC_SHA/**< @security NIST_SHALL */
++//#define USE_TLS_RSA_WITH_AES_256_CBC_SHA/**< @security NIST_SHOULD */
+ /* TLS 1.2 ciphers */
+-#define USE_TLS_RSA_WITH_AES_128_CBC_SHA256/**< @security NIST_MAY */
+-#define USE_TLS_RSA_WITH_AES_256_CBC_SHA256/**< @security NIST_MAY */
+-#define USE_TLS_RSA_WITH_AES_128_GCM_SHA256/**< @security NIST_SHALL */
+-#define USE_TLS_RSA_WITH_AES_256_GCM_SHA384/**< @security NIST_SHOULD */
++//#define USE_TLS_RSA_WITH_AES_128_CBC_SHA256/**< @security NIST_MAY */
++//#define USE_TLS_RSA_WITH_AES_256_CBC_SHA256/**< @security NIST_MAY */
++//#define USE_TLS_RSA_WITH_AES_128_GCM_SHA256/**< @security NIST_SHALL */
++//#define USE_TLS_RSA_WITH_AES_256_GCM_SHA384/**< @security NIST_SHOULD */
+ 
+ /******************************************************************************/
+ /**
+@@ -120,8 +120,8 @@ extern "C" {
+ //#define USE_SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA
+ 
+ /** Ephemeral Diffie-Hellman ciphersuites, with PSK authentication */
+-#define USE_TLS_DHE_PSK_WITH_AES_128_CBC_SHA/**< @security NIST_SHOULD_NOT */
+-#define USE_TLS_DHE_PSK_WITH_AES_256_CBC_SHA/**< @security NIST_SHOULD_NOT */
++//#define USE_TLS_DHE_PSK_WITH_AES_128_CBC_SHA/**< @security NIST_SHOULD_NOT */
++//#define USE_TLS_DHE_PSK_WITH_AES_256_CBC_SHA/**< @security NIST_SHOULD_NOT */
+ 
+ /** Ephemeral ECC DH keys, RSA certificates */
+ //#define USE_TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA /**< @security NIST_SHOULD */
+@@ -129,11 +129,11 @@ extern "C" {
+ /** Pre-Shared Key Ciphers.
+ 	NIST SP 800-52 Rev 1 recommends against using PSK unless neccessary
+     See NIST SP 800-52 Rev 1 Appendix C */
+-#define USE_TLS_PSK_WITH_AES_128_CBC_SHA/**< @security NIST_SHOULD_NOT */
+-#define USE_TLS_PSK_WITH_AES_256_CBC_SHA/**< @security NIST_SHOULD_NOT */
++//#define USE_TLS_PSK_WITH_AES_128_CBC_SHA/**< @security NIST_SHOULD_NOT */
++//#define USE_TLS_PSK_WITH_AES_256_CBC_SHA/**< @security NIST_SHOULD_NOT */
+ /* TLS 1.2 ciphers */
+-#define USE_TLS_PSK_WITH_AES_128_CBC_SHA256/**< @security NIST_SHOULD_NOT */
+-#define USE_TLS_PSK_WITH_AES_256_CBC_SHA384/**< @security NIST_SHOULD_NOT */
++//#define USE_TLS_PSK_WITH_AES_128_CBC_SHA256/**< @security NIST_SHOULD_NOT */
++//#define USE_TLS_PSK_WITH_AES_256_CBC_SHA384/**< @security NIST_SHOULD_NOT */
+ 
+ /** Non-Ephemeral ECC DH keys, ECC DSA certificates */
+ //#define USE_TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA /**< @security NIST_MAY */
+@@ -186,7 +186,7 @@ extern "C" {
+ 		USE_TLS_1_0_AND_ABOVE
+ 	@note There is no option for enabling SSL3.0 at this level
+ */
+-#define USE_TLS_1_1_AND_ABOVE/**< @security default 1_1_AND_ABOVE */
++//#define USE_TLS_1_1_AND_ABOVE/**< @security default 1_1_AND_ABOVE */
+ //#define USE_TLS_1_2_AND_ABOVE /**< @security better than 1_1_AND_ABOVE if no backwards compatiblity concerns */
+ //#define USE_TLS_1_0_AND_ABOVE /**< @security no longer recommended. */
+ 
+@@ -196,7 +196,7 @@ extern "C" {
+ 	Enables DTLS in addition to TLS.
+ 	@pre TLS_1_1
+ */
+-#define USE_DTLS
++//#define USE_DTLS
+ 
+ /******************************************************************************/
+ /**
+@@ -298,8 +298,8 @@ extern "C" {
+ 	however, this will also immediately expire SESSION_TICKETS below.
+ */
+ #ifdef USE_SERVER_SIDE_SSL
+-#define SSL_SESSION_TABLE_SIZE 32
+-#define SSL_SESSION_ENTRY_LIFE (86400*1000)/* one day, in milliseconds */
++//#define SSL_SESSION_TABLE_SIZE 32
++//#define SSL_SESSION_ENTRY_LIFE (86400*1000)/* one day, in milliseconds */
+ #endif
+ 
+ /******************************************************************************/
+@@ -308,8 +308,8 @@ extern "C" {
+ 	define applies to this method as well as the standard method. The
+ 	SSL_SESSION_TICKET_LIST_LEN is the max size of the server key list.
+ */
+-#define USE_STATELESS_SESSION_TICKETS
+-#define SSL_SESSION_TICKET_LIST_LEN 32
++//#define USE_STATELESS_SESSION_TICKETS
++//#define SSL_SESSION_TICKET_LIST_LEN 32
+ 
+ /******************************************************************************/
+ /**
+@@ -322,8 +322,8 @@ extern "C" {
+ 	SSL_DEFAULT_x_BUF_SIZE	value in bytes, maximum SSL_MAX_BUF_SIZE
+  */
+ #ifndef USE_DTLS
+-#can_define	SSL_DEFAULT_IN_BUF_SIZE		1500		/* Base recv buf size, bytes */
+-#can_define	SSL_DEFAULT_OUT_BUF_SIZE	1500		/* Base send buf size, bytes */
++//#can_define	SSL_DEFAULT_IN_BUF_SIZE		1500		/* Base recv buf size, bytes */
++//#can_define	SSL_DEFAULT_OUT_BUF_SIZE	1500		/* Base send buf size, bytes */
+ #else
+ /******************************************************************************/
+ /**
+
+diff --git a/crypto/keyformat/pkcs.c b/crypto/keyformat/pkcs.c
+index f1a725e..afb537f 100644
+--- a/crypto/keyformat/pkcs.c
++++ b/crypto/keyformat/pkcs.c
+@@ -519,7 +519,8 @@ int32 psPkcs8ParsePrivBin(psPool_t *pool, unsigned char *buf, int32 size,
+         if (plen > 0)
+         {
+             /* Unexpected extra data remains. Treat it as an error. */
+-            goto PKCS8_FAIL;
++            psTraceIntCrypto("Unexpected extra data: %d\n", plen);
++            //goto PKCS8_FAIL;
+         }
+     }

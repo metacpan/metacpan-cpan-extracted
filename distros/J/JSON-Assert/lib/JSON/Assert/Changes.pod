@@ -1,5 +1,38 @@
 =head1 CHANGELOG FOR JSON::Assert
 
+=head2 VERSION 0.07, 27 JUNE 2017
+
+=over
+
+=item *
+
+RT #122245: Syntax error in Synopsis: nested double quotes
+
+=back
+
+=head2 VERSION 0.06, 27 JUNE 2017
+
+=over
+
+=item *
+
+RT #122223
+Fix failing POD.
+Replaced Any::Moose with Moo.
+
+=back
+
+=head2 VERSION 0.05, 25 JUNE 2017
+
+=over
+
+=item *
+
+Fixed tests
+RT #121978 MYMETA must not be included
+
+=back
+
 =head2 VERSION 0.04, 06 DECEMBER 2016
 
 =over

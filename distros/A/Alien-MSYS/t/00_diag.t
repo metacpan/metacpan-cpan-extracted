@@ -2,22 +2,26 @@ use strict;
 use warnings;
 use Config;
 use Test::More tests => 1;
-BEGIN {
-  my @modules;
-  eval q{
-    require FindBin;
-    require File::Spec;
-    1;
-  } || die $@;
-  do {
-    my $fh;
-    open($fh, '<', File::Spec->catfile($FindBin::Bin, '00_diag.pre.txt'));
-    @modules = <$fh>;
-    close $fh;
-    chomp @modules;
-  };
-  eval qq{ require $_ } for @modules;
-};
+
+# This .t file is generated.
+# make changes instead to dist.ini
+
+my %modules;
+my $post_diag;
+
+$modules{$_} = $_ for qw(
+  Archive::Zip
+  File::HomeDir
+  File::ShareDir
+  HTTP::Tiny
+  Module::Build
+  Test::More
+  Win32::Shortcut
+);
+
+
+
+my @modules = sort keys %modules;
 
 sub spacer ()
 {
@@ -27,15 +31,6 @@ sub spacer ()
 }
 
 pass 'okay';
-
-my @modules;
-do {
-  my $fh;
-  open($fh, '<', File::Spec->catfile($FindBin::Bin, '00_diag.txt'));
-  @modules = <$fh>;
-  close $fh;
-  chomp @modules;
-};
 
 my $max = 1;
 $max = $_ > $max ? $_ : $max for map { length $_ } @modules;
@@ -66,10 +61,7 @@ if(@keys > 0)
   spacer;
 }
 
-diag sprintf $format, 'perl ', $^V;
-
-require(File::Spec->catfile($FindBin::Bin, '00_diag.pl'))
-  if -e File::Spec->catfile($FindBin::Bin, '00_diag.pl');
+diag sprintf $format, 'perl ', $];
 
 foreach my $module (@modules)
 {
@@ -83,6 +75,12 @@ foreach my $module (@modules)
   {
     diag sprintf $format, $module, '-';
   }
+}
+
+if($post_diag)
+{
+  spacer;
+  $post_diag->();
 }
 
 spacer;

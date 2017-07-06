@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Time;
-$Lab::XPRESS::Sweep::Time::VERSION = '3.550';
+$Lab::XPRESS::Sweep::Time::VERSION = '3.552';
 
 use Lab::XPRESS::Sweep::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;

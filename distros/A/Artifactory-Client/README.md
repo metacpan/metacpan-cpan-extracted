@@ -6,7 +6,7 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 # VERSION
 
-Version 1.4.1
+Version 1.5.0
 
 # SYNOPSIS
 
@@ -585,6 +585,36 @@ Sets the private key that Artifactory will use to sign Debian packages
 ## set\_gpg\_pass\_phrase( $passphrase )
 
 Sets the pass phrase required signing Debian packages using the private key
+
+## create\_token( username => 'johnq', scope => 'member-of-groups:readers' )
+
+Creates an access token
+
+## refresh\_token( grant\_type => 'refresh\_token', refresh\_token => 'fgsg53t3g' )
+
+Refresh an access token to extend its validity. If only the access token and the refresh token are provided (and no
+other parameters), this pair is used for authentication. If username or any other parameter is provided, then the
+request must be authenticated by a token that grants admin permissions.
+
+## revoke\_token( token => 'fgsg53t3g' )
+
+Revoke an access token
+
+## get\_service\_id
+
+Provides the service ID of an Artifactory instance or cluster
+
+## get\_certificates
+
+Returns a list of installed SSL certificates.
+
+## add\_certificate( $alias, $file\_path )
+
+Adds an SSL certificate.
+
+## delete\_certificate( $alias )
+
+Deletes an SSL certificate.
 
 # REPOSITORIES
 

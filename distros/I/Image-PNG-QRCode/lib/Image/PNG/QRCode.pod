@@ -13,13 +13,13 @@ Image::PNG::QRCode - make a PNG image containing a QR code from text
     
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-PNG-QRCode-0.07/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.09/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Image::PNG::QRCode version 0.07
-corresponding to git commit L<3044488671774bd11adaeda5554671364cd3b0e2|https://github.com/benkasminbullock/image-png-qrcode/commit/3044488671774bd11adaeda5554671364cd3b0e2> released on Mon Feb 6 10:14:48 2017 +0900.
+This documents Image::PNG::QRCode version 0.09
+corresponding to git commit L<9a919172a83344ec6a3a3fb2f4bb770a7d3c8ad2|https://github.com/benkasminbullock/image-png-qrcode/commit/9a919172a83344ec6a3a3fb2f4bb770a7d3c8ad2> released on Sat Jul 1 10:30:36 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -212,7 +212,7 @@ This example makes a data URL QR code:
     print "<img src='$u'>\n";
 
 
-(This example is included as L<F<qrpng-data.pl>|https://api.metacpan.org/source/BKB/Image-PNG-QRCode-0.07/examples/qrpng-data.pl> in the distribution.)
+(This example is included as L<F<qrpng-data.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.09/examples/qrpng-data.pl> in the distribution.)
 
 
 =head2 qrpng CGI script
@@ -276,7 +276,7 @@ user's input.
     }
 
 
-(This example is included as L<F<qrpng.pl>|https://api.metacpan.org/source/BKB/Image-PNG-QRCode-0.07/examples/qrpng.pl> in the distribution.)
+(This example is included as L<F<qrpng.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-QRCode-0.09/examples/qrpng.pl> in the distribution.)
 
 
 =head1 SEE ALSO
@@ -294,11 +294,11 @@ inventors of the QR code, contains much information.
 
 =item Imager::QRCode
 
-L<Imager::QRCode> is based on the L<Imager> module and libqrencode.
+L<Imager::QRCode> is based on the L<Imager> module and L</libqrencode>.
 
 =item Text::QRCode
 
-L<Text::QRCode> makes a text QR code. It's based on libqrencode.
+L<Text::QRCode> makes a text QR code. It's based on L</libqrencode>.
 
 =item HTML::QRCode
 
@@ -321,8 +321,14 @@ L<Image::QRCode::Effects> is based on L<Imager::QRCode> and adds
 
 =item GD::Barcode::QRcode
 
-Pure-Perl implementation of QR codes using the GD library for the
-graphical part. At the time of writing, the last update was in 2004.
+L<GD::Barcode::QRcode> is a Pure-Perl implementation of QR codes using
+the GD library for the graphical part. At the time of writing, the
+last update was in 2004.
+
+=item Vector::QRCode::EPS
+
+L<Vector::QRCode::EPS> is a generator that returns a QRCode data as
+L<PostScript::Simple> object.
 
 =back
 

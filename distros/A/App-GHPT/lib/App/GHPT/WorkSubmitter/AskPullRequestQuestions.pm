@@ -2,7 +2,7 @@ package App::GHPT::WorkSubmitter::AskPullRequestQuestions;
 
 use App::GHPT::Wrapper::OurMoose;
 
-our $VERSION = '1.000004';
+our $VERSION = '1.000007';
 
 use App::GHPT::Types qw( ArrayRef Str );
 use Module::Pluggable::Object;
@@ -11,6 +11,12 @@ use App::GHPT::WorkSubmitter::ChangedFilesFactory;
 has merge_to_branch_name => (
     is       => 'ro',
     isa      => Str,
+    required => 1,
+);
+
+has question_namespaces => (
+    is       => 'ro',
+    isa      => ArrayRef [Str],
     required => 1,
 );
 
@@ -38,7 +44,7 @@ sub _build_questions ($self) {
     return [
         map { $_->new( changed_files => $self->_changed_files ) }
             Module::Pluggable::Object->new(
-            search_path => 'App::GHPT::WorkSubmitter::Question',
+            search_path => $self->question_namespaces,
             require     => 1,
             )->plugins,
     ];
@@ -66,7 +72,7 @@ App::GHPT::WorkSubmitter::AskPullRequestQuestions - Ask questions to go in the p
 
 =head1 VERSION
 
-version 1.000004
+version 1.000007
 
 =head1 SYNOPSIS
 

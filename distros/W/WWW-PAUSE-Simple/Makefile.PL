@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "HTTP::Request::Common" => 0,
     "LWP::UserAgent" => 0,
     "List::MoreUtils" => 0,
-    "Log::Any" => 0,
+    "Log::ger" => "0.011",
     "Perinci::Object" => "0.26",
     "Regexp::Wildcards" => 0,
     "String::Wildcard::Bash" => "0.03",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.38",
+  "VERSION" => "0.43",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "LWP::UserAgent" => 0,
   "List::MoreUtils" => 0,
-  "Log::Any" => 0,
+  "Log::ger" => "0.011",
   "Perinci::Object" => "0.26",
   "Regexp::Wildcards" => 0,
   "String::Wildcard::Bash" => "0.03",

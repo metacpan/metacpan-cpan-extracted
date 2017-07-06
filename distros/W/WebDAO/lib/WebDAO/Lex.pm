@@ -2,7 +2,7 @@
 #
 #  DESCRIPTION:  New Ng Lexer
 #
-#       AUTHOR:  Aliaksandr P. Zahatski, <zahatski@gmail.com>
+#       AUTHOR:  Aliaksandr P. Zahatski, <zag@cpan.org>
 #===============================================================================
 package WebDAO::Lex;
 

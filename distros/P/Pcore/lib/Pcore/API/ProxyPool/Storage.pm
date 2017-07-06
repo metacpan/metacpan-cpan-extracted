@@ -10,144 +10,147 @@ has _connect_id => ( is => 'ro', isa => HashRef, default => sub { {} }, init_arg
 sub _build_dbh ($self) {
     my $dbh = P->handle('sqlite:');
 
-    my $ddl = $dbh->ddl;
-
-    $ddl->add_changeset(
-        id  => 1,
-        sql => <<'SQL'
-            CREATE TABLE IF NOT EXISTS `proxy` (
-                `id` INTEGER PRIMARY KEY NOT NULL,
-                `hostport` TEXT NOT NULL,
-                `source_id` INTEGER NOT NULL,
-                `source_enabled` INTEGER NOT NULL,
-                `connect_error` INTEGER NOT NULL DEFAULT 0,
-                `connect_error_time` INTEGER NOT NULL DEFAULT 0,
-                `weight` INTEGER NOT NULL
+    $dbh->add_schema_patch(
+        1 => <<'SQL'
+            CREATE TABLE IF NOT EXISTS "proxy" (
+                "id" INTEGER PRIMARY KEY NOT NULL,
+                "hostport" TEXT NOT NULL,
+                "source_id" INTEGER NOT NULL,
+                "source_enabled" INTEGER NOT NULL,
+                "connect_error" INTEGER NOT NULL DEFAULT 0,
+                "connect_error_time" INTEGER NOT NULL DEFAULT 0,
+                "weight" INTEGER NOT NULL
             );
 
-            CREATE UNIQUE INDEX IF NOT EXISTS `idx_proxy_hostport` ON `proxy` (`hostport` ASC);
+            CREATE UNIQUE INDEX IF NOT EXISTS "idx_proxy_hostport" ON "proxy" ("hostport" ASC);
 
-            CREATE INDEX IF NOT EXISTS `idx_proxy_source_id` ON `proxy` (`source_id` ASC);
+            CREATE INDEX IF NOT EXISTS "idx_proxy_source_id" ON "proxy" ("source_id" ASC);
 
-            CREATE INDEX IF NOT EXISTS `idx_proxy_source_enabled` ON `proxy` (`source_enabled` DESC);
+            CREATE INDEX IF NOT EXISTS "idx_proxy_source_enabled" ON "proxy" ("source_enabled" DESC);
 
-            CREATE INDEX IF NOT EXISTS `idx_proxy_connect_error_time` ON `proxy` (`connect_error` DESC, `connect_error_time` ASC);
+            CREATE INDEX IF NOT EXISTS "idx_proxy_connect_error_time" ON "proxy" ("connect_error" DESC, "connect_error_time" ASC);
 
-            CREATE INDEX IF NOT EXISTS `idx_proxy_weight` ON `proxy` (`weight` ASC);
+            CREATE INDEX IF NOT EXISTS "idx_proxy_weight" ON "proxy" ("weight" ASC);
 
-            CREATE TABLE IF NOT EXISTS `connect` (
-                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                `name` TEXT NOT NULL
+            CREATE TABLE IF NOT EXISTS "connect" (
+                "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                "name" TEXT NOT NULL
             );
 
-            CREATE UNIQUE INDEX IF NOT EXISTS `idx_connect_name` ON `connect` (`name` ASC);
+            CREATE UNIQUE INDEX IF NOT EXISTS "idx_connect_name" ON "connect" ("name" ASC);
 
-            CREATE TABLE IF NOT EXISTS `proxy_connect` (
-                `proxy_id` INTEGER NOT NULL,
-                `connect_id` INTEGER NOT NULL,
-                `proxy_type` INTEGER NOT NULL,
-                PRIMARY KEY (`proxy_id`, `connect_id`),
-                FOREIGN KEY(`proxy_id`) REFERENCES `proxy`(`id`) ON DELETE CASCADE,
-                FOREIGN KEY(`connect_id`) REFERENCES `connect`(`id`) ON DELETE CASCADE
+            CREATE TABLE IF NOT EXISTS "proxy_connect" (
+                "proxy_id" INTEGER NOT NULL,
+                "connect_id" INTEGER NOT NULL,
+                "proxy_type" INTEGER NOT NULL,
+                PRIMARY KEY ("proxy_id", "connect_id"),
+                FOREIGN KEY("proxy_id") REFERENCES "proxy"("id") ON DELETE CASCADE,
+                FOREIGN KEY("connect_id") REFERENCES "connect"("id") ON DELETE CASCADE
             );
 
-            CREATE INDEX IF NOT EXISTS `idx_proxy_connect_proxy_type` ON `proxy_connect` (`proxy_type` ASC);
+            CREATE INDEX IF NOT EXISTS "idx_proxy_connect_proxy_type" ON "proxy_connect" ("proxy_type" ASC);
 
-            CREATE TABLE IF NOT EXISTS `proxy_ban` (
-                `proxy_id` INTEGER NOT NULL,
-                `ban_id` TEXT NOT NULL,
-                `release_time` INTEGER NOT NULL,
-                PRIMARY KEY (`proxy_id`, `ban_id`),
-                FOREIGN KEY(`proxy_id`) REFERENCES `proxy`(`id`) ON DELETE CASCADE
+            CREATE TABLE IF NOT EXISTS "proxy_ban" (
+                "proxy_id" INTEGER NOT NULL,
+                "ban_id" TEXT NOT NULL,
+                "release_time" INTEGER NOT NULL,
+                PRIMARY KEY ("proxy_id", "ban_id"),
+                FOREIGN KEY("proxy_id") REFERENCES "proxy"("id") ON DELETE CASCADE
             );
 
-            CREATE INDEX IF NOT EXISTS `idx_proxy_ban_release_time` ON `proxy_ban` (`release_time` ASC);
+            CREATE INDEX IF NOT EXISTS "idx_proxy_ban_release_time" ON "proxy_ban" ("release_time" ASC);
 SQL
     );
 
-    $ddl->upgrade;
+    $dbh->upgrade_schema(
+        sub ($status) {
+            die $status if !$status;
+
+            return;
+        }
+    );
 
     return $dbh;
 }
 
 # PROXY METHODS
 sub add_proxy ( $self, $proxy ) {
-    state $q1 = $self->dbh->query('INSERT INTO `proxy` (`id`, `hostport`, `source_id`, `source_enabled`, `weight`) VALUES (?, ?, ?, ?, ?)');
+    state $sth = $self->dbh->prepare(q[INSERT INTO "proxy" ("id", "hostport", "source_id", "source_enabled", "weight") VALUES (?, ?, ?, ?, ?)]);
 
-    $q1->do( [ $proxy->id, $proxy->hostport, $proxy->source->id, $proxy->source->can_connect, $proxy->weight ] );
+    $self->dbh->do( $sth, [ $proxy->id, $proxy->hostport, $proxy->source->id, $proxy->source->can_connect, $proxy->weight ] );
 
     return;
 }
 
 sub remove_proxy ( $self, $proxy ) {
-    state $q1 = $self->dbh->query('DELETE FROM `proxy` WHERE `id` = ?');
+    state $sth = $self->dbh->prepare(q[DELETE FROM "proxy" WHERE "id" = ?]);
 
-    $q1->do( [ $proxy->id ] );
+    $self->dbh->do( $sth, [ $proxy->id ] );
 
     return;
 }
 
 sub ban_proxy ( $self, $proxy, $ban_id, $release_time ) {
-    state $q1 = $self->dbh->query('INSERT OR REPLACE INTO `proxy_ban` (`proxy_id`, `ban_id`, `release_time`) VALUES (?, ?, ?)');
+    state $sth = $self->dbh->prepare(q[INSERT OR REPLACE INTO "proxy_ban" ("proxy_id", "ban_id", "release_time") VALUES (?, ?, ?)]);
 
-    $q1->do( [ $proxy->id, $ban_id, $release_time ] );
+    $self->dbh->do( $sth, [ $proxy->id, $ban_id, $release_time ] );
 
     return;
 }
 
 sub set_connect_error ( $self, $proxy ) {
-    state $q1 = $self->dbh->query('UPDATE `proxy` SET `connect_error` = 1, `connect_error_time` = ? WHERE `id` = ?');
+    state $sth1 = $self->dbh->prepare(q[UPDATE "proxy" SET "connect_error" = 1, "connect_error_time" = ? WHERE "id" = ?]);
 
-    state $q2 = $self->dbh->query('DELETE FROM `proxy_connect` WHERE `proxy_id` = ?');
+    state $sth2 = $self->dbh->prepare(q[DELETE FROM "proxy_connect" WHERE "proxy_id" = ?]);
 
-    $q1->do( [ $proxy->{connect_error_time}, $proxy->id ] );
+    $self->dbh->do( $sth1, [ $proxy->{connect_error_time}, $proxy->id ] );
 
-    $q2->do( [ $proxy->id ] );
+    $self->dbh->do( $sth2, [ $proxy->id ] );
 
     return;
 }
 
 sub update_weight ( $self, $proxy ) {
-    state $q1 = $self->dbh->query('UPDATE `proxy` SET `weight` = ? WHERE `id` = ?');
+    state $sth = $self->dbh->prepare(q[UPDATE "proxy" SET "weight" = ? WHERE "id" = ?]);
 
-    $q1->do( [ $proxy->weight, $proxy->id ] );
+    $self->dbh->do( $sth, [ $proxy->weight, $proxy->id ] );
 
     return;
 }
 
 sub set_connection_test_results ( $self, $proxy, $connect_id, $proxy_type ) {
     if ( !$self->_connect_id->{$connect_id} ) {
-        state $q1 = $self->dbh->query('INSERT INTO `connect` (`name`) VALUES (?)');
+        state $sth1 = $self->dbh->prepare(q[INSERT INTO "connect" ("name") VALUES (?)]);
 
-        $q1->do( [$connect_id] );
+        $self->dbh->do( $sth1, [$connect_id] );
 
         $self->{_connect_id}->{$connect_id} = $self->dbh->last_insert_id;
     }
 
-    state $q2 = $self->dbh->query('INSERT OR REPLACE INTO `proxy_connect` (`proxy_id`, `connect_id`, `proxy_type`) VALUES (?, ?, ?)');
+    state $sth2 = $self->dbh->prepare(q[INSERT OR REPLACE INTO "proxy_connect" ("proxy_id", "connect_id", "proxy_type") VALUES (?, ?, ?)]);
 
-    $q2->do( [ $proxy->id, $self->{_connect_id}->{$connect_id}, $proxy_type ] );
+    $self->dbh->do( $sth2, [ $proxy->id, $self->{_connect_id}->{$connect_id}, $proxy_type ] );
 
     return;
 }
 
 # SOURCE METHODS
 sub update_source_status ( $self, $source, $status ) {
-    state $q1 = $self->dbh->query('UPDATE `proxy` SET `source_enabled` = ? WHERE `source_id` = ?');
+    state $sth = $self->dbh->prepare(q[UPDATE "proxy" SET "source_enabled" = ? WHERE "source_id" = ?]);
 
-    $q1->do( [ $status, $source->id ] );
+    $self->dbh->do( $sth, [ $status, $source->id ] );
 
     return;
 }
 
 # MAINTENANCE METHODS
 sub release_connect_error ( $self, $time ) {
-    state $q1 = $self->dbh->query('SELECT `hostport` FROM `proxy` WHERE `connect_error` = 1 AND `connect_error_time` <= ?');
+    state $sth1 = $self->dbh->prepare(q[SELECT "hostport" FROM "proxy" WHERE "connect_error" = 1 AND "connect_error_time" <= ?]);
 
-    state $q2 = $self->dbh->query('UPDATE `proxy` SET `connect_error` = 0, `connect_error_time` = 0 WHERE `connect_error` = 1 AND `connect_error_time` <= ?');
+    state $sth2 = $self->dbh->prepare(q[UPDATE "proxy" SET "connect_error" = 0, "connect_error_time" = 0 WHERE "connect_error" = 1 AND "connect_error_time" <= ?]);
 
-    if ( my $res = $q1->selectcol( [$time] ) ) {
-        $q2->do( [$time] );
+    if ( my $res = $self->dbh->selectcol( $sth1, [$time] ) ) {
+        $self->dbh->do( $sth2, [$time] );
 
         return $res;
     }
@@ -156,7 +159,7 @@ sub release_connect_error ( $self, $time ) {
 }
 
 sub release_ban ( $self, $time ) {
-    state $q1 = $self->dbh->query(
+    state $sth1 = $self->dbh->prepare(
         <<'SQL'
             SELECT proxy.hostport, proxy_ban.ban_id
             FROM proxy
@@ -165,10 +168,10 @@ sub release_ban ( $self, $time ) {
 SQL
     );
 
-    state $q2 = $self->dbh->query('DELETE FROM `proxy_ban` WHERE `release_time` <= ?');
+    state $sth2 = $self->dbh->prepare(q[DELETE FROM "proxy_ban" WHERE "release_time" <= ?]);
 
-    if ( my $res = $q1->selectall( [$time] ) ) {
-        $q2->do( [$time] );
+    if ( my $res = $self->dbh->selectall( $sth1, [$time] ) ) {
+        $self->dbh->do( $sth2, [$time] );
 
         return $res;
     }
@@ -183,7 +186,7 @@ SQL
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 90, 118              | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 93, 121              | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

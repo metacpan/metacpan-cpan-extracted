@@ -1,5 +1,5 @@
 package Lab::Instrument::RSSMB100A;
-$Lab::Instrument::RSSMB100A::VERSION = '3.550';
+$Lab::Instrument::RSSMB100A::VERSION = '3.552';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);

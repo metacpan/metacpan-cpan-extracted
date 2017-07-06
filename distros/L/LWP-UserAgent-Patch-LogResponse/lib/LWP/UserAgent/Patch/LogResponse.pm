@@ -1,7 +1,7 @@
 package LWP::UserAgent::Patch::LogResponse;
 
-our $DATE = '2016-10-07'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-06-26'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,28 +13,30 @@ use base qw(Module::Patch);
 our %config;
 
 my $p_simple_request = sub {
-    require Log::Any::IfLOG;
+    require Log::ger;
 
     my $ctx  = shift;
     my $orig = $ctx->{orig};
     my $resp = $orig->(@_);
 
-    my $log = Log::Any::IfLOG->get_logger;
+    my $log = Log::ger->get_logger;
     if ($log->is_trace) {
 
-        # there is no equivalent of caller_depth in Log::Any, so we do this only
-        # for Log4perl
-        local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1
-            if $Log::{"Log4perl::"};
+        # XXX use equivalent in Log::ger
+
+        # # there is no equivalent of caller_depth in Log::Any, so we do this only
+        # # for Log4perl
+        # local $Log::Log4perl::caller_depth = $Log::Log4perl::caller_depth + 1
+        #     if $Log::{"Log4perl::"};
 
         if ($config{-log_response_header}) {
-            $log->tracef("HTTP response header:\n%s",
-                         $resp->status_line."\r\n".$resp->headers->as_string);
+            $log->trace("HTTP response header:\n%s",
+                        $resp->status_line."\r\n".$resp->headers->as_string);
         }
         if ($config{-log_response_body}) {
             # XXX or 4, if we're calling request() which calls simple_request()
             my @caller = caller(3);
-            my $log_b = Log::Any::IfLOG->get_logger(
+            my $log_b = Log::ger->get_logger(
                 category => "LWP_Response_Body::".$caller[0]);
             my $content;
             if ($config{-decode_response_body}) {
@@ -84,7 +86,7 @@ LWP::UserAgent::Patch::LogResponse - Log raw HTTP responses
 
 =head1 VERSION
 
-This document describes version 0.10 of LWP::UserAgent::Patch::LogResponse (from Perl distribution LWP-UserAgent-Patch-LogResponse), released on 2016-10-07.
+This document describes version 0.11 of LWP::UserAgent::Patch::LogResponse (from Perl distribution LWP-UserAgent-Patch-LogResponse), released on 2017-06-26.
 
 =head1 SYNOPSIS
 
@@ -98,7 +100,7 @@ This document describes version 0.10 of LWP::UserAgent::Patch::LogResponse (from
 
 Sample script and output:
 
- % TRACE=1 perl -MLog::Any::App -MLWP::UserAgent::Patch::LogResponse \
+ % TRACE=1 perl -MLog::ger::Output::Screen -MLWP::UserAgent::Patch::LogResponse \
    -MLWP::Simple -e'get "http://localhost:5000/"'
  [261] HTTP response header:
  200 OK
@@ -114,19 +116,22 @@ Sample script and output:
 
 This module patches LWP::UserAgent (which is used by LWP::Simple,
 WWW::Mechanize, among others) so that HTTP responses are logged using
-L<Log::Any>.
+L<Log::ger>.
 
 Response body is logged in category C<LWP_Response_Body.*> so it can be
 separated. For example, to dump response body dumps to directory instead of
 file:
 
- use Log::Any::App '$log',
-    -category_level => {LWP_Response_Body => 'off'},
-    -dir            => {
-        path           => "/path/to/dir",
-        level          => 'off',
-        category_level => {LWP_Response_Body => 'trace'},
-    };
+ use Log::ger::Output Composite => (
+     category_level => {LWP_Response_Body => 'off'},
+     outputs        => {
+         Dir => {
+             conf  => { path => "/path/to/dir" },
+             level => 'off',
+             category_level => {LWP_Response_Body => 'trace'},
+         },
+     }
+ );
 
 =for Pod::Coverage ^(patch_data)$
 
@@ -164,7 +169,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

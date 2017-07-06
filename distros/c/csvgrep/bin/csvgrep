@@ -7,8 +7,9 @@ use Text::CSV_XS;
 use Text::Table::Tiny qw/ generate_table /;
 use Getopt::Long;
 
-my $usage_string     = "usage: $0 [-h] [-d <dir>] [-i] <pattern> <file>\n";
-my $case_insensitive = 0;
+my $SHOW_COUNT_THRESHOLD = 7;
+my $usage_string         = "usage: $0 [-h] [-d <dir>] [-i] <pattern> <file>\n";
+my $case_insensitive     = 0;
 my $column_spec;
 
 
@@ -20,13 +21,18 @@ exit 0;
 sub show_matching_rows
 {
     my ($pattern, $filename) = @_;
+    my $sep_char             = ',';
+    my $total_rows           = 0;
     my @col_indices;
     my @rows;
+
+    # TSV files have tab as separator instead of comma
+    $sep_char = "\t" if $filename =~ /\.tsv$/;
 
     open(my $fh, '<:encoding(utf8)', $filename)
         || die "can't read $filename: $!\n";
 
-    my $parser  = Text::CSV_XS->new();
+    my $parser  = Text::CSV_XS->new({ sep_char => $sep_char });
     my @headers = @{ $parser->getline($fh) };
 
     if ($column_spec) {
@@ -37,6 +43,7 @@ sub show_matching_rows
     push(@rows, \@headers);
 
     while (<$fh>) {
+        $total_rows++;
         next unless ($case_insensitive && /$pattern/io)
                  || (!$case_insensitive && /$pattern/o);
         my $status = $parser->parse($_);
@@ -47,9 +54,14 @@ sub show_matching_rows
         push(@rows, [@columns]);
     }
 
-    die "no match\n" unless @rows > 1;
+    die "No match found in $total_rows records\n" unless @rows > 1;
 
     print generate_table(rows => \@rows, header_row => 1), "\n";
+
+    my $displayed_rows = int(@rows) - 1;
+    if ($displayed_rows > $SHOW_COUNT_THRESHOLD) {
+        print "matched $displayed_rows of $total_rows lines\n";
+    }
 }
 
 
@@ -88,7 +100,7 @@ sub find_newest_file
     my @files = map { $_->[0] }
                 sort { $b->[1] <=> $a->[1] }
                 map { [ $_, (stat("$dirpath/$_"))[9] ] } # mtime
-                grep { /\.csv$/ } readdir($DIR);
+                grep { /\.[ct]sv$/ } readdir($DIR);
 
     closedir($DIR);
 
@@ -176,6 +188,21 @@ So then I can just run:
 This is a script I've used internally,
 with features being added as I wanted them.
 Let me know if you've ideas for additional features, or send me a pull request.
+
+=head2 Tab-Separated Values
+
+TSV files are pretty common; they use a tab character instead of a comma.
+If the filename ends with C<.tsv> rather than C<.csv>,
+we'll set the field separator to be a tab character:
+
+ % csvgrep -i norwegian ~/books.tsv
+ +----------------+-----------------+-------+------+
+ | Book           | Author          | Pages | Date |
+ +----------------+-----------------+-------+------+
+ | Norwegian Wood | Haruki Murakami | 400   | 1987 |
+ +----------------+-----------------+-------+------+
+
+This also applies to the B<-d> option.
 
 =head1 REPOSITORY
 

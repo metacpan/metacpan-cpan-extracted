@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Overground;
 
-$Map::Tube::London::Line::Central::VERSION   = '0.84';
+$Map::Tube::London::Line::Central::VERSION   = '0.85';
 $Map::Tube::London::Line::Central::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Overground - London Tube Map: London Overground Line.
 
 =head1 VERSION
 
-Version 0.84
+Version 0.85
 
 =encoding utf8
 

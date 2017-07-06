@@ -5,10 +5,11 @@ use base 'PDF::API2::Resource::XObject::Image';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 use PDF::API2::Util;
 use PDF::API2::Basic::PDF::Utils;
+use Scalar::Util qw(weaken);
 
 sub new {
     my ($class,$pdf,$obj,$name,@opts) = @_;
@@ -20,6 +21,7 @@ sub new {
     $pdf->new_obj($self) unless($self->is_obj($pdf));
 
     $self->{' apipdf'}=$pdf;
+    weaken $self->{' apipdf'};
 
     $self->read_gd($obj,@opts);
 

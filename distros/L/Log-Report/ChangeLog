@@ -5,7 +5,34 @@ Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
 TODO:
-  . connect to Message::Passing framework
+	. connect to Message::Passing framework
+
+version 1.21: Mon  3 Jul 15:31:19 CEST 2017
+
+	Fixes:
+	- _prepend and _append texts doubled.
+	  rt.cpan.org#122304 [Andreas Koenig]
+	- accidental stringification of exceptions
+	  rt.cpan.org#122324 [Slaven Rezic]
+
+	Improvements:
+	- also \n of msgid moves to _prepend or _append
+
+version 1.20: Tue 27 Jun 16:41:36 CEST 2017
+
+	Fixes:
+	- Dancer2 sporadic missing request. [Andrew Beverley]
+	- attribute _lang overrules default locale in translation
+	- remove Log::Report::Lexicon dependency from ::Translator
+	- formatter PRINTP cannot be used, remove docs which tell that
+	- exceptions triggered translation too often
+
+	Improvements:
+	- add textdomain($name, 'EXISTS')
+	- add textdomain($domain_object);
+	- short-cut when translating without context
+	- use String::Print::printi() to interpolate: that code was forked-off
+	  earlier, and now mature.
 
 version 1.19: Thu  9 Feb 17:35:43 CET 2017
 

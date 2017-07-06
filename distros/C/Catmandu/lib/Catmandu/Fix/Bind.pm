@@ -2,7 +2,7 @@ package Catmandu::Fix::Bind;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0601';
+our $VERSION = '1.0602';
 
 use Moo::Role;
 use Package::Stash;
@@ -34,7 +34,7 @@ sub unit {
 }
 
 sub bind {
-    my ($self, $data, $code, $name, $fixes) = @_;
+    my ($self, $data, $code) = @_;
     return $code->($data);
 }
 
@@ -45,6 +45,13 @@ sub emit {
     my $var      = $fixer->var;
     my $bind_var = $fixer->capture($self);
     my $unit     = $fixer->generate_var;
+
+    #---The subfixer is only provided for backwards compatibility
+    # with older Bind implementations and is deprecated
+    my $sub_fixer = Catmandu::Fix->new(fixes => $self->__fixes__);
+    my $sub_fixer_var = $fixer->capture($sub_fixer);
+
+    #---
 
     my $fix_stash = Package::Stash->new('Catmandu::Fix');
     my $fix_emit_reject;
@@ -75,7 +82,7 @@ sub emit {
                     my $generated_code
                         = "sub { my ${var} = shift; $original_code ; ${var} }";
                     $perl
-                        .= "${unit} = ${bind_var}->bind(${unit}, $generated_code, '$name');";
+                        .= "${unit} = ${bind_var}->bind(${unit}, $generated_code, '$name',${sub_fixer_var});";
                 }
 
                 if ($self->can('result')) {
@@ -104,7 +111,8 @@ sub emit {
 
         $generated_code .= "${var} }";
 
-        $perl .= "${unit} = ${bind_var}->bind(${unit}, $generated_code);";
+        $perl
+            .= "${unit} = ${bind_var}->bind(${unit}, $generated_code,'::group::',${sub_fixer_var});";
     }
 
 #  If this isn't a Bind::Group, then bind will be executed for each seperate fix
@@ -116,7 +124,7 @@ sub emit {
                 = "sub { my ${var} = shift; $original_code ; ${var} }";
 
             $perl
-                .= "${unit} = ${bind_var}->bind(${unit}, $generated_code,'$name');";
+                .= "${unit} = ${bind_var}->bind(${unit}, $generated_code,'$name',${sub_fixer_var});";
         }
     }
 

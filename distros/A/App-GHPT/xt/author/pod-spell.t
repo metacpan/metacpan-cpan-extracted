@@ -21,6 +21,7 @@ Eilam
 Eilam's
 ExampleFileNameCheck
 FileInspector
+Florian
 Fowler
 GHE
 GHPT
@@ -42,6 +43,7 @@ Parameterizable
 Parameterized
 PayPal
 Question
+Ragwitz
 Role
 Rolsky
 Rolsky's
@@ -59,3 +61,4 @@ iff
 lib
 mark
 mfowler
+rafl

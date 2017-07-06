@@ -23,7 +23,7 @@ use File::Spec;
 use Yars::Util qw( format_tx_error );
 
 # ABSTRACT: various utility functions dealing with servers, hosts, etc
-our $VERSION = '1.27'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 sub new
@@ -435,7 +435,7 @@ Yars::Tools - various utility functions dealing with servers, hosts, etc
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 DESCRIPTION
 

@@ -84,79 +84,79 @@
    "provides" : {
       "MetaCPAN::Client" : {
          "file" : "lib/MetaCPAN/Client.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Author" : {
          "file" : "lib/MetaCPAN/Client/Author.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Distribution" : {
          "file" : "lib/MetaCPAN/Client/Distribution.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::DownloadURL" : {
          "file" : "lib/MetaCPAN/Client/DownloadURL.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Favorite" : {
          "file" : "lib/MetaCPAN/Client/Favorite.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::File" : {
          "file" : "lib/MetaCPAN/Client/File.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Mirror" : {
          "file" : "lib/MetaCPAN/Client/Mirror.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Module" : {
          "file" : "lib/MetaCPAN/Client/Module.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Package" : {
          "file" : "lib/MetaCPAN/Client/Package.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Permission" : {
          "file" : "lib/MetaCPAN/Client/Permission.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Pod" : {
          "file" : "lib/MetaCPAN/Client/Pod.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Rating" : {
          "file" : "lib/MetaCPAN/Client/Rating.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Release" : {
          "file" : "lib/MetaCPAN/Client/Release.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Request" : {
          "file" : "lib/MetaCPAN/Client/Request.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::ResultSet" : {
          "file" : "lib/MetaCPAN/Client/ResultSet.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Role::Entity" : {
          "file" : "lib/MetaCPAN/Client/Role/Entity.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Role::HasUA" : {
          "file" : "lib/MetaCPAN/Client/Role/HasUA.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Scroll" : {
          "file" : "lib/MetaCPAN/Client/Scroll.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       },
       "MetaCPAN::Client::Types" : {
          "file" : "lib/MetaCPAN/Client/Types.pm",
-         "version" : "2.016000"
+         "version" : "2.017000"
       }
    },
    "release_status" : "stable",
@@ -172,7 +172,7 @@
       "x_IRC" : "irc://irc.perl.org/#metacpan",
       "x_WebIRC" : "https://chat.mibbit.com/#metacpan@irc.perl.org"
    },
-   "version" : "2.016000",
+   "version" : "2.017000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022001"
@@ -498,7 +498,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.016000",
+                  "tag" : "v2.017000",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

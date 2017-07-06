@@ -10,6 +10,7 @@ requires        'Text::vFile::asData'       => 0;
 requires        'XML::Quick'                => 0;
 build_requires  'Text::vFile::asData'       => 0;
 build_requires  'Test::More'                => '0.42';
+build_requires  'XML::SemanticDiff'         => 0;
 
 auto_install;
 WriteAll;

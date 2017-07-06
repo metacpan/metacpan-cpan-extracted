@@ -2,11 +2,11 @@ use ExtUtils::MakeMaker;
 
 use 5.008;
 
-my $version = '1.02';
+my $version = '1.03';
 
 my %prereq  =
   ( Test::More    => '0.86'
-  , String::Print => '0.13'
+  , String::Print => '0.91'
 
   # Optional dependency to Log::Report handled in ::Optional.  It is hard
   # to make that work automatically, where Perl's install tools cannot

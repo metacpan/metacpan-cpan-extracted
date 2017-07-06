@@ -29,10 +29,10 @@ no_index:
 provides:
   Dist::Iller::Config::Author::CSSON:
     file: lib/Dist/Iller/Config/Author/CSSON.pm
-    version: '0.0315'
+    version: '0.0316'
   Dist::Iller::Config::Author::CSSON::MapMetro:
     file: lib/Dist/Iller/Config/Author/CSSON/MapMetro.pm
-    version: '0.0315'
+    version: '0.0316'
 requires:
   Dist::Iller: '0.1401'
   Moose: '2.0000'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON/issues
   homepage: https://metacpan.org/release/Dist-Iller-Config-Author-CSSON
   repository: https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON.git
-version: '0.0315'
+version: '0.0316'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -69,7 +69,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: Git::GatherDir
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -102,7 +102,7 @@ x_Dist_Zilla:
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
       name: RewriteVersion::Transitional
-      version: '0.007'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::ChangeStats::Dependencies::Git
       name: ChangeStats::Dependencies::Git
@@ -221,10 +221,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.9.3
+          git_version: 2.9.3
           repo_root: .
       name: Git::Check
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: GithubMeta
@@ -283,17 +283,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.9.3
+          git_version: 2.9.3
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: Git::Contributors
-      version: '0.029'
-    -
-      class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
-      name: Test::Kwalitee::Extra
-      version: v0.2.1
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -349,7 +345,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: Test::ReportPrereqs
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
@@ -393,7 +389,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.9.3
+          git_version: 2.9.3
           repo_root: .
       name: Git::CheckFor::CorrectBranch
       version: '0.014'
@@ -427,12 +423,12 @@ x_Dist_Zilla:
             - (?^u:.)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.9.3
+          git_version: 2.9.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: CommitBeforeTag
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -440,16 +436,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.0315'
+          tag: '0.0316'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.9.3
+          git_version: 2.9.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: Git::Tag
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: InstallRelease
@@ -465,7 +461,7 @@ x_Dist_Zilla:
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
       name: BumpVersionAfterRelease::Transitional
-      version: '0.007'
+      version: '0.008'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -480,12 +476,12 @@ x_Dist_Zilla:
             - (?^u:.)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.9.3
+          git_version: 2.9.3
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: CommitAfterRelease
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -494,10 +490,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.9.3
+          git_version: 2.9.3
           repo_root: .
       name: Git::Push
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Clean
       name: Clean

@@ -7,7 +7,7 @@ use File::Basename ();
 use Carp ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 has '+url' => sub { Carp::croak "url is a required property" };
@@ -94,7 +94,7 @@ Alien::Build::Plugin::Fetch::HTTPTiny - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -139,6 +139,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

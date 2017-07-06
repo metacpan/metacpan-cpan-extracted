@@ -22,36 +22,24 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[348]',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '[348]'
                 },
                 {
-                  'leading_digits' => '7',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})',
+                  'leading_digits' => '7'
                 },
                 {
-                  'leading_digits' => '5',
-                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{3})(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '5'
                 }
               ];
 
 my $validators = {
-                'mobile' => '
-          5(?:
-            14|
-            5[01578]|
-            68|
-            7[0147-9]|
-            9[0-35-9]
-          )\\d{6}
-        ',
-                'specialrate' => '',
-                'toll_free' => '800\\d{6}',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             3(?:
@@ -69,8 +57,8 @@ my $validators = {
             )
           )\\d{6}
         ',
-                'voip' => '706\\d{6}',
-                'pager' => '',
+                'specialrate' => '',
+                'personal_number' => '',
                 'fixed_line' => '
           (?:
             3(?:
@@ -87,7 +75,19 @@ my $validators = {
               9[1-7]
             )
           )\\d{6}
-        '
+        ',
+                'mobile' => '
+          5(?:
+            [14]4|
+            5[0157-9]|
+            68|
+            7[0147-9]|
+            9[0-35-9]
+          )\\d{6}
+        ',
+                'voip' => '706\\d{6}',
+                'toll_free' => '800\\d{6}',
+                'pager' => ''
               };
 
     sub new {

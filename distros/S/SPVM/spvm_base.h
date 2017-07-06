@@ -4,6 +4,34 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// spvm_constant_pool_sub.h
+struct SPVM_constant_pool_sub;
+typedef struct SPVM_constant_pool_sub SPVM_CONSTANT_POOL_SUB;
+
+// spvm_constant_pool_field.h
+struct SPVM_constant_pool_field;
+typedef struct SPVM_constant_pool_field SPVM_CONSTANT_POOL_FIELD;
+
+// spvm_constant_pool_package.h
+struct SPVM_constant_pool_package;
+typedef struct SPVM_constant_pool_package SPVM_CONSTANT_POOL_PACKAGE;
+
+// spvm_object.h
+struct SPVM_object;
+typedef struct SPVM_object SPVM_OBJECT;
+
+// spvm_array_object.h
+struct SPVM_array_object;
+typedef struct SPVM_array_object SPVM_ARRAY_OBJECT;
+
+// spvm_base_object.h
+struct SPVM_base_object;
+typedef struct SPVM_base_object SPVM_BASE_OBJECT;
+
+// spvm_value.h
+union SPVM_value;
+typedef union SPVM_value SPVM_VALUE;
+
 /* spvm_runtime.h */
 struct SPVM_runtime;
 typedef struct SPVM_runtime SPVM_RUNTIME;

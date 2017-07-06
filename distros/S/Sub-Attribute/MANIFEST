@@ -21,6 +21,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.yml
 mgx.h
+MYMETA.json
+MYMETA.yml
 README
 t/00_load.t
 t/01_attrs.t
@@ -32,6 +34,7 @@ t/06_inherit.t
 t/07_apply.t
 t/09_workaround58.t
 t/10_example_1.t
+t/11_survive_stack_moves_on_5.20.t
 xt/01_podspell.t
 xt/02_pod.t
 xt/03_pod-coverage.t

@@ -1,12 +1,11 @@
 package Parse::PayPal::TxFinderReport;
 
-our $DATE = '2016-12-30'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any qw($log);
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(parse_paypal_txfinder_report);
@@ -169,7 +168,7 @@ Parse::PayPal::TxFinderReport - Parse PayPal transaction detail report into data
 
 =head1 VERSION
 
-This document describes version 0.001 of Parse::PayPal::TxFinderReport (from Perl distribution Parse-PayPal-TxFinderReport), released on 2016-12-30.
+This document describes version 0.002 of Parse::PayPal::TxFinderReport (from Perl distribution Parse-PayPal-TxFinderReport), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -221,7 +220,11 @@ Some characteristics of this report:
 =head1 FUNCTIONS
 
 
-=head2 parse_paypal_txfinder_report(%args) -> [status, msg, result, meta]
+=head2 parse_paypal_txfinder_report
+
+Usage:
+
+ parse_paypal_txfinder_report(%args) -> [status, msg, result, meta]
 
 Parse PayPal transaction detail report into data structure.
 
@@ -279,7 +282,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

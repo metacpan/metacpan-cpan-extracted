@@ -8,7 +8,7 @@ require HTTP::Tiny;
 require URI;
 
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.07';
 
 =head1 NAME
 

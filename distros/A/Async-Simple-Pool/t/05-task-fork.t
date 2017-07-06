@@ -1,6 +1,5 @@
 #!perl -T
 
-use 5.10.0;
 use Modern::Perl;
 use POSIX;
 use Test::Spec;

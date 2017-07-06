@@ -4,23 +4,37 @@ services:
 
   bot:
     restart: always
-    build: .
+    # build: .
     image: pavelsr/camerabot
     container_name: fablab_camera_bot
     environment:
+      CAMSHOTBOT_FFMPEG_DOCKER: 1 # or name of running ffmpeg container
+      CAMSHOTBOT_LAST_SHOT_FILENAME: latest.jpg
+      CAMSHOTBOT_POLLING: 1 # set if server has no public domain
+      CAMSHOTBOT_STREAM_URL: "rtsp://10.132.193.9//ch0.h264"    # needed for status only, may not work
+      CAMSHOTBOT_TELEGRAM_API_TOKEN:
       VIRTUAL_HOST: camerabot.fablab61.ru
-      VIRTUAL_PORT: 8080
       LETSENCRYPT_HOST: camerabot.fablab61.ru
+      CAMSHOTBOT_DOMAIN: camerabot.fablab61.ru
+      VIRTUAL_PORT: 8080
       LETSENCRYPT_EMAIL: pavel@fablab61.ru
     volumes:
       - ${PWD}:/root/www/
     working_dir: /root/www
-    command: ["perl", "camshotbot.pl", "daemon", "-l", "http://*:8080"]
+    command: ["camshotbot", "daemon", "-l", "http://*:8080"]
     expose:
       - "8080"
     networks:
       - proxy-tier
 
+  ffmpeg:
+    restart: always
+    image: jrottenberg/ffmpeg:3.3-alpine
+    container_name: fablab_ffmpeg
+    command: ["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", "rtsp://10.132.193.9//ch0.h264", "-f", "image2", "-vf", "fps=1/3", "-y", "-update", "1", "latest.jpg" ]
+    volumes:
+      - ${PWD}:/tmp/workdir
+    network_mode: "host"
 
 
 networks:

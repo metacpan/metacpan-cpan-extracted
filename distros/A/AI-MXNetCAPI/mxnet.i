@@ -104,7 +104,7 @@ static void ExecutorMonitor_callback(const char* name, NDArrayHandle handle, voi
     }
 }
 
-%} 
+%}
 
 %init %{
     /* These SWIG_TypeClientData() calls might break in the future, but
@@ -628,30 +628,23 @@ int MXAutogradBackward(mx_uint num_output,
                                  NDArrayHandle* in,
                                  int retain_graph);
 
-/*!
- * \brief create cached operator
- */
-int MXCachedCreateOp(AtomicSymbolCreator in,
+ /*!
+  * \brief create cached operator
+  */
+int MXCreateCachedOp(SymbolHandle handle,
+                                CachedOpHandle *out);
+ /*!
+  * \brief free cached operator
+  */
+int MXFreeCachedOp(CachedOpHandle handle);
+ /*!
+  * \brief invoke cached operator
+  */
+int MXInvokeCachedOp(CachedOpHandle handle,
                                int num_inputs,
-                               int num_params,
-                               const char **keys,
-                               const char **vals,
-                               CachedOpHandle *out);
-
-/*!
- * \brief free cached operator
- */
-int MXCachedFree(CachedOpHandle handle);
-
-/*!
- * \brief invoke cached operator
- */
-int MXCachedInvoke(CachedOpHandle handle,
-                             int num_inputs,
-                             NDArrayHandle *in,
-                             int *out_size,
-                             NDArrayHandle** out_array);
-
+                               NDArrayHandle *in,
+                               int *out_size,
+                               NDArrayHandle **out_array);
 //--------------------------------------------
 // Part 3: symbolic configuration generation
 //--------------------------------------------
@@ -719,20 +712,6 @@ int MXSymbolCreateAtomicSymbol(AtomicSymbolCreator in,
                                          const char **keys,
                                          const char **vals,
                                          SymbolHandle *out);
-/*!
- * \brief Create an AtomicSymbol from cached op.
- * \param handle cached node attribute.
- * \param name name of new symbol.
- * \param num_args the number of symbol arguments
- * \param args symbol arguments
- * \return 0 when success, -1 when failure happens
- */
-int MXCachedCreateSymbol(CachedOpHandle handle,
-                                   const char* name,
-                                   mx_uint num_args,
-                                   SymbolHandle* in,
-                                   SymbolHandle* out);
-
 /*!
  * \brief Create a Variable Symbol.
  * \param name name of the variable
@@ -1372,21 +1351,21 @@ int MXKVStoreCreate(const char *type,
  * \return 0 when success, -1 when failure happens
  */
 int MXKVStoreFree(KVStoreHandle handle);
-/*!
- * \brief Init a list of (key,value) pairs in kvstore
- * \param handle handle to the kvstore
- * \param num the number of key-value pairs
- * \param keys the list of keys
- * \param vals the list of values
- * \return 0 when success, -1 when failure happens
- */
-int MXKVStoreInit(KVStoreHandle handle,
-                            mx_uint num,
-                            const int* in,
-                            NDArrayHandle* in);
 
 /*!
- * \brief Push a list of (key,value) pairs to kvstore
+ * \brief Init a list of (key,value) pairs in kvstore, where each key is a string
+ * \param handle handle to the kvstore
+ * \param num the number of key-value pairs
+ * \param keys the list of keys
+ * \param vals the list of values
+ * \return 0 when success, -1 when failure happens
+ */
+int MXKVStoreInitEx(KVStoreHandle handle,
+                              mx_uint num,
+                              const char** in,
+                              NDArrayHandle* in);
+ /*!
+ * \brief Push a list of (key,value) pairs to kvstore, where each key is a string
  * \param handle handle to the kvstore
  * \param num the number of key-value pairs
  * \param keys the list of keys
@@ -1394,13 +1373,13 @@ int MXKVStoreInit(KVStoreHandle handle,
  * \param priority the priority of the action
  * \return 0 when success, -1 when failure happens
  */
-int MXKVStorePush(KVStoreHandle handle,
-                            mx_uint num,
-                            const int* in,
-                            NDArrayHandle* in,
-                            int priority);
-/*!
- * \brief pull a list of (key, value) pairs from the kvstore
+int MXKVStorePushEx(KVStoreHandle handle,
+                              mx_uint num,
+                              const char** in,
+                              NDArrayHandle* in,
+                              int priority);
+ /*!
+ * \brief pull a list of (key, value) pairs from the kvstore, where each key is a string
  * \param handle handle to the kvstore
  * \param num the number of key-value pairs
  * \param keys the list of keys
@@ -1408,11 +1387,11 @@ int MXKVStorePush(KVStoreHandle handle,
  * \param priority the priority of the action
  * \return 0 when success, -1 when failure happens
  */
-int MXKVStorePull(KVStoreHandle handle,
-                            mx_uint num,
-                            const int* in,
-                            NDArrayHandle* in,
-                            int priority);
+int MXKVStorePullEx(KVStoreHandle handle,
+                              mx_uint num,
+                              const char** in,
+                              NDArrayHandle* in,
+                              int priority);
 /*!
  * \brief user-defined updater for the kvstore
  * It's this updater's responsibility to delete \a recv and \a local

@@ -89,3 +89,14 @@ Revision history for Dios
 
         * Clarified use of eval{} in documentation
           (thanks Olivier)
+
+
+0.002001  Wed Jun 21 14:51:09 2017
+
+        * Refined dependency specification for Keyword::Declare
+
+
+0.002002  Wed Jun 28 07:08:14 2017
+
+        * Fixed parameter handling in methods with explicit return type
+          but implicit invocant (thanks, Jeff!)

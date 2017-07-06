@@ -272,12 +272,23 @@ sub decompose_grid {
     my ($self, $line) = @_;
     $line =~ s/^\s+//;
     $line =~ s/\s+$//;
-    my $rest;
     my $orig;
-    if ( $line =~ /(.*\|\S*)\s([^\|]*)$/ ) {
-	$line = $1;
-	$rest = { $self->cdecompose( $orig = $2 ) };
+    my %res;
+    if ( $line !~ /\|/ ) {
+	$res{margin} = { $self->cdecompose($line), orig => $line };
+	$line = "";
     }
+    else {
+	if ( $line =~ /(.*\|\S*)\s([^\|]*)$/ ) {
+	    $line = $1;
+	    $res{comment} = { $self->cdecompose($2), orig => $2 };
+	}
+	if ( $line =~ /^([^|]+?)\s*(\|.*)/ ) {
+	    $line = $2;
+	    $res{margin} = { $self->cdecompose($1), orig => $1 };
+	}
+    }
+
     my @tokens = split( ' ', $line );
     foreach ( @tokens ) {
 	if ( $_ eq "|:" || $_ eq "{" ) {
@@ -311,8 +322,7 @@ sub decompose_grid {
 	    $_ = { chord => $self->chord($_), class => "chord" };
 	}
     }
-    return ( tokens => \@tokens,
-	     $rest ? ( comment => $rest, orig => $orig ) : () );
+    return ( tokens => \@tokens, %res );
 }
 
 sub dir_split {
@@ -343,12 +353,17 @@ sub directive {
 	do_warn("Already in " . ucfirst($in_context) . " context\n")
 	  if $in_context;
 	$in_context = $1;
-	if ( $in_context eq "grid" && $arg && $arg =~ /^(\d+)(?:x(\d+))?$/ ) {
+	if ( $in_context eq "grid" && $arg &&
+	     $arg =~ m/^
+		       (?: (\d+) \+)?
+		       (\d+) (?: x (\d+) )?
+		       (?:\+ (\d+) )?
+		       $/x ) {
 	    do_warn("Invalid grid params: $arg (must be non-zero)"), return
-	      unless $1;
+	      unless $2;
 	    $self->add( type => "set",
 			name => "gridparams",
-			value => [ $1, $2 ] );
+			value => [ $2, $3, $1, $4 ] );
 	}
 	else {
 	    do_warn("Garbage in start_of_$1: $arg (ignored)\n")
@@ -613,10 +628,11 @@ sub global_directive {
 	return 1;
     }
 
-    # define A: base-fret N frets N N N N N N
-    # define: A base-fret N frets N N N N N N
+    # define A: base-fret N frets N N N N N N fingers N N N N N N
+    # define: A base-fret N frets N N N N N N fingers N N N N N N
     # optional: base-fret N (defaults to 1)
     # optional: N N N N N N (for unknown chords)
+    # optional: fingers N N N N N N
     if ( $d =~ /^
 		(define|chord) [: ]+
 		([^: ]+) [: ] \s*
@@ -624,6 +640,9 @@ sub global_directive {
 		frets
 		((?: \s+ [0-9---xX])*
 		     \s+ [0-9---xX])?
+		(?: \s+ fingers
+		((?: \s+ [0-9---xX])*
+		     \s+ [0-9---xX])? )?
 		\s*$
 	       /xi
 	 or
@@ -643,11 +662,13 @@ sub global_directive {
 		    base => $3 || 1,
 		    frets => [ map { $_ =~ /^\d+/ ? $_ : -1 } @f ],
 		  };
+	    $ci->{fingers} = [ map { $_ =~ /^\d+/ ? $_ : -1 } split(' ',$5) ]
+	      if defined $5;
 	    push( @{$cur->{define}}, $ci );
 	    if ( @f ) {
 		my $res =
 		  App::Music::ChordPro::Chords::add_song_chord
-		      ( $ci->{name}, $ci->{base} || 1, $ci->{frets} );
+		      ( $ci->{name}, $ci->{base} || 1, $ci->{frets}, $ci->{fingers} );
 		if ( $res ) {
 		    do_warn("Invalid chord: ", $ci->{name}, ": ", $res, "\n");
 		    $show = 0;
@@ -762,6 +783,11 @@ sub transpose {
 	    foreach ( @{ $item->{tokens} } ) {
 		next unless $_->{class} eq "chord";
 		$_->{chord} = $self->xpchord( $_->{chord}, $xpose );
+	    }
+	    if ( $item->{margin} && exists $item->{margin}->{chords} ) {
+		foreach ( @{ $item->{margin}->{chords} } ) {
+		    $_ = $self->xpchord( $_, $xpose );
+		}
 	    }
 	    if ( $item->{comment} && exists $item->{comment}->{chords} ) {
 		foreach ( @{ $item->{comment}->{chords} } ) {

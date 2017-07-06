@@ -1,4 +1,6 @@
 package Cassandra::Client::Util;
+our $AUTHORITY = 'cpan:TVDW';
+$Cassandra::Client::Util::VERSION = '0.13';
 use 5.010;
 use strict;
 use warnings;
@@ -70,3 +72,28 @@ sub whilst {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Cassandra::Client::Util
+
+=head1 VERSION
+
+version 0.13
+
+=head1 AUTHOR
+
+Tom van der Woerdt <tvdw@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

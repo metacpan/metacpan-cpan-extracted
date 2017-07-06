@@ -10,7 +10,7 @@ use Scalar::Util ();
 
 use constant DEBUG => $ENV{MOJO_SLACKRTM_DEBUG};
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has ioloop => sub { Mojo::IOLoop->singleton };
 has ua => sub { Mojo::UserAgent->new };
@@ -105,8 +105,8 @@ sub connect {
         $self->ws->on(finish => sub {
             my ($ws) = @_;
             $self->log->warn("detect 'finish' event");
-            $self->finish;
-            $self->connect if $self->auto_reconnect;
+            $self->_clear;
+            Mojo::IOLoop->timer(1 => sub { $self->connect }) if $self->auto_reconnect;
         });
     });
 }
@@ -217,7 +217,7 @@ sub call_api {
     $param->{token} = $self->token unless exists $param->{token};
 
     DEBUG and $self->log->debug("===> call api '$method'");
-    DEBUG and $self->_dump( $param );
+    DEBUG and $self->_dump($param);
     my $url = "$SLACK_URL/$method";
     $self->ua->post($url => form => $param => sub {
         (undef, my $tx) = @_;

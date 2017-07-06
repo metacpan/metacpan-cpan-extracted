@@ -140,16 +140,16 @@ has 'connect_options'   => is => 'lazy', isa => HashRef,
 
 has 'ddl_commands'      => is => 'lazy', isa => HashRef, builder => sub { {
    'mysql'              => {
-      'create_user'     => "create user '[_2]'\@'[_1]' identified by '[_3]';",
+      'create_user'     => "create user '[_2]'\@'%' identified by '[_3]';",
       'create_db'       => 'create database [_3] default '
                          . 'character set utf8 collate utf8_unicode_ci;',
       'drop_db'         => 'drop database if exists [_3];',
-      'drop_user'       => "drop user '[_2]'\@'[_1]';",
+      'drop_user'       => "drop user '[_2]'\@'%';",
       'exists_db'       => 'select 1 from information_schema.SCHEMATA '
                          . "where SCHEMA_NAME = '[_3]';",
       'exists_user'     => 'select 1 from mysql.user '
-                         . "where User = '[_2]' and Host = '[_1]';",
-      'grant_all'       => "grant all privileges on [_3].* to '[_2]'\@'[_1]' "
+                         . "where User = '[_2]' and Host = '%';",
+      'grant_all'       => "grant all privileges on [_3].* to '[_2]'\@'%' "
                          . 'with grant option;',
       '-execute_ddl'    => 'mysql -A -h [_1] -u [_2] -p"[_3]" [_5]', },
    'pg'                 => {
@@ -596,6 +596,10 @@ Methods used to install and uninstall database applications
 Defines the following attributes
 
 =over 3
+
+=item C<all>
+
+Optional boolean. Perform operation for all possible schema
 
 =item C<database>
 

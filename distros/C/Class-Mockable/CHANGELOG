@@ -1,3 +1,7 @@
+2017-06-28      1.2000  Let people add fixtures to an existing
+                          C::M::G::IT object, with convenient shorthands;
+                        Add note to doco about namespace::autoclean
+
 2013-01-14      1.11    Add Class::Mock::Method::InterfaceTester
 
 2013-01-09      1.1     Add method mocking

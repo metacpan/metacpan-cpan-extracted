@@ -141,6 +141,8 @@ stderr_like(
 
   # Overwrite random_nbit_prime generation to fail
   *{"$name"} =
+    *{'random_nbit_prime'} =
+    *{'Math::Prime::Util::PP::random_nbit_prime'} =
     *{'Math::Prime::Util::RandomPrimes::random_nbit_prime'} =
     *{'Math::Prime::Util::GMP::random_nbit_prime'} =
     sub ($) {

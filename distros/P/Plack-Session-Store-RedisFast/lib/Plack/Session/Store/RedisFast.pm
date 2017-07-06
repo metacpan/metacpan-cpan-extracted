@@ -6,24 +6,32 @@ use warnings;
 use 5.008_005;
 
 use Carp qw( carp );
-use Plack::Util::Accessor qw( prefix redis encoder expire );
+use Plack::Util::Accessor qw( prefix redis encoder expires );
 use Time::Seconds qw( ONE_MONTH );
 
 use parent 'Plack::Session::Store';
 
 use constant SESSIONS_PER_SCAN => 100;
 
-our $VERSION   = '0.03';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:AKZHAN';
 
 sub new {
     my ( $class, %param ) = @_;
     $param{prefix} = __PACKAGE__ . ':' unless defined $param{prefix};
-    $param{expire} = ONE_MONTH         unless exists $param{expire};
+    if ( exists $param{expire} ) {
+        warn __PACKAGE__
+          . ": DEPRECATED expire. Should be replaced with expires.";
+        $param{expires} = delete $param{expire};
+    }
+    $param{expires} = ONE_MONTH unless exists $param{expires};
 
-    unless ( $param{redis} ) {
-        my $builder = ( delete $param{builder} ) || \&_build_redis;
-        $param{redis} = $builder->();
+    unless ( defined $param{redis} ) {
+        $param{redis} = \&_build_redis;
+    }
+
+    if ( ref( $param{redis} ) eq 'CODE' ) {
+        $param{redis} = $param{redis}->();
     }
 
     $param{encoder} ||=
@@ -87,7 +95,7 @@ sub store {
     my $data = $self->encoder->encode($session);
     $self->redis->set(
         $self->prefix . $session_id => $data,
-        ( defined( $self->expire ) ? ( EX => $self->expire ) : () ),
+        ( defined( $self->expires ) ? ( EX => $self->expires ) : () ),
     );
     1;
 }
@@ -148,7 +156,7 @@ Plack::Session::Store::RedisFast - Redis session store.
 
 Default implementation of Redis handle is L<Redis::Fast>; otherwise L<Redis>.
 
-May be overriden through L</redis> or  L</builder> param.
+May be overriden through L</redis> param.
 
 Default implementation of serializer handle is L<JSON::XS>; otherwise L<Mojo::JSON> or L<JSON>.
 
@@ -190,10 +198,6 @@ Parameters:
 
 A simple accessor for the Redis handle.
 
-=item builder
-
-A simple builder for the Redis handle if L</redis> not set.
-
 =item inflate
 
 A simple serializer, requires L</deflate> param.
@@ -210,9 +214,9 @@ A simple encoder (encode/decode implementation), class or instance. JSON/utf8 by
 
 A prefix for Redis session ids. 'Plack::Session::Store::RedisFast:' by default.
 
-=item expire
+=item expires
 
-An expire for Redis sessions. L<Time::Seconds/ONE_MONTH> by default.
+An expires for Redis sessions. L<Time::Seconds/ONE_MONTH> by default.
 
 =back
 

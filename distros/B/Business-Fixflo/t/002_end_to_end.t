@@ -96,6 +96,8 @@ cmp_deeply(
         },
         ( map { $_ => ignore() } qw/
             AdditionalDetails
+            AssignedAgent
+            Block
             CallbackId
             ContactNumber
             ContactNumberAlt

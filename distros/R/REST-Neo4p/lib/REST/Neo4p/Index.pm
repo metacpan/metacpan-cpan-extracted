@@ -8,8 +8,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::Index::VERSION = '0.3012';
-  $REST::Neo4p::Index::VERSION = '0.3012';
+  $REST::Neo4p::Index::VERSION = '0.3020';
 }
 
 my $unsafe = "^A-Za-z0-9\-\._\ ~";
@@ -425,7 +424,7 @@ L<REST::Neo4p>, L<REST::Neo4p::Relationship>, L<REST::Neo4p::Node>.
 
 =head1 LICENSE
 
-Copyright (c) 2012-2015 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

@@ -176,8 +176,8 @@ sub __compileRx
 sub __getAnonWithOp
 {
 	my $op = shift;
-	
-	return eval "sub { \$_[0] $op \$_[1] }";
+
+	return eval "sub { defined(\$_[0]) ? \$_[0] $op \$_[1] : 0 }";
 }
 
 1;
@@ -207,11 +207,11 @@ unary:
 field_op_value_test:
 		/
 				(?:(?<field>[^.\s]+)\.)?(?<op>(?i)true|false)
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)						# allow paired '()' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}						# allow paired '{}' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]						# allow paired '[]' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>						# allow paired '<>' delimiters
-			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\((?<value>[^)]*)\)								# allow paired '()' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\{(?<value>[^}]*)\}								# allow paired '{}' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)\[(?<value>[^\]]*)\]								# allow paired '[]' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)<(?<value>[^>]*)>								# allow paired '<>' delimiters
+			|	(?:(?<field>[^.\s]+)\.)?(?<op>(?i)regexp|=~|eq|ne|[lg][te]|[=!<>]=|<|>)(?<delim>[^(){}[\]<>\s])(?<value>.*?)\g{delim}	# allow arbitrary delimiter
 		/ix { bless( { field => $+{field}, op => lc($+{op}), value => $+{value} }, "Grep::Query::Parser::QOPS::$item[0]" ) }
 
 or:

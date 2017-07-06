@@ -5,3 +5,7 @@
 
  - Fix doc formatting of examples.
  - Fix doc formatting of args.
+
+1.02 - 2017-06-24
+
+    - Fix non-{array,hash}ref handling.

@@ -1,12 +1,12 @@
 package App::MysqlUtils;
 
-our $DATE = '2017-06-17'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use IPC::System::Options qw(system);
 use Perinci::Object;
@@ -175,10 +175,10 @@ sub mysql_drop_all_tables {
     my $res = envresmulti();
     for (@names) {
         if ($args{-dry_run}) {
-            $log->infof("[DRY_RUN] Dropping table %s ...", $_);
+            log_info("[DRY_RUN] Dropping table %s ...", $_);
             $res->add_result(304, "OK (dry-run)", {item_id=>$_});
         } else {
-            $log->infof("Dropping table %s ...", $_);
+            log_info("Dropping table %s ...", $_);
             $dbh->do("DROP TABLE $_");
             $res->add_result(200, "OK", {item_id=>$_});
         }
@@ -264,10 +264,10 @@ sub mysql_drop_tables {
         }
 
         if ($args{-dry_run}) {
-            $log->infof("[DRY_RUN] Dropping table %s ...", $name);
+            log_info("[DRY_RUN] Dropping table %s ...", $name);
             $res->add_result(304, "OK (dry-run)", {item_id=>$name});
         } else {
-            $log->infof("Dropping table %s ...", $name);
+            log_info("Dropping table %s ...", $name);
             $dbh->do("DROP TABLE $name");
             $res->add_result(200, "OK", {item_id=>$name});
         }
@@ -476,21 +476,21 @@ sub mysql_run_sql_files {
 
         if (-f $txtfile) {
             if ($ov_when eq 'always') {
-                $log->debugf("Overwriting existing %s ...", $txtfile);
+                log_debug("Overwriting existing %s ...", $txtfile);
             } elsif ($ov_when eq 'older') {
                 if ((-M $txtfile) > (-M $sqlfile)) {
-                    $log->debugf("Overwriting existing %s because it is older than the corresponding %s ...", $txtfile, $sqlfile);
+                    log_debug("Overwriting existing %s because it is older than the corresponding %s ...", $txtfile, $sqlfile);
                 } else {
-                    $log->infof("%s already exists and newer than corresponding %s, skipped", $txtfile, $sqlfile);
+                    log_info("%s already exists and newer than corresponding %s, skipped", $txtfile, $sqlfile);
                     next;
                 }
             } else {
-                $log->infof("%s already exists, we never overwrite existing .txt file, skipped", $txtfile);
+                log_info("%s already exists, we never overwrite existing .txt file, skipped", $txtfile);
                 next;
             }
         }
 
-        $log->infof("Running SQL file '%s' and putting result to '%s' ...",
+        log_info("Running SQL file '%s' and putting result to '%s' ...",
                     $sqlfile, $txtfile);
         my $cmd = join(
             " ",
@@ -520,7 +520,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.007 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2017-06-17.
+This document describes version 0.008 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2017-07-03.
 
 =head1 SYNOPSIS
 

@@ -89,13 +89,13 @@ the same terms as the Perl 5 programming language system itself.
 use namespace::clean;
 use Catmandu::Sane;
 use Catmandu::BagIt;
-use File::Path qw(mkpath);
-use File::Temp;
+use Path::Tiny;
+use File::Spec;
 use IO::File;
 use LWP::Simple;
 use Moo;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 with 'Catmandu::Exporter';
 
@@ -128,23 +128,27 @@ sub add {
             my ($url) = keys %$fetch;
             my $file  = $fetch->{$url};
 
-            mkpath("$directory/data") unless -d "$directory/data";
+            my $data_dir = File::Spec->catfile($directory,'data');
 
-            my $tmp = File::Temp->new(UNLINK => 1, suffix => '.tmp')
-              or Catmandu::Error->throw("Could not create temp file");
+            path($data_dir)->mkpath unless -d $data_dir;
+
+            my $tmp = Path::Tiny->tempfile
+                    or Catmandu::Error->throw("Could not create temp file");
 
             # For now using a simplistic mirror operation
-            my $fname = $tmp->filename;
-            my $response = $bagit->_http_client->mirror($url,$fname);
+            my $fname    = $tmp->stringify;
+            my $response = $bagit->user_agent->mirror($url,$fname);
 
             unless ($response->is_success) {
+                undef($tmp);
                 Catmandu::Error->throw("failed to mirror $url to $fname : " . $response->status_line);
             }
 
             $file =~ s{^data/}{};
             $bagit->add_file($file,IO::File->new($fname));
             $bagit->write($directory, overwrite => 1);
-            $tmp->unlink_on_destroy(1);
+
+            undef($tmp);
         }
     }
 

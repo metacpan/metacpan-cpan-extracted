@@ -243,6 +243,14 @@ gl_error_string(char * buf, int len)
 	}
 }
 
+Bool
+gl_is_direct(Handle context)
+{
+	CLEAR_ERROR;
+	XCHECKPOINT;
+	return glXIsDirect( DISP, ctx-> context );
+}
+
 #ifdef __cplusplus
 }
 #endif

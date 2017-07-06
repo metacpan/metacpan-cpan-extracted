@@ -13,3 +13,5 @@ MYMETA..*
 .*\.png$
 ^makeitfile$
 ^examples/.*-out\.txt$
+.*\.tmpl$
+^xt/.*\.t$

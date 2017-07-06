@@ -2,14 +2,16 @@
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '1.16.0';
+$Git::Hooks::CheckJira::VERSION = '2.0.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Git::Hooks qw/:DEFAULT :utils/;
+use Git::Hooks;
+use Git::Repository::Log;
 use Path::Tiny;
 use List::MoreUtils qw/uniq/;
+use Set::Scalar;
 
 my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -87,24 +89,31 @@ sub _jira {
     return $cache->{jira};
 }
 
-# Returns a JIRA::REST object or undef if there is any problem
-
-sub get_issue {
-    my ($git, $key) = @_;
-
-    my $jira = _jira($git) or return;
+sub _jql_query {
+    my ($git, $jql) = @_;
 
     my $cache = $git->cache($PKG);
 
-    # Try to get the issue from the cache
-    unless (exists $cache->{keys}{$key}) {
-        $cache->{keys}{$key} = eval { $jira->GET("/issue/$key") };
-        length $@
-            and $git->error($PKG, "cannot get issue $key", $@)
-                and return;
+    unless (exists $cache->{jql}{$jql}) {
+        my $jira = _jira($git);
+        $jira->set_search_iterator({
+            jql    => $jql,
+            fields => $git->get_config($CFG => 'check-code')
+                ? [qw/*all/]
+                : [qw/assignee fixVersions resolution/],
+        });
+        while (my $issue = $jira->next_issue) {
+            $cache->{jql}{$jql}{$issue->{key}} = $issue;
+        }
     }
 
-    return $cache->{keys}{$key};
+    return $cache->{jql}{$jql};
+}
+
+sub _disconnect_jira {
+    my ($git) = @_;
+    delete $git->cache($PKG)->{jira};
+    return;
 }
 
 sub check_codes {
@@ -147,121 +156,138 @@ sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
 
     unless (@keys) {
         if ($git->get_config($CFG => 'require')) {
-            my $shortid = exists $commit->{commit} ? substr($commit->{commit}, 0, 8) : '';
-            $git->error($PKG, "commit $shortid must cite a JIRA in its message");
+            $git->error($PKG, "commit @{[substr($commit->commit, 0, 10)]} must cite a JIRA in its message");
             return 0;
         } else {
             return 1;
         }
     }
 
-    my @issues;
-
-    my %projects    = map {($_ => undef)} $git->get_config($CFG => 'project');
-    my $unresolved  = $git->get_config($CFG => 'unresolved');
-    my %status      = map {($_ => undef)} $git->get_config($CFG => 'status');
-    my %issuetype   = map {($_ => undef)} $git->get_config($CFG => 'issuetype');
-    my $by_assignee = $git->get_config($CFG => 'by-assignee');
-    my @versions;
-    foreach ($git->get_config($CFG => 'fixversion')) {
-        my ($branch, $version) = split ' ', $_, 2;
-        my $last_paren_match;
-        if ($branch =~ /^\^/) {
-            next unless $ref =~ qr/$branch/;
-            $last_paren_match = $+;
-        } else {
-            next unless $ref eq $branch;
-        }
-        if ($version =~ /^\^/) {
-            $version =~ s/\$\+/\Q$last_paren_match\E/g if defined $last_paren_match;
-            push @versions, qr/$version/;
-        } else {
-            $version =~ s/\$\+/$last_paren_match/g if defined $last_paren_match;
-            push @versions, $version;
-        }
-    }
+    my %issues;                 # cache all grokked issues
 
     my $errors = 0;
 
-  KEY:
-    foreach my $key (@keys) {
-        not %projects
-            or $key =~ /([^-]+)/ and exists $projects{$1}
-                or $git->error($PKG, "do not cite issue $key. This repository accepts only issues from: "
-                                   . join(' ', sort keys %projects))
-                    and next KEY;
+    ############
+    # JQL checks
 
-        my $issue = get_issue($git, $key)
-            or ++$errors
-                and next KEY;
+    {
+        # global JQLs
+        my @jqls = $git->get_config($CFG => 'jql');
 
-        if (%issuetype && ! exists $issuetype{$issue->{fields}{issuetype}{name}}) {
-            my @issuetypes = sort keys %issuetype;
-            $git->error(
-                $PKG,
-                "issue $key cannot be used because it is of the unapproved type '$issue->{fields}{issuetype}{name}'",
-                "You can use the following issue types: @issuetypes",
-            );
-            ++$errors;
-            next KEY;
+        # ref-specific JQLs
+        foreach ($git->get_config($CFG => 'ref-jql')) {
+            my ($match_ref, $jql) = split ' ', $_, 2;
+            push @jqls, $jql if $ref =~ $match_ref;
         }
 
-        if (%status && ! exists $status{$issue->{fields}{status}{name}}) {
-            my @statuses = sort keys %status;
-            $git->error(
-                $PKG,
-                "issue $key cannot be used because it is in the unapproved status '$issue->{fields}{status}{name}'",
-                "The following statuses are approved: @statuses",
-            );
-            ++$errors;
-            next KEY;
-        }
-
-        if ($unresolved && defined $issue->{fields}{resolution}) {
-            $git->error($PKG, "issue $key cannot be used because it is already resolved");
-            ++$errors;
-            next KEY;
-        }
-
-      VERSION:
-        foreach my $version (@versions) {
-            foreach my $fixversion (@{$issue->{fields}{fixVersions}}) {
-                if (ref $version) {
-                    next VERSION if $fixversion->{name} =~ $version;
-                } else {
-                    next VERSION if $fixversion->{name} eq $version;
+        # Construct a JQL based on the deprecated configuration options
+        {
+            my @deprecated;
+            foreach my $option (qw/project issuetype status/) {
+                if (my @values = $git->get_config($CFG => $option)) {
+                    push @deprecated, "$option IN (@{[join(',', @values)]})";
                 }
             }
-            $git->error($PKG, "issue $key has no fixVersion matching '$version', which is required for commits affecting '$ref'");
-            ++$errors;
-            next KEY;
+            push @jqls, join(' AND ', @deprecated) if @deprecated;
         }
 
-        if ($by_assignee) {
-            my $user = $git->authenticated_user()
-                or $git->error($PKG, "cannot grok the authenticated user")
-                    and ++$errors
-                        and next KEY;
+        my $match_keys = "key IN (@{[join(',', @keys)]})";
+        my $cited_set  = Set::Scalar->new(@keys);
 
-            if (my $assignee = $issue->{fields}{assignee}) {
-                my $name = $assignee->{name};
-                $user eq $name
-                    or $git->error($PKG, "issue $key should be assigned to '$user', not '$name'")
-                        and ++$errors
-                            and next KEY;
-            } else {
-                $git->error($PKG, "issue $key should be assigned to '$user', but it's unassigned");
+        # Conjunct $match_keys with each JQL expression to match only the
+        # cited issues.
+        @jqls = map {"$match_keys AND $_"} @jqls;
+
+        # If there is no JQL expression used to restrict the search we
+        # inject an expression to search for the cited issues.
+        @jqls = ($match_keys) unless @jqls;
+
+        foreach my $jql (@jqls) {
+            my $issues = _jql_query($git, $jql);
+
+            @issues{keys %$issues} = values %$issues; # cache all matched issues
+
+            my $matched_set = Set::Scalar->new(keys %$issues);
+            if (my $missed_set = $cited_set - $matched_set) {
+                $git->error($PKG, "the JIRA issue(s) @{[$missed_set]} do(es) not match the expression '$jql'");
                 ++$errors;
-                next KEY;
+            }
+        }
+    }
+
+    ################
+    # Non-JQL checks
+    {
+        my $unresolved  = $git->get_config($CFG => 'unresolved');
+        my $by_assignee = $git->get_config($CFG => 'by-assignee');
+        my @versions;
+        foreach ($git->get_config($CFG => 'fixversion')) {
+            my ($branch, $version) = split ' ', $_, 2;
+            my $last_paren_match;
+            if ($branch =~ /^\^/) {
+                next unless $ref =~ qr/$branch/;
+                $last_paren_match = $+;
+            } else {
+                next unless $ref eq $branch;
+            }
+            if ($version =~ /^\^/) {
+                $version =~ s/\$\+/\Q$last_paren_match\E/g if defined $last_paren_match;
+                push @versions, qr/$version/;
+            } else {
+                $version =~ s/\$\+/$last_paren_match/g if defined $last_paren_match;
+                push @versions, $version;
             }
         }
 
-        push @issues, $issue;
+      ISSUE:
+        while (my ($key, $issue) = each %issues) {
+            if ($unresolved && defined $issue->{fields}{resolution}) {
+                $git->error($PKG, "issue $key cannot be used because it is already resolved");
+                ++$errors;
+                next ISSUE;
+            }
+
+          VERSION:
+            foreach my $version (@versions) {
+                foreach my $fixversion (@{$issue->{fields}{fixVersions}}) {
+                    if (ref $version) {
+                        next VERSION if $fixversion->{name} =~ $version;
+                    } else {
+                        next VERSION if $fixversion->{name} eq $version;
+                    }
+                }
+                $git->error($PKG, "issue $key has no fixVersion matching '$version', which is required for commits affecting '$ref'");
+                ++$errors;
+                next ISSUE;
+            }
+
+            if ($by_assignee) {
+                my $user = $git->authenticated_user()
+                    or $git->error($PKG, "cannot grok the authenticated user")
+                    and ++$errors
+                    and next ISSUE;
+
+                if (my $assignee = $issue->{fields}{assignee}) {
+                    my $name = $assignee->{name};
+                    $user eq $name
+                        or $git->error($PKG, "issue $key should be assigned to '$user', not '$name'")
+                        and ++$errors
+                        and next KEY;
+                } else {
+                    $git->error($PKG, "issue $key should be assigned to '$user', but it's unassigned");
+                    ++$errors;
+                    next KEY;
+                }
+            }
+        }
     }
+
+    #############
+    # Code checks
 
     foreach my $code (check_codes($git)) {
         if (my $jira = _jira($git)) {
-            my $ok = eval { $code->($git, $commit, $jira, @issues) };
+            my $ok = eval { $code->($git, $commit, $jira, values %issues) };
             if (defined $ok) {
                 ++$errors unless $ok;
             } elsif (length $@) {
@@ -279,7 +305,11 @@ sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
 sub check_commit_msg {
     my ($git, $commit, $ref) = @_;
 
-    return _check_jira_keys($git, $commit, $ref, uniq(grok_msg_jiras($git, $commit->{body})));
+    if ($commit->parent() > 1 && $git->get_config($CFG => 'skip-merges')) {
+        return 1;
+    } else {
+        return _check_jira_keys($git, $commit, $ref, uniq(grok_msg_jiras($git, $commit->message)));
+    }
 }
 
 sub check_patchset {
@@ -287,7 +317,7 @@ sub check_patchset {
 
     _setup_config($git);
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     my $sha1   = $opts->{'--commit'};
     my $commit = $git->get_commit($sha1);
@@ -299,7 +329,7 @@ sub check_patchset {
     $branch = "refs/heads/$branch"
         unless $branch =~ m:^refs/:;
 
-    return 1 unless is_ref_enabled($branch, $git->get_config($CFG => 'ref'));
+    return 1 unless $git->is_ref_enabled($branch, $git->get_config($CFG => 'ref'));
 
     return check_commit_msg($git, $commit, $branch);
 }
@@ -310,7 +340,7 @@ sub check_message_file {
     _setup_config($git);
 
     my $current_branch = $git->get_current_branch();
-    return 1 unless is_ref_enabled($current_branch, $git->get_config($CFG => 'ref'));
+    return 1 unless $git->is_ref_enabled($current_branch, $git->get_config($CFG => 'ref'));
 
     my $msg = eval { path($commit_msg_file)->slurp };
     defined $msg
@@ -320,17 +350,21 @@ sub check_message_file {
     # Remove comment lines from the message file contents.
     $msg =~ s/^#[^\n]*\n//mgs;
 
-    return check_commit_msg(
-        $git,
-        { body => $msg }, # fake a commit hash to simplify check_commit_msg
-        $current_branch,
+    # Construct a fake commit object to pass to the check_commit_msg
+    my $commit = Git::Repository::Log->new(
+        commit    => '<new>',
+        author    => 'Fake Author <author@example.net> 1234567890 -0300',
+        committer => 'Fake Committer <committer@example.net> 1234567890 -0300',
+        message   => $msg,
     );
+
+    return check_commit_msg($git, $commit, $current_branch);
 }
 
 sub check_ref {
     my ($git, $ref) = @_;
 
-    return 1 unless is_ref_enabled($ref, $git->get_config($CFG => 'ref'));
+    return 1 unless $git->is_ref_enabled($ref, $git->get_config($CFG => 'ref'));
 
     my $errors = 0;
 
@@ -339,8 +373,7 @@ sub check_ref {
             or ++$errors;
     }
 
-    # Disconnect from JIRA
-    $git->clean_cache($PKG);
+    _disconnect_jira($git);
 
     return $errors == 0;
 }
@@ -351,7 +384,7 @@ sub check_affected_refs {
 
     _setup_config($git);
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     my $errors = 0;
 
@@ -360,8 +393,7 @@ sub check_affected_refs {
             or ++$errors;
     }
 
-    # Disconnect from JIRA
-    $git->clean_cache($PKG);
+    _disconnect_jira($git);
 
     return $errors == 0;
 }
@@ -369,16 +401,16 @@ sub check_affected_refs {
 sub notify_commit_msg {
     my ($git, $commit, $ref, $visibility) = @_;
 
-    my @keys = uniq(grok_msg_jiras($git, $commit->{body}));
+    my @keys = uniq(grok_msg_jiras($git, $commit->message));
 
     return 0 unless @keys;
 
     my $jira = _jira($git) or return 1;
 
-    my $show = $git->command(show => '--stat', $commit->{commit});
+    my $show = $git->run(show => '--stat', $commit->commit);
 
     my %comment = (
-        body => <<EOF,
+        body => <<"EOF",
 [$PKG] commit refers to this issue:
 
 {noformat}
@@ -402,7 +434,7 @@ EOF
 sub notify_ref {
     my ($git, $ref, $visibility) = @_;
 
-    return 1 unless is_ref_enabled($ref, $git->get_config($CFG => 'ref'));
+    return 1 unless $git->is_ref_enabled($ref, $git->get_config($CFG => 'ref'));
 
     my $errors = 0;
 
@@ -440,8 +472,7 @@ sub notify_affected_refs {
         $errors += notify_ref($git, $ref, $visibility);
     }
 
-    # Disconnect from JIRA
-    $git->clean_cache($PKG);
+    _disconnect_jira($git);
 
     return $errors == 0;
 }
@@ -468,14 +499,14 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =head1 DESCRIPTION
 
-This Git::Hooks plugin hooks itself to the hooks below to guarantee
-that every commit message cites at least one valid JIRA issue key in
-its log message, so that you can be certain that every change has a
-proper change request (a.k.a. ticket) open.
+This L<Git::Hooks> plugin hooks itself to the hooks below to guarantee that
+every commit message cites at least one valid JIRA issue key in its log
+message, so that you can be certain that every change has a proper change
+request (a.k.a. ticket) open.
 
 =over
 
@@ -524,12 +555,11 @@ option:
 
     git config --add githooks.plugin CheckJira
 
-=for Pod::Coverage check_codes check_commit_msg check_ref notify_commit_msg notify_ref get_issue grok_msg_jiras
+=for Pod::Coverage check_codes check_commit_msg check_ref notify_commit_msg notify_ref grok_msg_jiras check_affected_refs check_message_file check_patchset notify_affected_refs
 
 =head1 NAME
 
-CheckJira - Git::Hooks plugin which requires citation of JIRA
-issues in commit messages.
+CheckJira - Git::Hooks plugin to implement JIRA checks
 
 =head1 CONFIGURATION
 
@@ -607,19 +637,43 @@ Wikimedia.
 =back
 
 This is a multi-valued option. You may specify it more than once. All
-regexes are tried and JIRA keys are looked for in all of them. This
-allows you to more easily accomodate more than one way of specifying
-JIRA keys if you wish.
+regexes are tried and JIRA keys are looked for in all of them. This allows
+you to more easily accommodate more than one way of specifying JIRA keys if
+you wish.
 
-=head2 githooks.checkjira.project KEY
+=head2 githooks.checkjira.jql JQL
 
-By default, the committer can reference any JIRA issue in the commit
-log. You can restrict the allowed keys to a set of JIRA projects by
-specifying a JIRA project key to this option. You can allow more than one
-project by specifying this option multiple times, once per project key.
+By default, any cited issue must exist on the server and be unresolved. You
+can specify other restrictions (and even allow for resolved issues) by
+specifying a L<JQL
+expression|https://confluence.atlassian.com/jirasoftwarecloud/advanced-searching-764478330.html>
+which must match all cited issues. For example, you may want to:
 
-If you set this option, then any cited JIRA issue that doesn't belong to one
-of the specified projects causes an error.
+=over
+
+=item * Allow for resolved issues
+
+  [githooks "checkjira"]
+    jql = resolution IS EMPTY OR resolution IS NOT EMPTY
+
+=item * Require specific projects, issuetypes, and statuses
+
+  [githooks "checkjira"]
+    jql = project IN (ABC, UTF, GIT) AND issuetype IN (Bug, Story) AND status IN ("In progress", "In testing")
+
+=back
+
+=head2 githooks.checkjira.ref-jql REF JQL
+
+You may impose restrictions on specific branches (or, more broadly, any
+reference) by mentioning them before the JQL expression. REF can be
+specified as a complete ref name (e.g. "refs/heads/master") or by a regular
+expression starting with a caret (C<^>), which is kept as part of the regexp
+(e.g. "^refs/heads/(master|fix)"). For instance:
+
+  [githooks "checkjira"]
+    jql = refs/heads/master fixVersion = future
+    jql = ^refs/heads/release/ fixVersion IN releasedVersions()
 
 =head2 githooks.checkjira.require [01]
 
@@ -631,17 +685,6 @@ make the reference optional by setting this option to 0.
 By default, every issue referenced must be unresolved, i.e., it must
 not have a resolution. You can relax this requirement by setting this
 option to 0.
-
-=head2 githooks.checkjira.status STATUSNAME
-
-By default, it doesn't matter in which status the JIRA issues are. By
-setting this multi-valued option you can restrict the valid statuses for the
-issues.
-
-=head2 githooks.checkjira.issuetype ISSUETYPENAME
-
-By default, it doesn't matter what type of JIRA issues are cited. By setting
-this multi-valued option you can restrict the valid issue types.
 
 =head2 githooks.checkjira.fixversion BRANCH FIXVERSION
 
@@ -676,7 +719,7 @@ So, suppose you have this configuration:
 
 Then, commits affecting the C<master> branch must cite issues assigned to
 the C<future> version. Also, commits affecting any branch which name begins
-with a version number (e.g. C<1.0.3>) be assinged to the corresponding JIRA
+with a version number (e.g. C<1.0.3>) be assigned to the corresponding JIRA
 version (e.g. C<1.0>).
 
 =head2 githooks.checkjira.by-assignee [01]
@@ -728,8 +771,9 @@ issues being cited by the commit's message.
 
 =back
 
-The subroutine should return a boolean value indicating success. Any
-errors should be produced by invoking the B<Git::More::error> method.
+The subroutine should return a boolean value indicating success. Any errors
+should be produced by invoking the
+B<Git::Repository::Plugin::GitHooks::error> method.
 
 If the subroutine returns undef it's considered to have succeeded.
 
@@ -741,7 +785,7 @@ to have failed and a proper message is produced to the user.
 If this option is set and the C<post-receive> hook is enabled, for every
 pushed commit, every cited JIRA issue receives a comment showing the result
 of the C<git show --stat COMMIT> command. This is meant to notify the issue
-assignee of commits refering to the issue.
+assignee of commits referring to the issue.
 
 Note that the user with which C<Git::Hooks> authenticates to JIRA must have
 permission to add comments to the issues or an error will be
@@ -767,38 +811,52 @@ In this case, the visibility isn't restricted at all.
 
 =back
 
-=head1 EXPORTS
+=head2 githooks.checkjira.skip-merges [01]
 
-This module exports two routines that can be used directly without
-using all of Git::Hooks infrastructure.
+By default, all commits are checked. You can exempt merge commits from being
+checked by setting this option to 0.
 
-=head2 check_affected_refs GIT
+=head2 githooks.checkjira.project KEY
 
-This is the routine used to implement the C<update> and the
-C<pre-receive> hooks. It needs a C<Git::More> object.
+This option is B<DEPRECATED>. Please, use a JQL expression such the
+following to restrict by project key:
 
-=head2 check_message_file GIT, MSGFILE
+  project IN (ABC, GIT)
 
-This is the routine used to implement the C<commit-msg> hook. It needs
-a C<Git::More> object and the name of a file containing the commit
-message.
+By default, the committer can reference any JIRA issue in the commit
+log. You can restrict the allowed keys to a set of JIRA projects by
+specifying a JIRA project key to this option. You can allow more than one
+project by specifying this option multiple times, once per project key.
 
-=head2 check_patchset GIT, HASH
+If you set this option, then any cited JIRA issue that doesn't belong to one
+of the specified projects causes an error.
 
-This is the routine used to implement the C<patchset-created> Gerrit
-hook. It needs a C<Git::More> object and the hash containing the
-arguments passed to the hook by Gerrit.
+=head2 githooks.checkjira.status STATUSNAME
 
-=head2 notify_affected_refs GIT
+This option is B<DEPRECATED>. Please, use a JQL expression such the
+following to restrict by status:
 
-This is the routine used to implement the C<post-receive> hook. It needs a
-C<Git::More> object.
+  status IN (Open, "In Progress")
+
+By default, it doesn't matter in which status the JIRA issues are. By
+setting this multi-valued option you can restrict the valid statuses for the
+issues.
+
+=head2 githooks.checkjira.issuetype ISSUETYPENAME
+
+This option is B<DEPRECATED>. Please, use a JQL expression such the
+following to restrict by issue type:
+
+  issuetype IN (Bug, Story)
+
+By default, it doesn't matter what type of JIRA issues are cited. By setting
+this multi-valued option you can restrict the valid issue types.
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<Git::More>
+=item * L<Git::Repository>
 
 =item * L<JIRA::REST>
 
@@ -810,11 +868,18 @@ C<Git::More> object.
 
 =over
 
-=item This script is heavily inspired (and sometimes derived) from Joyjit
-Nath's L<git-jira-hook|https://github.com/joyjit/git-jira-hook>.
+=item * L<git-jira-hook|https://github.com/joyjit/git-jira-hook>
 
-=item L<JIRA SOAP API deprecation
+This script is heavily inspired (and sometimes derived) from Joyjit Nath's hook.
+
+=item * L<JIRA SOAP API deprecation
 notice|https://developer.atlassian.com/display/JIRADEV/SOAP+and+XML-RPC+API+Deprecated+in+JIRA+6.0>
+
+=item * L<Yet Another Commit
+Checker|https://github.com/sford/yet-another-commit-checker>
+
+This Bitbucket plugin implements some nice checks with JIRA, from which we
+stole some ideas.
 
 =back
 

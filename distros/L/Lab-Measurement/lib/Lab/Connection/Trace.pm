@@ -1,5 +1,5 @@
 package Lab::Connection::Trace;
-$Lab::Connection::Trace::VERSION = '3.550';
+$Lab::Connection::Trace::VERSION = '3.552';
 use 5.010;
 use warnings;
 use strict;

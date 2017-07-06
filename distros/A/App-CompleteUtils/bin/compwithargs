@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2016-11-04'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2017-07-05'; # DATE
+our $VERSION = '0.15'; # VERSION
 
 # FRAGMENT id=shcompgen-hint command=compwithargs
 
@@ -95,7 +95,7 @@ compwithargs - Show completion from words specified in command-line arguments
 
 =head1 VERSION
 
-This document describes version 0.13 of compwithargs (from Perl distribution App-CompleteUtils), released on 2016-11-04.
+This document describes version 0.15 of compwithargs (from Perl distribution App-CompleteUtils), released on 2017-07-05.
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

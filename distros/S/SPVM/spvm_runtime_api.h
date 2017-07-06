@@ -1,338 +1,81 @@
-#ifndef SPVM_RUNTIME_API_API_H
-#define SPVM_RUNTIME_API_API_H
-
-#include <stdint.h>
-#include <assert.h>
-#include <string.h>
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
+#ifndef SPVM_RUNTIME_API_H
+#define SPVM_RUNTIME_API_H
 
 #include "spvm_base.h"
-#include "spvm_runtime.h"
-#include "spvm_runtime_api.h"
-#include "spvm_runtime_allocator.h"
 #include "spvm_api.h"
 
-static inline int64_t SPVM_RUNTIME_API_calcurate_data_byte_size(SPVM_RUNTIME* runtime, SPVM_DATA* data) {
-  
-  int64_t byte_size;
-  
-  // Reference is string
-  if (data->type == SPVM_DATA_C_TYPE_ARRAY) {
-    SPVM_DATA_ARRAY* data_array = (SPVM_DATA_ARRAY*)data;
-    byte_size = SPVM_DATA_C_HEADER_BYTE_SIZE + data_array->length * SPVM_API_get_array_value_size(runtime->env, data_array->value_type);
-  }
-  // Reference is object
-  else if (data->type == SPVM_DATA_C_TYPE_OBJECT) {
-    SPVM_DATA_OBJECT* data_object = (SPVM_DATA_OBJECT*)data;
-    SPVM_CONSTANT_POOL_PACKAGE constant_pool_package;
-    memcpy(&constant_pool_package, &runtime->env->constant_pool[data_object->package_constant_pool_index], sizeof(SPVM_CONSTANT_POOL_PACKAGE));
-    byte_size = SPVM_DATA_C_HEADER_BYTE_SIZE + sizeof(SPVM_VALUE) * constant_pool_package.fields_length;
-  }
-  else {
-    assert(0);
-  }
-  
-  return byte_size;
-}
+// Array functions
+int32_t SPVM_RUNTIME_API_get_array_length(SPVM_API* api, SPVM_ARRAY_OBJECT* array_object);
+int8_t* SPVM_RUNTIME_API_get_byte_array_elements(SPVM_API* api, SPVM_ARRAY_OBJECT* array_object);
+int16_t* SPVM_RUNTIME_API_get_short_array_elements(SPVM_API* api, SPVM_ARRAY_OBJECT* array_object);
+int32_t* SPVM_RUNTIME_API_get_int_array_elements(SPVM_API* api, SPVM_ARRAY_OBJECT* array_object);
+int64_t* SPVM_RUNTIME_API_get_long_array_elements(SPVM_API* api, SPVM_ARRAY_OBJECT* array_object);
+float* SPVM_RUNTIME_API_get_float_array_elements(SPVM_API* api, SPVM_ARRAY_OBJECT* array_object);
+double* SPVM_RUNTIME_API_get_double_array_elements(SPVM_API* api, SPVM_ARRAY_OBJECT* array_object);
+SPVM_BASE_OBJECT** SPVM_RUNTIME_API_get_object_array_elements(SPVM_API* api, SPVM_ARRAY_OBJECT* array_object);
 
-static inline SPVM_DATA_ARRAY* SPVM_RUNTIME_API_create_data_array_byte(SPVM_RUNTIME* runtime, int32_t length) {
-  (void)runtime;
-  
-  SPVM_RUNTIME_ALLOCATOR* allocator = runtime->allocator;
-  
-  // Allocate array
-  int32_t data_array_byte_size = SPVM_DATA_C_HEADER_BYTE_SIZE + sizeof(int8_t) * length;
-  SPVM_DATA_ARRAY* data_array = SPVM_RUNTIME_ALLOCATOR_malloc(runtime, allocator, data_array_byte_size);
-  
-  // Fatal memory allocation error
-  if (!data_array) {
-    fprintf(stderr, "Failed to allocate memory(create_data_array_from_pv)");
-    abort();
-  }
-  
-  // Set type
-  data_array->type = SPVM_DATA_C_TYPE_ARRAY;
-  
-  // Set sub type
-  data_array->value_type = SPVM_DATA_ARRAY_C_VALUE_TYPE_BYTE;
-  
-  // Set reference count
-  data_array->ref_count = 0;
-  
-  // Set array length
-  data_array->length = length;
-  
-  assert(data_array_byte_size == SPVM_RUNTIME_API_calcurate_data_byte_size(runtime, (SPVM_DATA*)data_array));
-  
-  return data_array;
-}
+// Object functions
+int32_t SPVM_RUNTIME_API_get_field_index(SPVM_API* api, SPVM_OBJECT* object, const char* name);
+int8_t SPVM_RUNTIME_API_get_byte_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index);
+int16_t SPVM_RUNTIME_API_get_short_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index);
+int32_t SPVM_RUNTIME_API_get_int_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index);
+int64_t SPVM_RUNTIME_API_get_long_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index);
+float SPVM_RUNTIME_API_get_float_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index);
+double SPVM_RUNTIME_API_get_double_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index);
+SPVM_BASE_OBJECT* SPVM_RUNTIME_API_get_object_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index);
+void SPVM_RUNTIME_API_set_byte_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index, int8_t value);
+void SPVM_RUNTIME_API_set_short_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index, int16_t value);
+void SPVM_RUNTIME_API_set_int_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index, int32_t value);
+void SPVM_RUNTIME_API_set_long_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index, int64_t value);
+void SPVM_RUNTIME_API_set_float_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index, float value);
+void SPVM_RUNTIME_API_set_double_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index, double value);
+void SPVM_RUNTIME_API_set_object_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_index, SPVM_BASE_OBJECT* value);
 
-static inline SPVM_DATA_ARRAY* SPVM_RUNTIME_API_create_data_array_byte_from_pv(SPVM_RUNTIME* runtime, const char* pv) {
-  (void)runtime;
-  
-  int32_t length = strlen(pv);
-  SPVM_DATA_ARRAY* data_array = SPVM_RUNTIME_API_create_data_array_byte(runtime, length);
-  
-  // Copy string
-  memcpy((void*)((intptr_t)data_array + SPVM_DATA_C_HEADER_BYTE_SIZE), pv, length);
-  
-  return data_array;
-}
+// Call ubroutine functions
+void SPVM_RUNTIME_API_push_var_byte(SPVM_API* api, int8_t value);
+void SPVM_RUNTIME_API_push_var_short(SPVM_API* api, int16_t value);
+void SPVM_RUNTIME_API_push_var_int(SPVM_API* api, int32_t value);
+void SPVM_RUNTIME_API_push_var_long(SPVM_API* api, int64_t value);
+void SPVM_RUNTIME_API_push_var_float(SPVM_API* api, float value);
+void SPVM_RUNTIME_API_push_var_double(SPVM_API* api, double value);
+void SPVM_RUNTIME_API_push_var_object(SPVM_API* api, SPVM_BASE_OBJECT* value);
+int8_t SPVM_RUNTIME_API_pop_retval_byte(SPVM_API* api);
+int16_t SPVM_RUNTIME_API_pop_retval_short(SPVM_API* api);
+int32_t SPVM_RUNTIME_API_pop_retval_int(SPVM_API* api);
+int64_t SPVM_RUNTIME_API_pop_retval_long(SPVM_API* api);
+float SPVM_RUNTIME_API_pop_retval_float(SPVM_API* api);
+double SPVM_RUNTIME_API_pop_retval_double(SPVM_API* api);
+void* SPVM_RUNTIME_API_pop_retval_object(SPVM_API* api);
 
-static inline void SPVM_RUNTIME_API_dec_ref_count(SPVM_RUNTIME* runtime, SPVM_DATA* data) {
-  (void)runtime;
-  
-  if (data != NULL) {
-    
-    assert(data->ref_count > 0);
-    
-    // Decrement reference count
-    data->ref_count -= 1;
-    
-    // If reference count is zero, free address.
-    if (data->ref_count == 0) {
-      
-      if (data->type == SPVM_DATA_C_TYPE_ARRAY) {
-        SPVM_DATA_ARRAY* data_array = (SPVM_DATA_ARRAY*)data;
-        if (data_array->value_type == SPVM_DATA_ARRAY_C_VALUE_TYPE_REF) {
-          
-          // Array length
-          int32_t length = data_array->length;
-          
-          for (int32_t i = 0; i < length; i++) {
-            SPVM_DATA* data_element = *(SPVM_DATA**)((intptr_t)data_array + SPVM_DATA_C_HEADER_BYTE_SIZE + sizeof(void*) * i);
-            SPVM_RUNTIME_API_dec_ref_count(runtime, data_element);
-          }
-        }
-        SPVM_RUNTIME_ALLOCATOR_free_data(runtime, runtime->allocator, data);
-      }
-      // Reference is object
-      else if (data->type == SPVM_DATA_C_TYPE_OBJECT) {
-        SPVM_DATA_OBJECT* data_object = (SPVM_DATA_OBJECT*)data;
-        
-        int32_t package_constant_pool_index = data_object->package_constant_pool_index;
-        SPVM_CONSTANT_POOL_PACKAGE constant_pool_package;
-        memcpy(&constant_pool_package, &runtime->env->constant_pool[package_constant_pool_index], sizeof(SPVM_CONSTANT_POOL_PACKAGE));
-        
-        int32_t ref_fields_length = constant_pool_package.ref_fields_length;
-        
-        for (int i = 0; i < ref_fields_length; i++) {
-          SPVM_DATA* data_field = *(SPVM_DATA**)((intptr_t)data_object + SPVM_DATA_C_HEADER_BYTE_SIZE + sizeof(void*) * i);
-          SPVM_RUNTIME_API_dec_ref_count(runtime, data_field);
-        }
-        
-        SPVM_RUNTIME_ALLOCATOR_free_data(runtime, runtime->allocator, (SPVM_DATA*)data_object);
-      }
-    }
-  }
-}
+// Functions used in subroutine
+int8_t SPVM_RUNTIME_API_get_var_byte(SPVM_API* api, int32_t index);
+int16_t SPVM_RUNTIME_API_get_var_short(SPVM_API* api, int32_t index);
+int32_t SPVM_RUNTIME_API_get_var_int(SPVM_API* api, int32_t index);
+int64_t SPVM_RUNTIME_API_get_var_long(SPVM_API* api, int32_t index);
+float SPVM_RUNTIME_API_get_var_float(SPVM_API* api, int32_t index);
+double SPVM_RUNTIME_API_get_var_double(SPVM_API* api, int32_t index);
+void* SPVM_RUNTIME_API_get_var_object(SPVM_API* api, int32_t index);
+void SPVM_RUNTIME_API_push_retval_byte(SPVM_API* api, int8_t value);
+void SPVM_RUNTIME_API_push_retval_short(SPVM_API* api, int16_t value);
+void SPVM_RUNTIME_API_push_retval_int(SPVM_API* api, int32_t value);
+void SPVM_RUNTIME_API_push_retval_long(SPVM_API* api, int64_t value);
+void SPVM_RUNTIME_API_push_retval_float(SPVM_API* api, float value);
+void SPVM_RUNTIME_API_push_retval_double(SPVM_API* api, double value);
+void SPVM_RUNTIME_API_push_retval_object(SPVM_API* api, SPVM_BASE_OBJECT* value);
 
-static inline void SPVM_RUNTIME_API_inc_ref_count(SPVM_RUNTIME* runtime, SPVM_DATA* data) {
-  (void)runtime;
-  
-  if (data != NULL) {
-    assert(data->ref_count >= 0);
-    // Increment reference count
-    data->ref_count += 1;
-  }
-}
+// Internal functions
+int64_t SPVM_RUNTIME_API_calcurate_base_object_byte_size(SPVM_API* api, SPVM_BASE_OBJECT* base_object);
+SPVM_ARRAY_OBJECT* SPVM_RUNTIME_API_create_array_object_byte(SPVM_API* api, int32_t length);
+SPVM_ARRAY_OBJECT* SPVM_RUNTIME_API_create_array_object_byte_from_pv(SPVM_API* api, const char* pv);
+int32_t SPVM_RUNTIME_API_get_array_value_size(SPVM_API* api, int32_t type);
+SPVM_VALUE* SPVM_RUNTIME_API_get_fields(SPVM_API* api, SPVM_OBJECT* object);
+int32_t SPVM_RUNTIME_API_get_fields_length(SPVM_API* api, SPVM_OBJECT* object);
+int32_t SPVM_RUNTIME_API_dump_field_names(SPVM_API* api, SPVM_OBJECT* object);
+void SPVM_RUNTIME_API_dec_ref_count(SPVM_API* api, SPVM_BASE_OBJECT* base_object);
+void SPVM_RUNTIME_API_inc_ref_count(SPVM_API* api, SPVM_BASE_OBJECT* base_object);
+int32_t SPVM_RUNTIME_API_get_ref_count(SPVM_API* api, SPVM_BASE_OBJECT* base_object);
 
-static inline void SPVM_RUNTIME_API_push_return_value_byte(SPVM_RUNTIME* runtime, int8_t value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].byte_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_return_value_short(SPVM_RUNTIME* runtime, int16_t value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].short_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_return_value_int(SPVM_RUNTIME* runtime, int32_t value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].int_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_return_value_long(SPVM_RUNTIME* runtime, int64_t value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].long_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_return_value_float(SPVM_RUNTIME* runtime, float value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].float_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_return_value_double(SPVM_RUNTIME* runtime, double value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].double_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_ret(SPVM_RUNTIME* runtime, void* value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].address_value = value;
-}
-
-static inline int8_t SPVM_RUNTIME_API_pop_return_value_byte(SPVM_RUNTIME* runtime) {
-  (void)runtime;
-  
-  int8_t ret = runtime->call_stack[runtime->operand_stack_top].byte_value;
-  runtime->operand_stack_top--;
-  return ret;
-}
-
-static inline int16_t SPVM_RUNTIME_API_pop_return_value_short(SPVM_RUNTIME* runtime) {
-  (void)runtime;
-  
-  int16_t ret = runtime->call_stack[runtime->operand_stack_top].short_value;
-  runtime->operand_stack_top--;
-  return ret;
-}
-
-static inline int32_t SPVM_RUNTIME_API_pop_return_value_int(SPVM_RUNTIME* runtime) {
-  (void)runtime;
-  
-  int32_t ret = runtime->call_stack[runtime->operand_stack_top].int_value;
-  runtime->operand_stack_top--;
-  return ret;
-}
-
-static inline int64_t SPVM_RUNTIME_API_pop_return_value_long(SPVM_RUNTIME* runtime) {
-  (void)runtime;
-
-  int64_t ret = runtime->call_stack[runtime->operand_stack_top].long_value;
-  runtime->operand_stack_top--;
-  return ret;
-}
-
-static inline float SPVM_RUNTIME_API_pop_return_value_float(SPVM_RUNTIME* runtime) {
-  (void)runtime;
-  
-  float ret = runtime->call_stack[runtime->operand_stack_top].float_value;
-  runtime->operand_stack_top--;
-  return ret;
-}
-
-static inline double SPVM_RUNTIME_API_pop_return_value_double(SPVM_RUNTIME* runtime) {
-  (void)runtime;
-  
-  double ret = runtime->call_stack[runtime->operand_stack_top].double_value;
-  runtime->operand_stack_top--;
-  return ret;
-}
-
-static inline void* SPVM_RUNTIME_API_pop_return_value_address(SPVM_RUNTIME* runtime) {
-  (void)runtime;
-  
-  void* ret = runtime->call_stack[runtime->operand_stack_top].address_value;
-  runtime->operand_stack_top--;
-  return ret;
-}
-
-static inline int8_t SPVM_RUNTIME_API_get_var_byte(SPVM_RUNTIME* runtime, int32_t index) {
-  (void)runtime;
-  
-  return runtime->call_stack[runtime->call_stack_base + (size_t)index].byte_value;
-}
-
-static inline int16_t SPVM_RUNTIME_API_get_var_short(SPVM_RUNTIME* runtime, int32_t index) {
-  (void)runtime;
-  
-  return runtime->call_stack[runtime->call_stack_base + (size_t)index].short_value;
-}
-
-static inline int32_t SPVM_RUNTIME_API_get_var_int(SPVM_RUNTIME* runtime, int32_t index) {
-  (void)runtime;
-  
-  return runtime->call_stack[runtime->call_stack_base + (size_t)index].int_value;
-}
-
-static inline int64_t SPVM_RUNTIME_API_get_var_long(SPVM_RUNTIME* runtime, int32_t index) {
-  (void)runtime;
-  
-  return runtime->call_stack[runtime->call_stack_base + (size_t)index].long_value;
-}
-
-static inline float SPVM_RUNTIME_API_get_var_float(SPVM_RUNTIME* runtime, int32_t index) {
-  (void)runtime;
-  
-  return runtime->call_stack[runtime->call_stack_base + (size_t)index].float_value;
-}
-
-static inline double SPVM_RUNTIME_API_get_var_double(SPVM_RUNTIME* runtime, int32_t index) {
-  (void)runtime;
-  
-  return runtime->call_stack[runtime->call_stack_base + (size_t)index].double_value;
-}
-
-static inline void* SPVM_RUNTIME_API_get_var_address(SPVM_RUNTIME* runtime, int32_t index) {
-  (void)runtime;
-  
-  return runtime->call_stack[runtime->call_stack_base + (size_t)index].address_value;
-}
-
-static inline void SPVM_RUNTIME_API_push_var_byte(SPVM_RUNTIME* runtime, int8_t value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].byte_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_var_short(SPVM_RUNTIME* runtime, int16_t value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].short_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_var_int(SPVM_RUNTIME* runtime, int32_t value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].int_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_var_long(SPVM_RUNTIME* runtime, int64_t value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].long_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_var_float(SPVM_RUNTIME* runtime, float value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].float_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_var_double(SPVM_RUNTIME* runtime, double value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].double_value = value;
-}
-
-static inline void SPVM_RUNTIME_API_push_var_address(SPVM_RUNTIME* runtime, void* value) {
-  (void)runtime;
-  
-  runtime->operand_stack_top++;
-  runtime->call_stack[runtime->operand_stack_top].address_value = value;
-}
+int32_t SPVM_RUNTIME_API_get_sub_index(SPVM_API* api, const char* name);
+int32_t SPVM_RUNTIME_API_get_package_index(SPVM_API* api, const char* name);
 
 #endif

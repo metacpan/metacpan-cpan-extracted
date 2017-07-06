@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Inlineable';
 
-our $VERSION = '1.13';
+our $VERSION = '1.16';
 
 has marc_path => (fix_arg => 1);
 
@@ -36,7 +36,7 @@ Remove (sub)fields in a MARC record
 
 =head1 METHODS
 
-=head2 marc_remove( MARC_PATH , [OPT1:VAL, OPT2: VAL])
+=head2 marc_remove(MARC_PATH)
 
 Delete the (sub)fields from the MARC record as indicated by the MARC_PATH.
 

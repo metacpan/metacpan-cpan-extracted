@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/plicease/dist-zilla-plugin-ourpkgversion/issues
   homepage: https://metacpan.org/dist/Dist-Zilla-Plugin-OurPkgVersion
   repository: git://github.com/plicease/dist-zilla-plugin-ourpkgversion.git
-version: '0.10'
+version: '0.11'
 x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Alexei Znamensky <russoz@cpan.org>'
@@ -53,3 +53,5 @@ x_contributors:
   - 'Graham Ollis <perl@wdlabs.com>'
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Ian Sealy <git@iansealy.com>'
+  - 'Stephan Loyd <stephanloyd9@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

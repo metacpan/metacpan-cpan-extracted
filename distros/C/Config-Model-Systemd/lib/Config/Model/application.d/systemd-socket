@@ -1,0 +1,3 @@
+model = Systemd::Socket
+require_config_file = 1
+support_info = https://github.com/dod38fr/config-model-systemd/issues

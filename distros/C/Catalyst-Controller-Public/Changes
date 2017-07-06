@@ -1,5 +1,8 @@
 # This file documents the revision history for Perl extension Catalyst::Controller::Public.
 
+0.004   28 June 2017
+  - Support chaining off a root chain action.
+
 0.003 - 01 May 2015
   - Fixed POD errors
 

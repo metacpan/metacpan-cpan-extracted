@@ -588,7 +588,7 @@ reset_system_fonts(void)
 	memset( &guts. windowFont, 0, sizeof( Font));
 	strcpy( guts. windowFont. name, DEFAULT_WIDGET_FONT);
 	guts. windowFont. size  = DEFAULT_WIDGET_FONT_SIZE;
-	guts. windowFont. width = guts. windowFont. height = C_NUMERIC_UNDEF;
+	guts. windowFont. undef. width = guts. windowFont. undef. height = 1;
 	apc_font_pick( nilHandle, &guts. windowFont, &guts. windowFont);
 
 	guts. ncmData. cbSize = sizeof( NONCLIENTMETRICS);
@@ -707,7 +707,7 @@ font_pp2font( char * presParam, Font * f)
 			p[ i] = 0;
 		}
 	}
-	f-> width = f-> height = C_NUMERIC_UNDEF;
+	f-> undef. width = f-> undef. height = 1;
 	f-> direction = 0;
 }
 
@@ -1090,6 +1090,7 @@ fep2( ENUMLOGFONTEXW FAR *e, NEWTEXTMETRICEXW FAR *t, int type, Fep2 * f)
 	}
 	fm = ( PFont) malloc( sizeof( Font));
 	if ( !fm) return 1;
+	memset( fm, 0, sizeof(Font));
 	font_textmetric2font(( TEXTMETRICW*) &t-> ntmTm, fm, false);
 	if ( f-> hash) { /* multi-encoding format */
 		char ** enc = (char**) fm-> encoding;
@@ -1509,6 +1510,7 @@ hwnd_enter_paint( Handle self)
 	apc_gp_set_text_opaque( self, is_apt( aptTextOpaque));
 	apc_gp_set_text_out_baseline( self, is_apt( aptTextOutBaseline));
 	apc_gp_set_fill_winding( self, sys fillWinding);
+	apc_gp_set_fill_pattern_offset( self, sys fillPatternOffset);
 	apc_gp_set_line_width( self, sys lineWidth);
 	apc_gp_set_line_end( self, sys lineEnd);
 	apc_gp_set_line_join( self, sys lineJoin);
@@ -1521,6 +1523,7 @@ hwnd_enter_paint( Handle self)
 	apc_gp_set_fill_pattern( self, sys fillPattern2);
 	sys psd-> font           = var font;
 	sys psd-> fillWinding    = sys fillWinding;
+	sys psd-> fillPatternOffset = sys fillPatternOffset;
 	sys psd-> lineWidth      = sys lineWidth;
 	sys psd-> lineEnd        = sys lineEnd;
 	sys psd-> lineJoin       = sys lineJoin;
@@ -1559,6 +1562,7 @@ hwnd_leave_paint( Handle self)
 	if ( sys psd != nil) {
 		var font           = sys psd-> font;
 		sys fillWinding    = sys psd-> fillWinding;
+		sys fillPatternOffset  = sys psd-> fillPatternOffset;
 		sys lineWidth      = sys psd-> lineWidth;
 		sys lineEnd        = sys psd-> lineEnd;
 		sys lineJoin       = sys psd-> lineJoin;

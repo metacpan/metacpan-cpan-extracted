@@ -13,6 +13,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More'       => 0,
         'Keyword::Declare' => '0.001',
+        'experimentals'    => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Perl6-Controls-*' },

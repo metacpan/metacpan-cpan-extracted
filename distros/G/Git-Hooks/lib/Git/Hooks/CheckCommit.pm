@@ -2,14 +2,14 @@
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '1.16.0';
+$Git::Hooks::CheckCommit::VERSION = '2.0.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Error ':try';
-use Git::Hooks qw/:DEFAULT :utils/;
-use Git::More::Message;
+use Try::Tiny;
+use Git::Hooks;
+use Git::Repository::Log;
 use List::MoreUtils qw/any none/;
 
 my $PKG = __PACKAGE__;
@@ -51,15 +51,16 @@ sub match_errors {
         foreach my $info (qw/name email/) {
             if (my $checks = $cache->{identity}{$info}) {
                 foreach my $who (qw/author committer/) {
-                    my $data = $commit->{"${who}_${info}"};
+                    my $who_info = "${who}_${info}";
+                    my $data     = $commit->$who_info;
 
                     unless (any  { $data =~ $_ } @{$checks->{''}}) {
-                        $git->error($PKG, "commit $commit->{commit} $who $info ($data) does not match any positive githooks.checkcommit.$info option");
+                        $git->error($PKG, "commit @{[$commit->commit]} $who $info ($data) does not match any positive githooks.checkcommit.$info option");
                         ++$errors;
                     }
 
                     unless (none { $data =~ $_ } @{$checks->{'!'}}) {
-                        $git->error($PKG, "commit $commit->{commit} $who $info ($data) matches some negative githooks.checkcommit.$info option");
+                        $git->error($PKG, "commit @{[$commit->commit]} $who $info ($data) matches some negative githooks.checkcommit.$info option");
                         ++$errors;
                     }
                 }
@@ -68,6 +69,21 @@ sub match_errors {
     }
 
     return $errors;
+}
+
+sub merge_errors {
+    my ($git, $commit) = @_;
+
+    if ($commit->parent() > 1) { # it's a merge commit
+        if (my @mergers = $git->get_config($CFG => 'merger')) {
+            if (none {$git->match_user($_)} @mergers) {
+                $git->error($PKG, "commit @{[$commit->commit]} is a merge but you (@{[$git->authenticated_user]}) are not allowed to do merges");
+                return 1;
+            }
+        }
+    }
+
+    return 0;
 }
 
 sub email_valid_errors {
@@ -97,10 +113,11 @@ sub email_valid_errors {
 
         if (my $ev = $cache->{email_valid}) {
             foreach my $who (qw/author committer/) {
-                my $email = $commit->{"${who}_email"};
+                my $who_email = "${who}_email";
+                my $email     = $commit->$who_email;
                 unless ($ev->address($email)) {
                     my $fail = $ev->details();
-                    $git->error($PKG, "commit $commit->{commit} $who email ($email) failed $fail check");
+                    $git->error($PKG, "commit @{[$commit->commit]} $who email ($email) failed $fail check");
                     ++$errors;
                 }
             }
@@ -116,21 +133,21 @@ sub _canonical_identity {
     my $cache = $git->cache($PKG);
 
     unless (exists $cache->{canonical}{$identity}) {
-        try {
-            my $canonical = $git->command(
-                '-c', "mailmap.file=$mailmap",
-                'check-mailmap',
-                $identity,
-            );
-
-            chomp($cache->{canonical}{$identity} = $canonical);
-        } otherwise {
-            $cache->{canonical}{$identity} = $identity;
-            $git->error($PKG, <<'EOS');
+        $cache->{canonical}{$identity} =
+            try {
+                chomp(my $canonical = $git->run(
+                    '-c', "mailmap.file=$mailmap",
+                    'check-mailmap',
+                    $identity,
+                ));
+                $canonical;
+            } catch {
+                $git->error($PKG, <<'EOS');
 The githooks.checkcommit.canonical option requires the git-check-mailmap
 command which isn't found. It's available since Git 1.8.4. You should either
 upgrade your Git or disable this option.
 EOS
+                $identity;
         };
     }
 
@@ -144,13 +161,15 @@ sub canonical_errors {
 
     if (my $mailmap = $git->get_config($CFG => 'canonical')) {
         foreach my $who (qw/author committer/) {
-            my $identity  = $commit->{"${who}_name"} . ' <' . $commit->{"${who}_email"} . '>';
+            my $who_name  = "${who}_name";
+            my $who_email = "${who}_email";
+            my $identity  = $commit->$who_name . ' <' . $commit->$who_email . '>';
             my $canonical = _canonical_identity($git, $mailmap, $identity);
 
             if ($identity ne $canonical) {
                 $git->error(
                     $PKG,
-                    "commit $commit->{commit} $who identity ($identity) isn't canonical ($canonical)",
+                    "commit @{[$commit->commit]} $who identity ($identity) isn't canonical ($canonical)",
                 );
                 ++$errors;
             }
@@ -168,32 +187,16 @@ sub signature_errors {
     my $signature = $git->get_config($CFG => 'signature');
 
     if (defined $signature && $signature ne 'nocheck') {
-        my $status;
-        {
-            local $/ = "\c@\cJ";
-            my ($pipe, $ctx) = $git->command_output_pipe(
-                'rev-list',
-                '--no-walk',
-                # See 'git help rev-list' to understand the --pretty argument
-                '--pretty=format:%G?',
-                '--encoding=UTF-8',
-                $commit,
-            );
-
-            my $header = <$pipe>;
-            chomp($status = <$pipe>);
-
-            $git->command_close_pipe($pipe, $ctx);
-        }
+        my $status = $git->run(qw/log -1 --format='%G?'/, $commit->commit);
 
         if ($status eq 'B') {
-            $git->error($PKG, "commit $commit->{commit} has a BAD signature");
+            $git->error($PKG, "commit @{[$commit->commit]} has a BAD signature");
             ++$errors;
-        } elsif ($signature ne 'optional' && $status eq 'N') {
-            $git->error($PKG, "commit $commit->{commit} has NO signature");
+        } elsif ($status eq 'N' && $signature ne 'optional') {
+            $git->error($PKG, "commit @{[$commit->commit]} has NO signature");
             ++$errors;
-        } elsif ($signature eq 'trusted' && $status eq 'U') {
-            $git->error($PKG, "commit $commit->{commit} has an UNTRUSTED signature");
+        } elsif ($status eq 'U' && $signature eq 'trusted') {
+            $git->error($PKG, "commit @{[$commit->commit]} has an UNTRUSTED signature");
             ++$errors;
         }
     }
@@ -264,6 +267,7 @@ sub commit_errors {
 
     return
         match_errors($git, $commit) +
+        merge_errors($git, $commit) +
         email_valid_errors($git, $commit) +
         canonical_errors($git, $commit) +
         signature_errors($git, $commit) +
@@ -275,7 +279,16 @@ sub check_ref {
 
     my $errors = 0;
 
-    foreach my $commit ($git->get_affected_ref_commits($ref)) {
+    my @commits = $git->get_affected_ref_commits($ref);
+
+    if (my $limit = $git->get_config($CFG => 'push-limit')) {
+        if (@commits > $limit) {
+            $git->error($PKG, "you're pushing @{[scalar @commits]} commits to $ref, more than our current limit of $limit");
+            ++$errors;
+        }
+    }
+
+    foreach my $commit (@commits) {
         $errors += commit_errors($git, $commit, $ref);
     }
 
@@ -287,13 +300,13 @@ sub check_pre_commit {
 
     _setup_config($git);
 
-    my $commit = {
-        commit          => '<new>',
-        author_name     => $ENV{GIT_AUTHOR_NAME},
-        author_email    => $ENV{GIT_AUTHOR_EMAIL},
-        committer_name  => $ENV{GIT_COMMITTER_NAME},
-        committer_email => $ENV{GIT_COMMITTER_EMAIL},
-    };
+    # Construct a fake commit object to pass to the error checking routines.
+    my $commit = Git::Repository::Log->new(
+        commit    => '<new>',
+        author    => "$ENV{GIT_AUTHOR_NAME} <$ENV{GIT_AUTHOR_EMAIL}> 1234567890 -0300",
+        committer => "$ENV{GIT_COMMITTER_NAME} <$ENV{GIT_COMMITTER_EMAIL}> 1234567890 -0300",
+        message   => "Fake\n",
+    );
 
     return 0 ==
         (match_errors($git, $commit) +
@@ -329,7 +342,7 @@ sub check_affected_refs {
 
     _setup_config($git);
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     my $errors = 0;
 
@@ -345,7 +358,7 @@ sub check_patchset {
 
     _setup_config($git);
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     my $sha1   = $opts->{'--commit'};
     my $commit = $git->get_commit($sha1);
@@ -376,12 +389,12 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =head1 DESCRIPTION
 
-This Git::Hooks plugin hooks itself to the hooks below to enforce
-commit policies.
+This L<Git::Hooks> plugin hooks itself to the hooks below to enforce commit
+policies.
 
 =over
 
@@ -430,11 +443,11 @@ option:
 
     git config --add githooks.plugin CheckCommit
 
-=for Pod::Coverage match_errors email_valid_errors canonical_errors identity_errors signature_errors spelling_errors pattern_errors subject_errors body_errors footer_errors commit_errors code_errors check_pre_commit check_post_commit check_ref check_affected_refs check_patchset
+=for Pod::Coverage match_errors merge_errors email_valid_errors canonical_errors identity_errors signature_errors spelling_errors pattern_errors subject_errors body_errors footer_errors commit_errors code_errors check_pre_commit check_post_commit check_ref check_affected_refs check_patchset
 
 =head1 NAME
 
-Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies.
+Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 CONFIGURATION
 
@@ -464,7 +477,7 @@ This check is performed by the C<pre-commit> local hook.
 
 =head2 githooks.checkcommit.email-valid [01]
 
-This option uses the L<Email::Valid> module' C<address> method to validade
+This option uses the L<Email::Valid> module' C<address> method to validate
 author and committer email addresses.
 
 These checks are performed by the C<pre-commit> local hook.
@@ -500,7 +513,7 @@ means addresses like: C<rjbs@[1.2.3.4]>. The default is true.
 
 =head2 githooks.checkcommit.canonical MAILMAP
 
-This option requires the use of cannonical names and emails for authors and
+This option requires the use of canonical names and emails for authors and
 committers, as configured in a F<MAILMAP> file and checked by the
 C<git-check-mailmap> command. Please, read that command's documentation to
 know how to configure a mailmap file for name and email canonicalization.
@@ -511,7 +524,8 @@ command. This means that if an unknown email is used it won't be considered
 an error.
 
 Note that the C<git-check-mailmap> command is available since Git
-1.8.4. Older Gits don't have it and Git::Hooks will complain accordingly.
+1.8.4. Older versions of Git don't have it and Git::Hooks will complain
+accordingly.
 
 Note that you should not have Git configured to use a default mailmap file,
 either by placing one named F<.mailmap> at the top level of the repository
@@ -552,6 +566,21 @@ signatures.
 
 This check is performed by the C<post-commit> local hook.
 
+=head2 githooks.checkcommit.merger WHO
+
+This multi-valued option restricts who can push commit merges to the
+repository. WHO may be specified as a username, a groupname, or a regex,
+like the C<githooks.admin> option (see L<Git::Hooks/CONFIGURATION>) so that
+only users matching WHO may push merge commits.
+
+=head2 githooks.checkcommit.push-limit N
+
+This limits the number of commits that may be pushed at once on top of any
+reference. Set it to 1 to force developers to squash their commits before
+pushing them. Or set it to a low number (such as 3) to deny long chains of
+commits to be pushed, which are usually made by Git newbies who don't know
+yet how to amend commits. ;-)
+
 =head2 githooks.checkcommit.check-code CODESPEC
 
 If the above checks aren't enough you can use this option to define a custom
@@ -572,7 +601,7 @@ The Git repository object used to grok information about the commit.
 =item * B<COMMIT>
 
 This is a hash representing a commit, as returned by the
-L<Git::More::get_commits> method.
+L<Git::Repository::Plugin::GitHooks::get_commits> method.
 
 =item * B<REF>
 
@@ -581,8 +610,9 @@ B<pre-receive> hooks. For the B<pre-commit> hook this argument is B<undef>.
 
 =back
 
-The subroutine should return a boolean value indicating success. Any
-errors should be produced by invoking the B<Git::More::error> method.
+The subroutine should return a boolean value indicating success. Any errors
+should be produced by invoking the
+B<Git::Repository::Plugin::GitHooks::error> method.
 
 If the subroutine returns undef it's considered to have succeeded.
 
@@ -593,7 +623,9 @@ to have failed and a proper message is produced to the user.
 
 =over
 
-=item * L<Email::Valid> Module used to check validity of email addresses.
+=item * L<Email::Valid>
+
+Module used to check validity of email addresses.
 
 =item * L<A Git Horror Story: Repository Integrity With Signed Commits|http://mikegerwitz.com/papers/git-horror-story>
 

@@ -38,11 +38,12 @@ sub enqueue {
   my $db = $self->pg->db;
   return $db->query(
     "insert into minion_jobs
-       (args, attempts, delayed, parents, priority, queue, task)
-     values (?, ?, (now() + (interval '1 second' * ?)), ?, ?, ?, ?)
+       (args, attempts, delayed, notes, parents, priority, queue, task)
+     values (?, ?, (now() + (interval '1 second' * ?)), ?, ?, ?, ?, ?)
      returning id", {json => $args}, $options->{attempts} // 1,
-    $options->{delay} // 0, $options->{parents} || [],
-    $options->{priority} // 0, $options->{queue} // 'default', $task
+    $options->{delay} // 0, {json => $options->{notes} || {}},
+    $options->{parents} || [], $options->{priority} // 0,
+    $options->{queue} // 'default', $task
   )->hash->{id};
 }
 
@@ -56,8 +57,8 @@ sub job_info {
          as children,
        extract(epoch from created) as created,
        extract(epoch from delayed) as delayed,
-       extract(epoch from finished) as finished, parents, priority, queue,
-       result, extract(epoch from retried) as retried, retries,
+       extract(epoch from finished) as finished, notes, parents, priority,
+       queue, result, extract(epoch from retried) as retried, retries,
        extract(epoch from started) as started, state, task, worker
      from minion_jobs as j where id = ?', shift
   )->expand->hash;
@@ -98,6 +99,14 @@ sub new {
   $pg->migrations->name('minion')->from_data;
 
   return $self;
+}
+
+sub note {
+  my ($self, $id, $key, $value) = @_;
+  return !!$self->pg->db->query(
+    'update minion_jobs set notes = jsonb_set(notes, ?, ?, true) where id = ?',
+    [$key], {json => $value}, $id
+  )->rows;
 }
 
 sub receive {
@@ -182,21 +191,19 @@ sub stats {
   my $self = shift;
 
   my $stats = $self->pg->db->query(
-    "select 'enqueued_jobs', case when is_called then last_value else 0 end
-     from minion_jobs_id_seq
-     union all
-     select state::text || '_jobs', count(*) from minion_jobs group by state
-     union all
-     select 'delayed_jobs', count(*) from minion_jobs
-     where (delayed > now() or parents != '{}') and state = 'inactive'
-     union all
-     select 'inactive_workers', count(*) from minion_workers
-     union all
-     select 'active_workers', count(distinct worker) from minion_jobs
-     where state = 'active'"
-  )->arrays->reduce(sub { $a->{$b->[0]} = $b->[1]; $a }, {});
+    "select count(*) filter (where state = 'inactive') as inactive_jobs,
+       count(*) filter (where state = 'active') as active_jobs,
+       count(*) filter (where state = 'failed') as failed_jobs,
+       count(*) filter (where state = 'finished') as finished_jobs,
+       count(*) filter (where state = 'inactive'
+         and (delayed > now() or parents != '{}')) as delayed_jobs,
+       count(distinct worker) filter (where state = 'active') as active_workers,
+       (select case when is_called then last_value else 0 end
+         from minion_jobs_id_seq) as enqueued_jobs,
+       (select count(*) from minion_workers) as inactive_workers
+     from minion_jobs"
+  )->hash;
   $stats->{inactive_workers} -= $stats->{active_workers};
-  $stats->{"${_}_jobs"} ||= 0 for qw(inactive active failed finished);
 
   return $stats;
 }
@@ -385,6 +392,12 @@ L<Minion/"backoff"> after the first attempt, defaults to C<1>.
 
 Delay job for this many seconds (from now), defaults to C<0>.
 
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
+
 =item parents
 
   parents => [$id1, $id2, $id3]
@@ -477,6 +490,12 @@ Epoch time job was delayed to.
   finished => 784111777
 
 Epoch time job was finished.
+
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
 
 =item parents
 
@@ -603,6 +622,12 @@ defaults to C<1>.
   my $backend = Minion::Backend::Pg->new('postgresql://postgres@/test');
 
 Construct a new L<Minion::Backend::Pg> object.
+
+=head2 note
+
+  my $bool = $backend->note($job_id, foo => 'bar');
+
+Change a metadata field for a job.
 
 =head2 receive
 
@@ -895,18 +920,18 @@ drop trigger if exists minion_jobs_notify_workers_trigger on minion_jobs;
 drop function if exists minion_jobs_notify_workers();
 
 -- 10 up
-alter table minion_jobs add column parents bigint[] default '{}';
+alter table minion_jobs add column parents bigint[] not null default '{}';
 
 -- 11 up
 create index on minion_jobs (state, priority desc, id);
 
 -- 12 up
 alter table minion_workers add column inbox jsonb
-  check(jsonb_typeof(inbox) = 'array') default '[]';
+  check(jsonb_typeof(inbox) = 'array') not null default '[]';
 
 -- 15 up
 alter table minion_workers add column status jsonb
-  check(jsonb_typeof(status) = 'object') default '{}';
+  check(jsonb_typeof(status) = 'object') not null default '{}';
 
 -- 16 up
 create index on minion_jobs using gin (parents);
@@ -915,7 +940,6 @@ create table if not exists minion_locks (
   name    text not null,
   expires timestamp with time zone not null
 );
-create index on minion_locks (expires);
 create function minion_lock(text, int, int) returns bool as $$
 declare
   new_expires timestamp with time zone = now() + (interval '1 second' * $2);
@@ -925,7 +949,9 @@ begin
   if (select count(*) >= $3 from minion_locks where name = $1) then
     return false;
   end if;
-  insert into minion_locks (name, expires) values ($1, new_expires);
+  if new_expires > now() then
+    insert into minion_locks (name, expires) values ($1, new_expires);
+  end if;
   return true;
 end;
 $$ language plpgsql;
@@ -933,3 +959,9 @@ $$ language plpgsql;
 -- 16 down
 drop function if exists minion_lock(text, int, int);
 drop table if exists minion_locks;
+
+-- 17 up
+alter table minion_jobs add column notes jsonb
+  check(jsonb_typeof(notes) = 'object') not null default '{}';
+alter table minion_locks set unlogged;
+create index on minion_locks (name, expires);

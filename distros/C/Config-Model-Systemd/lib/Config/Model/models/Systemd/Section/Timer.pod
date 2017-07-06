@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::Systemd::Section::Timer
 # ABSTRACT:  Configuration class Systemd::Section::Timer
+
 =encoding utf8
 
 =head1 NAME
@@ -87,7 +88,7 @@ have no effect.
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
 subject to the C<AccuracySec> setting
-below. I<< Optional. Type uniline.  >> 
+below. I< Optional. Type uniline.  > 
 
 =head2 OnBootSec
 
@@ -134,7 +135,7 @@ have no effect.
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
 subject to the C<AccuracySec> setting
-below. I<< Optional. Type uniline.  >> 
+below. I< Optional. Type uniline.  > 
 
 =head2 OnStartupSec
 
@@ -181,7 +182,7 @@ have no effect.
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
 subject to the C<AccuracySec> setting
-below. I<< Optional. Type uniline.  >> 
+below. I< Optional. Type uniline.  > 
 
 =head2 OnUnitActiveSec
 
@@ -228,7 +229,7 @@ have no effect.
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
 subject to the C<AccuracySec> setting
-below. I<< Optional. Type uniline.  >> 
+below. I< Optional. Type uniline.  > 
 
 =head2 OnUnitInactiveSec
 
@@ -275,7 +276,7 @@ have no effect.
 Note that timers do not necessarily expire at the
 precise time configured with these settings, as they are
 subject to the C<AccuracySec> setting
-below. I<< Optional. Type uniline.  >> 
+below. I< Optional. Type uniline.  > 
 
 =head2 OnCalendar
 
@@ -289,7 +290,7 @@ C<OnActiveSec> and related settings.
 Note that timers do not necessarily expire at the
 precise time configured with this setting, as it is subject to
 the C<AccuracySec> setting
-below. I<< Optional. Type uniline.  >> 
+below. I< Optional. Type uniline.  > 
 
 =head2 AccuracySec
 
@@ -315,7 +316,7 @@ C<TimerSlackNSec> setting. See
 L<prctl(2)>
 for details. To optimize power consumption, make sure to set
 this value as high as possible and as low as
-necessary. I<< Optional. Type uniline.  >> 
+necessary. I< Optional. Type uniline.  > 
 
 =head2 RandomizedDelaySec
 
@@ -344,7 +345,7 @@ C<RandomizedDelaySec> to 0, thus encouraging
 coalescing of timer events. In order to optimally stretch
 timer events over a certain range of time, make sure to set
 C<RandomizedDelaySec> to a higher value, and
-C<AccuracySec=1us>. I<< Optional. Type uniline.  >> 
+C<AccuracySec=1us>. I< Optional. Type uniline.  > 
 
 =head2 Unit
 
@@ -355,7 +356,7 @@ defaults to a service that has the same name as the timer
 unit, except for the suffix. (See above.) It is recommended
 that the unit name that is activated and the unit name of the
 timer unit are named identically, except for the
-suffix. I<< Optional. Type uniline.  >> 
+suffix. I< Optional. Type uniline.  > 
 
 =head2 Persistent
 
@@ -368,7 +369,7 @@ catch up on missed runs of the service when the machine was
 off. Note that this setting only has an effect on timers
 configured with C<OnCalendar>. Defaults
 to C<false>.
-I<< Optional. Type boolean.  >> 
+I< Optional. Type boolean.  > 
 
 =head2 WakeSystem
 
@@ -378,7 +379,7 @@ be suspended and if the system supports this. Note that this
 option will only make sure the system resumes on the
 appropriate times, it will not take care of suspending it
 again after any work that is to be done is finished. Defaults
-to C<false>. I<< Optional. Type boolean.  >> 
+to C<false>. I< Optional. Type boolean.  > 
 
 =head2 RemainAfterElapse
 
@@ -394,7 +395,7 @@ started again, and is guaranteed to elapse only once. However,
 if C<RemainAfterElapse> is off, it might be
 started again if it is already elapsed, and thus be triggered
 multiple times. Defaults to
-C<yes>. I<< Optional. Type boolean.  >> 
+C<yes>. I< Optional. Type boolean.  > 
 
 =head1 SEE ALSO
 

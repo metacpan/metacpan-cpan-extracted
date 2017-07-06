@@ -2,6 +2,12 @@
 ##
 ## Change log for perl distribution DDC-Concordance
 
+v0.39 Wed, 28 Jun 2017 09:06:20 +0200 moocow
+	+ fixes for perl 5.26 ('.' no longer in @INC, breaks `do "$TEST_DIR/parseme.pl"` in t/*8*qparse.t)
+
+v0.38 Fri, 23 Jun 2017 07:52:20 +0200 moocow
+	+ DDC:PP fixes for perl 5.25.x (escape more curly brackets in regexes)
+
 v0.37 Thu, 02 Mar 2017 15:16:49 +0100 moocow
 	+ added forgotten check for DDC::XS support in t/18b_any_xs_qparse.t
 
@@ -211,4 +217,3 @@ v0.11 Tue, 27 May 2014 09:48:33 +0200 moocow
 	  qexpand.perl, qparse.perl, t, t/00_basic.t, t/common.plt,
 	  testme.perl: + initial import of ddc-perl bindings for ddc-2.x
 	  branch
-

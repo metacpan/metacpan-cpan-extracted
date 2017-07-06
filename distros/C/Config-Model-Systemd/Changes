@@ -1,3 +1,31 @@
+0.232.7 2017-06-24
+
+  This release brings quite a big change to the way cme is invoked for
+  systemd.
+
+  "cme systemd" and "cme systemd-user" commands now expect an argument. Either:
+   - a pattern to select service names to edit
+   - a unit name with or without service type
+
+  I.e:
+
+    cme check systemd '*' # check all units
+    cme check systemd foo # check unit matching foo
+
+  This release also let a developer edit a systemd file in some
+  directory:
+
+    cme edit systemd-service <path-service-file>
+    cme edit systemd-socket <path-socket-file>
+    cme edit systemd-timer <path-timer-file>
+
+  This new interfaces requires Config::Model >= 2.104
+
+  Fix parse-man.pl code that infer element type from documentation:
+    * elements where doc mentions 'may be used more than once' are list element
+    * more systemd parameters are type list (e.g Conflicts DeviceAllow,
+      all parameters beginning with Listen, and others)
+
 0.232.6 2017-01-15
 
   Documentation improvement:

@@ -1,4 +1,17 @@
 
+7.02  2017-07-05
+  - Improved performance of worker command when processing jobs that are
+    finished very quickly.
+
+7.01  2017-06-25
+  - Added note methods to Minion::Job and Minion::Backend::Pg.
+  - Added notes option to enqueue methods in Minion and Minion::Backend::Pg.
+  - Added notes field to info method in Minion::Job and job_info method in
+    Minion::Backend::Pg.
+  - Improved performance of stats and lock methods in Minion::Backend::Pg with a
+    new index and other optimizations. (depesz)
+  - Improved benchmark script to be more consistent. (depesz)
+
 7.0  2017-06-18
   - Added support for rate limiting and unique jobs.
   - Added lock and unlock methods to Minion and Minion::Backend::Pg.

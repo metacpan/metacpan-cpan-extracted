@@ -13,11 +13,13 @@ __DATA__
 Alien
 CPAN
 Chase
+Graham
+Ollis
 Whitener
 capoeirab
-cwhitener
 github
 lib
 libuv
+plicease
 stopwords
 wordlist

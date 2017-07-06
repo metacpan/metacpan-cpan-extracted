@@ -4,7 +4,7 @@
       "Copyright (C) 2013-2015 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -41,23 +41,23 @@
    "provides" : {
       "Travel::Status::DE::EFA" : {
          "file" : "lib/Travel/Status/DE/EFA.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Travel::Status::DE::EFA::Line" : {
          "file" : "lib/Travel/Status/DE/EFA/Line.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Travel::Status::DE::EFA::Result" : {
          "file" : "lib/Travel/Status/DE/EFA/Result.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Travel::Status::DE::EFA::Stop" : {
          "file" : "lib/Travel/Status/DE/EFA/Stop.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       },
       "Travel::Status::DE::VRR" : {
          "file" : "lib/Travel/Status/DE/VRR.pm",
-         "version" : "1.14"
+         "version" : "1.15"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,6 +33,7 @@ typedef enum qrpng_status {
     qrpng_bad_scale,
     qrpng_bad_quietzone,
     qrpng_bad_filename,
+    qrpng_bounds,
 }
 qrpng_status_t;
 
@@ -121,8 +121,9 @@ qrpng_make_png (qr_t * qr, qrpng_t * qrpng)
 		for (r = 0; r < qrpng->scale; r++) {
 		    int p;
 		    p = o + r;
-		    //		    printf ("%d %d %d %d %d\n", x, qrpng->img_size, r, p, qrpng->quietzone * qrpng->scale);
-		    assert (p <= qrpng->img_size - qrpng->quietzone * qrpng->scale);
+		    if (p > qrpng->img_size - qrpng->quietzone * qrpng->scale) {
+			return qrpng_bounds;
+		    }
 		    SETBIT(line, p);
 		}
 	    }
@@ -169,3 +170,5 @@ qrpng_free (qrpng_t * qrpng)
     free (qrpng->row_pointers);
     return qrpng_ok;
 }
+
+

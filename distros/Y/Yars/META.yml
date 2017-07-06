@@ -14,7 +14,7 @@ configure_requires:
   Module::Build: '0.28'
   perl: '5.010001'
 dynamic_config: '1'
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,5 +40,10 @@ resources:
   bugtracker: https://github.com/clustericious/Yars/issues
   homepage: https://metacpan.org/pod/Yars
   repository: git://github.com/clustericious/Yars.git
-version: '1.27'
+version: '1.28'
+x_contributors:
+  - 'Marty Brandon'
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Brian Duggan'
+  - 'Curt Tilmes'
 x_serialization_backend: 'YAML::Tiny version 1.70'

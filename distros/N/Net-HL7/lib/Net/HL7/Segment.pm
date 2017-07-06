@@ -1,13 +1,3 @@
-################################################################################
-#
-# File      : Segment.pm
-# Author    : Duco Dokter
-# Created   : Tue Mar  4 13:03:00 2003
-# Version   : $Id: Segment.pm,v 1.15 2014/09/11 09:17:20 wyldebeast Exp $
-# Copyright : Wyldebeast & Wunderliebe
-#
-################################################################################
-
 package Net::HL7::Segment;
 
 use 5.004;

@@ -1,3 +1,12 @@
+0.77	xxx
+
+	Finalize design and implementation of chord grids.
+	Add support for chord fingerings, as suggested by Christian
+	Erickson (author of the Songsheet Generator).
+	Fix meaning of clo -G (was negated).
+	Add song examples.
+	(WxChordPro) Update to 0.76.
+
 0.76	May 16 2017
 
 	Allow text properties to stack/unstack.

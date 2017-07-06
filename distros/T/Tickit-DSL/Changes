@@ -1,5 +1,22 @@
 Revision history for Tickit-DSL
 
+0.032     2017-06-26 03:53:45+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+	Dependencies:
+	* Updated ::Term to 0.003
+
+0.032     2017-06-25 03:32:42+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+	Dependencies:
+	* Updated Tickit to 0.63
+	* Updated ::Layout::Desktop to latest version
+    * Removed Tickit::Console from deps due to test failures (RT101718)
+
+    Widgets:
+    * console now loads Tickit::Console at runtime
+
 0.031     2016-12-31 21:44:23+08:00 Asia/Kuala_Lumpur
 	No new features.
 

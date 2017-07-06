@@ -36,14 +36,31 @@ to the given module.
 Call a module with the argument C<--help> to see its usage.
 
 Module names are translated into CamelCased class named under the C<Rapi::Blog::Util::Rabl::*>
-namespace. For example, C<'modal-update'> becomes C<'Rapi::Blog::Util::Rabl::Create'>.
+namespace. For example, C<'create'> becomes C<'Rapi::Blog::Util::Rabl::Create'>.
 
-So far, the only module which has been written is L<Rapi::Blog::Util::Rabl::Create>.
+So far, the only module which has been written is L<Rapi::Blog::Util::Rabl::Create> which creates
+a new L<Rapi::Blog> site in the supplied directory:
 
+  rabl.pl create /path/to/new-site
+  cd /path/to/new-site && plackup
 
 =head1 SEE ALSO
 
+=over
+
+=item * 
+
+L<Rai::Blog>
+
+=item *
+
+L<Rapi::Blog::Manual>
+
+=item * 
+
 L<RapidApp>
+
+=back
 
 =head1 SUPPORT
  

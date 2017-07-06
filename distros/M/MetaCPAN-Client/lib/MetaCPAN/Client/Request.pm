@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Request;
 # ABSTRACT: Object used for making requests to MetaCPAN
-$MetaCPAN::Client::Request::VERSION = '2.016000';
+$MetaCPAN::Client::Request::VERSION = '2.017000';
 use Moo;
 use Carp;
 use JSON::MaybeXS qw<decode_json encode_json>;
@@ -270,7 +270,7 @@ MetaCPAN::Client::Request - Object used for making requests to MetaCPAN
 
 =head1 VERSION
 
-version 2.016000
+version 2.017000
 
 =head1 ATTRIBUTES
 

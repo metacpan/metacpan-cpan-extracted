@@ -1,11 +1,15 @@
-Revision history for Business-BankList
+0.012    2017-07-04 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to use Makefile.PL instead of Build.PL.
+
 
 0.011   2013-04-25 (SHARYANTO)
 
-        No functional changes. Fix typo.
+        - No functional changes. Fix typo.
 
 
 0.01    2012-07-06 (SHARYANTO)
 
-        First version, still empty.
-
+        - First version, still empty.

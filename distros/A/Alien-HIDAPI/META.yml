@@ -1,0 +1,36 @@
+---
+abstract: 'Perl distribution for HIDAPI'
+author:
+  - 'Ahmad Fatoum <athreef@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  IO::Socket::SSL: '0'
+  Test2: '1.302015'
+  Test2::Suite: '0.000030'
+  Test::Alien: '0.05'
+  Test::More: '0'
+configure_requires:
+  Alien::Autotools: 0.000_006
+  Alien::Base::ModuleBuild: '0'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-HIDAPI
+provides:
+  Alien::HIDAPI:
+    file: lib/Alien/HIDAPI.pm
+    version: '0.03'
+recommends:
+  IO::Socket::SSL: '0'
+requires:
+  Alien::Base: '0.030'
+  File::ShareDir: '1.00'
+  perl: '5.008001'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

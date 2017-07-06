@@ -1,5 +1,92 @@
 Revision history for perl module Git-Hooks. -*- text -*-
 
+2.0.1     2017-06-23 10:53:06-03:00 America/Sao_Paulo
+
+  - Official release of version 2.0.
+
+  [Documentation]
+
+  - The TUTORIAL.pod file was removed and its contents were moved to the
+    projects wiki at https://github.com/gnustavo/Git-Hooks/wiki.
+
+  [Internal changes]
+
+  - Substituted Dist::Zilla::Plugin::MakeMaker::Awesome for
+    Dist::Zilla::Plugin::MakeMaker::Custom as a Dist::Zilla dependency.
+
+2.0.0     2017-06-15 20:42:17-03:00 America/Sao_Paulo (TRIAL RELEASE)
+
+  This is a major new version of Git::Hooks and there is a few incompatible
+  changes mentioned below. Most of them affect only hook and plugin
+  developers, but not users. As a user you'll be affected only if you use
+  the CheckStructure plugin, which was removed from the distribution. If you
+  depend on it, you may reimplement its checks using the CheckFile and the
+  CheckReference plugins.
+
+  [Incompatible changes]
+
+  - Replace the Git module by the Git::Repository module as the underlying
+    git wrapper. This means that hooks now receive a Git::Repository object
+    as their first argument instead of a Git::More object, which may affect
+    the code of hooks and plugins.
+
+  - The Git::More module was transformed into the
+    Git::Repository::Plugin::GitHooks module to take advantage of
+    Git::Repository's plugin architecture. This means that the
+    Git::Repository object passed to hooks will have the
+    Git::Repository::Plugin::GitHooks plugin enabled, which brings most of
+    the methods previously provided by Git::More.
+
+  - The Git::Hooks::nocarp method was removed. The 'nocarp' function is
+    meant to be enabled via the githooks.nocarp configuration option only.
+
+  - Git::Hooks now only exports the hook directives and the 'run_hook'
+    function. All the other functions previously implemented by it are now
+    provided by Git::Repository::Plugin::GitHooks.
+
+  - Git::Repository::Plugin::GitHooks's methods 'get_commit', 'get_commits',
+    and 'get_affected_ref_commits' now return Git::Repository::Log objects
+    instead of naked hashes to represent commits.
+
+  - The CheckStructure plugin was removed from the distribution. Its
+    funcionality is provided by the CheckFile and the new CheckReference
+    plugins.
+
+  [New features]
+
+  - New options for the 'githooks' section: 'error-header' and
+    'error-footer'. These allow for the injection of a header and/or a
+    footer along with Git::Hooks's error messages.
+
+  - CheckReference: new plugin for checking branch names.
+
+  - CheckJira: new options: 'jql', 'ref-jql'. These allow one to use JIRA's
+    JQL expressions to impose restrictions on the JIRA issues cited on
+    commit messages.
+
+  - CheckJira: new option 'skip-merges' to avoid checking merge commits.
+
+  - CheckCommit: new configuration option 'merger' to define the users
+    allowed to push merge commits.
+
+  - CheckCommit: new configuration option 'push-limit' to specify the
+    maximum number of commits that may be pushed at once over a branch.
+
+  - CheckFile: New configuration option 'basename.sizelimit' to specify size
+    limits per file name.
+
+  - The Git::Hooks documentation now contains a section for plugin
+    developers.
+
+  [Deprecations]
+
+  - Remove the deprecated configuration options
+    'githooks.gerrit.review-label', 'githooks.gerrit.vote-ok', and
+    'githooks.gerrit.vote-nok'.
+
+  - CheckJira: deprecates the configuration options 'project', 'status', and
+    'issuetype'. They're better implemented by the new 'jql' option.
+
 1.16.0    2017-05-20 18:48:38-03:00 America/Sao_Paulo
 
   [New features]
@@ -46,7 +133,7 @@ Revision history for perl module Git-Hooks. -*- text -*-
   [Fixes]
 
   - Gerrit 2.13 slightly changed how it passes information to the hooks and
-    we had to make some changes to accomodate it.
+    we had to make some changes to accommodate it.
 
 1.14.1    2016-11-06 17:02:19-02:00 America/Sao_Paulo
 
@@ -650,7 +737,7 @@ Revision history for perl module Git-Hooks. -*- text -*-
   [Fixes]
 
   - Suppress spurious error message (fatal: ref HEAD is not a symbolic ref)
-  when pushing a commit while in a dettached head state.
+  when pushing a commit while in a detached head state.
 
 0.047     2014-01-29 12:21:18 America/Sao_Paulo
 
@@ -787,7 +874,7 @@ Revision history for perl module Git-Hooks. -*- text -*-
   [Changes]
   - Git::More::get_current_branch previously returned the branch
     short-name. Now it returns the branch full name. Moreover, when in
-    dettached mode it returns undef.
+    detached mode it returns undef.
 
   [Fixes]
   - The exit code of external pre-receive hooks weren't being dealt
@@ -797,7 +884,7 @@ Revision history for perl module Git-Hooks. -*- text -*-
     with correctly when new branches were being pushed or branches
     were being deteled on a push.
 
-  - Fix Git::More::is_ref_enabled for when in dettached head state. It
+  - Fix Git::More::is_ref_enabled for when in detached head state. It
     returns true in this case.
 
   [Cleanup]

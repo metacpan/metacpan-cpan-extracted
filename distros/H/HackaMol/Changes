@@ -1,5 +1,16 @@
 Revision history for HackaMol
 
+0.043     2017-06-24 14:05:20-07:00 America/Vancouver
+  * minor fix on FileFetchRole return
+
+0.042     2017-06-24 13:18:49-07:00 America/Vancouver
+  * reorganize tests
+  * avoid the FileFetchRole get tests for now... HTTP::Tiny->can_ssl but still fails 
+
+0.041     2017-06-24 12:45:52-07:00 America/Vancouver
+  * switch to HTTP::Tiny for FileFetchRole
+  * skip https tests unless HTTP::Tiny->can_ssl
+
 0.040     2017-06-18 21:38:23-06:00 America/Denver
   * added the group_by_atom_attrs method to HackaMol.pm
   * added SelectionRole to core, consumed by HackaMol::Molecule

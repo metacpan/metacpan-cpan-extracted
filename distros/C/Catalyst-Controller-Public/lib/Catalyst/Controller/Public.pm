@@ -3,20 +3,29 @@ package Catalyst::Controller::Public;
 use Moose;
 extends 'Catalyst::Controller';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 has show_debugging => (is=>'ro', required=>1, default=>sub {0});
 has cache_control => (is=>'ro', isa=>'Str', predicate=>'has_cache_control');
 has content_types => (is=>'ro', isa=>'ArrayRef[Str]', predicate=>'has_content_types');
-
+has chain_base_action => (is=>'ro', isa=>'Str', predicate=>'has_chain_base_action');
+has chain_pathpart => (is=>'ro', isa=>'Str', predicate=>'has_chain_pathpart');
+ 
 has at => (
   is=>'ro',
   isa=>'Str',
   required=>1,
   default=>'/:namespace/:args');
-
+ 
 after 'register_actions' => sub {
   my ($self, $app) = @_;
+  my %base_path_attributes = $self->has_chain_base_action ?
+    (
+      Chained => [$self->chain_base_action],
+      PathPart => [$self->has_chain_pathpart ? $self->chain_pathpart : $self->action_namespace],
+      Args => []
+    ) : (Path => [ $self->action_namespace ]);
+
   my $action = $self->create_action(
     name => 'serve_file',
     code => sub { },
@@ -24,7 +33,7 @@ after 'register_actions' => sub {
     namespace => $self->action_namespace,
     class => ref($self),
     attributes => {
-      Path => [ $self->action_namespace ],
+      %base_path_attributes,
       Does => ['Catalyst::ActionRole::Public'],
       At => [$self->at],
       ShowDebugging => [$self->show_debugging],
@@ -32,18 +41,16 @@ after 'register_actions' => sub {
       ( $self->has_content_types ? (ContentTypes => $self->content_types)
         : ()),
     });
-
+ 
   $app->dispatcher->register( $app, $action );
 };
-
+ 
 sub uri_args {
   my $self = shift;
   return $self->action_for('serve_file'), @_;
 }
-
+ 
 __PACKAGE__->meta->make_immutable;
-
-1;
 
 =head1 NAME 
 
@@ -58,10 +65,11 @@ Catalyst::Controller::Public - mount a public url to files in your Catalyst proj
 
     __PACKAGE__->meta->make_immutable;
 
-Will create an action that from URL 'localhost/public/a/b/c/d.js' will serve
-file $c->{root} . '/public' . '/a/b/c/d.js'.  Will also set content type, length
-and Last-Modified HTTP headers as needed.  If the file does not exist, will not
-match (allowing possibly other actions to match).
+Will create an action that matches '$HOST/public/@args', for example like a URL
+'localhost/public/a/b/c/d.js', that will serve file $c->{root} . '/public' . '/a/b/c/d.js'.
+
+Will also set content type, length and Last-Modified HTTP headers as needed.
+If the file does not exist, will not match (allowing possibly other actions to match).
 
 You can create a URL for a static file programmtically via the following:
 
@@ -69,6 +77,16 @@ You can create a URL for a static file programmtically via the following:
       my ($self, $c) = @_;
       my $static_url = $c->uri_for(controller('Public')->uri_args('example.txt'));
     }
+
+If you are using Chaining then you will probably need to specify the 'root' chain
+
+    package MyApp::Controller::Public;
+
+    use Moose;
+    extends 'Catalyst::Controller::Public';
+
+    __PACKAGE__->meta->make_immutable;
+    __PACKAGE__->config(chain_base_action=>'/root');
 
 =head1 DESCRIPTION
 
@@ -102,6 +120,24 @@ Used as a helper to correctly generate a URI.  For example:
 This controller defines the following configuration attributes.  They
 are pretty much all just wrappers for the same configuration options for
 the L<Catalyst::ActionRole::Public>
+
+has chain_base_action => (is=>'ro', isa=>'Str', predicate=>'has_chain_base_action');
+has chain_pathpart => (is=>'ro', isa=>'Str', predicate=>'has_chain_pathpart');
+
+=head2 chain_base_action
+
+Should be the full private path of the root chain action.  This is the value you'd
+normally put into the subroutine attribute 'Chained'. If you are doing
+the normal thing this is probably called '/root'.
+
+If you leave this undefined we assume you are not using chaining and we will create
+a new base path for this controller / action to match.
+
+=head2 chain_pathpart
+
+The value for 'PathPart' in your chaining declaration.  This defaults to the namespace,
+which is often correct but if you are doing something fussy you might need control
+over it.
 
 =head2 at
 
@@ -139,7 +175,7 @@ L<Catalyst::Controller::Assets>.  L<Catalyst::Controller::SimpleCAS>
  
 =head1 COPYRIGHT & LICENSE
  
-Copyright 2015, John Napiorkowski L<email:jjnapiork@cpan.org>
+Copyright 2017, John Napiorkowski L<email:jjnapiork@cpan.org>
  
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

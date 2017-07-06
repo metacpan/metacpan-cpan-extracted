@@ -1,3 +1,10 @@
+1.01  - Make OpenGL::Modern usage transparent for GLWidget
+
+1.00  - Experimental OpenGL code is no longer experimental, mark as stable.
+        Shift the focus of experiments to OpenGL::Modern instead.
+
+0.08  - Add gl image support and onSysHandle glwidget recreation
+
 0.07  - Windows: Try to get at the native OpenGL context, not the
         default software implementation
 

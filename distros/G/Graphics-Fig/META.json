@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "File::Temp" : "0.23",
+            "Test::More" : "1"
          }
       },
       "configure" : {
@@ -31,9 +32,12 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Image::Info" : "1.37",
+            "Math::Trig" : "1"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.2"
+   "version" : "v1.0.3"
 }

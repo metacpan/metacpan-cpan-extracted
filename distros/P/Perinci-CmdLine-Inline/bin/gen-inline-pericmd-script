@@ -1,16 +1,16 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /Perinci/CmdLine/Inline/gen_inline_pericmd_script
-# and generated automatically using Perinci::CmdLine::Gen version 0.44
+# and generated automatically using Perinci::CmdLine::Gen version 0.46
 
-our $DATE = '2017-01-19'; # DATE
+our $DATE = '2017-07-04'; # DATE
 our $DIST = 'Perinci-CmdLine-Inline'; # DIST
-our $VERSION = '0.50'; # VERSION
+our $VERSION = '0.53'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any;
+use Log::ger;
 
 use Perinci::CmdLine::Lite;
 
@@ -35,7 +35,7 @@ gen-inline-pericmd-script - Generate inline Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.50 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2017-01-19.
+This document describes version 0.53 of gen-inline-pericmd-script (from Perl distribution Perinci-CmdLine-Inline), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -253,23 +253,23 @@ See C<--subcommands>.
 
 =item B<--debug>
 
-Set log level to debug (note: you also need to set LOG=1 to enable logging, or use DEBUG=1).
+Shortcut for --log-level=debug.
 
 =item B<--log-level>=I<s>
 
-Set log level (note: you also need to set LOG=1 to enable logging).
+Set log level.
 
 =item B<--quiet>
 
-Set log level to quiet (note: you also need to set LOG=1 to enable logging, or use QUIET=1).
+Shortcut for --log-level=error.
 
 =item B<--trace>
 
-Set log level to trace (note: you also need to set LOG=1 to enable logging, or use TRACE=1).
+Shortcut for --log-level=trace.
 
 =item B<--verbose>
 
-Set log level to info (note: you also need to set LOG=1 to enable logging, or use VERBOSE=1).
+Shortcut for --log-level=info.
 
 =back
 
@@ -517,8 +517,8 @@ Display program's version and exit.
 
 =head1 COMPLETION
 
-The script comes with a companion shell completer script (L<gen-inline-pericmd-script>)
-for this script.
+This script has shell tab completion capability with support for several
+shells.
 
 =head2 bash
 
@@ -624,7 +624,7 @@ List of available configuration parameters:
 
 =head2 GEN_INLINE_PERICMD_SCRIPT_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
@@ -656,7 +656,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -16,6 +16,6 @@ WriteMakefile(
     OBJECT            => '$(O_FILES) phpserialize/parser/stringstore.o phpserialize/parser/ps_parser.o',
     LDFROM            => '$(O_FILES) stringstore.o ps_parser.o', # link all the C files too
     # TODO switch to C89 or otherwise permit building on Solaris
-    CCFLAGS           => "-fPIC -std=c99 $ccflags",
+    CCFLAGS           => "-std=c99 $ccflags",
 );
 

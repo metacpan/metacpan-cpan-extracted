@@ -21,9 +21,11 @@ requires:
   Exporter: '0'
   File::Basename: '0'
   File::Spec::Functions: '0'
+  Mojo::Base: '0'
   Mojolicious::Commands: '0'
   Mojolicious::Lite: '0'
   Mojolicious::Plugin::JSONConfig: '0'
+  Mojolicious::Plugin::Webtail: '0'
   Net::Ping: '0'
   Regexp::Common: '0'
   Telegram::Bot::Message: '0'
@@ -34,5 +36,5 @@ requires:
 resources:
   bugtracker: https://github.com/pavelsr/camshotbot/issues
   repository: git://github.com/pavelsr/camshotbot.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.69'

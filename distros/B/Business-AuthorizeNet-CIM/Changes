@@ -1,5 +1,11 @@
 Revision history for Perl extension Business-AuthorizeNet-CIM
 
+0.16    2017-06-26
+        no code changes
+
+0.15    2017-06-15
+        add transaction reporting methods (myrrhlin)
+
 0.14    2016-02-12
         unmaskExpirationDate (paulwelscott)
 

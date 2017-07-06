@@ -1,3 +1,4 @@
+use lib '.';
 use Mojo::Base -strict;
 use Mojo::IOLoop;
 use Mojo::Server::Daemon;

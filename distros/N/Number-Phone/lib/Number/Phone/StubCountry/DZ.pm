@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164947;
 
 my $formatters = [
                 {
@@ -30,17 +30,16 @@ my $formatters = [
                   'leading_digits' => '[1-4]'
                 },
                 {
-                  'pattern' => '([5-8]\\d{2})(\\d{2})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[5-8]'
+                  'leading_digits' => '[5-8]',
+                  'pattern' => '([5-8]\\d{2})(\\d{2})(\\d{2})(\\d{2})'
                 },
                 {
-                  'leading_digits' => '9',
-                  'pattern' => '(9\\d)(\\d{3})(\\d{2})(\\d{2})'
+                  'pattern' => '(9\\d)(\\d{3})(\\d{2})(\\d{2})',
+                  'leading_digits' => '9'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(80[12]1\\d{5})|(80[3-689]1\\d{5})',
                 'mobile' => '
           (?:
             5[4-6]|
@@ -51,7 +50,19 @@ my $validators = {
             7[0-6]
           )\\d{6}
         ',
+                'fixed_line' => '
+          (?:
+            1\\d|
+            2[013-79]|
+            3[0-8]|
+            4[0135689]
+          )\\d{6}|
+          9619\\d{5}
+        ',
+                'pager' => '',
                 'toll_free' => '800\\d{6}',
+                'voip' => '98[23]\\d{6}',
+                'personal_number' => '',
                 'geographic' => '
           (?:
             1\\d|
@@ -61,18 +72,7 @@ my $validators = {
           )\\d{6}|
           9619\\d{5}
         ',
-                'personal_number' => '',
-                'pager' => '',
-                'voip' => '98[23]\\d{6}',
-                'fixed_line' => '
-          (?:
-            1\\d|
-            2[013-79]|
-            3[0-8]|
-            4[0135689]
-          )\\d{6}|
-          9619\\d{5}
-        '
+                'specialrate' => '(80[12]1\\d{5})|(80[3-689]1\\d{5})'
               };
 my %areanames = (
   21321 => "Algiers",

@@ -1,32 +1,45 @@
 ---
 abstract: 'parse an application configuration file with wildcard keywords'
 author:
-  - '-2015 Smithsonian Astrophysical Observatory'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '6.36'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   File::pushd: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Log::Any: '0'
   Log::Any::Test: '0'
   Path::Tiny: '0.018'
   Test::Fatal: '0'
   Test::More: '0'
   Test::TempDir::Tiny: '0'
+  blib: '1.01'
+  namespace::clean: '0'
+  perl: '5.006'
 configure_requires:
-  CPAN::Meta: '0'
-  ExtUtils::MakeMaker: '6.36'
-dynamic_config: '0'
-generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
-license: unknown
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Config-Wild
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  Config::Wild:
+    file: lib/Config/Wild.pm
+    version: '2.02'
 requires:
+  Carp: '0'
   File::pushd: '0'
   Lingua::Boolean::Tiny: '0'
   List::Util: '1.24'
@@ -35,8 +48,11 @@ requires:
   Try::Tiny: '0'
   custom::failures: '0'
   failures: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
 resources:
-  license: http://www.gnu.org/licenses/gpl-3.0.html
-  repository: https://github.com/djerius/config-wild
-version: '2.01'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Wild
+  repository: git://github.com/djerius/config-wild.git
+version: '2.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

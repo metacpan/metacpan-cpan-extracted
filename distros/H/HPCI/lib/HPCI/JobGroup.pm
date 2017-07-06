@@ -155,7 +155,10 @@ role {
 			. qq{", with return value:     $status}
 		);
 
-		$run->_collect_job_stats( $status );
+		my $status_handler = $run->stage->_has_command
+			? '_collect_job_stats'
+			: '_base_register_status';
+		$run->$status_handler( $status );
 
 		return $run;
 	};
@@ -165,24 +168,31 @@ role {
 		my $stage        = shift;
 		my $run          = $stage->_run;
 		my $name         = $run->unique_id;
-		my $command      = $stage->command;
-		my ( $run_command, $soft_timeout, $hard_timeout ) = $run->_get_submit_command;
 		$self->info("Submitting stage:   name: $name");
-		$self->info("  wrapped submit command: $run_command");
-		$self->info("     actual user command: $command");
-		my $pid = $run->_submit_command( $run_command );
-		$self->info("                     pid: $pid");
-		$self->_runs->{$pid} = $run;
-		$run->pid( $pid );
-		if ($soft_timeout) {
-			$self->add_timeout( $soft_timeout, $run, 'soft_timeout' );
-			$self->info("            soft timeout: $soft_timeout");
+		if ($stage->_has_command) {
+			my $command      = $stage->command;
+			my ( $run_command, $soft_timeout, $hard_timeout ) = $run->_get_submit_command;
+			$self->info("  wrapped submit command: $run_command");
+			$self->info("     actual user command: $command");
+			$stage->_build_script_file;
+			my $pid = $run->_submit_command( $run_command );
+			$self->info("                     pid: $pid");
+			$self->_runs->{$pid} = $run;
+			$run->pid( $pid );
+			if ($soft_timeout) {
+				$self->add_timeout( $soft_timeout, $run, 'soft_timeout' );
+				$self->info("            soft timeout: $soft_timeout");
+			}
+			if ($hard_timeout) {
+				$self->add_timeout( $hard_timeout, $run, 'hard_timeout' );
+				$self->info("            hard timeout: $hard_timeout");
+			}
+			return $run;
 		}
-		if ($hard_timeout) {
-			$self->add_timeout( $hard_timeout, $run, 'hard_timeout' );
-			$self->info("            hard timeout: $hard_timeout");
+		else { # _has_code
+			my $stat = $stage->code->() || 0;
+			$self->_reap_run( $run, $stat );
 		}
-		return $run;
 	};
 
 	method kill_stages => sub {

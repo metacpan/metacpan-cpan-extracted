@@ -14,7 +14,7 @@ my $req = $person->_add_face_request("machida_pm", "ytnobody", $img,
     targetFace => '10,20,100,100', 
 );
 isa_ok $req, 'HTTP::Request';
-like $req->uri, qr|^https://api.projectoxford.ai/face/v1.0/persongroups/machida_pm/persons/ytnobody/persistedFaces|;
+like $req->uri, qr|^https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/persons/ytnobody/persistedFaces|;
 like $req->uri, qr|userData=japan-perl|;
 like $req->uri, qr|targetFace=10%2C20%2C100%2C100|;
 is $req->method, 'POST';

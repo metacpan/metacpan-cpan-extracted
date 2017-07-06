@@ -1,5 +1,9 @@
 Revision history for App-af
 
+0.11      2017-07-05 13:54:54 -0400
+  - Added probe subcommand
+  - Migrated from Test2::Bundle::Extended to Test2::V0
+
 0.10      2017-06-05 11:12:26 -0400
   - Correctly detect patch directory at the same level as the alienfile (fix for gh#3)
 

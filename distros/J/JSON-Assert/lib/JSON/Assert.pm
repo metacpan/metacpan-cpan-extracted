@@ -3,18 +3,19 @@
 ## ----------------------------------------------------------------------------
 package JSON::Assert;
 
-use Any::Moose;
+use Moo;
+use MooX::Types::MooseLike::Base 'Str';
 use JSON::Path;
 use Test::Deep::NoTest;
 
 $JSON::Path::Safe = 0;
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 our $VERBOSE = $ENV{JSON_ASSERT_VERBOSE} || 1;
 
 has 'error' =>
     is => "rw",
-    isa => "Str",
+    isa => Str,
     clearer => "_clear_error",
     ;
 
@@ -257,22 +258,18 @@ JSON::Assert - Asserts JSONPaths into a JSON data structure for correct values/m
     use JSON;
     use JSON::Assert;
 
-    my $xml = "<foo xmlns="urn:message"><bar baz="buzz">text</bar></foo>";
-    my $json = <<'EOF';
-    foo:
-      bar: text
-    EOF
+    my $json = '{ "foo": { "bar": "text" } }';
 
     # create a JSON::Assert object
     my $json_assert = JSON::Assert->new();
 
     # assert that there is:
     # - only one <bar> key in the document
+    $json_assert->assert_jpath_count($json, '$..bar', 1);
     # - the value of bar is 'text'
+    $json_assert->assert_jpath_value_match($json, '$..bar', 'text');
     # - the value of bar matches /^tex/
-    $json_assert->assert_jpath_count($doc, '$..bar', 1);
-    $json_assert->assert_jpath_value_match($doc, '$..bar', 'text');
-    $json_assert->assert_jpath_value_match($doc, '$..bar', qr{^tex});
+    $json_assert->assert_jpath_value_match($json, '$..bar', qr{^tex});
 
 =head1 DESCRIPTION
 

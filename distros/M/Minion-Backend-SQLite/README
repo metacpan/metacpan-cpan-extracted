@@ -121,6 +121,12 @@ METHODS
 
       Delay job for this many seconds (from now).
 
+    notes
+
+        notes => {foo => 'bar', baz => [1, 2, 3]}
+
+      Hash reference with arbitrary metadata for this job.
+
     parents
 
         parents => [$id1, $id2, $id3]
@@ -209,6 +215,12 @@ METHODS
         finished => 784111777
 
       Epoch time job was finished.
+
+    notes
+
+        notes => {foo => 'bar', baz => [1, 2, 3]}
+
+      Hash reference with arbitrary metadata for this job.
 
     parents
 
@@ -302,6 +314,31 @@ METHODS
       my $batch = $backend->list_workers($offset, $limit);
 
     Returns the same information as "worker_info" but in batches.
+
+ lock
+
+      my $bool = $backend->lock('foo', 3600);
+      my $bool = $backend->lock('foo', 3600, {limit => 20});
+
+    Try to acquire a named lock that will expire automatically after the
+    given amount of time in seconds.
+
+    These options are currently available:
+
+    limit
+
+        limit => 20
+
+      Number of shared locks with the same name that can be active at the
+      same time, defaults to 1.
+
+ note
+
+      my $bool = $backend->note($job_id, foo => 'bar');
+
+    Change a metadata field for a job. It is currently an error to attempt
+    to set a metadata field with a name containing the characters ., [, or
+    ].
 
  receive
 
@@ -432,6 +469,12 @@ METHODS
         inactive_workers => 100
 
       Number of workers that are currently not processing a job.
+
+ unlock
+
+      my $bool = $backend->unlock('foo');
+
+    Release a named lock.
 
  unregister_worker
 

@@ -5,10 +5,12 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 use PDF::API2::Util qw(pdfkey);
 use PDF::API2::Basic::PDF::Utils; # PDFName
+
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -35,6 +37,7 @@ sub new {
     $self->name($name or pdfkey());
 
     $self->{' apipdf'} = $pdf;
+    weaken $self->{' apipdf'};
 
     return $self;
 }

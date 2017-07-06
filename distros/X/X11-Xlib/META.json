@@ -5,7 +5,7 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -53,6 +53,5 @@
          "url" : "https://github.com/nanardon/X11-Xlib.git"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.15"
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Bus::VISA;
-$Lab::Bus::VISA::VERSION = '3.550';
+$Lab::Bus::VISA::VERSION = '3.552';
 use strict;
 use Lab::VISA;
 use Scalar::Util qw(weaken);

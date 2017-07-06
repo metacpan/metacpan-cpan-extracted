@@ -50,25 +50,8 @@ have had at least one PASS report submitted for the given perl version and platf
 Note that we list the generic platform name, and reports may have been processed for 
 different release versions of that operating system.</p>
 
-<div class="container">
-<table class="test_results">
-<tr><th><img src="/images/headings/perlversion.png" alt="Perl Version" /></th>
-[% FOREACH os IN stats_oses %]
-<th><img src="/images/headings/[% IF os ; THEN ; os | lower ; ELSE ; 'blank' ; END %].png" alt="[% os %]" /></th>
-[% END %]
-</tr>
-[% FOREACH perl IN stats_poff %]
-[% IF perl != '0' %]
-<tr>
-<td><small>[% perl %]</small></td>
-[% FOREACH oses IN stats_oses %]
-[% os = oses | lower %]
-[% IF stats.$perl.$os.version %]<td class="PASS"><small>[% stats.$perl.$os.version %]</small></td>[% ELSE %]<td></td>[% END %]
-[% END %]
-</tr>
-[% END %]
-[% END %]
-</table>
+<div id="statstable">
+Data loading please wait ....
 </div>
 
 <p>See also: Full PASS statistics for <a href="http://pass.cpantesters.org/distro/[% letter %]/[% distribution %].html">[% distribution %]</a></p>

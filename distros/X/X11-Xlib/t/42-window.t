@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::More;
-use X11::Xlib qw( :fn_win :const_win :const_winattr :const_sizehint RootWindow XSync None );
+use X11::Xlib qw( :fn_win :const_win :const_winattr :const_sizehint :const_event_mask RootWindow XSync None Success );
 
 plan skip_all => "No X11 Server available"
     unless $ENV{DISPLAY};
@@ -19,6 +19,33 @@ my $win_id;
 is( err{ $win_id= XCreateWindow(@args) }, '', 'CreateWindow' )
     or diag explain \@args;
 ok( $win_id > 0, 'got window id' );
+
+my ($netwmname, $type_utf8, $wm_proto, $wm_dest_win)
+    = @{ $dpy->XInternAtoms([qw( _NET_WM_NAME UTF8_STRING WM_PROTOCOLS WM_DESTROY_WINDOW )], 0) };
+
+is_deeply( [ XListProperties($dpy, $win_id) ], [], 'no window properties yet' );
+XChangeProperty($dpy, $win_id, $netwmname, $type_utf8, 8, PropModeReplace, "Hello World", 11);
+is_deeply( [ XListProperties($dpy, $win_id) ], [ $netwmname ], 'window has title property' );
+ok( Success == XGetWindowProperty($dpy, $win_id, $netwmname, 0, 32, 0, $type_utf8,
+    my $actual_type, my $actual_format, my $n, my $remaining, my $data), 'XGetWindowProperty' );
+is( $actual_type, $type_utf8, 'correct type' );
+is( $actual_format, 8, 'correct format' );
+is( $n, 11, '11 bytes' );
+is( $remaining, 0, 'no missing bytes' );
+is( $data, 'Hello World', 'correct string' );
+XDeleteProperty($dpy, $win_id, $netwmname);
+is_deeply( [ XListProperties($dpy, $win_id) ], [], 'no window properties again' );
+
+# Now check OO interface
+my $win= $dpy->get_cached_window($win_id);
+$win->set_property($netwmname, $type_utf8, "HelloAgain");
+is_deeply( [ $win->get_property_list ], [ $netwmname ], 'new window title' );
+is_deeply( $win->get_property($netwmname)->{data}, "HelloAgain", 'correct title text' );
+$win->set_property($netwmname, undef);
+is_deeply( [ $win->get_property_list ], [ ], 'unset window title' );
+ok( XSetWMProtocols($dpy, $win_id, [ $wm_dest_win ]), 'XSetWMProtocols' );
+is_deeply( [ $win->get_property_list ], [ $wm_proto ], 'protocols set' );
+is_deeply( [ XGetWMProtocols($dpy, $win_id) ], [ $wm_dest_win ], 'with expected values' );
 
 is( err{ XMapWindow($dpy, $win_id); }, '', 'XMapWindow' );
 $dpy->XSync;
@@ -62,6 +89,7 @@ is_deeply( \@children, \@cwnd, 'XQueryTree - children' );
 
 # Call a bunch of functions to see if any throw an error.
 # TODO: actually verify the behavior of these calls
+is( err{ XGetGeometry($dpy, $cwnd[0]) }, '', 'XGetGeometry' );
 is( err{ XChangeWindowAttributes($dpy, $cwnd[0], CWSaveUnder, { save_under => 1 }) }, '', 'XChangeWindowAttributes' );
 is( err{ XSetWindowBackground($dpy, $cwnd[0], 1) }, '', 'XSetWindowBackground' );
 is( err{ XSetWindowBackgroundPixmap($dpy, $cwnd[0], None) }, '', 'XSetWindowBackgroundPixmap' );
@@ -83,6 +111,22 @@ is( err{ XRestackWindows($dpy, \@cwnd) }, '', 'XRestackWindows' );
 
 XUnmapWindow($dpy, $_) for @cwnd;
 XDestroyWindow($dpy, $_) for @cwnd;
+
+($w, $h)= $dpy->root_window->get_w_h;
+ok( $w > 0, '$wnd->get_w_h; w > 0' );
+ok( $h > 0, '$wnd->get_w_h; h > 0' );
+
+ok( ($attrs= $dpy->root_window->attributes), '$wnd->attributes' );
+is( $dpy->root_window->event_mask, $attrs->your_event_mask, '$wnd->event_mask' );
+$dpy->root_window->event_mask(ExposureMask);
+$dpy->root_window->clear_all;
+is( $dpy->root_window->event_mask, ExposureMask, 'event_mask set to ExposureMask' );
+$dpy->root_window->event_mask_include(KeyPressMask);
+$dpy->root_window->clear_all;
+is( $dpy->root_window->event_mask, (ExposureMask|KeyPressMask), 'event_mask set to ExposureMask|KeyPressMask' );
+$dpy->root_window->event_mask_exclude(ExposureMask);
+$dpy->root_window->clear_all;
+is( $dpy->root_window->event_mask, KeyPressMask, 'event_mask set to KeyPressMask' );
 
 is( err{ XUnmapWindow($dpy, $win_id); }, '', 'XUnmapWindow' );
 

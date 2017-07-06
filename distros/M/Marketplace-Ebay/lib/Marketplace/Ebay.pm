@@ -25,11 +25,11 @@ Marketplace::Ebay - Making API calls to eBay (with XSD validation)
 
 =head1 VERSION
 
-Version 0.191
+Version 0.200
 
 =cut
 
-our $VERSION = '0.191';
+our $VERSION = '0.200';
 
 =head1 SYNOPSIS
 

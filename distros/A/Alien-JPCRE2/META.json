@@ -1,0 +1,82 @@
+{
+   "abstract" : "Find Or Download/Build/Install libjpcre2 In JPCRE2",
+   "author" : [
+      "Will Braswell <wbraswell@cpan.org>"
+   ],
+   "description" : "JPCRE2 is the C++ wrapper for the new Perl Compatible Regular Expression engine, written in C, compiled and installed via Alien",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "alien",
+      "pcre",
+      "pcre2",
+      "jpcre2",
+      "regex",
+      "regularexpression"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-JPCRE2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25",
+            "Alien::PCRE2" : "0.006",
+            "Alien::gmake" : "0.11",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.52",
+            "Alien::Build::MM" : "0.25",
+            "Alien::PCRE2" : "0.006",
+            "File::Find::Rule" : "0.34",
+            "IO::Socket::SSL" : "2.043"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build" : "0.25"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Alien-JPCRE2"
+      },
+      "homepage" : "https://neurobin.org/projects/softwares/libs/jpcre2/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/wbraswell/alien-jpcre2.git",
+         "web" : "https://github.com/wbraswell/alien-jpcre2"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.002000",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

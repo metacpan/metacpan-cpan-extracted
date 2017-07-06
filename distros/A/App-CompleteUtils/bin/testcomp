@@ -1,18 +1,18 @@
 #!perl
 
-our $DATE = '2016-11-04'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2017-07-05'; # DATE
+our $VERSION = '0.15'; # VERSION
 
 BEGIN { $ENV{TRACE} = 1 }
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::Which qw(which);
 use Getopt::Long;
-use Log::Any::Adapter qw(Screen);
+use Log::ger::Output qw(Screen);
 use String::ShellQuote;
 
 my %Opts = (
@@ -69,18 +69,18 @@ if ($comp_line =~ /\^/) {
 }
 
 my @cmd = ($^X, (map {"-I$_"} @inc),
-           "-MLog::Any::Adapter=Screen",
+           "-MLog::ger::Output=Screen",
            $script);
 
 if ($Opts{shell} eq 'tcsh') {
-    $log->tracef("[testcomp] COMMAND_LINE=<%s>", $comp_line);
+    log_trace("[testcomp] COMMAND_LINE=<%s>", $comp_line);
     $ENV{COMMAND_LINE} = $comp_line;
 } else {
-    $log->tracef("[testcomp] COMP_LINE=<%s>, COMP_POINT=%d", $comp_line, $comp_point);
+    log_trace("[testcomp] COMP_LINE=<%s>, COMP_POINT=%d", $comp_line, $comp_point);
     $ENV{COMP_LINE}  = $comp_line;
     $ENV{COMP_POINT} = $comp_point;
 }
-$log->tracef("[testcomp] exec(): %s", \@cmd);
+log_trace("[testcomp] exec(): %s", \@cmd);
 exec @cmd;
 
 # ABSTRACT: Test your tab completion
@@ -98,7 +98,7 @@ testcomp - Test your tab completion
 
 =head1 VERSION
 
-This document describes version 0.13 of testcomp (from Perl distribution App-CompleteUtils), released on 2016-11-04.
+This document describes version 0.15 of testcomp (from Perl distribution App-CompleteUtils), released on 2017-07-05.
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ Examples:
 This utility will run your script (finding it in C<PATH> if not found in current
 directory) while setting C<COMP_LINE> and C<COMP_POINT> to test how your script
 will perform shell completion. In addition to that, it will also load
-L<Log::Any::Adapter::Screen> and set C<TRACE=1> to let you see trace log
+L<Log::ger::Output::Screen> and set C<TRACE=1> to let you see trace log
 messages.
 
 You can place caret sign (C<^>) somewhere in the argument to place cursor (set
@@ -184,7 +184,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

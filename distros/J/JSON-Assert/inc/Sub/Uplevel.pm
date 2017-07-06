@@ -3,7 +3,8 @@ package Sub::Uplevel;
 use 5.006;
 use strict;
 # ABSTRACT: apparently run a function in a higher stack frame
-our $VERSION = '0.24'; # VERSION
+
+our $VERSION = '0.25';
 
 # Frame check global constant
 our $CHECK_FRAMES;
@@ -50,6 +51,77 @@ sub _force_reload {
   }
 }
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Sub::Uplevel;
+#pod
+#pod   sub foo {
+#pod       print join " - ", caller;
+#pod   }
+#pod
+#pod   sub bar {
+#pod       uplevel 1, \&foo;
+#pod   }
+#pod
+#pod   #line 11
+#pod   bar();    # main - foo.plx - 11
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod Like Tcl's uplevel() function, but not quite so dangerous.  The idea
+#pod is just to fool caller().  All the really naughty bits of Tcl's
+#pod uplevel() are avoided.
+#pod
+#pod B<THIS IS NOT THE SORT OF THING YOU WANT TO DO EVERYDAY>
+#pod
+#pod =over 4
+#pod
+#pod =item B<uplevel>
+#pod
+#pod   uplevel $num_frames, \&func, @args;
+#pod
+#pod Makes the given function think it's being executed $num_frames higher
+#pod than the current stack level.  So when they use caller($frames) it
+#pod will actually give caller($frames + $num_frames) for them.
+#pod
+#pod C<uplevel(1, \&some_func, @_)> is effectively C<goto &some_func> but
+#pod you don't immediately exit the current subroutine.  So while you can't
+#pod do this:
+#pod
+#pod     sub wrapper {
+#pod         print "Before\n";
+#pod         goto &some_func;
+#pod         print "After\n";
+#pod     }
+#pod
+#pod you can do this:
+#pod
+#pod     sub wrapper {
+#pod         print "Before\n";
+#pod         my @out = uplevel 1, &some_func;
+#pod         print "After\n";
+#pod         return @out;
+#pod     }
+#pod
+#pod C<uplevel> has the ability to issue a warning if C<$num_frames> is more than
+#pod the current call stack depth, although this warning is disabled and compiled
+#pod out by default as the check is relatively expensive.
+#pod
+#pod To enable the check for debugging or testing, you should set the global
+#pod C<$Sub::Uplevel::CHECK_FRAMES> to true before loading Sub::Uplevel for the
+#pod first time as follows:
+#pod
+#pod     #!/usr/bin/perl
+#pod     
+#pod     BEGIN {
+#pod         $Sub::Uplevel::CHECK_FRAMES = 1;
+#pod     }
+#pod     use Sub::Uplevel;
+#pod
+#pod Setting or changing the global after the module has been loaded will have
+#pod no effect.
+#pod
+#pod =cut
 
 # @Up_Frames -- uplevel stack
 # $Caller_Proxy -- whatever caller() override was in effect before uplevel
@@ -111,6 +183,55 @@ sub _uplevel_caller (;$) { ## no critic Prototypes
     # to skip this function's caller
     return $Caller_Proxy->( $height + 1 ) if ! @Up_Frames;
 
+#pod =begin _private
+#pod
+#pod So it has to work like this:
+#pod
+#pod     Call stack               Actual     uplevel 1
+#pod CORE::GLOBAL::caller
+#pod Carp::short_error_loc           0
+#pod Carp::shortmess_heavy           1           0
+#pod Carp::croak                     2           1
+#pod try_croak                       3           2
+#pod uplevel                         4            
+#pod function_that_called_uplevel    5            
+#pod caller_we_want_to_see           6           3
+#pod its_caller                      7           4
+#pod
+#pod So when caller(X) winds up below uplevel(), it only has to use  
+#pod CORE::caller(X+1) (to skip CORE::GLOBAL::caller).  But when caller(X)
+#pod winds up no or above uplevel(), it's CORE::caller(X+1+uplevel+1).
+#pod
+#pod Which means I'm probably going to have to do something nasty like walk
+#pod up the call stack on each caller() to see if I'm going to wind up   
+#pod before or after Sub::Uplevel::uplevel().
+#pod
+#pod =end _private
+#pod
+#pod =begin _dagolden
+#pod
+#pod I found the description above a bit confusing.  Instead, this is the logic
+#pod that I found clearer when CORE::GLOBAL::caller is invoked and we have to
+#pod walk up the call stack:
+#pod
+#pod * if searching up to the requested height in the real call stack doesn't find
+#pod a call to uplevel, then we can return the result at that height in the
+#pod call stack
+#pod
+#pod * if we find a call to uplevel, we need to keep searching upwards beyond the
+#pod requested height at least by the amount of upleveling requested for that
+#pod call to uplevel (from the Up_Frames stack set during the uplevel call)
+#pod
+#pod * additionally, we need to hide the uplevel subroutine call, too, so we search
+#pod upwards one more level for each call to uplevel
+#pod
+#pod * when we've reached the top of the search, we want to return that frame
+#pod in the call stack, i.e. the requested height plus any uplevel adjustments
+#pod found during the search
+#pod
+#pod =end _dagolden
+#pod
+#pod =cut
 
     my $saw_uplevel = 0;
     my $adjust = 0;
@@ -146,9 +267,77 @@ sub _uplevel_caller (;$) { ## no critic Prototypes
     return @_ ? @caller : @caller[0..2];  # extra info or regular
 }
 
+#pod =back
+#pod
+#pod =head1 EXAMPLE
+#pod
+#pod The main reason I wrote this module is so I could write wrappers
+#pod around functions and they wouldn't be aware they've been wrapped.
+#pod
+#pod     use Sub::Uplevel;
+#pod
+#pod     my $original_foo = \&foo;
+#pod
+#pod     *foo = sub {
+#pod         my @output = uplevel 1, $original_foo;
+#pod         print "foo() returned:  @output";
+#pod         return @output;
+#pod     };
+#pod
+#pod If this code frightens you B<you should not use this module.>
+#pod
+#pod
+#pod =head1 BUGS and CAVEATS
+#pod
+#pod Well, the bad news is uplevel() is about 5 times slower than a normal
+#pod function call.  XS implementation anyone?  It also slows down every invocation
+#pod of caller(), regardless of whether uplevel() is in effect.
+#pod
+#pod Sub::Uplevel overrides CORE::GLOBAL::caller temporarily for the scope of
+#pod each uplevel call.  It does its best to work with any previously existing
+#pod CORE::GLOBAL::caller (both when Sub::Uplevel is first loaded and within 
+#pod each uplevel call) such as from Contextual::Return or Hook::LexWrap.  
+#pod
+#pod However, if you are routinely using multiple modules that override 
+#pod CORE::GLOBAL::caller, you are probably asking for trouble.
+#pod
+#pod You B<should> load Sub::Uplevel as early as possible within your program.  As
+#pod with all CORE::GLOBAL overloading, the overload will not affect modules that
+#pod have already been compiled prior to the overload.  One module that often is
+#pod unavoidably loaded prior to Sub::Uplevel is Exporter.  To forcibly recompile
+#pod Exporter (and Exporter::Heavy) after loading Sub::Uplevel, use it with the
+#pod ":aggressive" tag:
+#pod
+#pod     use Sub::Uplevel qw/:aggressive/;
+#pod
+#pod The private function C<Sub::Uplevel::_force_reload()> may be passed a list of
+#pod additional modules to reload if ":aggressive" is not aggressive enough.  
+#pod Reloading modules may break things, so only use this as a last resort.
+#pod
+#pod As of version 0.20, Sub::Uplevel requires Perl 5.6 or greater.
+#pod
+#pod =head1 HISTORY
+#pod
+#pod Those who do not learn from HISTORY are doomed to repeat it.
+#pod
+#pod The lesson here is simple:  Don't sit next to a Tcl programmer at the
+#pod dinner table.
+#pod
+#pod =head1 THANKS
+#pod
+#pod Thanks to Brent Welch, Damian Conway and Robin Houston.
+#pod
+#pod See http://www.perl.com/perl/misc/Artistic.html
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod PadWalker (for the similar idea with lexicals), Hook::LexWrap, 
+#pod Tcl's uplevel() at http://www.scriptics.com/man/tcl8.4/TclCmd/uplevel.htm
+#pod
+#pod =cut
 
 1;
 
 __END__
-#line 386
 
+#line 598

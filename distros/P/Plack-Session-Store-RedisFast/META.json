@@ -69,7 +69,7 @@
          "web" : "https://github.com/akzhan/perl-Plack-Session-Store-RedisFast"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

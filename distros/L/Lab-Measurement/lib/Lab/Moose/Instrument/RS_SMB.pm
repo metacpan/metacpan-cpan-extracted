@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_SMB;
-$Lab::Moose::Instrument::RS_SMB::VERSION = '3.550';
+$Lab::Moose::Instrument::RS_SMB::VERSION = '3.552';
 use 5.010;
 
 use Moose;

@@ -1,0 +1,18 @@
+0.003   2017-06-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix example in Synopsis.
+
+
+0.002   2017-06-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update example in Synopsis.
+
+
+0.001   2017-06-24 (PERLANCAR)
+
+        - First release, modified from Log::Dispatch::Dir. Log::Dispatch::Dir
+          will later be changed to be based on us.

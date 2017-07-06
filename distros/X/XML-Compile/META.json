@@ -35,7 +35,7 @@
             "Digest::MD5" : "2.36",
             "IO" : "1.22",
             "List::Util" : "0",
-            "Log::Report" : "1.03",
+            "Log::Report" : "1.2",
             "MIME::Base64" : "3.1",
             "Math::BigInt" : "1.77",
             "Math::BigRat" : "0.1",
@@ -49,5 +49,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.57"
+   "version" : "1.58"
 }

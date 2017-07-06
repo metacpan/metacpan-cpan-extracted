@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::Data;
-$Test::BDD::Cucumber::Harness::Data::VERSION = '0.52';
+$Test::BDD::Cucumber::Harness::Data::VERSION = '0.53';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::Data - Builds up an internal data representation of test passes / failures
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,8 @@ A L<Test::BDD::Cucumber::Harness> subclass which collates test data
 
 use strict;
 use warnings;
-use Moose;
+use Moo;
+use Types::Standard qw( HashRef ArrayRef );
 use Test::More;
 use Test::BDD::Cucumber::Model::Result;
 
@@ -31,7 +32,7 @@ C<feature_done> is called, it won't be in here.
 
 =cut
 
-has 'features' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
+has 'features' => ( is => 'rw', isa => ArrayRef, default => sub { [] } );
 
 =head2 current_feature
 
@@ -45,10 +46,10 @@ not the C<_done> method.
 =cut
 
 has 'current_feature' =>
-  ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+  ( is => 'rw', isa => HashRef, default => sub { {} } );
 has 'current_scenario' =>
-  ( is => 'rw', isa => 'HashRef', default => sub { {} } );
-has 'current_step' => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+  ( is => 'rw', isa => HashRef, default => sub { {} } );
+has 'current_step' => ( is => 'rw', isa => HashRef, default => sub { {} } );
 
 =head2 feature
 

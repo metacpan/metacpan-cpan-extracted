@@ -1,0 +1,12 @@
+Build.PL
+lib/Text/Summarizer.pm
+LICENSE
+MANIFEST			This list of files
+README.md
+scripts/SummarizeAll.pl
+words/permanent.stop
+words/stopwords.stop
+words/watchlist.stop
+Makefile.PL
+META.yml
+META.json

@@ -782,7 +782,7 @@ decode_av (dec_t *dec)
         {
           WANT (1);
 
-          if (*dec->cur == (MAJOR_MISC | MINOR_INDEF))
+          if (*dec->cur == (MAJOR_MISC | MINOR_INDEF) || dec->err)
             {
               ++dec->cur;
               break;
@@ -900,7 +900,7 @@ decode_hv (dec_t *dec)
         {
           WANT (1);
 
-          if (*dec->cur == (MAJOR_MISC | MINOR_INDEF))
+          if (*dec->cur == (MAJOR_MISC | MINOR_INDEF) || dec->err)
             {
               ++dec->cur;
               break;
@@ -1031,7 +1031,7 @@ decode_tagged (dec_t *dec)
 
           UV idx = decode_uint (dec);
 
-          if (!dec->stringref || (int)idx > AvFILLp (dec->stringref))
+          if (!dec->stringref || idx >= (UV)(1 + AvFILLp (dec->stringref)))
             ERR ("corrupted CBOR data (stringref index out of bounds or outside namespace)");
 
           sv = newSVsv (AvARRAY (dec->stringref)[idx]);
@@ -1069,7 +1069,7 @@ decode_tagged (dec_t *dec)
 
           UV idx = decode_uint (dec);
 
-          if (!dec->shareable || (int)idx > AvFILLp (dec->shareable))
+          if (!dec->shareable || idx >= (UV)(1 + AvFILLp (dec->shareable)))
             ERR ("corrupted CBOR data (sharedref index out of bounds)");
 
           sv = SvREFCNT_inc_NN (AvARRAY (dec->shareable)[idx]);
@@ -1669,4 +1669,20 @@ void decode_cbor (SV *cborstr)
         PUTBACK; cborstr = decode_cbor (cborstr, &cbor, 0); SPAGAIN;
         XPUSHs (cborstr);
 }
+
+#ifdef __AFL_COMPILER
+
+void
+afl_init ()
+	CODE:
+        __AFL_INIT ();
+
+int
+afl_loop (unsigned int count = 10000)
+	CODE:
+	RETVAL = __AFL_LOOP (count);
+	OUTPUT:
+	RETVAL
+
+#endif
 

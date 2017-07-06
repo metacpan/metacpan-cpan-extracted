@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -34,24 +34,24 @@ my $formatters = [
           '
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'leading_digits' => '
             [2467]|
             3[0-2457-9]|
             5[089]|
             8[02-9]|
             9[0-35-9]
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 },
                 {
+                  'pattern' => '(1)([358]\\d)(\\d{4})(\\d{4})',
                   'leading_digits' => '
             1(?:
               33|
               55|
               81
             )
-          ',
-                  'pattern' => '(1)([358]\\d)(\\d{4})(\\d{4})'
+          '
                 },
                 {
                   'pattern' => '(1)(\\d{3})(\\d{3})(\\d{4})',
@@ -68,9 +68,8 @@ my $formatters = [
               ];
 
 my $validators = {
-                'pager' => '',
-                'voip' => '',
-                'fixed_line' => '
+                'specialrate' => '(300\\d{7})|(900\\d{7})',
+                'geographic' => '
           (?:
             33|
             55|
@@ -138,7 +137,15 @@ my $validators = {
             )
           )\\d{7}
         ',
-                'specialrate' => '(300\\d{7})|(900\\d{7})',
+                'personal_number' => '500\\d{7}',
+                'voip' => '',
+                'toll_free' => '
+          8(?:
+            00|
+            88
+          )\\d{7}
+        ',
+                'pager' => '',
                 'mobile' => '
           1(?:
             (?:
@@ -208,13 +215,7 @@ my $validators = {
             )\\d{7}
           )
         ',
-                'toll_free' => '
-          8(?:
-            00|
-            88
-          )\\d{7}
-        ',
-                'geographic' => '
+                'fixed_line' => '
           (?:
             33|
             55|
@@ -281,8 +282,7 @@ my $validators = {
               8[1-8]
             )
           )\\d{7}
-        ',
-                'personal_number' => '500\\d{7}'
+        '
               };
 
     sub new {

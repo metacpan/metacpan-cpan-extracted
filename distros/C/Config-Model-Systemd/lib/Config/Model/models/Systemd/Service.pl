@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2016 by Dominique Dumont.
+# This software is Copyright (c) 2015-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -35,6 +35,7 @@
         }
       }
     ],
+    'generated_by' => 'parse-man.pl from systemd doc',
     'include' => [
       'Systemd::CommonElements'
     ],

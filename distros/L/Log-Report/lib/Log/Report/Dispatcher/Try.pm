@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Dispatcher::Try;
 use vars '$VERSION';
-$VERSION = '1.19';
+$VERSION = '1.21';
 
 use base 'Log::Report::Dispatcher';
 
@@ -30,13 +30,6 @@ sub init($)
     $self->{died}       = delete $args->{died};
     $self->hide($args->{hide} // 'NONE');
     $self->{on_die}     = $args->{on_die} // 'ERROR';
-    $self;
-}
-
-
-sub close()
-{   my $self = shift;
-    $self->SUPER::close or return;
     $self;
 }
 
@@ -94,8 +87,8 @@ sub log($$$$)
 
     push @{$self->{exceptions}}, $e;
 
-    $self->{died} ||=
-        exists $opts->{is_fatal} ? $opts->{is_fatal} : $e->isFatal;
+#    $self->{died} ||=
+#        exists $opts->{is_fatal} ? $opts->{is_fatal} : $e->isFatal;
 
     $self;
 }
@@ -106,13 +99,15 @@ sub reportAll(@)   { $_->throw(@_) for shift->exceptions }
 
 #-----------------
 
-sub failed()  {   shift->{died}}
-sub success() { ! shift->{died}}
+sub failed()  {   defined shift->{died}}
+sub success() { ! defined shift->{died}}
+
 
 
 sub wasFatal(@)
 {   my ($self, %args) = @_;
-    $self->{died} or return ();
+    defined $self->{died} or return ();
+
     my $ex = $self->{exceptions}[-1];
     (!$args{class} || $ex->inClass($args{class})) ? $ex : ();
 }

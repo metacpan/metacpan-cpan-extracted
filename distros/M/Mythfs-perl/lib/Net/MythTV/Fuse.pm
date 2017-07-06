@@ -31,16 +31,18 @@ use strict;
 use warnings;
 use Net::MythTV::Fuse::Recordings;
 use Fuse 'fuse_get_context';
-use POSIX qw(ENOENT EISDIR EINVAL ECONNABORTED);
+use POSIX qw(ENOENT EISDIR ENOTDIR ENOTEMPTY EINVAL ECONNABORTED EACCES EIO);
+use Data::Dumper 'Dumper'; # for DEBUGGING!
 use Carp 'croak';
 
 use constant MARKER_FILE=> '.fuse-mythfs';
 use constant STATUS_FILE=> 'STATUS';
+use constant UPCOMING_FILE=> 'UPCOMING';
 
-our $VERSION = '1.33';
+our $VERSION = '1.36';
 
 my $Package = __PACKAGE__;
-my $Recorded;
+my ($Recorded,$Options);
 
 =head2 $f = Net::MythTV::Fuse->new(@options)
 
@@ -117,6 +119,7 @@ sub run {
 
     # copy critical parameters into package globals so that Fuse callbacks work
     $Recorded   = $self->recordings;
+    $Options    = $options;
 
     $self->recordings->start_update_thread;
     
@@ -124,6 +127,8 @@ sub run {
 	       getdir     => "$Package\:\:e_getdir",
 	       getattr    => "$Package\:\:e_getattr",
 	       open       => "$Package\:\:e_open",
+	       unlink     => "$Package\:\:e_unlink",
+	       rmdir      => "$Package\:\:e_rmdir",
 	       read       => "$Package\:\:e_read",
 	       release    => "$Package\:\:e_release",
 	       readlink   => "$Package\:\:e_readlink",
@@ -141,11 +146,13 @@ generate the virtual filesystem:
 
  $clean_path = fixup($path)                Remove the leading '/' from file paths.
  $status     = e_open($path)               Check that $path can be opened and return 0 if so.
- $status     = e_release($path)            Called to release a closed path.
+ $status     = e_release($path)            Called to release a closed path, returns 0 if successful.
  $contents   = e_read($path,$size,$offset) Called to read $size bytes from $path starting at $offset.
  @entries    = e_getdir($path)             Return all entries within directory indicated by $path.
  $contents   = e_readlink($path)           Resolve a symbolic link (used when recordings mounted locally).
  @attributes = e_getattr($path)            Stat() call on $path
+ $status     = e_unlink($path)             Called to remove a file, returns 0 if successful.
+ $status     = e_rmdir($path)              Called to remove a directory, returns 0 if successful.
  $string     = copyright_and_version()     Return contents of the automatic file ".fuse-mythfs"
 
 =cut
@@ -158,7 +165,9 @@ sub fixup {
 
 sub e_open {
     my $path = fixup(shift);
-    return 0 if $path eq MARKER_FILE or $path eq STATUS_FILE;
+
+    # awkward: fix
+    return 0 if $path eq MARKER_FILE or $path eq STATUS_FILE or $path eq UPCOMING_FILE;
     
     $Recorded->valid_path($path) or return -ENOENT();
     $Recorded->is_dir($path)    and return -EISDIR();
@@ -169,11 +178,34 @@ sub e_release {
     return 0;
 }
 
+sub e_unlink {
+    my $path   = fixup(shift);
+
+    $Recorded->valid_path($path) or return -ENOENT();
+    $Recorded->is_dir($path)    and return -EISDIR();
+    return -EACCES() if $path eq MARKER_FILE or $path eq STATUS_FILE or $path eq UPCOMING_FILE;   
+
+    my $status = $Recorded->delete_recording($path);
+    $status eq 'ok' or return -EIO();
+    return 0;
+}
+
+sub e_rmdir {
+    my $path   = fixup(shift);
+    $Recorded->valid_path($path) or return -ENOENT();
+    $Recorded->is_dir($path)     or return -ENOTDIR();
+    my $status = $Recorded->delete_directory($path);
+    $status eq 'directory not empty' and return -ENOTEMPTY();
+    $status eq 'ok' or return -EIO();
+    return 0;
+}
+
 sub e_read {
     my ($path,$size,$offset) = @_;
     $offset ||= 0;
     $path = fixup($path);
 
+    # we need to create a special method for these special files
     if ($path eq MARKER_FILE) {
 	my $content = copyright_and_version();
 	return substr($content,$offset,$size);
@@ -181,6 +213,11 @@ sub e_read {
 
     if ($path eq STATUS_FILE) {
 	my $content = $Recorded->status;
+	return substr($content,$offset,$size);
+    }
+
+    if ($path eq UPCOMING_FILE) {
+	my $content = _get_upcoming_list();
 	return substr($content,$offset,$size);
     }
 
@@ -195,8 +232,7 @@ sub e_getdir {
     my $path = fixup(shift) || '.';
 
     my @entries = $Recorded->entries($path);
-    unshift @entries,MARKER_FILE if $path eq '.';
-    unshift @entries,STATUS_FILE if $path eq '.';
+    unshift @entries,MARKER_FILE,STATUS_FILE,UPCOMING_FILE if $path eq '.';
     return -ENOENT() unless @entries;
     return ('.','..',@entries,0);
 }
@@ -230,13 +266,29 @@ sub e_getattr {
 	    length($contents),time(),time(),time(),$blksize,$blocks);
     }
 
+    if ($path eq UPCOMING_FILE) { # another special case
+	my $content = _get_upcoming_list();
+	return (
+	    $dev,$ino,0100000|0444,$nlink,$uid,$gid,$rdev,
+	    length($content),time(),time(),time(),$blksize,$blocks);
+    }
+
     my $entry    = $Recorded->entry($path) or return -ENOENT();
+
+    # debugging an occasional error
+    unless ($entry->{type}) {
+	warn "broken entry for path =$path";
+	print STDERR Data::Dumper::Dumper($entry);
+	return -ENOENT();
+    }
 
     my $basename = $entry->{basename};
     my $isdir    = $entry->{type} eq 'directory';
     my $islink   = $entry->{type} eq 'file' && $Recorded->localmount && -r $Recorded->localmount."/$basename";
 
-    my $mode = $isdir ? 0040000|0555 : ($islink ? 0120000|0777 : 0100000|0444);
+    my $readonly = $Options->{fuse_options}=~ /\bro\b/;
+    my $write = $readonly ? 0000                : 0200;
+    my $mode  = $isdir    ? 0040000|0555|$write : ($islink ? 0120000|0777 : 0100000|0444|$write);
 
     my $ctime = $entry->{ctime};
     my $mtime = $entry->{mtime};
@@ -253,6 +305,11 @@ mythfs.pl version $VERSION.
 Copyright 2013 Lincoln D. Stein <lincoln.stein\@gmail.com>. 
 Distributed under Perl Artistic License Version 2.
 END
+}
+
+sub _get_upcoming_list {
+    my $self = shift;
+    return $Recorded->get_upcoming_list;
 }
 
 

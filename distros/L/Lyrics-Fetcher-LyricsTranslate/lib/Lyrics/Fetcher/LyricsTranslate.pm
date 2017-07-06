@@ -8,7 +8,7 @@ use HTML::TreeBuilder;
 use HTTP::Tiny;
 use Scalar::Util qw/looks_like_number/;
 
-our $VERSION = '0.002';
+our $VERSION = '0.002001';
 our $BASE_URL = 'http://lyricstranslate.com';
 # 0 means (from) any language; the following arguments are the
 # destination language, artist, and title. The meaning of the last
@@ -42,7 +42,7 @@ sub fetch {
 		return
 	}
 	$tree = HTML::TreeBuilder->new_from_content($response->{content});
-	my $node = $tree->look_down(class => qr/\btranslate-node-text\b/);
+	my $node = $tree->look_down(class => qr/(?<!\S)translate-node-text(?!\S)/);
 	my $ltf = $node->look_down(class => qr/\bltf\b/);
 	my @pars = $ltf->look_down(class => 'par');
 	join "\n", map {
@@ -446,7 +446,7 @@ Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Marius Gavrilescu
+Copyright (C) 2016-2017 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.0 or,

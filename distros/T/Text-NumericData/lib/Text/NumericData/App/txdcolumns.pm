@@ -4,6 +4,12 @@ use Text::NumericData::App;
 
 use strict;
 
+# This is just a placeholder because of a past build system bug.
+# The one and only version for Text::NumericData is kept in
+# the Text::NumericData module itself.
+our $VERSION = '1';
+$VERSION = eval $VERSION;
+
 my $infostring = 'get specific columns out of textual data files
 
 Usage:

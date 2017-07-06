@@ -38,19 +38,23 @@ requires:
   Cwd: '0'
   DBM::Deep: '0'
   Data::Dumper: '0'
+  Data::UUID: '0'
   DateTime: '0'
   DateTime::Format::Duration: '0'
   File::Basename: '0'
   File::Copy: '0'
+  File::Find::Rule: '0'
   File::Path: '0'
   File::Slurp: '0'
   File::Spec: '0'
   File::Temp: '0'
+  File::stat: '0'
   Git::Wrapper: '0'
   Git::Wrapper::Plus::Branches: '0'
   Git::Wrapper::Plus::Ref::Tag: '0'
   Git::Wrapper::Plus::Tags: '0'
   HPC::Runner::Command::Utils::ManyConfigs: '0'
+  IO::Dir: '0'
   IO::File: '0'
   IO::Interactive: '0'
   IO::Select: '0'
@@ -77,7 +81,9 @@ requires:
   MooseX::Types: '0'
   MooseX::Types::Moose: '0'
   MooseX::Types::Path::Tiny: '0'
+  Number::Bytes::Human: '0'
   POSIX: '0'
+  Path::Tiny: '0'
   Sort::Versions: '0'
   Storable: '0'
   String::Approx: '0'
@@ -97,7 +103,7 @@ resources:
   bugtracker: https://github.com/biosails/HPC-Runner-Command/issues
   homepage: https://github.com/biosails/HPC-Runner-Command
   repository: https://github.com/biosails/HPC-Runner-Command.git
-version: 3.2.5
+version: 3.2.6
 x_contributors:
   - 'Travis CI <nobody@nobody.org>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

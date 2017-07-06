@@ -1,0 +1,77 @@
+{
+   "abstract" : "set of scripts to manage a CPAN::Reporter::Smoker on OpenBSD",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Reporter-Smoker-OpenBSD",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN" : "0",
+            "CPAN::Mini" : "1.111016",
+            "DBI" : "1.636",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "1.69",
+            "Set::Tiny" : "0.04",
+            "Term::ProgressBar" : "2.18",
+            "Test::Reporter" : "1.62",
+            "Test::Reporter::Transport::Socket" : "0.32",
+            "YAML::XS" : "0.63",
+            "perl" : "5.012",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Warnings" : "0.026",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "CPAN::Reporter::Smoker::OpenBSD" : {
+         "file" : "lib/CPAN/Reporter/Smoker/OpenBSD.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/glasswalk3r/cpan-openbsd-smoker/issues"
+      },
+      "homepage" : "https://github.com/glasswalk3r/cpan-openbsd-smoker",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/glasswalk3r/cpan-openbsd-smoker.git",
+         "web" : "https://github.com/glasswalk3r/cpan-openbsd-smoker"
+      }
+   },
+   "version" : "0.007",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

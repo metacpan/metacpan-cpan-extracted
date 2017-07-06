@@ -2,7 +2,7 @@ package Test2::Plugin::SourceDiag;
 use strict;
 use warnings;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 
 use Test2::Event::Diag;
 
@@ -51,8 +51,6 @@ sub filter {
 
     my $trace = $event->trace           or return $event;
     my $code  = get_assert_code($trace) or return $event;
-
-    chomp($code);
 
     if ($event->can('name') && !$event->name && $event->can('set_name')) {
         my $text = join "\n" => @{$code->{source}};

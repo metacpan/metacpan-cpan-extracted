@@ -7,6 +7,8 @@ use Cassandra::Client;
 use Cassandra::Client::Util qw/series parallel/;
 use Scalar::Util 'weaken';
 use Socket qw/PF_INET SOCK_STREAM/;
+use Devel::Cycle;
+use Data::Dumper;
 
 plan skip_all => "CASSANDRA_HOST not set" unless $ENV{CASSANDRA_HOST};
 plan tests => 14;
@@ -97,19 +99,15 @@ if (join(',', @fd_sequence_init) ne join(',', @fd_sequence_init2)) {
 }
 
 if (!$deinit) {
-    if (eval("use Devel::Cycle; use Data::Dumper; 1")) {
-        my $trivial_cycles;
-        find_cycle($client, sub {
-            $trivial_cycles= 1;
-        });
+    my $trivial_cycles;
+    find_cycle($client, sub {
+        $trivial_cycles= 1;
+    });
 
-        if ($trivial_cycles) {
-            diag("Trivial cycles found, should be easy to fix.");
-        } else {
-            diag("No trivial cycles found, but we do have a memory leak!");
-        }
+    if ($trivial_cycles) {
+        diag("Trivial cycles found, should be easy to fix.");
     } else {
-        diag("Skipping cycle check: can't load Devel::Cycle");
+        diag("No trivial cycles found, but we do have a memory leak!");
     }
 }
 

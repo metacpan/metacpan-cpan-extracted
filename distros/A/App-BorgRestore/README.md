@@ -15,6 +15,7 @@ borg-restore.pl \[options\] &lt;path>
                                 <time spec> old
      --adhoc                    Do not use the cache, instead provide an
                                 unfiltered list of archive to choose from
+     --version                  display the version of the program
 
     Time spec:
      Select the newest backup that is at least <time spec> old.
@@ -84,6 +85,10 @@ It can be used to build your own restoration script.
     yet and you want to restore a file without having to manually call borg
     extract. Using this option will show all archives that borg knows about, even
     if they do not contain the file that shall be restored.
+
+- **--version**
+
+    Output the program version.
 
 # CONFIGURATION
 

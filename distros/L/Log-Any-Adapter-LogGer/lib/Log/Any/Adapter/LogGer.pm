@@ -1,7 +1,7 @@
 package Log::Any::Adapter::LogGer;
 
-our $DATE = '2017-06-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-06-25'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,10 +37,10 @@ for my $method (Log::Any->logging_methods()) {
             my $cat = $self->{category};
             unless ($LogGer_Objects{$cat}) {
                 $LogGer_Objects{$cat} =
-                    Log::ger::setup_object(category => $cat);
+                    Log::ger->get_logger(category => $cat);
             }
-            my $lg_method = "log_$method";
-            $lg_method = "log_warn" if $lg_method eq 'log_warning';
+            my $lg_method = $method;
+            $lg_method = "warn" if $lg_method eq 'warning';
             #if ($LogGer_Objects{$cat}->can($lg_method)) {
             $LogGer_Objects{$cat}->$lg_method($msg);
             #}
@@ -71,7 +71,7 @@ Log::Any::Adapter::LogGer - Send Log::Any logs to Log::ger
 
 =head1 VERSION
 
-This document describes version 0.002 of Log::Any::Adapter::LogGer (from Perl distribution Log-Any-Adapter-LogGer), released on 2017-06-21.
+This document describes version 0.003 of Log::Any::Adapter::LogGer (from Perl distribution Log-Any-Adapter-LogGer), released on 2017-06-25.
 
 =head1 SYNOPSIS
 

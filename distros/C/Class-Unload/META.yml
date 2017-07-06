@@ -3,13 +3,14 @@ abstract: 'Unload a class'
 author:
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>;'
 build_requires:
-  Test::More: '0'
+  Test::More: '0.88'
+  Test::Requires: '0'
   base: '0'
   lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,4 +24,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Unload
   homepage: https://github.com/ilmari/Class-Unload
   repository: https://github.com/ilmari/Class-Unload.git
-version: '0.09'
+version: '0.11'
+x_serialization_backend: 'YAML::Tiny version 1.70'

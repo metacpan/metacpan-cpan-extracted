@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 #
 # This file is part of Image-Base-Magick.
 #
@@ -20,12 +20,12 @@ Section: perl
 Priority: optional
 Build-Depends: cdbs, debhelper (>= 5)
 Maintainer: Kevin Ryde <user42@zip.com.au>
-Standards-Version: 3.9.3
+Standards-Version: 3.9.8
 Homepage: http://user42.tuxfamily.org/image-base-magick/index.html
 Bugs: mailto:user42@zip.com.au
 
 Package: libimage-base-magick-perl
 Architecture: all
-Depends: perl (>= 5.004), libimage-base-perl | libimage-base-bundle-perl, perlmagick, ${perl:Depends}, ${misc:Depends}
+Depends: perl (>= 5.004), libimage-base-perl | libimage-base-bundle-perl, libimage-magick-perl | perlmagick, ${perl:Depends}, ${misc:Depends}
 Description: Create or update image files using ImageMagick
  An Image::Base extension to operate on files using ImageMagick.

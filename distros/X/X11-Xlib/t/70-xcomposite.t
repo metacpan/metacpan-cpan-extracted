@@ -41,6 +41,7 @@ SKIP: {
     note "region = $region";
     is( err{ $display->XFixesSetWindowShapeRegion($overlay, ShapeBounding, 0, 0, 0) }, '', 'XFixesSetWindowShapeRegion' );
     is( err{ $display->XFixesSetWindowShapeRegion($overlay, ShapeInput, 0, 0, $region) }, '', 'XFixesSetWindowShapeRegion' );
+    $region->autofree(0);
     is( err{ $display->XFixesDestroyRegion($region) }, '', 'XFixesDestroyRegion' );
 }
 

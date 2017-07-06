@@ -3,7 +3,7 @@ package Specio::Coercion;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use Specio::OO;
 
@@ -140,7 +140,7 @@ Specio::Coercion - A class representing a coercion from one type to another
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 

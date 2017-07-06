@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Extension;
-$Test::BDD::Cucumber::Extension::VERSION = '0.52';
+$Test::BDD::Cucumber::Extension::VERSION = '0.53';
 =head1 NAME
 
 Test::BDD::Cucumber::Extension - Abstract superclass for extensions
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -16,7 +16,8 @@ the BDD script execution.
 
 =cut
 
-use Moose;
+use Moo;
+use Types::Standard qw( HashRef );
 
 =head1 PROPERTIES
 
@@ -29,7 +30,7 @@ should look for their own configuration in
 
 =cut
 
-has config => ( is => 'rw', isa => 'HashRef' );
+has config => ( is => 'rw', isa => HashRef );
 
 =head1 METHODS
 

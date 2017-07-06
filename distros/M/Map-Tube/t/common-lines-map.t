@@ -17,7 +17,7 @@ eval "use Test::Map::Tube $min_ver tests => 1";
 plan skip_all => "Test::Map::Tube $min_ver required." if $@;
 
 my @routes = <DATA>;
-ok_map_routes(CommonLinesMap->new, \@routes);
+ok_map_routes(CommonLinesMap->new(experimental =>1), \@routes);
 
 __DATA__
 Route 1|A|D|A,B,C,D

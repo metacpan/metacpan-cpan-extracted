@@ -24,5 +24,5 @@ resources:
   bugtracker: https://github.com/jhthorsen/toadfarm/issues
   homepage: https://github.com/jhthorsen/toadfarm
   repository: https://github.com/jhthorsen/toadfarm.git
-version: '0.77'
+version: '0.78'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

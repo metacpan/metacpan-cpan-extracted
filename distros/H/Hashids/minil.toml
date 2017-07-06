@@ -1,2 +1,3 @@
 name="Hashids"
-badges = ['travis', 'coveralls']
+badges = ['travis', 'coveralls', 'metacpan']
+license = "mit"

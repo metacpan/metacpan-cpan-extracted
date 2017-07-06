@@ -29,7 +29,6 @@ plists/test3.plist
 ppport.h
 README
 t/00-load.t
-t/01.t
 t/array.t
 t/bad.t
 t/basic_types.t

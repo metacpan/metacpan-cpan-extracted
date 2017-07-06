@@ -9,10 +9,10 @@ build_requires:
   Test::More: '0'
   perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
   directory:
     - t/08-_get_packages_not_indexed
 requires:
-  MetaCPAN::API::Tiny: '0'
+  MetaCPAN::Client: '0'
   Module::CPANTS::Analyse: '0.87'
   Module::CoreList: 2.31_01
   Module::Extract::Namespaces: '0'
@@ -33,4 +33,5 @@ requires:
 resources:
   homepage: https://github.com/yak1ex/Test-Kwalitee-Extra
   repository: https://github.com/yak1ex/Test-Kwalitee-Extra.git
-version: v0.3.1
+version: v0.4.0
+x_serialization_backend: 'YAML::Tiny version 1.70'

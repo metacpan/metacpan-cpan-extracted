@@ -13,3 +13,18 @@ Revision history for Perl6-Controls
 
     * Documented limitations of FIRST phaser
       (thanks, ZZ!)
+
+
+
+0.000005  Wed Jun 28 21:16:14 2017
+
+    * Added dependency on experimentals.pm
+      (Thanks Slaven and Bart)
+
+
+
+
+0.000006  Thu Jul  6 13:04:57 2017
+
+    * Now works with Perl 5.12 or greater
+      (under Keyword::Declare 0.001003 or later)

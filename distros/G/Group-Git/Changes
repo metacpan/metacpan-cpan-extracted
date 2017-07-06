@@ -1,5 +1,15 @@
 Revision history for Group-Git
 
+0.6.3   2017-07-03
+        Updating for release of version 0.6.3
+        Using new cmd() method (Ivan Wills)
+        Changed the way cmd() works to be more generic (Ivan Wills)
+
+0.6.2   2017-06-26
+        Updating for release of version 0.6.2
+        Added in new lib to config (Ivan Wills)
+        Fixed usage documentation (Ivan Wills)
+
 0.6.1   2017-06-18
         Updating for release of version 0.6.1
         Adding new file for testing (Ivan Wills)

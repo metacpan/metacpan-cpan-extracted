@@ -15,6 +15,7 @@
 package Google::Ads::AdWords::Utilities::BatchJobHandler;
 
 use strict;
+use warnings;
 use utf8;
 use version;
 
@@ -512,7 +513,7 @@ time that the http client waits to get a response from the server.
 If the timeout is not specified, the default is
 Google::Ads::AdWords::Constants::LWP_DEFAULT_TIMEOUT
 
-= back
+=back
 
 =head3 Returns
 
@@ -570,7 +571,7 @@ time that the http client waits to get a response from the server.
 If the timeout is not specified, the default is
 Google::Ads::AdWords::Constants::LWP_DEFAULT_TIMEOUT
 
-= back
+=back
 
 =head3 Returns
 
@@ -603,6 +604,8 @@ The timeout is an optional parameter that can be set to alter the default
 time that the http client waits to get a response from the server.
 If the timeout is not specified, the default is
 Google::Ads::AdWords::Constants::LWP_DEFAULT_TIMEOUT
+
+=back
 
 =head3 Returns
 

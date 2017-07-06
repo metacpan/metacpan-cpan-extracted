@@ -5,6 +5,9 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
+use strict;
+use warnings;
+
 use Test;
 BEGIN { plan tests => 77 }
 use HTML::Scrubber;

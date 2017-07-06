@@ -15,6 +15,7 @@
 package Google::Ads::AdWords::Serializer;
 
 use strict;
+use warnings;
 use utf8;
 use version;
 
@@ -29,9 +30,9 @@ use Google::Ads::AdWords::Logging;
 use Class::Std::Fast;
 use SOAP::WSDL::Factory::Serializer;
 
-# A list of headers that need to be scrubbed before logging due to sensitive
+# A list of fields that need to be scrubbed before logging due to sensitive
 # content.
-use constant SCRUBBED_HEADERS => qw(developerToken);
+use constant SCRUBBED_FIELDS => qw(developerToken httpAuthorizationHeader);
 
 # Class attributes used to hook this class with the AdWords client.
 my %client_of : ATTR(:name<client> :default<>);
@@ -47,8 +48,7 @@ sub serialize {
 
   my $auth_handler = $client->_get_auth_handler();
 
-  Google::Ads::AdWords::Logging::get_soap_logger->info(
-    "Outgoing Request:\n" . $sanitized_request);
+  # The request will be logged when the response comes back in Deserializer.
   $client->set_last_soap_request($sanitized_request);
 
   return $request;
@@ -89,7 +89,7 @@ sub serialize_header {
 sub __scrub_request {
   my ($request) = @_;
   my $scrubbed_request = $request;
-  foreach my $header (SCRUBBED_HEADERS) {
+  foreach my $header (SCRUBBED_FIELDS) {
     $scrubbed_request =~
       s!<$header([^>]*)>.+?</$header>!<$header$1>REDACTED</$header>!;
   }

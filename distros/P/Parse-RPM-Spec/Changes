@@ -1,40 +1,78 @@
-2009-10-27  Dave Cross <dave@dave.org.uk>
+2017-06-23  Dave Cross <dave@perlhacks.com>
 
-  * Build.PL: Removed version defintion (use one from .pm)
+	* lib/Parse/RPM/Spec.pm: Removed extra whitespace
 
-  * lib/Parse/RPM/Spec.pm, t/parse-rpm-spec.t: Version 0.04. Handle BuildArch
-  definition. Thanks to Steve Goldner for pointing out the omission.
+2015-07-18  Dave Cross <dave@perlhacks.com>
 
-2009-08-30  Dave Cross <dave@dave.org.uk>
+	* .gitignore, .travis.yml, MANIFEST.SKIP: Added .gitignore,
+	  .travis.yml and MANIFEST.SKIP
 
-  * Build.PL, lib/Parse/RPM/Spec.pm: Add Moose as a requirement. Bump version
-  number to 0.03 for release.
+2015-07-17  Dave Cross <dave@perlhacks.com>
 
-2009-07-25  Dave Cross <dave@dave.org.uk>
+	* MANIFEST: Added META.yml to MANIFEST
 
-  * lib/Parse/RPM/Spec.pm: Made file attribute mandatory.
+2013-08-20  Justin Cook <jscook@users.noreply.github.com>
 
-  * MANIFEST, t/Parse-RPM-Spec.t, t/parse-rpm-spec.t: Renamed test file.
+	* lib/Parse/RPM/Spec.pm: Update Spec.pm  Fixed a typo in POD
 
-  * t/pod.t, t/pod_coverage.t: Added pod tests.
+2011-10-03  Dave Cross <dave@perlhacks.com>
 
-  * Build.PL: Bump version number.
+	* lib/Parse/RPM/Spec.pm: Made the spec parser more configurable (and
+	  a little more efficient).
+	* lib/Parse/RPM/Spec.pm: Fix typo in documentation.
 
-  * Changes: Removed generated file.
+2010-07-11  Dave Cross <dave@perlhacks.com>
 
-  * README, README.xml: Changed README to text file.
+	* lib/Parse/RPM/Spec.pm: Fixed docs to reflect previous fix.
+	* lib/Parse/RPM/Spec.pm: Change Source to return an array of sources
+	  (Thanks to Vadim Vatlin for the suggestion).
 
-  * t/Parse-RPM-Spec.t: Changes to support the Moose version.
+2010-02-17  Dave Cross <dave@perlhacks.com>
 
-  * lib/Parse/RPM/Spec.pm: Switch to using Moose.
+	* lib/Parse/RPM/Spec.pm: Version 0.07
+	* lib/Parse/RPM/Spec.pm: Added some docs to placate
+	  Test::Pod::Coverage.
 
-2008-08-25  Dave Cross <dave@dave.org.uk>
+2010-02-10  Dave Cross <dave@perlhacks.com>
 
-  * README, README.xml: Removed README and added README.xml
+	* lib/Parse/RPM/Spec.pm: Bump to version 0.06.
+	* lib/Parse/RPM/Spec.pm, t/file.spec, t/parse-rpm-spec.t: Added
+	  support for Epoch field. And tests for it.
 
-  * MANIFEST: Various changes
+2010-02-09  Dave Cross <dave@perlhacks.com>
 
-  * lib/Parse/RPM/Spec.pm: Added documentation
+	* lib/Parse/RPM/Spec.pm: Bump version.
+	* lib/Parse/RPM/Spec.pm, t/parse-rpm-spec.t: Parse the summary
+	  correctly. Added a test for that.
 
-  * Build.PL, Changes, MANIFEST, README, lib/Parse/RPM/Spec.pm,
-  t/Parse-RPM-Spec.t, t/file.spec: Initial revision
+2009-10-27  Dave Cross <dave@perlhacks.com>
+
+	* Build.PL: Removed version defintion (use one from .pm)
+	* lib/Parse/RPM/Spec.pm, t/parse-rpm-spec.t: Version 0.04. Handle
+	  BuildArch definition. Thanks to Steve Goldner for pointing out the
+	  omission.
+
+2009-08-30  Dave Cross <dave@perlhacks.com>
+
+	* Build.PL, lib/Parse/RPM/Spec.pm: Add Moose as a requirement. Bump
+	  version number to 0.03 for release.
+
+2009-07-25  Dave Cross <dave@perlhacks.com>
+
+	* lib/Parse/RPM/Spec.pm: Made file attribute mandatory.
+	* MANIFEST, t/{Parse-RPM-Spec.t => parse-rpm-spec.t}: Renamed test
+	  file.
+	* t/pod.t, t/pod_coverage.t: Added pod tests.
+	* Build.PL: Bump version number.
+	* Changes: Removed generated file.
+	* README, README.xml: Changed README to text file.
+	* t/Parse-RPM-Spec.t: Changes to support the Moose version.
+	* lib/Parse/RPM/Spec.pm: Switch to using Moose.
+
+2008-08-25  Dave Cross <dave@perlhacks.com>
+
+	* README, README.xml: Removed README and added README.xml
+	* MANIFEST: Various changes
+	* lib/Parse/RPM/Spec.pm: Added documentation
+	* Build.PL, Changes, MANIFEST, README, lib/Parse/RPM/Spec.pm, t
+	  /Parse-RPM-Spec.t, t/file.spec: Initial revision

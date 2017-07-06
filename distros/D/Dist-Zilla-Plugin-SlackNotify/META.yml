@@ -1,0 +1,34 @@
+---
+abstract: 'Publish a notification on Slack after release'
+author:
+  - 'Steven Leung <stvleung@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-SlackNotify
+no_index:
+  directory:
+    - corpus
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::EmailNotify: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/stvleung/dist-zilla-plugin-slacknotify.git
+  repository: git://github.com/stvleung/dist-zilla-plugin-slacknotify.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

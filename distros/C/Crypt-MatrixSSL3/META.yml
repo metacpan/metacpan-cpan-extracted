@@ -30,22 +30,22 @@ no_index:
 provides:
   Crypt::MatrixSSL3:
     file: lib/Crypt/MatrixSSL3.pm
-    version: v3.9.0
+    version: v3.9.1
   Crypt::MatrixSSL3::Client:
     file: lib/Crypt/MatrixSSL3.pm
-    version: v3.9.0
+    version: v3.9.1
   Crypt::MatrixSSL3::HelloExt:
     file: lib/Crypt/MatrixSSL3.pm
-    version: v3.9.0
+    version: v3.9.1
   Crypt::MatrixSSL3::Keys:
     file: lib/Crypt/MatrixSSL3.pm
-    version: v3.9.0
+    version: v3.9.1
   Crypt::MatrixSSL3::Server:
     file: lib/Crypt/MatrixSSL3.pm
-    version: v3.9.0
+    version: v3.9.1
   Crypt::MatrixSSL3::SessID:
     file: lib/Crypt/MatrixSSL3.pm
-    version: v3.9.0
+    version: v3.9.1
 requires:
   File::ShareDir: '0'
   Getopt::Long: '0'
@@ -62,7 +62,7 @@ resources:
   bugtracker: https://github.com/powerman/perl-Crypt-MatrixSSL3/issues
   homepage: https://github.com/powerman/perl-Crypt-MatrixSSL3
   repository: https://github.com/powerman/perl-Crypt-MatrixSSL3.git
-version: v3.9.0
+version: v3.9.1
 x_contributors:
   - 'Alex Efros <powerman@cpan.org>'
   - 'vonydev <vony@teamevolve.ro>'

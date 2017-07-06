@@ -1,0 +1,277 @@
+commit b0e117953acbb6a853e8c73c082a1fa5efa1bd37
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jul 4 17:13:26 2017 -0700
+
+    Fixed bug in Withdrawl class to crypto, changed test in 010-initial to not test execution of secrets pipe because BSD fails the test and also changed currency to be successful if value > 0 instead of >1 - something changed at GDAX with that.
+
+commit ffaa534ee9fe1e839555d8e6c49cae502f40f8da
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jun 27 18:42:36 2017 -0700
+
+    rebuild for new 0.02 release
+
+commit 8fd03488533958add7fb1ba534557b0c38202137
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jun 27 18:26:50 2017 -0700
+
+    Stupid version number in URL.pm
+
+commit bd02ae69758ed0bee086b0c19540d791dd2f9309
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jun 27 18:13:13 2017 -0700
+
+    strip leading '/' off added url's, put warning in account test if there is an API error encountered, which is often a developer API key being deleted
+
+commit 3720a0afbe16ef042cc876d3706fd31bb5d8f922
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jun 27 11:18:57 2017 -0700
+
+    Corrected the docs for API send method
+
+commit f82527aa05372029daa0fb24c77d483afb7298d8
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Jun 26 04:55:12 2017 -0700
+
+    Mention of ::Request class changed to the base class in README
+
+commit 8c912a82c5660615d4e06860a80d5c15a942f1cc
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Jun 25 14:23:48 2017 -0700
+
+    Took UTF-8 character out of pod so CPAN won't complain
+
+commit d8281067584a26c4d6dcf8d4c10e5a701b40c38a
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Jun 25 11:17:11 2017 -0700
+
+    Fixed default values for secret environment variables. Added PositiveNumOrZero subtype
+
+commit 08f964177548f46db7e31ada19e50e6ae058d0ac
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Jun 25 05:40:38 2017 -0700
+
+    A couple more test cleanups
+
+commit 4d805dbd9d6cf6c20178b43c6ca40ac4f65078da
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Jun 25 05:10:04 2017 -0700
+
+    altered manifest
+
+commit e53e7b170b6ce8a9ea79403acb47dce70350f55e
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Jun 25 05:03:13 2017 -0700
+
+    A few changes to initial test
+
+commit b9983f00a440940f5b22ebfbe22938cfe763d814
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Jun 25 02:31:32 2017 -0700
+
+    Renamed ::Request to just base Finance::GDAX::API and changed all the inheritance. Added save_secrets_to_environment method to base
+
+commit 2af6ee35bbfed7fd9f586ae7d7ae8f0c6e8d7cf4
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sun Jun 25 00:00:03 2017 -0700
+
+    removed aes_file from distribution since it's not really part of it
+
+commit ff80f98e37db50c85f0fe4c643af36478fa5942f
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Jun 24 23:45:28 2017 -0700
+
+    Added warning to docs about too much polling of level 3 product book orders
+
+commit 15571251610f64c11e14c44f9950fcffaa857e05
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Jun 24 12:59:18 2017 -0700
+
+    updated build stuff for CPAN
+
+commit 8f36e3317fc54a6223ed3619b80edac72263dcd2
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Jun 24 11:56:03 2017 -0700
+
+    Some cleaning up for CPAN
+
+commit 0c95bcf64066141f965c65bda2a19cec140412c6
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Jun 24 03:38:25 2017 -0700
+
+    Added author and copyright notices, renamed type constraints down into API, got rid of util test because it seemed useless
+
+commit 656df6a9bfe592f199ec9f106df09d6c0262b861
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jun 23 19:31:41 2017 -0700
+
+    Currency and Time API's implemented, along with tests
+
+commit 1462e39d03dba6e00717bc05f35189822d0dae58
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jun 23 17:53:37 2017 -0700
+
+    Implemented Product API, made tests, added type
+
+commit 3b750ec3cc2ae2480b6eae80d8e10b99caf906f6
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jun 23 13:05:08 2017 -0700
+
+    Implemented User Account API
+
+commit d7fb9a6a9a2320683a7d79552d126ed565214e11
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jun 23 12:54:02 2017 -0700
+
+    Documented the Report class
+
+commit a60f28e293290c5a92286653f6e785bee3e156f2
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jun 23 12:07:09 2017 -0700
+
+    renamed 120-report from .pm to .t
+
+commit 7a93b14ac270811a4523d48c59dcdcae6815b8f4
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jun 23 12:06:19 2017 -0700
+
+    Implemented Report API and created tests, renamed some tests
+
+commit f74bff724025fd31166dba0586fcd7a272566f9d
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jun 22 01:07:55 2017 -0700
+
+    Implemented Coinbase Account API and did tests. Fixed a test in paymentmethods
+
+commit 013b80e226cdc507c06bb21c1ad38b1b4e67c87f
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jun 22 00:42:37 2017 -0700
+
+    Implemented Payment Methods API and tests
+
+commit 53046123f31c850802bea4a7fb918afc5f6cbe19
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jun 22 00:24:30 2017 -0700
+
+    Added to_crypto method to Withdrawl along with tests
+
+commit 2f142000f58da24261077b484e570da7a4861f42
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Wed Jun 21 03:19:27 2017 -0700
+
+    Added implementation of Withdrawl API along with tests. A couple cleanups of deposite stuff.
+
+commit 61a2828d028aa24039774e861aadf3d2fa5cce32
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Wed Jun 21 00:01:45 2017 -0700
+
+    created implementation for Deposit API and added test for deposit.
+
+commit 92bafd6d107b02c70d3c2e4fce8969e0e8658a2a
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jun 20 02:37:35 2017 -0700
+
+    Added a few more tests to position api
+
+commit 9f9889d9ae6a4def6355b2fe7235725d004c6be4
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jun 20 02:28:38 2017 -0700
+
+    Added test for Position API
+
+commit 7c4ead69bb8fb2bcc0151a1d4af059cc029ae41a
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jun 20 02:22:18 2017 -0700
+
+    renamed tests to allow for more
+
+commit f17cf1c7e751d08e67dac5e3b77b924c2a721ea8
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Jun 19 09:44:28 2017 -0700
+
+    Implemented the Position portion of the API
+
+commit f22bbb55f81e3e582e150cd39978148fe0df6df6
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Jun 19 04:25:26 2017 -0700
+
+    Added implementation of Margin Transfers and tests and a new type for withdraw or deposit
+
+commit 12f719345d043cca9ca8a3134943684f004faeb1
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Jun 19 02:54:57 2017 -0700
+
+    Added margin repay method and a couple attributes for it and minor tests
+
+commit 9a01a930963945ad9a75e3c3cf9e9fb6b229cd63
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Jun 19 02:18:25 2017 -0700
+
+    Added Funding implementation of API and added new type for Funding status
+
+commit 52a6dcfa518c6076dddeb646ff575ab9471e1c21
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Mon Jun 19 00:14:24 2017 -0700
+
+    Added some more tests for Order. Changed the way secrets are dealt with in tests. Implemented the Fills API and wrote some initial tests.
+    
+    Changed author
+
+commit 54e341f63a77b3ae25dee91a3430009154b10419
+Author: Mark Rushing <mark@blud.orbislumen.net>
+Date:   Sun Jun 18 05:49:11 2017 -0700
+
+    new install revealed addition to cpanfile
+
+commit 5bc30d65c5c54680feb06403bbecb34b2bf0b329
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jun 16 06:45:31 2017 -0700
+
+    individual order get added
+
+commit 0f9324db526c47950fd55e6fe965653be04426cb
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Fri Jun 16 06:21:49 2017 -0700
+
+    Orders finshed out, along with list, cancel, cancel all, etc., and docs made, and some initial tests
+
+commit 53c4d21c5b7f9c80e2114481c950c3dcd2a0298a
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jun 15 00:59:22 2017 -0700
+
+    Created Order API class, set type constraints for order attributes, created test helper library to span across lexical boundaries, created tests for order and cleaned up account to use test helpers, created test for utils which will be just testing constraints for now.
+
+commit 563d665441aed82819ac5ca9ec1e2e229812ed28
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Wed Jun 14 18:05:31 2017 -0700
+
+    API Request object will now use API key signing environment variables as defaults if they are set. Tests altered to use them too.
+
+commit 876bd00ce77bbf2da792888dcc75dfc155acd635
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Wed Jun 14 01:02:46 2017 -0700
+
+    Fixed tests to reflect changes
+
+commit 8f3f1fe391bc5ac15f0adbfee98f062fbb55869a
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Wed Jun 14 00:36:57 2017 -0700
+
+    Finished GDAX API for accounts and renamed whole module package to be under Finance::GDAX::API:: instead
+
+commit 211130594fc890f483be09062c94102b98cad3cb
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jun 13 08:49:49 2017 -0700
+
+    Added account class, much cleanup and work, got API signatures working, aes external secrets methods, etc., etc
+
+commit ab902e7d477544caebd808bc661036ee8ddb6a5f
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Sat Jun 10 05:10:17 2017 -0700
+
+    Created REST request object
+
+commit 76f3a26d54dff9c226c213111b7d4d60fa0470b9
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Wed Jun 7 05:49:55 2017 -0700
+
+    Initial commit

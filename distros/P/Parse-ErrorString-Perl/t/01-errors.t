@@ -11,7 +11,7 @@ my $parser = Parse::ErrorString::Perl->new;
 # use strict;
 # use warnings;
 #
-# $hell;
+# $kaboom;
 
 my $msg_compile = <<'ENDofMSG';
 Global symbol "$kaboom" requires explicit package name at error.pl line 8.

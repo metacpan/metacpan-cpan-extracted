@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,45 +14,53 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 e0f586fc3906b1e3c2eea8a7887ee4adeff5095a CONTRIBUTORS
-SHA1 b34b72a5eb650f71348dc15136c1bddfd4df7c85 Changes
-SHA1 ec51b54652836e34dd092b3b3859e9a62fdfcfaa INSTALL
+SHA1 a4b42eb3099781dda50b96d5fc1f22fb5ea325e2 CONTRIBUTORS
+SHA1 7357dff96d5eb7570c29b78f79b1319f96f42914 Changes
+SHA1 29248263a101a6f54ffa6b8efbde6f11b5a7e783 INSTALL
 SHA1 5c07d3a47e5da0e9f6cdb8a1e4dc31624efa8f19 LICENSE
-SHA1 e5ea62775b3f44733f07a6073d1dbbe92e64ab12 MANIFEST
-SHA1 3b84f9bd66624e2cd9a3f626882e28a7639a43ed META.json
-SHA1 e65a17bfffeb29394ac6cee81fa5c31e6406599c META.yml
-SHA1 0fe39cbb939f72b7b8e7b58553bcc1adb01a39fe Makefile.PL
+SHA1 b18bae087dffa6d9af9c7c3a89d534f8e726c56b MANIFEST
+SHA1 53f2ae5eb4e5a0b2dfed7330f3711c2f6eb05d66 META.json
+SHA1 a39279b8dc13375816e4dbadcb2176d9a4143754 META.yml
+SHA1 b2b03a70085a8e61b2e4f55359077ae5324e9bdb Makefile.PL
 SHA1 f2ac16929c9643008782d9a8ce2ec0a203106c72 README.md
-SHA1 965695292e1316de2177cb4d2cb2b718a633bca4 README.mkdn
-SHA1 9482c9119982b0864d7088b2f9c9c97955288541 benchmark.pl
-SHA1 59124109baa589ef8923bc693afd7b79b2b34d83 bin/mustache.pl
-SHA1 a528f4da6f1915827e9464ab19628bf1a5b50bdd cpanfile
-SHA1 68fb718895e45c640069496c86e296fe86575be2 dist.ini
-SHA1 f954b9e19e84ef2e69d2ad7f68dbca9de2ef10ae doap.xml
-SHA1 bae809acc26ce7f67dc352f02933a50ba05f5ebe lib/Template/Mustache.pm
-SHA1 dd4fcf8f979cb6980bb815da57a4cbb7f57003c0 t/00-compile.t
-SHA1 48163971681a857c5335382092362fe9988d9211 t/00-report-prereqs.dd
-SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
-SHA1 fafa3e336d6303a84d0d1636ddd424256b4c205c t/001_spec_compatibility.t
-SHA1 b1242b5319fd8b0ee442d15df476596f6702201e t/lambdas_receive_render_helper.t
-SHA1 8ef660bc8002722651da3f77f1c54c1dc3722fee t/parse_errors.t
-SHA1 70b429365ac5ce40de47041523934592410d785b t/read_data_from_classes.t
+SHA1 6c340a65345f5c4038f93acb39272a696f306580 bin/mustache.pl
+SHA1 30d7f4e4cf5a7cf757c6fc1485260d9845b50044 contrib/benchmark.pl
+SHA1 34dcb53091d769ff4d65a973dad1c6f898d0c1fb contrib/gen_grammar.pl
+SHA1 d9154b85be1fba96bbe9604c704575ceaa550994 contrib/print_graph.pl
+SHA1 d9fee970f17624d9b5480b8f2c263b9851f28771 cpanfile
+SHA1 2c4625829b9cfeb3310669ae99bb139cb59d82c2 doap.xml
+SHA1 d93e6cb6c0c8b20f685f6d58b43673e999ced078 lib/Template/Mustache.pm
+SHA1 a08ac0d4fb9d301aca6ee3698762957f88ceca2c lib/Template/Mustache/Parser.pm
+SHA1 becef06e28639ea30c698644146bd9597cb7d6c8 lib/Template/Mustache/Token/Partial.pm
+SHA1 6895e437f11efa2c397543cedb605879cd5ea932 lib/Template/Mustache/Token/Section.pm
+SHA1 da091c7224dfbdf78c53009a71494c79c017901c lib/Template/Mustache/Token/Template.pm
+SHA1 d029a7b1cb7c98c5d7d9cb3088f15a36102900c7 lib/Template/Mustache/Token/Variable.pm
+SHA1 0158cda09690d7a0a0012d8edaa095cacd383b17 lib/Template/Mustache/Token/Verbatim.pm
+SHA1 cd7b30015d2f6b375b5838d742d685bade3a6246 lib/Template/Mustache/Trait.pm
+SHA1 ad6f73380140ec8ea13be4915871df5e0ddd119d t/00-compile.t
+SHA1 a6e807f13f428730a410882a0f59cab614e02964 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 767abd548c23a1b6560a83e7665c3a46e714acb7 t/001_spec_compatibility.t
+SHA1 0f30226d48105659b6f0a5f02f90c277eef229be t/basic.t
+SHA1 7287ded1c5a72996c9e2888e6e1c6a7dd4c0a874 t/lambdas_receive_render_helper.t
+SHA1 d5d762fdd3f670238a6e463cbce9c9c21f20f0b6 t/moose-trait.t
+SHA1 11428dc62c540ef92c6a3d3253e192d160ffb795 t/parse_errors.t
+SHA1 d2a5eb1b48bcf30a2740e61355da4bb867e871a4 t/partials.t
+SHA1 142b8a0080628f47fe4d3f663aba64996bee97a8 t/read_data_from_classes.t
 SHA1 f6e7141a519b6f07a547eb85e117057c6f6a3fc9 t/read_data_from_hashes.t
 SHA1 ab79d0761a72e76ac87b1a45022506003ce87625 t/read_data_from_instances.t
-SHA1 ad3bab3f2714e1457883d5bec5bbbd9b8526d4a9 t/read_data_from_subclass.t
-SHA1 eb64fc6422d235c396c9b3641bc6e6973c6f55f1 t/read_partials_from_file_system.t
+SHA1 7003e683c64d5cbb57141c2258183b2c488daff4 t/read_data_from_subclass.t
+SHA1 e08036ac23d9952f62f43f27670377fcf2ec5c84 t/read_partials_from_file_system.t
 SHA1 ba0941047652a5ee22d89c70579b2cf3dc5ac3e0 t/read_partials_from_hashes.t
-SHA1 1f4ada3c62732a9319788c2785f7f5e61f164096 t/read_partials_from_partial_method.t
+SHA1 6c22439fd770d9d61a8d556b5b9792892d3c2845 t/read_partials_from_partial_method.t
 SHA1 9c0f2f55c6af0df83b6bdff4766eacc460592901 t/read_partials_from_subs.t
-SHA1 17d4d15445345702c356645905dee492de0fa0d6 t/read_templates_from_file_system.t
-SHA1 82aaaaef372c0bd8aab3ed4b3f15ee1b871c8431 t/read_templates_from_file_system_with_namespacing.t
-SHA1 0283bcdbbb6fdc3acd7b057cb4ca2817c657db26 t/read_templates_from_subclass.t
-SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d3f37d486de6a8967803e4f7d9dff6f34a28cda8 t/read_templates_from_file_system.t
+SHA1 e4f0e8280b7a9e8eb9b105be55a7eb37674a1c0e t/read_templates_from_subclass.t
+SHA1 dc56bf9a16b9305cf96e0600c0012270f244d8e4 t/sections.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlguMfYACgkQ34Hwf+GwC4yw+gCgud3T1iwe8KQnNhhYO3g7AWob
-r78AoNPx8hMgL2se711rmHwm71lInxxS
-=37UP
+iEYEARECAAYFAlla25gACgkQ34Hwf+GwC4wGIQCg6Vfy/GrrhluPmtqWBHhkkzx2
+PoQAnRtW2OmXcAFS4RHDksNpUdKo0ZIu
+=3qOJ
 -----END PGP SIGNATURE-----

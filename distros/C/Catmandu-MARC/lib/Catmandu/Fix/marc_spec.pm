@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Base';
 
-our $VERSION = '1.13';
+our $VERSION = '1.16';
 
 has spec          => ( fix_arg=> 1 );
 has path          => ( fix_arg=> 1 );
@@ -16,7 +16,7 @@ has join          => ( fix_opt=> 1 );
 has value         => ( fix_opt=> 1 );
 has pluck         => ( fix_opt=> 1 );
 has invert        => ( fix_opt=> 1 );
-has nested_arrays => (fix_opt => 1);
+has nested_arrays => ( fix_opt=> 1 );
 
 sub emit {
     my ( $self, $fixer ) = @_;
@@ -161,7 +161,7 @@ In a fix file e.g. 'my.fix':
     # Assign values of of all other subfields than a of field 020
     # to my.isbn.other.subfields
     marc_spec('020$a' my.isbn.other.subfields, invert:1)
-    
+
     # Assign value of subfield a of field 245 only, if subfield a of field 246
     # with value 1 for indicator1 exists
     marc_spec('245$a{246_1$a}', my.var.title)
@@ -200,7 +200,7 @@ to assign referenced values to
 
 You may use one of $first, $last, $prepend or $append to add
 referenced data values to a specific position of an array
-(see L<Catmandu Wildcards|http://librecat.org/Catmandu/#wildcards> and 
+(see L<Catmandu Wildcards|http://librecat.org/Catmandu/#wildcards> and
 mapping rules at L<https://github.com/LibreCat/Catmandu-MARC/wiki/Mapping-rules>).
 
     # INPUT

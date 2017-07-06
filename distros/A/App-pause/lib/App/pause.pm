@@ -1,8 +1,8 @@
 package App::pause;
 
-our $DATE = '2017-05-20'; # DATE
+our $DATE = '2017-07-04'; # DATE
 our $DIST = 'App-pause'; # DIST
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.62'; # VERSION
 
 our %cli_attrs = do {
     my $p = '/WWW/PAUSE/Simple/';
@@ -44,7 +44,7 @@ App::pause - A CLI for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.60 of App::pause (from Perl distribution App-pause), released on 2017-05-20.
+This document describes version 0.62 of App::pause (from Perl distribution App-pause), released on 2017-07-04.
 
 =head1 DESCRIPTION
 

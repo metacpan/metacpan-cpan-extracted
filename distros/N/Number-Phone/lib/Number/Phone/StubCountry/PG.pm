@@ -22,15 +22,15 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
+                  'pattern' => '(\\d{3})(\\d{4})',
                   'leading_digits' => '
             [13-689]|
             27
-          ',
-                  'pattern' => '(\\d{3})(\\d{4})'
+          '
                 },
                 {
                   'pattern' => '(\\d{4})(\\d{4})',
@@ -42,7 +42,13 @@ my $formatters = [
               ];
 
 my $validators = {
-                'voip' => '27[568]\\d{4}',
+                'voip' => '
+          2(?:
+            0[0-47]|
+            7[568]
+          )\\d{4}
+        ',
+                'toll_free' => '180\\d{4}',
                 'pager' => '',
                 'fixed_line' => '
           (?:
@@ -58,18 +64,12 @@ my $validators = {
             9[78]\\d
           )\\d{4}
         ',
-                'specialrate' => '',
                 'mobile' => '
-          (?:
-            20150|
-            68\\d{2}|
-            7(?:
-              [0-689]\\d|
-              75
-            )\\d{2}
-          )\\d{3}
+          7(?:
+            [0-689]\\d|
+            75
+          )\\d{5}
         ',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             3[0-2]\\d|
@@ -84,10 +84,19 @@ my $validators = {
             9[78]\\d
           )\\d{4}
         ',
-                'toll_free' => '180\\d{4}'
+                'specialrate' => '',
+                'personal_number' => ''
               };
 my %areanames = (
+  6753 => "NCD",
+  67542 => "Madang",
+  67545 => "Sepik",
   67547 => "Morobe",
+  67553 => "Highlands",
+  67554 => "Highlands",
+  67562 => "Oro",
+  67564 => "MP\/Gulf\/Tabubil\/Kiunga",
+  6759 => "Islands",
 );
     sub new {
       my $class = shift;

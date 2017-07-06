@@ -187,7 +187,8 @@ L<Math::Prime::Util::GMP> and L<Math::Random::ISAAC::XS>
 =head1 KNOWN BUGS AND LIMITATIONS
 
 The signing and verification is not guaranteed to be
-compatible with other implementations!
+compatible with other implementations, as the specification
+changed over time!
 
 
 =head1 SEE ALSO

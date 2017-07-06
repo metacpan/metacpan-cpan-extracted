@@ -31,7 +31,7 @@ struct SPVM_compiler {
   // Current file name
   const char* cur_module_path;
   
-  // Source data
+  // Source base_object
   const char* cur_src;
   
   // AST grammar
@@ -82,13 +82,22 @@ struct SPVM_compiler {
   // Current package count
   int32_t current_package_count;
   
+  // Package indexes constant pool index
+  int32_t package_indexes_constant_pool_index;
+  
+  // Subroutine indexes constant pool index
+  int32_t sub_indexes_constant_pool_index;
+  
+  // Subroutine length
+  int32_t subs_length;
+  
   // Error is fatal
   _Bool fatal_error;
 };
 
 SPVM_COMPILER* SPVM_COMPILER_new();
 int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler);
-
+SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler);
 void SPVM_COMPILER_free(SPVM_COMPILER* compiler);
 
 #endif

@@ -1,6 +1,7 @@
 package Test::BDD::Cucumber::Model::Scenario;
-$Test::BDD::Cucumber::Model::Scenario::VERSION = '0.52';
-use Moose;
+$Test::BDD::Cucumber::Model::Scenario::VERSION = '0.53';
+use Moo;
+use Types::Standard qw( Str ArrayRef HashRef Bool InstanceOf );
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ Test::BDD::Cucumber::Model::Scenario - Model to represent a scenario
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -22,7 +23,7 @@ The text after the C<Scenario:> keyword
 
 =cut
 
-has 'name' => ( is => 'rw', isa => 'Str' );
+has 'name' => ( is => 'rw', isa => Str );
 
 =head2 steps
 
@@ -32,7 +33,7 @@ The associated L<Test:BDD::Cucumber::Model::Step> objects
 
 has 'steps' => (
     is      => 'rw',
-    isa     => 'ArrayRef[Test::BDD::Cucumber::Model::Step]',
+    isa     => ArrayRef[InstanceOf['Test::BDD::Cucumber::Model::Step']],
     default => sub { [] }
 );
 
@@ -42,7 +43,7 @@ Scenario-related data table, as an arrayref of hashrefs
 
 =cut
 
-has 'data' => ( is => 'rw', isa => 'ArrayRef[HashRef]', default => sub { [] } );
+has 'data' => ( is => 'rw', isa => ArrayRef[HashRef], default => sub { [] } );
 
 =head2 background
 
@@ -50,7 +51,7 @@ Boolean flag to mark whether this was the background section
 
 =cut
 
-has 'background' => ( is => 'rw', isa => 'Bool', default => 0 );
+has 'background' => ( is => 'rw', isa => Bool, default => 0 );
 
 =head2 line
 
@@ -59,7 +60,7 @@ the C<Scenario> keyword is.
 
 =cut
 
-has 'line' => ( is => 'rw', isa => 'Test::BDD::Cucumber::Model::Line' );
+has 'line' => ( is => 'rw', isa => InstanceOf['Test::BDD::Cucumber::Model::Line'] );
 
 =head2 tags
 
@@ -68,7 +69,7 @@ feature.
 
 =cut
 
-has 'tags' => ( is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] } );
+has 'tags' => ( is => 'rw', isa => ArrayRef[Str], default => sub { [] } );
 
 =head1 AUTHOR
 

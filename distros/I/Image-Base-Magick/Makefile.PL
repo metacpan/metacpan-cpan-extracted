@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2014, 2015 Kevin Ryde
 
 # This file is part of Image-Base-Magick.
 #
@@ -20,15 +20,13 @@
 require 5.001;
 use strict;
 use ExtUtils::MakeMaker;
-use lib 'inc';
-use MyMakeMakerExtras;
 
-MyMakeMakerExtras::WriteMakefile
-  (NAME         => 'Image-Base-Magick',
+WriteMakefile
+  (NAME         => 'Image::Base::Magick',
    ABSTRACT     => 'Image::Base on files using ImageMagick.',
    VERSION_FROM => 'lib/Image/Base/Magick.pm',
-   AUTHOR       => 'Kevin Ryde <user42@zip.com.au>',
-   LICENSE      => 'gpl',
+   AUTHOR       => 'Kevin Ryde <user42_kevin@yahoo.com.au>',
+   LICENSE      => 'gpl_3',
    SIGN         => 1,
    PREREQ_PM    => {
                     'Image::Base' => 0,
@@ -36,10 +34,11 @@ MyMakeMakerExtras::WriteMakefile
                     # maybe 0.39 of Nov 2001 for oop style tags,
                     # oopery is from somewhere post 0.20 at least
                     'Image::Magick' => 0,
-
-                    # for testing
-                    'Test' => 0,
                    },
+   TEST_REQUIRES => {
+                     'Test' => 0,
+                    },
+
    # Magick might go right back to 5.002 or some such
    MIN_PERL_VERSION => '5.001',
 
@@ -48,13 +47,13 @@ MyMakeMakerExtras::WriteMakefile
      { homepage => 'http://user42.tuxfamily.org/image-base-magick/index.html',
        license  => 'http://www.gnu.org/licenses/gpl.html',
      },
-     no_index => { directory=>['devel'] },
+     no_index => { directory=>['devel','xt'] },
 
-     optional_features =>
-     { maximum_tests =>
-       { description => 'Have "make test" do as much as possible.',
-         requires => { 'Test::Weaken' => '2.000',
-                     },
+     prereqs =>
+     { test =>
+       { suggests =>
+         { 'Test::Weaken' => '2.000',
+         },
        },
      },
    },

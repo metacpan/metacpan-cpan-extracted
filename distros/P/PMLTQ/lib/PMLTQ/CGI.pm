@@ -1,6 +1,6 @@
 package PMLTQ::CGI;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::CGI::VERSION = '1.3.2';
+$PMLTQ::CGI::VERSION = '1.4.0';
 # ABSTRACT: [DEPRECATED] This is html fronted for SQLEvaluator and is currently being replaced by PMLTQ::Server
 
 use 5.006;
@@ -2390,7 +2390,7 @@ PMLTQ::CGI - [DEPRECATED] This is html fronted for SQLEvaluator and is currently
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 SYNOPSIS
 

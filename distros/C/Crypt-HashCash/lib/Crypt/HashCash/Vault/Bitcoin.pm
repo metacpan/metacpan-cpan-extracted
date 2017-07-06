@@ -3,7 +3,7 @@
 # Crypt::HashCash::Vault::Bitcoin - Bitcoin Vault for HashCash Digital Cash
 # Copyright (c) 2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Vault/Bitcoin.pm v1.124 Mon Jun 19 15:52:00 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Vault/Bitcoin.pm v1.126 Sat Jun 24 02:15:18 PDT 2017 $
 
 package Crypt::HashCash::Vault::Bitcoin;
 
@@ -20,7 +20,7 @@ use Business::Bitcoin;
 use Authen::TuringImage;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.126 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -470,8 +470,8 @@ Crypt::HashCash::Vault::Bitcoin - Bitcoin Vault for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.124 $
- $Date: Mon Jun 19 15:52:00 PDT 2017 $
+ $Revision: 1.126 $
+ $Date: Sat Jun 24 02:15:18 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -546,7 +546,7 @@ Creates and returns a new Crypt::HashCash::Vault::Bitcoin object.
 
 =head1 SEE ALSO
 
-=head2 L<www.hashcash.com>
+=head2 L<http://www.hashcash.com>
 
 =head2 L<Crypt::HashCash>
 

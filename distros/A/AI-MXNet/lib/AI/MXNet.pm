@@ -3,7 +3,6 @@ use v5.14.0;
 use strict;
 use warnings;
 use AI::MXNet::Base;
-use AI::MXNet::CachedOp;
 use AI::MXNet::Callback;
 use AI::MXNet::NDArray;
 use AI::MXNet::Symbol;
@@ -29,7 +28,8 @@ use AI::MXNet::RecordIO;
 use AI::MXNet::Image;
 use AI::MXNet::Contrib;
 use AI::MXNet::Contrib::AutoGrad;
-our $VERSION = '1.01';
+use AI::MXNet::CachedOp;
+our $VERSION = '1.0101';
 
 sub import
 {

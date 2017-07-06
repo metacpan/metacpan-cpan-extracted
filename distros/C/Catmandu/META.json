@@ -114,7 +114,7 @@
          "web" : "https://github.com/LibreCat/Catmandu"
       }
    },
-   "version" : "1.0601",
+   "version" : "1.0602",
    "x_contributors" : [
       "Christian Pietsch <chr.pietsch+github@googlemail.com>",
       "Dave Sherohman <dsheroh@cpan.org>",

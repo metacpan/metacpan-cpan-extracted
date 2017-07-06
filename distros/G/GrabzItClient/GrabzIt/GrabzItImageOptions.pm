@@ -18,9 +18,11 @@ sub new
     $self->{"format"} = '';
     $self->{"targetElement"} = '';
     $self->{"hideElement"} = '';
+    $self->{"waitForElement"} = '';    
     $self->{"requestAs"} = 0;
     $self->{"customWaterMarkId"} = '';
     $self->{"quality"} = -1;
+    $self->{"transparent"} = 0;
 
     bless $self, $class;
 
@@ -132,6 +134,19 @@ sub hideElement
 }
 
 #
+# The CSS selector of the HTML element in the web page that must be visible before the capture is performed
+#
+sub waitForElement
+{
+    my $self = shift;   
+    if (scalar(@_) == 1)
+    {
+        $self->{"waitForElement"} = shift;
+    }
+    return $self->{"waitForElement"};
+}
+
+#
 # The user agent type should be used: Standard Browser = 0, Mobile Browser = 1, Search Engine = 2 and Fallback Browser = 3
 #
 sub requestAs
@@ -170,6 +185,19 @@ sub quality
     return $self->{"quality"};
 }
 
+#
+# True if the image capture should be transparent. This is only compatible with png and tiff images
+#
+sub transparent
+{
+    my $self = shift;   
+    if (scalar(@_) == 1)
+    {
+        $self->{"transparent"} = shift;
+    }
+    return $self->{"transparent"};
+}
+
 sub _getSignatureString($$;$)
 {
     my ($self, $applicationSecret, $callBackURL, $url) = @_;
@@ -190,7 +218,7 @@ sub _getSignatureString($$;$)
     
     return $applicationSecret."|". $urlParam . $callBackURLParam .
     "|".$self->format()."|".$self->height()."|".$self->width()."|".$self->browserHeight()."|".$self->browserWidth()."|".$self->customId()."|".$self->delay().
-    "|".$self->targetElement()."|".$self->customWaterMarkId()."|".$self->requestAs()."|".$self->country()."|".$self->quality()."|".$self->hideElement();
+    "|".$self->targetElement()."|".$self->customWaterMarkId()."|".$self->requestAs()."|".$self->country()."|".$self->quality()."|".$self->hideElement()."|".$self->exportURL()."|".$self->waitForElement()."|".$self->transparent();
 }
 
 sub _getParameters($$$$$)
@@ -209,6 +237,8 @@ sub _getParameters($$$$$)
     $params->{'customwatermarkid'} = $self->customWaterMarkId();
     $params->{'requestmobileversion'} = $self->requestAs();
     $params->{'quality'} = $self->quality();
+    $params->{'waitfor'} = $self->waitForElement();   
+    $params->{'transparent'} = $self->transparent();        
     
     return $params;
 }

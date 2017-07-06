@@ -49,7 +49,7 @@ The available parameters are these, default values (in Perl-compatible syntax) a
 
 	1
 
-begin of section
+begin of section (above all other criteria)
 
 =item B<black> (scalar)
 
@@ -86,7 +86,7 @@ treat empty lines as empty data sets, preserving them in output (from Text::Nume
 
 	-1
 
-end of section (when negative: until end)
+end of section (when negative: until end; above all other criteria)
 
 =item B<fill> (scalar)
 
@@ -146,11 +146,17 @@ quote titles (from Text::NumericData)
 
 quote character to use (derived from input or ") (from Text::NumericData)
 
+=item B<ranges>, B<R> (array)
+
+	[]
+
+give multiple ranges (format: "from:to", either may be omitted or set to negative to extend to beginning/end) inside the main range given by begin and end indices, this does not duplicate or rearrange data, just specifies an additional condition to include a record or not, in input order
+
 =item B<reduce>, B<r> (scalar)
 
 	'1'
 
-Redunce row count by a certain factor: Only include every ...th one. A value of 2 means rows 1,3,5... , a value of 10 means rows 1,11,21... (from the beginning).
+Redunce row count by a certain factor: Only include every ...th one. A value of 2 means rows 1,3,5... , a value of 10 means rows 1,11,21... (from the input).
 
 =item B<separator> (scalar)
 
@@ -190,6 +196,6 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2005-2016 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+Copyright (c) 2005-2017 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
 
 =cut

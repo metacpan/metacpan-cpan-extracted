@@ -1,0 +1,23 @@
+Revision history for RPi-I2C
+
+2.3604  2017-06-28
+        - removed WiringPi::API from being a prereq
+        - POD fixes
+        - added UNIT TESTS section in POD to explain why there's no unit tests
+          for this distribution
+        - remove useless int param in XS readByte(), throwing a compiler warning
+
+2.3603  2017-06-23
+        - completely changed the way we work. We do not use wiringPi for this
+          anymore due to lack of options
+        - major POD overhaul
+        - added several examples using I2C to an Arduino (Trinket Pro or Uno).
+          This provides examples for nearly every function. Internally in the
+          Arduino sketch, on the write functions, we save the data to EEPROM,
+          where the data can be fetched back out at a certain register to make
+          comparisons on (this functionality will be incorporated into the
+          RPi::WiringPi unit test suite)
+
+2.3601  2017-06-22
+        - First version, released on an unsuspecting world.
+

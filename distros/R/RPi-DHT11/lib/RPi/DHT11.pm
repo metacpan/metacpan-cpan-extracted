@@ -4,7 +4,7 @@ use warnings;
 
 use Carp qw(croak);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 require XSLoader;
 XSLoader::load('RPi::DHT11', $VERSION);

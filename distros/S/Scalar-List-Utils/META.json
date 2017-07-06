@@ -49,6 +49,6 @@
          "web" : "https://github.com/Scalar-List-Utils/Scalar-List-Utils"
       }
    },
-   "version" : "1.47",
+   "version" : "1.48",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

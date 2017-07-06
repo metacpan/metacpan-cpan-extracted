@@ -1,3 +1,9 @@
+0.15    2017-06-26 (PERLANCAR)
+
+	- [Bugfix] check-json: Fix typo in constructing JSON::MaybeXS
+	  object.
+
+
 0.14    2017-06-01 (PERLANCAR)
 
 	- [ux] pp-json, pp-yaml: Make sure we print terminating newline.

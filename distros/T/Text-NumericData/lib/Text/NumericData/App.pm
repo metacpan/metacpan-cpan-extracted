@@ -5,6 +5,12 @@ use Config::Param;
 use Storable;
 use strict;
 
+# This is just a placeholder because of a past build system bug.
+# The one and only version for Text::NumericData is kept in
+# the Text::NumericData module itself.
+our $VERSION = '1';
+$VERSION = eval $VERSION;
+
 my %shorts = (strict=>'S', text=>'T', numformat=>'N');
 
 sub new

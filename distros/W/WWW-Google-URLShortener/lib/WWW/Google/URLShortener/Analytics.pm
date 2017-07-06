@@ -1,6 +1,6 @@
 package WWW::Google::URLShortener::Analytics;
 
-$WWW::Google::URLShortener::Analytics::VERSION   = '0.22';
+$WWW::Google::URLShortener::Analytics::VERSION   = '0.23';
 $WWW::Google::URLShortener::Analytics::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::URLShortener::Analytics - Placeholder for the analytics of short UR
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 

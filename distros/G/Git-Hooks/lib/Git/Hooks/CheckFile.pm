@@ -2,16 +2,16 @@
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '1.16.0';
+$Git::Hooks::CheckFile::VERSION = '2.0.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Git::Hooks qw/:DEFAULT :utils/;
+use Carp;
+use Git::Hooks;
 use Text::Glob qw/glob_to_regex/;
 use Path::Tiny;
 use List::MoreUtils qw/any none/;
-use Error qw(:try);
 
 my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -19,21 +19,35 @@ my $PKG = __PACKAGE__;
 sub check_command {
     my ($git, $commit, $file, $command) = @_;
 
-    my $tmpfile = $git->blob($commit, $file);
-    $tmpfile or return;
+    my $tmpfile = $git->blob($commit, $file)
+        or return;
 
     # interpolate filename in $command
     (my $cmd = $command) =~ s/\{\}/\'$tmpfile\'/g;
 
     # execute command and update $errors
-    my $saved_output = redirect_output();
-    my $exit = do {
+    my ($exit, $output);
+    {
+        my $tempfile = Path::Tiny->tempfile(UNLINK => 1);
+
+        ## no critic (RequireBriefOpen, RequireCarping)
+        open(my $oldout, '>&', \*STDOUT)  or croak "Can't dup STDOUT: $!";
+        open(STDOUT    , '>' , $tempfile) or croak "Can't redirect STDOUT to \$tempfile: $!";
+        open(my $olderr, '>&', \*STDERR)  or croak "Can't dup STDERR: $!";
+        open(STDERR    , '>&', \*STDOUT)  or croak "Can't dup STDOUT for STDERR: $!";
+
         # Let the external command know the commit that's being checked in
         # case it needs to grok something from Git.
         local $ENV{GIT_COMMIT} = $commit;
-        system $cmd;
-    };
-    my $output = restore_output($saved_output);
+        $exit = system $cmd;
+
+        open(STDOUT, '>&', $oldout) or croak "Can't dup \$oldout: $!";
+        open(STDERR, '>&', $olderr) or croak "Can't dup \$olderr: $!";
+        ## use critic
+
+        $output = $tempfile->slurp;
+    }
+
     if ($exit != 0) {
         $command =~ s/\{\}/\'$file\'/g;
         my $message = do {
@@ -54,7 +68,7 @@ sub check_command {
         $git->error($PKG, $message, $output);
         return;
     } else {
-        # FIXME: What we should do with eventual output from a
+        # FIXME: What should we do with eventual output from a
         # successful command?
     }
     return 1;
@@ -90,6 +104,10 @@ sub check_new_files {
             $re_checks{$name}{$check} = [map {qr/$_/} $git->get_config("$CFG.$name" => $check)];
         }
     }
+    foreach ($git->get_config("$CFG.basename" => 'sizelimit')) {
+        my ($bytes, $regexp) = split ' ', $_, 2;
+        unshift @{$re_checks{basename}{sizelimit}}, [qr/$regexp/, $bytes];
+    }
 
     # Now we iterate through every new file and apply to them the matching
     # commands.
@@ -114,8 +132,17 @@ sub check_new_files {
         }
 
         my $size = $git->file_size($commit, $file);
-        if ($sizelimit && $sizelimit < $size) {
-            $git->error($PKG, "File '$file' has $size bytes but the current limit is just $sizelimit bytes.");
+
+        my $file_sizelimit = $sizelimit;
+        foreach my $spec (@{$re_checks{basename}{sizelimit}}) {
+            if ($basename =~ $spec->[0]) {
+                $file_sizelimit = $spec->[1];
+                last;
+            }
+        }
+
+        if ($file_sizelimit && $file_sizelimit < $size) {
+            $git->error($PKG, "File '$file' has $size bytes but the current limit is just $file_sizelimit bytes.");
             ++$errors;
             next FILE;    # Don't botter checking the contents of huge files
         }
@@ -133,7 +160,7 @@ sub check_new_files {
 sub check_affected_refs {
     my ($git) = @_;
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     my $errors = 0;
 
@@ -155,7 +182,7 @@ sub check_commit {
 sub check_patchset {
     my ($git, $opts) = @_;
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     return check_new_files($git, $opts->{'--commit'}, $git->filter_files_in_commit('AM', $opts->{'--commit'}));
 }
@@ -182,13 +209,13 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =head1 DESCRIPTION
 
-This Git::Hooks plugin hooks itself to the hooks below to check if the
-contents of files added to or modified in the repository meet specified
-constraints. If they don't, the commit/push is aborted.
+This L<Git::Hooks> plugin hooks itself to the hooks below to check if the
+names and contents of files added to or modified in the repository meet
+specified constraints. If they don't, the commit/push is aborted.
 
 =over
 
@@ -333,6 +360,11 @@ file with a name beginning with a dot.
     [githooks "checkfile"]
         basename.allow ^\\.gitignore
         basename.deny  ^\\.
+
+=head2 githooks.checkfile.basename.sizelimit BYTES REGEXP
+
+This directive takes precedence over the C<githooks.checkfile.sizelimit> for
+files which basename matches REGEXP.
 
 =head2 githooks.checkfile.path.deny REGEXP
 

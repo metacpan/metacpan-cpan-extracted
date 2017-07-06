@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument;
-$Lab::Moose::Instrument::VERSION = '3.550';
+$Lab::Moose::Instrument::VERSION = '3.552';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw(enum duck_type);

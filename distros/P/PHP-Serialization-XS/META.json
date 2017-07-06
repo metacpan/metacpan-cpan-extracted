@@ -1,10 +1,10 @@
 {
-   "abstract" : "simple flexible means of converting the output of PHP's serialize() into the equivalent Perl memory structure, and vice versa - XS version.",
+   "abstract" : "simple flexible means of converting the output",
    "author" : [
       "Darren Kulp <kulp@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
    "license" : [
       "unknown"
    ],
@@ -37,6 +37,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.10"
 }

@@ -1,5 +1,5 @@
-=== README for Mail-Box-POP3 version 3.001
-=   Generated on Thu Feb  2 16:07:13 2017 by OODoc 2.02
+=== README for Mail-Box-POP3 version 3.002
+=   Generated on Thu Jun 29 15:16:59 2017 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d Mail-Box-POP3-3.001.tar.gz
-       tar -xf Mail-Box-POP3-3.001.tar
-       cd Mail-Box-POP3-3.001
+       gzip -d Mail-Box-POP3-3.002.tar.gz
+       tar -xf Mail-Box-POP3-3.002.tar
+       cd Mail-Box-POP3-3.002
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/Mail-Box-POP3-3.001/
+    http://search.cpan.org/dist/Mail-Box-POP3-3.002/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=Mail-Box-POP3

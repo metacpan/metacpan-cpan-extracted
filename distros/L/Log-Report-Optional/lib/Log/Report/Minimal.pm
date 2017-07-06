@@ -1,4 +1,4 @@
-# Copyrights 2013-2016 by [Mark Overmeer].
+# Copyrights 2013-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -7,12 +7,13 @@ use strict;
 
 package Log::Report::Minimal;
 use vars '$VERSION';
-$VERSION = '1.02';
+$VERSION = '1.03';
 
 use base 'Exporter';
 
 use Log::Report::Util;
 use List::Util        qw/first/;
+use Scalar::Util      qw/blessed/;
 
 use Log::Report::Minimal::Domain ();
 
@@ -58,7 +59,18 @@ sub _interpolate(@)
 
 
 sub textdomain($@)
-{   my $name   = shift;
+{   if(@_==1 && blessed $_[0])
+    {   my $domain = shift;
+        return $textdomains{$domain->name} = $domain;
+    }
+
+    if(@_==2)
+    {    # used for 'maintenance' and testing
+        return delete $textdomains{$_[0]} if $_[1] eq 'DELETE';
+        return $textdomains{$_[0]} if $_[1] eq 'EXISTS';
+    }
+
+    my $name   = shift;
     my $domain = $textdomains{$name}
       ||= Log::Report::Minimal::Domain->new(name => $name);
 

@@ -1,6 +1,6 @@
 package Catalyst::View::Template::Lace;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Moo;
 use Module::Runtime;

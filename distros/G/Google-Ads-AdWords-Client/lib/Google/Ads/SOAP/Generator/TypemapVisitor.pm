@@ -18,6 +18,8 @@
 
 package Google::Ads::SOAP::Generator::TypemapVisitor;
 
+use strict;
+use warnings;
 use base qw(SOAP::WSDL::Generator::Visitor::Typemap);
 
 use Class::Std::Fast::Storable;

@@ -1,6 +1,7 @@
 package Test::BDD::Cucumber::Model::Feature;
-$Test::BDD::Cucumber::Model::Feature::VERSION = '0.52';
-use Moose;
+$Test::BDD::Cucumber::Model::Feature::VERSION = '0.53';
+use Moo;
+use Types::Standard qw( Str ArrayRef InstanceOf );
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ Test::BDD::Cucumber::Model::Feature - Model to represent a feature file, parsed
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -22,7 +23,7 @@ The text after the C<Feature:> keyword
 
 =cut
 
-has 'name' => ( is => 'rw', isa => 'Str' );
+has 'name' => ( is => 'rw', isa => Str );
 
 =head2 name_line
 
@@ -31,7 +32,7 @@ C<Feature> keyword was found on
 
 =cut
 
-has 'name_line' => ( is => 'rw', isa => 'Test::BDD::Cucumber::Model::Line' );
+has 'name_line' => ( is => 'rw', isa => InstanceOf['Test::BDD::Cucumber::Model::Line'] );
 
 =head2 satisfaction
 
@@ -41,7 +42,7 @@ An arrayref of strings of the Conditions of Satisfaction
 
 has 'satisfaction' => (
     is      => 'rw',
-    isa     => 'ArrayRef[Test::BDD::Cucumber::Model::Line]',
+    isa     => ArrayRef[InstanceOf['Test::BDD::Cucumber::Model::Line']],
     default => sub { [] }
 );
 
@@ -51,7 +52,7 @@ The corresponding L<Test::BDD::Cucumber::Model::Document> object
 
 =cut
 
-has 'document' => ( is => 'rw', isa => 'Test::BDD::Cucumber::Model::Document' );
+has 'document' => ( is => 'rw', isa => InstanceOf['Test::BDD::Cucumber::Model::Document'] );
 
 =head2 background
 
@@ -61,7 +62,7 @@ background section.
 =cut
 
 has 'background' =>
-  ( is => 'rw', isa => 'Test::BDD::Cucumber::Model::Scenario' );
+  ( is => 'rw', isa => InstanceOf['Test::BDD::Cucumber::Model::Scenario'] );
 
 =head2 scenarios
 
@@ -72,7 +73,7 @@ constitute the test.
 
 has 'scenarios' => (
     is      => 'rw',
-    isa     => 'ArrayRef[Test::BDD::Cucumber::Model::Scenario]',
+    isa     => ArrayRef[InstanceOf['Test::BDD::Cucumber::Model::Scenario']],
     default => sub { [] }
 );
 
@@ -83,7 +84,7 @@ Scenarios.
 
 =cut
 
-has 'tags' => ( is => 'rw', isa => 'ArrayRef[Str]', default => sub { [] } );
+has 'tags' => ( is => 'rw', isa => ArrayRef[Str], default => sub { [] } );
 
 =head2 language
 
@@ -93,7 +94,7 @@ Language the feature is written in. Defaults to 'en'.
 
 has 'language' => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => Str,
     default => sub { 'en' }
 );
 

@@ -1,38 +1,47 @@
 ---
 abstract: 'display the Schwartz ratio of the distribution upon release'
 author:
-  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+  - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  Carp: 0
-  File::Find: 0
-  File::Temp: 0
-  Module::Build: 0.3601
-  Scalar::Util: 0
-  Test::More: 0.94
-  perl: 5.004
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::Lazy: '0'
+  Test::DZil: '0'
+  Test::Deep: '0'
+  Test::MockObject: '0'
+  Test::More: '0.96'
 configure_requires:
-  Module::Build: 0.3601
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Dist-Zilla-Plugin-SchwartzRatio
 provides:
   Dist::Zilla::Plugin::SchwartzRatio:
     file: lib/Dist/Zilla/Plugin/SchwartzRatio.pm
-    version: v0.2.0
+    version: v0.3.2
 requires:
-  Dist::Zilla::Role::AfterRelease: 0
-  Dist::Zilla::Role::Plugin: 0
-  LWP::Simple: 0
-  Moose: 0
-  strict: 0
-  warnings: 0
+  Dist::Zilla::Role::AfterRelease: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  List::UtilsBy: '0'
+  MetaCPAN::Client: '0'
+  Moose: '0'
+  perl: v5.14.0
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-SchwartzRatio
-  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-SchwartzRatio/
+  bugtracker: https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio/issues
+  homepage: https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio
   repository: https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio.git
-version: 0.2.0
+version: 0.3.2
+x_author_pledge:
+  version: 1
 x_authority: cpan:YANICK
+x_contributors:
+  - 'brian greenfield <0briang0@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

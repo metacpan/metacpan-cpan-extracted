@@ -1,5 +1,5 @@
 package App::pherkin;
-$App::pherkin::VERSION = '0.52';
+$App::pherkin::VERSION = '0.53';
 use strict;
 use warnings;
 
@@ -18,11 +18,12 @@ use Test::BDD::Cucumber::I18n
     qw(languages langdef readable_keywords keyword_to_subname);
 use Test::BDD::Cucumber::Loader;
 
-use Moose;
-has 'step_paths' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
-has 'extensions' => ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
-has 'tags'       => ( is => 'rw', isa => 'ArrayRef', required => 0 );
-has 'tag_scheme' => ( is => 'rw', isa => 'ArrayRef', required => 0 );
+use Moo;
+use Types::Standard qw( ArrayRef );
+has 'step_paths' => ( is => 'rw', isa => ArrayRef, default => sub { [] } );
+has 'extensions' => ( is => 'rw', isa => ArrayRef, default => sub { [] } );
+has 'tags'       => ( is => 'rw', isa => ArrayRef, required => 0 );
+has 'tag_scheme' => ( is => 'rw', isa => ArrayRef, required => 0 );
 
 has 'harness' => ( is => 'rw' );
 
@@ -32,7 +33,7 @@ App::pherkin - Run Cucumber tests from the command line
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 SYNOPSIS
 
@@ -310,7 +311,7 @@ sub _process_arguments {
 
             # if the configuration of the extension is 'undef', then
             # none was defined. Replace it with an empty hashref, which
-            # is what Moose's 'new()' method wants later on
+            # is what Moo's 'new()' method wants later on
             my @e = map { [ $_, [ $value->{$_} || {} ] ] } keys %$value;
             $value = \@e;
             my $array = $additions{ 0 + $target } ||= [];

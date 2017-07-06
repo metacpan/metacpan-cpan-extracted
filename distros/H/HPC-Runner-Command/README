@@ -1,3 +1,7 @@
+  project
+
+    When submitting jobs we will prepend the jobname with the project name
+
 NAME
 
     HPC::Runner::Command - Create composable bioinformatics hpc analyses.
@@ -10,11 +14,11 @@ SYNOPSIS
 
     To submit jobs to a cluster
 
-        hpcrunner.pl submit_jobs
+        hpcrunner.pl submit_jobs --infile my_submission.sh
 
     To run jobs on an interactive queue or workstation
 
-        hpcrunner.pl execute_job
+        hpcrunner.pl single_node --infile my_submission.sh
 
 DESCRIPTION
 
@@ -22,8 +26,7 @@ DESCRIPTION
     analysis projects, submitting and executing jobs on an HPC cluster or
     workstation, and obsessively logging results.
 
-    Get help by heading on over to github and raising an issue
-    https://github.com/biosails/HPC-Runner-Command/issues.
+    Get help by heading on over to github and raising an issue. GitHub .
 
     Please see the complete documentation at HPC::Runner::Command GitBooks
     .
@@ -56,6 +59,11 @@ Quick Start - Submit Workflows
   Look at results!
 
             tree hpc-runner
+
+  Audit your results
+
+      hpcrunner.pl stats -h
+      hpcrunner.pl stats
 
  Job Type Dependencency Declaration
 
@@ -117,6 +125,11 @@ Quick Start - Submit Workflows
 
             tree hpc-runner
 
+  Audit your results
+
+      hpcrunner.pl stats -h
+      hpcrunner.pl stats
+
  Declare Scheduler Variables
 
     Each scheduler has its own set of variables. HPC::Runner::Command has a
@@ -137,6 +150,7 @@ Quick Start - Submit Workflows
             #HPC cpus_per_task=1
             #HPC partition=serial
             #HPC commands_per_node=1
+      #HPC mem=4GB
             #TASK tags=Sample1
             unzip Sample1.zip
             #TASK tags=Sample2
@@ -162,6 +176,11 @@ Quick Start - Submit Workflows
 
             tree hpc-runner
 
+  Audit your results
+
+      hpcrunner.pl stats -h
+      hpcrunner.pl stats
+
 AUTHOR
 
     Jillian Rowe <jillian.e.rowe@gmail.com>
@@ -179,7 +198,7 @@ Acknowledgements
 
     This modules continuing development is supported by NYU Abu Dhabi in
     the Center for Genomics and Systems Biology. With approval from NYUAD,
-    this information was generalized and put on bitbucket, for which the
+    this information was generalized and put on github, for which the
     authors would like to express their gratitude.
 
     Before Version 2.41

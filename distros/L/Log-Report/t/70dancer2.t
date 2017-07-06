@@ -114,7 +114,7 @@ subtest 'Throw error' => sub {
         $jar->add_cookie_header($req);
         my $res = $test->request( $req );
         ok $res->is_success, "get /write_message";
-        is ($res->content, '0');
+        is $res->content, '0';
 
         # Check caught message is in session
         $jar->extract_cookies($res);

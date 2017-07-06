@@ -29,7 +29,7 @@ no_index:
 provides:
   Test::Mock::Net::FTP:
     file: lib/Test/Mock/Net/FTP.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   File::Path: '2.07'
   File::Slurp: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/tsucchi/Test-Mock-Net-FTP/issues
   homepage: https://github.com/tsucchi/Test-Mock-Net-FTP
   repository: git://github.com/tsucchi/Test-Mock-Net-FTP.git
-version: '0.03'
+version: '0.04'
 x_contributors:
   - 'tsucchi <takuya.tsuchida at gmail.com>'
   - 'Diab Jerius <djerius@cfa.harvard.edu>'

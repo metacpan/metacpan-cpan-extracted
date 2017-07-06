@@ -37,4 +37,4 @@ requires:
   Scalar::Util: 1.13
   Sys::Hostname: 0
   Test::More: 0.47
-version: 3.002
+version: 3.003

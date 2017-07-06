@@ -1,5 +1,8 @@
 Revision history for perl distribution App-git-ship
 
+0.24 2017-06-24T09:37:25+0200
+ - Fix failing unit tests after 406f32d
+
 0.23 2017-06-20T00:11:42+0200
  - Add GITHUB_USERNAME and GIT_SHIP_NO_UPLOAD environment vars
  - Add support for GIT_SHIP_NO_UPLOAD

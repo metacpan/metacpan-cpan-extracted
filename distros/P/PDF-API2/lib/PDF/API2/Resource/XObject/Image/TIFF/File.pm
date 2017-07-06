@@ -3,7 +3,7 @@ package PDF::API2::Resource::XObject::Image::TIFF::File;
 use strict;
 use warnings;
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 use IO::File;
 

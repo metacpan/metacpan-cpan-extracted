@@ -1,5 +1,17 @@
 Revision history for Catmandu-MARC
 
+1.16  2017-07-04 15:27:51 CEST
+  - Adding marc_copy (Carsten Klee) and marc_paste fix
+
+1.15  2017-06-29 16:31:39 CEST
+  - Adding the marc_spec_has Fix Condition (Carsten Klee)
+  - Adding marc_replace_all fix
+  - Adding marc_append fix
+
+1.14  2017-06-23 07:48:49 CEST
+  - Upgrading to Catmandu 1.06X
+  - Using the Catmandu::Fix::Bind::Group style for marc_each bind
+
 1.13  2017-06-15 09:19:13 CEST
   - Fixing join subfields per field correctly in marc_spec
 

@@ -1,5 +1,11 @@
 Revision history for RPi-Pin
 
+2.3603 2017-06-28
+        - bump ver of prereq WiringPi::API to 2.3612
+
+2.3602  2017-06-24
+        - added mode_alt(), allows changing any pin to any mode
+
 2.3601  2017-05-27
         - separated this distribution from RPi::WiringPi::Pin
         - added set_interrupt(), deprecated interrupt_set()

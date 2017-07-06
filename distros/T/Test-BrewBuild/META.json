@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -40,11 +40,12 @@
             "File::Copy::Recursive" : "0",
             "LWP::Simple" : "0",
             "Logging::Simple" : "0.07",
-            "MetaCPAN::Client" : "0",
+            "MetaCPAN::Client" : "2.017",
             "Module::Load" : "0",
             "Parallel::ForkManager" : "0",
             "Plugin::Simple" : "0.06",
             "Proc::Background" : "0",
+            "Test::BrewBuild::Plugin::Author" : "0.02",
             "Test::BrewBuild::Plugin::TestAgainst" : "0.06",
             "perl" : "5.01",
             "version" : "0"
@@ -62,6 +63,6 @@
          "web" : "https://github.com/stevieb9/p5-test-brewbuild"
       }
    },
-   "version" : "2.17",
+   "version" : "2.18",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

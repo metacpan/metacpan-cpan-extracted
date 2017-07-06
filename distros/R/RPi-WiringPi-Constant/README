@@ -46,6 +46,17 @@ CONSTANT EXPORT TAGS
         SOFT_TONE_OUTPUT => 5,  # reserved
         PWM_TONE_OUTPUT  => 6,  # reserved
 
+ :altmode
+
+    Pin ALT modes.
+
+        ALT0 => 4,
+        ALT1 => 5,
+        ALT2 => 6,
+        ALT3 => 7,
+        ALT4 => 3,
+        ALT5 => 2,
+
  :pull
 
     Internal pin pull up/down resistor state.

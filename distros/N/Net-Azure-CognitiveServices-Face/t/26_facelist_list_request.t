@@ -10,7 +10,7 @@ can_ok $facelist, qw/_list_request/;
 
 my $req = $facelist->_list_request;
 isa_ok $req, 'HTTP::Request';
-is $req->uri, 'https://api.projectoxford.ai/face/v1.0/facelists';
+is $req->uri, 'https://westus.api.cognitive.microsoft.com/face/v1.0/facelists';
 is $req->method, 'GET';
 is $req->header('Content-Type'), 'application/json';
 is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';

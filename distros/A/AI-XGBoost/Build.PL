@@ -18,7 +18,7 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "AI-XGBoost",
-  "dist_version" => "0.004",
+  "dist_version" => "0.005",
   "license" => "apache",
   "module_name" => "AI::XGBoost",
   "recursive_test_files" => 1,
@@ -26,16 +26,17 @@ my %module_build_args = (
     "Exception::Class" => 0,
     "Exporter::Easy" => 0,
     "FFI::Platypus" => 0,
+    "Moose" => 0,
     "NativeCall" => 0,
     "parent" => 0,
     "perl" => "5.010",
     "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
   "test_requires" => {
     "Test::More" => 0,
-    "Test::Most" => 0,
-    "utf8" => 0
+    "Test::Most" => 0
   }
 );
 
@@ -43,8 +44,7 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "Module::Build" => "0.28",
   "Test::More" => 0,
-  "Test::Most" => 0,
-  "utf8" => 0
+  "Test::Most" => 0
 );
 
 

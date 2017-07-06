@@ -1,6 +1,6 @@
 package WWW::Google::URLShortener::Params;
 
-$WWW::Google::URLShortener::Params::VERSION   = '0.22';
+$WWW::Google::URLShortener::Params::VERSION   = '0.23';
 $WWW::Google::URLShortener::Params::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::URLShortener::Params - Placeholder for parameters for L<WWW::Google
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 

@@ -1,5 +1,8 @@
 Changes for Debug::Client
 
+0.31 2017-07-04
+ - Merged PR #7 (Fix build and test failures under Perl 5.26 when '.' is not in @INC), thanks @KENTNL.
+
 0.30 2017-06-19
  - Merged PR #5 (Fixed test failure due to perl regression fix in 5.21.3), thanks @TBSliver.
 
@@ -91,7 +94,7 @@ Changes for Debug::Client
 
 0.21_14 2013-01-04
  - #This all relates to #1469
- - fix Windows hangings (CHORNY) 
+ - fix Windows hangings (CHORNY)
  - split and sort out hack into each dev release
  - the switch to time hiRes & win32::Precess (BOWTIE)
  - add some tests back-in using Test::Class to see what CPAN::Reporter go
@@ -122,7 +125,7 @@ Changes for Debug::Client
 
 0.21_10 2012-09-06
  - Debug::Client's dependency on Test::Class is breaking Strawberry
-   Test::Class has Windows problems adamk++ 
+   Test::Class has Windows problems adamk++
  - Remove Test::Class from Debug::Client (BOWTIE)
 
 0.21_09 2012-09-06
@@ -332,4 +335,3 @@ Changes for Debug::Client
 
 0.01 2008-09-13
  - Initial release
-

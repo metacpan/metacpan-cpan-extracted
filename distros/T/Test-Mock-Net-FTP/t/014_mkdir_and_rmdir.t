@@ -4,7 +4,8 @@ use warnings;
 use Test::More;
 use File::Path qw(remove_tree);
 use File::Spec::Functions qw(catdir);
-use lib '.';
+use FindBin;
+use lib $FindBin::Bin;
 use t::Util;
 use Test::Mock::Net::FTP;
 

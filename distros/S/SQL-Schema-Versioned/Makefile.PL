@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "DBIx::Diff::Schema" => "0.05",
     "Exporter" => 0,
-    "Log::Any::IfLOG" => "0.07",
+    "Log::ger" => "0.006",
     "Scalar::Util::Numeric" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.98",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.21",
+  "VERSION" => "0.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,7 +55,7 @@ my %FallbackPrereqs = (
   "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::Any::IfLOG" => "0.07",
+  "Log::ger" => "0.006",
   "Scalar::Util::Numeric" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",

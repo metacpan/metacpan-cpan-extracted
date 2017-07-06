@@ -16,6 +16,7 @@ use_ok('X11::Xlib') or BAIL_OUT;
 
 my $conn= X11::Xlib::XOpenDisplay();
 isa_ok( $conn, 'X11::Xlib', 'new connection' );
+note 'connected to '.X11::Xlib::XDisplayName();
 
 my $pointer1= $conn->_pointer_value;
 ok( defined $pointer1,     'pointer defined' );

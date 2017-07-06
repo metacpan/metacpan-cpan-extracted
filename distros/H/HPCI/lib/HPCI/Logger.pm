@@ -114,19 +114,19 @@ has 'log_no_file' => (
 );
 
 subtype 'LogLevel',
-    as 'Num';
+	as 'Num';
 
 coerce 'LogLevel', from 'Str', via { Log::Log4perl::Level::to_priority( uc $_ ) };
 
 has '_log' => (
-	is      => 'rw',
-    isa     => 'Log::Log4perl::Logger',
+	is       => 'rw',
+	isa      => 'Log::Log4perl::Logger',
 	init_arg => undef,
 );
 
 has 'log' => (
 	is      => 'ro',
-    isa     => 'Log::Log4perl::Logger',
+	isa     => 'Log::Log4perl::Logger',
 	lazy    => 1,
 	trigger => \&_log_provided,
 	builder => '_default_logger',
@@ -216,7 +216,7 @@ sub _log_level_change {
 }
 
 sub _default_logger {
-    my $self = shift;
+	my $self = shift;
 
 	return $self->_log if $self->_init_stage;
 
@@ -226,8 +226,8 @@ sub _default_logger {
 
 	$log->level( $self->log_level );
 
-    # Layouts - output formats for appenders. See here for specification:
-    # (http://search.cpan.org/~mschilli/Log-Log4perl-1.40/lib/Log/Log4perl/Layout/PatternLayout.pm)
+	# Layouts - output formats for appenders. See here for specification:
+	# (http://search.cpan.org/~mschilli/Log-Log4perl-1.40/lib/Log/Log4perl/Layout/PatternLayout.pm)
 	my %layout = (
 		simple  => "%d %6p> %m%n",
 		verbose => "%d (%10r) %6p> %m%n",
@@ -263,7 +263,7 @@ sub _default_logger {
 	}
 
 	$self->_init_stage(2);
-    return $log;
+	return $log;
 }
 
 1;

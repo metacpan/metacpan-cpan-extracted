@@ -1,13 +1,13 @@
-# Copyrights 2008-2014 by [Mark Overmeer].
+# Copyrights 2008-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
+# Pod stripped from pm file by OODoc 2.02.
 use warnings;
 use strict;
 
 package Geo::GML;
 use vars '$VERSION';
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 use base 'XML::Compile::Cache';
 
@@ -15,6 +15,7 @@ use Geo::GML::Util;
 
 use Log::Report 'geo-gml', syntax => 'SHORT';
 use XML::Compile::Util  qw/unpack_type pack_type type_of_node/;
+use File::Glob          qw/bsd_glob/;
 
 # map namespace always to the newest implementation of the protocol
 my %ns2version =
@@ -66,12 +67,12 @@ sub init($)
     $args->{allow_undeclared} = 1
         unless exists $args->{allow_undeclared};
 
-    $args->{opts_rw} = { @{$args->{opts_rw}} }
+    $args->{opts_rw} = +{ @{$args->{opts_rw}} }
         if ref $args->{opts_rw} eq 'ARRAY';
-    $args->{opts_rw}{key_rewrite} = 'PREFIXED';
+    $args->{opts_rw}{key_rewrite}    = 'PREFIXED';
     $args->{opts_rw}{mixed_elements} = 'STRUCTURAL';
 
-    $args->{any_element}         ||= 'ATTEMPT';
+    $args->{any_element}           ||= 'ATTEMPT';
 
     $self->SUPER::init($args);
 
@@ -86,13 +87,13 @@ sub init($)
         $version = $ns2version{$version};
     }
     $self->{GG_version} = $version;    
-    my $info    = $info{$version};
+    my $info = $info{$version};
 
     $self->addPrefixes(xlink => NS_XLINK_1999, %{$info->{prefixes}});
 
     (my $xsd = __FILE__) =~ s!\.pm!/xsd!;
-    my @xsds    = map {glob "$xsd/$_"}
-        @{$info->{schemas} || []}, 'xlink1.0.0/*.xsd';
+    my @xsds = map bsd_glob("$xsd/$_")
+      , @{$info->{schemas} || []}, 'xlink1.0.0/*.xsd';
 
     $self->importDefinitions(\@xsds);
     $self;

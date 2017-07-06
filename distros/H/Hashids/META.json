@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.3.0",
+   "generated_by" : "Minilla/v3.0.12",
    "license" : [
       "mit"
    ],
@@ -28,7 +28,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -42,9 +42,13 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "1.26",
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "List::Util" : "0",
             "Math::BigInt" : "1.9993",
             "Moo" : "1.003000",
+            "POSIX" : "0",
+            "namespace::clean" : "0.27",
             "perl" : "5.008001"
          }
       },
@@ -58,7 +62,10 @@
    "provides" : {
       "Hashids" : {
          "file" : "lib/Hashids.pm",
-         "version" : "1.000002"
+         "version" : "1.000005"
+      },
+      "Hashids::Util" : {
+         "file" : "lib/Hashids/Util.pm"
       }
    },
    "release_status" : "stable",
@@ -72,10 +79,11 @@
          "web" : "https://github.com/zakame/hashids.pm"
       }
    },
-   "version" : "1.000002",
+   "version" : "1.000005",
    "x_contributors" : [
       "C. A. Church <thisdroneeatspeople@gmail.com>",
       "Troy Morehouse <troymore@nbnet.nb.ca>",
       "Zak B. Elep <zakame@zakame.net>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

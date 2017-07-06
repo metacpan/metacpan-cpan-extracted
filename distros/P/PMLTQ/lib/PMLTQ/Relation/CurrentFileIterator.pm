@@ -1,6 +1,6 @@
 package PMLTQ::Relation::CurrentFileIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::CurrentFileIterator::VERSION = '1.3.2';
+$PMLTQ::Relation::CurrentFileIterator::VERSION = '1.4.0';
 # ABSTRACT: Iterates nodes of TredMacro::CurrentFile()
 
 use 5.006;
@@ -88,7 +88,7 @@ PMLTQ::Relation::CurrentFileIterator - Iterates nodes of TredMacro::CurrentFile(
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 AUTHORS
 

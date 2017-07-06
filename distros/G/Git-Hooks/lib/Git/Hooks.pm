@@ -1,19 +1,19 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '1.16.0';
+$Git::Hooks::VERSION = '2.0.1';
 use 5.010;
 use strict;
 use warnings;
 use Carp;
 use Exporter qw/import/;
 use Sub::Util qw/subname/;
-use Path::Tiny;
-use List::MoreUtils qw/any/;
+use Git::Repository qw/GitHooks Log/;
 
-our (@EXPORT, @EXPORT_OK, %EXPORT_TAGS); ## no critic (Modules::ProhibitAutomaticExportation)
-my (%Hooks, @PostHooks);
+our @EXPORT; ## no critic (Modules::ProhibitAutomaticExportation)
 
-BEGIN {                         ## no critic (RequireArgUnpacking)
+my %Hooks;
+
+BEGIN {
     my @installers =
         qw/ APPLYPATCH_MSG PRE_APPLYPATCH POST_APPLYPATCH
             PRE_COMMIT PREPARE_COMMIT_MSG COMMIT_MSG
@@ -25,633 +25,38 @@ BEGIN {                         ## no critic (RequireArgUnpacking)
           /;
 
     for my $installer (@installers) {
-        my $hook = lc $installer;
-        $hook =~ tr/_/-/;
+        my $hook = $installer;
+        $hook =~ tr/A-Z_/a-z-/;
         no strict 'refs';       ## no critic (ProhibitNoStrict)
-        *{__PACKAGE__ . '::' . $installer} = sub (&) {
-            my ($sub) = @_;
-            push @{$Hooks{$hook}}, sub { $sub->(@_); };
-        }
+        *{"Git::Hooks::$installer"} = sub (&) { push @{$Hooks{$hook}}, shift }
     }
 
-    @EXPORT      = (@installers, 'run_hook');
+    @EXPORT = (@installers, 'run_hook');
 
-    @EXPORT_OK = qw/is_ref_enabled im_memberof match_user im_admin file_temp
-                    eval_gitconfig post_hook redirect_output restore_output/;
-
-    %EXPORT_TAGS = (utils => \@EXPORT_OK);
-}
-
-use Git::More;
-
-##############
-# The following routines are invoked after all hooks have been
-# processed. Some hooks may need to take a global action depending on
-# the overall result of all hooks.
-
-sub post_hook {
-    my ($sub) = @_;
-    push @PostHooks, $sub;
-    return;
-}
-
-sub is_ref_enabled {
-    my ($ref, @specs) = @_;
-
-    return 1 if ! defined $ref || @specs == 0;
-
-    foreach (@specs) {
-        if (/^\^/) {
-            return 1 if $ref =~ qr/$_/;
-        } else {
-            return 1 if $ref eq $_;
-        }
-    }
-
-    return 0;
-}
-
-# The routine redirect_output redirects STDOUT and STDERR to a temporary
-# file and returns a reference that should be passed to the routine
-# restore_output to restore the handles to their original state.
-
-sub redirect_output {
-    ## no critic (RequireBriefOpen, RequireCarping)
-    open(my $oldout, '>&', \*STDOUT)  or die "Can't dup STDOUT: $!";
-    open(my $olderr, '>&', \*STDERR)  or die "Can't dup STDERR: $!";
-    my $tempfile = Path::Tiny->tempfile(UNLINK => 1);
-    open(STDOUT    , '>' , $tempfile) or die "Can't redirect STDOUT to \$tempfile: $!";
-    open(STDERR    , '>&', \*STDOUT)  or die "Can't dup STDOUT for STDERR: $!";
-    ## use critic
-    return [$oldout, $olderr, $tempfile];
-}
-
-# This routine gets a reference returned by redirect_output, restores STDOUT
-# and STDERR to their previous state and returns a string containing every
-# output since the previous call to redirect_output.
-
-sub restore_output {
-    my ($saved) = @_;
-    my ($oldout, $olderr, $tempfile) = @$saved;
-    ## no critic (RequireCarping)
-    open(STDOUT, '>&', $oldout) or die "Can't dup \$oldout: $!";
-    open(STDERR, '>&', $olderr) or die "Can't dup \$olderr: $!";
-    ## use critic
-    return $tempfile->slurp;
-}
-
-# This is an internal routine used to invoke external hooks, feed them
-# the needed input and wait for them.
-
-sub spawn_external_hook {
-    my ($git, $file, $hook, @args) = @_;
-
-    my $prefix  = '[' . __PACKAGE__ . '(' . path($file)->basename . ')]';
-    my $saved_output = redirect_output();
-
-    if ($hook =~ /^(?:pre-receive|post-receive|pre-push|post-rewrite)$/) {
-
-        # These hooks receive information via STDIN that we read once
-        # before invoking any hook. Now, we must regenerate the same
-        # information and output it to the external hooks we invoke.
-
-        my $stdin = join("\n", map {join(' ', @$_)} @{$git->get_input_data}) . "\n";
-
-        my $pid = open my $pipe, '|-'; ## no critic (InputOutput::RequireBriefOpen)
-
-        if (! defined $pid) {
-            restore_output($saved_output);
-            $git->error($prefix, "can't fork: $!");
-        } elsif ($pid) {
-            # parent
-            print $pipe $stdin;
-            my $exit = close $pipe;
-            my $output = restore_output($saved_output);
-            if ($exit) {
-                warn $output, "\n" if length $output;
-                return 1;
-            } elsif ($!) {
-                $git->error($prefix, "Error closing pipe to external hook: $!", $output);
-            } else {
-                $git->error($prefix, "External hook exited with code $?", $output);
-            }
-        } else {
-            # child
-            { exec {$file} ($hook, @args) }
-            restore_output($saved_output);
-            die "$prefix: can't exec: $!\n";
-        }
-
-    } else {
-
-        if (@args && ref $args[0]) {
-            # This is a Gerrit hook and we need to expand its arguments
-            @args = %{$args[0]};
-        }
-
-        my $exit = system {$file} ($hook, @args);
-
-        my $output = restore_output($saved_output);
-
-        if ($exit == 0) {
-            warn $output, "\n" if length $output;
-            return 1;
-        } else {
-            my $message = do {
-                if ($exit == -1) {
-                    "failed to execute external hook: $!";
-                } elsif ($exit & 127) {
-                    sprintf("external hook died with signal %d, %s coredump",
-                            ($exit & 127), ($exit & 128) ? 'with' : 'without');
-                } else {
-                    sprintf("'$file' exited abnormally with value %d", $exit >> 8);
-                }
-            };
-            $git->error($prefix, $message, $output);
-        }
-    }
-
-    return 0;
-}
-
-sub file_temp {
-    my ($git, $rev, $file, @args) = @_;
-
-    carp 'Invoking deprecated routine ', __PACKAGE__, '::file_temp. Please, see documentation.';
-
-    return $git->blob($rev, $file, @args);
-}
-
-sub grok_groups_spec {
-    my ($groups, $specs, $source) = @_;
-    foreach (@$specs) {
-        s/\#.*//;               # strip comments
-        next unless /\S/;       # skip blank lines
-        /^\s*(\w+)\s*=\s*(.+?)\s*$/
-            or die __PACKAGE__, ": invalid line in '$source': $_\n";
-        my ($groupname, $members) = ($1, $2);
-        exists $groups->{"\@$groupname"}
-            and die __PACKAGE__, ": redefinition of group ($groupname) in '$source': $_\n";
-        foreach my $member (split / /, $members) {
-            if ($member =~ /^\@/) {
-                # group member
-                $groups->{"\@$groupname"}{$member} = $groups->{$member}
-                    or die __PACKAGE__, ": unknown group ($member) cited in '$source': $_\n";
-            } else {
-                # user member
-                $groups->{"\@$groupname"}{$member} = undef;
-            }
-        }
-    }
-    return;
-}
-
-sub grok_groups {
-    my ($git) = @_;
-
-    my $cache = $git->cache('githooks');
-
-    unless (exists $cache->{groups}) {
-        my @groups = $git->get_config(githooks => 'groups')
-            or die __PACKAGE__, ": you have to define the githooks.groups option to use groups.\n";
-
-        my $groups = {};
-        foreach my $spec (@groups) {
-            if (my ($groupfile) = ($spec =~ /^file:(.*)/)) {
-                my @groupspecs = path($groupfile)->lines;
-                defined $groupspecs[0]
-                    or die __PACKAGE__, ": can't open groups file ($groupfile): $!\n";
-                grok_groups_spec($groups, \@groupspecs, $groupfile);
-            } else {
-                my @groupspecs = split /\n/, $spec;
-                grok_groups_spec($groups, \@groupspecs, "githooks.groups");
-            }
-        }
-        $cache->{groups} = $groups;
-    }
-
-    return $cache->{groups};
-}
-
-sub im_memberof {
-    my ($git, $myself, $groupname) = @_;
-
-    my $groups = grok_groups($git);
-
-    exists $groups->{$groupname}
-        or die __PACKAGE__, ": group $groupname is not defined.\n";
-
-    my $group = $groups->{$groupname};
-    return 1 if exists $group->{$myself};
-    while (my ($member, $subgroup) = each %$group) {
-        next     unless defined $subgroup;
-        return 1 if     im_memberof($git, $myself, $member);
-    }
-    return 0;
-}
-
-sub match_user {
-    my ($git, $spec) = @_;
-
-    if (my $myself = $git->authenticated_user()) {
-        if ($spec =~ /^\^/) {
-            return 1 if $myself =~ $spec;
-        } elsif ($spec =~ /^@/) {
-            return 1 if im_memberof($git, $myself, $spec);
-        } else {
-            return 1 if $myself eq $spec;
-        }
-    }
-
-    return 0;
-}
-
-sub im_admin {
-    my ($git) = @_;
-    foreach my $spec ($git->get_config(githooks => 'admin')) {
-        return 1 if match_user($git, $spec);
-    }
-    return 0;
-}
-
-sub eval_gitconfig {
-    my ($config) = @_;
-
-    my $value;
-
-    if ($config =~ s/^file://) {
-        $value = do $config;
-        unless ($value) {
-            die "couldn't parse '$config': $@\n" if $@;
-            die "couldn't do '$config': $!\n"    unless defined $value;
-            die "couldn't run '$config'\n"       unless $value;
-        }
-    } elsif ($config =~ s/^eval://) {
-        $value = eval $config; ## no critic (BuiltinFunctions::ProhibitStringyEval)
-        die "couldn't parse '$config':\n$@\n" if $@;
-    } else {
-        $value = $config;
-    }
-
-    return $value;
-}
-
-##############
-# The following routines prepare the arguments for some hooks to make
-# it easier to deal with them later on.
-
-# Some hooks get information from STDIN as text lines with
-# space-separated fields. This routine reads up all of STDIN and tucks
-# that information in the Git::More object.
-
-sub _prepare_input_data {
-    my ($git) = @_;
-    while (<STDIN>) { ## no critic (InputOutput::ProhibitExplicitStdin)
-        chomp;
-        $git->push_input_data([split]);
-    }
-    return;
-}
-
-# The pre-receive and post-receive hooks get the list of affected
-# commits via STDIN. This routine gets them all and set all affected
-# refs in the Git object.
-
-sub _prepare_receive {
-    my ($git) = @_;
-    _prepare_input_data($git);
-    foreach (@{$git->get_input_data()}) {
-        my ($old_commit, $new_commit, $ref) = @$_;
-        $git->set_affected_ref($ref, $old_commit, $new_commit);
-    }
-    return;
-}
-
-# The update hook get three arguments telling which reference is being
-# updated, from which commit, to which commit. Here we use these
-# arguments to set the affected ref in the Git object.
-
-sub _prepare_update {
-    my ($git, $args) = @_;
-    $git->set_affected_ref(@$args);
-    return;
-}
-
-# Gerrit hooks get a list of option/value pairs. Here we convert the
-# list into a hash and change the original argument list into a single
-# hash-ref. We also record information about the user performing the
-# push. Based on:
-# https://gerrit-review.googlesource.com/Documentation/config-hooks.html
-
-sub _prepare_gerrit_args {
-    my ($git, $args) = @_;
-
-    my %opt = @$args;
-
-    # Each Gerrit hook receive the full name and email of the user
-    # performing the hooked operation via a specific option in the
-    # format "User Name (email@example.net)". Here we grok it.
-    my $user =
-        $opt{'--uploader'}  ||
-        $opt{'--author'}    ||
-        $opt{'--submitter'} ||
-        $opt{'--abandoner'} ||
-        $opt{'--restorer'}  ||
-        $opt{'--reviewer'}  ||
-        undef;
-
-    # Here we make the name and email available in two environment
-    # variables (GERRIT_USER_NAME and GERRIT_USER_EMAIL) so that
-    # Git::More::authenticated_user can more easily grok the userid
-    # from them later.
-    if ($user && $user =~ /([^\(]+)\s+\(([^\)]+)\)/) {
-        $ENV{GERRIT_USER_NAME}  = $1; ## no critic (Variables::RequireLocalizedPunctuationVars)
-        $ENV{GERRIT_USER_EMAIL} = $2; ## no critic (Variables::RequireLocalizedPunctuationVars)
-    }
-
-    # Now we create a Gerrit::REST object connected to the Gerrit
-    # server and tack it to the hook arguments so that Gerrit plugins
-    # can interact with it.
-
-    # We 'require' the module instead of 'use' it because it's only
-    # used if one sets up Gerrit hooks, which may not be the most
-    # common usage of Git::Hooks.
-    eval {require Gerrit::REST}
-        or die __PACKAGE__, ": Please, install the Gerrit::REST module to use Gerrit hooks.\n";
-
-    $opt{gerrit} = do {
-        my %info;
-        foreach my $arg (qw/url username password/) {
-            $info{$arg} = $git->get_config('githooks.gerrit' => $arg)
-                or die __PACKAGE__, ": Missing githooks.gerrit.$arg configuration variable.\n";
-        }
-
-        Gerrit::REST->new(@info{qw/url username password/});
-    };
-
-    @$args = (\%opt);
-
-    return;
-}
-
-# The ref-update Gerrit hook is invoked synchronously when a user
-# pushes commits to a branch. So, it acts much like Git's standard
-# 'update' hook. This routine prepares the options as usual and sets
-# the affected ref accordingly. The documented arguments for the hook
-# are these:
-
-# ref-update --project <project name> --refname <refname> --uploader \
-# <uploader> --oldrev <sha1> --newrev <sha1>
-
-sub _prepare_gerrit_ref_update {
-    my ($git, $args) = @_;
-
-    _prepare_gerrit_args($git, $args);
-
-    # The --refname argument contains the branch short-name if it's in the
-    # refs/heads/ namespace. But we need to always use the branch long-name,
-    # so we change it here.
-    my $refname = $args->[0]{'--refname'};
-    $refname = "refs/heads/$refname"
-        unless $refname =~ m:^refs/:;
-
-    $git->set_affected_ref($refname, @{$args->[0]}{qw/--oldrev --newrev/});
-    return;
-}
-
-# The following routine is the post_hook used by the Gerrit hooks
-# patchset-created and draft-published. It basically casts a vote on the
-# patchset based on the errors found during the hook processing.
-
-sub _gerrit_patchset_post_hook {
-    my ($hook_name, $git, $args) = @_;
-
-    for my $arg (qw/project branch change patchset/) {
-        exists $args->{"--$arg"}
-            or die __PACKAGE__, ": Missing --$arg argument to Gerrit's $hook_name hook.\n";
-    }
-
-    # We have to use the most complete form of Gerrit change ids because
-    # it's the only unanbiguous one. Vide:
-    # https://gerrit.cpqd.com.br/Documentation/rest-api-changes.html#change-id.
-
-    # Up to Gerrit 2.12 the argument --change passed the change's Change-Id
-    # code. So, we had to build the complete change id using the information
-    # passed on the arguments --project and --branch. From Gerrit 2.13 on
-    # the --change argument already contains the complete change id. So we
-    # have to figure out if we need to build it or not.
-
-    # Also, for the old Gerrit we have to url-escape the change-id because
-    # the project name may contain slashes (and perhaps other reserved
-    # characters). This is possibly not a complete solution. Vide:
-    # http://mark.stosberg.com/blog/2010/12/percent-encoding-uris-in-perl.html.
-
-    require URI::Escape;
-    my $id = $args->{'--change'} =~ /~/
-        ? $args->{'--change'}
-        : URI::Escape::uri_escape(join('~', @{$args}{qw/--project --branch --change/}));
-
-    my $patchset = $args->{'--patchset'};
-
-    # Grok all configuration options at once to make it easier to deal with them below.
-    my %cfg = map {$_ => $git->get_config('githooks.gerrit' => $_) || undef}
-        qw/review-label vote-nok vote-ok votes-to-approve votes-to-reject comment-ok auto-submit/;
-
-    # Convert DEPRECATED configuration options to new ones.
-    if (any {defined $cfg{$_}} qw/review-label vote-nok vote-ok/) {
-        if (any {defined $cfg{$_}} qw/votes-to-approve votes-to-reject/) {
-            die __PACKAGE__ . ": Mixing deprecated githooks.gerrit configuration options (review-label vote-nok vote-ok) with new ones (votes-to-approve votes-to-reject) is not permited. Please, convert the deprecated ones.\n"
-        }
-        $cfg{'votes-to-approve'} = $cfg{'votes-to-reject'} = $cfg{'review-label'} || 'Code-Review';
-        $cfg{'votes-to-reject'} .= $cfg{'vote-nok'} || '-1';
-        $cfg{'votes-to-approve'} .= $cfg{'vote-ok'}  || '+1';
-    }
-
-    # https://gerrit-documentation.storage.googleapis.com/Documentation/2.13.1/rest-api-changes.html#set-review
-    my %review_input;
-    my $auto_submit = 0;
-
-    if (my @errors = $git->get_errors()) {
-        $review_input{labels}  = $cfg{'votes-to-reject'} || 'Code-Review-1';
-        $review_input{message} = join("\n\n", @errors);
-    } else {
-        $review_input{labels}  = $cfg{'votes-to-approve'} || 'Code-Review+1';
-        $review_input{message} = "[Git::Hooks] $cfg{'comment-ok'}"
-            if $cfg{'comment-ok'};
-        $auto_submit = 1 if $cfg{'auto-submit'};
-    }
-
-    # Convert, e.g., 'LabelA-1,LabelB+2' into { LabelA => '-1', LabelB => '+2' }
-    $review_input{labels} = { map {/^([-\w]+)([-+]\d+)$/i} split(',', $review_input{labels}) };
-
-    if (my $notify = $git->get_config('githooks.gerrit' => 'notify')) {
-        $review_input{notify} = $notify;
-    }
-
-    # Cast review
-    eval { $args->{gerrit}->POST("/changes/$id/revisions/$patchset/review", \%review_input) }
-        or die __PACKAGE__ . ": error in Gerrit::REST::POST(/changes/$id/revisions/$patchset/review): $@\n";
-
-    # Auto submit if requested and passed verification
-    if ($auto_submit) {
-        eval { $args->{gerrit}->POST("/changes/$id/submit", {wait_for_merge => 'true'}) }
-            or die __PACKAGE__ . ": I couldn't submit the change. Perhaps you have to rebase it manually to resolve a conflict. Please go to its web page to check it out. The error message follows: $@\n";
-    }
-
-    return;
-}
-
-# Gerrit's patchset-created hook is invoked when a commit is pushed to a
-# refs/for/* branch for revision. It's invoked asynchronously, i.e., it
-# can't stop the push to happen. Instead, if it detects any problem, we must
-# reject the commit via Gerrit's own revision process. So, we prepare a post
-# hook action in which we see if there were errors that should be signaled
-# via a code review action. Note, however, that draft changes can only be
-# accessed by their respective owners and usually can't be voted on by the
-# hook. So, draft changes aren't voted on and we exit the hook prematurely.
-# The arguments for the hook are these:
-
-# patchset-created --change <change id> --is-draft <boolean> \
-# --kind <change kind> --change-url <change url> \
-# --change-owner <change owner> --project <project name> \
-# --branch <branch> --topic <topic> --uploader <uploader>
-# --commit <sha1> --patchset <patchset id>
-
-# Gerrit's draft-published hook is invoked when a draft change is
-# published. In this state they're are visible by the hook and can be voted
-# on. The arguments for the hook are these:
-
-# draft-published --change <change id> --change-url <change url> \
-# --change-owner <change owner> --project <project name> \
-# --branch <branch> --topic <topic> --uploader <uploader> \
-# --commit <sha1> --patchset <patchset id>
-
-sub _prepare_gerrit_patchset {
-    my ($git, $args) = @_;
-
-    _prepare_gerrit_args($git, $args);
-
-    exit(0) if exists $args->[0]{'--is-draft'} and $args->[0]{'--is-draft'} eq 'true';
-
-    post_hook(\&_gerrit_patchset_post_hook);
-
-    return;
-}
-
-# The %prepare_hook hash maps hook names to the routine that must be
-# invoked in order to "prepare" their arguments.
-
-my %prepare_hook = (
-    'update'           => \&_prepare_update,
-    'pre-push'         => \&_prepare_input_data,
-    'post-rewrite'     => \&_prepare_input_data,
-    'pre-receive'      => \&_prepare_receive,
-    'post-receive'     => \&_prepare_receive,
-    'ref-update'       => \&_prepare_gerrit_ref_update,
-    'patchset-created' => \&_prepare_gerrit_patchset,
-    'draft-published'  => \&_prepare_gerrit_patchset,
-);
-
-################
-
-# This routine loads every plugin configured in the githooks.plugin
-# option.
-
-sub _load_plugins {
-    my ($git) = @_;
-
-    my %enabled_plugins  = map {($_ => undef)} map {split} $git->get_config(githooks => 'plugin');
-
-    return unless %enabled_plugins; # no one configured
-
-    my %disabled_plugins = map {($_ => undef)} map {split} $git->get_config(githooks => 'disable');
-
-    # Remove disabled plugins from the list of enabled ones
-    foreach my $plugin (keys %enabled_plugins) {
-        my ($prefix, $basename) = ($plugin =~ /^(.+::)?(.+)/);
-
-        if (   exists $disabled_plugins{$plugin}
-            || exists $disabled_plugins{$basename}
-            || exists $ENV{$basename} && ! $ENV{$basename}
-        ) {
-            delete $enabled_plugins{$plugin};
-        } else {
-            $enabled_plugins{$plugin} = [$prefix, $basename];
-        }
-    }
-
-    # Define the list of directories where we'll look for the hook
-    # plugins. First the local directory 'githooks' under the
-    # repository path, then the optional list of directories
-    # specified by the githooks.plugins config option, and,
-    # finally, the Git::Hooks standard hooks directory.
-    my @plugin_dirs = grep {-d} (
-        'githooks',
-        $git->get_config(githooks => 'plugins'),
-        path($INC{'Git/Hooks.pm'})->parent->child('Hooks'),
-    );
-
-    # Load remaining enabled plugins
-    while (my ($key, $plugin) = each %enabled_plugins) {
-        my ($prefix, $basename) = @$plugin;
-        my $exit = do {
-            if ($prefix) {
-                # It must be a module name
-                ## no critic (ProhibitStringyEval, RequireCheckingReturnValueOfEval)
-                eval "require $prefix$basename";
-            } else {
-                # Otherwise, it's a basename we must look for in @plugin_dirs
-                $basename .= '.pm' unless $basename =~ /\.p[lm]$/i;
-                my @scripts = grep {!-d} map {path($_)->child($basename)} @plugin_dirs;
-                $basename = shift @scripts
-                    or die __PACKAGE__, ": can't find enabled hook $basename.\n";
-                do $basename;
-            }
-        };
-        unless ($exit) {
-            die __PACKAGE__, ": couldn't parse $basename: $@\n" if $@;
-            die __PACKAGE__, ": couldn't do $basename: $!\n"    unless defined $exit;
-            die __PACKAGE__, ": couldn't run $basename\n";
-        }
-    }
-
-    return;
 }
 
 # This is the main routine of Git::Hooks. It gets the original hook
 # name and arguments, sets up the environment, loads plugins and
 # invokes the appropriate hook functions.
 
-sub run_hook {                  ## no critic (Subroutines::ProhibitExcessComplexity)
+sub run_hook {
     my ($hook_name, @args) = @_;
 
-    $hook_name = path($hook_name)->basename;
+    my $git = Git::Repository->new();
 
-    my $git = Git::More->repository();
+    my $hook_basename = $git->prepare_hook($hook_name, @args);
 
-    $git->hookname($hook_name);
-
-    # Don't show context in error messages if requested
-    $git->nocarp if $git->get_config(githooks => 'nocarp');
-
-    # Some hooks need some argument munging before we invoke them
-    if (my $prepare = $prepare_hook{$hook_name}) {
-        $prepare->($git, \@args);
-    }
-
-    _load_plugins($git);
-
-    my $errors = 0;             # Count number of errors found
+    $git->load_plugins();
 
     # Call every hook function installed by the hook scripts before.
-    for my $hook (@{$Hooks{$hook_name}}) {
+    for my $hook (@{$Hooks{$hook_basename}}) {
         my ($package) = subname($hook) =~ m/^(.+)::/;
         my $ok = eval { $hook->($git, @args) };
         if (defined $ok) {
             # Modern hooks return a boolean value indicating their success.
-            # If they fail they invoke Git::More::error.
+            # If they fail they invoke
+            # Git::Repository::Plugin::GitHooks::error.
             unless ($ok) {
-                $errors += 1;
                 # Let's see if there is a help-on-error message configured
                 # specifically for this plugin.
                 (my $CFG = $package) =~ s/.*::/githooks./;
@@ -660,52 +65,27 @@ sub run_hook {                  ## no critic (Subroutines::ProhibitExcessComplex
                 }
             }
         } elsif (length $@) {
-            $errors += 1;
             # Old hooks die when they fail...
-            $git->error(__PACKAGE__ . "($hook_name)", "Hook failed", $@);
+            $git->error(__PACKAGE__ . "($hook_basename)", "Hook failed", $@);
         } else {
             # ...and return undef when they succeed.
         }
     }
 
     # Invoke enabled external hooks. This doesn't work in Windows yet.
-    if ($^O ne 'MSWin32' && $git->get_config(githooks => 'externals')) {
-        foreach my $dir (
-            grep {-e} map {path($_)->child($hook_name)}
-                ($git->get_config(githooks => 'hooks'), path($git->repo_path())->child('hooks.d'))
-        ) {
-            opendir my $dh, $dir
-                or $git->error(__PACKAGE__, ": cannot opendir '$dir'", $!)
-                    and next;
-            foreach my $file (grep {!-d && -x} map {path($dir)->child($_)} readdir $dh) {
-                spawn_external_hook($git, $file, $hook_name, @args)
-                    or $git->error(__PACKAGE__, ": error in external hook '$file'");
-            }
-        }
-    }
+    $git->invoke_external_hooks(@args);
 
     # Some hooks want to do some post-processing
-    foreach my $post_hook (@PostHooks) {
-        $post_hook->($hook_name, $git, @args);
+    foreach my $post_hook ($git->post_hooks) {
+        $post_hook->($hook_basename, $git, @args);
     }
 
-    if ($errors || scalar($git->get_errors())) {
-        # Let's see if there is a help-on-error message configured globally.
-        if (my $help = $git->get_config(githooks => 'help-on-error')) {
-            $git->error(__PACKAGE__, $help);
-        }
-
-        if (($hook_name eq 'commit-msg' or $hook_name eq 'pre-commit')
+    if (my $errors = $git->get_errors()) {
+        if (($hook_basename eq 'commit-msg' or $hook_basename eq 'pre-commit')
                 and not $git->get_config(githooks => 'abort-commit')) {
-            warn <<"EOF";
-ATTENTION: To fix the problems in this commit, please consider
-amending it:
-
-        git commit --amend      # to amend it
-
-EOF
+            carp $errors;
         } else {
-            die "\n";
+            croak $errors;
         }
     }
 
@@ -727,7 +107,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =head1 SYNOPSIS
 
@@ -758,8 +138,6 @@ options. (More on this later.)
         use Git::Hooks;
 
         run_hook($0, @ARGV);
-
-=for Pod::Coverage spawn_external_hook grok_groups_spec grok_groups
 
 =head1 INTRODUCTION
 
@@ -899,9 +277,9 @@ is detected the hook is considered to have failed and the exception
 string (B<$@>) is showed to the user.
 
 The best way to produce an error message is to invoke the
-B<Git::More::error> method passing a prefix and a message for uniform
-formating. Note that any hook invokes this method it counts as a failure,
-even if it ultimately returns true!
+B<Git::Repository::Plugin::GitHooks::error> method passing a prefix and a
+message for uniform formatting. Note that any hook invokes this method it
+counts as a failure, even if it ultimately returns true!
 
 For example:
 
@@ -912,17 +290,17 @@ For example:
     PRE_COMMIT {
         my ($git) = @_;
 
-        my @changed = $git->command(qw/diff --cached --name-only --diff-filter=AM/);
+        my @changed = $git->filter_files_in_index('AM');
 
         my $errors = 0;
 
-        foreach ($git->command('ls-files' => '-s', @changed)) {
-            chomp;
+        foreach ($git->run(qw/ls-files -s/, @changed)) {
             my ($mode, $sha, $n, $name) = split / /;
-            my $size = $git->command('cat-file' => '-s', $sha);
-            $size <= $LIMIT
-                or $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $LIMIT"
-                    and ++$errors;
+            my $size = $git->file_size(":0:$name");
+            if ($size > $LIMIT) {
+                $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $LIMIT");
+                ++$errors;
+            }
         }
 
         return $errors == 0;
@@ -935,14 +313,13 @@ For example:
         my ($git) = @_;
         my %violations;
 
-        my @changed = grep {/\.p[lm]$/} $git->command(qw/diff --cached --name-only --diff-filter=AM/);
+        my @changed = grep {/\.p[lm]$/} $git->filter_files_in_index('AM');
 
-        foreach ($git->command('ls-files' => '-s', @changed)) {
-            chomp;
+        foreach ($git->run(qw/ls-files -s/, @changed)) {
             my ($mode, $sha, $n, $name) = split / /;
             require Perl::Critic;
             state $critic = Perl::Critic->new(-severity => 'stern', -top => 10);
-            my $contents = $git->command('cat-file' => $sha);
+            my $contents = $git->run('cat-file', $sha);
             my @violations = $critic->critique(\$contents);
             $violations{$name} = \@violations if @violations;
         }
@@ -1006,11 +383,11 @@ that no rewritten commit is contained by any other branch besides the
 current one. This is useful, for instance, to prevent rebasing commits
 already pushed.
 
-=item * Git::Hooks::CheckStructure
+=item * Git::Hooks::CheckReference
 
-Check if newly added files and reference names (branches and tags) comply
-with specified policies, so that you can impose a strict structure to the
-repository's file and reference hierarchies.
+Check if newly added reference names (branches, tags are just the most
+common Git references) comply with specified policies, so that you can
+impose a strict structure to the repository's reference hierarchies.
 
 =item * Git::Hooks::GerritChangeId
 
@@ -1031,6 +408,146 @@ To enable a plugin you must add it to the C<githooks.plugin>
 configuration option.
 
 The CONFIGURATION section below explains this in more detail.
+
+=head2 Implementing Plugins
+
+Plugins are simply Perl modules inside the Git::Hooks namespace. Choose a
+descriptive name for it so that it can be installed by means of the
+C<githooks.plugin> configuration option. The only requirement of a plugin is
+that it record one of more functions as hooks using the HOOK DIRECTIVES
+described above.
+
+As an example of a bare-bones plugin we could transform the pre-commit hook
+checking for file sizes that we implemented above into a proper plugin
+simply by putting it inside a package and using the Git::Hooks module to
+import the PRE_COMMIT directive, like this:
+
+    package Git::Hooks::CheckFileSize;
+    # ABSTRACT: Git::Hooks plugin for checking file sizes
+
+    use Git::Hooks;
+
+    # Check if every added/updated file is smaller than a fixed limit.
+
+    my $LIMIT = 10 * 1024 * 1024; # 10MB
+
+    PRE_COMMIT {
+        my ($git) = @_;
+
+        my @changed = $git->filter_files_in_index('AM');
+
+        my $errors = 0;
+
+        foreach ($git->run(qw/ls-files -s/, @changed)) {
+            my ($mode, $sha, $n, $name) = split / /;
+            my $size = $git->file_size(":0:$name");
+            if ($size > $LIMIT) {
+                $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $LIMIT");
+                ++$errors;
+            }
+        }
+
+        return $errors == 0;
+    };
+
+After having it installed where Perl can find it you can enable it by
+putting this into your global or local Git config file:
+
+  [githooks]
+	plugin = CheckFileSize
+
+By using some of the L<Git::Repository::Plugin::GitHooks> methods we can
+make this check work for other hooks as well:
+
+    package Git::Hooks::CheckFileSize;
+    # ABSTRACT: Git::Hooks plugin for checking file sizes
+
+    use Git::Hooks;
+
+    # Check if every added/updated file is smaller than a fixed limit.
+
+    my $LIMIT = 10 * 1024 * 1024; # 10MB
+
+    sub check_new_files {
+        my ($git, $commit, @files) = @_;
+
+        my $errors = 0;
+
+        foreach ($git->run(qw/ls-files -s/, @files)) {
+            my ($mode, $sha, $n, $name) = split / /;
+            my $size = $git->file_size(":0:$name");
+            if ($size > $LIMIT) {
+                $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $LIMIT");
+                ++$errors;
+            }
+        }
+
+        return $errors == 0;
+    }
+
+    sub check_commit {
+        my ($git) = @_;
+
+        return check_new_files($git, ':0', $git->filter_files_in_index('AM'));
+    }
+
+    # This routine can act both as an update or a pre-receive hook.
+    sub check_affected_refs {
+        my ($git) = @_;
+
+        return 1 if $git->im_admin();
+
+        my $errors = 0;
+
+        foreach my $ref ($git->get_affected_refs()) {
+            my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
+            check_new_files($git, $new_commit, $git->filter_files_in_range('AM', $old_commit, $new_commit))
+                or ++$errors;
+        }
+
+        return $errors == 0;
+    }
+
+    # Install hooks
+    PRE_COMMIT       \&check_commit;
+    UPDATE           \&check_affected_refs;
+    PRE_RECEIVE      \&check_affected_refs;
+
+Now it can check file sizes on the Git server, when the user pushes commits
+to it.
+
+Plugins usually can be configured in their own configuration section. For
+instance, we could allow the user to configure the size limit by putting
+this on her configuration file:
+
+    [githooks "checkfilesize"]
+	limit = 10485760
+
+We just have to change the check_new_files function:
+
+    sub check_new_files {
+        my ($git, $commit, @files) = @_;
+
+        my $limit = $git->get_config('githooks.checkfilesize', 'limit');
+
+        return 1 unless defined $limit;   # By default there is no limit
+
+        my $errors = 0;
+
+        foreach ($git->run(qw/ls-files -s/, @files)) {
+            my ($mode, $sha, $n, $name) = split / /;
+            my $size = $git->file_size(":0:$name");
+            if ($size > $limit) {
+                $git->error('CheckSize', "File '$name' has $size bytes, more than our limit of $limit");
+                ++$errors;
+            }
+        }
+
+        return $errors == 0;
+    }
+
+Please, look at the implementation of the native Git::Hooks plugins for more
+examples.
 
 =head2 Invoking external hooks
 
@@ -1079,13 +596,15 @@ L<special
 hooks|https://gerrit-review.googlesource.com/Documentation/config-hooks.html>.
 B<Git::Hooks> currently supports only three of Gerrit hooks:
 
-=head3 ref-update
+=over
+
+=item * ref-update
 
 The B<ref-update> hook is executed synchronously when a user performs
 a push to a branch. It's purpose is the same as Git's B<update> hook
 and Git::Hooks's plugins usually support them both together.
 
-=head3 patchset-created
+=item * patchset-created
 
 The B<patchset-created> hook is executed asynchronously when a user
 performs a push to one of Gerrit's virtual branches (refs/for/*) in
@@ -1108,13 +627,146 @@ B<patchset-created> hook is unusable because it uses a fixed user to
 authenticate. So, Git::Hooks exit prematurely when invoked as the
 B<patchset-created> hook for a draft change.
 
-=head3 draft-published
+=item * draft-published
 
 The B<draft-published> hook is executed when the user publishes a draft
 change, making it visible to other users. Since the B<patchset-created> hook
 doesn't work for draft changes, the B<draft-published> hook is a good time
 to work on them. All plugins that work on the B<patchset-created> also work
 on the B<draft-published> hook to cast a vote when drafts are published.
+
+=back
+
+=head1 MAIN FUNCTION
+
+=head2 run_hook(NAME, ARGS...)
+
+This is the main routine responsible to invoke the right hooks
+depending on the context in which it was called.
+
+Its first argument must be the name of the hook that was
+called. Usually you just pass C<$0> to it, since it knows to extract
+the basename of the parameter.
+
+The remaining arguments depend on the hook for which it's being
+called. Usually you just pass C<@ARGV> to it. And that's it. Mostly.
+
+        run_hook($0, @ARGV);
+
+=head1 HOOK DIRECTIVES
+
+Hook directives are routines you use to register routines as hooks.
+Each one of the hook directives gets a routine-ref or a single block
+(anonymous routine) as argument. The routine/block will be called by
+C<run_hook> with proper arguments, as indicated below. These arguments
+are the ones gotten from @ARGV, with the exception of the ones
+identified by 'GIT' which are C<Git::Repository> objects that can be used to
+grok detailed information about the repository and the current
+transaction. (Please, refer to C<Git::Repository> specific documentation to
+know how to use them.)
+
+Note that the hook directives resemble function definitions but they
+aren't. They are function calls, and as such must end with a
+semicolon.
+
+Some hooks are invoked before an action (e.g., C<pre-commit>) so that
+one can check some condition. If the condition holds, they must simply
+end without returning anything. Otherwise, they should invoke the
+C<error> method on the GIT object passing a suitable error message. On
+some hooks, this will prevent Git from finishing its operation.
+
+Other hooks are invoked after the action (e.g., C<post-commit>) so
+that its outcome cannot affect the action. Those are usually used to
+send notifications or to signal the completion of the action someway.
+
+You may learn about every Git hook by invoking the command C<git help
+hooks>. Gerrit hooks are documented in the L<project
+site|https://gerrit-review.googlesource.com/Documentation/config-hooks.html>.
+
+Also note that each hook directive can be called more than once if you
+need to implement more than one specific hook.
+
+=head2 APPLYPATCH_MSG(GIT, commit-msg-file)
+
+=head2 PRE_APPLYPATCH(GIT)
+
+=head2 POST_APPLYPATCH(GIT)
+
+=head2 PRE_COMMIT(GIT)
+
+=head2 PREPARE_COMMIT_MSG(GIT, commit-msg-file [, msg-src [, SHA1]])
+
+=head2 COMMIT_MSG(GIT, commit-msg-file)
+
+=head2 POST_COMMIT(GIT)
+
+=head2 PRE_REBASE(GIT, upstream [, branch])
+
+=head2 POST_CHECKOUT(GIT, prev-head-ref, new-head-ref, is-branch-checkout)
+
+=head2 POST_MERGE(GIT, is-squash-merge)
+
+=head2 PRE_PUSH(GIT, remote-name, remote-url)
+
+The C<pre-push> hook was introduced in Git 1.8.2. The default hook
+gets two arguments: the name and the URL of the remote which is being
+pushed to. It also gets a variable number of arguments via STDIN with
+lines of the form:
+
+    <local ref> SP <local sha1> SP <remote ref> SP <remote sha1> LF
+
+The information from these lines is read and can be fetched by the
+hooks using the C<Git::Hooks::get_input_data> method.
+
+=head2 PRE_RECEIVE(GIT)
+
+The C<pre-receive> hook gets a variable number of arguments via STDIN
+with lines of the form:
+
+    <old-value> SP <new-value> SP <ref-name> LF
+
+The information from these lines is read and can be fetched by the hooks
+using the C<Git::Hooks::get_input_data> method or, perhaps more easily, by
+using the C<Git::Repository::Plugin::GitHooks::get_affected_refs> and the
+C<Git::Repository::Plugin::GitHooks::get_affected_ref_range> methods.
+
+=head2 UPDATE(GIT, updated-ref-name, old-object-name, new-object-name)
+
+=head2 POST_RECEIVE(GIT)
+
+=head2 POST_UPDATE(GIT, updated-ref-name, ...)
+
+=head2 PUSH_TO_CHECKOUT(GIT, SHA1)
+
+The C<push-to-checkout> hook was introduced in Git 2.4.
+
+=head2 PRE_AUTO_GC(GIT)
+
+=head2 POST_REWRITE(GIT, command)
+
+The C<post-rewrite> hook gets a variable number of arguments via STDIN
+with lines of the form:
+
+    <old sha1> SP <new sha1> SP <extra info> LF
+
+The C<extra info> and the preceding SP are optional.
+
+The information from these lines is read and can be fetched by the
+hooks using the C<Git::Hooks::get_input_data> method.
+
+=head2 REF_UPDATE(GIT, OPTS)
+
+=head2 PATCHSET_CREATED(GIT, OPTS)
+
+=head2 DRAFT_PUBLISHED(GIT, OPTS)
+
+These are Gerrit-specific hooks. Gerrit invokes them passing a list of
+option/value pairs which are converted into a hash, which is passed by
+reference as the OPTS argument. In addition to the option/value pairs,
+a C<Gerrit::REST> object is created and inserted in the OPTS hash with
+the key 'gerrit'. This object can be used to interact with the Gerrit
+server.  For more information, please, read the L</Gerrit Hooks>
+section.
 
 =head1 CONFIGURATION
 
@@ -1140,7 +792,7 @@ Gerrit keeps its repositories in a hierarchy and its specific configuration
 mechanism takes advantage of that to allow a configuration definition in a
 parent repository to trickle down to its children repositories. Git::Hooks
 uses Git's native configuration mechanisms and doesn't support Gerrit's
-mechanism, which is based on configuration files kept in a dettached
+mechanism, which is based on configuration files kept in a detached
 C<refs/meta/config> branch. But you can implement a hierarchy of
 configuration files by using Git's inclusion mechanism. Please, read the
 "Includes" section of C<git help config> to know how.
@@ -1383,7 +1035,9 @@ So, for server hooks you may want to set this configuration variable to 1 to
 strip those suffixes from the error messages.
 
 =head2 githooks.gerrit.url URL
+
 =head2 githooks.gerrit.username USERNAME
+
 =head2 githooks.gerrit.password PASSWORD
 
 These three options are required if you enable Gerrit hooks. They are
@@ -1456,31 +1110,32 @@ Allowed values are NONE, OWNER, OWNER_REVIEWERS, and ALL.
 
 If not set, the default is ALL.
 
-=head2 githooks.gerrit.review-label LABEL
+=head2 githooks.error-header CMD
 
-This option is DEPRECATED. Please, use C<githooks.gerrit.votes-to-approve> and
-C<githooks.gerrit.votes-to-reject> instead.
+This option specifies a command that should produce a multi-line string
+which will be used as a header prefixing the error messages, if there are
+any. The command is invoked using Perl's C<qx{CMD}> operator, with no error
+detection. Since the string will most probably appear at the user's terminal
+their lines should have no more than 70 characters or so.
 
-This option defines the
-L<label|https://gerrit-review.googlesource.com/Documentation/config-labels.html>
-that must be used in Gerrit's review process. If not specified, the standard
-C<Code-Review> label is used.
+The following commands may give you an idea as to which commands to use:
 
-=head2 githooks.gerrit.vote-ok +N
+=over
 
-This option is DEPRECATED. Please, use C<githooks.gerrit.votes-to-approve> and
-C<githooks.gerrit.votes-to-reject> instead.
+=item * L<fortune|https://en.wikipedia.org/wiki/Fortune_(Unix)>
 
-This option defines the vote that must be used to approve a review. If
-not specified, +1 is used.
+=item * L<cowsay|https://en.wikipedia.org/wiki/Cowsay>
 
-=head2 githooks.gerrit.vote-nok -N
+=item * C<fortune -s | cowsay>
 
-This option is DEPRECATED. Please, use C<githooks.gerrit.votes-to-approve> and
-C<githooks.gerrit.votes-to-reject> instead.
+=item * C<GET 'http://api.icndb.com/jokes/random?limitTo=nerdy' | jq -r '.value.joke' | cowsay>
 
-This option defines the vote that must be used to reject a review. If
-not specified, -1 is used.
+=back
+
+=head2 githooks.error-footer CMD
+
+This option is similar to the C<githooks.error-header> above, but produces a
+footer to the error messages generated by Git::Hooks, if any.
 
 =head2 githooks.help-on-error MESSAGE
 
@@ -1492,287 +1147,77 @@ users about how to get help from your site's Git gurus.
 
 You can also provide helpful messages specific to each enabled PLUGIN.
 
-=head1 MAIN FUNCTION
+=head1 TO-DO list
 
-=head2 run_hook(NAME, ARGS...)
-
-This is the main routine responsible to invoke the right hooks
-depending on the context in which it was called.
-
-Its first argument must be the name of the hook that was
-called. Usually you just pass C<$0> to it, since it knows to extract
-the basename of the parameter.
-
-The remaining arguments depend on the hook for which it's being
-called. Usually you just pass C<@ARGV> to it. And that's it. Mostly.
-
-        run_hook($0, @ARGV);
-
-=head1 HOOK DIRECTIVES
-
-Hook directives are routines you use to register routines as hooks.
-Each one of the hook directives gets a routine-ref or a single block
-(anonymous routine) as argument. The routine/block will be called by
-C<run_hook> with proper arguments, as indicated below. These arguments
-are the ones gotten from @ARGV, with the exception of the ones
-identified by 'GIT' which are C<Git::More> objects that can be used to
-grok detailed information about the repository and the current
-transaction. (Please, refer to C<Git::More> specific documentation to
-know how to use them.)
-
-Note that the hook directives resemble function definitions but they
-aren't. They are function calls, and as such must end with a
-semicolon.
-
-Some hooks are invoked before an action (e.g., C<pre-commit>) so that
-one can check some condition. If the condition holds, they must simply
-end without returning anything. Otherwise, they should invoke the
-C<error> method on the GIT object passing a suitable error message. On
-some hooks, this will prevent Git from finishing its operation.
-
-Other hooks are invoked after the action (e.g., C<post-commit>) so
-that its outcome cannot affect the action. Those are usually used to
-send notifications or to signal the completion of the action someway.
-
-You may learn about every Git hook by invoking the command C<git help
-hooks>. Gerrit hooks are documented in the L<project
-site|https://gerrit-review.googlesource.com/Documentation/config-hooks.html>.
-
-Also note that each hook directive can be called more than once if you
-need to implement more than one specific hook.
+The following list is no order whatsoever. Any comments or other suggestion
+are welcome.
 
 =over
 
-=item * APPLYPATCH_MSG(GIT, commit-msg-file)
+=item * Support the WIN32 Platform
 
-=item * PRE_APPLYPATCH(GIT)
+=item * Improve documentation
 
-=item * POST_APPLYPATCH(GIT)
+Follow the advice in L<13 Things People Hate about Your Open Source
+Docs|http://blog.smartbear.com/careers/13-things-people-hate-about-your-open-source-docs/>
 
-=item * PRE_COMMIT(GIT)
+=item * I18N
 
-=item * PREPARE_COMMIT_MSG(GIT, commit-msg-file [, msg-src [, SHA1]])
+Use Locale::TextDomain to internationalize it?
 
-=item * COMMIT_MSG(GIT, commit-msg-file)
+=item * In CheckAcls implement DENY for ACL operations
 
-=item * POST_COMMIT(GIT)
+Along the lines of NFSv4 ACLs
+(L<http://tools.ietf.org/html/rfc5661#section-6>). I'm thinking about
+prefixing the what component with a '!'.
 
-=item * PRE_REBASE(GIT, upstream [, branch])
+=item * In CheckLog allow for stop words
 
-=item * POST_CHECKOUT(GIT, prev-head-ref, new-head-ref, is-branch-checkout)
+C<CheckLog.spelling> should have a way to register stop words.
 
-=item * POST_MERGE(GIT, is-squash-merge)
+=item * CheckLog should check the footer of the commit log message
 
-=item * PRE_PUSH(GIT, remote-name, remote-url)
-
-The C<pre-push> hook was introduced in Git 1.8.2. The default hook
-gets two arguments: the name and the URL of the remote which is being
-pushed to. It also gets a variable number of arguments via STDIN with
-lines of the form:
-
-    <local ref> SP <local sha1> SP <remote ref> SP <remote sha1> LF
-
-The information from these lines is read and can be fetched by the
-hooks using the C<Git::Hooks::get_input_data> method.
-
-=item * PRE_RECEIVE(GIT)
-
-The C<pre-receive> hook gets a variable number of arguments via STDIN
-with lines of the form:
-
-    <old-value> SP <new-value> SP <ref-name> LF
-
-The information from these lines is read and can be fetched by the
-hooks using the C<Git::Hooks::get_input_data> method or, perhaps more
-easily, by using the C<Git::More::get_affected_refs> and the
-C<Git::More::get_affected_ref_range> methods.
-
-=item * UPDATE(GIT, updated-ref-name, old-object-name, new-object-name)
-
-=item * POST_RECEIVE(GIT)
-
-=item * POST_UPDATE(GIT, updated-ref-name, ...)
-
-=item * PUSH_TO_CHECKOUT(GIT, SHA1)
-
-The C<push-to-checkout> hook was introduced in Git 2.4.
-
-=item * PRE_AUTO_GC(GIT)
-
-=item * POST_REWRITE(GIT, command)
-
-The C<post-rewrite> hook gets a variable number of arguments via STDIN
-with lines of the form:
-
-    <old sha1> SP <new sha1> SP <extra info> LF
-
-The C<extra info> and the preceeding SP are optional.
-
-The information from these lines is read and can be fetched by the
-hooks using the C<Git::Hooks::get_input_data> method.
-
-=item * REF_UPDATE(GIT, OPTS)
-=item * PATCHSET_CREATED(GIT, OPTS)
-=item * DRAFT_PUBLISHED(GIT, OPTS)
-
-These are Gerrit-specific hooks. Gerrit invokes them passing a list of
-option/value pairs which are converted into a hash, which is passed by
-reference as the OPTS argument. In addition to the option/value pairs,
-a C<Gerrit::REST> object is created and inserted in the OPTS hash with
-the key 'gerrit'. This object can be used to interact with the Gerrit
-server.  For more information, please, read the L</Gerrit Hooks>
-section.
-
-=back
-
-=head1 METHODS FOR PLUGIN DEVELOPERS
-
-Plugins should start by importing the utility routines from
-Git::Hooks:
-
-    use Git::Hooks qw/:utils/;
-
-Usually at the end, the plugin should use one or more of the hook
-directives defined above to install its hook routines in the
-appropriate hooks.
-
-Every hook routine receives a Git::More object as its first
-argument. You should use it to infer all needed information from the
-Git repository.
-
-Please, take a look at the code for the standard plugins under the
-Git::Hooks:: namespace in order to get a better understanding about
-this. Hopefully it's not that hard.
-
-The utility routines implemented by Git::Hooks are the following:
-
-=head2 post_hook SUB
-
-Plugin developers may be interested in performing some action
-depending on the overall result of every check made by every other
-hook. As an example, Gerrit's C<patchset-created> hook is invoked
-asynchronously, meaning that the hook's exit code doesn't affect the
-action that triggered the hook. The proper way to signal the hook
-result for Gerrit is to invoke it's API to make a review. But we want
-to perform the review once, at the end of the hook execution, based on
-the overall result of all enabled checks.
-
-To do that plugin developers can use this routine to register
-callbacks that are invoked at the end of C<run_hooks>. The callbacks
-are called with the following arguments:
+The Gerrit default C<commit-msg> implements some checks that could be used
+here. Some other things to check:
 
 =over
 
-=item * HOOK_NAME
+=item * L<Require Signed-off-by lines|https://github.com/icefox/git-hooks/blob/master/git_hooks/commit-msg/signed-off-by>
 
-The basename of the invoked hook.
-
-=item * GIT
-
-The Git::More object that was passed to the plugin hooks.
-
-=item * ARGS...
-
-The remaining arguments that were passed to the plugin hooks.
+=item * L<Duplicate Signed-off-by lines|https://github.com/icefox/git-hooks/blob/master/contrib/commit-msg/duplicate-signedoffby>
 
 =back
 
-The callbacks may see if there were any errors signalled by the plugin
-hook by invoking the C<get_errors> method on the GIT object. They may
-be used to signal the hook result in any way they want, but they
-should not die or they will prevent other post hooks to run.
+=item * pre-commit or pre-push
 
-=head2 is_ref_enabled(REF, SPEC, ...)
+It would be nice to let the user decide in which of these two hooks he'd
+like to have his checks run. The idea would be to have a (default and
+per-plugin) configuration option called C<*.hook> accepting the options
+C<pre-commit> and C<pre-push> (defaulting for the former). This way the user
+would be able to make his checks run on any one of the hooks.
 
-This routine returns a boolean indicating if REF matches one of the
-ref-specs in SPECS. REF is the complete name of a Git ref and SPECS is
-a list of strings, each one specifying a rule for matching ref names.
+=item * Use the post-rewrite hook in CheckRewrite
 
-As a special case, it returns true if REF is undef or if there is no
-SPEC whatsoever, meaning that by default all refs/commits are enabled.
+The CheckRewrite plugin was written without resort to the post-rewrite hook,
+which I think was implemented later. It seems that it would make the
+implementation easier and more efficient. I would still use the pre-rebase
+hook to detect unsafe rebases before they're done, however there should
+exist an option to choose to postpone the check to after the rebase.
 
-You may want to use it, for example, in an C<update>, C<pre-receive>,
-or C<post-receive> hook which may be enabled depending on the
-particular refs being affected.
+The pre-commit and post-commit hooks would be replaced by the post-rewrite
+though.
 
-Each SPEC rule may indicate the matching refs as the complete ref
-name (e.g. "refs/heads/master") or by a regular expression starting
-with a caret (C<^>), which is kept as part of the regexp.
-
-=head2 im_memberof(GIT, USER, GROUPNAME)
-
-This routine tells if USER belongs to GROUPNAME. The groupname is
-looked for in the specification given by the C<githooks.groups>
-configuration variable.
-
-=head2 match_user(GIT, SPEC)
-
-This routine checks if the authenticated user (as returned by the
-C<Git::More::authenticated_user> method) matches the specification,
-which may be given in one of the three different forms acceptable for
-the C<githooks.admin> configuration variable above, i.e., as a
-username, as a @group, or as a ^regex.
-
-=head2 im_admin(GIT)
-
-This routine checks if the authenticated user (again, as returned by
-the C<Git::More::authenticated_user> method) matches the
-specifications given by the C<githooks.admin> configuration variable.
-
-=head2 eval_gitconfig(VALUE)
-
-This routine makes it easier to grok config values as Perl code. If
-C<VALUE> is a string beginning with C<eval:>, the remaining of it is
-evaluated as a Perl expression and the resulting value is returned. If
-C<VALUE> is a string beginning with C<file:>, the remaining of it is
-treated as a file name which contents are evaluated as Perl code and
-the resulting value is returned. Otherwise, C<VALUE> itself is
-returned.
-
-=head2 redirect_output
-
-This routine redirects STDOUT and STDERR to a temporary file and returns a
-reference that should be passed to the routine C<restore_output> to restore
-the handles to their original state.
-
-=head2 restore_output REF
-
-This routine gets a reference returned by C<redirect_output>, restores
-STDOUT and STDERR to their previous state and returns a string containing
-every output since the previous call to redirect_output.
-
-=head2 file_temp REV, FILE, ARGS...
-
-This routine is DEPRECATED and has been replaced by the L<Git::More> C<blob>
-method.
-
-This routine returns the name of a temporary file into which the contents of
-the file FILE in revision REV has been copied.
-
-It's useful for hooks that need to read the contents of changed files in
-order to check anything in them.
-
-These files are cached so that if more than one hook needs to get at them
-they're created only once.
-
-By default, all temporary files are removed when the hook exits.
-
-Any remaining ARGS are passed as arguments to C<Path::Tiny::tempfile> so
-that you can have more control over the temporary file creation.
-
-=head1 TO DO
-
-There is a to-do list for this module at L<Git::Hooks::TODO>.
+=back
 
 =head1 SEE ALSO
 
 =over
 
-=item * C<Git::More>
+=item * L<Git::Repository>
 
-A Git extension with some goodies for hook developers.
+Perl interface to Git repositories.
 
-=item * C<Gerrit::REST>
+=item * L<Gerrit::REST>
 
 A thin wrapper around Gerrit's REST API.
 

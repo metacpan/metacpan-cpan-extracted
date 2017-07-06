@@ -7,6 +7,12 @@ use Text::NumericData::FileCalc qw(file_calc);
 
 use strict;
 
+# This is just a placeholder because of a past build system bug.
+# The one and only version for Text::NumericData is kept in
+# the Text::NumericData module itself.
+our $VERSION = '1';
+$VERSION = eval $VERSION;
+
 #the infostring says it all
 my $infostring = 'text data calculations
 
@@ -56,7 +62,7 @@ sub new
 		,'lin',0,'',
 			'shortcut for enforcing linear interpolation'
 		,'spline',0,'',
-			'shortcut for enforcing spline interpolation (overrules --line)'
+			'shortcut for enforcing spline interpolation (overrules --lin)'
 		,'headcode','','C',
 			'FullFun: Some code that gets eval()ed with possibility to parse/modify every head line (variable $line; line number is $num).'
 		,'aftercode','','A',

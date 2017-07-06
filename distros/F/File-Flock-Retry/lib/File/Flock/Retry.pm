@@ -1,7 +1,7 @@
 package File::Flock::Retry;
 
-our $DATE = '2015-10-22'; # DATE
-our $VERSION = '0.61'; # VERSION
+our $DATE = '2017-07-01'; # DATE
+our $VERSION = '0.62'; # VERSION
 
 use 5.010001;
 use strict;
@@ -127,7 +127,7 @@ File::Flock::Retry - Yet another flock module
 
 =head1 VERSION
 
-This document describes version 0.61 of File::Flock::Retry (from Perl distribution File-Flock-Retry), released on 2015-10-22.
+This document describes version 0.62 of File::Flock::Retry (from Perl distribution File-Flock-Retry), released on 2017-07-01.
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,10 @@ I prefer this approach to blocking/waiting indefinitely or failing immediately.
 =back
 
 =for Pod::Coverage ^(DESTROY)$
+
+=head1 CAVEATS
+
+Not yet tested on Windows. Some filesystems do not support inode?
 
 =head1 METHODS
 
@@ -195,20 +199,6 @@ Unlock.
 
 Synonym for C<unlock()>.
 
-=head1 CAVEATS
-
-Not yet tested on Windows. Some filesystems do not support inode?
-
-=head1 SEE ALSO
-
-L<File::Flock>
-
-L<File::Flock::Tiny> which is also tiny, but does not have the autoremove and
-autoretry capability which I want. See also:
-https://github.com/trinitum/perl-File-Flock-Tiny/issues/1
-
-flock() Perl function.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/File-Flock-Retry>.
@@ -225,13 +215,23 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<File::Flock>
+
+L<File::Flock::Tiny> which is also tiny, but does not have the autoremove and
+autoretry capability which I want. See also:
+L<https://github.com/trinitum/perl-File-Flock-Tiny/issues/1>
+
+flock() Perl function.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

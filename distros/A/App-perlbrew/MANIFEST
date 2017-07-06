@@ -44,7 +44,6 @@ t/14.perl_version_parsing.t
 t/15.no-reuse-build-dir.t
 t/16.release-detail.t
 t/17.release-detail-cperl-local.t
-t/17.release-detail-cperl-remote.t
 t/18.release-detail-perl-local.t
 t/18.release-detail-perl-remote.t
 t/command-alias.t
@@ -63,7 +62,10 @@ t/current_perl.t
 t/do_system.t
 t/failure-command-install-cpanm.t
 t/failure-command-install-patchperl.t
+t/fake-bin/curl
 t/http-program-control.t
+t/http-ua-detect-non-curl.t
+t/http-ua-detect.t
 t/http.t
 t/installation-perlbrew.t
 t/installation.t

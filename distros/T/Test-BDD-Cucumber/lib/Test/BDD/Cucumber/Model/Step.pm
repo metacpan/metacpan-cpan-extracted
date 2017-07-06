@@ -1,6 +1,7 @@
 package Test::BDD::Cucumber::Model::Step;
-$Test::BDD::Cucumber::Model::Step::VERSION = '0.52';
-use Moose;
+$Test::BDD::Cucumber::Model::Step::VERSION = '0.53';
+use Moo;
+use Types::Standard qw( Str ArrayRef InstanceOf );
 
 =head1 NAME
 
@@ -8,7 +9,7 @@ Test::BDD::Cucumber::Model::Step - Model to represent a step in a scenario
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -22,7 +23,7 @@ The text of the step, once Scenario Outlines have been applied
 
 =cut
 
-has 'text' => ( is => 'rw', isa => 'Str' );
+has 'text' => ( is => 'rw', isa => Str );
 
 =head2 verb
 
@@ -33,8 +34,8 @@ that appeared in the physical file - this will sometimes be C<and>.
 
 =cut
 
-has 'verb'          => ( is => 'rw', isa => 'Str' );
-has 'verb_original' => ( is => 'rw', isa => 'Str' );
+has 'verb'          => ( is => 'rw', isa => Str );
+has 'verb_original' => ( is => 'rw', isa => Str );
 
 =head2 line
 
@@ -42,7 +43,7 @@ The corresponding L<Test:BDD::Cucumber::Model::Line>
 
 =cut
 
-has 'line' => ( is => 'rw', isa => 'Test::BDD::Cucumber::Model::Line' );
+has 'line' => ( is => 'rw', isa => InstanceOf['Test::BDD::Cucumber::Model::Line'] );
 
 =head2 data
 
@@ -63,7 +64,7 @@ by harnesses
 has 'data_as_strings' => (
     is      => 'rw',
     default => sub { [] },
-    isa     => 'ArrayRef[Str]'
+    isa     => ArrayRef[Str]
 );
 
 =head2 columns
@@ -73,7 +74,7 @@ they appeared.
 
 =cut
 
-has 'columns' => ( is => 'rw', isa => 'ArrayRef[Str]' );
+has 'columns' => ( is => 'rw', isa => ArrayRef[Str] );
 
 =head1 AUTHOR
 

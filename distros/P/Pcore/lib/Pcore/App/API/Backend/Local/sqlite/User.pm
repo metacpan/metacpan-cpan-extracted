@@ -1,6 +1,6 @@
 package Pcore::App::API::Backend::Local::sqlite::User;
 
-use Pcore -role, -promise, -result;
+use Pcore -role, -result;
 use Pcore::App::API qw[:CONST];
 use Pcore::Util::UUID qw[uuid_str];
 use Pcore::Util::Text qw[encode_utf8];

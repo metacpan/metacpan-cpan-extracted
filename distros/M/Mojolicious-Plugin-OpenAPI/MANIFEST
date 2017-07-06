@@ -22,6 +22,7 @@ t/empty-string.t
 t/example-array-of-hashes.t
 t/headers.t
 t/issue-24-booleans-in-yaml-schema.t
+t/mixin.t
 t/path-parameters.t
 t/register.t
 t/renderer.t

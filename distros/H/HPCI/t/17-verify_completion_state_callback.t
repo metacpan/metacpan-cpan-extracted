@@ -57,7 +57,7 @@ for my $to (qw(pass fail nochange)) {
 					is( ref($stats), 'HASH', 'stats arg should be a hash' );
 					like( $stdout, qr{/stdout$}, 'stdout filename must be stdout' );
 					like( $stderr, qr{/stderr$}, 'stderr filename must be stderr' );
-					like( `cat $stderr`, qr{^\+ exit [01]$}, 'stderr contains echo of exit 0 or exit 1 command' );
+					like( `cat $stderr`, qr{^\+ exit [01]$}m, 'stderr contains echo of exit 0 or exit 1 command' );
 					return 'retry' if $iter++ < $retry;
 					return $to;
 				},

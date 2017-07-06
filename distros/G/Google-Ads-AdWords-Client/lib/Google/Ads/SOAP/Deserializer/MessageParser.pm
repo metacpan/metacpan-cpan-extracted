@@ -17,6 +17,8 @@
 
 package Google::Ads::SOAP::Deserializer::MessageParser;
 
+use strict;
+use warnings;
 use base qw(SOAP::WSDL::Expat::MessageParser);
 
 use Google::Ads::Common::XPathSAXParser;
@@ -150,7 +152,8 @@ sub _initialize {
         $characters = q{};
 
         no warnings "once";
-        $current = pop @{$OBJECT_CACHE_REF->{$_class}};
+        $current =
+          pop @{$SOAP::WSDL::Expat::MessageParser::OBJECT_CACHE_REF->{$_class}};
         if (not defined $current) {
           my $o = Class::Std::Fast::ID();
           $current = bless \$o, $_class;

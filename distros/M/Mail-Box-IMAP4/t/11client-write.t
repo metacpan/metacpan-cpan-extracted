@@ -33,7 +33,7 @@ use File::Spec::Functions;
 
 BEGIN
 {
-   if(!$ENV{USER} || $ENV{USER} ne 'markov')
+   unless($ENV{MARKOV_DEVEL})
    {   plan skip_all => 'Only tested on markov\'s platform';
    }
 

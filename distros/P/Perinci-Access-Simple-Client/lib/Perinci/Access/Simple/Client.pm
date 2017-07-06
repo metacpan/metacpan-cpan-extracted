@@ -1,12 +1,12 @@
 package Perinci::Access::Simple::Client;
 
-our $DATE = '2016-10-07'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.23'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 
 use Cwd qw(abs_path);
 use Perinci::AccessUtil qw(strip_riap_stuffs_from_res);
@@ -16,8 +16,6 @@ use URI::Split qw(uri_split);
 use URI::Escape;
 
 use parent qw(Perinci::Access::Base);
-
-my @logging_methods = Log::Any->logging_methods();
 
 sub new {
     my $class = shift;
@@ -74,7 +72,7 @@ sub _parse {
 # (for testing)
 sub _parse_or_request {
     my ($self, $which, $action, $server_url, $extra) = @_;
-    $log->tracef("=> %s\::request(action=%s, server_url=%s, extra=%s)",
+    log_trace("=> %s\::request(action=%s, server_url=%s, extra=%s)",
                  __PACKAGE__, $action, $server_url, $extra);
     return [400, "Please specify server_url"] unless $server_url;
 
@@ -157,7 +155,7 @@ sub _parse_or_request {
         }];
     }
 
-    $log->tracef("Parsed URI, scheme=%s, host=%s, port=%s, path=%s, args=%s, ".
+    log_trace("Parsed URI, scheme=%s, host=%s, port=%s, path=%s, args=%s, ".
                      "uri=%s", $srvsch, $host, $port, $path, $args, $uri);
 
     require JSON::MaybeXS;
@@ -177,7 +175,7 @@ sub _parse_or_request {
                 if ($cache->{socket}->connected) {
                     $in = $out = $cache->{socket};
                 } else {
-                    $log->infof("Stale socket cache (%s), discarded",
+                    log_info("Stale socket cache (%s), discarded",
                                 $cache_key);
                     $cache = undef;
                 }
@@ -186,7 +184,7 @@ sub _parse_or_request {
                     $in  = $cache->{chld_out};
                     $out = $cache->{chld_in};
                 } else {
-                    $log->infof(
+                    log_info(
                         "Process (%s) seems dead/unsignalable, discarded",
                         $cache_key);
                     $cache = undef;
@@ -232,7 +230,7 @@ sub _parse_or_request {
                 require String::ShellQuote;
                 my $cmd = $path . (@$args ? " " . join(" ", map {
                     String::ShellQuote::shell_quote($_) } @$args) : "");
-                $log->tracef("executing cmd: %s", $cmd);
+                log_trace("executing cmd: %s", $cmd);
 
                 # using shell
                 #my $pid = IPC::Open2::open2($in, $out, $cmd, @$args);
@@ -256,11 +254,11 @@ sub _parse_or_request {
         return [400, "Can't encode request as JSON: $e"] if $e;
 
         $out->write("j$req_json\015\012");
-        $log->tracef("Sent request to server: %s", $req_json);
+        log_trace("Sent request to server: %s", $req_json);
 
         # XXX alarm/timeout
         my $line = $in->getline;
-        $log->tracef("Got line from server: %s", $line);
+        log_trace("Got line from server: %s", $line);
         if (!$line) {
             $self->_delete_cache($cache_key);
             return [500, "Empty response from server"];
@@ -279,7 +277,7 @@ sub _parse_or_request {
 
       RETRY:
         if ($do_retry && $attempts++ < $self->{retries}) {
-            $log->tracef("Request failed ($e), waiting to retry #%s...",
+            log_trace("Request failed ($e), waiting to retry #%s...",
                          $attempts);
             sleep $self->{retry_delay};
         } else {
@@ -342,7 +340,7 @@ Perinci::Access::Simple::Client - Riap::Simple client
 
 =head1 VERSION
 
-This document describes version 0.22 of Perinci::Access::Simple::Client (from Perl distribution Perinci-Access-Simple-Client), released on 2016-10-07.
+This document describes version 0.23 of Perinci::Access::Simple::Client (from Perl distribution Perinci-Access-Simple-Client), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -468,7 +466,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-Simple-Client>.
+Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-Simple-Client>.
 
 =head1 BUGS
 
@@ -490,7 +488,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

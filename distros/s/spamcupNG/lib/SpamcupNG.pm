@@ -5,6 +5,7 @@ use LWP::UserAgent 6.05;
 use HTML::Form 6.03;
 use HTTP::Cookies 6.01;
 use Getopt::Std;
+use HTML::Entities 3.69;
 use YAML::XS 0.62 qw(LoadFile);
 use File::Spec;
 use Hash::Util qw(lock_hash);
@@ -25,7 +26,7 @@ our %MAP = (
 
 lock_hash(%MAP);
 
-our $VERSION = '0.4'; # VERSION
+our $VERSION = '0.6'; # VERSION
 
 =head1 NAME
 
@@ -284,8 +285,7 @@ sub main_loop {
     if ( $res->is_success ) {
         if ( $opts_ref->{debug} ) {
             print "D: Got HTTP response\n";
-
-            # print "D: Headers follow:\n". $res->headers->as_string ."\n\n";
+            print "D: Headers follow:\n" . $res->headers->as_string . "\n\n";
         }
 
     }
@@ -318,18 +318,19 @@ sub main_loop {
 
     # print the header of the spam
 
-    my $spamhead;
     if ( $res->content =~
 /Please make sure this email IS spam.*?size=2\>\n(.*?)\<a href\=\"\/sc\?id\=$nextid/sgi
       )
-    {    # this is also quite easy...
-            # this is the normal case
+    {
 
-        $spamhead = $1;
         unless ( $opts_ref->{quiet} ) {
+            my $spamhead = decode_entities($1);
             print "* Head of the spam follows >>>\n";
-            $spamhead =~ s/\n/\t/igs;      # prepend a tab to each line
-            $spamhead =~ s/<br>/\n/gsi;    # simplify a bit
+            $spamhead =~ s/\n/\t/igs;    # prepend a tab to each line
+            $spamhead =~ s/<\/?strong>//gi;
+            $spamhead =~ s/<br>/\n/gsi;
+            $spamhead =~ s/<\/?font>//gi;
+            binmode( STDOUT, ":utf8" );
             print "\t$spamhead\n";
             print "<<<\n";
         }

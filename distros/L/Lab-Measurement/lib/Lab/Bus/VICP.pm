@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Bus::VICP;
-$Lab::Bus::VICP::VERSION = '3.550';
+$Lab::Bus::VICP::VERSION = '3.552';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);

@@ -1,6 +1,6 @@
 # -*- Mode: CPerl -*-
 use Test::More;
-use lib qw(../lib);
+use lib qw(. ../lib);
 use DDC::Any qw(:none);
 use File::Basename;
 no warnings 'once';

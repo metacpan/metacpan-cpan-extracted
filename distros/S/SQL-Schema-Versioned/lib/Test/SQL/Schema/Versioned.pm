@@ -1,7 +1,7 @@
 package Test::SQL::Schema::Versioned;
 
-our $DATE = '2017-06-15'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $DATE = '2017-06-24'; # DATE
+our $VERSION = '0.22'; # VERSION
 
 use 5.010001;
 use strict;
@@ -75,7 +75,7 @@ Test::SQL::Schema::Versioned - Test SQL::Schema::Versioned spec
 
 =head1 VERSION
 
-This document describes version 0.21 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2017-06-15.
+This document describes version 0.22 of Test::SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2017-06-24.
 
 =head1 FUNCTIONS
 
@@ -90,7 +90,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/SQL-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SQL-Schema-Versioned>.
+Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-SQL-Schema>.
 
 =head1 BUGS
 

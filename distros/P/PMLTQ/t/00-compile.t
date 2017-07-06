@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 69 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 71 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'PMLTQ.pm',
@@ -14,6 +14,7 @@ my @module_files = (
     'PMLTQ/BtredEvaluator.pm',
     'PMLTQ/CGI.pm',
     'PMLTQ/Command.pm',
+    'PMLTQ/Command/configuration.pm',
     'PMLTQ/Command/convert.pm',
     'PMLTQ/Command/delete.pm',
     'PMLTQ/Command/init.pm',
@@ -24,6 +25,7 @@ my @module_files = (
     'PMLTQ/Command/version.pm',
     'PMLTQ/Command/webdelete.pm',
     'PMLTQ/Command/webload.pm',
+    'PMLTQ/Command/webtreebank.pm',
     'PMLTQ/Command/webverify.pm',
     'PMLTQ/Commands.pm',
     'PMLTQ/Common.pm',

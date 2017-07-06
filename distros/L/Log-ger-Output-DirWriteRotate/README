@@ -1,0 +1,40 @@
+SYNOPSIS
+
+     use Log::ger::Output DirWriteRotate => (
+         path               => 'somedir.log',            # required
+         filename_pattern   => '%Y-%m-%d-%H%M%S.pid-%{pid}.%{ext}', # optional
+         filename_sub       => sub { ... },              # optional
+         max_size           => undef,                    # optional
+         max_files          => undef,                    # optional
+         max_age            => undef,                    # optional
+         rotate_probability => 0.25,                     # optional
+     );
+
+DESCRIPTION
+
+    This output sends logs to Dir::Write::Rotate object.
+
+CONFIGURATION
+
+    These configuration parameters are Dir::Write::Rotate's.
+
+ path
+
+ filename_pattern
+
+ filename_sub
+
+ max_size
+
+ max_files
+
+ max_age
+
+ rotate_probability
+
+SEE ALSO
+
+    Log::ger
+
+    Dir::Write::Rotate
+

@@ -1,8 +1,9 @@
-# $Id: basic.t,v 1.2 2017/06/21 19:29:22 cmanley Exp $
+# $Id: basic.t,v 1.3 2017/06/24 13:25:32 cmanley Exp $
 use strict;
 use warnings;
-use Test::More; #qw(no_plan);
+use Test::More;
 use lib qw(../lib);
+use PHP::Functions::Password;
 
 my @methods = map { $_, "password_$_"; } qw(
 	get_info
@@ -11,10 +12,10 @@ my @methods = map { $_, "password_$_"; } qw(
 	verify
 );
 
-plan tests => 1 + scalar(@methods);
+plan tests => scalar(@methods);
 
 my $class = 'PHP::Functions::Password';
-require_ok($class) || BAIL_OUT("$class has errors");
 foreach my $method (@methods) {
 	can_ok($class, $method);
 }
+#done_testing();

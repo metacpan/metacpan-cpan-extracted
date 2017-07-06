@@ -1,6 +1,6 @@
 package PMLTQ::Relation::DepthFirstPrecedesIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::DepthFirstPrecedesIterator::VERSION = '1.3.2';
+$PMLTQ::Relation::DepthFirstPrecedesIterator::VERSION = '1.4.0';
 # ABSTRACT: Iterates tree using depth first search calling $node->following
 
 use 5.006;
@@ -57,7 +57,7 @@ PMLTQ::Relation::DepthFirstPrecedesIterator - Iterates tree using depth first se
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 AUTHORS
 

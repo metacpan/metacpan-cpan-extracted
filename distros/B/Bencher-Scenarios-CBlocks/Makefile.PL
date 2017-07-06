@@ -20,18 +20,18 @@ my %WriteMakefileArgs = (
     "C::Blocks" => 0,
     "C::Blocks::Types" => 0,
     "File::Temp" => 0,
-    "Log::Any" => 0,
+    "Log::ger" => "0.011",
     "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Bencher::Backend" => "1.034",
+    "Bencher::Backend" => "1.039",
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,14 +39,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Bencher::Backend" => "1.034",
+  "Bencher::Backend" => "1.039",
   "C::Blocks" => 0,
   "C::Blocks::Types" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::Any" => 0,
+  "Log::ger" => "0.011",
   "Test::More" => 0,
   "strict" => 0,
   "warnings" => 0

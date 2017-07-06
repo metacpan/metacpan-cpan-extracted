@@ -1,0 +1,8 @@
+0.003   2017-06-28
+	- Fix repository metadata
+
+0.002   2017-06-28
+	- Fix email ;-)
+
+0.001   2017-06-27
+        - Initial version roughly based off Dist::Zilla::Plugin::EmailNotify

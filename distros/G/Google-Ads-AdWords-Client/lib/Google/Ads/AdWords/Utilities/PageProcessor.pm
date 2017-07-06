@@ -17,6 +17,7 @@
 package Google::Ads::AdWords::Utilities::PageProcessor;
 
 use strict;
+use warnings;
 use utf8;
 use version;
 
@@ -175,8 +176,6 @@ This is a utility that provides automatic paging of results.
 
 The following properties may be accessed using get_PROPERTY methods:
 
-=back
-
 =head1 METHODS
 
 =head2 new
@@ -214,7 +213,7 @@ of the subroutines as an array of results.
 
 A reference to the subroutine that will be executed on each entry.
 
-= back
+=back
 
 =head3 Returns
 

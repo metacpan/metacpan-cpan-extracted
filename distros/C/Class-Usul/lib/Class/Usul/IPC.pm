@@ -8,21 +8,18 @@ use Class::Usul::Functions    qw( arg_list get_user io loginid
                                   merge_attributes throw );
 use Class::Usul::IPC::Cmd;
 use Class::Usul::Time         qw( time2str );
-use Class::Usul::Types        qw( Bool ConfigProvider LoadableClass Logger );
+use Class::Usul::Types        qw( Bool ConfigProvider Logger );
 use English                   qw( -no_match_vars );
 use Module::Load::Conditional qw( can_load );
 use Unexpected::Functions     qw( Unspecified );
 use Moo;
 
 # Public attributes
-has 'cache_ttys'  => is => 'ro',   isa => Bool, default => TRUE;
+has 'cache_ttys' => is => 'ro', isa => Bool, default => TRUE;
 
-has 'config'      => is => 'ro',   isa => ConfigProvider, required => TRUE;
+has 'config' => is => 'ro', isa => ConfigProvider, required => TRUE;
 
-has 'log'         => is => 'ro',   isa => Logger, required => TRUE;
-
-has 'table_class' => is => 'lazy', isa => LoadableClass, coerce => TRUE,
-   default        => 'Class::Usul::Response::Table';
+has 'log' => is => 'ro', isa => Logger, required => TRUE;
 
 # Private functions
 my $_cmd_matches = sub {
@@ -38,25 +35,6 @@ my $_new_proc_process_table = sub {
       and return Proc::ProcessTable->new( cache_ttys => $cache_ttys );
 
    return Class::Null->new;
-};
-
-my $_new_process_table = sub {
-   my ($class, $rows, $count) = @_;
-
-   # TODO: Rewrite this to match macros.tt. Delete Response::Table
-   return $class->new
-      ( count    => $count,
-        fields   => [ qw( uid pid ppid start time size state tty cmd ) ],
-        labels   => { uid   => 'User',   pid   => 'PID',
-                      ppid  => 'PPID',   start => 'Start Time',
-                      tty   => 'TTY',    time  => 'Time',
-                      size  => 'Size',   state => 'State',
-                      cmd   => 'Command' },
-        typelist => { pid   => 'numeric', ppid => 'numeric',
-                      start => 'date',    size => 'numeric',
-                      time  => 'numeric' },
-        values   => $rows,
-        wrap     => { cmd => 1 }, );
 };
 
 my $_proc_belongs_to_user = sub {
@@ -134,6 +112,25 @@ around 'BUILDARGS' => sub {
    merge_attributes $attr, $builder, [ 'config', 'log' ];
 
    return $attr;
+};
+
+my $_new_process_table = sub {
+   my ($self, $rows, $count) = @_;
+
+   return {
+      count    => $count,
+      fields   => [ qw( uid pid ppid start time size state tty cmd ) ],
+      labels   => { uid   => 'User',   pid   => 'PID',
+                    ppid  => 'PPID',   start => 'Start Time',
+                    tty   => 'TTY',    time  => 'Time',
+                    size  => 'Size',   state => 'State',
+                    cmd   => 'Command' },
+      typelist => { pid   => 'numeric', ppid => 'numeric',
+                    start => 'date',    size => 'numeric',
+                    time  => 'numeric' },
+      values   => $rows,
+      wrap     => { cmd => 1 },
+   };
 };
 
 # Public methods
@@ -215,8 +212,8 @@ sub process_table {
       }
    }
 
-   return $_new_process_table->
-      ( $self->table_class, [ sort { $_pscomp->( $a, $b ) } @rows ], $count );
+   return $self->$_new_process_table
+      ( [ sort { $_pscomp->( $a, $b ) } @rows ], $count );
 }
 
 sub run_cmd {
@@ -316,11 +313,6 @@ A required instance of type C<ConfigProvider>
 
 A required instance of type C<Logger>
 
-=item C<table_class>
-
-A lazy evaluated C<LoadableClass> that defaults to
-L<Class::Usul::Response::Table>
-
 =back
 
 =head1 Subroutines/Methods
@@ -362,8 +354,9 @@ path to a file containing the process id or specify the id directly
 
 =head2 C<process_table>
 
-Generates the process table data used by the L<HTML::FormWidget> table
-subclass. Called by L<Class::Usul::Model::Process/proc_table>
+   $res = $self->process_table( type => ..., );
+
+Returns a hash reference representing the current process table
 
 =head2 C<run_cmd>
 
@@ -413,8 +406,6 @@ None
 =item L<Class::Usul::Constants>
 
 =item L<Class::Usul::IPC::Cmd>
-
-=item L<Class::Usul::Response::Table>
 
 =item L<Module::Load::Conditional>
 

@@ -1,0 +1,39 @@
+==================================================
+Changes from 2017-06-25 13:30:41 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2017-07-04 03:34:42 +0000
+------------------------------------------
+
+  Change: cf3e225e620acbd6b9e792a92dd396ed614edbd4
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-07-04 05:34:42 +0200
+ 
+    Install Alien:Autotools if not available
+ 
+------------------------------------------
+version 0.002 at 2017-07-01 22:58:06 +0000
+------------------------------------------
+ 
+  Change: e33b61800aefe03e5d5715401bc3e6ca7558b858
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-07-02 00:58:06 +0200
+ 
+    Require IO::Socket::SSL, so Github download suceeds
+    
+    There should be a HTTP fallback instead, but this is easier
+ 
+------------------------------------------
+version 0.001 at 2017-06-25 13:30:41 +0000
+------------------------------------------
+ 
+  Change: 31ae276e629dbcbbae62fd227f4e413c96edbb5d
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-06-25 15:30:41 +0200
+ 
+    Initial commit 
+ 
+================
+End of releases.
+================

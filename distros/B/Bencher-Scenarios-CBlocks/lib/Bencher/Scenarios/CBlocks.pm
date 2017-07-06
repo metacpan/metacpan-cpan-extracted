@@ -1,7 +1,7 @@
 package Bencher::Scenarios::CBlocks;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Scenarios to benchmark C::Blocks
@@ -18,7 +18,7 @@ Bencher::Scenarios::CBlocks - Scenarios to benchmark C::Blocks
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenarios::CBlocks (from Perl distribution Bencher-Scenarios-CBlocks), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenarios::CBlocks (from Perl distribution Bencher-Scenarios-CBlocks), released on 2017-07-03.
 
 =head1 DESCRIPTION
 
@@ -26,13 +26,11 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =over
 
-=item * L<Bencher::Scenario::CBlocks::#Startup.pm#>
-
-=item * L<Bencher::Scenario::CBlocks::Numeric>
+=item * L<Bencher::Scenario::CBlocks::IO>
 
 =item * L<Bencher::Scenario::CBlocks::Startup>
 
-=item * L<Bencher::Scenario::CBlocks::IO>
+=item * L<Bencher::Scenario::CBlocks::Numeric>
 
 =back
 

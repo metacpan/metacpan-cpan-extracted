@@ -61,7 +61,12 @@ role {
 		my $finished_job = $self->next_finished_job;
 		my $name         = $finished_job->stage->name;
 		my $stage        = $self->_stages->{$name};
-		$stage->_analyse_completion_state($finished_job);
+		if ($stage->_has_command) {
+			$stage->_analyse_completion_state($finished_job);
+		}
+		else {
+			$stage->_set_state( $finished_job->status ? 'fail' : 'pass' );
+		}
 		if ($stage->is_fail
 				&& $stage->_chosen_retries < $stage->choose_retries
 				&& ($finished_job->_analysis_chose_retry
@@ -688,7 +693,7 @@ other stage or the attempt is aborted).
 			$self->_running_cnt( $self->_running_cnt + 1 );
 			$self->_submitted->{$name} = 1;
 			my ( $now_secs, $now_microsecs ) = gettimeofday;
-			if ($now_secs < $self->_sub_secs + 2) {
+			if ($stage->_has_command && $now_secs < $self->_sub_secs + 2) {
 				my $delta_microsecs =
 					( $now_secs - $self->_sub_secs ) * 1_000_000 +
 					( $now_microsecs - $self->_sub_microsecs );

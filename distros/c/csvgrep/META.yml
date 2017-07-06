@@ -23,5 +23,5 @@ requires:
 resources:
   homepage: https://github.com/neilb/csvgrep
   repository: https://github.com/neilb/csvgrep.git
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'YAML::Tiny version 1.62'

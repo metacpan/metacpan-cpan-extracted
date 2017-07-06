@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Path::Tiny ();
 
 # ABSTRACT: Convert .pc files into static
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 has path => undef;
@@ -107,7 +107,7 @@ Alien::Build::Plugin::PkgConfig::MakeStatic - Convert .pc files into static
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -138,6 +138,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

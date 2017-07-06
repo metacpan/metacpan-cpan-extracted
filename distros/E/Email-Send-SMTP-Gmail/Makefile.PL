@@ -13,8 +13,7 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
-        'Net::SMTP' => 0,
-        'Net::SMTPS' => 0,
+        'Net::SMTP' => 3.10,
         'Net::SMTP_auth' => 0,
         'MIME::Base64' => 0,
         'File::Spec' => 0,

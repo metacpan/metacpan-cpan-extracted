@@ -2159,6 +2159,76 @@ subtest 'set_gpg_pass_phrase', sub {
     like( $url_in_response, qr|/api/gpg/key/passphrase|, 'requsted URL looks sane' );
 };
 
+subtest 'create_token', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->create_token( username => 'johnq', scope => 'member-of-groups:readers' );
+    is( $resp->code, 200, 'create_token' );
+};
+
+subtest 'refresh_token', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->refresh_token( grant_type => 'refresh_token', refresh_token => 'fgsg53tg' );
+    is( $resp->code, 200, 'refresh_token' );
+};
+
+subtest 'revoke_token', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->revoke_token( token => 'fgsg53tg' );
+    is( $resp->code, 200, 'revoke_token' );
+};
+
+subtest 'get_service_id', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::get'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->get_service_id();
+    is( $resp->code, 200, 'get_service_id' );
+};
+
+subtest 'get_certificates', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::get'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->get_certificates();
+    is( $resp->code, 200, 'get_certificates' );
+};
+
+subtest 'add_certificate', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::post'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->add_certificate( 'foobar', "$Bin/data/test.xml" );
+    is( $resp->code, 200, 'add_certificates' );
+};
+
+subtest 'delete_certificate', sub {
+    my $client = setup();
+
+    local *{'LWP::UserAgent::delete'} = sub {
+        return $mock_responses{http_200};
+    };
+    my $resp = $client->delete_certificate('foobar');
+    is( $resp->code, 200, 'delete_certificates' );
+};
+
 subtest 'get_repositories', sub {
     my $client = setup();
 

@@ -1,5 +1,10 @@
 Revision history for Perl extension WebDAO.
 
+2.26 28 Jun 2017
+  * add secure, httponly options to set_cookie
+  * support +<number>[myMd] notation for expires option
+  * default httponly in Sessionco.pm cookie
+
 2.25 17 Dec 2015
   * add upload method to WebDAO::CV
 

@@ -18,6 +18,6 @@ no_index:
     - t
     - inc
 requires:
-  String::Print: 0.13
+  String::Print: 0.91
   Test::More: 0.86
-version: 1.02
+version: 1.03

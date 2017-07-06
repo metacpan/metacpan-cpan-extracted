@@ -1,7 +1,7 @@
 package Bencher::Formatter::ShowEnv;
 
-our $DATE = '2017-02-20'; # DATE
-our $VERSION = '1.036'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '1.039'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,7 +49,7 @@ Bencher::Formatter::ShowEnv - Replace 'env_hash' field (numeric) with 'env' (str
 
 =head1 VERSION
 
-This document describes version 1.036 of Bencher::Formatter::ShowEnv (from Perl distribution Bencher-Backend), released on 2017-02-20.
+This document describes version 1.039 of Bencher::Formatter::ShowEnv (from Perl distribution Bencher-Backend), released on 2017-07-02.
 
 =head1 DESCRIPTION
 

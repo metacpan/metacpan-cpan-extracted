@@ -1,4 +1,12 @@
 Revision history for Perl extension FIX::Lite.
+
+0.06  Thu Jul 06 2017
+- Fixed synopsis in pod
+
+0.05  Wed Jul 05 2017
+- A server mode has been implemented alongside with the new method startServer
+- The FIX generation routine has changed, so the backward compatibility has been broken. But the code is now simpler and cleaner
+
 0.04  Sat Dec 19 2015
 - Now we can parse concatenated FIX messages
 - Also we can parse grouped tags correctly

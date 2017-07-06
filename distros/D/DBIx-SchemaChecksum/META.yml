@@ -1,5 +1,5 @@
 ---
-abstract: 'Generate and compare checksums of database schematas'
+abstract: 'Manage your datebase schema via checksums'
 author:
   - 'Thomas Klausner <domm@cpan.org>'
   - 'Maroš Kollár <maros@cpan.org>'
@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,9 +30,11 @@ requires:
   Data::Dumper: '0'
   Digest::SHA1: '0'
   File::Find::Rule: '0'
+  File::HomeDir: '0'
   IO::Prompt::Tiny: '0'
   Moose: '0'
   Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
   MooseX::App: '1.21'
   MooseX::App::Command: '0'
   Path::Class: '0'
@@ -43,5 +45,5 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
-  repository: git://code.validad.net/validad/dbix-schemachecksum
-version: '1.006'
+  repository: git://git.ips.validad.net/opensource/DBIx-SchemaChecksum
+version: '1.101'

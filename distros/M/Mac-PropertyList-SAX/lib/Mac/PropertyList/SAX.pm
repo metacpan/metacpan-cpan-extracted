@@ -63,7 +63,7 @@ our %EXPORT_TAGS = (
     parse  => [ qw(parse_plist parse_plist_fh parse_plist_file parse_plist_string) ],
 );
 
-our $VERSION = '0.85';
+our $VERSION = '0.86';
 
 
 
@@ -160,12 +160,41 @@ An alias to parse_plist, provided for better regularity compared to Perl SAX.
 *parse_plist_string = \&parse_plist;
 
 sub _parse {
-    my ($sub, $data) = @_;
+    # shift off first param in case we use `goto` later (leaving @_ with $data)
+    my $sub = shift;
+    my ($data) = @_;
 
-    my $handler = Mac::PropertyList::SAX::Handler->new;
-    XML::SAX::ParserFactory->parser(Handler => $handler)->$sub($data);
+    my $first;
+    my $fh;
+    my $delegate;
 
-    $handler->{struct}
+    # read initial bytes of file
+    # if we have a binary plist, delegate to Mac::PropertyList
+    if ($sub eq "parse_uri") {
+        open $fh, "<", $_[0];
+        $sub = "parse_file";
+        $_[0] = $fh;
+        # delegate will be set below
+    }
+
+    if ($sub eq "parse_file") {
+        read $_[0], $first, length "bplist";
+        seek $_[0], 0, 0 or die "Can't seek given filehandle"; # seek back to beginning
+        $delegate = \&Mac::PropertyList::parse_plist_fh;
+    } elsif ($sub eq "parse_string") {
+        $first = $_[0];
+        $delegate = \&Mac::PropertyList::parse_plist;
+    }
+
+    if ($first =~ /^bplist/) {
+        # binary plist -- delegate to non-SAX module
+        goto $delegate;
+    } else {
+        my $handler = Mac::PropertyList::SAX::Handler->new;
+        XML::SAX::ParserFactory->parser(Handler => $handler)->$sub($data);
+
+        return $handler->{struct};
+    }
 }
 
 =item create_from_ref( HASH_REF | ARRAY_REF )
@@ -460,6 +489,11 @@ The implementation of the C<$ENCODE_ENTITIES> variable and the addition of the
 C<$ENCODE_UNSAFE_CHARS> variable are also due to Bion Pohl and / or
 L<http://ingz-inc.com/>.
 
+Before version 0.86, this module did not handle binary plists. Now it delegates
+binary plists to L<Mac::PropertyList|Mac::PropertyList>, but if used with
+filehandles, requires seekable streams (\*STDIN will work but only if it points
+to a seekable file, rather than a pipe).
+
 =head1 SUPPORT
 
 Please contact the author with bug reports or feature requests.
@@ -481,7 +515,7 @@ L<Mac::PropertyList|Mac::PropertyList>, the inspiration for this module.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007-2010 by Darren Kulp
+Copyright (C) 2007-2017 by Darren Kulp
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.4 or,

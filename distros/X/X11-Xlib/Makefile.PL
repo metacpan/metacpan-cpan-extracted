@@ -74,6 +74,7 @@ sub add_optional_lib {
 
 add_optional_lib( Xcomposite => 'X11/extensions/Xcomposite.h' );
 add_optional_lib( Xfixes     => 'X11/extensions/Xfixes.h' );
+add_optional_lib( Xrender    => 'X11/extensions/Xrender.h' );
 
 $dep->set_libs(join(' ', map { "-l$_" } @libs));
 $dep->add_c('PerlXlib.c');

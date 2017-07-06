@@ -18,8 +18,9 @@ no_index:
     - t
     - inc
 requires:
+  Date::Parse: 2.3
   Encode: 0
   HTML::Entities: 0
   Test::More: 0.86
   Unicode::GCString: 0
-version: 0.90
+version: 0.92

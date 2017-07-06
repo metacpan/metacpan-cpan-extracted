@@ -1,10 +1,12 @@
 #-*- Mode: Shell-Script; coding: utf-8; -*-
 #
-# File: t/parseme.pl
+# File: t/parseme.dat
 # Description: query-parsing test data
 # Format:
-#  + TAB-separated: QUERY1 "\t" QUERY2 ("\t" COMMENT)?
-#  + QUERY1 should parse identically to QUERY2
+#  + comment lines begin with "#"
+#  + data lines are TAB-separated with 2 or 3 fields: QUERY1 "\t" QUERY2 ("\t" COMMENT)?
+#  + QUERY1->toJson() should be identical to QUERY2->toJson()
+#  + by convention, QUERY1 are "naive" or "bareword" queries, and QUERY2 are explicitly constructed and/or quoted
 
 #-- basic
 foo	'foo'

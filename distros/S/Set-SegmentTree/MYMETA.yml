@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - 'David Ihnen <davidihnen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.17, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Set-SegmentTree
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Map: '0.64'
+  Set::IntervalTree: '0.01'
+  Test::XT: '0.04'
+version: '0.01'
+x_module_name: Set::SegmentTree
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

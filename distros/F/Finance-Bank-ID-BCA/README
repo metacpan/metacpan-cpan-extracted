@@ -8,11 +8,8 @@ SYNOPSIS
 
         use Finance::Bank::ID::BCA;
     
-        # FBI::BCA uses Log::Any. to show logs using, e.g., Log4perl:
-        use Log::Log4perl qw(:easy);
-        use Log::Any::Adapter;
-        Log::Log4perl->easy_init($DEBUG);
-        Log::Any::Adapter->set('Log4perl');
+        # FBI::BCA uses Log::ger. to show logs to, for example, screen:
+        use Log::ger::Output 'Screen';
     
         my $ibank = Finance::Bank::ID::BCA->new(
             username => 'ABCDEFGH1234', # opt if only using parse_statement()
@@ -138,17 +135,17 @@ METHODS
 
       * logger
 
-      Optional. You can supply a Log::Any-like logger object here. If not
-      specified, this module will use a default logger.
+      Optional. You can supply any object that responds to trace(),
+      debug(), info(), warn(), error(), or fatal() here. If not specified,
+      this module will use a default logger.
 
       * logger_dump
 
-      Optional. You can supply a Log::Any-like logger object here. This is
-      just like logger but this module will log contents of response here
-      instead of to logger for debugging purposes. You can configure using
-      something like Log::Dispatch::Dir to save web pages more conveniently
-      as separate files. If unspecified, the default logger is used (same
-      as logger).
+      Optional. This is just like logger but this module will log contents
+      of response here instead of to logger for debugging purposes. You can
+      configure something like Log::ger::Output::DirWriteRotate to save web
+      pages more conveniently as separate files. If unspecified, the
+      default logger is used (same as logger).
 
  login()
 

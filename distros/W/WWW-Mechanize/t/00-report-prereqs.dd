@@ -1,0 +1,76 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Encode' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::Code::TidyAll' => '0.50',
+                                      'Test::More' => '0.88',
+                                      'Test::Needs' => '0',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::RequiresInternet' => '0',
+                                      'constant' => '0',
+                                      'lib' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Getopt::Long' => '0',
+                                      'HTML::Form' => '1.00',
+                                      'HTML::HeadParser' => '0',
+                                      'HTML::TokeParser' => '0',
+                                      'HTML::TreeBuilder' => '0',
+                                      'HTTP::Cookies' => '0',
+                                      'HTTP::Request' => '1.30',
+                                      'HTTP::Request::Common' => '0',
+                                      'LWP::UserAgent' => '5.827',
+                                      'Pod::Usage' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Tie::RefHash' => '0',
+                                      'URI::URL' => '0',
+                                      'URI::file' => '0',
+                                      'base' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'CGI' => '4.32',
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'FindBin' => '0',
+                                   'HTTP::Daemon' => '0',
+                                   'HTTP::Response' => '0',
+                                   'HTTP::Server::Simple::CGI' => '0',
+                                   'LWP' => '0',
+                                   'LWP::Simple' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0.96',
+                                   'Test::Output' => '0',
+                                   'Test::Warnings' => '0',
+                                   'URI' => '0',
+                                   'URI::Escape' => '0',
+                                   'bytes' => '0',
+                                   'lib' => '0',
+                                   'vars' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

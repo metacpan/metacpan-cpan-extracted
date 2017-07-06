@@ -9,7 +9,7 @@ configure_requires:
   DBIx::Class: '0.082810'
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,7 @@ name: App-Netdisco
 provides:
   App::Netdisco:
     file: lib/App/Netdisco.pm
-    version: '2.036000'
+    version: '2.036005'
   App::Netdisco::AnyEvent::Nbtstat:
     file: lib/App/Netdisco/AnyEvent/Nbtstat.pm
   App::Netdisco::Backend::Job:
@@ -61,7 +61,7 @@ provides:
     file: lib/App/Netdisco/Core/Nbtstat.pm
   App::Netdisco::DB:
     file: lib/App/Netdisco/DB.pm
-    version: '43'
+    version: '44'
   App::Netdisco::DB::ExplicitLocking:
     file: lib/App/Netdisco/DB/ExplicitLocking.pm
   App::Netdisco::DB::Result::Admin:
@@ -112,6 +112,8 @@ provides:
     file: lib/App/Netdisco/DB/Result/Process.pm
   App::Netdisco::DB::Result::Session:
     file: lib/App/Netdisco/DB/Result/Session.pm
+  App::Netdisco::DB::Result::Statistics:
+    file: lib/App/Netdisco/DB/Result/Statistics.pm
   App::Netdisco::DB::Result::Subnet:
     file: lib/App/Netdisco/DB/Result/Subnet.pm
   App::Netdisco::DB::Result::Topology:
@@ -232,6 +234,8 @@ provides:
     file: lib/App/Netdisco/Util/Device.pm
   App::Netdisco::Util::ExpandParams:
     file: lib/App/Netdisco/Util/ExpandParams.pm
+  App::Netdisco::Util::FastResolver:
+    file: lib/App/Netdisco/Util/FastResolver.pm
   App::Netdisco::Util::Graph:
     file: lib/App/Netdisco/Util/Graph.pm
   App::Netdisco::Util::Node:
@@ -266,6 +270,8 @@ provides:
     file: lib/App/Netdisco/Web/Password.pm
   App::Netdisco::Web::Plugin:
     file: lib/App/Netdisco/Web/Plugin.pm
+  App::Netdisco::Web::Plugin::AdminTask::DuplicateDevices:
+    file: lib/App/Netdisco/Web/Plugin/AdminTask/DuplicateDevices.pm
   App::Netdisco::Web::Plugin::AdminTask::JobQueue:
     file: lib/App/Netdisco/Web/Plugin/AdminTask/JobQueue.pm
   App::Netdisco::Web::Plugin::AdminTask::NodeMonitor:
@@ -421,8 +427,9 @@ requires:
   Plack: '1.0023'
   Plack::Middleware::Expires: '0.03'
   Plack::Middleware::ReverseProxy: '0.15'
+  Pod::Usage: '0'
   Role::Tiny: '1.002005'
-  SNMP::Info: '3.34'
+  SNMP::Info: '3.36'
   SQL::Translator: '0.11018'
   Sereal: '0'
   Socket6: '0.23'
@@ -446,5 +453,5 @@ resources:
   homepage: http://netdisco.org/
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/netdisco/netdisco
-version: '2.036000'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: '2.036005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

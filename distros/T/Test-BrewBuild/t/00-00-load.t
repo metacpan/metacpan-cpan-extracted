@@ -8,7 +8,7 @@ use Test::More;
 
 if ($ENV{BBDEV_TESTING}){
     if (! $ENV{PERLVER}){
-        BAIL_OUT("for BBDEV_TESTING, you need to set \$ENV{PERLVER}, eg: 5.24.0");
+        BAIL_OUT("for BBDEV_TESTING, you need to set \$ENV{PERLVER}, eg: 5.26.0");
     }
 }
 BEGIN {

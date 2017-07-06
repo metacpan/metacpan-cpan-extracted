@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.550';
+$Lab::Moose::Instrument::SR830::VERSION = '3.552';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints qw/enum/;

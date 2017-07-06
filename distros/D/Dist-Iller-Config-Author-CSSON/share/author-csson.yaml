@@ -149,7 +149,7 @@ plugins:
  - +plugin: DistIller::MetaGeneratedBy
 
  - +plugin: Git::Contributors
-   +version: 0.029
+   +version: 0.030
 
  - +plugin: Test::Kwalitee::Extra
    +version: v0.2.1
@@ -170,7 +170,7 @@ plugins:
    +version: 2.056
 
  - +plugin: Test::ReportPrereqs
-   +version: 0.021
+   +version: 0.027
 
  - +plugin: PodSyntaxTests
  - +plugin: MetaYAML
@@ -229,7 +229,7 @@ plugins:
    install_command: cpanm .
 
  - +plugin: BumpVersionAfterRelease::Transitional
-   +version: 0.007
+   +version: 0.008
    +remove_if: $env.fake_release
 
  - +plugin: CommitAfterRelease

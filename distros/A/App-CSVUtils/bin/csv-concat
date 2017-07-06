@@ -1,11 +1,11 @@
 #!perl
 
 # Note: This script is a CLI  for Riap function /App/CSVUtils/csv_concat
-# and generated automatically using Perinci::CmdLine::Gen version 0.45
+# and generated automatically using Perinci::CmdLine::Gen version 0.46
 
-our $DATE = '2017-04-25'; # DATE
+our $DATE = '2017-07-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ csv-concat - Concatenate several CSV files together, collecting all the fields
 
 =head1 VERSION
 
-This document describes version 0.012 of csv-concat (from Perl distribution App-CSVUtils), released on 2017-04-25.
+This document describes version 0.013 of csv-concat (from Perl distribution App-CSVUtils), released on 2017-07-02.
 
 =head1 SYNOPSIS
 
@@ -92,6 +92,12 @@ Can be specified multiple times.
 Input CSV files (JSON-encoded).
 
 See C<--filename>.
+
+=item B<--no-header>
+
+When you declare that CSV does not have header row (`--no-header`), the fields
+will be named `field1`, `field2`, and so on.
+
 
 =back
 
@@ -236,6 +242,7 @@ List of available configuration parameters:
 
  filenames (see --filename)
  format (see --format)
+ header (see --no-header)
  naked_res (see --naked-res)
 
 =head1 ENVIRONMENT

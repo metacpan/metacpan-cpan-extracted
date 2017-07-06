@@ -1,11 +1,23 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Net-SFTP
-version:      0.10
-version_from: lib/Net/SFTP.pm
-installdirs:  site
+---
+abstract: 'Secure File Transfer Protocol client'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-SFTP
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Net::SSH::Perl:                1.24
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Math::Int64: '0.54'
+  Net::SSH::Perl: '2.12'
+version: '0.12'

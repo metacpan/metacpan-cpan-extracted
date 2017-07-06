@@ -41,6 +41,7 @@ my $t = Test::Mojo->new;
 $t->get_ok('/')->status_is(200)->content_is('Hello Mojo!');
 $t->get_ok('/inline')->status_is(200)->content_is('Hello, Mustache!');
 $t->get_ok('/data')->status_is(200)->content_is('Hello, Mustache!');
+$t->get_ok('/file')->status_is(200)->content_is('Hello, Mustache!');
 
 done_testing();
 

@@ -1,5 +1,5 @@
 package IPC::Transit::Test::Example;
-$IPC::Transit::Test::Example::VERSION = '1.162230';
+$IPC::Transit::Test::Example::VERSION = '1.171860';
 use strict;use warnings;
 use Data::Dumper;
 use IPC::Transit;

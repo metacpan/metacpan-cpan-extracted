@@ -1,3 +1,12 @@
+0.07 20170703
+    . Only test changes, no need to upgrade
+	. Split up the backend test into separate files to avoid trying to reload
+	  an identical module during the test run(s)
+
+0.06 20170630
+    . We want AnyEvent::Future 0.02 minimum
+	+ Actually return a "true" message when failing in HTTP::Future::Mojo
+
 0.05 20160524
     . Old versions of HTTP::Tiny don't have some features, defang the tests
       appropriately.

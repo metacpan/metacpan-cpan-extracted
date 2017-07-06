@@ -1,10 +1,10 @@
 {
    "abstract" : "Get currency information for different currencies",
    "author" : [
-      "David D Lowe <daviddlowe.flimm@gmail.com>"
+      "Ed Freyfogle <edf@opencagedata.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "mit"
    ],
@@ -49,10 +49,9 @@
          "web" : "https://github.com/Flimm/perl5-Data-MoneyCurrency"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_bugtracker" : {
       "web" : "https://github.com/Flimm/perl5-Data-MoneyCurrency/issues"
    },
-   "x_homepage" : "https://github.com/Flimm/perl5-Data-MoneyCurrency",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_homepage" : "https://github.com/Flimm/perl5-Data-MoneyCurrency"
 }

@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
   "NAME" => "spamcupNG",
   "PREREQ_PM" => {
     "Getopt::Std" => 0,
+    "HTML::Entities" => "3.69",
     "HTML::Form" => "6.03",
     "HTTP::Cookies" => "6.01",
     "LWP::UserAgent" => "6.05",
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.4",
+  "VERSION" => "0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Getopt::Std" => 0,
+  "HTML::Entities" => "3.69",
   "HTML::Form" => "6.03",
   "HTTP::Cookies" => "6.01",
   "LWP::UserAgent" => "6.05",

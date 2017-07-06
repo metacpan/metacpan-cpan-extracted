@@ -12,7 +12,7 @@ WWW::Mechanize::Chrome - automate the Chrome browser
 
     Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
     my $mech = WWW::Mechanize::Chrome->new();
-    $mech->get('http://google.com');
+    $mech->get('https://google.com');
 
     $mech->eval_in_page('alert("Hello Chrome")');
     my $png= $mech->content_as_png();
@@ -31,9 +31,18 @@ WWW::Mechanize::Chrome - automate the Chrome browser
     as that makes debugging much easier than expecting
     you to actually check the results of every action.
 
+- **host**
+
+    Specify the host where Chrome listens
+
+        host => 'localhost'
+
+    Most likely you don't want to have Chrome listening on an outside port
+    on a machine connected to the internet.
+
 - **port**
 
-    Specify the port where Chrome should listen
+    Specify the port of Chrome to connect to
 
         port => 9222
 
@@ -45,9 +54,15 @@ WWW::Mechanize::Chrome - automate the Chrome browser
 
     Specify the path to the Chrome executable.
 
-    The default is `chrome` as found via `$ENV{PATH}`.
-    You can also provide this information from the outside
+    The default is `chrome` on Windows and `google-chrome` elsewhere, as found via
+    `$ENV{PATH}`.
+    You can also provide this information from the outside to the class
     by setting `$ENV{CHROME_BIN}`.
+
+- **start\_url**
+
+    Launch Chrome with the given URL. Normally you would use
+    the `->get` method instead.
 
 - **launch\_arg**
 
@@ -55,10 +70,37 @@ WWW::Mechanize::Chrome - automate the Chrome browser
 
         launch_arg => [ "--some-new-parameter=foo" ],
 
-- **cookie\_file**
+    Interesting parameters might be
 
-    Cookies are not directly persisted. If you pass in a path here,
-    that file will be used to store or retrieve cookies.
+        '--window-size=1280x1696'
+        '--ignore-certificate-errors'
+
+- **profile**
+
+    Profile directory for this session. If not given, Chrome will use your current
+    user profile.
+
+- **incognito**
+
+    Launch Chrome in incognito mode.
+
+- **data\_directory**
+
+    The base data directory for this session. If not given, Chrome will use your
+    current base directory.
+
+        use File::Temp 'tempdir';
+        my $mech = WWW::Mechanize::Chrome->new(
+            data_directory => tempdir(),        # create a fresh Chrome every time
+        );
+
+- **startup\_timeout**
+
+        startup_timeout => 20,
+
+    The maximum number of seconds to wait until Chrome is ready. This helps on slow
+    systems where Chrome takes some time starting up. The process will try every
+    second to connect to Chrome.
 
 - **driver**
 
@@ -68,6 +110,23 @@ WWW::Mechanize::Chrome - automate the Chrome browser
 
     If set to 1, after each request tests for Javascript errors and warns. Useful
     for testing with `use warnings qw(fatal)`.
+
+You can override the class to implement the transport from the outside by
+setting `$ENV{WWW_MECHANIZE_CHROME_TRANSPORT}` to the transport class.
+This is mostly used for testing but can be useful to exclude the underlying
+websocket implementation(s) as source of bugs.
+
+## `$mech->add_listener`
+
+    my $url_loaded = $mech->add_listener('Network.responseReceived', sub {
+        my( $info ) = @_;
+        warn "Loaded URL $info->{response}->{url}: $info->{response}->{status}";
+    });
+
+Returns a listener object. If that object is discarded, the listener callback
+will be removed.
+
+Calling this method in void context croaks.
 
 ## `$mech->chrome_version`
 
@@ -96,19 +155,25 @@ Access the [Chrome::DevToolsProtocol](https://metacpan.org/pod/Chrome::DevToolsP
 Access the tab hash of the [Chrome::DevToolsProtocol](https://metacpan.org/pod/Chrome::DevToolsProtocol) instance connecting
 to Chrome. This represents the tab we control.
 
-## `$mech->js_alerts()`
+## `$mech->on_dialog( $cb )`
 
-    print for $mech->js_alerts();
+    $mech->on_dialog( sub {
+        my( $mech, $dialog ) = @_;
+        warn $dialog->{message};
+        $mech->handle_dialog( 1 ); # click "OK" / "yes" instead of "cancel"
+    });
 
-An interface to the Javascript Alerts
+A callback for Javascript dialogs (`alert()`, `prompt()`, ... )
 
-Returns the list of alerts
+## `$mech->handle_dialog( $accept, $prompt = undef )`
 
-## `$mech->clear_js_alerts()`
+    $mech->on_dialog( sub {
+        my( $mech, $dialog ) = @_;
+        warn "[Javascript $dialog->{type}]: $dialog->{message}";
+        $mech->handle_dialog( 1 ); # click "OK" / "yes" instead of "cancel"
+    });
 
-    $mech->clear_js_alerts();
-
-Clears all saved alerts
+Closes the current Javascript dialog. Depending on
 
 ## `$mech->js_errors()`
 
@@ -127,12 +192,6 @@ Maybe this should be called `js_messages` or
     $mech->clear_js_errors();
 
 Clears all Javascript messages from the console
-
-## `$mech->confirm( 'Really do this?' [ => 1 ])`
-
-Records a confirmation (which is "1" or "ok" by default), to be used
-whenever javascript fires a confirm dialog. If the message is not found,
-the answer is "cancel".
 
 ## `$mech->eval_in_page( $str, @args )`
 
@@ -274,6 +333,14 @@ that Chrome may still send a header with its default value.
 
 Removes all custom headers and makes Chrome send its defaults again.
 
+## `$mech->block_urls()`
+
+    $mech->block_urls( '//facebook.com/js/conversions/tracking.js' );
+
+Sets the list of blocked URLs. These URLs will not be retrieved by Chrome
+when loading a page. This is useful to eliminate tracking images or to test
+resilience in face of bad network conditions.
+
 ## `$mech->res()` / `$mech->response(%options)`
 
     my $response = $mech->response(headers => 0);
@@ -316,6 +383,15 @@ Goes one page forward in the page history.
 
 Returns the (new) response.
 
+## `$mech->stop()`
+
+    $mech->stop();
+
+Stops all loading in Chrome, as if you pressed `ESC`.
+
+This function is mostly of use in callbacks or in a timer callback from your
+event loop.
+
 ## `$mech->uri()`
 
     print "We are at " . $mech->uri;
@@ -326,7 +402,7 @@ Returns the current document URI.
 
 ## `$mech->document()`
 
-    print $self->document->get->{nodeId}
+    print $self->document->get->{nodeId};
 
 Returns the document object as a Future.
 
@@ -747,6 +823,17 @@ By default, the events set in the
 constructor for `pre_events` and `post_events`
 are triggered.
 
+## `$mech->upload( $selector, $value )`
+
+    $mech->upload( user_picture => 'C:/Users/Joe/face.png' );
+
+Sets the file upload field with the name given in `$selector` to the given
+file. The filename must be an absolute path and filename in the local
+filesystem.
+
+The method understands very basic CSS selectors in the value for `$selector`,
+like the `->field` method.
+
 ## `$mech->value( $selector_or_element, [%options] )`
 
     print $mech->value( 'user' );
@@ -764,6 +851,9 @@ in favour of the `->field` method.
 For fields that can have multiple values, like a `select` field,
 the method is context sensitive and returns the first selected
 value in scalar context and all values in list context.
+
+Note that this method does not support file uploads. See the `->upload`
+method for that.
 
 ## `$mech->get_set_value( %options )`
 
@@ -834,34 +924,6 @@ field name and value pairs. If there is more than one field with the same
 name, the first one found is set. If you want to select which of the
 duplicate field to set, use a value which is an anonymous array which
 has the field value and its number as the 2 elements.
-
-## `$mech->expand_frames( $spec )`
-
-    my @frames = $mech->expand_frames();
-
-Expands the frame selectors (or `1` to match all frames)
-into their respective Chrome nodes according to the current
-document. All frames will be visited in breadth first order.
-
-This is mostly an internal method.
-
-## `$mech->current_frame`
-
-    my $last_frame= $mech->current_frame;
-    # Switch frame somewhere else
-
-    # Switch back
-    $mech->activate_container( $last_frame );
-
-Returns the currently active frame as a WebElement.
-
-This is mostly an internal method.
-
-See also
-
-[http://code.google.com/p/selenium/issues/detail?id=4305](http://code.google.com/p/selenium/issues/detail?id=4305)
-
-Frames are currently not really supported.
 
 # CONTENT RENDERING METHODS
 
@@ -973,6 +1035,31 @@ in `@elements` having the attributes `%attributes`. The `@elements`
 will form an `or` condition, while the attributes will form an `and`
 condition.
 
+# DEBUGGING METHODS
+
+This module can collect the screencasts that Chrome can produce. The screencasts
+are sent to your callback which either feeds them to `ffmpeg` to create a video
+out of them or dumps them to disk as sequential images.
+
+    sub saveFrame {
+        my( $mech, $framePNG ) = @_;
+        # just ignore this frame
+    }
+
+    $mech->setScreenFrameCallback( \&saveFrame );
+    ... do stuff ...
+    $mech->setScreenFrameCallback( undef ); # stop recording
+
+## `$mech->sleep`
+
+    $mech->sleep( 2 ); # wait for things to settle down
+
+Suspends the progress of the program while still handling messages from
+Chrome.
+
+The main use of this method is to give Chrome enough time to send all its
+screencast frames and to catch up before shutting down the connection.
+
 # INCOMPATIBILITIES WITH WWW::Mechanize
 
 As this module is in a very early stage of development,
@@ -1023,15 +1110,24 @@ they make little sense in the context of Chrome.
 
 # INSTALLING
 
-## Install the `Chrome` executable
+## Install the `chrome` executable
 
 Test it has been installed on your system:
 
+On unixish systems, the executable is named `chrome-browser`. Check
+that Chrome starts:
+
 `chrome-browser --version`
+
+On Windows, the executable is named `chrome.exe` and doesn't output
+information to the console. Check that Chrome starts:
+
+`chrome`
 
 # SEE ALSO
 
 - [https://developer.chrome.com/devtools/docs/debugging-clients](https://developer.chrome.com/devtools/docs/debugging-clients) - the Chrome DevTools homepage
+- [https://github.com/GoogleChrome/lighthouse](https://github.com/GoogleChrome/lighthouse) - Google Lighthouse, the main client
 - [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize) - the module whose API grandfathered this module
 - [WWW::Mechanize::Firefox](https://metacpan.org/pod/WWW::Mechanize::Firefox) - a similar module with a visible application
 - [WWW::Mechanize::PhantomJS](https://metacpan.org/pod/WWW::Mechanize::PhantomJS) - a similar module without a visible application
@@ -1048,7 +1144,8 @@ The public support forum of this module is
 
 # TALKS
 
-I've given no talks about this module yet at Perl conferences.
+I've given a German talk at GPW 2017, see [http://act.yapc.eu/gpw2017/talk/7027](http://act.yapc.eu/gpw2017/talk/7027)
+and [https://corion.net/talks](https://corion.net/talks) for the slides.
 
 # BUG TRACKER
 

@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 package Regexp::Common::time;
-$Regexp::Common::time::VERSION = '0.08';
+$Regexp::Common::time::VERSION = '0.09';
 use Regexp::Common qw(pattern);
 
 sub _croak { require Carp; goto &Carp::croak}
@@ -1388,7 +1388,11 @@ weekday names.
 
 L<Test::More> is required for the test suite.
 
-=head1 AUTHOR / COPYRIGHT
+=head1 AUTHOR
+
+Eric J. Roode, ROODE I<-at-> cpan I<-dot-> org
+
+=head1 LICENSE AND COPYRIGHT
 
 Copyright (c) 2005-2008 by Eric J. Roode, ROODE I<-at-> cpan I<-dot-> org
 
@@ -1413,6 +1417,5 @@ your house to burn down, your dog to collapse, your heart-lung machine
 to fail, your spouse to desert you, or George Bush to be re-elected, I
 can offer only my sincere sympathy and apologies, and promise to
 endeavor to improve the software.
-
 
 =cut

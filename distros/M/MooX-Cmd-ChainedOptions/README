@@ -1,61 +1,45 @@
-MooX-Cmd-ChainedOptions
+MooX::Cmd::ChainedOptions
 
-[ REPLACE THIS...
+For applications using MooX::Cmd and MooX::Options,
+MooX::Cmd::ChainedOptions transparently provides access to command line
+options from further up the command chain.
 
-  The README is used to introduce the module and provide instructions on
-  how to install the module, any machine dependencies it may have (for
-  example C compilers and installed libraries) and any other information
-  that should be understood before the module is installed.
+For example, if an application provides options at each level of the
+command structure:
 
-  A README file is required for CPAN modules since CPAN extracts the
-  README file from a module distribution so that people browsing the
-  archive can use it get an idea of the modules uses. It is usually a
-  good idea to provide version information here so that people can
-  decide whether fixes for the module are worth downloading.
-]
+  app --app-opt cmd --cmd-opt subcmd --subcmd-opt
 
+The subcmd object will have direct access to the "app_option" and
+"cmd_option" options via object attributes:
+
+  sub execute {
+      print $self->app_opt, "\n";
+      print $self->cmd_opt, "\n";
+      print $self->subcmd_opt, "\n";
+  }
 
 INSTALLATION
 
-To install this module, run the following commands:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-SUPPORT AND DOCUMENTATION
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-After installing, you can find documentation for this module with the
-perldoc command.
+COPYRIGHT AND LICENSE
 
-    perldoc MooX::Cmd::ChainedOptions
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
 
+This is free software, licensed under:
 
-DEPENDENCIES
-
-None.
-
-COPYRIGHT AND LICENCE
-
---8<--8<--8<--8<--
-
-This file is part of MooX-Cmd-ChainedOptions
-
-Copyright (c) 2015 The Smithsonian Astrophysical Observatory
-
-MooX-Cmd-ChainedOptions is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->8-->8-->8-->8--
+  The GNU General Public License, Version 3, June 2007

@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::Circle;
 
-$Map::Tube::London::Line::Circle::VERSION   = '0.84';
+$Map::Tube::London::Line::Circle::VERSION   = '0.85';
 $Map::Tube::London::Line::Circle::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::Circle - London Tube Map: Circle Line.
 
 =head1 VERSION
 
-Version 0.84
+Version 0.85
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
-# $Id: custom.txt 1418 2015-10-20 09:55:07Z willem $
-domain t2.net-dns.org
+# $Id: custom.txt 1573 2017-06-12 11:03:59Z willem $
+domain alt.net-dns.org
 search alt.net-dns.org ext.net-dns.org
-nameserver 10.0.1.42 10.0.2.42
+nameserver 10.0.1.128 10.0.2.128
 options attempts:2 inet6 bogus

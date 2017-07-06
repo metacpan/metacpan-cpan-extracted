@@ -1,7 +1,8 @@
 #!/usr/bin/perl -w
 use Test::More;
 use Test::Mock::Net::FTP;
-use lib '.';
+use FindBin;
+use lib $FindBin::Bin;
 use t::Util;
 use strict;
 use warnings;

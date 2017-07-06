@@ -6,6 +6,7 @@ use Test::Exception;
 use Module::Build;
 use lib '../lib';
 use lib 't/lib';
+use lib 'lib';
 use Neo4p::Connect;
 use strict;
 use warnings;
@@ -75,8 +76,8 @@ SKIP : {
   }
 
   diag("rt80343");
-  ok $q=REST::Neo4p::Query->new("START n=node($$n3) MATCH (p)-[r:parent_of]->n RETURN p.name"), 'parent_of Pebbles query';
-#  is $q->execute, 2, 'execute and return 2 rows';
+  ok $q=REST::Neo4p::Query->new("START n=node($$n3) MATCH (p)-[r:parent_of]->(n) RETURN p.name"), 'parent_of Pebbles query';
+  #  is $q->execute, 2, 'execute and return 2 rows';
   ok $q->execute, 'execute';
   my @parents;
   while (my $row = $q->fetch) { push @parents, $$row[0]; }

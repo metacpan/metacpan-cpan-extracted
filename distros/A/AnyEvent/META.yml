@@ -3,28 +3,28 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 configure_requires:
-  Canary::Stability: '0'
-  ExtUtils::MakeMaker: '6.52'
+  Canary::Stability: 0
+  ExtUtils::MakeMaker: 6.52
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: AnyEvent
 no_index:
   directory:
     - t
     - inc
 recommends:
-  Async::Interrupt: '1'
-  EV: '4'
-  Guard: '1.02'
-  JSON: '2.09'
-  JSON::XS: '2.2'
-  Net::SSLeay: '1.33'
-  Task::Weaken: '0'
+  Async::Interrupt: 1
+  EV: 4
+  Guard: 1.02
+  JSON: 2.09
+  JSON::XS: 2.2
+  Net::SSLeay: 1.33
+  Task::Weaken: 0
 requires: {}
-version: 7.13
+version: 7.14

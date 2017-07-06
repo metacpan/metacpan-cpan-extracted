@@ -1,3 +1,7 @@
+0.10 20170628
+    + Support multiline signatures
+	. We also attempt to keep the line numbers correct
+
 0.09 20170116
     + Support single-line functions
       In fact, we simply don't require the subroutine declaration to be on a

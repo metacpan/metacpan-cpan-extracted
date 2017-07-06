@@ -9,7 +9,7 @@ use strict;
 use warnings;
 no warnings 'recursion'; # Disable the "deep recursion" warning
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Carp qw(); # don't import croak
 use Scalar::Util qw( weaken blessed reftype );
@@ -771,7 +771,7 @@ sub await
 sub get
 {
    my $self = shift;
-   $self->await until $self->{ready};
+   until( $self->{ready} ) { $self->await }
    if( $self->{failure} ) {
       $self->{reported} = 1;
       my $exception = $self->{failure}->[0];
@@ -902,7 +902,7 @@ statement:
 sub failure
 {
    my $self = shift;
-   $self->await until $self->{ready};
+   until( $self->{ready} ) { $self->await }
    return unless $self->{failure};
    $self->{reported} = 1;
    return $self->{failure}->[0] if !wantarray;
@@ -2353,6 +2353,12 @@ L<https://docs.google.com/presentation/d/1UkV5oLcTOOXBXPh8foyxko4PR28_zU_aVx6gBm
 "Futures advent calendar 2013"
 
 L<http://leonerds-code.blogspot.co.uk/2013/12/futures-advent-day-1.html>
+
+=item *
+
+"Asynchronous Programming with Futures" - YAPC::EU 2014
+
+L<https://www.youtube.com/watch?v=u9dZgFM6FtE>
 
 =back
 

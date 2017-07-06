@@ -1,7 +1,7 @@
 {
    "abstract" : "This module provides ported PHP password functions.",
    "author" : [
-      "Craig Manley (craigmanley.com)"
+      "Craig Manley"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
@@ -22,7 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.48",
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -36,10 +37,10 @@
             "Crypt::OpenSSL::Random" : "0",
             "MIME::Base64" : "0",
             "Test::More" : "0",
-            "perl" : "5.006"
+            "perl" : "5.01"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.05"
+   "version" : "1.07"
 }

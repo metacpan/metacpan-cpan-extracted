@@ -1,0 +1,11 @@
+Revision history for Async-Stream
+
+0.01    24.06.17
+        First version, released on an unsuspecting world.
+
+0.03    24.06.17
+        Adding arguments validation
+
+0.04    24.06.17
+        Fix for bug with several request to same item
+

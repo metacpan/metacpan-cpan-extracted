@@ -55,21 +55,21 @@ returning *;
 
 @@ dsbl/enbl role
 update "{%= $schema %}"."{%= $tables->{roles} %}"
-set disable=?::bit
+set disable=?::boolean
 where id=? or name=?
 returning *;
 
 @@ access role?cached=1
-%# Доступ по роли
+-- Доступ по роли
 select count(*)
 from "{%= $schema %}"."{%= $tables->{roles} %}"
 where (id = ? or name = ?)
   and id = any(?)
-  and coalesce(disable, 0::bit) <> 1::bit
+  and not coalesce(disable, false)
 ;
 
 @@ role profiles
-%# Пользователи роли
+-- Пользователи роли
 select p.*
 from
   "{%= $schema %}"."{%= $tables->{profiles} %}" p

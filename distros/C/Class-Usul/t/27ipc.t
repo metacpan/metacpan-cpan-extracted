@@ -45,7 +45,7 @@ SKIP: {
 
    my $table = $prog->ipc->process_table;
 
-   ok $table->count > 0, 'process table';
+   ok $table->{count} > 0, 'process table';
 }
 
 sub popen_test {

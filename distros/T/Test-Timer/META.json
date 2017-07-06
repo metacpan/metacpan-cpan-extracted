@@ -65,11 +65,11 @@
    "provides" : {
       "Test::Timer" : {
          "file" : "lib/Test/Timer.pm",
-         "version" : "2.01"
+         "version" : "2.03"
       },
       "Test::Timer::TimeoutException" : {
          "file" : "lib/Test/Timer/TimeoutException.pm",
-         "version" : "2.01"
+         "version" : "2.03"
       }
    },
    "release_status" : "stable",
@@ -84,7 +84,7 @@
          "web" : "https://github.com/jonasbn/perl-test-timer"
       }
    },
-   "version" : "2.01",
+   "version" : "2.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

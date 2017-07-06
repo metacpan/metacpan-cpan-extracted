@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Dumper" => 0,
     "File::Share" => "0.25",
-    "Map::Tube" => "3.30",
+    "Map::Tube" => "3.32",
     "Moo" => "2.000000",
     "namespace::clean" => "0.24",
     "strict" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.56",
+  "VERSION" => "0.57",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "File::Share" => "0.25",
-  "Map::Tube" => "3.30",
+  "Map::Tube" => "3.32",
   "Moo" => "2.000000",
   "Test::More" => 0,
   "namespace::clean" => "0.24",

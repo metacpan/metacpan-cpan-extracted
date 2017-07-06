@@ -1,7 +1,7 @@
 package Finance::Bank::ID::Mandiri;
 
-our $DATE = '2017-05-31'; # DATE
-our $VERSION = '0.34'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.35'; # VERSION
 
 use 5.010001;
 
@@ -638,7 +638,7 @@ Finance::Bank::ID::Mandiri - Check your Bank Mandiri accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.34 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2017-05-31.
+This document describes version 0.35 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -650,11 +650,8 @@ If you want to use the library in your Perl application:
 
     use Finance::Bank::ID::Mandiri;
 
-    # FBI::Mandiri uses Log::Any. to show logs, use something like:
-    use Log::Log4perl qw(:easy);
-    use Log::Any::Adapter;
-    Log::Log4perl->easy_init($DEBUG);
-    Log::Any::Adapter->set('Log4perl');
+    # FBI::Mandiri uses Log::ger. to show logs, use something like:
+    use Log::ger::Output 'Screen';
 
     my $ibank = Finance::Bank::ID::Mandiri->new(
         username => '....', # optional if you're only using parse_statement()

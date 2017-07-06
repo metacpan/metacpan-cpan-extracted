@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::PodnameFromFilename;
 
-our $DATE = '2014-12-14'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2017-07-04'; # DATE
+our $VERSION = '0.02'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,7 +61,7 @@ Dist::Zilla::Plugin::PodnameFromFilename - Fill out # PODNAME from filename
 
 =head1 VERSION
 
-This document describes version 0.01 of Dist::Zilla::Plugin::PodnameFromFilename (from Perl distribution Dist-Zilla-Plugin-PodnameFromFilename), released on 2014-12-14.
+This document describes version 0.02 of Dist::Zilla::Plugin::PodnameFromFilename (from Perl distribution Dist-Zilla-Plugin-PodnameFromFilename), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ In your module/script:
 
  # PODNAME:
 
-During build, PODNAME will be filled from filename. If Abstract is already
+During build, PODNAME will be filled from filename. If PODNAME is already
 filled, will leave it alone.
 
 =head1 DESCRIPTION
@@ -83,13 +83,10 @@ C<bin/some-progname> you have to specify:
 
  # PODNAME: some-progname
 
-With this plugin, the value of PODNAME directive will be filled from filename.
+With this plugin, the value of PODNAME directive will be filled from filename
+(unless it has been set explicitly).
 
 =for Pod::Coverage .+
-
-=head1 SEE ALSO
-
-L<Rinci>
 
 =head1 HOMEPAGE
 
@@ -107,13 +104,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<https://github.com/rjbs/Pod-Weaver/issues/29>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

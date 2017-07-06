@@ -25,7 +25,7 @@ no_index:
 provides:
   Mojolicious::Plugin::Text::Caml:
     file: lib/Mojolicious/Plugin/Text/Caml.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Mojolicious: '0'
   Text::Caml: '0'
@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/cynovg/Mojolicious-Plugin-Text-Caml/issues
   homepage: https://github.com/cynovg/Mojolicious-Plugin-Text-Caml
   repository: git://github.com/cynovg/Mojolicious-Plugin-Text-Caml.git
-version: '0.03'
+version: '0.04'
 x_authority: cpan:CYNOVG
 x_contributors:
   - 'Novgorodcev Cyrill <cynovg@gmail.com>'

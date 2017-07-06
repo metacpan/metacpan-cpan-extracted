@@ -1,5 +1,9 @@
 Revision history for Perl extension Variable::Expand::AnyLevel
 
+0.05 2017-07-02T02:46:03Z
+        - fixed for removed '.' in @INC again (using FindBin)
+		- removed xt/ (no longer used)
+
 0.04 2017-05-21T12:31:00Z
 
         - fixed for removed '.' in @INC (https://github.com/tsucchi/p5-Variable-Expand-AnyLevel/issues/1)

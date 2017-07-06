@@ -15,6 +15,7 @@
 package Google::Ads::Common::ErrorUtils;
 
 use strict;
+use warnings;
 use version;
 
 # The following needs to be on one line because CPAN uses a particularly hacky
@@ -29,7 +30,7 @@ sub get_source_operation_index ($) {
   if ($error->can('get_fieldPathElements')) {
     my $field_path_elements = $error->get_fieldPathElements();
     my $first_field_path_element =
-      ($field_path_elements && (scalar $field_path_elements > 0))
+      ($field_path_elements && (scalar @{$field_path_elements} > 0))
       ? $field_path_elements->[0]
       : undef;
     if ( $first_field_path_element

@@ -1,5 +1,9 @@
 Revision history for Bot::IRC
 
+1.15      2017-06-28 19:30:42-04:00 America/New_York
+        - Improve bot's ability to be addressed and respond
+        - Fix bug that would throw undef hash ref error for missing vars() vars
+
 1.14      2017-06-17 22:00:44-04:00 America/New_York
         - Bot is slightly smarter about not responding to input that may not
           actually be intended for the bot

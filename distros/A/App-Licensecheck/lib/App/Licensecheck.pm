@@ -30,11 +30,11 @@ App::Licensecheck - functions for a simple license checker for source files
 
 =head1 VERSION
 
-Version v3.0.29
+Version v3.0.30
 
 =cut
 
-our $VERSION = version->declare("v3.0.29");
+our $VERSION = version->declare("v3.0.30");
 
 =head1 SYNOPSIS
 
@@ -312,14 +312,14 @@ sub clean_comments
 	# Remove generic comments: look for 4 or more lines beginning with
 	# regular comment pattern and trim it. Fall back to old algorithm
 	# if no such pattern found.
-	my @matches = m/^\s*((?:[^a-zA-Z0-9\s]{1,3}|\bdnl\b|\bREM\b))\s\w/mg;
+	my @matches = m/^[ \t]*([^a-zA-Z0-9\s]{1,3}|\bdnl\b|\bREM\b)[ \t]+\S/mg;
 	if ( @matches >= 4 ) {
-		my $comment_re = qr/\s*[\Q$matches[0]\E]{1,3}\s*/;
+		my $comment_re = qr/[ \t]*[\Q$matches[0]\E]{1,3}[ \t]*/;
 		s/^$comment_re//mg;
 	}
 
 	# Remove other side of "boxed" comments
-	s/\s*[*#]\s*$//gm;
+	s/[ \t]*[*#][ \t]*$//gm;
 
 	# Remove Fortran comments
 	s/^[cC] //gm;
@@ -541,7 +541,7 @@ sub parse_license
 			push @spdx_license, $gen_spdx->('AGPL');
 		}
 		# exclude CeCILL-2.1 license
-		when ( /GNU Affero General Public License dans/i ) {
+		when ( /(?:signe la|means the) GNU Affero General Public License/i ) {
 			break;
 		}
 		# exclude GPL-3 license
@@ -652,6 +652,9 @@ sub parse_license
 	given ($licensetext) {
 		when ( /$L{re}{perl}/ ) {
 			$gen_license->('perl');
+		}
+		when ( /$L{re}{artistic_2}/ ) {
+			$gen_license->('artistic_2');
 		}
 		when ( /$L{re}{artistic}(?:,? $L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/ ) {
 			$gen_license->('artistic', $1, $2);
@@ -774,8 +777,8 @@ sub parse_license
 
 	# EPL
 	given ($licensetext) {
-		when ( /This program and the accompanying materials are made available under the terms of $L{re}{epl}(?:[ ,-]+$L{re}{version}{-keep})?/ ) {
-			$gen_license->( 'epl', $1 );
+		when ( /$L{re}{epl}(?:[ ,-]+$L{re}{version}{-keep}(,? $L{re}{version_later_postfix})?)?/ ) {
+			$gen_license->( 'epl', $1, $2 );
 		}
 	}
 

@@ -1,4 +1,5 @@
 requires "Getopt::Std" => "0";
+requires "HTML::Entities" => "3.69";
 requires "HTML::Form" => "6.03";
 requires "HTTP::Cookies" => "6.01";
 requires "LWP::UserAgent" => "6.05";

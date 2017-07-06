@@ -1,5 +1,5 @@
 package Lab::Instrument::TDS2024B;
-$Lab::Instrument::TDS2024B::VERSION = '3.550';
+$Lab::Instrument::TDS2024B::VERSION = '3.552';
 use 5.006;
 use strict;
 use warnings;

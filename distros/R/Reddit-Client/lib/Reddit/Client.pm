@@ -1,6 +1,6 @@
 package Reddit::Client;
 
-our $VERSION = '1.084'; 
+our $VERSION = '1.086'; 
 $VERSION = eval $VERSION;
 
 use strict;
@@ -657,7 +657,8 @@ sub submit_link {
     my $subreddit = $param{subreddit} || '';
     my $title     = $param{title}     || croak 'Expected "title"';
     my $url       = $param{url}       || croak 'Expected "url"';
-	my $replies = exists $param{inbox_replies} ? $param{inbox_replies} : 1;
+    my $replies = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
+    my $repost = exists $param{repost} ? ($param{repost} ? "true" : "false") : "false";
 
     DEBUG('Submit link to %s: %s', $subreddit, $title, $url);
 
@@ -669,6 +670,7 @@ sub submit_link {
         sr       => $subreddit,
         kind     => SUBMIT_LINK,
 	sendreplies=>$replies,
+	resubmit => $repost,
     });
 
     return $result->{data}{name};
@@ -679,7 +681,8 @@ sub submit_text {
     my $subreddit = $param{subreddit} || '';
     my $title     = $param{title}     || croak 'Expected "title"';
     my $text      = $param{text}      || croak 'Expected "text"';
-	my $replies = exists $param{inbox_replies} ? $param{inbox_replies} : 1;
+    # true and false have to be the strings "true" or "false"
+    my $replies = exists $param{inbox_replies} ? ($param{inbox_replies} ? "true" : "false") : "true";
 
     DEBUG('Submit text to %s: %s', $subreddit, $title);
 

@@ -46,7 +46,10 @@ sub INIT_INSTANCE {
    });
 
    $self->{list}->signal_connect (cursor_changed => sub {
-      my $row = scalar +($_[0]->get_selection->get_selected_rows)[0]->get_indices;
+      my @rows = $_[0]->get_selection->get_selected_rows
+         or return;
+
+      my $row = scalar $rows[0]->get_indices;
 
       my $k = $_[0]{data}[$row][1];
       $k = $self->{cluster}{$k};
@@ -162,13 +165,39 @@ sub start {
 sub new_schnauzer {
    my ($self, $schnauzer) = @_;
 
+   my $namecluster;
+
    $schnauzer->signal_connect (popup => sub {
       my ($self, $menu, $cursor, $event) = @_;
       
       $menu->append (my $i_up = new Gtk2::MenuItem "Filename clustering...");
       $i_up->signal_connect (activate => sub {
-         Gtk2::CV::Plugin::NameCluster->new->start ($self);
+         $namecluster = Gtk2::CV::Plugin::NameCluster->new;
+         $namecluster->start ($self);
       });
+   });
+
+
+   $schnauzer->signal_connect (key_press_event => sub {
+      my ($self, $event) = @_;
+      my $key = $event->keyval;
+      my $state = $event->state;
+
+      if (
+         $state == ["control-mask"]
+         && ($key == $Gtk2::Gdk::Keysyms{Up} || $key == $Gtk2::Gdk::Keysyms{Down})
+      ) {
+         if ($namecluster) {
+            my ($path) = $namecluster->{list}->get_cursor;
+            $key == $Gtk2::Gdk::Keysyms{Up} ? $path->prev : $path->next;
+            $namecluster->{list}->set_cursor ($path);
+            return 1;
+         } else {
+            return 1;
+         }
+      }
+
+      0
    });
 }
 

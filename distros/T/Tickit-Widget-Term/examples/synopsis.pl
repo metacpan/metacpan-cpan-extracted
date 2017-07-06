@@ -5,8 +5,10 @@ use Tickit::Async;
 use Tickit::Widget::Term;
 use IO::Async::Loop;
 use Log::Any qw($log);
-use Log::Any::Adapter qw(Stderr);
+use Log::Any::Adapter qw(Stderr), log_level => 'debug';
 use Tickit::Widget::Frame;
+
+binmode STDERR, ':encoding(UTF-8)';
 
 my $loop = IO::Async::Loop->new;
 $loop->add(

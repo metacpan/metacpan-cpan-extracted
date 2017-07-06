@@ -1,0 +1,7 @@
+TYPEMAP
+        SearchPaths * T_SEARCH_PATHS
+
+
+INPUT
+T_SEARCH_PATHS
+        $var = ($type)sv2SearchPaths($arg)

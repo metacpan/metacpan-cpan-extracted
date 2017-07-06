@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::UNIX;
 
 #
-# $Id: UNIX.pm 1527 2017-01-18 21:42:48Z willem $
+# $Id: UNIX.pm 1573 2017-06-12 11:03:59Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1527 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1573 $)[1];
 
 
 =head1 NAME
@@ -18,33 +18,28 @@ use warnings;
 use base qw(Net::DNS::Resolver::Base);
 
 
-my $resolv_conf = "/etc/resolv.conf";
-my $dotfile	= '.resolv.conf';
+my @config_file = grep -f $_ && -r _, '/etc/resolv.conf';
 
-my @resolv_conf = grep -f $_ && -r _, $resolv_conf;
-
-my @config_path;
-push( @config_path, $ENV{HOME} ) if exists $ENV{HOME};
-push( @config_path, '.' );
-
-my @config_file = grep -f $_ && -o _, map "$_/$dotfile", @config_path;
+my $dotfile = '.resolv.conf';
+my @dotpath = grep defined, $ENV{HOME}, '.';
+my @dotfile = grep -f $_ && -o _, map "$_/$dotfile", @dotpath;
 
 
-sub _untaint {
-	map { m/^(.*)$/; $1 } grep defined, @_;
-}
+local $ENV{PATH} = '/bin:/usr/bin';
+my $uname = eval {`uname -n 2>/dev/null`} || '';
+chomp $uname;
+my ( $host, @domain ) = split /\./, $uname, 2;
+__PACKAGE__->domain(@domain);
 
 
 sub _init {
 	my $defaults = shift->_defaults;
 
-	map $defaults->_read_config_file($_), @resolv_conf;
-
-	foreach my $attr (qw(nameservers searchlist)) {
-		$defaults->$attr( _untaint $defaults->$attr() );
-	}
-
 	map $defaults->_read_config_file($_), @config_file;
+
+	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
+
+	map $defaults->_read_config_file($_), @dotfile;
 
 	$defaults->_read_env;
 }

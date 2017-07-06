@@ -1,3 +1,13 @@
+0.46    2017-07-01 (PERLANCAR)
+
+        - Bump prereq version Perinci::CmdLine::Base 1.72 -> 1.75.
+
+
+0.45_001 2017-06-19 (PERLANCAR)
+
+        - Replace Log::Any with Log::ger.
+
+
 0.45    2017-01-29 (PERLANCAR)
 
 	- Bump Perinci::CmdLine::{Lite,Base} version.

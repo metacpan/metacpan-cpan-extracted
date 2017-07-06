@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::RichtextCustomField;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =encoding utf8
 

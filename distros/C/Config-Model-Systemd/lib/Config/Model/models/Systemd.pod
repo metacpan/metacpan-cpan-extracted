@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::Systemd
 # ABSTRACT:  Configuration class Systemd
+
 =encoding utf8
 
 =head1 NAME
@@ -14,15 +15,15 @@ Configuration classes used by L<Config::Model>
 
 =head2 service
 
-I<< Optional. Type hash of node of class L<Systemd::Service|Config::Model::models::Systemd::Service> .  >> 
+I< Optional. Type hash of node of class L<Systemd::Service|Config::Model::models::Systemd::Service> .  > 
 
 =head2 socket
 
-I<< Optional. Type hash of node of class L<Systemd::Socket|Config::Model::models::Systemd::Socket> .  >> 
+I< Optional. Type hash of node of class L<Systemd::Socket|Config::Model::models::Systemd::Socket> .  > 
 
 =head2 timer
 
-I<< Optional. Type hash of node of class L<Systemd::Timer|Config::Model::models::Systemd::Timer> .  >> 
+I< Optional. Type hash of node of class L<Systemd::Timer|Config::Model::models::Systemd::Timer> .  > 
 
 =head1 SEE ALSO
 

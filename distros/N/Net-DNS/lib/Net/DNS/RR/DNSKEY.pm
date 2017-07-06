@@ -1,9 +1,9 @@
 package Net::DNS::RR::DNSKEY;
 
 #
-# $Id: DNSKEY.pm 1561 2017-04-19 13:08:13Z willem $
+# $Id: DNSKEY.pm 1567 2017-05-19 09:52:52Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1561 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
 
 
 use strict;
@@ -54,21 +54,13 @@ use constant BASE64 => defined eval 'require MIME::Base64';
 
 	my %algbyval = reverse @algbyname;
 
-	my $map = sub {
-		my $arg = shift;
-		unless ( $arg =~ /^\d/ ) {
-			$arg =~ s/[^A-Za-z0-9]//g;		# synthetic key
-			return uc $arg;
-		}
-		my @map = ( $arg, "$arg" => $arg );		# also accept number
-	};
-
-	my %algbyname = map &$map($_), @algbyname;
+	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @algbyname;
+	my %algbyname = @algrehash;    # work around broken cperl
 
 	sub _algbyname {
 		my $arg = shift;
 		my $key = uc $arg;				# synthetic key
-		$key =~ s/[^A-Z0-9]//g;				# strip non-alphanumerics
+		$key =~ s/[\W_]//g;				# strip non-alphanumerics
 		my $val = $algbyname{$key};
 		return $val if defined $val;
 		return $key =~ /^\d/ ? $arg : croak "unknown algorithm $arg";

@@ -9,7 +9,10 @@ local $| = 1;
 
 use Test::More tests => 1;
 
-use t::lib::Debugger;
+BEGIN {
+  require "./t/lib/Debugger.pm";
+  t::lib::Debugger->import;
+}
 
 if (rc_file) {
 	diag('');

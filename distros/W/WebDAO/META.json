@@ -4,7 +4,7 @@
       "Zahatski Aliaksandr zag@cpan.org"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Module::Build version 0.4222",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,7 @@
       },
       "WebDAO" : {
          "file" : "lib/WebDAO.pm",
-         "version" : "2.25"
+         "version" : "2.26"
       },
       "WebDAO::Base" : {
          "file" : "lib/WebDAO/Base.pm",
@@ -53,7 +53,7 @@
       },
       "WebDAO::CV" : {
          "file" : "lib/WebDAO/CV.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       },
       "WebDAO::CVfcgi" : {
          "file" : "lib/WebDAO/CVfcgi.pm",
@@ -141,7 +141,7 @@
       },
       "WebDAO::Sessionco" : {
          "file" : "lib/WebDAO/Sessionco.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "WebDAO::Test" : {
          "file" : "lib/WebDAO/Test.pm",
@@ -149,7 +149,7 @@
       },
       "WebDAO::Util" : {
          "file" : "lib/WebDAO/Util.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -166,5 +166,6 @@
       },
       "x_ProjectHome" : "https://github.com/zag/webdao"
    },
-   "version" : "2.25"
+   "version" : "2.26",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,7 +1,5 @@
 package Gtk2::CV::Plugin::RCluster;
 
-use strict;
-
 use common::sense;
 use File::Temp;
 

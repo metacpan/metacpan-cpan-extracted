@@ -1,46 +1,47 @@
 package Log::ger::Output::LogAny;
 
-our $DATE = '2017-06-21'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-06-26'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
 
-use Log::Any ();
-use Log::ger::Util;
+sub get_hooks {
+    my %conf = @_;
 
-my %Log_Any_Loggers;
+    return {
+        create_log_routine => [
+            __PACKAGE__, 50,
+            sub {
+                my %args = @_;
 
-sub PRIO_create_log_routine { 50 }
+                my $pkg;
+                if ($args{target} eq 'package') {
+                    $pkg = $args{target_arg};
+                } elsif ($args{target} eq 'object') {
+                    $pkg = ref $args{target_arg};
+                } else {
+                    return [];
+                }
 
-sub create_log_routine {
-    my ($self, %args) = @_;
+                # use init_args as a per-target stash
+                $args{init_args}{_la} ||= do {
+                    require Log::Any;
+                    Log::Any->get_logger(category => $pkg);
+                };
 
-    return unless $args{target} eq 'package';
-    my $pkg = $args{target_arg};
-
-    {
-        my $log = Log::Any->get_logger(category => $pkg);
-        $Log_Any_Loggers{$pkg} = $log;
-    }
-
-    my $meth = $args{str_level}; # closure :(
-
-    my $code = sub {
-        my $ctx = shift;
-        $Log_Any_Loggers{$pkg}->$meth(@_);
+                my $meth = $args{str_level};
+                my $logger = sub {
+                    my $ctx = shift;
+                    $args{init_args}{_la}->$meth(@_);
+                };
+                [$logger];
+            }],
     };
-    [$code];
-};
-
-sub import {
-    my $self = shift;
-
-    Log::ger::Util::add_plugin('create_log_routine', __PACKAGE__, 'replace');
 }
 
 1;
-# ABSTRACT: Send log to Log::Any
+# ABSTRACT: Send logs to Log::Any
 
 __END__
 
@@ -50,15 +51,15 @@ __END__
 
 =head1 NAME
 
-Log::ger::Output::LogAny - Send log to Log::Any
+Log::ger::Output::LogAny - Send logs to Log::Any
 
 =head1 VERSION
 
-version 0.002
+version 0.006
 
 =head1 SYNOPSIS
 
- use Log::ger::Output::LogAny;
+ use Log::ger::Output 'LogAny';
  use Log::ger;
 
  log_warn "blah ...";

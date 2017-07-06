@@ -15,6 +15,7 @@
 package Google::Ads::AdWords::Deserializer;
 
 use strict;
+use warnings;
 use utf8;
 use version;
 use Scalar::Util qw(blessed);
@@ -38,8 +39,9 @@ sub deserialize {
   my $client         = $self->get_client();
   utf8::is_utf8 $response_xml and utf8::encode $response_xml;
 
-  Google::Ads::AdWords::Logging::get_soap_logger->info(
-    "Incoming response:\n" . $response_xml);
+  my $request_message = sprintf("Outgoing request:\n%s",
+    $client->get_last_soap_request());
+  my $response_message = sprintf("Incoming response:\n%s", $response_xml);
   $client->set_last_soap_response($response_xml);
 
   my $response_header =
@@ -60,13 +62,13 @@ sub deserialize {
 
     my $auth_handler = $client->_get_auth_handler();
     $request_stats = Google::Ads::AdWords::RequestStats->new({
-        client_id     => $client->get_client_id(),
-        server        => $client->get_alternate_url(),
-        service_name  => $service_name,
-        method_name   => $method_name,
-        response_time => $response_time,
-        request_id    => $request_id,
-        operations    => $operations
+      client_id     => $client->get_client_id(),
+      server        => $client->get_alternate_url(),
+      service_name  => $service_name,
+      method_name   => $method_name,
+      response_time => $response_time,
+      request_id    => $request_id,
+      operations    => $operations
     });
   }
 
@@ -78,15 +80,24 @@ sub deserialize {
     $request_stats->set_is_fault($is_fault);
     if ($is_fault) {
       $request_stats->set_fault_message($response[0]->get_faultstring());
+      Google::Ads::AdWords::Logging::get_awapi_logger->logwarn($request_stats);
+    } else {
+      Google::Ads::AdWords::Logging::get_awapi_logger->info($request_stats);
     }
     $client->_push_new_request_stats($request_stats);
-    Google::Ads::AdWords::Logging::get_awapi_logger->info($request_stats);
   }
 
-  if ($is_fault && $self->get_client->get_die_on_faults) {
-    die(
-      sprintf("A fault was returned by the server:\n%s\n",
-        $response[0]->get_faultstring()));
+  if ($is_fault) {
+    Google::Ads::AdWords::Logging::get_soap_logger->info($request_message);
+    Google::Ads::AdWords::Logging::get_soap_logger->info($response_message);
+    if ($self->get_client->get_die_on_faults) {
+      die(
+        sprintf("A fault was returned by the server:\n%s\n",
+          $response[0]->get_faultstring()));
+    }
+  } else {
+    Google::Ads::AdWords::Logging::get_soap_logger->debug($request_message);
+    Google::Ads::AdWords::Logging::get_soap_logger->debug($response_message);
   }
 
   # Unwrapping the response if contains an rval no value for the user to see the
@@ -107,10 +118,10 @@ sub _deserialize {
   eval { $parser->parse_string($content) };
   if ($@) {
     return $self->generate_fault({
-        code    => 'SOAP-ENV:Server',
-        role    => 'urn:localhost',
-        message => "Error deserializing message: $@. \n" .
-          "Message was: \n$content"
+      code    => 'SOAP-ENV:Server',
+      role    => 'urn:localhost',
+      message => "Error deserializing message: $@. \n" .
+        "Message was: \n$content"
     });
   }
   return ($parser->get_data(), $parser->get_header());
@@ -132,6 +143,7 @@ sub __get_element_content {
 # Invoked by SOAP::WSDL when deserialize die()s.
 sub generate_fault {
   my ($self, $args) = @_;
+  Google::Ads::AdWords::Logging::get_soap_logger->info($args->{message});
   die($args->{message});
 }
 

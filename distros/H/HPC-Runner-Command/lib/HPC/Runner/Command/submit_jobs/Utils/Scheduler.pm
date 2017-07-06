@@ -1,5 +1,8 @@
 package HPC::Runner::Command::submit_jobs::Utils::Scheduler;
 
+use MooseX::App::Role;
+use namespace::autoclean;
+
 use File::Path qw(make_path);
 use File::Temp qw/ tempfile /;
 use IO::Select;
@@ -14,8 +17,6 @@ use Storable qw(dclone);
 use Text::ASCIITable;
 use Memoize;
 use List::MoreUtils qw(first_index);
-
-use MooseX::App::Role;
 
 use HPC::Runner::Command::Utils::Traits qw(ArrayRefOfStrs);
 
@@ -187,77 +188,6 @@ DEPRECATED - use --dry_run instead
 # q{Bool value whether or not to submit to slurm. If you are looking to debug your files, or this script you will want to set this to zero.},
 # );
 
-=head3 template_file
-
-actual template file
-
-One is generated here for you, but you can always supply your own with --template_file /path/to/template
-
-#TODO add back PBS support and add SGE support
-
-=cut
-
-has 'template_file' => (
-    is      => 'rw',
-    isa     => 'Str',
-    default => sub {
-        my $self = shift;
-
-        my ( $fh, $filename ) = tempfile();
-
-        my $tt = <<EOF;
-#!/bin/bash
-#
-#SBATCH --share
-#SBATCH --job-name=[% JOBNAME %]
-#SBATCH --output=[% OUT %]
-[% IF job.has_account %]
-#SBATCH --account=[% job.account %]
-[% END %]
-[% IF job.has_account %]
-#SBATCH --partition=[% job.partition %]
-[% END %]
-[% IF job.has_nodes_count %]
-#SBATCH --nodes=[% job.nodes_count %]
-[% END %]
-[% IF job.has_ntasks %]
-#SBATCH --ntasks=[% job.ntasks %]
-[% END %]
-[% IF job.has_cpus_per_task %]
-#SBATCH --cpus-per-task=[% job.cpus_per_task %]
-[% END %]
-[% IF job.has_ntasks_per_node %]
-#SBATCH --ntasks-per-node=[% job.ntasks_per_node %]
-[% END %]
-[% IF job.has_mem %]
-#SBATCH --mem=[% job.mem %]
-[% END %]
-[% IF job.has_walltime %]
-#SBATCH --time=[% job.walltime %]
-[% END %]
-[% IF ARRAY_STR %]
-#SBATCH --array=[% ARRAY_STR %]
-[% END %]
-[% IF AFTEROK %]
-#SBATCH --dependency=afterok:[% AFTEROK %]
-[% END %]
-
-[% IF MODULES %]
-module load [% MODULES %]
-[% END %]
-
-[% COMMAND %]
-
-EOF
-
-        print $fh $tt;
-        return $filename;
-    },
-    predicate => 'has_template_file',
-    clearer   => 'clear_template_file',
-    documentation =>
-      q{Path to Slurm template file if you do not wish to use the default}
-);
 
 =head3 serial
 
@@ -404,7 +334,7 @@ has 'template' => (
     is       => 'rw',
     required => 0,
     default  => sub {
-        return Template->new( ABSOLUTE => 1, PRE_CHOMP => 1, TRIM => 1 );
+        return Template->new( ABSOLUTE => 1, PRE_CHOMP => 1, TRIM => 1, EVAL_PERL => 1, );
     },
 );
 
@@ -834,6 +764,7 @@ sub process_batch {
     my $self = shift;
 
     my $ok;
+    #TODO Rework this so we only get the arrayids we need the first time around
     $ok = $self->join_scheduler_ids(':') if $self->has_scheduler_ids;
 
     my $count_by = $self->prepare_batch_indexes;
@@ -859,6 +790,7 @@ sub process_batch {
         $self->post_process_jobs;
 
         $self->post_process_batch_indexes($batch_indexes);
+        $self->inc_batch_counter;
     }
 }
 
@@ -871,6 +803,7 @@ Put the scheduler_id in each batch
 sub post_process_batch_indexes {
     my $self          = shift;
     my $batch_indexes = shift;
+
     my $scheduler_id = $self->jobs->{ $self->current_job }->scheduler_ids->[-1];
 
     for (

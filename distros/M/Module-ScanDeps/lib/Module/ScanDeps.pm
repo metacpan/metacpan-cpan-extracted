@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use vars qw( $VERSION @EXPORT @EXPORT_OK @ISA $CurrentPackage @IncludeLibs $ScanFileRE );
 
-$VERSION   = '1.23';
+$VERSION   = '1.24';
 @EXPORT    = qw( scan_deps scan_deps_runtime );
 @EXPORT_OK = qw( scan_line scan_chunk add_deps scan_deps_runtime path_to_inc_name );
 
@@ -281,6 +281,7 @@ my %Preload = (
                 _glob_in_inc('Date/Manip/Offset', 1));
     },
     'DateTime/Format/Builder/Parser.pm' => 'sub',
+    'DateTime/Format/Natural.pm'        => 'sub',
     'DateTime/Locale.pm'                => 'sub',
     'DateTime/TimeZone.pm'              => 'sub',
     'DBI.pm'                            => sub {
@@ -467,6 +468,7 @@ my %Preload = (
         _glob_in_inc('SOAP/Lite', 1),
     },
     'Socket/GetAddrInfo.pm'             => 'sub',
+    'Specio/PartialDump.pm'             => \&_unicore,
     'SQL/Parser.pm'                     => sub {
         _glob_in_inc('SQL/Dialects', 1);
     },

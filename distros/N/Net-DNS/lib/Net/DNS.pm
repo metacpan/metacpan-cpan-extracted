@@ -1,13 +1,13 @@
 package Net::DNS;
 
 #
-# $Id: DNS.pm 1566 2017-05-05 22:01:09Z willem $
+# $Id: DNS.pm 1581 2017-06-26 11:46:03Z willem $
 #
 require 5.006;
 our $VERSION;
-$VERSION = '1.10';
+$VERSION = '1.11';
 $VERSION = eval $VERSION;
-our $SVNVERSION = (qw$LastChangedRevision: 1566 $)[1];
+our $SVNVERSION = (qw$LastChangedRevision: 1581 $)[1];
 
 
 =head1 NAME
@@ -178,7 +178,7 @@ sub rr_add {
 
 sub rr_del {
 	my ( $domain, @etc ) = map split, @_;
-	my $rr = new Net::DNS::RR( scalar(@etc) ? @_ : ( name => $domain ) );
+	my $rr = new Net::DNS::RR( scalar(@etc) ? @_ : ( name => $domain, type => 'ANY' ) );
 	$rr->class( $rr->rdata ? 'NONE' : 'ANY' );
 	$rr->ttl(0);
 	return $rr;
@@ -276,7 +276,7 @@ Returns the version of Net::DNS.
 
     my ($ptr) = rr("192.0.2.1");
 
-The rr() method provides simple RR lookup for scenarios where
+The C<rr()> method provides simple RR lookup for scenarios where
 the full flexibility of Net::DNS is not required.
 
 Returns a list of L<Net::DNS::RR> objects for the specified name
@@ -431,7 +431,7 @@ elapsed since the previous update is less than one second.
 
     $successor = $soa->serial( YYYYMMDDxx );
 
-The 32 bit value returned by the auxiliary YYYYMMDDxx() function
+The 32 bit value returned by the auxiliary C<YYYYMMDDxx()> function
 will be used as the base for the date-coded zone serial number.
 Serial number increments must be limited to 100 per day for the
 date information to remain useful.
@@ -440,18 +440,18 @@ date information to remain useful.
 
 =head1 Sorting of RR arrays
 
-rrsort() provides functionality to help you sort RR arrays. In most cases
-rrsort() will give you the answer that you want, but you can specify your
+C<rrsort()> provides functionality to help you sort RR arrays. In most cases
+this will give you the answer that you want, but you can specify your
 own sorting method by using the C<< Net::DNS::RR::FOO->set_rrsort_func() >>
 class method. See L<Net::DNS::RR> for details.
 
-=head2 rrsort()
+=head2 rrsort
 
     use Net::DNS;
 
     my @sorted = rrsort( $rrtype, $attribute, @rr_array );
 
-rrsort() selects all RRs from the input array that are of the type defined
+C<rrsort()> selects all RRs from the input array that are of the type defined
 by the first argument. Those RRs are sorted based on the attribute that is
 specified as second argument.
 
@@ -470,13 +470,13 @@ value is performed.
 
     my @portsorted = rrsort( "SRV", "port", @rr_array );
 
-If the attribute is not defined then either the default_sort() function or
+If the attribute is not defined then either the C<default_sort()> function or
 "canonical sorting" (as defined by DNSSEC) will be used.
 
-rrsort() returns a sorted array containing only elements of the specified
+C<rrsort()> returns a sorted array containing only elements of the specified
 RR type.  Any other RR types are silently discarded.
 
-rrsort() returns an empty list when arguments are incorrect.
+C<rrsort()> returns an empty list when arguments are incorrect.
 
 
 =head1 EXAMPLES
@@ -492,11 +492,11 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
 
     use Net::DNS;
     my $res   = Net::DNS::Resolver->new;
-    my $reply = $res->search("host.example.com");
+    my $reply = $res->search("www.example.com", "A");
 
     if ($reply) {
 	foreach my $rr ($reply->answer) {
-	    print $rr->address, "\n" if $rr->type eq "A";
+	    print $rr->address, "\n" if $rr->can("address");
 	}
     } else {
 	warn "query failed: ", $res->errorstring, "\n";
@@ -510,7 +510,7 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
     my $reply = $res->query("example.com", "NS");
 
     if ($reply) {
-	foreach $rr (grep { $_->type eq 'NS' } $reply->answer) {
+	foreach $rr (grep { $_->type eq "NS" } $reply->answer) {
 	    print $rr->nsdname, "\n";
 	}
     } else {
@@ -527,7 +527,7 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
 
     if (@mx) {
 	foreach $rr (@mx) {
-	    print $rr->preference, " ", $rr->exchange, "\n";
+	    print $rr->preference, "\t", $rr->exchange, "\n";
 	}
     } else {
 	warn "Can not find MX records for $name: ", $res->errorstring, "\n";
@@ -541,9 +541,11 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
     my $reply = $res->query("example.com", "SOA");
 
     if ($reply) {
-	($reply->answer)[0]->print;
+	foreach my $rr ($reply->answer) {
+	    $rr->print;
+	}
     } else {
-	print "query failed: ", $res->errorstring, "\n";
+	warn "query failed: ", $res->errorstring, "\n";
     }
 
 
@@ -551,6 +553,7 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
 
     use Net::DNS;
     my $res  = Net::DNS::Resolver->new;
+    $res->tcp_timeout(20);
     $res->nameservers("ns.example.com");
 
     my @zone = $res->axfr("example.com");
@@ -559,11 +562,15 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
 	$rr->print;
     }
 
+    warn $res->errorstring if $res->errorstring;
+
 
 =head2 Perform a background query and print the reply.
 
     use Net::DNS;
     my $res    = Net::DNS::Resolver->new;
+    $res->udp_timeout(10);
+    $res->tcp_timeout(20);
     my $socket = $res->bgsend("host.example.com");
 
     while ( $res->bgbusy($socket) ) {
@@ -572,7 +579,11 @@ See L<Net::DNS::Update> for an example of performing dynamic updates.
     }
 
     my $packet = $res->bgread($socket);
-    $packet->print;
+    if ($packet) {
+	$packet->print;
+    } else {
+	warn "query failed: ", $res->errorstring, "\n";
+    }
 
 
 =head1 BUGS

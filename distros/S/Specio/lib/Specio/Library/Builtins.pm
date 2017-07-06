@@ -3,7 +3,7 @@ package Specio::Library::Builtins;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use parent 'Specio::Exporter';
 
@@ -47,7 +47,7 @@ declare(
     'Bool',
     parent => t('Item'),
     inline => sub {
-        return sprintf( <<'EOF', ( $_[1] ) x 8 );
+        return sprintf( <<'EOF', ( $_[1] ) x 7 );
 (
     (
         !ref( %s )
@@ -61,7 +61,6 @@ declare(
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, 'bool' )
     )
 )
@@ -89,7 +88,7 @@ declare(
     'Str',
     parent => t('Value'),
     inline => sub {
-        return sprintf( <<'EOF', ( $_[1] ) x 7 );
+        return sprintf( <<'EOF', ( $_[1] ) x 6 );
 (
     (
         defined( %s )
@@ -102,7 +101,6 @@ declare(
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, q{""} )
     )
 )
@@ -115,7 +113,7 @@ declare(
     'Num',
     parent => t('Str'),
     inline => sub {
-        return sprintf( <<'EOF', ( $_[1] ) x 6 );
+        return sprintf( <<'EOF', ( $_[1] ) x 5 );
 (
     (
         defined( %s )
@@ -133,7 +131,6 @@ declare(
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, '0+' )
     )
 )
@@ -145,7 +142,7 @@ declare(
     'Int',
     parent => t('Num'),
     inline => sub {
-        return sprintf( <<'EOF', ( $_[1] ) x 7 )
+        return sprintf( <<'EOF', ( $_[1] ) x 6 )
 (
     (
         defined( %s )
@@ -157,7 +154,6 @@ declare(
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, '0+' )
         && do { ( my $val2 = %s + 0 ) =~ /\A-?[0-9]+(?:[Ee]\+?[0-9]+)?\z/ }
     )
@@ -176,13 +172,12 @@ EOF
         'CodeRef',
         parent => t('Ref'),
         inline => sub {
-            return sprintf( <<"EOF", ( $_[1] ) x 4 );
+            return sprintf( <<"EOF", ( $_[1] ) x 3 );
 (
     $ref_check
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, '&{}' )
     )
 )
@@ -211,13 +206,12 @@ EOF
         'RegexpRef',
         parent => t('Ref'),
         inline => sub {
-            return sprintf( <<"EOF", ( $_[1] ) x 4 );
+            return sprintf( <<"EOF", ( $_[1] ) x 3 );
 (
     $ref_check
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, 'qr' )
     )
 )
@@ -236,13 +230,12 @@ EOF
         'GlobRef',
         parent => t('Ref'),
         inline => sub {
-            return sprintf( <<"EOF", ( $_[1] ) x 4 );
+            return sprintf( <<"EOF", ( $_[1] ) x 3 );
 (
     $ref_check
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, '*{}' )
     )
 )
@@ -263,7 +256,7 @@ EOF
         'FileHandle',
         parent => t('Ref'),
         inline => sub {
-            return sprintf( <<"EOF", ( $_[1] ) x 7 );
+            return sprintf( <<"EOF", ( $_[1] ) x 6 );
 (
     (
         $ref_check
@@ -277,8 +270,7 @@ EOF
             %s->isa('IO::Handle')
             ||
             (
-                overload::Overloaded( %s )
-                && defined overload::Method( %s, '*{}' )
+                defined overload::Method( %s, '*{}' )
                 && Scalar::Util::openhandle( *{ %s } )
             )
         )
@@ -325,7 +317,7 @@ EOF
         : q{ref( %s ) eq 'SCALAR' || ref( %s ) eq 'REF'};
 
     my $base_scalarref_check = sub {
-        return sprintf( <<"EOF", ( $_[0] ) x 5 );
+        return sprintf( <<"EOF", ( $_[0] ) x 4 );
 (
     (
         $ref_check
@@ -333,7 +325,6 @@ EOF
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, '\${}' )
     )
 )
@@ -366,13 +357,12 @@ EOF
         : q{ref( %s ) eq 'ARRAY'};
 
     my $base_arrayref_check = sub {
-        return sprintf( <<"EOF", ( $_[0] ) x 4 );
+        return sprintf( <<"EOF", ( $_[0] ) x 3 );
 (
     $ref_check
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, '\@{}' )
     )
 )
@@ -406,13 +396,12 @@ EOF
         : q{ref( %s ) eq 'HASH'};
 
     my $base_hashref_check = sub {
-        return sprintf( <<"EOF", ( $_[0] ) x 4 );
+        return sprintf( <<"EOF", ( $_[0] ) x 3 );
 (
     $ref_check
     ||
     (
         Scalar::Util::blessed( %s )
-        && overload::Overloaded( %s )
         && defined overload::Method( %s, '%%{}' )
     )
 )
@@ -471,7 +460,7 @@ Specio::Library::Builtins - Implements type constraint objects for Perl's built-
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 DESCRIPTION
 

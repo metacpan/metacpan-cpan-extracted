@@ -2,16 +2,16 @@
 
 package Git::Hooks::GerritChangeId;
 # ABSTRACT: Git::Hooks plugin to insert a Change-Id in a commit message
-$Git::Hooks::GerritChangeId::VERSION = '1.16.0';
+$Git::Hooks::GerritChangeId::VERSION = '2.0.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Git::Hooks qw/:DEFAULT :utils/;
-use Git::More::Message;
+use Git::Hooks;
+use Git::Message;
 use Path::Tiny;
 use Carp;
-use Error qw(:try);
+use Try::Tiny;
 
 my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -31,17 +31,16 @@ sub gen_change_id {
         [ author    => [qw/var GIT_AUTHOR_IDENT/] ],
         [ committer => [qw/var GIT_COMMITTER_IDENT/] ],
     ) {
+        # It's OK if we can't find info.
         try {
-            $fh->print($info->[0], ' ', scalar($git->command($info->[1], {STDERR => 0})));
-        } otherwise {
-            # Can't find info. That's ok.
+            $fh->print($info->[0], ' ', scalar($git->run(@{$info->[1]})));
         };
     }
 
     $fh->print("\n", $msg);
     $fh->close();
 
-    return 'I' . $git->hash_object(commit => $filename);
+    return 'I' . $git->run(qw/hash-object -t blob/, $filename);
 }
 
 sub insert_change_id {
@@ -50,7 +49,7 @@ sub insert_change_id {
     # Does Change-Id: already exist? if so, exit (no change).
     return if $msg =~ /^Change-Id:/im;
 
-    my $cmsg = Git::More::Message->new($msg);
+    my $cmsg = Git::Message->new($msg);
 
     # Don't mess with the message if it's empty.
     if (   (! defined $cmsg->title || $cmsg->title !~ /\S/)
@@ -101,15 +100,15 @@ Git::Hooks::GerritChangeId - Git::Hooks plugin to insert a Change-Id in a commit
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =head1 DESCRIPTION
 
-This Git::Hooks plugin hooks itself to the C<commit-msg> hook. It is a
+This L<Git::Hooks> plugin hooks itself to the C<commit-msg> hook. It is a
 reimplementation of Gerrit's official commit-msg hook for inserting
 change-ids in git commit messages.  It's does not produce the same
-C<Change-Id> for the same message, but this is not really necessary,
-since it keeps existing Change-Id footers unmodified.
+C<Change-Id> for the same message, but this is not really necessary, since
+it keeps existing Change-Id footers unmodified.
 
 (What follows is a partial copy of that document's DESCRIPTION
 section.)
@@ -155,36 +154,30 @@ configuration option:
 
     git config --add githooks.plugin GerritChangeId
 
-=for Pod::Coverage gen_change_id insert_change_id
+=for Pod::Coverage gen_change_id insert_change_id rewrite_message
 
 =head1 NAME
 
-Git::Hooks::GerritChangeId - Git::Hooks plugin to insert a Change-Id in a commit message.
+Git::Hooks::GerritChangeId - Git::Hooks plugin to insert Change-Ids in
+commit messages
 
 =head1 CONFIGURATION
 
 There's no configuration needed or provided.
 
-=head1 EXPORTS
-
-This module exports one routine that can be used directly without
-using all of Git::Hooks infrastructure.
-
-=head2 rewrite_message GIT, MSGFILE
-
-This is the routine used to implement the C<commit-msg> hook. It needs
-a C<Git::More> object and the name of a file containing the commit
-message.
-
 =head1 REFERENCES
 
-L<Gerrit's Home Page|http://gerrit.googlecode.com/>.
+=over
 
-L<Gerrit's official commit-msg
-hook|https://gerrit.googlesource.com/gerrit/+/master/gerrit-server/src/main/resources/com/google/gerrit/server/tools/root/hooks/commit-msg>.
+=item * L<Gerrit's Home Page|http://gerrit.googlecode.com/>
 
-L<Gerrit's official hook
-documentation|https://gerrit.googlesource.com/gerrit/+/master/Documentation/cmd-hook-commit-msg.txt>.
+=item * L<Gerrit's official commit-msg
+hook|https://gerrit.googlesource.com/gerrit/+/master/gerrit-server/src/main/resources/com/google/gerrit/server/tools/root/hooks/commit-msg>
+
+=item * L<Gerrit's official hook
+documentation|https://gerrit.googlesource.com/gerrit/+/master/Documentation/cmd-hook-commit-msg.txt>
+
+=back
 
 =head1 AUTHOR
 

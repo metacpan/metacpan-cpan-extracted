@@ -4,7 +4,7 @@
 # Pod stripped from pm file by OODoc 2.02.
 package XML::Compile::Translate::Reader;
 use vars '$VERSION';
-$VERSION = '1.57';
+$VERSION = '1.58';
 
 use base 'XML::Compile::Translate';
 
@@ -830,7 +830,10 @@ sub makeFacets
 
     sub {
         my $v = shift;
-        $v = $_->($v) for @$early;
+        if(@$early)
+		{   return if !defined $v;
+            $v = $_->($v) for @$early;
+        }
         $v = $st->($v);
 		defined $v or return undef;
         $v = $_->($v) for @$late;

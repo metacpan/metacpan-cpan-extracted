@@ -1,12 +1,12 @@
 package Complete::Util;
 
-our $DATE = '2016-12-10'; # DATE
-our $VERSION = '0.58'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.59'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Complete::Common qw(:all);
 
@@ -16,6 +16,7 @@ our @EXPORT_OK = qw(
                        arrayify_answer
                        combine_answers
                        modify_answer
+                       ununiquify_answer
                        complete_array_elem
                        complete_hash_key
                        complete_comma_sep
@@ -30,9 +31,9 @@ $SPEC{':package'} = {
     summary => 'General completion routine',
     description => <<'_',
 
-This package provides some generic completion routine that follows the
-<pm:Complete> convention (if you are looking for bash/shell tab completion
-routine, take a look at the See Also section). The main routine is
+This package provides some generic completion routines that follow the
+<pm:Complete> convention. (If you are looking for bash/shell tab completion
+routines, take a look at the See Also section.) The main routine is
 `complete_array_elem` which tries to complete a word using choices from elements
 of supplied array. For example:
 
@@ -228,7 +229,7 @@ sub complete_array_elem {
     my $char_mode   = $Complete::Common::OPT_CHAR_MODE;
     my $fuzzy       = $Complete::Common::OPT_FUZZY;
 
-    $log->tracef("[computil] entering complete_array_elem(), word=<%s>", $word)
+    log_trace("[computil] entering complete_array_elem(), word=<%s>", $word)
         if $COMPLETE_UTIL_TRACE;
 
     my $res;
@@ -273,7 +274,7 @@ sub complete_array_elem {
     # normal string prefix matching. we also fill @array & @arrayn here (which
     # will be used again in word-mode, fuzzy, and char-mode matching) so we
     # don't have to calculate again.
-    $log->tracef("[computil] Trying normal string-prefix matching ...") if $COMPLETE_UTIL_TRACE;
+    log_trace("[computil] Trying normal string-prefix matching ...") if $COMPLETE_UTIL_TRACE;
     for my $el (@$array0) {
         my $eln = $ci ? uc($el) : $el; $eln =~ s/_/-/g if $map_case;
         next if $excluden && $excluden->{$eln};
@@ -290,7 +291,7 @@ sub complete_array_elem {
             }
         }
     }
-    $log->tracef("[computil] Result from normal string-prefix matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
+    log_trace("[computil] Result from normal string-prefix matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
 
     # word-mode matching
     {
@@ -304,7 +305,7 @@ sub complete_array_elem {
             $re .= quotemeta($split_wordn[$i]).'\w*';
         }
         $re = qr/$re/;
-        $log->tracef("[computil] Trying word-mode matching (re=%s) ...", $re) if $COMPLETE_UTIL_TRACE;
+        log_trace("[computil] Trying word-mode matching (re=%s) ...", $re) if $COMPLETE_UTIL_TRACE;
 
         for my $i (0..$#array) {
             my $match;
@@ -326,23 +327,23 @@ sub complete_array_elem {
             next unless $match;
             push @words, $array[$i];
         }
-        $log->tracef("[computil] Result from word-mode matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
+        log_trace("[computil] Result from word-mode matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
     }
 
     # char-mode matching
     if ($char_mode && !@words && length($wordn) && length($wordn) <= 7) {
         my $re = join(".*", map {quotemeta} split(//, $wordn));
         $re = qr/$re/;
-        $log->tracef("[computil] Trying char-mode matching (re=%s) ...", $re) if $COMPLETE_UTIL_TRACE;
+        log_trace("[computil] Trying char-mode matching (re=%s) ...", $re) if $COMPLETE_UTIL_TRACE;
         for my $i (0..$#array) {
             push @words, $array[$i] if $arrayn[$i] =~ $re;
         }
-        $log->tracef("[computil] Result from char-mode matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
+        log_trace("[computil] Result from char-mode matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
     }
 
     # fuzzy matching
     if ($fuzzy && !@words) {
-        $log->tracef("[computil] Trying fuzzy matching ...") if $COMPLETE_UTIL_TRACE;
+        log_trace("[computil] Trying fuzzy matching ...") if $COMPLETE_UTIL_TRACE;
         $code_editdist //= do {
             my $env = $ENV{COMPLETE_UTIL_LEVENSHTEIN} // '';
             if ($env eq 'xs') {
@@ -403,7 +404,7 @@ sub complete_array_elem {
                 next ELEM;
             }
         }
-        $log->tracef("[computil] Result from fuzzy matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
+        log_trace("[computil] Result from fuzzy matching: %s", \@words) if @words && $COMPLETE_UTIL_TRACE;
     }
 
     # replace back the words from replace_map
@@ -423,7 +424,7 @@ sub complete_array_elem {
     $res =$ci ? [sort {lc($a) cmp lc($b)} @words] : [sort @words];
 
   RETURN_RES:
-    $log->tracef("[computil] leaving complete_array_elem(), res=%s", $res)
+    log_trace("[computil] leaving complete_array_elem(), res=%s", $res)
         if $COMPLETE_UTIL_TRACE;
     $res;
 }
@@ -724,6 +725,39 @@ sub modify_answer {
     undef;
 }
 
+$SPEC{ununiquify_answer} = {
+    v => 1.1,
+    summary => 'If answer contains only one item, make it two',
+    description => <<'_',
+
+For example, if answer is `["a"]`, then will make answer become `["a","a "]`.
+This will prevent shell from automatically adding space.
+
+_
+    args => {
+        answer => {
+            schema => ['any*', of=>['hash*','array*']], # XXX answer_t
+            req => 1,
+            pos => 0,
+        },
+    },
+    result_naked => 1,
+    result => {
+        schema => 'undef',
+    },
+};
+sub ununiquify_answer {
+    my %args = @_;
+
+    my $answer = $args{answer};
+    my $words = ref($answer) eq 'HASH' ? $answer->{words} : $answer;
+
+    if (@$words == 1) {
+        push @$words, "$words->[0] ";
+    }
+    undef;
+}
+
 1;
 # ABSTRACT: General completion routine
 
@@ -739,14 +773,14 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.58 of Complete::Util (from Perl distribution Complete-Util), released on 2016-12-10.
+This document describes version 0.59 of Complete::Util (from Perl distribution Complete-Util), released on 2017-07-03.
 
 =head1 DESCRIPTION
 
 
-This package provides some generic completion routine that follows the
-L<Complete> convention (if you are looking for bash/shell tab completion
-routine, take a look at the See Also section). The main routine is
+This package provides some generic completion routines that follow the
+L<Complete> convention. (If you are looking for bash/shell tab completion
+routines, take a look at the See Also section.) The main routine is
 C<complete_array_elem> which tries to complete a word using choices from elements
 of supplied array. For example:
 
@@ -763,7 +797,11 @@ are usually used by the other more specific or higher-level completion modules.
 =head1 FUNCTIONS
 
 
-=head2 arrayify_answer($arg) -> array
+=head2 arrayify_answer
+
+Usage:
+
+ arrayify_answer($arg) -> array
 
 Make sure we return completion answer in array form.
 
@@ -783,7 +821,11 @@ Arguments ('*' denotes required arguments):
 Return value:  (array)
 
 
-=head2 combine_answers($answers, ...) -> hash
+=head2 combine_answers
+
+Usage:
+
+ combine_answers($answers, ...) -> hash
 
 Given two or more answers, combine them into one.
 
@@ -818,7 +860,11 @@ combined, order preserved and duplicates removed. The other keys from each
 answer will be merged.
 
 
-=head2 complete_array_elem(%args) -> array
+=head2 complete_array_elem
+
+Usage:
+
+ complete_array_elem(%args) -> array
 
 Complete from array.
 
@@ -861,7 +907,11 @@ Word to complete.
 Return value:  (array)
 
 
-=head2 complete_comma_sep(%args) -> array
+=head2 complete_comma_sep
+
+Usage:
+
+ complete_comma_sep(%args) -> array
 
 Complete a comma-separated list string.
 
@@ -951,7 +1001,11 @@ Word to complete.
 Return value:  (array)
 
 
-=head2 complete_hash_key(%args) -> array
+=head2 complete_hash_key
+
+Usage:
+
+ complete_hash_key(%args) -> array
 
 Complete from hash keys.
 
@@ -972,7 +1026,11 @@ Word to complete.
 Return value:  (array)
 
 
-=head2 hashify_answer($arg, $meta) -> hash
+=head2 hashify_answer
+
+Usage:
+
+ hashify_answer($arg, $meta) -> hash
 
 Make sure we return completion answer in hash form.
 
@@ -999,7 +1057,11 @@ Metadata (extra keys) for the hash.
 Return value:  (hash)
 
 
-=head2 modify_answer(%args) -> undef
+=head2 modify_answer
+
+Usage:
+
+ modify_answer(%args) -> undef
 
 Modify answer (add prefix/suffix, etc).
 
@@ -1014,6 +1076,30 @@ Arguments ('*' denotes required arguments):
 =item * B<prefix> => I<str>
 
 =item * B<suffix> => I<str>
+
+=back
+
+Return value:  (undef)
+
+
+=head2 ununiquify_answer
+
+Usage:
+
+ ununiquify_answer(%args) -> undef
+
+If answer contains only one item, make it two.
+
+For example, if answer is C<["a"]>, then will make answer become C<["a","a "]>.
+This will prevent shell from automatically adding space.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<answer>* => I<hash|array>
 
 =back
 
@@ -1098,7 +1184,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -158,6 +158,7 @@ t/persister_spops.t
 t/persister_uuid.t
 t/release-cpan-changes.t
 t/release-kwalitee.t
+t/release-meta-json.t
 t/state.t
 t/state_perl.t
 t/validator.t

@@ -3,7 +3,7 @@
 # Crypt::HashCash::Stash - Coin Stash for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash/Stash.pm v1.124 Mon Jun 19 15:51:59 PDT 2017 $
+# $Id: lib/Crypt/HashCash/Stash.pm v1.126 Sat Jun 24 02:15:18 PDT 2017 $
 
 package Crypt::HashCash::Stash;
 
@@ -14,7 +14,7 @@ use Crypt::HashCash::Coin;
 use Crypt::HashCash::Client;
 use vars qw( $VERSION $AUTOLOAD );
 
-our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.126 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -62,23 +62,6 @@ sub new {
     }
   }
   bless { _DB => $db }, $class;
-}
-
-sub commit {            # Save stash to DB
-  my $self = shift;
-  $self->db->do("DELETE from coins;");
-  for (grep { !/^_/ } keys %$self) {
-    if (defined $self->{$_}->{V}) {
-      for my $coin (@{$self->{$_}->{V}}) {
-	$self->db->do("INSERT INTO coins values ('V', '" . $coin->as_string . "');");
-      }
-    }
-    if (defined $self->{$_}->{U}) {
-      for my $coin (@{$self->{$_}->{U}}) {
-	$self->db->do("INSERT INTO coins values ('U', '" . $coin->as_string . "');");
-      }
-    }
-  }
 }
 
 sub load {              # Load stash from DB
@@ -251,8 +234,8 @@ Crypt::HashCash::Stash - Coin Stash for HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.124 $
- $Date: Mon Jun 19 15:51:59 PDT 2017 $
+ $Revision: 1.126 $
+ $Date: Sat Jun 24 02:15:18 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -270,9 +253,7 @@ stash.
 
 =head2 new
 
-Creates and returns a new Crypt::HashCash::Vault::Bitcoin object.
-
-=head2 commit
+Creates and returns a new Crypt::HashCash::Stash object.
 
 =head2 load
 
@@ -291,6 +272,22 @@ Creates and returns a new Crypt::HashCash::Vault::Bitcoin object.
 =head2 savedbuys
 
 =head2 finishbuy
+
+=head1 SEE ALSO
+
+=head2 L<http://www.hashcash.com>
+
+=head2 L<Crypt::HashCash>
+
+=head2 L<Crypt::HashCash::Mint>
+
+=head2 L<Crypt::HashCash::Client>
+
+=head2 L<Crypt::HashCash::Coin>
+
+=head2 L<Crypt::HashCash::Vault::Bitcoin>
+
+=head2 L<Business::HashCash>
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-our $VERSION = '0.001';
+our $VERSION = '0.004';
 $VERSION = eval $VERSION;
 
 1;
@@ -36,12 +36,6 @@ In your C<Makefile.PL>:
       ...
     );
 
-=head1 NOTICE
-
-This will not yet work on Windows. However, it should function properly on
-linux and unix platforms. We will be working hard to make things behave on
-Windows as soon as possible.
-
 =head1 DESCRIPTION
 
 This package can be used by other L<CPAN|https://metacpan.org> modules that
@@ -50,6 +44,10 @@ require L<libuv|http://libuv.org>.
 =head1 AUTHOR
 
 Chase Whitener <F<capoeirab@cpan.org>>
+
+=head1 CONTRIBUTORS
+
+Graham Ollis <F<plicease@cpan.org>>
 
 =head1 COPYRIGHT & LICENSE
 

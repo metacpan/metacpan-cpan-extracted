@@ -28,8 +28,7 @@
       "configure" : {
          "requires" : {
             "DBI" : "1.609",
-            "Data::Dumper" : "0",
-            "Devel::CheckLib" : "0"
+            "Data::Dumper" : "0"
          }
       },
       "runtime" : {
@@ -58,7 +57,7 @@
       "x_IRC" : "irc://irc.perl.org/#dbi",
       "x_MailingList" : "mailto:dbi-dev@perl.org"
    },
-   "version" : "4.042",
+   "version" : "4.043",
    "x_contributors" : [
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Alexey Molchanov <alexey.molchanov@portaone.com>",
@@ -74,12 +73,11 @@
       "Daisuke Murase <typester@cpan.org>",
       "Damyan Ivanov <dmn@debian.org>",
       "Daniël van Eeden <daniel.vaneeden@booking.com>",
-      "Dave Lambley <davel@isosceles.(none)>",
       "David Farrell <davidnmfarrell@gmail.com>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",
       "Giovanni Bechis <giovanni@bigio.snb.it>",
       "Graham Ollis <plicease@cpan.org>",
-      "H.Merijn Brand - Tux <h.m.brand@xs4all.nl>",
+      "H.Merijn Brand <h.m.brand@xs4all.nl>",
       "Hanno <hanno@gentoo.org>",
       "James McCoy <jamessan@jamessan.com>",
       "Jim Winstead <jimw@trainedmonkey.com>",

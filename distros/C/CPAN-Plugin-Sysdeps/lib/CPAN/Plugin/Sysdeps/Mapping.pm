@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 # shortcuts
 #  os and distros
@@ -106,7 +106,8 @@ sub mapping {
        [linuxdistrocodename => ['squeeze','wheezy'],
 	[package => ['libtool', 'libncurses5-dev']]],
        [package => ['libtool-bin', 'libncurses5-dev']]],
-      # XXX what about freebsd?
+      [like_fedora,
+       [package => ['libtool', 'ncurses-devel']]],
      ],
 
      [cpanmod => 'Alien::ProtoBuf',
@@ -399,6 +400,8 @@ sub mapping {
 
      [cpanmod => 'Cairo::GObject',
       [like_fedora,
+       [linuxdistroversion => qr{^6\.},
+	[package => []]],
        [package => 'cairo-gobject-devel']],
      ],
 
@@ -425,6 +428,13 @@ sub mapping {
        [package => 'cdb']],
       [like_debian,
        [package => 'freecdb']]],
+
+     [cpanmod => 'Ceph::Rados',
+      #[os_freebsd,
+      # [package => 'ceph-devel']], # XXX Doesnt build for FreeBSD 10.x
+      [like_debian,
+       [package => 'librados-dev']],
+     ],
 
      [cpanmod => 'Chipcard::PCSC',
       # XXX what about freebsd?
@@ -665,8 +675,12 @@ sub mapping {
       [os_freebsd,
        [package => 'mysql-connector-c | mysql57-client | mysql56-client | mysql55-client | mariadb101-client | mariadb100-client | mariadb55-client | percona56-client | percona55-client']],
       [like_debian,
+       [linuxdistrocodename => 'stretch',
+	[package => 'default-libmysqlclient-dev']],
        [package => 'libmysqlclient-dev']],
       [like_fedora,
+       [linuxdistroversion => qr{^6\.},
+	[package => 'mysql-devel']],
        [package => 'mariadb-devel']],
       [os_darwin,
        [package => 'mysql-connector-c | mysql']],
@@ -1005,6 +1019,8 @@ sub mapping {
 
      [cpanmod => 'Glib',
       [like_fedora,
+       [linuxdistroversion => qr{^6\.},
+	[package => []]],
        [package => 'gobject-introspection-devel']],
       [os_darwin,
        [package => 'glib']],
@@ -1060,11 +1076,14 @@ sub mapping {
        [package => 'libgnome2-dev']], # does not work, module does not look into /usr/include/libgnome-2.0/
      ],
 
-     [cpanmod => 'GnuPG::Interface',
+     [cpanmod => ['GnuPG', 'GnuPG::Interface'],
       [os_freebsd,
        [package => 'gnupg1'] #  XXX what about gnupg (version 2)?
       ],
-      # XXX what about debian?
+      [like_debian,
+       [package => 'gnupg']],
+      [like_fedora,
+       [package => 'gnupg2']],
      ],
 
      [cpanmod => 'Goo::Canvas',
@@ -1073,7 +1092,20 @@ sub mapping {
       [like_debian,
        [package => 'libgoocanvas-dev']],
       [like_fedora,
-       [package => 'goocanvas-devel']],
+       [package => 'goocanvas2']],
+     ],
+
+     [cpanmod => 'GooCanvas2',
+      [os_freebsd,
+       [package => 'goocanvas2']],
+      [like_debian,
+       [linuxdistrocodename => [qw(squeeze wheezy jessie)], # not available before xenial/stretch
+	[package => []]],
+       [package => 'gir1.2-goocanvas-2.0']],
+      [like_fedora,
+       [linuxdistroversion => qr{^6\.},
+	[package => []]],
+       [package => 'goocanvas2-devel']],
      ],
 
      [cpanmod => 'Google::ProtocolBuffers::Dynamic',
@@ -1189,6 +1221,8 @@ sub mapping {
       [like_debian,
        [package => 'libgtk-3-dev']],
       [like_fedora,
+       [linuxdistroversion => qr{^6\.},
+	[package => []]],
        [package => 'gtk3-devel']],
      ],
 
@@ -1811,6 +1845,13 @@ sub mapping {
        [package => 'libesmtp-devel']],
      ],
 
+     [cpanmod => 'Net::Gadu',
+      [os_freebsd,
+       [package => 'pl-libgadu']],
+      [like_debian,
+       [package => 'libgadu-dev']],
+     ],
+
      [cpanmod => 'Net::Ifstat',
       [os_freebsd,
        [package => 'ifstat']],
@@ -2092,9 +2133,11 @@ sub mapping {
       # XXX what about freebsd?
       [like_debian,
        [linuxdistrocodename => [qw(squeeze wheezy jessie precise xenial)],
-	[package => [qw(libx11-dev libxpm-dev libgif-dev libpng12-dev libjpeg-dev), 'pkg-config | pkgconf']]], # XXX maybe also add libtiff...
-       [package => [qw(libx11-dev libxpm-dev libgif-dev libpng-dev libjpeg-dev), 'pkg-config | pkgconf']], # XXX maybe also add libtiff...
+	[package => [qw(libx11-dev libxcursor-dev libxpm-dev libgif-dev libpng12-dev libjpeg-dev), 'pkg-config | pkgconf']]], # XXX maybe also add libtiff...
+       [package => [qw(libx11-dev libxcursor-dev libxpm-dev libgif-dev libpng-dev libjpeg-dev), 'pkg-config | pkgconf']], # XXX maybe also add libtiff...
       ],
+      [like_fedora,
+       [package => [qw(libXcursor-devel)]]], # XXX probably incomplete
      ],
 
      [cpanmod => 'PulseAudio',
@@ -2197,6 +2240,16 @@ sub mapping {
       [like_debian,
        [package => 'libosp-dev']]],
 
+     ## version mismatch
+     #[cpanmod => 'SNMP',
+     # [os_freebsd,
+     #  [package => 'net-snmp']],
+     # [like_debian,
+     #  [package => 'libsnmp-dev']],
+     # [like_fedora,
+     #  [package => 'net-snmp-devel']],
+     #],
+
      [cpanmod => 'SNMP::OID::Translate',
       [os_freebsd,
        [package => 'net-snmp']],
@@ -2279,7 +2332,10 @@ sub mapping {
       # XXX what about freebsd?
       [like_debian,
        # tcllib is needed for the snit package
-       [package => ['tk8.5-dev', 'tcllib']]]],
+       [package => ['tk8.5-dev', 'tcllib']]],
+      [like_fedora,
+       [package => ['tk', 'tcllib']]],
+     ],
 
      [cpanmod => 'Template::Plugin::React',
       [os_freebsd,

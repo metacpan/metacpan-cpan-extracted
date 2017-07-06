@@ -23,6 +23,7 @@ option str => group_by    => 'Group log output: --group-by day',    alias => 'g'
 documentation 'App::tt';
 version 'App::tt';
 
+$ENV{EDITOR} ||= 'nano';
 $SIG{__DIE__} = sub { Carp::confess($_[0]) }
   if DEBUG;
 
@@ -81,19 +82,31 @@ sub cmd_edit {
   my $doit = grep {/^--no-dry-run$/} @_;
   my $dir  = readlink($self->_root) || $self->_root;
   my $code = '';
+  my ($date, @files);
 
-  $code .= $_ while <STDIN>;
-  $code = "sub {$code}" unless $code =~ /^\s*sub\b/s;
-  $code = eval "use 5.10.1;$code" or die "Could not compile code from STDIN: $@\n";
+  if (@_ and -f $_[0]) {
+    return $self->_edit_with_editor($_[0]);
+  }
+  elsif (-t STDIN) {
+    $date = $self->_date_arg(@_);
+    $code = sub { print "$_{file}\n"; };
+  }
+  else {
+    $code .= $_ while <STDIN>;
+    $code = "sub {$code}" unless $code =~ /^\s*sub\b/s;
+    $code = eval "use 5.10.1;$code" or die "Could not compile code from STDIN: $@\n";
+  }
 
   find {
     no_chdir => 0,
     wanted   => sub {
-      /^(\d+)-(\d+)_(.*)\.trc$/ or return;
+      return unless /^(\d+)-(\d+)_(.*)\.trc$/;
+      return if $date and not /$date/;
       my $f     = abs_path $_;
       my $event = decode_json(_slurp($f));
-      local %_ = (date => $1, doit => $doit, file => $f, hms => $2, project => $3);
+      local %_ = (file => $f, date => $1, doit => $doit, file => $f, hms => $2, project => $3);
       $event->{tags} ||= [];
+      push @files, $f if $date and (!$self->project or $event->{project} eq $self->project);
       $self->$code($event) or return;
       my $trc_file
         = abs_path($self->_trc_path($event->{project}, $self->_from_iso_8601($event->{start})));
@@ -103,6 +116,10 @@ sub cmd_edit {
       unlink $f or die "rm $f: $!" if $f ne $trc_file;
     }
   }, $dir;
+
+  if (@files == 1) {
+    return $self->_edit_with_editor($files[0]);
+  }
 
   return 0;
 }
@@ -344,6 +361,50 @@ sub _add_event_info {
   for my $t (ref $tags ? @$tags : $tags) {
     push @{$event->{tags}}, $t;
   }
+}
+
+sub _edit_with_editor {
+  require File::Temp;
+  my ($self, $trc_file) = @_;
+  my $fh    = File::Temp->new;
+  my $event = decode_json(_slurp($trc_file));
+
+  printf $fh "# %s\n", $trc_file;
+
+  for my $k (qw(project tags start stop user)) {
+    $event->{$k} = join ', ', @{$event->{$k} || []} if $k eq 'tags';
+    printf $fh "%-8s %s\n", "$k:", $event->{$k};
+  }
+
+  close $fh;
+  system $ENV{EDITOR} => "$fh";
+
+  for (split /\n/, _slurp("$fh")) {
+    my ($k, $v) = /^(\w+)\s*:\s*(.+)/ or next;
+    $v = [split /\W+/, $v] if $k eq 'tags';
+    $event->{$k} = $v;
+  }
+
+  $self->_fill_duration($event);
+  _spurt(encode_json($event) => $trc_file);
+
+  return 0;
+}
+
+sub _date_arg {
+  my ($self, @args) = @_;
+  my $yesterday = $self->_now - 86400;
+  my @ymd       = map { $yesterday->$_ } qw(year mon mday);
+  my $fmt       = '%02s%02s%02s';
+
+  for (@args) {
+    if (/^\d+$/) {
+      return $_ if /^\d{8}$/;
+      return sprintf $fmt, @ymd[0, 1], $_ if /^\d{1,2}$/;
+    }
+  }
+
+  return sprintf $fmt, @ymd;
 }
 
 sub _diag {

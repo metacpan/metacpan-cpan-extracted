@@ -2,7 +2,7 @@ package Catmandu::Plugin::SideCar;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.0601';
+our $VERSION = '1.0602';
 
 use Catmandu::Util qw(:is);
 use Hash::Merge::Simple 'merge';
@@ -212,7 +212,7 @@ Catmandu::Plugin::SideCar - Automatically update a parallel Catmandu::Store with
 =head1 DESCRIPTION
 
 The Catmandu::Plugin::SideCar can be used to combine L<Catmandu::Store>-s , L<Catmandu::FileStore>-s
-(and L<Catmandu::Store::Multi> , L<Catmandu::Store::File::Multi> as one access point.
+(and L<Catmandu::Store::Multi> , L<Catmandu::Store::File::Multi>) as one access point.
 Every get,add,delete,drop and commit action in the store will be first executed in the original
 store and re-executed in the SideCar store.
 
@@ -233,6 +233,7 @@ bag of the FileStore:
                         options:
                             client: '1_0::Direct'
                             index_name: catmandu
+                sidecar_bag: data
 
 =head1 COMBINING A STORE WITH A FILESTORE
 
@@ -252,6 +253,7 @@ the metadata (by default C<data>):
                         options:
                             root: /data/test123
                             uuid: 1
+                sidecar_bag: index
 
 Notice that we added for the L<Catmandu::Store::File::Simple> the requires C<uuid> options
 because the L<Catmandu::Store::ElasticSearch> is using UUIDs as default identifiers.

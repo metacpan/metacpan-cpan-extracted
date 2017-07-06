@@ -216,8 +216,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Box distribution version 3.002,
-built on March 31, 2017.
+This module is part of Mail-Box distribution version 3.003,
+built on June 29, 2017.
 
 Do not forget to read
 L<Mail::Box-Overview>,
@@ -247,6 +247,6 @@ Please post questions or ideas to the author F<markov@cpan.org>.
 Copyrights 2001-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
 

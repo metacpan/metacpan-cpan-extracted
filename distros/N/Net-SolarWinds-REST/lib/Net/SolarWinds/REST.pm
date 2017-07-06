@@ -40,7 +40,7 @@ use JSON qw();
 use URI::Encode qw(uri_encode);
 use POSIX qw(strftime);
 
-our $VERSION=1.18;
+our $VERSION="1.21";
 
 use base qw(Net::SolarWinds::ConstructorHash Net::SolarWinds::LogMethods Net::SolarWinds::Helper);
 use constant RESULT_CLASS=>'Net::SolarWinds::Result';
@@ -504,6 +504,24 @@ sub getInterfacesOnNode {
   return $self->RESULT_CLASS->new_true($ints);
 }
 
+=item * my $result=$self->GetAlertSettings($nodeid);
+
+Returns a Net::SolarWinds::Result Object
+
+when true: Contains the list of Orion.ForecastCapacity, for the given node
+when false: returns why it failed
+
+=cut
+
+sub GetAlertSettings {
+  my ($self,$node_id)=@_;
+  $self->log_info("starting $node_id");
+  my $query=$self->query_lookup($node_id);
+  my $result=$self->Query($query);
+  $self->log_info("finished $node_id");
+  return $result;
+}
+
 =item * my $result=$self->NodeCustomProperties($nodeId,$hash_ref|undef);
 
 Used to get or set custom properties of a node.
@@ -780,6 +798,7 @@ sub createNode {
 
   return $self->nopresetsCreateNode(%args);
 }
+
 =item * my $result=$self->getNodeUri($node_id);
 
 When true the Net::SolarWinds::Result object contains the node uri.
@@ -1108,6 +1127,7 @@ sub getEngine {
 
   return $result unless $result;
 }
+
 =item * my $result=$self->getVolumeMap($nodeID);
 
 Returns a Net::SolarWinds::Result object:

@@ -4,9 +4,9 @@ package Nagios::Passive::Base;
 use strict;
 use Carp;
 use Fcntl qw/:DEFAULT :flock/;
-use Nagios::Plugin::Threshold;
-use Nagios::Plugin::Performance;
-Nagios::Plugin::Functions::_use_die(1);
+use Monitoring::Plugin::Threshold;
+use Monitoring::Plugin::Performance;
+Monitoring::Plugin::Functions::_use_die(1);
 use overload '""' => 'to_string';
 use Moo;
 use MooX::late;
@@ -39,16 +39,16 @@ sub add_output {
 
 has 'threshold'           => (
   is => 'ro',
-  isa => 'Nagios::Plugin::Threshold',
+  isa => 'Monitoring::Plugin::Threshold',
   handles => [qw/set_thresholds/],
   lazy => 1,
   predicate => 'has_threshold',
-  default => sub { Nagios::Plugin::Threshold->new },
+  default => sub { Monitoring::Plugin::Threshold->new },
 );
 has 'performance' => (
   traits => ['Array'],
   is => 'ro',
-  isa => 'ArrayRef[Nagios::Plugin::Performance]',
+  isa => 'ArrayRef[Monitoring::Plugin::Performance]',
   default => sub { [] },
   lazy => 1,
   predicate => 'has_performance',
@@ -67,7 +67,7 @@ sub submit {
 
 sub add_perf {
   my $self = shift;
-  my $perf = Nagios::Plugin::Performance->new(@_);
+  my $perf = Monitoring::Plugin::Performance->new(@_);
   $self->_performance_add($perf);
 }
 

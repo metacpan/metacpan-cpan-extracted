@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173055;
+our $VERSION = 1.20170702164949;
 
 my $formatters = [
                 {
@@ -30,25 +30,25 @@ my $formatters = [
                   'pattern' => '([29]\\d)(\\d{7})'
                 },
                 {
-                  'leading_digits' => '8',
-                  'pattern' => '(800)(\\d{3})(\\d{3})'
+                  'pattern' => '(800)(\\d{3})(\\d{3})',
+                  'leading_digits' => '8'
                 }
               ];
 
 my $validators = {
                 'specialrate' => '',
+                'geographic' => '21[1-8]\\d{6}',
+                'personal_number' => '',
+                'fixed_line' => '21[1-8]\\d{6}',
                 'mobile' => '
           9(?:
             5[034589]|
             [67]\\d
           )\\d{6}
         ',
-                'personal_number' => '',
-                'geographic' => '21[1-8]\\d{6}',
-                'toll_free' => '800\\d{6}',
                 'voip' => '',
                 'pager' => '',
-                'fixed_line' => '21[1-8]\\d{6}'
+                'toll_free' => '800\\d{6}'
               };
 my %areanames = (
   260211 => "Lusaka\ Province",

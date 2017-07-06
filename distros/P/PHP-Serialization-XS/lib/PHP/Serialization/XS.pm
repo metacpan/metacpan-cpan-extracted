@@ -13,24 +13,34 @@ our @ISA = qw(PHP::Serialization Exporter);
 our %EXPORT_TAGS = (all => [ qw(serialize unserialize) ]);
 our @EXPORT_OK = @{ $EXPORT_TAGS{all} };
 
-our $VERSION = '0.08';
-
-our %DEFAULT_OPTS = (
-    prefer_hash  => 0,
-    prefer_array => 1,
-    prefer_undef => 0,
-);
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('PHP::Serialization::XS', $VERSION);
 
-# in XS
-sub new;
+my $default = __PACKAGE__->new(prefer_array => 1);
+
+sub new
+{
+    my $class = shift;
+    # depend on PHP::Serialize using a blessed hash
+    my %args = @_;
+    my $self = $class->SUPER::new(%args);
+
+    # precedence order was really undefined, but now we match legacy behaviour
+    $self->{flags} =
+        $args{prefer_hash}  ? 0 :
+        $args{prefer_undef} ? 2 :
+        $args{prefer_array} ? 1 :
+        1; # default is prefer_array
+
+    return $self;
+}
 
 sub unserialize
 {
     my ($str, $class) = @_;
-    return __PACKAGE__->new(%DEFAULT_OPTS)->decode($str, $class);
+    return $default->decode($str, $class);
 }
 
 sub serialize
@@ -41,16 +51,11 @@ sub serialize
 sub decode
 {
     my ($self, $str, $class) = @_;
-    $self = $self->new(%DEFAULT_OPTS) unless ref $self;
-    return $self->_c_decode($str || "", $class);
+    $self = $default unless ref $self;
+    return _c_decode($str || "", $self->{flags}, $class);
 }
 
-sub encode
-{
-    my ($self, @rest) = @_;
-    my $parent = $self->_get_parent;
-    return $parent->encode(@rest);
-}
+# encode method is handled by super class
 
 1;
 __END__
@@ -100,12 +105,21 @@ array stands out : if there are no keys, should the resulting structure
 be an array or a hash ? Neither answer works universally, so the code
 that uses the Perl structure has to check for both cases on every access.
 
-For this reason, PHP::Serialization::XS accepts two additional options
-to its C<new()> constructor, C<prefer_hash> and C<prefer_array>.
-Currently, C<prefer_array> is the default, for backward-compatibility
-reasons, but if you wish your code to act consistently, you should
-always use the OO interface and specify the behavior you want (this
-configurability is not available through the procedural interface).
+For this reason, PHP::Serialization::XS accepts additional options to
+its C<new()> constructor : C<prefer_hash>, C<prefer_array>, or
+C<prefer_undef> (use only one at a time). C<prefer_undef> allows
+autovivification.  Currently, C<prefer_array> is the default, for
+backward-compatibility reasons, but if you wish your code to act
+consistently, you should always use the OO interface and specify the
+behavior you want (this configurability is not available through the
+procedural interface).
+
+=head1 BUGS
+
+Yes.
+
+Prior to version 0.09, there were significant memory leaks (thanks for the bug
+report goes to Rune Hylleberg).
 
 =head1 TODO
 
@@ -123,7 +137,7 @@ Tests stolen shamelessly from Tomas Doran's L<PHP::Serialization> package.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009 by Darren Kulp
+Copyright (C) 2009-2017 by Darren Kulp
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

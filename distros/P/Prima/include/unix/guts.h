@@ -40,6 +40,9 @@
 #ifdef HAVE_X11_EXTENSIONS_XCOMPOSITE_H
 #include <X11/extensions/Xcomposite.h>
 #endif
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+#include <X11/Xcursor/Xcursor.h>
+#endif
 #undef Font
 #undef Drawable
 #undef Bool
@@ -664,6 +667,7 @@ typedef struct _UnixGuts
 	Bool                         icccm_only;
 	Bool                         net_wm_maximization;
 	int                          net_wm_maximize_HORZ_vs_HORIZ;
+	int                          use_gtk;
 } UnixGuts;
 
 extern UnixGuts  guts;
@@ -727,6 +731,7 @@ typedef struct _drawable_sys_data
 	Region invalid_region, paint_region, current_region, cached_region;
 	XRectangle clip_rect;
 	FillPattern fill_pattern, saved_fill_pattern;
+	Point fill_pattern_offset, saved_fill_pattern_offset;
 	Pixmap fp_pixmap;
 #if defined(sgi) && !defined(__GNUC__)
 /* multiple compilation and runtime errors otherwise. must be some alignment tricks */
@@ -748,6 +753,9 @@ typedef struct _drawable_sys_data
 	Cursor user_pointer;
 	Pixmap user_p_source;
 	Pixmap user_p_mask;
+#ifdef HAVE_X11_XCURSOR_XCURSOR_H
+	XcursorImage * user_xcursor;
+#endif
 	void * recreateData;
 	XWindow client;
 	struct {
@@ -755,6 +763,7 @@ typedef struct _drawable_sys_data
 		unsigned brush_fore               : 1;
 		unsigned brush_back               : 1;
 		unsigned brush_null_hatch         : 1;
+		unsigned clip_by_children	  : 1;
 		unsigned clip_owner	          : 1;
 		unsigned configured               : 1;
 		unsigned cursor_visible		  : 1;
@@ -1341,3 +1350,9 @@ prima_font_debug_style(int style);
 
 extern Region
 prima_region_create( Handle mask);
+
+extern Handle
+prima_find_toplevel_window(Handle self);
+
+extern Byte*
+prima_mirror_bits( void);

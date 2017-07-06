@@ -21,7 +21,7 @@ my %module_build_args = (
     "Maty\x{e1}\x{161} Kopp <matyas.kopp\@gmail.com>"
   ],
   "dist_name" => "PMLTQ",
-  "dist_version" => "1.3.2",
+  "dist_version" => "1.4.0",
   "license" => "perl",
   "module_name" => "PMLTQ",
   "recommends" => {

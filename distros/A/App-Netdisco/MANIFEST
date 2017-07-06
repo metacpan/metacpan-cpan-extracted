@@ -60,6 +60,7 @@ lib/App/Netdisco/DB/Result/NodeWireless.pm
 lib/App/Netdisco/DB/Result/Oui.pm
 lib/App/Netdisco/DB/Result/Process.pm
 lib/App/Netdisco/DB/Result/Session.pm
+lib/App/Netdisco/DB/Result/Statistics.pm
 lib/App/Netdisco/DB/Result/Subnet.pm
 lib/App/Netdisco/DB/Result/Topology.pm
 lib/App/Netdisco/DB/Result/User.pm
@@ -129,6 +130,7 @@ lib/App/Netdisco/Util/Backend.pm
 lib/App/Netdisco/Util/Device.pm
 lib/App/Netdisco/Util/DNS.pm
 lib/App/Netdisco/Util/ExpandParams.pm
+lib/App/Netdisco/Util/FastResolver.pm
 lib/App/Netdisco/Util/Graph.pm
 lib/App/Netdisco/Util/Node.pm
 lib/App/Netdisco/Util/NodeMonitor.pm
@@ -146,6 +148,7 @@ lib/App/Netdisco/Web/Device.pm
 lib/App/Netdisco/Web/GenericReport.pm
 lib/App/Netdisco/Web/Password.pm
 lib/App/Netdisco/Web/Plugin.pm
+lib/App/Netdisco/Web/Plugin/AdminTask/DuplicateDevices.pm
 lib/App/Netdisco/Web/Plugin/AdminTask/JobQueue.pm
 lib/App/Netdisco/Web/Plugin/AdminTask/NodeMonitor.pm
 lib/App/Netdisco/Web/Plugin/AdminTask/OrphanedDevices.pm
@@ -312,12 +315,14 @@ share/schema_versions/App-Netdisco-DB-4-5-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-40-41-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-41-42-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-42-43-PostgreSQL.sql
+share/schema_versions/App-Netdisco-DB-43-44-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-5-6-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-6-7-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-7-8-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-8-9-PostgreSQL.sql
 share/schema_versions/App-Netdisco-DB-9-10-PostgreSQL.sql
 share/views/admintask.tt
+share/views/ajax/admintask/duplicatedevices.tt
 share/views/ajax/admintask/jobqueue.tt
 share/views/ajax/admintask/nodemonitor.tt
 share/views/ajax/admintask/orphaned.tt

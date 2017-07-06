@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 26;
+use Test::Most tests => 28;
 use Test::NoWarnings;
 use Data::Dumper;
 
@@ -83,6 +83,13 @@ diag($i->browser_type());
 	ok($i->is_robot() == 0);
 
 	$ENV{'HTTP_REFERER'} = 'http://free-video-tool.com';
+	$i = new_ok('CGI::Info' => [
+		cache => $cache,
+		logger => MyLogger->new()
+	]);
+	ok($i->is_robot() == 1);
+
+	$ENV{'HTTP_REFERER'} = 'http://0.tqn.com/d/d/spae.gif)';
 	$i = new_ok('CGI::Info' => [
 		cache => $cache,
 		logger => MyLogger->new()

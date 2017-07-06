@@ -3,7 +3,7 @@
 # IPC::Queue::Duplex - Filesystem based request / response queue
 # Copyright (c) 2017 Ashish Gulhati <ipc-qd at hash.neo.tc>
 #
-# $Id: lib/IPC/Queue/Duplex.pm v1.004 Fri Jun  9 17:19:01 PDT 2017 $
+# $Id: lib/IPC/Queue/Duplex.pm v1.007 Sun Jun 25 01:43:14 PDT 2017 $
 
 package IPC::Queue::Duplex;
 
@@ -11,10 +11,10 @@ use warnings;
 use strict;
 use File::Temp;
 use File::Copy qw(cp);
-use Time::HiRes qw(usleep);
 use IPC::Queue::Duplex::Job;
+use Fcntl qw(:flock);
 
-our ( $VERSION ) = '$Revision: 1.004 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.007 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %args) = @_;
@@ -56,9 +56,11 @@ sub get {
       }
     }
     last unless $filename;
-    usleep 1000, next unless -e $filename;
+    next unless -e $filename;
+    open(my $jobfh, ">>", $filename);
+    close $jobfh, next unless flock($jobfh, LOCK_EX | LOCK_NB);
     $filework = $filename; $filework =~ s/\.job/.wrk/;
-    last if rename $filename,$filework;
+    close $jobfh, last if rename $filename,$filework;
   }
   if ($filework) {
     open (JOB, $filework);
@@ -81,9 +83,11 @@ sub getresponse {
       }
     }
     last unless $filename;
-    usleep 1000, next unless -e $filename;
+    next unless -e $filename;
+    open(my $jobfh, ">>", $filename);
+    close $jobfh, next unless flock($jobfh, LOCK_EX | LOCK_NB);
     $filefin = $filename; $filefin =~ s/\.fin/.rsp/;
-    last if rename $filename,$filefin;
+    close $jobfh, last if rename $filename,$filefin;
   }
   if ($filefin) {
     open (JOBFIN, $filefin);
@@ -102,8 +106,8 @@ IPC::Queue::Duplex - Filesystem based request / response queue
 
 =head1 VERSION
 
- $Revision: 1.004 $
- $Date: Fri Jun  9 17:19:01 PDT 2017 $
+ $Revision: 1.007 $
+ $Date: Sun Jun 25 01:43:14 PDT 2017 $
 
 =head1 SYNOPSIS
 

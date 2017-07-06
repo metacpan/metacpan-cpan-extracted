@@ -3,7 +3,7 @@ package PDF::API2::Resource::PaperSizes;
 use strict;
 use warnings;
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 sub get_paper_sizes {
     return (

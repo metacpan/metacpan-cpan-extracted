@@ -25,14 +25,14 @@ ATTRIBUTES
 
  log => bool (default: from env or 0)
 
-    Whether to enable logging. This currently means setting up
-    Log::Any::Adapter to display logging (set in hook_after_parse_argv, so
-    tab completion skips this step). To produce log, you use Log::Any in
-    your code.
+    Whether to enable logging. This currently means calling
+    Log::ger::Output to set logging output to Screen (set in
+    hook_after_parse_argv, so tab completion skips this step). To produce
+    log, you use Log::ger in your code.
 
-    The default is off. If you set LOG=1 or LOG_LEVEL or
-    TRACE/DEBUG/VERBOSE/QUIET, then the default will be on. It defaults to
-    off if you set LOG=0 or LOG_LEVEL=off.
+    The default is off. If you set LOG_LEVEL or TRACE/DEBUG/VERBOSE/QUIET,
+    then the default will be on. It defaults to off if you set
+    LOG_LEVEL=off.
 
  log_level => str (default: from env, or 'warning')
 

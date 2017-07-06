@@ -1,6 +1,68 @@
-2017-03-29  Dave Cross <dave@perlhacks.com>
+2017-07-02  Dave Cross <dave@dave.org.uk>
 
-  * lib/Perlanet/Trait/Scrubber.pm: Improved HTML scrubbing.
+  * t/06_youtube.t, t/data/youtube.xml, t/youtube2rc, t/youtuberc: Added tests
+  for new sorting functionality.
+
+  * MANIFEST, bin/perlanet, lib/Perlanet.pm: Version 1.1.0. Allow sorting by
+  issued date (as well as modified date)
+
+2017-06-23  Dave Cross <dave@dave.org.uk>
+
+  * lib/Perlanet.pm: Typo in version number FFS!
+
+  * lib/Perlanet.pm: Bumped version for release (version 1.0.0!)
+
+  * lib/Perlanet.pm, lib/Perlanet/Trait/OPML.pm, t/02_phases.t, t/04_mps.t,
+  t/05_cache.t: Change various methods to take array refs, not lists.
+
+2017-04-01  Dave Cross <dave@dave.org.uk>
+
+  * .travis.yml: Force installation of XML::OPML::SimpleGen
+
+2017-03-29  Dave Cross <dave@dave.org.uk>
+
+  * lib/Perlanet.pm: Bump version for release.
+
+  * lib/Perlanet/Trait/Scrubber.pm: Remove border attributes
+
+  * lib/Perlanet/Trait/Scrubber.pm: Best to allow https images these days. 
+  Also, the idiocy of some feeds makes it well worth including width and height
+  on image tags.
+
+2015-07-19  Dave Cross <dave@dave.org.uk>
+
+  * .travis.yml, Build.PL: Another go at building HMTL::Tidy on Travis CI
+  boxes.
+
+  * .travis.yml: Ensure HTML tidy is installed
+
+2015-07-18  Dave Cross <dave@dave.org.uk>
+
+  * t/atom.xml: Added t/atom.xml
+
+  * .travis.yml, MANIFEST.SKIP: Added .travis.yml and MANIFEST.SKIP
+
+  * .gitignore: Changed .gitignore
+
+2013-04-22  Dave Cross <dave@dave.org.uk>
+
+  * examples/index.tt: Change index.tt to HTML5 and remove excess <html> tag.
+
+2013-04-22  Tom Bloor <tom.bloor@googlemail.com>
+
+  * .gitignore, lib/Perlanet/Simple.pm: POD Update  updated POD synopsis as per
+  my Blog post
+
+2012-07-27  Dave Cross <dave.cross@net-a-porter.com>
+
+  * lib/Perlanet/Trait/Scrubber.pm: Argh! Scrubbing hasn't been working for
+  about two years :/ Fixed now. Should write a test.
+
+  * Build.PL: Added missing pre-req (namespace::autoclean)
+
+2012-07-14  Dave Cross <dave@dave.org.uk>
+
+  * .gitignore: Added some more stuff to .gitignore.
 
 2012-03-17  Dave Cross <dave@dave.org.uk>
 

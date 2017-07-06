@@ -33,8 +33,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Minion" : "6.05",
-            "Mojolicious" : "6.3",
+            "Minion" : "6",
+            "Mojolicious" : "6",
+            "Sereal" : "3",
             "perl" : "5.010001"
          }
       }
@@ -53,6 +54,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : 6.051,
+   "version" : 7.012,
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

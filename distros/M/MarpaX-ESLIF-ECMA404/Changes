@@ -1,6 +1,13 @@
 Changelog for MarpaX-ESLIF-ECMA404
 
-0.006 2017-06-01T04:06:08
+0.007 2017-07-04T17:48:37
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Fix RecognizerInterface POD
+ - elements action bug fix
+ - dist.ini: t/test_transform as byte files
+ - Added t/test_transform [ci skip]
+
+0.006 2017-06-01T04:06:08Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - t/test.t: forces UTF-8 in some cases just to please tests with old
    versions of perl [ci skip]

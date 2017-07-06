@@ -2,7 +2,7 @@
 
 use App::GHPT::Wrapper::Ourperl;
 
-our $VERSION = '1.000004';
+our $VERSION = '1.000007';
 
 use FindBin qw($Bin);
 use lib "$Bin/../../lib", "$Bin/../../../lib";

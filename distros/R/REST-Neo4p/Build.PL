@@ -1,4 +1,3 @@
-#$Id$
 use Module::Build;
 use strict;
 use warnings;
@@ -55,6 +54,6 @@ my $build =  Module::Build->new
      );
 
 $build->notes( test_server => $ENV{REST_NEO4P_TEST_SERVER} // $build->prompt("Server for live tests:", "http://127.0.0.1:7474"));
-$build->notes( user => $ENV{REST_NEO4P_TEST_USER} // $build->prompt("Username:", "") );
-$build->notes( pass => $ENV{REST_NEO4P_TEST_PASS} // $build->prompt("Pass:", "") );
+$build->notes( user => $ENV{REST_NEO4P_TEST_USER} // $build->prompt("Username:", "neo4j") );
+$build->notes( pass => $ENV{REST_NEO4P_TEST_PASS} // $build->prompt("Pass:", "neo4j") );
 $build->create_build_script;

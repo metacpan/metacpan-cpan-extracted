@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::PDRUtils",
   "PREREQ_PM" => {
-    "Config::IOD" => "0.30",
+    "Config::IOD" => "0.31",
     "Config::IOD::Constants" => "0.29",
     "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "File::chdir" => 0,
     "Function::Fallback::CoreOrPP" => 0,
     "Log::Any" => 0,
-    "Log::Any::IfLOG" => "0.07",
+    "Log::ger" => "0.011",
     "PERLANCAR::Module::List" => 0,
     "POSIX" => 0,
     "Perinci::CmdLine::Any" => 0,
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.09",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Config::IOD" => "0.30",
+  "Config::IOD" => "0.31",
   "Config::IOD::Constants" => "0.29",
   "Data::Sah::Coerce::perl::str::str_normalize_perl_modname" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
@@ -70,7 +70,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::Any" => 0,
-  "Log::Any::IfLOG" => "0.07",
+  "Log::ger" => "0.011",
   "PERLANCAR::Module::List" => 0,
   "POSIX" => 0,
   "Perinci::CmdLine::Any" => 0,

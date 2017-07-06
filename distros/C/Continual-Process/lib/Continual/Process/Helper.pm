@@ -67,7 +67,7 @@ sub prepare_fork {
     }
 }
 
-=head2 prepare_run($executable, $args)
+=head2 prepare_run($executable, @args)
 
 prepare and return correct (multiplatform) CodeRef which returns PID
 
@@ -78,17 +78,17 @@ set I<C_P_INSTANCE_ID> environment variable with C<$instance->id>
 =cut
 
 sub prepare_run {
-    my ($executable, $args) = @_;
+    my ($executable, @args) = @_;
 
     if (WINDOWS) {
-        return _prepare_run_win($executable, $args);
+        return _prepare_run_win($executable, @args);
     }
 
-    return _prepare_run_other($executable, $args);
+    return _prepare_run_other($executable, @args);
 }
 
 sub _prepare_run_win {
-    my ($executable, $args) = @_;
+    my ($executable, @args) = @_;
         return sub {
             my ($instance) = @_;
 
@@ -104,7 +104,7 @@ sub _prepare_run_win {
                 Win32::Process::Create(
                     my $proc,
                     $executable,
-                    "$executable $args",
+                    "$executable @args",
                     0,
                     NORMAL_PRIORITY_CLASS,
                     "."
@@ -116,14 +116,14 @@ sub _prepare_run_win {
 }
 
 sub _prepare_run_other {
-    my ($executable, $args) = @_;
+    my ($executable, @args) = @_;
 
     return prepare_fork(sub {
         my ($instance) = @_;
 
         $ENV{C_P_INSTANCE_ID} = $instance->id();
-        print "# $executable $args\n" if $ENV{C_P_DEBUG}; 
-        exec $executable, $args;
+        print "# $executable @args\n" if $ENV{C_P_DEBUG}; 
+        exec $executable, @args;
         die "exec fail";
     });
 }

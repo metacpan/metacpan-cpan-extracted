@@ -1,5 +1,5 @@
 package Lab::Data::Analysis::WaveRunner;
-$Lab::Data::Analysis::WaveRunner::VERSION = '3.550';
+$Lab::Data::Analysis::WaveRunner::VERSION = '3.552';
 use 5.006;
 use strict;
 use warnings;

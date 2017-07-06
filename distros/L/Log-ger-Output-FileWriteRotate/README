@@ -1,0 +1,37 @@
+SYNOPSIS
+
+     use Log::ger::Output FileWriteRotate => (
+         dir          => '/var/log',    # required
+         prefix       => 'myapp',       # required
+         #suffix      => '.log',        # default is ''
+         size         => 25*1024*1024,  # default is 10MB, unless period is set
+         histories    => 12,            # default is 10
+         #buffer_size => 100,           # default is none
+     );
+
+DESCRIPTION
+
+    This output sends logs to File::Write::Rotate object.
+
+CONFIGURATION
+
+    These configuration parameters are File::Write::Rotate's.
+
+ dir
+
+ prefix
+
+ suffix
+
+ size
+
+ histories
+
+ buffer_size
+
+SEE ALSO
+
+    Log::ger
+
+    File::Write::Rotate
+

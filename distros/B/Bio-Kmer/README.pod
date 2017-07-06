@@ -16,6 +16,21 @@ A module for helping with kmer analysis.
   my $kmerHash=$kmer->kmers();
   my $countOfCounts=$kmer->histogram();
 
+The BioPerl way
+
+  use strict;
+  use warnings;
+  use Bio::SeqIO;
+  use Bio::Kmer;
+
+  # Load up any Bio::SeqIO object. Quality values will be
+  # faked internally to help with compatibility even if
+  # a fastq file is given.
+  my $seqin = Bio::SeqIO->new(-file=>"input.fasta");
+  my $kmer=Bio::Kmer->new($seqin);
+  my $kmerHash=$kmer->kmers();
+  my $countOfCounts=$kmer->histogram();
+
 =head1 DESCRIPTION
 
 A module for helping with kmer analysis. The basic methods help count kmers and can produce a count of counts.  Currently this module only supports fastq format.  Although this module can count kmers with pure perl, it is recommended to give the option for a different kmer counter such as Jellyfish.

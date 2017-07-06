@@ -7,7 +7,7 @@ use File::Spec;
 use Test::More;
 BEGIN {
     if(!File::Spec->case_tolerant()) {
-        plan skip_all => 'Test irrelevant on case intolerant systems';
+        plan skip_all => 'Test irrelevant on case-sensitive systems';
     } else {
         plan tests => 43;
     }
@@ -51,8 +51,8 @@ my $expected_rv1 =
 
 # Functional i/f
 my $rv1 = scan_deps(@roots1);
-#use Data::Dump qw(dump);
-#print dump($rv1), "\n";
+#use Data::Dumper;
+#print STDERR "\n", Dumper($rv1);
 
 compare_scandeps_rvs($rv1, $expected_rv1, \@roots1);
 

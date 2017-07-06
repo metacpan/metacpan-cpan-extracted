@@ -30,7 +30,7 @@ for my $result (@results) {
 	can_ok($result, qw(date destination info line time type platform));
 }
 
-is($results[0]->destination, decode('UTF-8', 'Düsseldorf Hbf'), 'first result: destination ok');
+is($results[0]->destination, 'Düsseldorf Hbf', 'first result: destination ok');
 is($results[0]->info, 'Bordrestaurant', 'first result: no info');
 is($results[0]->line, 'ICE 946 Intercity-Express', 'first result: line ok');
 is($results[0]->date, '16.11.2011', 'first result: real date ok');
@@ -42,8 +42,8 @@ is($results[0]->mot_name, 'zug', 'first result: mot_name ok');
 #is($results[0]->platform, '1', 'first result: platform ok');
 #is($results[0]->platform_db, 1, 'first result: platform_db ok');
 
-is($results[3]->destination, decode('UTF-8', 'Mülheim Heißen Kirche'), 'fourth result: destination ok');
-is($results[3]->info, decode('UTF-8', 'Ab (H) Heißen Kirche, Umstieg in den SEV Ri. Mülheim Hbf.'), 'fourth result: no info');
+is($results[3]->destination, 'Mülheim Heißen Kirche', 'fourth result: destination ok');
+is($results[3]->info, 'Ab (H) Heißen Kirche, Umstieg in den SEV Ri. Mülheim Hbf.', 'fourth result: no info');
 is($results[3]->line, '18', 'fourth result: line ok');
 is($results[3]->date, '16.11.2011', 'fourth result: real date ok');
 is($results[3]->time, '09:39', 'fourth result: real time ok');
@@ -55,7 +55,7 @@ is($results[3]->mot_name, 'u-bahn', 'fourth result: mot_name ok');
 #is($results[3]->platform_db, 0, 'fourth result: platform_db ok');
 
 is($results[-1]->destination, 'Hamm (Westf)', 'last result: destination ok');
-is($results[-1]->info, decode('UTF-8', 'Fahrradmitnahme begrenzt möglich'), 'last result: info ok');
+is($results[-1]->info, 'Fahrradmitnahme begrenzt möglich', 'last result: info ok');
 is($results[-1]->delay, 12, 'last result: delay 12');
 is($results[-1]->line, 'RE1', 'last result: line ok');
 is($results[-1]->date, '16.11.2011', 'last result: date ok');

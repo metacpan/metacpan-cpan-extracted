@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -30,23 +30,25 @@ my $formatters = [
                   'pattern' => '(2\\d)(\\d{6})'
                 },
                 {
-                  'pattern' => '([79]\\d{3})(\\d{4})',
-                  'leading_digits' => '[79]'
+                  'leading_digits' => '[79]',
+                  'pattern' => '([79]\\d{3})(\\d{4})'
                 },
                 {
-                  'leading_digits' => '[58]',
-                  'pattern' => '([58]00)(\\d{4,6})'
+                  'pattern' => '([58]00)(\\d{4,6})',
+                  'leading_digits' => '[58]'
                 }
               ];
 
 my $validators = {
-                'geographic' => '2[2-6]\\d{6}',
                 'personal_number' => '',
+                'geographic' => '2[2-6]\\d{6}',
+                'specialrate' => '(900\\d{5})',
+                'pager' => '',
                 'toll_free' => '
           8007\\d{4,5}|
           500\\d{4}
         ',
-                'specialrate' => '(900\\d{5})',
+                'voip' => '',
                 'mobile' => '
           7[19]\\d{6}|
           9(?:
@@ -54,9 +56,7 @@ my $validators = {
             [1-9]\\d
           )\\d{5}
         ',
-                'fixed_line' => '2[2-6]\\d{6}',
-                'pager' => '',
-                'voip' => ''
+                'fixed_line' => '2[2-6]\\d{6}'
               };
 my %areanames = (
   96823 => "Dhofar\ \&\ Al\ Wusta",

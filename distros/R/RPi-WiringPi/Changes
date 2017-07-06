@@ -1,5 +1,82 @@
 Revision history for Perl extension RPi::WiringPi.
 
+2.3619  2017-07-04
+        - hid all of the setup() tests. Somewhere in the last commits we broke
+          it, but that's actually ok
+        - all external devices/sensors that require GPIO pins have all of those
+          pins registered prior to returning the object
+        - registered pins are still stored in $ENV{RPI_PINS}, but we store them
+          within a JSON hash now, along with each pin's state and alt mode
+        - in cleanup, we now use WiringPi::API directly to reset all registered
+          pins back to the way they were as the program first started up
+        - significantly beefed up the testing regime. On each test file, we
+          check that all pins are back to their default (pre-test) state and
+          mode. Added t/RPiTest.pm to handle the work
+        - addded new DEVELOPMENT section to FAQ; added blurb about registering
+          pins if adding new subs
+        - all pins are now reset to default with cleanup(), as well as on any
+          crash (closes #34)
+        - fix typo in GPS section in SYNOPSIS (closes #37)
+        - clarify in POD that it's not just WiringPi::API we use (closes #38)
+        - clean up POD (closes #36)
+
+2.3618  2017-07-01
+        - incorporated RPi::Serial
+        - bumped remaining prereqs specific to RPi:: that needed it to encompass
+          all known bug fixes and feature adds
+
+2.3617  2017-06-28
+        - fix wire colour for the DAC CS pin in the diagram (light blue from
+          orange)
+        - added the tester flag to bbdispatch in the FAQs automated test section
+        - bump ver of RPi::LCD to 2.3603 due to a bug fix
+        - added new tests to t/60-lcd.t to verify that RPi::LCD dies() properly
+          if too many LCD objects are initialized (closes #35)
+        - bump prereq of RPi::DHT11 from v1.02 to v1.03
+        - bump prereq of RPi::I2C from v2.3602 to v2.3603
+
+2.3616  2017-06-24
+        - fix FAQ link in the Test portion of POD
+        - clean up the way _fatal_exit() works. There's more to do here
+        - tidy how the RPI_PINS env var is worked on in certain Util:: methods
+        - incorporated RPi::I2C; updated POD and FAQ
+        - added t/65-i2c.t for the I2C stuff. Requires an Arduino. See
+          examples/arduino.ino for details
+        - added a copy of the arduino.ino sketch for testing RPi::I2C, in
+          docs/sketch
+        - fixed bug in arduino.ino that wasn't resetting the register variable
+          back to default, causing failure of a basic read if the I2C bus hadn't
+          been reset before another t/65-i2c.t test run (removed workaround from
+          the test as well)
+        - bump ver of RPi::WiringPi::Constant prereq after adding ALT mode tag
+        - bump ver of WiringPi::API to 2.36.12 due to updates in that module
+        - bump ver of RPi::Pin to 2.3602
+        - added t/70-mode_alt.t to test the various ALT pin modes
+        - fix shift register tests. The pins were outside of the $pi object
+          scope, so they weren't being reset to INPUT, which broke a later
+          test file
+        - added I2C/Arduino testing information to the FAQ, and updated the
+          diagrams with the Arduino wiring
+
+2.3615  2017-06-22
+        - fixed issues with specific pins in test diagram for DAC (closes #29)
+          (closes #30)
+        - added more code to t/55-dac.t. We now thoroughly test both onboard
+          DACs. Updated diagram (closes #33)
+        - updated interrupt tests to conform to set_interrupt() as opposed to
+          the old interrupt_set()
+        - send in model => MCP4922 by default in dac() if it's not sent in, and
+          update docs accordingly (closes #31)
+        - moved the removal of the pin env var to outside of the for() loop in
+          Util::cleanup (closes #32)
+        - added Perlbrew install instructions into the SETUP section of FAQ
+        - removed erroneous LWP::Simple use statement in t/60-lcd.t that was
+          breaking tests
+        - sudo run t/40-interrupt_and_pwd.t were setting PI_BOARD recklessly,
+          breaking the tests within if we're not set up correctly. Same with
+          t/15-pwm.t
+        - minor code cleanup/tidying
+
 2.3614  2017-05-27
         - added GPSD::Parse support via gps()
         - removed all traces of software PWM (closes #7)

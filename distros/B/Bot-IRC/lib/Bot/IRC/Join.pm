@@ -5,7 +5,7 @@ use 5.012;
 use strict;
 use warnings;
 
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -131,7 +131,7 @@ Bot::IRC::Join - Bot::IRC join and part channels and remember channels state
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

@@ -5,7 +5,7 @@
 #
 
 package Lab::Connection::VICP;
-$Lab::Connection::VICP::VERSION = '3.550';
+$Lab::Connection::VICP::VERSION = '3.552';
 use strict;
 use Time::HiRes qw (usleep sleep);
 use Lab::Connection::GPIB;

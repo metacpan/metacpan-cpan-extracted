@@ -15,6 +15,7 @@
 package Google::Ads::AdWords::RequestStats;
 
 use strict;
+use warnings;
 use version;
 use Encode qw( encode_utf8 decode_utf8 );
 

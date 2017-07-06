@@ -1,6 +1,7 @@
 package Bot::IRC::X::Reminder;
 # ABSTRACT: Bot::IRC plugin for scheduling reminders
 
+use 5.012;
 use strict;
 use warnings;
 
@@ -8,7 +9,7 @@ use DateTime;
 use DateTime::Duration;
 use Time::Crontab;
 
-our $VERSION = '1.01'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -63,7 +64,7 @@ sub init {
                 repeat => ( ( lc( $m->{type} ) eq 'every' ) ? 1 : 0 ),
                 text   => $m->{text},
                 expr   => $expr,
-                time   => time() + $lapse,
+                time   => ( ($lapse) ? time() + $lapse : undef ),
                 lapse  => $lapse,
             } );
             $bot->store->set( 'reminders' => \@reminders );
@@ -135,6 +136,8 @@ sub init {
                 $bot->store->set( 'reminders' => \@reminders );
                 $bot->reply_to('OK.');
             }
+
+            return 1;
         },
     );
 
@@ -159,7 +162,7 @@ Bot::IRC::X::Reminder - Bot::IRC plugin for scheduling reminders
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Reminder.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC-X-Reminder)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC-X-Reminder/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC-X-Reminder)
@@ -296,7 +299,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Gryphon Shafer.
+This software is copyright (c) 2017 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

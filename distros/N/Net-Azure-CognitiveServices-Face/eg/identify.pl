@@ -9,6 +9,9 @@ my $api = 'Net::Azure::CognitiveServices::Face';
 ### add access_key string
 $api->access_key($ARGV[0]);
 
+### set endpoint url
+$api->endpoint($ARGV[1]);
+
 ### Source data of Japanese popular persons
 my %image = (
     'Yo Ooizumi'        => 'http://s3-ap-northeast-1.amazonaws.com/topicks/article_thumb/15584_original.jpg',

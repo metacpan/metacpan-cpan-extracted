@@ -1,12 +1,7 @@
-NAME
-    Business::BankCard - Utilities for dealing with bank card number
-    (ISO/IEC 7812)
-
-VERSION
-    version 0.01
-
 SYNOPSIS
+
 DESCRIPTION
+
     NOTE: This module is still empty without implementation. Plans are to
     provide a list of IIN codes, routines to parse a card number into
     components, routines to validate card number, etc.
@@ -26,16 +21,8 @@ DESCRIPTION
     information.
 
 SEE ALSO
+
     Business::BankCard::Indonesia
 
     Business::CardInfo
-
-AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2012 by Steven Haryanto.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

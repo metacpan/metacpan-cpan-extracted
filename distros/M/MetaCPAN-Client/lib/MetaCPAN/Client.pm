@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.016000';
+$MetaCPAN::Client::VERSION = '2.017000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_arrayref is_hashref >;
@@ -313,7 +313,7 @@ sub _reverse_deps {
 
     eval {
         $res = $self->fetch(
-            '/search/reverse_dependencies/'.$dist,
+            "/reverse_dependencies/dist/$dist",
             {
                 size   => 5000,
                 query  => { match_all => {} },
@@ -333,7 +333,7 @@ sub _reverse_deps {
     };
 
     return MetaCPAN::Client::ResultSet->new(
-        items => $res->{'hits'}{'hits'},
+        items => $res->{'data'},
         type  => 'release',
     );
 }
@@ -394,7 +394,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.016000
+version 2.017000
 
 =head1 SYNOPSIS
 

@@ -16,6 +16,13 @@ efficient than fully inflating/deflating perl hashrefs for every Xlib call.
 
 All attribute accessors are defined in XS.
 
+=head1 ATTRIBUTES
+
+=head2 display
+
+This is a 'magic' attribute that can be attached to all structs (except for
+XEvent where it is a real attribute).  Many times a struct will have 
+
 =head1 METHODS
 
 =head2 new
@@ -99,6 +106,12 @@ Extract all fields as Perl data.
 sub unpack {
     my $self= shift;
     $self->_unpack(my $ret= {});
+    if ($self->can('display') && defined (my $dpy= $self->display)) {
+        # tag all objects returned as belonging to this display
+        for (values %$ret) {
+            $_->display($dpy) if ref $_ && ref($_)->can('display');
+        }
+    }
     $ret;
 }
 
@@ -121,6 +134,7 @@ require X11::Xlib::XEvent;
 @X11::Xlib::XSetWindowAttributes::ISA= ( __PACKAGE__ );
 @X11::Xlib::XSizeHints::ISA= ( __PACKAGE__ );
 @X11::Xlib::XRectangle::ISA= ( __PACKAGE__ );
+@X11::Xlib::XRenderPictFormat::ISA= ( __PACKAGE__ );
 
 1;
 

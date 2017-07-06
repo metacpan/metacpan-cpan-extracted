@@ -1,3 +1,8 @@
+0.23    2017-07-01 (PERLANCAR)
+
+	- Avoided: add module Module::Path.
+
+
 0.22    2017-06-19 (PERLANCAR)
 
 	- Add Log::Any::IfLOG to list of modules to avoid (tired of the

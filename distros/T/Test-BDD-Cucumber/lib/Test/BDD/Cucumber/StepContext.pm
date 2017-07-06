@@ -1,6 +1,7 @@
 package Test::BDD::Cucumber::StepContext;
-$Test::BDD::Cucumber::StepContext::VERSION = '0.52';
-use Moose;
+$Test::BDD::Cucumber::StepContext::VERSION = '0.53';
+use Moo;
+use Types::Standard qw( Bool Str HashRef ArrayRef InstanceOf );
 use List::Util qw( first );
 
 =head1 NAME
@@ -9,7 +10,7 @@ Test::BDD::Cucumber::StepContext - Data made available to step definitions
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -35,7 +36,7 @@ the column names in the order they appeared.
 
 =cut
 
-has 'columns' => ( is => 'ro', isa => 'ArrayRef' );
+has 'columns' => ( is => 'ro', isa => ArrayRef );
 
 =head2 _data
 
@@ -47,7 +48,7 @@ See the C<data> method below.
 =cut
 
 has '_data' =>
-  ( is => 'ro', isa => 'Str|ArrayRef', init_arg => 'data', default => '' );
+  ( is => 'ro', isa => Str|ArrayRef, init_arg => 'data', default => '' );
 
 =head2 stash
 
@@ -62,7 +63,7 @@ the following two lines of code equivalent:
 
 =cut
 
-has 'stash' => ( is => 'ro', required => 1, isa => 'HashRef' );
+has 'stash' => ( is => 'ro', required => 1, isa => HashRef );
 
 =head2 feature
 
@@ -79,15 +80,15 @@ objects respectively.
 has 'feature' => (
     is       => 'ro',
     required => 1,
-    isa      => 'Test::BDD::Cucumber::Model::Feature'
+    isa      => InstanceOf['Test::BDD::Cucumber::Model::Feature']
 );
 has 'scenario' => (
     is       => 'ro',
     required => 1,
-    isa      => 'Test::BDD::Cucumber::Model::Scenario'
+    isa      => InstanceOf['Test::BDD::Cucumber::Model::Scenario']
 );
 has 'step' =>
-  ( is => 'ro', required => 0, isa => 'Test::BDD::Cucumber::Model::Step' );
+  ( is => 'ro', required => 0, isa => InstanceOf['Test::BDD::Cucumber::Model::Step'] );
 
 =head2 verb
 
@@ -95,7 +96,7 @@ The lower-cased verb a Step Definition was called with.
 
 =cut
 
-has 'verb' => ( is => 'ro', required => 1, isa => 'Str' );
+has 'verb' => ( is => 'ro', required => 1, isa => Str );
 
 =head2 text
 
@@ -104,7 +105,7 @@ multiplied out at this point.
 
 =cut
 
-has 'text' => ( is => 'ro', required => 1, isa => 'Str', default => '' );
+has 'text' => ( is => 'ro', required => 1, isa => Str, default => '' );
 
 =head2 harness
 
@@ -113,7 +114,7 @@ The L<Test::BDD::Cucumber::Harness> harness being used by the executor.
 =cut
 
 has 'harness' =>
-  ( is => 'ro', required => 1, isa => 'Test::BDD::Cucumber::Harness' );
+  ( is => 'ro', required => 1, isa => InstanceOf['Test::BDD::Cucumber::Harness'] );
 
 =head2 executor
 
@@ -125,7 +126,7 @@ for step redispatch.
 has 'executor' => (
     is       => 'ro',
     required => 1,
-    isa      => 'Test::BDD::Cucumber::Executor',
+    isa      => InstanceOf['Test::BDD::Cucumber::Executor'],
     weak_ref => 1
 );
 
@@ -138,17 +139,17 @@ C<$1>, C<$2> etc as appropriate.
 
 has '_matches' => (
     is       => 'rw',
-    isa      => 'ArrayRef',
+    isa      => ArrayRef,
     init_arg => 'matches',
     default  => sub { [] }
 );
 
 has 'transformers' =>
-  ( is => 'ro', isa => 'ArrayRef', predicate => 'has_transformers', );
+  ( is => 'ro', isa => ArrayRef, predicate => 'has_transformers', );
 
 has '_transformed_matches' => (
     is      => 'ro',
-    isa     => 'ArrayRef',
+    isa     => ArrayRef,
     lazy    => 1,
     builder => '_build_transformed_matches',
     clearer => '_clear_transformed_matches',
@@ -156,7 +157,7 @@ has '_transformed_matches' => (
 
 has '_transformed_data' => (
     is      => 'ro',
-    isa     => 'Str|ArrayRef',
+    isa     => Str|ArrayRef,
     lazy    => 1,
     builder => '_build_transformed_data',
     clearer => '_clear_transformed_data',
@@ -170,7 +171,7 @@ this step which is actually an internal hook, i.e. a Before or After step
 =cut
 
 has 'is_hook' =>
-  ( is => 'ro', isa => 'Bool', lazy => 1, builder => '_build_is_hook' );
+  ( is => 'ro', isa => Bool, lazy => 1, builder => '_build_is_hook' );
 
 =head2 parent
 
@@ -179,7 +180,7 @@ its parent step here; otherwise undef. See L</Redispatching>.
 
 =cut
 
-has 'parent' => ( is => 'ro', isa => 'Test::BDD::Cucumber::StepContext' );
+has 'parent' => ( is => 'ro', isa => InstanceOf['Test::BDD::Cucumber::StepContext'] );
 
 =head1 METHODS
 

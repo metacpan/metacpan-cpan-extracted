@@ -4,6 +4,24 @@ TODO: unwrap the save stack to find mortalised scalars (too version dependent).
 TODO: hash keys containing \x00 do not display properly.
 TODO: get the stack of non-running coroutines?
 
+TODO: And, there's one more thing.. The `sub THREE` in t/02_array_hash_weaken.t
+TODO: is reported as
+TODO:   `CODE(0xb92810) [refcount 1], which is the global &main::THREE`
+TODO:  on perl-5.20.3 or earlier versions, and reported as
+TODO:   `CODE(0x1517c60) [refcount 1],  which is referenced by REF(0x1518038)
+TODO: [refcount 2], which is the hash member 'THREE' of HASH(0x14f2fe0) [refcount
+TODO: 2], which is the global %main::main::`
+TODO:  on perl-5.22.3 or later versions. It makes me a little unhappy, but it's
+TODO: still acceptable to me~
+
+1.45 Fri Jun 23 20:27:07 CEST 2017
+	- port to 5.22 and maybe later versions, mostly based on the
+          patch by Cindy Wang.
+        - added t/02_array_hash_weaken.t test case by Cindy Wang.
+        - bumped minimum version to 5.008003.
+        - added Canary::Stability, so minimum version doesn't keep it from
+          compiling with older versions.
+
 1.44 Tue Jun  3 20:40:13 CEST 2014
 	- port to 5.20 (analyzed by Dave Mitchell).
 

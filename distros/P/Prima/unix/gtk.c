@@ -8,11 +8,15 @@
 
 #ifdef WITH_GTK2
 
+#undef GT
+
 #undef dirty
 
 #define Window  XWindow
 
+#ifndef WITH_GTK2_NONX11
 #include <gdk/gdkx.h>
+#endif
 #include <gtk/gtk.h>
 
 static int gtk_initialized = 0;
@@ -82,8 +86,25 @@ prima_gtk_init(void)
 	case -1:
 		return NULL;
 	case 1:
+#ifdef WITH_GTK2_NONX11
+		{
+		}
+		return (void*)1;
+#else
 		return gdk_x11_display_get_xdisplay(display);
+#endif
 	}
+
+#ifdef WITH_GTK2_NONX11
+	{
+		char * display_str = getenv("DISPLAY");
+		if ( display_str ) {
+			struct stat s;
+			if ((stat( display_str, &s) < 0) || !S_ISSOCK(s.st_mode))  /* not a socket */
+				return (void*)0;
+		}
+	}
+#endif
 
 #if PERL_REVISION == 5 && PERL_VERSION == 20
 /* perl bug in 5.20.0, see more at https://rt.perl.org/Ticket/Display.html?id=122105 */
@@ -95,7 +116,11 @@ prima_gtk_init(void)
 	} else {
 		gtk_initialized = 1;
 		XSetErrorHandler( guts.main_error_handler );
+#ifdef WITH_GTK2_NONX11
+		ret = (void*)1;
+#else
 		ret = gdk_x11_display_get_xdisplay(display);
+#endif
 	}
 
 	settings  = gtk_settings_get_default();
@@ -106,7 +131,7 @@ prima_gtk_init(void)
 		Font      * f = s->prima_font;
 		GtkStyle  * t = gtk_rc_get_style_by_paths(settings, NULL, s->gtk_class, s->func());
 		int selected  = ( 
-			s-> prima_class == wcRadio || 
+			s->prima_class == wcRadio || 
 			s->prima_class == wcCheckBox || 
 			s->prima_class == wcButton
 		) ? GTK_STATE_ACTIVE : GTK_STATE_SELECTED;
@@ -117,14 +142,38 @@ prima_gtk_init(void)
 		}
 		c[ciFore]         = gdk_color( t-> fg + GTK_STATE_NORMAL );
 		c[ciBack]         = gdk_color( t-> bg + GTK_STATE_NORMAL );
-		c[ciHiliteText]   = gdk_color( t-> fg + selected );
-		c[ciHilite]       = gdk_color( t-> bg + selected );
 		c[ciDisabledText] = gdk_color( t-> fg + GTK_STATE_INSENSITIVE );
 		c[ciDisabled]     = gdk_color( t-> bg + GTK_STATE_INSENSITIVE );
-		/*
-		c[ciLight3DColor] = gdk_color( t-> light + GTK_STATE_NORMAL );
-		c[ciDark3DColor]  = gdk_color( t-> dark  + GTK_STATE_NORMAL );
-		*/
+
+		if ( s-> prima_class == wcMenu || s-> prima_class == wcPopup) {
+			/* Observed on Centos7 - GTK_STATE_SELECTED gives white 
+			on white, while GTK_STATE_PRELIGHT gives correct colors.
+			OTOH, on Ubuntu it is other way around. Without digging
+			too much into GTK guts, just select the one that gives
+			best contrast */
+
+			int da, db;
+			Color ca1, ca2, cb1, cb2;
+			ca1 = gdk_color( t-> fg + selected );
+			ca2 = gdk_color( t-> bg + selected );
+			da = 
+				abs( (int)(ca1 & 0xff)-(int)(ca2 & 0xff) ) +
+				abs( (int)((ca1 & 0xff00)>>8)-(int)((ca2 & 0xff00)>>8) ) +
+				abs( (int)((ca1 & 0xff0000)>>16)-(int)((ca2 & 0xff0000)>>16) )
+			;
+			cb1 = gdk_color( t-> fg + GTK_STATE_PRELIGHT );
+			cb2 = gdk_color( t-> bg + GTK_STATE_PRELIGHT );
+			db = 
+				abs( (int)(cb1 & 0xff)-(int)(cb2 & 0xff) ) +
+				abs( (int)((cb1 & 0xff00)>>8)-(int)((cb2 & 0xff00)>>8) ) +
+				abs( (int)((cb1 & 0xff0000)>>16)-(int)((cb2 & 0xff0000)>>16) )
+			;
+			c[ciHiliteText]   = (da > db) ? ca1 : cb1;
+			c[ciHilite]       = (da > db) ? ca2 : cb2;
+		} else {
+			c[ciHiliteText]   = gdk_color( t-> fg + selected );
+			c[ciHilite]       = gdk_color( t-> bg + selected );
+		}
 		Pdebug("gtk-color: %s %06x %06x %06x %06x %06x\n", s->name, c[0], c[1], c[2], c[3], c[4], c[5]);
 
 		if ( !f) continue;
@@ -136,17 +185,15 @@ prima_gtk_init(void)
 		if ( weight <= PANGO_WEIGHT_LIGHT ) f-> style |= fsThin;
 		if ( weight >= PANGO_WEIGHT_BOLD  ) f-> style |= fsBold;
 		if ( pango_font_description_get_style(t->font_desc) == PANGO_STYLE_ITALIC)
-					f-> style |= fsItalic;
+			f-> style |= fsItalic;
 		strcpy( f->encoding, "Default" );
-		f-> width = f-> height = f->pitch = C_NUMERIC_UNDEF;
+		f-> undef. width = f-> undef. height = f-> undef. pitch = 1;
 		apc_font_pick( application, f, f);
 #define DEBUG_FONT(font) f->height,f->width,f->size,f->name,f->encoding
 		Fdebug("gtk-font (%s): %d.[w=%d,s=%d].%s.%s\n", s->name, DEBUG_FONT(f));
-				
 	}
 
 	return ret;
-
 }
 
 Bool
@@ -163,8 +210,42 @@ prima_gtk_done(void)
 	return true;
 }
 
-static gboolean do_events(gpointer data)
+#ifndef WITH_GTK2_NONX11
+static void
+set_transient_for(void)
 {
+	static GdkWindow * gdk_toplevel = NULL;
+	Handle toplevel = prima_find_toplevel_window(nilHandle);
+	if ( toplevel ) {
+		GdkWindow * g = NULL;
+
+#if GTK_MAJOR_VERSION >= 2 && GTK_MINOR_VERSION >= 14
+		g = gtk_widget_get_window(GTK_WIDGET(gtk_dialog));
+#else
+		g = gtk_dialog->window;
+#endif
+		if ( g ) {
+			Window w = gdk_x11_drawable_get_xid(g);
+			if ( w )
+				XSetTransientForHint( DISP, w, PWidget(toplevel)-> handle);
+		}
+	}
+}
+#endif
+
+
+static gboolean
+do_events(gpointer data)
+{
+	int* stage = ( int*) data;
+	if ( gtk_dialog != NULL && !*stage ) {
+		*stage = 1;
+#ifdef WITH_GTK2_NONX11
+		gtk_window_present(GTK_WINDOW(gtk_dialog));
+#else
+		set_transient_for();
+#endif
+	}
 	prima_one_loop_round( WAIT_NEVER, true);
 	return gtk_dialog != NULL;
 }
@@ -172,9 +253,9 @@ static gboolean do_events(gpointer data)
 static char *
 gtk_openfile( Bool open)
 {
-
 	char *result = NULL;
 	struct MsgDlg message_dlg, **storage;
+	int stage = 0;
 
 	if ( gtk_dialog) return NULL; /* we're not reentrant */
 
@@ -187,6 +268,9 @@ gtk_openfile( Bool open)
 		GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
 		GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
 		NULL);
+#ifdef WITH_GTK2_NONX11
+	gtk_window_set_position( GTK_WINDOW(gtk_dialog), GTK_WIN_POS_CENTER);
+#endif
 
 	gtk_file_chooser_set_local_only( GTK_FILE_CHOOSER (gtk_dialog), TRUE);
 	if (open)
@@ -220,7 +304,7 @@ gtk_openfile( Bool open)
 	while ( *storage) storage = &((*storage)-> next);
 	*storage = &message_dlg;
 
-	g_idle_add( do_events, NULL);
+	g_idle_add( do_events, &stage);
 
 	if (gtk_dialog_run (GTK_DIALOG (gtk_dialog)) == GTK_RESPONSE_ACCEPT) {
 
@@ -304,10 +388,10 @@ gtk_openfile( Bool open)
 			
 		}
 	}
-				
+		
 	if ( gtk_filters) {
-				plist_destroy( gtk_filters);
-				gtk_filters = NULL;
+		plist_destroy( gtk_filters);
+		gtk_filters = NULL;
 	}
 
 	*storage = message_dlg. next; /* unlock */

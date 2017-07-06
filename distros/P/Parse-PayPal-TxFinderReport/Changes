@@ -1,4 +1,9 @@
-Revision history for Parse-PayPal-TxFinderReport
+0.002   2017-07-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove usage of Log::Any.
+
 
 0.001   2016-12-30 (PERLANCAR)
 

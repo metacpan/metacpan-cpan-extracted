@@ -22,11 +22,10 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164949;
 
 my $formatters = [
                 {
-                  'pattern' => '(\\d{3})(\\d{6})',
                   'leading_digits' => '
             [7-9]|
             20(?:
@@ -37,17 +36,18 @@ my $formatters = [
               6[45]|
               [7-9]
             )
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{6})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{7})',
                   'leading_digits' => '
             3|
             4(?:
               [1-5]|
               6[0-36-9]
             )
-          '
+          ',
+                  'pattern' => '(\\d{2})(\\d{7})'
                 },
                 {
                   'pattern' => '(2024)(\\d{5})',
@@ -56,26 +56,6 @@ my $formatters = [
               ];
 
 my $validators = {
-                'fixed_line' => '
-          20(?:
-            [0147]\\d{2}|
-            2(?:
-              40|
-              [5-9]\\d
-            )|
-            3(?:
-              0[0-4]|
-              [23]\\d
-            )|
-            5[0-4]\\d|
-            6[035-9]\\d|
-            8[0-2]\\d
-          )\\d{4}|
-          [34]\\d{8}
-        ',
-                'pager' => '',
-                'voip' => '',
-                'toll_free' => '800[123]\\d{5}',
                 'geographic' => '
           20(?:
             [0147]\\d{2}|
@@ -93,7 +73,11 @@ my $validators = {
           )\\d{4}|
           [34]\\d{8}
         ',
+                'specialrate' => '(90[123]\\d{6})',
                 'personal_number' => '',
+                'voip' => '',
+                'pager' => '',
+                'toll_free' => '800[123]\\d{5}',
                 'mobile' => '
           7(?:
             (?:
@@ -108,7 +92,23 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'specialrate' => '(90[123]\\d{6})'
+                'fixed_line' => '
+          20(?:
+            [0147]\\d{2}|
+            2(?:
+              40|
+              [5-9]\\d
+            )|
+            3(?:
+              0[0-4]|
+              [23]\\d
+            )|
+            5[0-4]\\d|
+            6[035-9]\\d|
+            8[0-2]\\d
+          )\\d{4}|
+          [34]\\d{8}
+        '
               };
 my %areanames = (
   25641 => "Kampala",

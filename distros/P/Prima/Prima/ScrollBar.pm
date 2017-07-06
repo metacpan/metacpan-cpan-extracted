@@ -124,30 +124,35 @@ sub draw_pad
 		@spline  = reverse @spline;
 	}
 
-	my %gradient = (
-		palette    => \@palette,
-		spline     => \@spline,
-		vertical   => $self->{vertical},
-		points     => $cache->{points},
-		offsets    => $cache->{offsets},
-	);
-
-	if ( defined($cache->{base_color}) && $base_color == $cache->{base_color}) {
-		$gradient{gradient} = $cache->{gradient};
-	}
-
 	$self-> rect_bevel( $canvas, @{$self-> {$part}-> {rect}},
-		gradient=> \%gradient,
 		width   => 2, 
-		fill    => $base_color,
 		concave => $self->{$part}->{pressed},
+		fill    => $canvas->new_gradient(
+			palette   => \@palette,
+			spline    => \@spline,
+			vertical  => $self->{vertical},
+		),
 	);
-
-	$cache->{points}     = $gradient{points};
-	$cache->{offsets}    = $gradient{offsets};
-	$cache->{gradient}   = $gradient{gradient};
-	$cache->{base_color} = $base_color;
 }
+
+sub fix_triangle
+{
+	my ( $v, $spot ) = @_;
+	if ( $v ) {
+		my $d = $$spot[4] - $$spot[2];
+		if ($d % 2) {
+			$$spot[0] = $$spot[2] + ($d - 1) / 2;
+			$$spot[2]--;
+		}
+	} else {
+		my $d = $$spot[3] - $$spot[5];
+		if ($d % 2) {
+			$$spot[1] = $$spot[5] + ($d - 1) / 2;
+			$$spot[5]--;
+		}
+	}
+}
+
 
 sub on_paint
 {
@@ -169,12 +174,11 @@ sub on_paint
 	$canvas-> color( $c3d[1]);
 	$canvas-> line( 0, $maxy, $maxx, $maxy);
 	$canvas-> line( 0, 0, 0, $maxy);
-	my %pad_cache;
 	{
-		$self-> draw_pad( $canvas, b1 => $clr[1], \%pad_cache);
+		$self-> draw_pad( $canvas, b1 => $clr[1]);
 		$canvas-> color( $self-> {b1}-> { enabled} ? $clr[ 0] : $self-> disabledColor);
 		my $a = $self-> { b1}-> { pressed} ? 1 : 0;
-		my @spot = $v ? (
+		my @spot = map { int($_ + .5) } $v ? (
 			$maxx * 0.5 + $a, $maxy - $btx * 0.40 - $a,
 			$maxx * 0.3 + $a, $maxy - $btx * 0.55 - $a,
 			$maxx * 0.7 + $a, $maxy - $btx * 0.55 - $a,
@@ -183,22 +187,26 @@ sub on_paint
 			$btx * 0.55 + $a, $maxy * 0.7 - $a,
 			$btx * 0.55 + $a, $maxy * 0.3 - $a
 		);
-		$canvas-> fillpoly( [ @spot]);
+		fix_triangle($v, \@spot);
+		$canvas-> fillpoly( [ @spot])
+			if $maxx > 10 && $maxy > 10;
 	}
 	{
-		$self-> draw_pad( $canvas, b2 => $clr[1], \%pad_cache);
+		$self-> draw_pad( $canvas, b2 => $clr[1]);
 		$canvas-> color( $self-> {b2}-> { enabled} ? $clr[ 0] : $self-> disabledColor);
 		my $a = $self-> { b2}-> { pressed} ? 1 : 0;
-		my @spot = $v ? (
-			$maxx * 0.5 + $a, $btx * 0.40 + 1 - $a,
-			$maxx * 0.3 + $a, $btx * 0.55 + 1 - $a,
-			$maxx * 0.7 + $a, $btx * 0.55 + 1 - $a
+		my @spot = map { int($_ + .5) } $v ? (
+			$maxx * 0.5 + $a, $btx * 0.40 - $a,
+			$maxx * 0.3 + $a, $btx * 0.55 - $a,
+			$maxx * 0.7 + $a, $btx * 0.55 - $a
 		) : (
-			$maxx - $btx * 0.45 + 1 + $a, $maxy * 0.5 - $a,
-			$maxx - $btx * 0.60 + 1 + $a, $maxy * 0.7 - $a,
-			$maxx - $btx * 0.60 + 1 + $a, $maxy * 0.3 - $a
+			$maxx - $btx * 0.40 + $a, $maxy * 0.5 - $a,
+			$maxx - $btx * 0.55 + $a, $maxy * 0.7 - $a,
+			$maxx - $btx * 0.55 + $a, $maxy * 0.3 - $a
 		);
-		$canvas-> fillpoly( [ @spot]);
+		fix_triangle($v, \@spot);
+		$canvas-> fillpoly( [ @spot])
+			if $maxx > 10 && $maxy > 10;
 		$canvas-> color( $clr[ 1]);
 	}
 	if ( $self-> { tab}-> { enabled})
@@ -226,9 +234,15 @@ sub on_paint
 			}
 		}
 
-		$self-> draw_pad( $canvas, tab => $clr[1], \%pad_cache);
-		if ( $self-> {minThumbSize} > 8 && $self->{style} ne 'xp')
+		$self-> draw_pad( $canvas, tab => $clr[1]);
+		if ( 
+			$self-> {minThumbSize} > 8 && 
+			$self->{style} ne 'xp' && 
+			(( $v ? $maxx : $maxy) > 10)
+		)
 		{
+			$canvas-> color( $clr[ 0]);
+			$canvas-> backColor( $c3d[ 0]);
 			if ( $v)
 			{
 				my $sty = $rect[1] + 
@@ -237,27 +251,21 @@ sub on_paint
 					( $self-> { tab} -> { pressed} ? 1 : 0);
 				my $stx = int($maxx / 3) + ( $self-> { tab} -> { pressed} ? 1 : 0);
 				my $lnx = int($maxx / 3);
-				$canvas-> color( $c3d[ 0]);
+				$lnx += $maxx - $lnx * 3;
+				$canvas-> fillPattern([(0xff, 0) x 4]);
+				$canvas-> fillPatternOffset($stx, $sty);
 				$canvas-> bar( $stx, $sty - 1, $stx + $lnx, $sty + 9);
-				$canvas-> color( $clr[ 0]);
-				$canvas-> lines( [ map { 
-					$stx,        $sty + $_ * 2, 
-					$stx + $lnx, $sty + $_ * 2 
-				} 0..5 ] );
 			} else {
 				my $stx = $rect[0] + 
 					int($lenx / 2) - 
-					6 + 
+					4 + 
 					( $self-> { tab}-> { pressed} ? 1 : 0) ;
 				my $sty = int($maxy / 3) - ( $self-> { tab} -> { pressed} ? 1 : 0);
 				my $lny = int($maxy / 3);
-				$canvas-> color( $c3d[ 0]);
-				$canvas-> bar( $stx + 1, $sty, $stx + 11, $sty + $lny);
-				$canvas-> color( $clr[ 0]);
-				$canvas-> lines( [ map { 
-					$stx + $_ * 2, $sty, 
-					$stx + $_ * 2, $sty + $lny
-				} 0..5 ] );
+				$lny += $maxy - $lny * 3;
+				$canvas-> fillPattern([(0xAA) x 8]);
+				$canvas-> fillPatternOffset($stx, $sty);
+				$canvas-> bar( $stx - 1, $sty, $stx + 9, $sty + $lny);
 			}
 		}
 	} else {
@@ -569,7 +577,7 @@ sub reset
 		@rect = $v ? (
 			1, $maxy - $btx - $lenx - $atx, $maxx - 1, $maxy - $btx - $atx
 		) : (
-			$btx + $atx, 1, $btx + $atx + $lenx - 1, $maxy - 1
+			$btx + $atx, 1, $btx + $atx + $lenx, $maxy - 1
 		);
 		$self-> set(
 			cursorPos  => [ $rect[0] + 1, $rect[1] + 1],

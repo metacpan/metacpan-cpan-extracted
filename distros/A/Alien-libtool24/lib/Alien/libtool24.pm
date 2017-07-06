@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use base qw( Alien::Base );
 
-# ABSTRACT: Built or find libtool 2.4.x
-our $VERSION = '0.04'; # VERSION
+# ABSTRACT: (Deprecated) Built or find libtool 2.4.x
+our $VERSION = '0.05'; # VERSION
 
 
 1;
@@ -18,11 +18,11 @@ __END__
 
 =head1 NAME
 
-Alien::libtool24 - Built or find libtool 2.4.x
+Alien::libtool24 - (Deprecated) Built or find libtool 2.4.x
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -51,6 +51,9 @@ From regular Perl:
  system 'libtool ...';
 
 =head1 DESCRIPTION
+
+B<This module is deprecated>.  Use L<Alien::libtool> instead, it uses newer
+better Alien tech.
 
 This module will download and install libtool 2.4.x if it is not already
 available on your system.  As with other L<Alien::Base> based distributions
@@ -85,9 +88,11 @@ hackishly on Windows.
 
 =over 4
 
-=item Alien
+=item L<Alien>
 
-=item Alien::Base
+=item L<Alien::Base>
+
+=item L<Alien::libtool>
 
 =back
 

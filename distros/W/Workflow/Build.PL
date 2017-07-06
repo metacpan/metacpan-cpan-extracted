@@ -19,11 +19,10 @@ my %module_build_args = (
     "Chris Winters <chris\@cwinters.com>"
   ],
   "dist_name" => "Workflow",
-  "dist_version" => "1.43",
+  "dist_version" => "1.45",
   "license" => "perl",
   "module_name" => "Workflow",
   "recommends" => {
-    "Data::UUID" => 0,
     "SPOPS" => 0
   },
   "recursive_test_files" => 1,
@@ -34,6 +33,7 @@ my %module_build_args = (
     "Class::Observable" => "1.04",
     "DBI" => 0,
     "Data::Dumper" => 0,
+    "Data::UUID" => 0,
     "DateTime" => "0.15",
     "DateTime::Format::Strptime" => "1.00",
     "Exception::Class" => "1.10",

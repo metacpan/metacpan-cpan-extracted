@@ -1,6 +1,7 @@
 TYPEMAP
 Display *             O_X11_Xlib
 DisplayOrNull         O_X11_XlibOrNull
+Screen *              O_X11_Xlib_Screen
 ScreenNumber          O_X11_Xlib_ScreenNumber
 Visual *              O_X11_Xlib_Opaque
 VisualOrNull          O_X11_Xlib_OpaqueOrNull
@@ -12,6 +13,7 @@ XWindowAttributes *   O_X11_Xlib_Struct
 XSetWindowAttributes* O_X11_Xlib_Struct
 XSizeHints *          O_X11_Xlib_Struct
 XRectangle *          O_X11_Xlib_Struct
+XRenderPictFormat *   O_X11_Xlib_Struct
 Window                O_X11_Xlib_XID
 Pixmap                O_X11_Xlib_XID
 Cursor                O_X11_Xlib_XID
@@ -19,6 +21,10 @@ Colormap              O_X11_Xlib_XID
 Drawable              O_X11_Xlib_XID
 VisualID              O_X11_Xlib_XID
 XserverRegion         O_X11_Xlib_XID
+Glyph                 O_X11_Xlib_XID
+GlyphSet              O_X11_Xlib_XID
+Picture               O_X11_Xlib_XID
+PictFormat            O_X11_Xlib_XID
 Atom                  T_UV
 Time                  T_UV
 Bool                  T_BOOL
@@ -43,17 +49,27 @@ O_X11_XlibOrNull
 
 INPUT
 O_X11_Xlib_ScreenNumber
-	if (!SvOK($arg))
-		$var = DefaultScreen(dpy);
-	else if (SvROK($arg)) {
-		SV **fp;
-		if (SvTYPE(SvRV($arg)) == SVt_PVHV && (fp= hv_fetch((HV*)SvRV($arg), \"screen_number\", 13, 0)) && *fp) {
-			$var= SvIV(*fp);
-		}
-		else croak(\"Invalid object passed as Screen number\");
-	}
-	else
-		$var= SvIV($arg);
+    if (!SvOK($arg))
+        $var = DefaultScreen(dpy);
+    else if (SvROK($arg)) {
+        SV **fp;
+        if (SvTYPE(SvRV($arg)) == SVt_PVHV && (fp= hv_fetch((HV*)SvRV($arg), \"screen_number\", 13, 0)) && *fp) {
+            $var= SvIV(*fp);
+        }
+        else croak(\"Invalid object passed as Screen number\");
+    }
+    else {
+        $var= SvIV($arg);
+        if ($var == -1) $var= DefaultScreen(dpy);
+    }
+
+INPUT
+O_X11_Xlib_Screen
+    $var = PerlXlib_sv_to_screen($arg, 1);
+
+OUTPUT
+O_X11_Xlib_Screen
+    $arg = PerlXlib_obj_for_screen($var, 0);
 
 INPUT
 O_X11_Xlib_XID
@@ -74,21 +90,22 @@ O_X11_Xlib_Struct
 INPUT
 O_X11_Xlib_Opaque
     if (sv_isa($arg, \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\")) {
-        $var= ($type) SvIV((SV*)SvRV($arg));
+        $var= ($type) PerlXlib_sv_to_display_innerptr($arg, 1);
     } else {
         croak( \"%s is not a %s\", \"$var\", \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\" );
     }
 
 OUTPUT
 O_X11_Xlib_Opaque
-    sv_setref_pv($arg, \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\", (void*) $var);
+    sv_setsv($arg, PerlXlib_obj_for_display_innerptr(
+        dpy, $var, \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\", SVt_PVMG, 1));
 
 INPUT
 O_X11_Xlib_OpaqueOrNull
     if (!SvOK($arg) || (SvIOK($arg) && !SvIV($arg)))
         $var= NULL;
     else if (sv_isa($arg, \"X11::Xlib::@{[ $type =~ /(\w+?)OrNull/ ]}\")) {
-        $var= ($type) SvIV((SV*)SvRV($arg));
+        $var= ($type) PerlXlib_sv_to_display_innerptr($arg, 0);
     } else {
         croak( \"%s is not a %s\", \"$var\", \"X11::Xlib::@{[ $type =~ /(\w+)/ ]}\" );
     }
@@ -96,6 +113,7 @@ O_X11_Xlib_OpaqueOrNull
 OUTPUT
 O_X11_Xlib_OpaqueOrNull
     if ($var)
-        sv_setref_pv($arg, \"X11::Xlib::@{[ $type =~ /(\w+?)OrNull/ ]}\", (void*) $var);
+        sv_setsv($arg, PerlXlib_obj_for_display_innerptr(
+            dpy, $var, \"X11::Xlib::@{[ $type =~ /(\w+?)OrNull/ ]}\", SVt_PVMG, 1));
     else
         sv_setsv($arg, &PL_sv_undef);

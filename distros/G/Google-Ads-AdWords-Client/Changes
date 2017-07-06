@@ -1,3 +1,13 @@
+4.15.0
+- Removed examples and support for v201607. For future sunset dates, see
+https://developers.google.com/adwords/api/docs/sunset-dates
+- Logging was updated so that failed SOAP and summary messages are logged
+as INFO while successful SOAP and summary messages are logged as DEBUG.
+A request will now be logged at the same time as a response.
+- Added 'use strict' and 'use warnings' to various modules and fixed
+POD issues in non-generated code in order to improve the quality of
+the library.
+
 4.14.0
 - Added support and examples for v201705.
 - Updated add_shopping_campaign.pl to include an option of creating an

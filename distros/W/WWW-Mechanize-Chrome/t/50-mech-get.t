@@ -4,9 +4,9 @@ use Test::More;
 use Log::Log4perl qw(:easy);
 
 use WWW::Mechanize::Chrome;
-use lib './inc', '../inc';
+use lib './inc', '../inc', '.';
 use Test::HTTP::LocalServer;
-
+use Mojolicious;
 use t::helper;
 
 Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
@@ -22,16 +22,11 @@ if (my $err = t::helper::default_unavailable) {
     plan tests => 6*@instances;
 };
 
-my %args;
 sub new_mech {
-    # Just keep these to pass the parameters to new instances
-    if( ! keys %args ) {
-        %args = @_;
-    };
     #use Mojolicious;
     WWW::Mechanize::Chrome->new(
         autodie => 1,
-        %args,
+        @_,
     );
 };
 
@@ -45,6 +40,7 @@ t::helper::run_across_instances(\@instances, $instance_port, \&new_mech, 6, sub 
     isa_ok $mech, 'WWW::Mechanize::Chrome';
 
     my ($site,$estatus) = ($server->url,200);
+
     my $res = $mech->get($site);
     isa_ok $res, 'HTTP::Response', "Response";
 

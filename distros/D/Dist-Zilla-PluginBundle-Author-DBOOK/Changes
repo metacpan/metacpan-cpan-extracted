@@ -1,3 +1,6 @@
+0.033     2017-07-05 17:22:42 EDT
+  - Add perl 5.26 to travis config in minting profile
+
 0.032     2016-11-23 16:07:57 EST
   - Add irc option to set x_IRC resource metadata
 

@@ -6,7 +6,7 @@ use Mojo::JSON;
 use Mojo::Util 'deprecated';
 use constant DEBUG => $ENV{MOJO_OPENAPI_DEBUG} || 0;
 
-our $VERSION = '1.17';
+our $VERSION = '1.18';
 my $X_RE = qr{^x-};
 
 has _validator => sub { JSON::Validator::OpenAPI::Mojolicious->new; };
@@ -64,7 +64,7 @@ sub _add_routes {
 
   for my $path (_sort_paths(keys %$paths)) {
     next if $path =~ $X_RE;
-    my @parameters = @{$paths->{$path}{parameters} || []};
+    my @path_parameters = @{$paths->{$path}{parameters} || []};
     my $route_path = $path;
     my $has_options;
 
@@ -75,6 +75,7 @@ sub _add_routes {
       my $to      = $op_spec->{'x-mojo-to'};
       my $endpoint;
 
+      $op_spec->{'x-all-parameters'} = [@path_parameters, @{$op_spec->{parameters} || []}];
       $has_options = 1 if lc $http_method eq 'options';
       $route_path = _route_path($path, $op_spec);
 
@@ -82,9 +83,6 @@ sub _add_routes {
         if $op_spec->{operationId} and $uniq{o}{$op_spec->{operationId}}++;
       die qq([OpenAPI] Route name "$name" is not unique.) if $name and $uniq{r}{$name}++;
 
-      if (@parameters) {
-        $op_spec->{parameters} = [@parameters, @{$op_spec->{parameters} || []}];
-      }
       if ($name and $endpoint = $route->root->find($name)) {
         $route->add_child($endpoint);
       }
@@ -217,8 +215,14 @@ sub _render_route_spec {
   my $spec   = $c->stash('openapi.api_spec')->data->{paths}{$path};
   my $method = $c->param('method');
   $spec = $spec->{$method} if $method;
-  return $c->render(json => $spec) if $spec;
-  return $c->render(json => {}, status => 404);
+  return $c->render(json => {}, status => 404) unless $spec;
+
+  # jhthorsen: I don't like this, but I also don't want
+  # x-all-parameters to be part of the response.
+  local $spec->{'parameters'} = $spec->{'x-all-parameters'} || $spec->{'parameters'};
+  local $spec->{'x-all-parameters'};
+  delete $spec->{'x-all-parameters'};
+  return $c->render(json => $spec);
 }
 
 sub _reply_spec {
@@ -244,7 +248,7 @@ sub _reply_spec {
 
 sub _route_path {
   my ($path, $op_spec) = @_;
-  my %parameters = map { ($_->{name}, $_) } @{$op_spec->{parameters} || []};
+  my %parameters = map { ($_->{name}, $_) } @{$op_spec->{'x-all-parameters'} || []};
   $path =~ s/{([^}]+)}/{
     my $pname = $1;
     my $type = $parameters{$pname}{'x-mojo-placeholder'} || ':';
@@ -278,6 +282,7 @@ sub _validate {
   my $op_spec = $c->openapi->spec;
 
   # Write validated data to $c->validation->output
+  local $op_spec->{parameters} = $op_spec->{'x-all-parameters'};
   my @errors = $self->_validator->validate_request($c, $op_spec, $c->validation->output);
 
   if (@errors) {
@@ -590,7 +595,7 @@ __DATA__
 <p class="op-summary op-doc-missing">This resource is not documented.</p>
 % }
 @@ mojolicious/plugin/openapi/parameters.html.ep
-% my $has_parameters = @{$op->{parameters} || []};
+% my $has_parameters = @{$op->{'x-all-parameters'}};
 % my $body;
 <h4 class="op-parameters">Parameters</h3>
 % if ($has_parameters) {
@@ -606,7 +611,7 @@ __DATA__
   </thead>
   <tbody>
 % }
-% for my $p (@{$op->{parameters} || []}) {
+% for my $p (@{$op->{'x-all-parameters'} || []}) {
   % $body = $p->{schema} if $p->{in} eq 'body';
     <tr>
       <td><%= $p->{name} %></td>
@@ -661,7 +666,7 @@ __DATA__
 % for my $path (sort { length $a <=> length $b } keys %{$spec->{paths}}) {
   % next if $path =~ $X_RE;
   % for my $http_method (sort keys %{$spec->{paths}{$path}}) {
-    % next if $http_method =~ $X_RE;
+    % next if $http_method =~ $X_RE or $http_method eq 'parameters';
     % my $op = $spec->{paths}{$path}{$http_method};
     %= include "mojolicious/plugin/openapi/resource", method => $http_method, op => $op, path => $path
   % }

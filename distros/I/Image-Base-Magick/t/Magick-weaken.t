@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2012 Kevin Ryde
 
 # This file is part of Image-Base-Magick.
 #
@@ -36,7 +36,7 @@ if (! eval "use Test::Weaken 2.000; 1") {
   }
   exit 0;
 }
-MyTestHelpers::diag("Test::Weaken version $Test::Weaken::VERSION");
+MyTestHelpers::diag ("Test::Weaken version ", Test::Weaken->VERSION);
 
 {
   my $leaks = Test::Weaken::leaks

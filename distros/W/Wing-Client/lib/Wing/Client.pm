@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Wing::Client;
-$Wing::Client::VERSION = '1.0000';
+$Wing::Client::VERSION = '1.1000';
 use HTTP::Thin;
 use HTTP::Request::Common;
 use HTTP::CookieJar;
@@ -17,7 +17,7 @@ Wing::Client - A simple client to Wing's web services.
 
 =head1 VERSION
 
-version 1.0000
+version 1.1000
 
 =head1 SYNOPSIS
 
@@ -57,6 +57,15 @@ A hash of parameters.
 
 The base URI of the service you're interacting with. Example: C<https://www.thegamecrafter.com>.
 
+=item session_id
+
+A Wing session_id.  If set, this is automatically added to all requests because I'm lazy.  If you don't
+want a session_id for a while, set the C<no_session_id> flag on the object.
+
+=item no_session_id
+
+If set to true, prevents adding the session_id to the request.
+
 =cut
 
 has uri => (
@@ -84,6 +93,32 @@ has agent => (
 sub _build_agent {
     return HTTP::Thin->new( cookie_jar => HTTP::CookieJar->new() )
 }
+
+has [qw/session_id no_session_id/] => (
+    is          => 'rw',
+    required    => 0,
+);
+
+##Optionally add a session id, if the following conditions are met:
+## 1) A session_id was put into the object
+## 2) no_session_id was not set
+## 3) No session_id was passed with any parameters when calling the method.
+
+sub _add_session_id {
+    my $orig   = shift;
+    my $self   = shift;
+    my $uri    = shift;
+    my $params = shift || {};
+    if ($self->session_id && ! $self->no_session_id && ! exists $params->{session_id}) {
+        $params->{session_id} = $self->session_id;
+    }
+    return $self->$orig($uri, $params, @_);
+}
+
+around get => \&_add_session_id;
+around post => \&_add_session_id;
+around put => \&_add_session_id;
+around delete => \&_add_session_id;
 
 =head2 get(path, params)
 

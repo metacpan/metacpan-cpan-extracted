@@ -1,5 +1,4 @@
 use Test::More;
-use Data::Dumper;
 BEGIN{
 };
 eval "use Template::Extract;";
@@ -56,9 +55,7 @@ pop(@{$str1});
 pop(@{$str2});
 my $str3 = "I am king of the world, and I am a richest man";
 $parts = $rev->detect($str1, $str2);
-print Dumper $parts;
 $temps = $tt2->Convert($parts);
-print Dumper $temps;
 my $r = $ext->extract($temps->[0],$str3);
 is $r->{'value'},'king of the world,';
 

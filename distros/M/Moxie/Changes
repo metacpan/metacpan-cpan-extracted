@@ -1,4 +1,8 @@
 Revision history for Perl extension Moxie
 
-0.01
+0.02 05-07-2017
+    - fixing missing dependency (PadWalker)
+    - fixing some simple kwalitee issues
+
+0.01 21-06-2017
     - Initial release to an unsuspecting world

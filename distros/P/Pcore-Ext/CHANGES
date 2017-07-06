@@ -1,3 +1,7 @@
+v0.9.1 2017-07-04T05:20:27Z
+ - No issues on bugtracker were closed since the last release
+ - fix unicode chars in json generator
+
 v0.9.0 2017-06-04T10:15:29Z
  - No issues on bugtracker were closed since the last release
  - $ext->ext_ methods were replaced with tied hashes

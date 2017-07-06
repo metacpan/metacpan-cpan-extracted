@@ -110,14 +110,13 @@ ANTONC <antonc@cpan.org>
 =cut
 
 
-use v5.10.0;
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
 use Data::Serializer;
 use Time::HiRes qw/ alarm sleep /;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 extends 'Async::Simple::Task';

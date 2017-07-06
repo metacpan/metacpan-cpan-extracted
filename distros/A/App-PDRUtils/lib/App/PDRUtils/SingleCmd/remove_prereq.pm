@@ -1,7 +1,7 @@
 package App::PDRUtils::SingleCmd::remove_prereq;
 
-our $DATE = '2016-12-28'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,12 +28,16 @@ App::PDRUtils::SingleCmd::remove_prereq - Add a prereq
 
 =head1 VERSION
 
-This document describes version 0.09 of App::PDRUtils::SingleCmd::remove_prereq (from Perl distribution App-PDRUtils), released on 2016-12-28.
+This document describes version 0.10 of App::PDRUtils::SingleCmd::remove_prereq (from Perl distribution App-PDRUtils), released on 2017-07-03.
 
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Add a prereq.
 
@@ -93,7 +97,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

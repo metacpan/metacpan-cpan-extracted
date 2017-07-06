@@ -1,3 +1,33 @@
+2.032     2017-07-02
+
+    - PDF::API2 has many circular references, and the end() method
+      doesn't clear them all, so memory is leaked.  This release uses
+      Scalar::Util's weaken() function to improve garbage collection.
+      A significant number of circular references have been weakened,
+      though many likely still remain.
+
+    - [RT #120756] Eliminate a warning for an ambiguous call to
+      CORE::open (first reported by Abdelbaki Brahmia).
+
+    - $text->text_justified() and $text->text_fill_justified() now
+      adjust the space between words rather than stretching individual
+      characters in order to get the text to fit.
+
+    - [RT #120397] Indirect references and indirect objects can have
+      comments embedded in their whitespace, and their object number
+      and generation may be split across multiple lines, which may not
+      all be buffered (reported by SPROUT).
+
+    - [RT #120450] Fix PDF::API2->open($filename)->stringify()
+      (reported by SPROUT).
+
+    - Fix an off-by-one error when calculating text width while
+      charspace is non-zero.
+
+    - [RT #120048] Fix PDF::API2->synfont() (broken in 2.029, fixed by Vadim
+      Repin) and add basic testing.
+
+
 2.031     2017-01-26
 
     - Fix use of cache files when reading streams: temp files will now

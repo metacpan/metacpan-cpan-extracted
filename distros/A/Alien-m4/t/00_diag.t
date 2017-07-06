@@ -14,7 +14,7 @@ $modules{$_} = $_ for qw(
   Alien::Build
   Alien::Build::MM
   ExtUtils::MakeMaker
-  Test2::Suite
+  Test2::V0
   Test::Alien
   Test::More
 );

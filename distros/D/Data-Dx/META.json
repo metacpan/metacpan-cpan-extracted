@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Dx",
    "no_index" : {
@@ -41,5 +41,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.000003"
+   "version" : "0.000004"
 }

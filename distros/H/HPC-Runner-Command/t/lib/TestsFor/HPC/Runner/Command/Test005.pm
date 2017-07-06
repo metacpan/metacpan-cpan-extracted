@@ -11,16 +11,17 @@ use File::Path qw(make_path remove_tree);
 use IPC::Cmd qw[can_run];
 use Data::Dumper;
 use Capture::Tiny ':all';
-use Slurp;
 use File::Slurp;
+use File::Spec;
+use JSON;
 
 extends 'TestMethods::Base';
 
 sub write_test_file {
     my $test_dir = shift;
 
-    open( my $fh, ">$test_dir/script/test002.1.sh" );
-    print $fh <<EOF;
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test002.1.sh' );
+    my $text=<<EOF;
 #HPC jobname=pyfasta
 #HPC module=gencore_dev gencore_metagenomics_dev
 #HPC commands_per_node=1
@@ -78,7 +79,7 @@ blastx -db  env_nr -query Sample6
 
 EOF
 
-    close($fh);
+    write_file( $file, $text );
 }
 
 sub construct {
@@ -88,12 +89,12 @@ sub construct {
     my $test_dir     = $test_methods->make_test_dir();
     write_test_file($test_dir);
 
-    my $t = "$test_dir/script/test002.1.sh";
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test002.1.sh' );
     MooseX::App::ParsedArgv->new(
         argv => [
             "submit_jobs",    "--infile",
-            $t,               "--outdir",
-            "$test_dir/logs", "--hpc_plugins",
+            $file,               "--outdir",
+            File::Spec->catdir($test_dir, 'logs'), "--hpc_plugins",
             "Dummy",
         ]
     );
@@ -123,7 +124,7 @@ sub test_001 : Tags(job_stats) {
     my $logdir = $test->logdir;
     my $outdir = $test->outdir;
 
-    my @files = glob( $test->outdir . "/*" );
+    my @files = glob( File::Spec->catdir($test->outdir , "*") );
 
     is( scalar @files, 8, "Got the right number of files" );
 
@@ -176,6 +177,87 @@ sub test_001 : Tags(job_stats) {
     chdir($cwd);
     remove_tree($test_dir);
 
+}
+
+sub test_004 : Tags(submit_jobs) {
+    my $test = construct();
+    my $test_dir = getcwd();
+
+    $test->execute;
+
+    ok($test->has_data_tar);
+    my $basename = $test->data_tar->basename('.tar.gz');
+    my $submission_file = File::Spec->catdir( $basename, 'submission.json' );
+    ok($test->archive->contains_file($submission_file), 'We have a submission.json');
+
+    my $content = $test->archive->get_content($submission_file);
+
+    my $json_obj = decode_json($content);
+
+    ok(exists $json_obj->{submission_time});
+    is($json_obj->{uuid}, $test->submission_uuid);
+    delete $json_obj->{submission_time};
+
+    my $expect = {
+          'uuid' => $test->submission_uuid,
+          'jobs' => [
+                      {
+                        'deps' => '',
+                        'mem' => '4GB',
+                        'cpus_per_task' => '1',
+                        'schedule' => [
+                                        {
+                                          'total_tasks' => 6,
+                                          'task_indices' => '1-6',
+                                          'scheduler_id' => '1234'
+                                        }
+                                      ],
+                        'cmd_end' => 6,
+                        'job' => 'pyfasta',
+                        'cmd_start' => '0',
+                        'total_tasks' => '6',
+                        'walltime' => '00:15:00'
+                      },
+                      {
+                        'cmd_end' => 12,
+                        'walltime' => '06:00:00',
+                        'total_tasks' => '6',
+                        'job' => 'blastx_scratch',
+                        'cmd_start' => '6',
+                        'mem' => '20GB',
+                        'cpus_per_task' => '7',
+                        'deps' => 'pyfasta',
+                        'schedule' => [
+                                        {
+                                          'task_indices' => '1-6',
+                                          'scheduler_id' => '1235',
+                                          'total_tasks' => 6
+                                        }
+                                      ]
+                      }
+                    ],
+          'submissions' => {
+                             '001_pyfasta' => {
+                                                'job_task_index_end' => 5,
+                                                'batch_index_end' => '6',
+                                                'job_task_index_start' => 0,
+                                                'batch_index_start' => '1',
+                                                'jobname' => 'pyfasta'
+                                              },
+                             '002_blastx_scratch' => {
+                                                       'jobname' => 'blastx_scratch',
+                                                       'batch_index_start' => '1',
+                                                       'job_task_index_start' => 6,
+                                                       'batch_index_end' => '6',
+                                                       'job_task_index_end' => 11
+                                                     }
+                           },
+        };
+
+
+    is_deeply($expect, $json_obj, 'submission meta passes');
+    chdir($Bin);
+    remove_tree($test_dir);
 }
 
 1;

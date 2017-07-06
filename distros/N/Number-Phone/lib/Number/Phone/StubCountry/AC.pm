@@ -22,23 +22,23 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173053;
+our $VERSION = 1.20170702164946;
 
 my $formatters = [];
 
 my $validators = {
-                'pager' => '',
-                'voip' => '',
+                'personal_number' => '',
+                'geographic' => '
+          6[2-467]\\d{3}
+        ',
+                'specialrate' => '([01589]\\d{5})',
                 'fixed_line' => '
           6[2-467]\\d{3}
         ',
                 'mobile' => '4\\d{4}',
-                'specialrate' => '([01589]\\d{5})',
-                'geographic' => '
-          6[2-467]\\d{3}
-        ',
-                'personal_number' => '',
-                'toll_free' => ''
+                'toll_free' => '',
+                'pager' => '',
+                'voip' => ''
               };
 my %areanames = (
   2471 => "Georgetown",

@@ -1,5 +1,5 @@
 package HackaMol::Roles::MolReadRole;
-$HackaMol::Roles::MolReadRole::VERSION = '0.040';
+$HackaMol::Roles::MolReadRole::VERSION = '0.043';
 # ABSTRACT: Read files with molecular information
 use Moose::Role;
 use Carp;
@@ -102,7 +102,7 @@ HackaMol::Roles::MolReadRole - Read files with molecular information
 
 =head1 VERSION
 
-version 0.040
+version 0.043
 
 =head1 SYNOPSIS
 

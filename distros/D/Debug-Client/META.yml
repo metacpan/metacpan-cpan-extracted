@@ -49,4 +49,4 @@ resources:
   homepage: https://github.com/PadreIDE/Debug-Client
   license: http://dev.perl.org/licenses/
   repository: git://github.com/PadreIDE/Debug-Client.git
-version: 0.30
+version: 0.31

@@ -4,7 +4,7 @@ use warnings;
 
 use 5.024;
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 7.30;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "minimal mailing list manager",
@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.024",
   "NAME" => "Sietima",
   "PREREQ_PM" => {
-    "App::Spec" => "0.004",
-    "App::Spec::Run" => "0.004",
+    "App::Spec" => ">= 0.004, != 0.004_001",
+    "App::Spec::Run" => ">= 0.004, != 0.004_001",
     "Digest::SHA" => "5.96",
     "Email::Address" => "1.908",
     "Email::MIME" => "1.940",
@@ -52,7 +52,7 @@ my %WriteMakefileArgs = (
     "URI" => "1.71",
     "lib" => "0.63"
   },
-  "VERSION" => "1.0.2",
+  "VERSION" => "1.0.3",
   "test" => {
     "TESTS" => "t/*.t t/tests/*.t t/tests/sietima/*.t t/tests/sietima/multi-role/*.t t/tests/sietima/role/*.t t/tests/sietima/role/subscriberonly/*.t"
   }
@@ -60,8 +60,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::Spec" => "0.004",
-  "App::Spec::Run" => "0.004",
+  "App::Spec" => ">= 0.004, != 0.004_001",
+  "App::Spec::Run" => ">= 0.004, != 0.004_001",
   "Data::Printer" => "0.39",
   "Digest::SHA" => "5.96",
   "Email::Address" => "1.908",

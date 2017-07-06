@@ -6,7 +6,7 @@ build_requires:
   Alien::Build: '0.40'
   Alien::Build::MM: '0.40'
   ExtUtils::MakeMaker: '6.52'
-  Test2::Suite: '0.000060'
+  Test2::V0: '0.000060'
   Test::Alien: '0'
   Test::More: '0.94'
   perl: '5.006'
@@ -30,5 +30,5 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Alien-m4/issues
   homepage: https://metacpan.org/pod/Alien::m4
   repository: git://github.com/Perl5-Alien/Alien-m4.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'YAML::Tiny version 1.70'

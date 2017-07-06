@@ -59,7 +59,7 @@
    "provides" : {
       "Test::Mock::Net::FTP" : {
          "file" : "lib/Test/Mock/Net/FTP.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/tsucchi/Test-Mock-Net-FTP"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
       "tsucchi <takuya.tsuchida at gmail.com>",
       "Diab Jerius <djerius@cfa.harvard.edu>",

@@ -3,7 +3,7 @@ abstract: 'very simplicistic signatures for Perl < 5.20'
 author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires: {}
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
@@ -16,5 +16,6 @@ no_index:
     - inc
 resources:
   repository: git://github.com/Corion/filter-signatures.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

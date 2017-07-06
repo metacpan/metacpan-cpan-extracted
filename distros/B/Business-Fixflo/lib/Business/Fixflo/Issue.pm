@@ -24,6 +24,8 @@ use Business::Fixflo::Property;
 
     Address
     AdditionalDetails
+    AssignedAgent
+    Block
     CallbackId
     ContactNumber
     ContactNumberAlt
@@ -63,6 +65,8 @@ use Business::Fixflo::Property;
 has [ qw/
     Address
     AdditionalDetails
+    AssignedAgent
+    Block
     CallbackId
     ContactNumber
     ContactNumberAlt

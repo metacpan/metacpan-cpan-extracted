@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,19 +18,19 @@ name: Travel-Status-DE-VRR
 provides:
   Travel::Status::DE::EFA:
     file: lib/Travel/Status/DE/EFA.pm
-    version: '1.14'
+    version: '1.15'
   Travel::Status::DE::EFA::Line:
     file: lib/Travel/Status/DE/EFA/Line.pm
-    version: '1.14'
+    version: '1.15'
   Travel::Status::DE::EFA::Result:
     file: lib/Travel/Status/DE/EFA/Result.pm
-    version: '1.14'
+    version: '1.15'
   Travel::Status::DE::EFA::Stop:
     file: lib/Travel/Status/DE/EFA/Stop.pm
-    version: '1.14'
+    version: '1.15'
   Travel::Status::DE::VRR:
     file: lib/Travel/Status/DE/VRR.pm
-    version: '1.14'
+    version: '1.15'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -41,5 +41,5 @@ requires:
   perl: v5.10.1
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.14'
+version: '1.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

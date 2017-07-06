@@ -1,4 +1,17 @@
-Revision history for App-CompleteUtils
+0.15    2017-07-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Forgot to replace dependency Log::Any::Adapter::Screen to
+	  Log::ger::Output::Screen.
+
+
+0.14    2017-07-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::ger.
+
 
 0.13    2016-11-04 (PERLANCAR)
 

@@ -11,6 +11,7 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use Slurp;
 use File::Slurp;
+use File::Spec;
 
 extends 'TestMethods::Base';
 
@@ -23,8 +24,8 @@ extends 'TestMethods::Base';
 sub write_test_file {
     my $test_dir = shift;
 
-    open( my $fh, ">$test_dir/script/test003.1.sh" );
-    print $fh <<EOF;
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test003.1.sh' );
+    my $text = <<EOF;
 #HPC partition=mypartition
 echo "hello world from job 1" && sleep 5
 
@@ -41,9 +42,7 @@ wait
 echo "hello again from job 3" && sleep 5
 EOF
 
-    close($fh);
-
-    close($fh);
+    ok(write_file( $file, $text ));
 }
 
 sub construct {
@@ -51,11 +50,10 @@ sub construct {
     my $test_dir     = $test_methods->make_test_dir();
     write_test_file($test_dir);
 
-    my $t = "$test_dir/script/test003.1.sh";
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test003.1.sh' );
 
     MooseX::App::ParsedArgv->new(
-        argv => [ "submit_jobs", "--infile", $t, "--dry_run" ]
-    );
+        argv => [ "submit_jobs", "--infile", $file, "--dry_run" ] );
 
     my $test = HPC::Runner::Command->new_with_command();
     $test->logname('slurm_logs');
@@ -67,7 +65,7 @@ sub construct {
 sub test_003 : Tags(construct) {
 
     my $cwd      = getcwd();
-    my $test = construct();
+    my $test     = construct();
     my $test_dir = getcwd();
 
     $test->parse_file_slurm();
@@ -76,23 +74,10 @@ sub test_003 : Tags(construct) {
     is_deeply( [ 'hpcjob_001', 'hpcjob_002', 'hpcjob_003', 'hpcjob_004' ],
         $test->schedule, 'Schedule passes' );
 
-    chdir($cwd);
+    chdir($Bin);
     remove_tree($test_dir);
 }
 
-# sub test_004 : Tags(submit_jobs) {
-#     my $cwd      = getcwd();
-#     my $test = construct();
-#     my $test_dir = getcwd();
-#
-#     $test->parse_file_slurm();
-#     $test->iterate_schedule();
-#
-#     ok(1);
-#
-#     chdir($cwd);
-#     remove_tree($test_dir);
-# }
 #
 # sub test_005 : Tags(submit_jobs) {
 #     my $cwd      = getcwd();

@@ -7,7 +7,7 @@ use Module::Load ();
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 has '+url' => sub { Carp::croak "url is a required property" };
@@ -61,6 +61,8 @@ sub init
 {
   my($self, $meta) = @_;
   
+  $meta->prop->{plugin_download_negotiate_default_url} = $self->url;
+
   my $fetch = $self->_pick_fetch;
   
   $self->_plugin($meta, 'Fetch', $fetch, url => $self->url, ssl => $self->ssl);
@@ -112,7 +114,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -175,6 +177,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

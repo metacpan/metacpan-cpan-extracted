@@ -26,7 +26,7 @@ no_index:
 provides:
   Net::Azure::CognitiveServices::Face:
     file: lib/Net/Azure/CognitiveServices/Face.pm
-    version: '0.01'
+    version: '0.02'
   Net::Azure::CognitiveServices::Face::Base:
     file: lib/Net/Azure/CognitiveServices/Face/Base.pm
   Net::Azure::CognitiveServices::Face::Face:
@@ -50,4 +50,4 @@ resources:
   bugtracker: https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face/issues
   homepage: https://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face
   repository: git://github.com/ytnobody/p5-Net-Azure-CognitiveServices-Face.git
-version: '0.01'
+version: '0.02'

@@ -19,7 +19,7 @@ require Module::Locate;
 use Path::Class qw/file dir/;
 use YAML::XS 0.64 'LoadFile';
 
-our $VERSION = '1.0000';
+our $VERSION = 1.0003;
 our $TITLE = "Rapi::Blog v" . $VERSION;
 
 has 'site_path',        is => 'ro', required => 1;
@@ -293,7 +293,22 @@ Create a new site from scratch using the L<rabl.pl> utility script:
 
 =head1 DESCRIPTION
 
-This is a L<Plack>-compatible blogging platform written using L<RapidApp>.
+This is a L<Plack>-compatible blogging platform written using L<RapidApp>. This module was first 
+released during The Perl Conference 2017 in Washington D.C. where a talk/demo was given on the 
+platform:
+
+=begin HTML
+
+  <p><a href="http://rapi.io/tpc2017"><img 
+     src="https://raw.githubusercontent.com/vanstyn/Rapi-Blog/master/share/tpc2017-video-preview.png" 
+     width="800"
+     alt="Rapi::Blog talk/video"
+     title="Rapi::Blog talk/video"
+  /></a></p>
+
+=end HTML
+
+L<rapi.io/tpc2017|http://rapi.io/tpc2017>
 
 See L<Rapi::Blog::Manual> for more information and usage.
 

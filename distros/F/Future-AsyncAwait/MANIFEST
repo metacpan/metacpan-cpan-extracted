@@ -11,6 +11,8 @@ t/00use.t
 t/01async-immediate.t
 t/02await-immediate.t
 t/03await.t
+t/04await-twice.t
 t/10pad.t
 t/11contexts.t
+t/20context-while.t
 t/99pod.t

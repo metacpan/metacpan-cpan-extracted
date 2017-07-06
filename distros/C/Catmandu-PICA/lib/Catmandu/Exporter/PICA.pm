@@ -9,7 +9,7 @@ use PICA::Writer::Binary;
 use PICA::Writer::XML;
 use Moo;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 with 'Catmandu::Exporter';
 

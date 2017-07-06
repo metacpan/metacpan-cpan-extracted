@@ -1,4 +1,6 @@
 Revision history for Perl module REST::Neo4p
+0.3020 2017-07-01
+    - Update Mojo::Message::Response usage to fix failing tests
 0.3012 2015-11-06
     - Add build req (Mojo::Exception) to Build.PL
 0.3011 2015-11-01

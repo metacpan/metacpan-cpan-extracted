@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2016 by Dominique Dumont.
+# This software is Copyright (c) 2015-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -314,16 +314,23 @@ below.',
       },
       'ListenFIFO',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Specifies a file system FIFO to listen on.
 This expects an absolute file system path as argument.
 Behavior otherwise is very similar to the
 C<ListenDatagram> directive
 above.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'ListenSpecial',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Specifies a special file in the file system to
 listen on. This expects an absolute file system path as
 argument. Behavior otherwise is very similar to the
@@ -331,11 +338,14 @@ C<ListenFIFO> directive above. Use this to
 open character device nodes as well as special files in
 /proc and
 /sys.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'ListenNetlink',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Specifies a Netlink family to create a socket
 for to listen on. This expects a short string referring to the
 C<AF_NETLINK> family name (such as
@@ -344,22 +354,28 @@ as argument, optionally suffixed by a whitespace followed by a
 multicast group integer. Behavior otherwise is very similar to
 the C<ListenDatagram> directive
 above.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'ListenMessageQueue',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Specifies a POSIX message queue name to listen
 on. This expects a valid message queue name (i.e. beginning
 with /). Behavior otherwise is very similar to the
 C<ListenFIFO> directive above. On Linux
 message queue descriptors are actually file descriptors and
 can be inherited between processes.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'ListenUSBFunction',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Specifies a USB
 FunctionFS endpoints location to listen on, for
 implementation of USB gadget functions. This expects an
@@ -371,8 +387,7 @@ activated service has to have the
 C<USBFunctionDescriptors> and
 C<USBFunctionStrings> options set.
 ',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'SocketProtocol',
       {

@@ -1,5 +1,5 @@
 package HackaMol::Roles::PhysVecMVRRole;
-$HackaMol::Roles::PhysVecMVRRole::VERSION = '0.040';
+$HackaMol::Roles::PhysVecMVRRole::VERSION = '0.043';
 # ABSTRACT: Provides the core of HackaMol Atom and Molecule classes.
 use Math::Vector::Real;
 use Math::Trig;
@@ -342,7 +342,7 @@ HackaMol::Roles::PhysVecMVRRole - Provides the core of HackaMol Atom and Molecul
 
 =head1 VERSION
 
-version 0.040
+version 0.043
 
 =head1 SYNOPSIS
 

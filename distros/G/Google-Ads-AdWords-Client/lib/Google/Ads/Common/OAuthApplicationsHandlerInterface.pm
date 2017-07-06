@@ -14,6 +14,8 @@
 
 package Google::Ads::Common::OAuthApplicationsHandlerInterface;
 
+use strict;
+use warnings;
 use base qw(Google::Ads::Common::AuthHandlerInterface);
 
 # Method to retrieve an authorization URL for the user to put in a

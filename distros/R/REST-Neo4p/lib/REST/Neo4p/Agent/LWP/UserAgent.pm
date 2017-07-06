@@ -1,12 +1,11 @@
 #$Id$
 package REST::Neo4p::Agent::LWP::UserAgent;
 use base qw/LWP::UserAgent REST::Neo4p::Agent/;
-use MIME::Base64;
+use LWP::Authen::Basic;
 use strict;
 use warnings;
 BEGIN {
-  $REST::Neo4p::Agent::LWP::UserAgent::VERSION = "0.3012";
-  $REST::Neo4p::Agent::LWP::UserAgent::VERSION = "0.3012";
+  $REST::Neo4p::Agent::LWP::UserAgent::VERSION = "0.3020";
 }
 sub new {
   my ($class,@args) = @_;
@@ -19,8 +18,9 @@ sub credentials {
   my $self = shift;
   my ($host, $realm, $user, $pass) = @_;
   if ($user && $pass) {
-    $self->default_header( 'Authorization' => encode_base64("$user:$pass",'') )
+    $self->default_header(
+      Authorization => LWP::Authen::Basic->auth_header($user, $pass)
+    );
   }
 }
 1;
-

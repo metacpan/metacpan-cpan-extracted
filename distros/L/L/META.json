@@ -1,10 +1,10 @@
 {
-   "abstract" : "Module loader for one liner.",
+   "abstract" : "Perl extention to load module automatically in one liner.",
    "author" : [
-      "Masayuki Matsuki E<lt>y.songmu@gmail.comE<gt>"
+      "Masayuki Matsuki <y.songmu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "Minilla/v3.0.11",
    "license" : [
       "perl_5"
    ],
@@ -15,19 +15,34 @@
    "name" : "L",
    "no_index" : {
       "directory" : [
-         "inc"
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
       ]
    },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.98",
-            "Test::Requires" : "0.06"
+            "Test::More" : "0.98"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
          }
       },
       "runtime" : {
@@ -40,14 +55,24 @@
    "provides" : {
       "L" : {
          "file" : "lib/L.pm",
-         "version" : "0.01"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-L/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-L",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-L.git",
+         "web" : "https://github.com/Songmu/p5-L"
+      }
    },
-   "version" : "0.01"
+   "version" : "v1.0.0",
+   "x_authority" : "cpan:SONGMU",
+   "x_contributors" : [
+      "tokuhirom <tokuhirom@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

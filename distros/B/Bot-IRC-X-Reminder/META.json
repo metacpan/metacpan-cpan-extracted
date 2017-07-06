@@ -4,20 +4,20 @@
       "Gryphon Shafer <gryphon@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Bot-IRC-X-Reminder",
    "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.009005"
+            "perl" : "5.012"
          }
       },
       "develop" : {
@@ -37,7 +37,7 @@
             "DateTime" : "0",
             "DateTime::Duration" : "0",
             "Time::Crontab" : "0",
-            "perl" : "5.009005",
+            "perl" : "5.012",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -51,7 +51,7 @@
             "Test::Most" : "0",
             "blib" : "1.01",
             "constant" : "0",
-            "perl" : "5.009005"
+            "perl" : "5.012"
          }
       }
    },
@@ -67,7 +67,7 @@
          "web" : "https://github.com/gryphonshafer/Bot-IRC-X-Reminder"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::XS version 3.02"
+   "version" : "1.03",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

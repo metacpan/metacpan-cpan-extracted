@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
-# 0-no-debug-left-on.t -- check EXE_FILES use #!perl for interpreter
+# 0-no-debug-left-on.t -- check no Smart::Comments left on
 
-# Copyright 2011 Kevin Ryde
+# Copyright 2011, 2012 Kevin Ryde
 
 # 0-no-debug-left-on.t is shared by several distributions.
 #
@@ -59,6 +59,7 @@ sub check {
                             ^lib/
                           |^(lib|examples|x?t)/.*\.(p[lm]|t)$
                           |^Makefile.PL$
+                          |^[^/]+$
                         }x
                       } @files;
   my $filename;

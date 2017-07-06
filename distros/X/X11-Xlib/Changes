@@ -1,5 +1,19 @@
 Revision history for Perl extension X11::Xlib.
 
+0.15 - 2017-07-03
+    - Fix bug in XEvent member XErrorEvent, which has different field
+      order than other XEvent "subclass" structs
+    - Fix timeout bug in Display->wait_event, and add loop option
+    - New X11 API: error functions, atom functions, few XRender functions,
+      window property functions
+    - Add missing XMapRequest event type
+    - Convenience method XEvent->summarize can pretty-print an event
+    - Wrapper object (and typemap) for XserverRegion
+    - All ::Struct and ::Opaque subclasses now have ->display attribute
+    - More flexible caching of wrapper objects in Display
+    - Convenience methods in Window wrapper for manipulating event mask,
+      and for reading/writing attributes
+
 0.14 - 2017-04-15
     - Fix bug in XEvent->window that was using the incorrect field for
        any struct that renames 'xany.window' to i.e. 'parent' or 'event'

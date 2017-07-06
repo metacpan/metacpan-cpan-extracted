@@ -47,6 +47,14 @@ Drawable_init( Handle self, HV * profile)
 		holder = av_fetch( av, 1, 0);
 		if ( holder) tr.y = SvIV( *holder); else warn("Array panic on 'translate'");
 		my-> set_translate( self, tr);
+
+		av = ( AV *) SvRV( pget_sv( fillPatternOffset));
+		tr.x = tr.y = 0;
+		holder = av_fetch( av, 0, 0);
+		if ( holder) tr.x = SvIV( *holder); else warn("Array panic on 'fillPatternOffset'");
+		holder = av_fetch( av, 1, 0);
+		if ( holder) tr.y = SvIV( *holder); else warn("Array panic on 'fillPatternOffset'");
+		my-> set_fillPatternOffset( self, tr );
 	}
 	SvHV_Font( pget_sv( font), &Font_buffer, "Drawable::init");
 	my-> set_font( self, Font_buffer);
@@ -151,6 +159,17 @@ Drawable_set( Handle self, HV * profile)
 		pdelete( width);
 		pdelete( height);
 	}
+	if ( pexist( fillPatternOffset))
+	{
+		AV * av = ( AV *) SvRV( pget_sv( fillPatternOffset));
+		Point fpo = {0,0};
+		SV ** holder = av_fetch( av, 0, 0);
+		if ( holder) fpo.x = SvIV( *holder); else warn("Array panic on 'fillPatternOffset'");
+		holder = av_fetch( av, 1, 0);
+		if ( holder) fpo.y = SvIV( *holder); else warn("Array panic on 'fillPatternOffset'");
+		my-> set_fillPatternOffset( self, fpo);
+		pdelete( fillPatternOffset);
+	}
 	inherited set( self, profile);
 }
 
@@ -168,17 +187,18 @@ Drawable_font_match( char * dummy, Font * source, Font * dest, Bool pick)
 Bool
 Drawable_font_add( Handle self, Font * source, Font * dest)
 {
-	Bool useHeight = source-> height    != C_NUMERIC_UNDEF;
-	Bool useWidth  = source-> width     != C_NUMERIC_UNDEF;
-	Bool useSize   = source-> size      != C_NUMERIC_UNDEF;
-	Bool usePitch  = source-> pitch     != C_NUMERIC_UNDEF;
-	Bool useStyle  = source-> style     != C_NUMERIC_UNDEF;
-	Bool useDir    = source-> direction != C_NUMERIC_UNDEF;
-	Bool useName   = strcmp( source-> name, C_STRING_UNDEF) != 0;
-	Bool useEnc    = strcmp( source-> encoding, C_STRING_UNDEF) != 0;
+	Bool useHeight = !source-> undef. height;
+	Bool useWidth  = !source-> undef. width;
+	Bool useSize   = !source-> undef. size;
+	Bool usePitch  = !source-> undef. pitch;
+	Bool useStyle  = !source-> undef. style;
+	Bool useDir    = !source-> undef. direction;
+	Bool useName   = !source-> undef. name;
+	Bool useEnc    = !source-> undef. encoding;
 
 	/* assignning values */
 	if ( dest != source) {
+		dest-> undef = source-> undef;
 		if ( useHeight) dest-> height    = source-> height;
 		if ( useWidth ) dest-> width     = source-> width;
 		if ( useDir   ) dest-> direction = source-> direction;
@@ -212,10 +232,11 @@ Drawable_font_add( Handle self, Font * source, Font * dest)
 		strcpy( dest-> name, "Default");
 	if ( dest-> pitch < fpDefault || dest-> pitch > fpFixed)
 		dest-> pitch = fpDefault;
-	if ( dest-> direction == C_NUMERIC_UNDEF)
+	if ( dest-> undef. direction )
 		dest-> direction = 0;
-	if ( dest-> style == C_NUMERIC_UNDEF)
+	if ( dest-> undef. style )
 		dest-> style = 0;
+	memset(&dest->undef, 0, sizeof(&dest->undef));
 
 	return useSize && !useHeight;
 }
@@ -438,7 +459,7 @@ Drawable_text_out( Handle self, SV * text, int x, int y)
 }
 
 void *
-read_array( SV * points, char * procName, Bool integer, int div, int min, int max, int * n_points )
+prima_read_array( SV * points, char * procName, Bool integer, int div, int min, int max, int * n_points )
 {
 	AV * av;
 	int i, count, psize;
@@ -514,7 +535,7 @@ read_polypoints( Handle self, SV * points, char * procName, int min, Bool (*proc
 	int count;
 	Point * p;
 	Bool ret = false;
-	if (( p = (Point*) read_array( points, procName, true, 2, min, -1, &count)) != NULL) {
+	if (( p = (Point*) prima_read_array( points, procName, true, 2, min, -1, &count)) != NULL) {
 		ret = procPtr( self, count, p);
 		if ( !ret) perl_error();
 		free(p);
@@ -538,7 +559,7 @@ Drawable_bars( Handle self, SV * rects)
 	int count;
 	Rect * p;
 	Bool ret = false;
-	if (( p = read_array( rects, "Drawable::bars", true, 4, 0, -1, &count)) != NULL) {
+	if (( p = prima_read_array( rects, "Drawable::bars", true, 4, 0, -1, &count)) != NULL) {
 		ret = apc_gp_bars( self, count, p);
 		if ( !ret) perl_error();
 		free( p);
@@ -678,7 +699,7 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	} else 
 		precision = 24;
 	
-	p = (NPoint*) read_array( points, "Drawable::render_spline", false, 2, degree + 1, -1, &n_points);
+	p = (NPoint*) prima_read_array( points, "Drawable::render_spline", false, 2, degree + 1, -1, &n_points);
 	if ( !p) goto EXIT;
 
 	/* closed curve will need at least one extra point and unclamped default knot set */
@@ -687,14 +708,14 @@ Drawable_render_spline( SV * obj, SV * points, HV * profile)
 	n_points += n_add_points;
 
 	if ( pexist( knots )) {
-		knots = (double*) read_array( pget_sv(knots), "knots", false, 1, 
+		knots = (double*) prima_read_array( pget_sv(knots), "knots", false, 1, 
 			n_points + degree + 1, n_points + degree + 1, NULL);
 		if (!knots) goto EXIT;
 	} else
 		knots = default_knots(n_points, degree, !closed);
 	
 	if ( pexist( weights )) {
-		weights = (double*) read_array(pget_sv(weights), "weights", false, 1, 
+		weights = (double*) prima_read_array(pget_sv(weights), "weights", false, 1, 
 			n_points, n_points, NULL);
 		if (!weights) goto EXIT;
 		dim = 3;
@@ -1230,9 +1251,9 @@ Drawable_text_wrap( Handle self, SV * text, int width, int options, int tabInden
 			STRLEN len = t. utf8_text ? utf8_hop(( U8*) t. t_char, 1) - ( U8*) t. t_char : 1;
 			sv_char = newSVpv( t. t_char, len);
 			if ( t. utf8_text) SvUTF8_on( sv_char);
-			pset_i( tildeStart, t. t_start);
-			pset_i( tildeEnd,   t. t_end);
-			pset_i( tildeLine,  t. t_line);
+			if ( t. t_start != C_NUMERIC_UNDEF) pset_i( tildeStart, t. t_start);
+			if ( t. t_end   != C_NUMERIC_UNDEF) pset_i( tildeEnd,   t. t_end);
+			if ( t. t_line  != C_NUMERIC_UNDEF) pset_i( tildeLine,  t. t_line);
 		} else {
 			sv_char = newSVsv( nilSV);
 			pset_sv( tildeStart, nilSV);
@@ -1248,7 +1269,7 @@ Drawable_text_wrap( Handle self, SV * text, int width, int options, int tabInden
 
 
 PRGBColor
-read_palette( int * palSize, SV * palette)
+prima_read_palette( int * palSize, SV * palette)
 {
 	AV * av;
 	int i, count;
@@ -1342,7 +1363,7 @@ Drawable_palette( Handle self, Bool set, SV * palette)
 	colors = var-> palSize;
 	if ( set) {
 		free( var-> palette);
-		var-> palette = read_palette( &var-> palSize, palette);
+		var-> palette = prima_read_palette( &var-> palSize, palette);
 		if ( colors == 0 && var-> palSize == 0) return nilSV; /* do not bother apc */
 		apc_gp_set_palette( self);
 	} else {
@@ -1483,6 +1504,16 @@ Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 		}
 	}
 	return nilSV;
+}
+
+Point
+Drawable_fillPatternOffset( Handle self, Bool set, Point fpo)
+{
+	if (!set) return apc_gp_get_fill_pattern_offset( self);
+	fpo. x %= 8;
+	fpo. y %= 8;
+	apc_gp_set_fill_pattern_offset( self, fpo);
+	return fpo;
 }
 
 Font

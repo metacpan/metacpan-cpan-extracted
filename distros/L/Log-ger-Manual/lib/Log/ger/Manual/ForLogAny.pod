@@ -1,0 +1,142 @@
+package Log::ger::Manual::ForLogAny;
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Log::ger for Log::Any users
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Log::ger::Manual::ForLogAny - Log::ger for Log::Any users
+
+=head1 VERSION
+
+version 0.012
+
+=head1 WHY LOG::ANY
+
+Log::Any is one of the first logging libraries on CPAN which promotes separation
+of producers and consumers. This means, instead of having to configure logging
+output in your module like this:
+
+ package MyLib;
+ use Log::SomeLib;
+
+ my $log = Log::SomeLib->new(
+     output => ...,
+     level => ...,
+ );
+
+ sub mymethod {
+     $log->warn("blah ...");
+ }
+
+you just log:
+
+ package MyLibrary;
+ use Log::Any '$log';
+
+ sub mymethod {
+     $log->warn("blah ...");
+ }
+
+and the configuration of outputs and leels is done on the application side.
+
+=head1 WHY LOG::GER OVER LOG::ANY
+
+Log::ger can be used in procedural style in addition to OO style. Aside from
+preference, this gives the benefit of being able to optimize away unneeded
+logging statements to avoid runtime overhead (see L<Log::ger::Plugin::OptAway>).
+A procedural wrapper for Log::Any could also be written to accomplish the same,
+but this is native in Log::ger.
+
+Log::ger has a smaller startup overhead compared to Log::Any. Log::Any used to
+be very light also (startup overhead under 1ms) until version 0.15.
+
+Log::ger gives you customizable levels and routine names.
+
+Log::ger allows you to log in a custom format, e.g. using block a la
+L<Log::Contextual>, raw data structure as JSON, etc.
+
+=head1 MIGRATING
+
+To ease migrating, L<Log::ger::Like::LogAny> is provided. You can change this
+line in your code:
+
+ use Log::Any;
+
+into:
+
+ use Log::ger::Like::LogAny;
+
+and this:
+
+ my $log = Log::Any->get_logger;
+
+into:
+
+ my $log = Log::Any::Like::LogAny->get_logger;
+
+and this:
+
+ use Log::Any '$log';
+
+into:
+
+ use Log::ger::Like::LogAny '$log';
+
+=head1 FAQ
+
+=head2 In my application, I have some modules using Log::Any and some using Log::ger. I want to consume logs using Log::Any, how do I do that?
+
+Install L<Log::ger::Output::LogAny> then in your application:
+
+ use Log::ger::Output 'LogAny';
+
+This will send logs produced via Log::ger to Log::Any.
+
+=head2 In my application, I have some modules using Log::Any and some using Log::ger. I want to consume logs using Log::ger, how do I do that?
+
+Install L<Log::Any::Adapter::LogGer> then in your application:
+
+ use Log::Any::Adapter 'LogGer';
+
+This will send logs produced via Log::Any to Log::ger.
+
+=head2 How to set an output "lexically", like with the 'lexically' option in Log::Any::Adapter?
+
+In Log::Any, this is a way to set an adapter temporarily:
+
+ {
+     Log::Any::Adapter->set({lexically => \my $lex}, 'Name', ...);
+     ...
+ } # when $lex goes out of scope, the adapter setting is removed
+
+One way to do this in Log::ger:
+
+ my $saved = Log::ger::Util::save_hooks('create_logml_routine'); # or create_log_routine
+ Log::ger::Output->set('Name', ...);
+ ...
+ Log::ger::Util::restore_hooks('create_logml_routine', $saved);
+
+A nicer interface may be provided in the future.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

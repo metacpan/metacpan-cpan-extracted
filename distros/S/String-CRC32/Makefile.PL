@@ -6,7 +6,16 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
 	'NAME' => 'String::CRC32',
 	'DISTNAME' => 'String-CRC32',
-	'VERSION' => '1.5',
 	'OBJECT' => 'CRC32.o',
-	'dist'   => {COMPRESS=>'gzip', SUFFIX=>'gz'}
+	'dist'   => {COMPRESS=>'gzip', SUFFIX=>'gz'},
+    'LICENSE' => 'unrestricted',
+	VERSION_FROM => 'CRC32.pm',
+    META_MERGE => {
+        resources => {
+            license    => 'https://wiki.creativecommons.org/wiki/Public_domain',
+            homepage   => 'https://metacpan.org/module/String::CRC32',
+            bugtracker => 'https://github.com/leejo/string-crc32/issues',
+            repository => 'https://github.com/leejo/string-crc32'
+        },
+    },
 );

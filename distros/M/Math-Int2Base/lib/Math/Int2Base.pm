@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require Exporter;
 use base qw(Exporter);
@@ -34,6 +34,7 @@ sub int2base {
         croak "not supported: int2base( '$num', $base, $minlen )" }
 
     for (; $num; $num = int($num/$base) ) { $ret .= $Chars[$num % $base] }
+    no warnings 'numeric';  # negative repeat count
     return scalar reverse $ret . '0'x($minlen - length($ret));
 }
 

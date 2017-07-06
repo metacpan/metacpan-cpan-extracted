@@ -1,3 +1,60 @@
+2.036005 - 2017-07-05
+
+  [ENHANCEMENTS]
+
+  * #323 c_ip only ever returns one IP per value
+  * get IPv6 neighbors via sshcollector from Cisco ASA (G. Rappenecker)
+
+  [BUG FIXES]
+
+  * #315 missing Pod::Usage dependency
+  * clean POD in SSHCollector platforms
+
+2.036004 - 2017-07-02
+
+  [BUG FIXES]
+
+  * remove Path::Class dependency from netdisco-daemon scripts
+
+2.036003 - 2017-06-28
+
+  [NEW FEATURES]
+
+  * #15 record device and node statistics once a day
+
+  [BUG FIXES]
+
+  * #322 cease use of Sys::Proctitle
+  * quieten PERL_ANYEVENT_HOSTS undef error
+
+2.036002 - 2017-06-26
+
+  [ENHANCEMENTS]
+
+  * #319 better fix for acceping ACL names or values in check_acl_*
+  * #311 added duplicate devices report with option to delete
+  * #263 discover neighbors advertising ipv6 management addresses
+  * #286 support only/no ACLs for snmp_auth stanza, update docs
+  * support NETDISCO_DBNAME in "netdisco-do psql"
+  * die with message when snmp_auth community is (mis-)configured as a list
+  * faster DNS lookups for SNMP Timeouts Report entries
+
+  [BUG FIXES]
+
+  * #231 fix docs to stop old daemon and start new backend worker
+  * #320 DNS subroutines are redefined
+  * #318 ACLs with RegExp are very slow - aggressive resolver timeouts
+  * #317 #265 #311 when renumbering on discover, delete likely duplicate devices
+  * #316 neighbor map should fall back to device sysname after dns
+  * #310 allow multiple LLDP management addresses
+  * fix bug on device port view (speed-up) to avoid DB query on every node
+
+2.036001 - 2017-06-22
+
+  [BUG FIXES]
+
+  * fix ACL content accepted by check_acl_*
+
 2.036000 - 2017-06-22
 
   [NEW FEATURES]

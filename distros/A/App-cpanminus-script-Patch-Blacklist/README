@@ -1,0 +1,16 @@
+SYNOPSIS
+
+    In ~/cpanm-blacklist.conf:
+
+     module=Some::Module
+     module=Another::Module
+     author=SOMEID
+
+    In the command-line:
+
+     % perl -MModule::Load::In::INIT=App::cpanminus::script::Patch::Blacklist `which cpanm` ...
+
+DESCRIPTION
+
+    This patch adds blacklisting feature to cpanm.
+

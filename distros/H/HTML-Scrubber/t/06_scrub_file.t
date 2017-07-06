@@ -25,18 +25,17 @@ SKIP: {
     $r = "Error: \$@=$@ \$!=$!" unless $r;
     is( $r, 1, "scrub(\$html,\$tmpfile=$tmpfile)" );
 
-    local *FILIS;
-    open FILIS, "+>$tmpfile" or die "can't write to $tmpfile";
+    open my $filis, "+>", $tmpfile or die "can't write to $tmpfile";
 
-    $r = $s->scrub( $html, \*FILIS );
+    $r = $s->scrub( $html, $filis );
     $r = "Error: \$@=$@ \$!=$!" unless $r;
 
-    is( $r, 1, q[scrub($html,\*FILIS)] );
+    is( $r, 1, q[scrub($html, $filis)] );
 
-    seek *FILIS, 0, 0;
-    $r = join '', readline *FILIS;
-    is( $r, "histart  mid1  mid2  end", "FILIS has the right stuff" );
-    is( close(FILIS), 1, q[close(FILIS)] );
+    seek $filis, 0, 0;
+    $r = join '', readline $filis;
+    is( $r, "histart  mid1  mid2  end", '$filis has the right stuff' );
+    is( close($filis), 1, q[close($filis)] );
 
     my ( $tfh2, $tmpfile2 ) = tempfile( $template, DIR => $tmpdir, SUFFIX => '.html' );
     $r = $s->scrub_file( $tmpfile, "$tmpfile2" );
@@ -44,14 +43,14 @@ SKIP: {
 
     is( $r, 1, qq[scrub_file(\$tmpfile,"\$tmpfile2"=$tmpfile2)] );
 
-    open FILIS, "+>$tmpfile2" or die "can't write to $tmpfile";
-    $r = $s->scrub_file( $tmpfile, \*FILIS );
+    open $filis, "+>", $tmpfile2 or die "can't write to $tmpfile";
+    $r = $s->scrub_file( $tmpfile, $filis );
     $r = "Error: \$@=$@ \$!=$!" unless $r;
 
-    is( $r, 1, q[scrub_file($tmpfile,\*FILIS)] );
-    seek *FILIS, 0, 0;
-    $r = join '', readline *FILIS;
-    is( $r, "histart  mid1  mid2  end", "FILIS has the right stuff" );
-    is( close(FILIS), 1, q[close(FILIS)] );
+    is( $r, 1, q[scrub_file($tmpfile, $filis)] );
+    seek $filis, 0, 0;
+    $r = join '', readline $filis;
+    is( $r, "histart  mid1  mid2  end", '$filis has the right stuff' );
+    is( close($filis), 1, q[close($filis)] );
 
 }

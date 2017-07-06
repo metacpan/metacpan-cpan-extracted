@@ -19,7 +19,7 @@ use Config::Any;
 use Term::ANSIColor qw/colored/;
 use File::chdir;
 
-our $VERSION = version->new('0.6.1');
+our $VERSION = version->new('0.6.3');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 main();
@@ -195,13 +195,13 @@ sub do_cmd {
             my $script = "$path/group-git-$cmd";
             next if !-x $script;
 
-            return sub { system $script, @_; }
+            return sub { $group->cmd( '', $script, @_); };
         }
     }
 
     return if !$fallback;
 
-    return sub { $group->cmd( $cmd, @_ ) };
+    return sub { $group->cmd( 'git', $cmd, @_ ) };
 }
 
 sub sorter {
@@ -301,7 +301,7 @@ group-git - Perform operations over many git repositories at once
 
 =head1 VERSION
 
-This documentation refers to group-git version 0.6.1.
+This documentation refers to group-git version 0.6.3.
 
 =head1 SYNOPSIS
 

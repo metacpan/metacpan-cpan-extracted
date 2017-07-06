@@ -3,11 +3,11 @@
 use warnings;
 use strict;
 use Test::More;
-use FindBin;
+use FindBin '$Bin';
 use Image::PNG::Const ':all';
 use Image::PNG::Libpng ':all';
 plan skip_all => "tEXt is not supported" unless libpng_supports ('tEXt');
-my $file = "$FindBin::Bin/set-text.png";
+my $file = "$Bin/set-text.png";
 if (-f $file) {
     unlink $file;
 }

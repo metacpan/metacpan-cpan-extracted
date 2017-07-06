@@ -22,6 +22,7 @@ from the request URL that the Mojolicious route dispatcher will see.
 
     location /myapp {
       rewrite ^/myapp/?(.*)$ /$1 break;
+      proxy_set_header Host $host;
       proxy_set_header X-Request-Base http://$host/myapp;
       proxy_pass http://myapp;
     }

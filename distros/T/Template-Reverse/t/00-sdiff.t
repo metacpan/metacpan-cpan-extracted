@@ -1,5 +1,4 @@
 use Test::More ;
-use Data::Dump;
 
 BEGIN{
 use_ok("Template::Reverse");

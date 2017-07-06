@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use Prty::Option;
 use Time::HiRes ();
@@ -30,7 +30,7 @@ Mit print:
     
     $| = 1;
     my $n = 5;
-    my $p = Prty::Progress->new(5);
+    my $p = Prty::Progress->new($n);
     for my $i (1 .. $n) {
         sleep 1;
         print $p->msg($i,'i/n x% t/t(t) x/s t/1');
@@ -53,6 +53,39 @@ Mit R1::Log2:
         $log->printCr($msg);
     }
     $log->printLn($msg);
+
+Ohne Gesamtanzahl der Schritte. Anmerkungen:
+
+=over 2
+
+=item *
+
+die Ausgabe der Prozentangabe wird unterdrückt
+
+=item *
+
+alle Ausgaben erfolgen ohne Bezug zu einer Gesamtanzahl (statt
+Ausgabe I/N nur I, statt ZEIT/GESAMTZEIT(RESTZEIT) nur ZEIT)
+
+=back
+
+*
+
+    use Prty::Progress;
+    
+    $| = 1;
+    my $p = Prty::Progress->new;
+    for my $i (1 .. 5) {
+        print $pro->msg($i,'i/n x% t/t(t) x/h x/s t/1');
+        sleep 1;
+    }
+    print $p->msg;
+    1 0s 3600000/h 1000.00/s 0.00s/1\r
+    2 1s 7200/h 2.00/s 0.50s/1\r
+    3 2s 5400/h 1.50/s 0.67s/1\r
+    4 3s 4788/h 1.33/s 0.75s/1\r
+    5 4s 4500/h 1.25/s 0.80s/1\r
+    5 5s 3600/h 1.00/s 1.00s/1\r
 
 =head1 ATTRIBUTES
 
@@ -123,15 +156,15 @@ Referenz auf Progress-Objekt
 
 sub new {
     my $class = shift;
-    my $n = shift;
-    # @_: @opt
+    # @_: $n,@opt -or- @opt
 
-    # Optionen
+    # Optionen und Argumente
 
     my $show = 1;
     Prty::Option->extract(\@_,
         -show=>\$show,
     );
+    my $n = shift || 0;
 
     # Objekt instantiieren
 
@@ -140,7 +173,8 @@ sub new {
         n=>$n,
         duration=>0,
         i=>0,
-        msg=>'',
+        fmt=>'', # letztes Format
+        msg=>'', # letzte Meldung
         show=>$show,
     );
 }
@@ -200,18 +234,25 @@ sub step {
 Liefere Stand in der Form "I/N". I ist die Anzahl der absolvierten
 Schritte, N ist die Anzahl der Gesamtschritte.
 
+Liefere Stand in der Form "I", wenn die Anzahl der Gesamtschritte
+(N) nicht bekannt ist.
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub count {
     my $self = shift;
-    return "$self->{'i'}/$self->{'n'}";
+
+    my $n = $self->{'n'};
+    my $i = $self->{'i'};
+
+    return $n? "$i/$n": $i;
 }
 
 # -----------------------------------------------------------------------------
 
-=head3 percent() - Liefere "X%"
+=head3 percent() - Liefere Verarbeitungsstand als Prozentsatz
 
 =head4 Synopsis
 
@@ -219,7 +260,8 @@ sub count {
 
 =head4 Description
 
-Liefere Verarbeitungsstand in Prozent.
+Liefere Verarbeitungsstand in Prozent in der Form "X". Ist die
+Gesamtanzahl der Schritte nicht bekannt, liefere einen Leersting.
 
 =cut
 
@@ -227,7 +269,13 @@ Liefere Verarbeitungsstand in Prozent.
 
 sub percent {
     my $self = shift;
-    return sprintf '%.0f%%',$self->{'i'}/$self->{'n'}*100;
+
+    my $n = $self->{'n'};
+    if ($n == 0) {
+        return '';
+    }
+
+    return sprintf '%.0f',$self->{'i'}/$n*100;
 }
 
 # -----------------------------------------------------------------------------
@@ -244,6 +292,9 @@ Liefere Zeitinformation in der Form "HhMmSs/HhMmSs(HhMmSs)". Der erste
 Teil ist die bislang verstrichene Zeit, der zweite Teil die geschätzte
 Gesamtzeit, der dritte Teil ist die geschätzte verbleibende Zeit.
 
+Liefere die Zeitinformation in der Form "HhMmSs", wenn die Anzahl
+der Gesamtschritte (N) nicht bekannt ist.
+
 =cut
 
 # -----------------------------------------------------------------------------
@@ -256,6 +307,10 @@ sub time {
     my $duration = $self->{'duration'};
 
     my $durStr = Prty::Duration->secondsToString($duration);
+    if (!$n) {
+        return $durStr;
+    }        
+
     my $durEst = $duration/$i*$n;
     my $durEstStr = Prty::Duration->secondsToString($durEst);
 
@@ -267,7 +322,7 @@ sub time {
 
 # -----------------------------------------------------------------------------
 
-=head3 performance() - Liefere "X.XX/s"
+=head3 performance() - Liefere Durchsatz
 
 =head4 Synopsis
 
@@ -276,7 +331,7 @@ sub time {
 
 =head4 Description
 
-Liefere Durchsatz in der Form "X.XX/s" (Schritte pro Sekunde).
+Liefere Durchsatz in der Form "X.XX" (Schritte pro Sekunde).
 
 =head4 Arguments
 
@@ -298,12 +353,12 @@ sub performance {
     if (!defined $prec) {
         $prec = 2;
     }
-    return sprintf '%.*f/s',$prec,$self->{'i'}/$self->{'duration'};
+    return sprintf '%.*f',$prec,$self->{'i'}/$self->{'duration'};
 }
 
 # -----------------------------------------------------------------------------
 
-=head3 timePerStep() - Liefere "HhMmS.XXs/1"
+=head3 timePerStep() - Liefere Zeit pro Schritt
 
 =head4 Synopsis
 
@@ -312,7 +367,7 @@ sub performance {
 
 =head4 Description
 
-Liefere Durchsatz in der Form "HhMmSs.x/1" (Zeit pro Schritt).
+Liefere Durchsatz in der Form "HhMmSs.x" (Zeit pro Schritt).
 
 =head4 Arguments
 
@@ -334,8 +389,8 @@ sub timePerStep {
     if (!defined $prec) {
         $prec = 2;
     }
-    my $x = $self->{'i'}/$self->{'duration'};
-    return sprintf '%s/1',Prty::Duration->secondsToString($x,$prec);
+    my $x = $self->{'duration'}/$self->{'i'};
+    return Prty::Duration->secondsToString($x,$prec);
 }
 
 # -----------------------------------------------------------------------------
@@ -380,11 +435,11 @@ bislang verstrichene Zeit, der zweite Teil die geschätzte Gesamtzeit.
 
 =item $performance
 
-Durchsatz in der Form "X.XX/s" (Schritte pro Sekunde).
+Durchsatz in der Form "X.XX" (Schritte pro Sekunde).
 
 =item $timePerStep
 
-Durchsatz in der Form "HhMmSs.x/1" (Zeit pro Schritt).
+Durchsatz in der Form "HhMmSs.x" (Zeit pro Schritt).
 
 =back
 
@@ -432,8 +487,9 @@ erreicht ist. Die letzte Meldung bleibt stehen.
 
 =item 1.
 
-Die erste Form (ohne Parameter) liefert die zuletzt erzeugte
-Meldung noch einmal mit "\n" am Zeilenende.
+Die erste Form (ohne Parameter) liefert die beim letzten
+Aufruf produzierte Meldung - allerdings mit neu berechneten
+Durchschittswerten - noch einmal mit "\n" am Zeilenende.
 
 =item 2.
 
@@ -482,6 +538,10 @@ Wert von $pi->time.
 
 Wert von $pi->performance.
 
+=item x/h
+
+Wert von $pi->performance*3600.
+
 =item t/1
 
 Wert von $pi->timePerStep.
@@ -527,13 +587,26 @@ sub msg {
         my $fmt = shift;
         # @_: sprintf-Argumente
 
+        # Format sichern (für $pro->msg ohne Parameter)
+
+        $fmt =~ s/x%/x%%/g;
+        $self->{'fmt'} = sprintf $fmt,@_;
+        $fmt =~ s/x%%/x%/g;
+
         my $l0 = length $self->{'msg'};
 
+        my $percent = $self->percent;
+        if ($percent eq '') {
+            $fmt =~ s|\s*x%||; # Prozentsatz unterdrücken
+        }
+        else {
+            $fmt =~ s|x%|$self->percent.'%%'|e;
+        }
         $fmt =~ s|i/n|$self->count|e;
-        $fmt =~ s|x%|$self->percent.'%'|e;
         $fmt =~ s|t/t\(t\)|$self->time|e;
-        $fmt =~ s|x/s|$self->performance|e;
-        $fmt =~ s|t/1|$self->timePerStep|e;
+        $fmt =~ s|x/s|$self->performance.'/s'|e;
+        $fmt =~ s|x/h|($self->performance*3600).'/h'|e;
+        $fmt =~ s|t/1|$self->timePerStep.'/1'|e;
 
         $msg = sprintf $fmt,@_;
 
@@ -560,10 +633,14 @@ sub msg {
         $msg .= $eol;
     }
     else {
-        $msg = $self->{'msg'};
-        if ($msg ne '') {
-            $self->{'msg'} = '';
-            $msg .= "\n";
+        # Wir berechnen die letzte Ausgabe auf Basis des Format-Strings
+        # neu und berücksichtigen auf dem Weg die Laufzeit des
+        # letzten Schritts. 
+
+        my $fmt = $self->{'fmt'};
+        if ($fmt ne '') {
+            $msg = $self->msg($self->{'i'},$fmt);
+            $msg =~ s/\r/\n/g;
         }
     }
 
@@ -574,7 +651,7 @@ sub msg {
 
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

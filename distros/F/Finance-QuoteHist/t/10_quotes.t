@@ -3,7 +3,7 @@ use lib $FindBin::RealBin;
 use testload;
 
 my $tcount;
-BEGIN { $tcount = 16 }
+BEGIN { $tcount = 14 }
 use Test::More tests => $tcount;
 
 use FindBin;

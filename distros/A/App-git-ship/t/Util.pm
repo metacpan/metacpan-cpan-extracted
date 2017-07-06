@@ -1,4 +1,5 @@
 BEGIN { $ENV{GIT_SHIP_SILENT} //= 1 }
+
 package t::Util;
 
 use strict;
@@ -14,7 +15,7 @@ sub mock_git {
     next unless -x "$p/git";
     $ENV{GIT_REAL_BIN} = "$p/git";
     $ENV{PATH} = join ':', File::Spec->catdir(Cwd::getcwd, 't/bin'), $ENV{PATH};
-    return 1 unless system 'git _'; # test t/bin/git
+    return 1 unless system 'git _';    # test t/bin/git
   }
 
   plan skip_all => 'Could not find git in PATH';
@@ -67,7 +68,7 @@ sub test_file_lines {
     return;
   }
 
-  LINE:
+LINE:
   while (<$FH>) {
     chomp;
     for my $re (@re) { next LINE if $_ =~ $re; }
@@ -75,14 +76,14 @@ sub test_file_lines {
   }
 
   is_deeply \@extra, [], "The file $file has no extra lines" or diag join ', ', @extra;
-  is_deeply [keys %lines], [], "The file $file has no missing lines" or diag join ', ', sort keys %lines;
+  is_deeply [keys %lines], [], "The file $file has no missing lines"
+    or diag join ', ', sort keys %lines;
 }
 
 sub test_git {
   my ($class, $git) = @_;
   my $output;
 
-  plan skip_all => "Invalid git: $git" unless $git =~ qr{^[\w\/-]+$};
   $output = qx{$git --version 2>/dev/null};
   $output =~ s![\n\r]!!g;
   plan skip_all => "Invalid git: $output" unless $output =~ qr{\b\s+version\s+\d};
@@ -90,11 +91,12 @@ sub test_git {
   diag "git --version: $output" unless $output =~ /\b(1\.9|2\.[0123])/;
   $output = qx{git config --global --get-regexp user.* 2>/dev/null};
   $output =~ s![\n\r]!!g;
-  plan skip_all => "Cannot run with unknown git user: $output" unless $output =~ /user\.email/ and $output =~ /user\.name/;
+  plan skip_all => "Cannot run with unknown git user: $output"
+    unless $output =~ /user\.email/ and $output =~ /user\.name/;
 }
 
 sub import {
-  my $class = shift;
+  my $class  = shift;
   my $caller = caller;
 
   strict->import;

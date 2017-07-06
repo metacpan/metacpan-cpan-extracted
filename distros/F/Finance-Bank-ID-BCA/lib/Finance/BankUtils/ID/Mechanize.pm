@@ -1,12 +1,12 @@
 package Finance::BankUtils::ID::Mechanize;
 
-our $DATE = '2017-05-16'; # DATE
-our $VERSION = '0.45'; # VERSION
+our $DATE = '2017-07-01'; # DATE
+our $VERSION = '0.46'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use parent qw(WWW::Mechanize);
 
@@ -30,21 +30,21 @@ sub _make_request {
     my $req = shift;
     local $ENV{HTTPS_CA_DIR} = $self->{verify_https} ?
         $self->{https_ca_dir} : '';
-    $log->tracef("HTTPS_CA_DIR = %s", $ENV{HTTPS_CA_DIR});
+    log_trace("HTTPS_CA_DIR = %s", $ENV{HTTPS_CA_DIR});
     if ($self->{verify_https} && $self->{https_host}) {
         $req->header('If-SSL-Cert-Subject',
                      qr!\Q/CN=$self->{https_host}\E(/|$)!);
     }
-    $log->trace("Mech request:\n" . String::Indent::indent('  ', $req->headers_as_string));
+    log_trace("Mech request:\n" . String::Indent::indent('  ', $req->headers_as_string));
     my $resp;
     if ($saved_resp) {
         $resp = $saved_resp;
         $saved_resp = undef;
-        $log->trace("Mech response (from saved):" .
+        log_trace("Mech response (from saved):" .
                         String::Indent::indent('  ', $resp->headers_as_string));
     } else {
         $resp = $self->SUPER::_make_request($req, @_);
-        $log->trace("Mech response:\n" . String::Indent::indent('  ', $resp->headers_as_string));
+        log_trace("Mech response:\n" . String::Indent::indent('  ', $resp->headers_as_string));
     }
     $resp;
 }
@@ -64,7 +64,7 @@ Finance::BankUtils::ID::Mechanize - A subclass of WWW::Mechanize
 
 =head1 VERSION
 
-This document describes version 0.45 of Finance::BankUtils::ID::Mechanize (from Perl distribution Finance-Bank-ID-BCA), released on 2017-05-16.
+This document describes version 0.46 of Finance::BankUtils::ID::Mechanize (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-01.
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ This is a subclass of WWW::Mechanize that can do some extra stuffs:
 
 =item * use saved response from a file
 
-=item * log using Log::ny
+=item * log using Log::ger
 
 =back
 

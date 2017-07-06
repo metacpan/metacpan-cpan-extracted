@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::cygwin;
 
 #
-# $Id: cygwin.pm 1558 2017-04-03 11:38:22Z willem $
+# $Id: cygwin.pm 1568 2017-05-27 06:40:20Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1558 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1568 $)[1];
 
 
 =head1 NAME
@@ -31,11 +31,6 @@ sub _getregkey {
 }
 
 
-sub _untaint {
-	map { m/^(.*)$/; $1 } grep defined, @_;
-}
-
-
 sub _init {
 	my $defaults = shift->_defaults;
 
@@ -60,7 +55,7 @@ sub _init {
 	# (also remove any duplicates later)
 	my $devolution = _getregkey( $root, 'UseDomainNameDevolution' );
 	my $searchlist = _getregkey( $root, 'SearchList' );
-	my @searchlist = _untaint $domain, split m/[\s,]+/, $searchlist;
+	my @searchlist = ( $domain, split m/[\s,]+/, $searchlist );
 
 
 	# This is (probably) adequate on NT4
@@ -114,7 +109,7 @@ sub _init {
 	}
 
 	@nameservers = @nt4nameservers unless @nameservers;
-	$defaults->nameservers( _untaint @nameservers );
+	$defaults->nameservers(@nameservers);
 
 
 	# fix devolution if configured, and simultaneously
@@ -133,6 +128,8 @@ sub _init {
 		}
 	}
 	$defaults->searchlist(@list);
+
+	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
 
 	$defaults->_read_env;
 }

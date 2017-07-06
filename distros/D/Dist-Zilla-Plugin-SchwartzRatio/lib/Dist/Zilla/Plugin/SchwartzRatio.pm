@@ -1,17 +1,14 @@
 package Dist::Zilla::Plugin::SchwartzRatio;
-BEGIN {
-  $Dist::Zilla::Plugin::SchwartzRatio::AUTHORITY = 'cpan:YANICK';
-}
-{
-  $Dist::Zilla::Plugin::SchwartzRatio::VERSION = '0.2.0';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: display the Schwartz ratio of the distribution upon release
+$Dist::Zilla::Plugin::SchwartzRatio::VERSION = '0.3.2';
 
-
+use 5.14.0;
 use strict;
 use warnings;
 
-use LWP::Simple;
+use List::UtilsBy qw/ sort_by /;
+use MetaCPAN::Client;
 
 use Moose;
 
@@ -20,33 +17,54 @@ with qw/
     Dist::Zilla::Role::AfterRelease
 /;
 
+has mcpan => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub { MetaCPAN::Client->new },
+);
+
+has releases => (
+    is => 'ro',
+    traits => [ 'Array' ],
+    handles => {
+        all_releases => 'elements',
+        nbr_releases => 'count',
+    },
+    lazy => 1,
+    default => sub {
+        my $self = shift;
+        
+        my $releases = $self->mcpan->release({
+            distribution => $self->zilla->name
+        });
+        my @releases;
+
+        while( my $r = $releases->next ) {
+            my( $version, $date ) = map { $r->$_ } qw/ version date /;
+            $date =~ s/T.*//;
+            push @releases, [ 'v'.$version, $date ];
+        }
+
+        return [ sort_by { $_->[1] } @releases ];
+    },
+);
+
 sub after_release {
     my $self = shift;
 
-    # I'm going to hell for that...
-
-    my $page = join "", LWP::Simple::get( 'http://search.cpan.org/dist/' .
-        $self->zilla->name );
-
-    my @releases;
-
-    push @releases, $1 if $page =~ m#This Release.*?<td.*?>(.*?)</td>#s;
-
-    if ( $page =~ m#Other Releases.*?<select name="url">(.*?)</select>#s ) {
-        my $inner = $&;
-        push @releases, map { my $x = $_; $x =~ s/&nbsp;&nbsp;--&nbsp;&nbsp;/, /; $x } $inner =~ />(.*?)</g;
-    }
-
-    $self->log( @releases . " old releases are lingering on CPAN" );
-    $self->log( "\t" . $_ ) for @releases;
+    $self->log( $self->nbr_releases . " old releases are lingering on CPAN" );
+    $self->log( "\t" . join ', ', @$_ ) for $self->all_releases;
 }
 
 __PACKAGE__->meta->make_immutable;
-no Moose;
+
 1;
 
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -54,7 +72,7 @@ Dist::Zilla::Plugin::SchwartzRatio - display the Schwartz ratio of the distribut
 
 =head1 VERSION
 
-version 0.2.0
+version 0.3.2
 
 =head1 SYNOPSIS
 
@@ -70,13 +88,23 @@ a single distribution, it boils down to the less exciting
 number of previous releases still on CPAN. 
 
 After a successful release, the plugin displays
-the releases of the distribution still kickign around on CPAN,
+the releases of the distribution still kicking around on CPAN,
 just to give an idea to the author that maybe it's time
 to do some cleanup.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<App-PAUSE-cleanup|https://metacpan.org/release/App-PAUSE-cleanup> 
+
+CLI utility to list and help you delete easily your distributions on CPAN.
+
+=back
+
 =head1 AUTHOR
 
-Yanick Champoux <yanick@babyl.dyndns.org>
+Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -86,4 +114,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

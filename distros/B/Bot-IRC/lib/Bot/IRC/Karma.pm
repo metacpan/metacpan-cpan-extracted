@@ -5,7 +5,7 @@ use 5.012;
 use strict;
 use warnings;
 
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -91,7 +91,7 @@ Bot::IRC::Karma - Bot::IRC track karma for things
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

@@ -45,6 +45,7 @@
          "requires" : {
             "DBD::SQLite" : "0",
             "DBI" : "0",
+            "File::pushd" : "0",
             "Function::Parameters" : "0",
             "IPC::Run" : "0",
             "Log::Any" : "0",
@@ -58,14 +59,16 @@
             "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::MockObject" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
          }
       }
    },
    "provides" : {
       "App::BorgRestore" : {
          "file" : "lib/App/BorgRestore.pm",
-         "version" : "v2.0.1"
+         "version" : "v2.1.0"
       },
       "App::BorgRestore::Borg" : {
          "file" : "lib/App/BorgRestore/Borg.pm"
@@ -91,6 +94,6 @@
          "web" : "https://github.com/Bluewind/App-BorgRestore"
       }
    },
-   "version" : "2.0.1",
+   "version" : "2.1.0",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

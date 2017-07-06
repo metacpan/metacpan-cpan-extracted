@@ -15,7 +15,6 @@ my $builder = Module::Build->new(
         'Locale::Maketext::Utils' => 0,
         'Locales'                 => 0.33,
         'File::Spec'              => 0,
-        'File::Slurp'             => 0,
         'File::Path::Tiny'        => 0,
         'Template'                => 0,
     },

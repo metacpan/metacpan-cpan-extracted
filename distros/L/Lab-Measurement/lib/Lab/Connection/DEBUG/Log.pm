@@ -1,5 +1,5 @@
 package Lab::Connection::DEBUG::Log;
-$Lab::Connection::DEBUG::Log::VERSION = '3.550';
+$Lab::Connection::DEBUG::Log::VERSION = '3.552';
 use 5.010;
 use warnings;
 use strict;

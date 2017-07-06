@@ -3,7 +3,7 @@ use Moo::Role;
 use Sietima::Policy;
 use namespace::clean;
 
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: drop messages from non-subscribers
 
 
@@ -26,7 +26,7 @@ Sietima::Role::SubscriberOnly::Drop - drop messages from non-subscribers
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

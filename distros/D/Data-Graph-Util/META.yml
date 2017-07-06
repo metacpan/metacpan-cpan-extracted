@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,10 +26,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Graph-Util
   homepage: https://metacpan.org/release/Data-Graph-Util
   repository: git://github.com/perlancar/perl-Data-Graph-Util.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
-    version: '5.022001'
+    version: '5.024000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -43,62 +43,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.003'
+      version: '6.008'
     -
-      class: Dist::Zilla::Plugin::UploadToCPAN
-      name: '@Author::PERLANCAR/@Filter/UploadToCPAN'
-      version: '6.003'
+      class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
+      name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
+      version: '0.55'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -106,11 +106,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodnameFromFilename
       name: '@Author::PERLANCAR/PodnameFromFilename'
-      version: '0.01'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.02'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -124,17 +124,21 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
     -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
+    -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
       version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::GenShellCompletion
       name: '@Author::PERLANCAR/GenShellCompletion'
@@ -224,9 +228,9 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Completion::GetoptLongSubcommand'
               version: '0.04'
             -
-              class: Pod::Weaver::Section::Completion::PerinciCmdLine
-              name: '@Author::PERLANCAR/Completion::PerinciCmdLine'
-              version: '0.14'
+              class: Pod::Weaver::Section::Completion::GetoptLongMore
+              name: '@Author::PERLANCAR/Completion::GetoptLongMore'
+              version: '0.001'
             -
               class: Pod::Weaver::Section::Homepage::DefaultCPAN
               name: '@Author::PERLANCAR/Homepage::DefaultCPAN'
@@ -238,7 +242,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Bugs::DefaultRT
               name: '@Author::PERLANCAR/Bugs::DefaultRT'
-              version: '0.05'
+              version: '0.06'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
@@ -250,7 +254,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.59'
+              version: '0.76'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -266,21 +270,21 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.02'
+              version: '0.06'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::ReadmeFromPod
       name: '@Author::PERLANCAR/ReadmeFromPod'
-      version: '0.33'
+      version: '0.35'
     -
       class: Dist::Zilla::Plugin::Rinci::AddPrereqs
       name: '@Author::PERLANCAR/Rinci::AddPrereqs'
-      version: '0.09'
+      version: '0.13'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
       name: '@Author::PERLANCAR/Rinci::AddToDb'
@@ -288,7 +292,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.22'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -315,6 +319,10 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Rinci'
       version: '0.03'
     -
+      class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
+      name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
+      version: '0.04'
+    -
       class: Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'
       version: '0.02'
@@ -325,7 +333,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.01'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::Prereqs::CheckCircular
+      name: '@Author::PERLANCAR/Prereqs::CheckCircular'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -333,7 +345,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -341,50 +353,51 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.003'
+      version: '6.008'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.003'
+      version: '6.008'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.003'
+    version: '6.008'
 x_authority: cpan:PERLANCAR
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -9,7 +9,7 @@ WriteMakefile(
 	ABSTRACT_FROM     => 'lib/Hash/GuavaRing.pm', # retrieve abstract from module
 	AUTHOR            => 'Sveta Kotleta <sveta@svetakotleta.ru>',
 	LIBS              => [''], # e.g., '-lm'
-	DEFINE            => '-Wall -Wno-shift-count-overflow -Wno-constant-conversion', # e.g., '-DHAVE_SOMETHING'
+	DEFINE            => '-Wall ', # e.g., '-DHAVE_SOMETHING'
 	INC               => '-I.', # e.g., '-I. -I/usr/include/other'
 	LICENSE           => 'perl_5',
 	# Un-comment this if you add C files to link with later:

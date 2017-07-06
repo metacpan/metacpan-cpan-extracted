@@ -1,6 +1,6 @@
 package WWW::Google::PageSpeedOnline::Advise;
 
-$WWW::Google::PageSpeedOnline::Advise::VERSION   = '0.22';
+$WWW::Google::PageSpeedOnline::Advise::VERSION   = '0.24';
 $WWW::Google::PageSpeedOnline::Advise::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::PageSpeedOnline::Advise - Placeholder for the advise of L<WWW::Goog
 
 =head1 VERSION
 
-Version 0.22
+Version 0.24
 
 =cut
 

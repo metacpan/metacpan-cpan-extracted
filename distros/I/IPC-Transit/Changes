@@ -1,3 +1,6 @@
+1.171860  2017-07-05 16:12:03-07:00 America/Los_Angeles
+    - Added missing but required module, IPC::Transit::Remote.pm
+
 1.162230  2016-08-10 15:58:36-07:00 America/Los_Angeles
     - Support multiple public keys for crypto.
     - Automatic default hostname detection for key identification.

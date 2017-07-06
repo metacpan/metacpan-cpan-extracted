@@ -30,6 +30,11 @@
             "Font::TTF" : "0",
             "perl" : "v5.8.5"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Memory::Cycle" : "0"
+         }
       }
    },
    "release_status" : "stable",
@@ -40,7 +45,7 @@
          "web" : "https://github.com/ssimms/pdfapi2"
       }
    },
-   "version" : "2.031",
+   "version" : "2.032",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

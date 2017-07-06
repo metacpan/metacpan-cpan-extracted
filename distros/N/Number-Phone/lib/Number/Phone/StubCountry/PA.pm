@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -30,42 +30,13 @@ my $formatters = [
                   'leading_digits' => '[1-57-9]'
                 },
                 {
-                  'leading_digits' => '6',
-                  'pattern' => '(\\d{4})(\\d{4})'
+                  'pattern' => '(\\d{4})(\\d{4})',
+                  'leading_digits' => '6'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(
-          (?:
-            779|
-            8(?:
-              55|
-              60|
-              7[78]
-            )|
-            9(?:
-              00|
-              81
-            )
-          )\\d{4}
-        )',
-                'mobile' => '
-          (?:
-            1[16]1|
-            21[89]|
-            8(?:
-              1[01]|
-              7[23]
-            )
-          )\\d{4}|
-          6(?:
-            [024-9]\\d|
-            1[0-5]|
-            3[0-24-9]
-          )\\d{5}
-        ',
-                'toll_free' => '80[09]\\d{4}',
+                'personal_number' => '',
                 'geographic' => '
           (?:
             1(?:
@@ -137,9 +108,38 @@ my $validators = {
             )
           )\\d{4}
         ',
-                'personal_number' => '',
+                'specialrate' => '(
+          (?:
+            779|
+            8(?:
+              55|
+              60|
+              7[78]
+            )|
+            9(?:
+              00|
+              81
+            )
+          )\\d{4}
+        )',
                 'pager' => '',
+                'toll_free' => '80[09]\\d{4}',
                 'voip' => '',
+                'mobile' => '
+          (?:
+            1[16]1|
+            21[89]|
+            8(?:
+              1[01]|
+              7[23]
+            )
+          )\\d{4}|
+          6(?:
+            [024-9]\\d|
+            1[0-5]|
+            3[0-24-9]
+          )\\d{5}
+        ',
                 'fixed_line' => '
           (?:
             1(?:

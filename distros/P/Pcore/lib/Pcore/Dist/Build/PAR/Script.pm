@@ -151,11 +151,13 @@ sub _add_modules ($self) {
         }
     }
 
+    my $not_found_modules;
+
     # add .pl, .pm
     for my $module ( grep {/[.](?:pl|pm)\z/sm} keys $self->mod->%* ) {
         my $found = $self->_add_module($module);
 
-        $self->_error(qq[required module wasn't found: "$module"]) if !$found;
+        push $not_found_modules->@*, $module if !$found;
     }
 
     # add .pc (part of some Win32API modules)
@@ -172,7 +174,11 @@ sub _add_modules ($self) {
             }
         }
 
-        $self->_error(qq[required module wasn't found: "$module"]) if !$found;
+        push $not_found_modules->@*, $module if !$found;
+    }
+
+    if ($not_found_modules) {
+        $self->_error( qq[required modules wasn't found: ] . join ', ', map {qq["$_"]} $not_found_modules->@* );
     }
 
     return;
@@ -527,13 +533,15 @@ sub _error ( $self, $msg ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 307                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
+## |    3 | 181                  | ValuesAndExpressions::ProhibitInterpolationOfLiterals - Useless interpolation of literal string                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 397                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
+## |    3 | 313                  | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 482, 485             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |    3 | 403                  | RegularExpressions::ProhibitCaptureWithoutTest - Capture variable used outside conditional                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 414, 420             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    2 | 488, 491             | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 420, 426             | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

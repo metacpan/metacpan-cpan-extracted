@@ -13,17 +13,29 @@ package My::P2;
 
 package main;
 
+subtest numeric_level => sub {
+    is(Log::ger::Util::numeric_level(1), 1);
+    is(Log::ger::Util::numeric_level("info"), 4);
+    # XXX check unknown level
+};
+
+subtest string_level => sub {
+    is(Log::ger::Util::string_level(1), "fatal");
+    is(Log::ger::Util::string_level("info"), "info");
+    is(Log::ger::Util::string_level("warning"), "warn");
+    # XXX check unknown level
+};
+
 subtest "basics" => sub {
     subtest "import" => sub {
         my $str = "";
-        Log::ger::Util::reset_plugins('create_log_routine');
+        Log::ger::Util::reset_hooks('create_log_routine');
         require Log::ger::Output;
         Log::ger::Output->set('String', string => \$str);
 
         My::P1::log_warn("warn");
         My::P1::log_debug("debug");
         is($str, "warn\n");
-
         {
             $str = "";
             Log::ger::Util::set_level(5);
@@ -33,125 +45,127 @@ subtest "basics" => sub {
         }
     };
 
-    subtest "setup_package" => sub {
+    subtest "init_target package" => sub {
         my $str = "";
-        Log::ger::Util::reset_plugins('create_log_routine');
+        Log::ger::Util::reset_hooks('create_log_routine');
         Log::ger::Util::set_level(3);
         require Log::ger::Output;
         Log::ger::Output->set('String', string => \$str);
-        Log::ger::setup_package('My::P2');
+        Log::ger::init_target(package => 'My::P2');
         My::P2::log_warn("warn");
         My::P2::log_debug("debug");
         is($str, "warn\n");
     };
 
-    subtest "setup_hash" => sub {
+    subtest "init_target hash" => sub {
         my $str = "";
-        Log::ger::Util::reset_plugins('create_log_routine');
+        Log::ger::Util::reset_hooks('create_log_routine');
         require Log::ger::Output;
         Log::ger::Output->set('String', string => \$str);
         Log::ger::Util::set_level(3);
-        my $h = Log::ger::setup_hash();
+        my $h = {}; Log::ger::init_target(hash => $h);
 
         is(ref $h, 'HASH');
-        $h->{log_fatal}("fatal");
-        $h->{log_error}("error");
-        $h->{log_warn}("warn");
-        $h->{log_info}("info");
-        $h->{log_debug}("debug");
-        $h->{log_trace}("trace");
+        $h->{fatal}("fatal");
+        $h->{error}("error");
+        $h->{warn}("warn");
+        $h->{info}("info");
+        $h->{debug}("debug");
+        $h->{trace}("trace");
         is($str, "fatal\nerror\nwarn\n");
     };
 
-    subtest "setup_object" => sub {
+    subtest "init_target object" => sub {
         my $str = "";
-        Log::ger::Util::reset_plugins('create_log_routine');
+        Log::ger::Util::reset_hooks('create_log_routine');
         require Log::ger::Output;
         Log::ger::Output->set('String', string => \$str);
         Log::ger::Util::set_level(3);
-        my $o = Log::ger::setup_object();
+        my $o = bless [], "My::Logger"; Log::ger::init_target(object => $o);
 
-        $o->log_fatal("fatal");
-        $o->log_error("error");
-        $o->log_warn("warn");
-        $o->log_info("info");
-        $o->log_debug("debug");
-        $o->log_trace("trace");
+        $o->fatal("fatal");
+        $o->error("error");
+        $o->warn("warn");
+        $o->info("info");
+        $o->debug("debug");
+        $o->trace("trace");
         is($str, "fatal\nerror\nwarn\n");
 
         subtest "level=off (0)" => sub {
             $str = "";
             Log::ger::Util::set_level(0);
-            $o = Log::ger::setup_object();
-            $o->log_fatal("fatal");
-            $o->log_error("error");
-            $o->log_warn("warn");
-            $o->log_info("info");
-            $o->log_debug("debug");
-            $o->log_trace("trace");
+            my $o = bless [], "My::Logger"; Log::ger::init_target(object => $o);
+            $o->fatal("fatal");
+            $o->error("error");
+            $o->warn("warn");
+            $o->info("info");
+            $o->debug("debug");
+            $o->trace("trace");
             is($str, "");
         };
         subtest "level=fatal (1)" => sub {
             $str = "";
             Log::ger::Util::set_level(1);
-            $o = Log::ger::setup_object();
-            $o->log_fatal("fatal");
-            $o->log_error("error");
-            $o->log_warn("warn");
-            $o->log_info("info");
-            $o->log_debug("debug");
-            $o->log_trace("trace");
+            my $o = bless [], "My::Logger"; Log::ger::init_target(object => $o);
+            $o->fatal("fatal");
+            $o->error("error");
+            $o->warn("warn");
+            $o->info("info");
+            $o->debug("debug");
+            $o->trace("trace");
             is($str, "fatal\n");
         };
         subtest "level=error (2)" => sub {
             $str = "";
             Log::ger::Util::set_level(2);
-            $o = Log::ger::setup_object();
-            $o->log_fatal("fatal");
-            $o->log_error("error");
-            $o->log_warn("warn");
-            $o->log_info("info");
-            $o->log_debug("debug");
-            $o->log_trace("trace");
+            my $o = bless [], "My::Logger"; Log::ger::init_target(object => $o);
+            $o->fatal("fatal");
+            $o->error("error");
+            $o->warn("warn");
+            $o->info("info");
+            $o->debug("debug");
+            $o->trace("trace");
             is($str, "fatal\nerror\n");
         };
         subtest "level=info (4)" => sub {
             $str = "";
             Log::ger::Util::set_level(4);
-            $o = Log::ger::setup_object();
-            $o->log_fatal("fatal");
-            $o->log_error("error");
-            $o->log_warn("warn");
-            $o->log_info("info");
-            $o->log_debug("debug");
-            $o->log_trace("trace");
+            my $o = bless [], "My::Logger"; Log::ger::init_target(object => $o);
+            $o->fatal("fatal");
+            $o->error("error");
+            $o->warn("warn");
+            $o->info("info");
+            $o->debug("debug");
+            $o->trace("trace");
             is($str, "fatal\nerror\nwarn\ninfo\n");
         };
         subtest "level=debug (5)" => sub {
             $str = "";
             Log::ger::Util::set_level(5);
-            $o = Log::ger::setup_object();
-            $o->log_fatal("fatal");
-            $o->log_error("error");
-            $o->log_warn("warn");
-            $o->log_info("info");
-            $o->log_debug("debug");
-            $o->log_trace("trace");
+            my $o = bless [], "My::Logger"; Log::ger::init_target(object => $o);
+            $o->fatal("fatal");
+            $o->error("error");
+            $o->warn("warn");
+            $o->info("info");
+            $o->debug("debug");
+            $o->trace("trace");
             is($str, "fatal\nerror\nwarn\ninfo\ndebug\n");
         };
         subtest "level=trace (6)" => sub {
             $str = "";
             Log::ger::Util::set_level(6);
-            $o = Log::ger::setup_object();
-            $o->log_fatal("fatal");
-            $o->log_error("error");
-            $o->log_warn("warn");
-            $o->log_info("info");
-            $o->log_debug("debug");
-            $o->log_trace("trace");
+            my $o = bless [], "My::Logger"; Log::ger::init_target(object => $o);
+            $o->fatal("fatal");
+            $o->error("error");
+            $o->warn("warn");
+            $o->info("info");
+            $o->debug("debug");
+            $o->trace("trace");
             is($str, "fatal\nerror\nwarn\ninfo\ndebug\ntrace\n");
         };
     };
 };
 
-done_testing;
+DONE_TESTING:
+done_testing
+    ;

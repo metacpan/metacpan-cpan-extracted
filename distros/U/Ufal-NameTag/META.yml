@@ -17,34 +17,34 @@ name: Ufal-NameTag
 provides:
   Ufal::NameTag:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTag::Forms:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTag::NamedEntities:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTag::NamedEntity:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTag::Ner:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTag::TokenRange:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTag::TokenRanges:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTag::Tokenizer:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTag::Version:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
   Ufal::NameTagc:
     file: lib/Ufal/NameTag.pm
-    version: v1.1.1.1
+    version: v1.1.2.1
 resources:
   license: http://www.mozilla.org/MPL/2.0/index.txt
-version: v1.1.1.1
+version: v1.1.2.1

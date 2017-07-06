@@ -1,5 +1,5 @@
 package Lab::Generic;
-$Lab::Generic::VERSION = '3.550';
+$Lab::Generic::VERSION = '3.552';
 use Lab::Generic::CLOptions;
 
 

@@ -22,7 +22,6 @@ requires:
   Log::Report: 0.19
   Test::More: 0.54
   Test::Pod: 1.00
-  XML::Compile: 1.28
-  XML::Compile::Cache: 0.995
-  XML::Compile::Tester: 0.04
-version: 0.16
+  XML::Compile: 1.58
+  XML::Compile::Cache: 1.05
+version: 0.17

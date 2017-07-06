@@ -1,6 +1,10 @@
 Revision history for Date-Utility
 
-1.07      2017-03-16 09:41:36+00:00 UTC
+1.08      2017-06-23 12:52:08+08:00 Asia/Kuala_Lumpur
+        Add missing Test::Most dependency. Thanks to @eserte for reporting.
+
+1.07      2017-03-17 01:06:18+00:00 UTC
+          remove signature module
 
 1.06    13/12/2016
         Fix version to be in sync with pause

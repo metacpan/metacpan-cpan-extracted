@@ -5,11 +5,12 @@ author:
 build_requires:
   Config::Model::Tester: '2.054'
   Module::Build: '0.34'
+  Test::File::Contents: '0'
   Test::More: '0'
 configure_requires:
   Module::Build: '0.34'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: lgpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +20,7 @@ recommends:
   App::Cme: '0'
   Config::Model::TkUI: '0'
 requires:
-  Config::Model: '2.096'
+  Config::Model: '2.104'
   Config::Model::Backend::Any: '0'
   Config::Model::Backend::IniFile: '0'
   Log::Log4perl: '0'
@@ -31,5 +32,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model-systemd/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model-systemd.git
-version: 0.232.6
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: 0.232.7
+x_serialization_backend: 'YAML::Tiny version 1.70'

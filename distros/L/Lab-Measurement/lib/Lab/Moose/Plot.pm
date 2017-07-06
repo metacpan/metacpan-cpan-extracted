@@ -58,7 +58,7 @@ terminal-, plot- and curve-options.
 =cut
 
 package Lab::Moose::Plot;
-$Lab::Moose::Plot::VERSION = '3.550';
+$Lab::Moose::Plot::VERSION = '3.552';
 use warnings;
 use strict;
 use 5.010;

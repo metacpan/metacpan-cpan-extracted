@@ -1,21 +1,23 @@
 #!/usr/bin/perl
 
-package Catalyst::Authentication::Store::Htpasswd;
+package Catalyst::Authentication::Store::Htpasswd; # git description: v1.005-4-g2915058
+# ABSTRACT: Authen::Htpasswd based user storage/authentication
+
 use base qw/Class::Accessor::Fast/;
 use strict;
 use warnings;
 
-use Authen::Htpasswd;
+use Authen::Htpasswd 0.13;
 use Catalyst::Authentication::Store::Htpasswd::User;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '1.004';
+our $VERSION = '1.006';
 
 BEGIN { __PACKAGE__->mk_accessors(qw/file user_field user_class/) }
 
 sub new {
     my ($class, $config, $app, $realm) = @_;
-    
+
     my $file = delete $config->{file};
     unless (ref $file) {
         my $filename = ($file =~ m|^/|) ? $file : $app->path_to($file)->stringify;
@@ -25,7 +27,7 @@ sub new {
     $config->{file} = $file;
     $config->{user_class} ||= __PACKAGE__ . '::User';
     $config->{user_field} ||= 'username';
-    
+
     bless { %$config }, $class;
 }
 
@@ -38,7 +40,7 @@ sub find_user {
 sub user_supports {
     my $self = shift;
 
-    # this can work as a class method, but in that case you can't have 
+    # this can work as a class method, but in that case you can't have
     # a custom user class
     ref($self) ? $self->user_class->supports(@_)
         : Catalyst::Authentication::Store::Htpasswd::User->supports(@_);
@@ -55,10 +57,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Catalyst::Authentication::Store::Htpasswd - Authen::Htpasswd based
-user storage/authentication.
+Catalyst::Authentication::Store::Htpasswd - Authen::Htpasswd based user storage/authentication
+
+=head1 VERSION
+
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -82,7 +89,7 @@ user storage/authentication.
                     },
                 },
             },
-        },   
+        },
     );
 
     sub login : Global {
@@ -93,7 +100,7 @@ user storage/authentication.
 
 =head1 DESCRIPTION
 
-This plugin uses L<Authen::Htpasswd> to let your application use C<<.htpasswd>>
+This plugin uses L<Authen::Htpasswd> to let your application use C<< .htpasswd >>
 files for it's authentication storage.
 
 =head1 METHODS
@@ -108,18 +115,19 @@ Looks up the user, and returns a Catalyst::Authentication::Store::Htpasswd::User
 
 =head2 user_supports
 
-Delegates to L<Catalyst::Authentication::Store::Htpasswd::User->user_supports|Catalyst::Authentication::Store::Htpasswd::User#user_supports>
+Delegates to L<< Catalyst::Authentication::User->supports|Catalyst::Authentication::User/supports >> or an
+override in L<user_class|/user_class>.
 
 =head2 from_session
 
-Delegates the user lookup to C<< find_user >>
+Delegates the user lookup to L<find_user|/find_user>
 
 =head1 CONFIGURATION
 
 =head2 file
 
 The path to the htpasswd file. If the path starts with a slash, then it is assumed to be a fully
-qualified path, otherwise the path is fed through C<< $c->path_to >> and so normalised to the 
+qualified path, otherwise the path is fed through C<< $c->path_to >> and so normalised to the
 application root.
 
 Alternatively, it is possible to pass in an L<Authen::Htpasswd> object here, and this will be
@@ -149,24 +157,62 @@ Example:
     # Later in your code
     $c->authenticate({ email_address => $c->req->param("email"), password => $c->req->param("password") });
 
-=head1 AUTHORS
-
-Yuval Kogman C<<nothingmuch@woobling.org>>
-
-David Kamholz C<<dkamholz@cpan.org>>
-
-Tomas Doran C<<bobtfish@bobtfish.net>>
-
 =head1 SEE ALSO
 
 L<Authen::Htpasswd>.
 
-=head1 COPYRIGHT & LICENSE
+=head1 SUPPORT
 
-	Copyright (c) 2005-2008 the aforementioned authors. All rights
-	reserved. This program is free software; you can redistribute
-	it and/or modify it under the same terms as Perl itself.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Authentication-Store-Htpasswd>
+(or L<bug-Catalyst-Authentication-Store-Htpasswd@rt.cpan.org|mailto:bug-Catalyst-Authentication-Store-Htpasswd@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#catalyst> on C<irc.perl.org>|irc://irc.perl.org/#catalyst>.
+
+=head1 AUTHOR
+
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords David Kamholz Tomas Doran Karen Etheridge Tom Bloor Christopher Hoskin Ilmari Vacklin
+
+=over 4
+
+=item *
+
+David Kamholz <dkamholz@cpan.org>
+
+=item *
+
+Tomas Doran <bobtfish@bobtfish.net>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Tom Bloor <t.bloor@shadowcat.co.uk>
+
+=item *
+
+Christopher Hoskin <christopher.hoskin@gmail.com>
+
+=item *
+
+Ilmari Vacklin <ilmari.vacklin@cs.helsinki.fi>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2005 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-

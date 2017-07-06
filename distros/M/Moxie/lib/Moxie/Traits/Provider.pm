@@ -15,7 +15,7 @@ use B::CompilerPhase::Hook (); # multi-phase programming
 use Sub::Util              ();
 use PadWalker              (); # for generating lexical accessors
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub init_args ( $meta, $method, %init_args ) : OverwritesMethod {
@@ -329,7 +329,7 @@ Moxie::Traits::Provider - built in traits
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 

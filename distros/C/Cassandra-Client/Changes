@@ -1,5 +1,16 @@
 Revision history for Cassandra-Client
 
+0.13    2017/07/05
+
+      * Fix a critical bug in the INET type decoder.
+        If you run 0.12, upgrade immediately!
+      * Add back 32bit support
+
+0.12    2017/06/27
+
+      * Decoder rewritten in XS, for performance
+      * Temporarily drops support for 32bit Perl. It will come back in a future version.
+
 0.11    2017/06/12
 
       * Stricter and faster reference checks

@@ -59,7 +59,8 @@
       },
       "test" : {
          "requires" : {
-            "Test2::Suite" : "0.000060",
+            "Test2::Mock" : "0.000060",
+            "Test2::V0" : "0.000060",
             "Test::More" : "0.94",
             "perl" : "5.008001"
          }
@@ -78,11 +79,12 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.45",
+   "version" : "0.52",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
-      "Roy Storey"
+      "Roy Storey",
+      "Ilya Pavlov"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }

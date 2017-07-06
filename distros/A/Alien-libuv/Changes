@@ -1,5 +1,20 @@
 Revision history for Alien-libuv
 
+0.004     2017-06-29
+  - Ensure we're at least using libuv v1.0.0. Prior versions of libuv handled
+    errors differently, causing problems for XS modules needing to deal with
+    both.
+
+0.003     2017-06-27
+  - Bump prereqs for Alien:: tools
+  - Isolate dynamic libraries (Graham Ollis)
+
+0.002     2017-06-26
+  - Use Alien::libtool (Graham Ollis)
+  - Use Alien::autoconf (Graham Ollis)
+  - Use Alien::automake (Graham Ollis)
+  - Fix install on BSD, OS X, and Windows (Graham Ollis)
+
 0.001     2017-06-16
   - initial version
   - Does not yet work on Windows.

@@ -1,0 +1,69 @@
+SYNOPSIS
+
+     use Log::ger::Layout LTSV => (
+         add_fields         => {key3 => 'value', key4 => 'value', ...},         # optional
+         add_special_fields => {_date => 'Date_GMT', _host => 'Hostname', ...}, # optional
+         delete_fields      => ['key1', 'key2', qr/some-regex/, ...],           # optional
+     );
+     use Log::ger;
+    
+     # if you use it together with Log::ger::Format::None:
+     log_warn({key1 => 'val1', key2 => 'val2', foo => 'bar', ...);
+    
+     # otherwise, using the standard formatter:
+     log_warn("blah %s", ['some', 'data']);
+
+    The final message will be something like:
+
+     _date:2017-06-28T14:08:22      _host:example.com       foo:bar key3:value      key4:value
+
+    or:
+
+     _date:2017-06-28T14:08:22      _host:example.com       message:blah ["some","data"]
+
+DESCRIPTION
+
+    This layouter allows you to log message as LTSV row. If you use
+    Log::ger::Format::None, you can pass a hashref. Otherwise, the message
+    will be put in message label. You can then delete keys then add
+    additional fields/keys (including special fields, a la
+    Log::ger::Layout::Pattern).
+
+CONFIGURATION
+
+ add_fields => hash
+
+ add_special_fields => hash
+
+    Known special fields:
+
+     Category: Category of the logging event
+     Class: Fully qualified package [or class] name of the caller
+     Date_Local: Current date in ISO8601 format (YYYY-MM-DD<T>hh:mm:ss) (localtime)
+     Date_GMT: Current date in ISO8601 format (YYYY-MM-DD<T>hh:mm:ss) (GMT)
+     File: File where the logging event occurred
+     Hostname: (if Sys::Hostname is available)
+     Location: Fully qualified name of the calling method followed by the
+       callers source the file name and line number between parentheses.
+     Line: Line number within the file where the log statement was issued
+     Message: The message to be logged
+     Method: Method or function where the logging request was issued
+     Level: Level ("priority") of the logging event
+     PID: PID of the current process
+     Elapsed_Start: Number of seconds elapsed from program start to logging event
+     Elapsed_Last: Number of seconds elapsed from last logging event to current
+       logging event
+     Stack_Trace: stack trace of functions called
+
+    Unknown special fields will cause the layouter to die.
+
+ delete_fields
+
+SEE ALSO
+
+    More about LTSV format: http://ltsv.org
+
+    Log::ger
+
+    Log::ger::Layout::Pattern
+

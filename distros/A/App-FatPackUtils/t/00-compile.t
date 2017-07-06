@@ -6,13 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FatPackUtils.pm'
 );
 
 my @scripts = (
+    'bin/fatpack-extract',
     'bin/fatpack-info',
     'bin/fatpack-modules',
     'bin/update-fatpack-snippets'

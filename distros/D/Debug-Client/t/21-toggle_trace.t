@@ -13,7 +13,10 @@ plan( tests => 2 );
 
 
 #Top
-use t::lib::Debugger;
+BEGIN {
+  require "./t/lib/Debugger.pm";
+  t::lib::Debugger->import;
+}
 
 start_script('t/eg/14-y_zero.pl');
 my $debugger;

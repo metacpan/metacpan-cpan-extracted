@@ -63,3 +63,14 @@ my $hi;
 try {
     $hi = "nine";
 };
+
+## name "try" in an if block
+## failures 1
+## cut
+
+use Try::Tiny;
+
+my $hi;
+if ( try { $hi = "one" } ) {
+    $hi = "two";
+}

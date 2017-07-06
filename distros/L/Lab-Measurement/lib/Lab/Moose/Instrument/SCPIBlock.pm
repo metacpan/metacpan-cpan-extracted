@@ -1,5 +1,7 @@
 package Lab::Moose::Instrument::SCPIBlock;
-$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.550';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Role for handling SCPI/IEEE 488.2 block data
+$Lab::Moose::Instrument::SCPIBlock::VERSION = '3.552';
 use Moose::Role;
 use MooseX::Params::Validate;
 
@@ -14,32 +16,6 @@ with qw/
     Lab::Moose::Instrument::SCPI::Format
     /;
 
-
-=head1 NAME
-
-Lab::Moose::Instrument::SCPI::Block - Role for handling SCPI/IEEE 488.2
-block data.
-
-=head1 DESCRIPTION
-
-So far, only definite length floating point data of type 'REAL' is
-supported.
-
-See "8.7.9 <DEFINITE LENGTH ARBITRARY BLOCK RESPONSE DATA>" in IEEE 488.2.
-
-=head1 METHODS
-
-=head2 block_to_array
-
- my $array_ref = $self->block_to_array(
-     binary => "#232${bytes}";
-     precision => 'double'
- );
-
-Convert block data to arrayref, where the binary block holds floating point
-values in native byte-order.
-
-=cut
 
 sub block_to_array {
     my ( $self, %args ) = validated_hash(
@@ -75,13 +51,6 @@ sub block_to_array {
 
 }
 
-=head2 set_data_format_precision
-
- $self->set_data_format_precision( precision => 'double' );
-
-Set used floating point type. Has to be 'single' (default) or 'double'.
-
-=cut
 
 sub set_data_format_precision {
     my ( $self, %args ) = validated_hash(
@@ -100,3 +69,53 @@ sub set_data_format_precision {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Moose::Instrument::SCPIBlock - Role for handling SCPI/IEEE 488.2 block data
+
+=head1 VERSION
+
+version 3.552
+
+=head1 DESCRIPTION
+
+So far, only definite length floating point data of type 'REAL' is
+supported.
+
+See "8.7.9 <DEFINITE LENGTH ARBITRARY BLOCK RESPONSE DATA>" in IEEE 488.2.
+
+=head1 METHODS
+
+=head2 block_to_array
+
+ my $array_ref = $self->block_to_array(
+     binary => "#232${bytes}";
+     precision => 'double'
+ );
+
+Convert block data to arrayref, where the binary block holds floating point
+values in native byte-order.
+
+=head2 set_data_format_precision
+
+ $self->set_data_format_precision( precision => 'double' );
+
+Set used floating point type. Has to be 'single' (default) or 'double'.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team.
+  Copyright 2016       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

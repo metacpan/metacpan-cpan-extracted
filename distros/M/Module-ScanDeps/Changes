@@ -1,3 +1,11 @@
+1.24  2017-06-28
+
+- Merge pull request from Salvador Fandiño (salva), thx!
+  Specio::PartialDump uses unicore
+    
+- Fix RT#119737: Problems with detecting DateTime::Format::Natural dependencies
+  ... by adding a %Preload rule
+
 1.23  2016-11-16
 
 - add %Preload rules for List::SomeUtils and Pod::Simple::Transcode
@@ -40,8 +48,8 @@
   - A line of "use utf8;" just means "this file is encoded in UTF-8"
     and should _not_ result in scanning utf8.pm which will pull in
     the whole Unicode shebang (propery tables and what not). 
-    Yes, utf8.pm _doesn contain "require utf8_heavy.pl", but only inside 
-    an AUTOLOAD() that is _not_ triggered by calling functions 
+    Yes, utf8.pm *does* contain "require utf8_heavy.pl", but only inside 
+    an AUTOLOAD() that is *not* triggered by calling functions 
     like utf8::is_utf8().
 
   - OTOH the innocently looking one-liner

@@ -1,0 +1,53 @@
+{
+   "abstract" : "Add per-file per-year copyright info to each Perl document",
+   "author" : [
+      "Andreas K. Huettel <dilfridge@gentoo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-AuthorsFromGit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Git::Wrapper" : "0",
+            "List::MoreUtils" : "0.4",
+            "List::Util" : "1.33",
+            "Moose" : "0",
+            "Pod::Weaver::Config::Assembler" : "0",
+            "namespace::autoclean" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/akhuettel/Dist-Zilla-Plugin-AuthorsFromGit/issues"
+      },
+      "homepage" : "https://github.com/akhuettel/Dist-Zilla-Plugin-AuthorsFromGit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/akhuettel/Dist-Zilla-Plugin-AuthorsFromGit.git",
+         "web" : "https://github.com/akhuettel/Dist-Zilla-Plugin-AuthorsFromGit"
+      }
+   },
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

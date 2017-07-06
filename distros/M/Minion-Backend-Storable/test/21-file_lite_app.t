@@ -16,7 +16,7 @@ my $file = catfile $tmpdir, 'minion.data';
 eval { plugin Minion => {Something => 'fun'} };
 like $@, qr/^Backend "Minion::Backend::Something" missing/, 'right error';
 
-plugin Minion => {Storable => $file};
+plugin Minion => {Sereal => $file};
 
 app->minion->add_task(
   add => sub {

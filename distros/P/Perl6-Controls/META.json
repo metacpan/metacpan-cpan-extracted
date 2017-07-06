@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Perl6-Controls",
    "no_index" : {
@@ -34,10 +34,11 @@
          "requires" : {
             "Keyword::Declare" : "0.001",
             "Test::More" : "0",
+            "experimentals" : "0",
             "perl" : "5.01"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.000003"
+   "version" : "0.000006"
 }

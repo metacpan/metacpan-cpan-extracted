@@ -4,40 +4,52 @@ use Config::Tiny;
 
 use File::HomeDir;
 
-use Hash::FieldHash ':all';
+use Moo;
 
 use Path::Class;
 
-fieldhash my %config           => 'config';
-fieldhash my %config_file_path => 'config_file_path';
-fieldhash my %section          => 'section';
+use Types::Standard qw/Any Str/;
 
-our $VERSION = '1.07';
+has config =>
+(
+	default  => sub{return ''},
+	is       => 'rw',
+	isa      => Any,
+	required => 0,
+);
+
+has config_file_path =>
+(
+	default  => sub{return ''},
+	is       => 'rw',
+	isa      => Any,
+	required => 0,
+);
+
+has section =>
+(
+	default  => sub{return ''},
+	is       => 'rw',
+	isa      => Any,
+	required => 0,
+);
+
+our $VERSION = '1.08';
 
 # -----------------------------------------------
 
-sub init
+sub BUILD
 {
-	my($self, $arg)         = @_;
-	$$arg{config_file_path} ||= Path::Class::file(File::HomeDir -> my_dist_config('Module-Metadata-CoreList'), '.htmodule.metadata.corelist.conf');
+	my($self) = @_;
 
-} # End of init.
+	if (! $self -> config_file_path)
+	{
+		$self -> config_file_path(Path::Class::file(File::HomeDir -> my_dist_config('Module-Metadata-CoreList'), '.htmodule.metadata.corelist.conf') );
+	}
 
-# --------------------------------------------------
+	$self -> read;
 
-sub new
-{
-	my($class, %arg) = @_;
-
-	$class -> init(\%arg);
-
-	my($self) = from_hash(bless({}, $class), \%arg);
-
-	$self -> read($path);
-
-	return $self;
-
-} # End of new.
+} # End of BUILD.
 
 # -----------------------------------------------
 

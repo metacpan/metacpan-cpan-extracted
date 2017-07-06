@@ -99,6 +99,7 @@ C++ API, see L\<http://ufal.mff.cuni.cz/nametag/api-reference\>.
 
 Simple example performing named entity recognition.
 
+  use warnings;
   use strict;
   use open qw(:std :utf8);
   

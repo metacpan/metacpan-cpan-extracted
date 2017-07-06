@@ -11,7 +11,10 @@ lib/Nagios/Passive/CommandFile.pm
 lib/Nagios/Passive/Gearman.pm
 lib/Nagios/Passive/ResultPath.pm
 lib/Nagios/Passive/Role/Tempfile.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/00.load.t
 t/10.result_path.t
@@ -22,6 +25,3 @@ t/changes.t
 t/kwalitee.t
 t/perlcritic.t
 t/pod.t
-LICENSE
-META.yml
-META.json

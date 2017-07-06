@@ -417,7 +417,7 @@ sub HASH {
             };
 
             # hash key requires to be quoted
-            if (/[^[:alnum:]_]/sm) {
+            if ( $_ eq q[] || /[^[:alnum:]_]/sm ) {
                 $indexed_key->{escaped_key} = \( 'q[' . $indexed_key->{escaped_key}->$* . ']' );
             }
 

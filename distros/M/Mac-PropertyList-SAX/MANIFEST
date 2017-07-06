@@ -14,7 +14,8 @@ inc/Module/Install/WriteAll.pm
 lib/Mac/PropertyList/SAX.pm
 Makefile.PL
 MANIFEST
-META.yml			# Will be created by "make dist"
+META.yml
+META.json
 plists/com.apple.iPhoto.plist
 plists/com.apple.iTunes.plist
 plists/com.apple.systempreferences.plist

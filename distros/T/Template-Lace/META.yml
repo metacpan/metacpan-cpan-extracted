@@ -3,13 +3,14 @@ abstract: 'Logic-less, strongly typed, and componentized HTML templates.'
 author:
   - 'John Napiorkowski <jjnapiork@cpan.org>'
 build_requires:
+  DateTime: '0'
   Moo: '2.003000'
   Scalar::Util: '0'
   Test::Most: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,5 +29,5 @@ resources:
   bugtracker: https://github.com/jjn1056/Template-Lace/issues
   homepage: https://github.com/jjn1056/Template-Lace
   repository: https://github.com/jjn1056/Template-Lace.git
-version: '0.005'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.007'
+x_serialization_backend: 'YAML::Tiny version 1.70'

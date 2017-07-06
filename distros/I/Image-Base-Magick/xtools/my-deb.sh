@@ -2,7 +2,7 @@
 
 # my-deb.sh -- make .deb
 
-# Copyright 2009, 2010, 2011, 2012 Kevin Ryde
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
 
 # my-deb.sh is shared by several distributions.
 #
@@ -31,17 +31,18 @@ if test -z "$DISTNAME"; then
   exit 1
 fi
 
-DISTVNAME=`sed -n 's/^DISTVNAME = \(.*\)/\1/p' Makefile`
-if test -z "$DISTVNAME"; then
-  echo "DISTVNAME not found"
-  exit 1
-fi
-
 VERSION=`sed -n 's/^VERSION = \(.*\)/\1/p' Makefile`
 if test -z "$VERSION"; then
   echo "VERSION not found"
   exit 1
 fi
+
+DISTVNAME=`sed -n 's/^DISTVNAME = \(.*\)/\1/p' Makefile`
+if test -z "$DISTVNAME"; then
+  echo "DISTVNAME not found"
+  exit 1
+fi
+DISTVNAME=`echo "$DISTVNAME" | sed "s/[$][(]VERSION[)]/$VERSION/"`
 
 XS_FILES=`sed -n 's/^XS_FILES = \(.*\)/\1/p' Makefile`
 EXE_FILES=`sed -n 's/^EXE_FILES = \(.*\)/\1/p' Makefile`
@@ -51,16 +52,16 @@ then DPKG_ARCH=all
 else DPKG_ARCH=`dpkg --print-architecture`
 fi
 
+# programs named after the dist, libraries named with "lib"
+# gtk2-ex-splash and wx-perl-podbrowser programs are lib too though
 DEBNAME=`echo $DISTNAME | tr A-Z a-z`
-if test -z "$EXE_FILES"
-then
-  case "$EXE_FILES" in
-  gtk2*) ;;
-  *) DEBNAME="lib${DEBNAME}-perl" ;;
-  esac
-fi
+DEBNAME=`echo $DEBNAME | sed 's/app-//'`
+case "$EXE_FILES" in
+gtk2-ex-splash|wx-perl-podbrowser|'')
+  DEBNAME="lib${DEBNAME}-perl" ;;
+esac
 
-DEBVNAME="${DEBNAME}_$VERSION-1"
+DEBVNAME="${DEBNAME}_$VERSION-0.1"
 DEBFILE="${DEBVNAME}_$DPKG_ARCH.deb"
 
 # ExtUtils::MakeMaker 6.42 of perl 5.10.0 makes "$(DISTVNAME).tar.gz" depend
@@ -88,8 +89,16 @@ rm -rf $DISTVNAME
 tar xfz $DISTVNAME.tar.gz
 unset DISPLAY; export DISPLAY
 cd $DISTVNAME
+
+if test -d examples; then
+  if ! grep _examples debian/rules; then
+    echo "examples directory not in debian/rules"
+  fi
+fi
+
 dpkg-checkbuilddeps debian/control
 fakeroot debian/rules binary
+
 cd ..
 rm -rf $DISTVNAME
 
@@ -97,7 +106,7 @@ rm -rf $DISTVNAME
 # lintian .deb and source
 
 lintian -I -i \
-  --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key \
+  --suppress-tags new-package-should-close-itp-bug,desktop-entry-contains-encoding-key,command-in-menu-file-and-desktop-file \
   $DEBFILE
 
 TEMP="/tmp/temp-lintian-$DISTVNAME"
@@ -113,7 +122,7 @@ fi
 dpkg-source -b $DEBNAME-$VERSION \
                ${DEBNAME}_$VERSION.orig.tar.gz; \
 lintian -I -i \
-  --suppress-tags empty-debian-diff,debian-rules-uses-deprecated-makefile *.dsc
+  --suppress-tags maintainer-upload-has-incorrect-version-number,changelog-should-mention-nmu,empty-debian-diff,debian-rules-uses-deprecated-makefile *.dsc
 cd /
 rm -rf $TEMP
 

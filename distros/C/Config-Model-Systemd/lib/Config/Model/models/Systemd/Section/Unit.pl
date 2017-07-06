@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2016 by Dominique Dumont.
+# This software is Copyright (c) 2015-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -277,15 +277,22 @@ above.',
       },
       'Requisite',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Similar to C<Requires>.
 However, if the units listed here are not started already,
 they will not be started and the transaction will fail
 immediately. ',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'Wants',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'A weaker version of
 C<Requires>. Units listed in this option will
 be started if the configuring unit is. However, if the listed
@@ -299,11 +306,14 @@ configured outside of the unit configuration file by adding
 symlinks to a .wants/ directory
 accompanying the unit file. For details, see
 above.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'BindsTo',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Configures requirement dependencies, very
 similar in style to C<Requires>, however in
 addition to this behavior, it also declares that this unit is
@@ -312,22 +322,28 @@ Units can suddenly, unexpectedly disappear if a service
 terminates on its own choice, a device is unplugged or a mount
 point unmounted without involvement of
 systemd.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'PartOf',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => "Configures dependencies similar to
 C<Requires>, but limited to stopping and
 restarting of units. When systemd stops or restarts the units
 listed here, the action is propagated to this unit. Note that
 this is a one-way dependency\x{a0}\x{2014} changes to this unit do not
 affect the listed units. ",
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'Conflicts',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'A space-separated list of unit names.
 Configures negative requirement dependencies. If a unit has a
 C<Conflicts> setting on another unit,
@@ -344,8 +360,7 @@ required part of the transaction). In the latter case, the job
 that is not the required will be removed, or in case both are
 not required, the unit that conflicts will be started and the
 unit that is conflicted is stopped.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'Before',
       {

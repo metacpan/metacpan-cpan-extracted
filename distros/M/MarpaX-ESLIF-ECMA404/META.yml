@@ -36,7 +36,7 @@ no_index:
 provides:
   MarpaX::ESLIF::ECMA404:
     file: lib/MarpaX/ESLIF/ECMA404.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Carp: '0'
   MarpaX::ESLIF: v2.0.13
@@ -50,6 +50,6 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-ESLIF-ECMA404
   homepage: https://metacpan.org/release/MarpaX-ESLIF-ECMA404
   repository: git://github.com/jddurand/marpax-eslif-ecma404.git
-version: '0.006'
+version: '0.007'
 x_authority: cpan:JDDPAUSE
 x_serialization_backend: 'YAML::Tiny version 1.70'

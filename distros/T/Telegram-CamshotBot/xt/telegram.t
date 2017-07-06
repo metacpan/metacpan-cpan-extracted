@@ -5,13 +5,20 @@
 # or
 # perl -Ilib xt/telegram.t
 
+# export CAMSHOTBOT_TELEGRAM_API_TOKEN=
+
+# If you see
+# ERROR: code 409: Conflict: can't use getUpdates method while webhook is active
+# please run
+# perl -Ilib xt/remove_webhook.t
+
 use Telegram::Bot::Message;
 use WWW::Telegram::BotAPI;
 
 my $cmd = '/abc';
 my $screenshot_file = 'xt/Screenshot.png';
 my $api = $api = WWW::Telegram::BotAPI->new (
-    token => '267111731:AAHKKqyyjbVBh0pAOrH7pWoUxi-juMpWKto'
+    token => $ENV{CAMSHOTBOT_TELEGRAM_API_TOKEN}
 );
 
 while (1) {
@@ -30,7 +37,7 @@ while (1) {
     		    reply_to_message_id => $mo->message_id
     		})
       }
-      $api->getUpdates({ offset => $update->{update_id} + 1.0 })->{result}; # clear buffer
+      $api->getUpdates({ offset => $update->{update_id} + 1.0 })->{result};   # clear buffer
     }
     print "Replied to all updates!\n";
   }

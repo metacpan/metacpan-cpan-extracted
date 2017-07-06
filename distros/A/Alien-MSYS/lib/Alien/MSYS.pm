@@ -10,7 +10,7 @@ our @EXPORT    = qw( msys msys_run );
 our @EXPORT_OK = qw( msys msys_run msys_path );
 
 # ABSTRACT: Tools required for GNU style configure scripts on Windows
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 
 sub msys (&)
@@ -37,50 +37,60 @@ sub msys_run
 sub msys_path ()
 {
   return undef unless  $^O eq 'MSWin32';
-  return $ENV{PERL_ALIEN_MSYS_BIN} if defined $ENV{PERL_ALIEN_MSYS_BIN};
   
-  require File::Spec;
-  foreach my $dir (split /;/, $ENV{PATH})
+  my $override_type = $ENV{ALIEN_MSYS_INSTALL_TYPE} || $ENV{ALIEN_INSTALL_TYPE} || '';
+  
+  if($override_type ne 'share')
   {
+    return $ENV{PERL_ALIEN_MSYS_BIN}
+      if defined $ENV{PERL_ALIEN_MSYS_BIN} && -x File::Spec->catfile($$ENV{PERL_ALIEN_MSYS_BIN}, 'sh.exe');
+  
+    require File::Spec;
+    foreach my $dir (split /;/, $ENV{PATH})
+    {
+      my $path = eval {
+        my $mingw_get = File::Spec->catfile($dir, 'mingw-get.exe');
+        die 'no mingw-get.exe' unless -x $mingw_get;
+        my($volume, $dirs) = File::Spec->splitpath($mingw_get);
+        my @dirs = File::Spec->splitdir($dirs);
+        splice @dirs, -2;
+        push @dirs, qw( msys 1.0 bin );
+        my $path = File::Spec->catdir($volume, @dirs);
+        die 'no sh.exe' unless -x File::Spec->catfile($path, 'sh.exe');
+        $path;
+      };
+      return $path unless $@;
+    }
+
+    foreach my $dir (qw( C:\MinGW\msys\1.0\bin ))
+    {
+      return $dir if -x File::Spec->catfile($dir, 'sh.exe');
+    }
+
     my $path = eval {
-      my $mingw_get = File::Spec->catfile($dir, 'mingw-get.exe');
-      die 'no mingw-get.exe' unless -x $mingw_get;
-      my($volume, $dirs) = File::Spec->splitpath($mingw_get);
+      require File::HomeDir;
+      require Win32::Shortcut;
+      my $lnk_name = File::Spec->catfile(File::HomeDir->my_desktop, 'MinGW Installer.lnk');
+      die "No MinGW Installer.lnk" unless -r $lnk_name;
+      my $lnk      = Win32::Shortcut->new;
+      $lnk->Load($lnk_name);
+      my($volume, $dirs) = File::Spec->splitpath($lnk->{Path});
       my @dirs = File::Spec->splitdir($dirs);
-      splice @dirs, -2;
+      splice @dirs, -3;
       push @dirs, qw( msys 1.0 bin );
       my $path = File::Spec->catdir($volume, @dirs);
       die 'no sh.exe' unless -x File::Spec->catfile($path, 'sh.exe');
       $path;
     };
+
     return $path unless $@;
   }
 
-  foreach my $dir (qw( C:\MinGW\msys\1.0\bin ))
+  if($override_type ne 'system')
   {
-    return $dir if -x File::Spec->catfile($dir, 'sh.exe');
+    my $dir = _my_dist_dir();
+    return $dir if defined $dir && -d $dir;
   }
-
-  my $path = eval {
-    require File::HomeDir;
-    require Win32::Shortcut;
-    my $lnk_name = File::Spec->catfile(File::HomeDir->my_desktop, 'MinGW Installer.lnk');
-    die "No MinGW Installer.lnk" unless -r $lnk_name;
-    my $lnk      = Win32::Shortcut->new;
-    $lnk->Load($lnk_name);
-    my($volume, $dirs) = File::Spec->splitpath($lnk->{Path});
-    my @dirs = File::Spec->splitdir($dirs);
-    splice @dirs, -3;
-    push @dirs, qw( msys 1.0 bin );
-    my $path = File::Spec->catdir($volume, @dirs);
-    die 'no sh.exe' unless -x File::Spec->catfile($path, 'sh.exe');
-    $path;
-  };
-
-  return $path unless $@;
-
-  my $dir = _my_dist_dir();
-  return $dir if defined $dir && -d $dir;
 
   return undef;
 }
@@ -104,7 +114,7 @@ Alien::MSYS - Tools required for GNU style configure scripts on Windows
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -112,7 +122,7 @@ from Perl:
 
  use Alien::MSYS;
  # runs uname from MSYS
- my $uname = mysy { `uname` };
+ my $uname = msys { `uname` };
 
 From Prompt/Makefile
 
@@ -131,6 +141,11 @@ methods in this order:
 
 =over 4
 
+=item environment variable C<ALIEN_INSTALL_TYPE> or C<ALIEN_MSYS_INSTALL_TYPE>
+
+If set to C<share> a system install will not be attempted.  If set to C<system>
+then a share install will not be attempted.
+
 =item environment variable C<PERL_ALIEN_MSYS_BIN>
 
 If set, this environment variable should be set to the root of C<MSYS> (NOT C<MinGW>).
@@ -143,20 +158,19 @@ so it is advisable to set this in the System Properties control panel.
 
 =item search C<PATH> for C<mingw-get.exe>
 
-First L<Alien::MSYS> searches the C<PATH> environment variable for the C<mingw-get.exe>
+Second, L<Alien::MSYS> searches the C<PATH> environment variable for the C<mingw-get.exe>
 program, which is a common method for installing C<MinGW> and C<MSYS>.  From there
 if it can deduce the location of C<MSYS> it will use that.
 
 =item try C<C:\MinGW\msys\1.0\bin>
 
-This is usually the default location, so L<Alien::MSYS> will try this directory
-even if it isn't found by another method.
+Next, L<Alien::MSYS> tries the default install location.
 
 =item Use desktop shortcut for C<MinGW Installer>
 
-Usually when you install the C<MinGW> installer it creates a shortcut on the desktop.
-if L<Win32::Shortcut> is installed (it is an optional dependency), then L<Alien::MSYS>
-can use that information to determine the location of C<MSYS>.
+Finally, L<Alien::MSYS> will try to find C<MSYS> from the desktop shortcut created
+by the GUI installer for C<MinGW>.  This method only works if you already have
+L<Win32::Shortcut> installed, as it is an optional dependency.
 
 =back
 

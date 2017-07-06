@@ -1,0 +1,58 @@
+{
+   "abstract" : "Dist::Zilla with Changes check",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-CheckChangeLog",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "1.007",
+            "perl" : "5.004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Class" : "0",
+            "Pod::Coverage" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Markdown" : "0",
+            "Test::Exception" : "0.43",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/fayland/dist-zilla-plugin-checkchangelog.git",
+         "web" : "https://github.com/fayland/dist-zilla-plugin-checkchangelog"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

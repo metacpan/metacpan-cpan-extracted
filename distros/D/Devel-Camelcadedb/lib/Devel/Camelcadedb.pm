@@ -1,5 +1,6 @@
 package Devel::Camelcadedb;
-our $VERSION = "2017.1";
+# must be quoted to work correctly with JSON protocol
+our $VERSION = "2017.100.2";
 
 # http://perldoc.perl.org/DB.html
 # http://perldoc.perl.org/perldebug.html
@@ -35,11 +36,9 @@ use constant {
 };
 use constant {
     # debugger enabled
-    DEBUG_DEFAULT_FLAGS # 0x73f
-       => DEBUG_ALL & ~(DEBUG_USE_SUB_ADDRESS|DEBUG_REPORT_GOTO),
+    DEBUG_DEFAULT_FLAGS => DEBUG_ALL & ~(DEBUG_USE_SUB_ADDRESS|DEBUG_REPORT_GOTO), # 0x73f
     # instrument code, but don't call DB::DB (see sub disable for DB::sub)
-    DEBUG_PREPARE_FLAGS # 0x73c
-       => DEBUG_ALL & ~(DEBUG_USE_SUB_ADDRESS|DEBUG_REPORT_GOTO|DEBUG_SINGLE_STEP_ON),
+    DEBUG_PREPARE_FLAGS => DEBUG_ALL & ~(DEBUG_USE_SUB_ADDRESS|DEBUG_REPORT_GOTO|DEBUG_SINGLE_STEP_ON), # 0x73c
 };
 
 

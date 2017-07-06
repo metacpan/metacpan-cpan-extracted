@@ -1,0 +1,40 @@
+package Log::ger::Manual::ForLogContextual;
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Log::ger for Log::Contextual users
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Log::ger::Manual::ForLogContextual - Log::ger for Log::Contextual users
+
+=head1 VERSION
+
+version 0.012
+
+=head1 WHY LOG::CONTEXTUAL
+
+=head1 WHY LOG::GER OVER LOG::CONTEXTUAL
+
+=head1 FAQ
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

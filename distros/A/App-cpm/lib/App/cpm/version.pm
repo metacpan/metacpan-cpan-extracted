@@ -2,7 +2,7 @@ package App::cpm::version;
 use strict;
 use warnings;
 use CPAN::Meta::Requirements;
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 use parent 'version';
 
@@ -28,6 +28,14 @@ sub numify {
 sub parse {
     local $SIG{__WARN__} = sub {};
     shift->SUPER::parse(@_);
+}
+
+# utility function
+sub range_merge {
+    my ($range1, $range2) = @_;
+    my $req = CPAN::Meta::Requirements->new;
+    $req->add_string_requirement('DummyModule', $_) for $range1, $range2; # may die
+    $req->requirements_for_module('DummyModule');
 }
 
 1;

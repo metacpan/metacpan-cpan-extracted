@@ -1,0 +1,33 @@
+use alienfile;
+
+#our $VERSION = 0.017_000;
+ 
+# NEED ANSWER: which should we be using below?
+plugin 'PkgConfig' => 'libpcre2-8';
+#plugin 'PkgConfig' => 'libpcre2-16';
+#plugin 'PkgConfig' => 'libpcre2-32';
+ 
+share {
+    plugin Download => (
+#        url => 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/',  # NEED ENABLE: official server once 10.30 is released
+        url => 'https://wbraswell.github.io/pcre2-mirror/',  # NEED DISABLE: pre-release mirror server, fixes Windows bug https://bugs.exim.org/show_bug.cgi?id=2067
+
+        filter => qr/^pcre2-.*\.tar\.gz$/,
+
+#        version => qr/([0-9\.]+)/,  # error, prefers 10.21 over 10.23
+#        version => qr/^pcre2-([0-9\.]+)/,  # NEED ENABLE: official server
+        version => qr/^pcre2-([0-9\.]+)/,  # NEED DISABLE: pre-release mirror server
+    );
+    plugin Extract => 'tar.gz';
+    plugin 'Build::Autoconf' => ();
+    build [
+#        '%{configure} --enable-pcre2-16 --enable-pcre2-32 --disable-shared',
+        '%{configure} --enable-pcre2-16 --enable-pcre2-32 --disable-shared --enable-jit',  # NEED ANSWER: what hardware is not supported for JIT???
+#        '%{make}',
+#        '%{make} install',
+#        '%{dmake}',
+#        '%{dmake} install',
+        '%{gmake}',
+        '%{gmake} install',
+    ];
+};

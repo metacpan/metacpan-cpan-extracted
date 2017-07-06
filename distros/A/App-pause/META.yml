@@ -22,15 +22,16 @@ requires:
   Getopt::Long::Subcommand: '0.09'
   JSON::PP: '0'
   List::Util: '0'
-  Log::Any: '0'
-  Log::Any::Adapter: '0'
-  Log::Any::Adapter::Screen: '0'
+  Log::ger: '0.011'
+  Log::ger::Output: '0.005'
+  Log::ger::Output::Screen: '0.004'
+  Log::ger::Util: '0.008'
   Perinci::CmdLine::Util::Config: '1.71'
   Perinci::Result::Format::Lite: '0.22'
   Scalar::Util: '0'
   Scalar::Util::Numeric: '0'
   Time::Duration::Parse::AsHash: '0'
-  WWW::PAUSE::Simple: '0.38'
+  WWW::PAUSE::Simple: '0.41'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause
   homepage: https://metacpan.org/release/App-pause
   repository: git://github.com/perlancar/perl-App-pause.git
-version: '0.60'
+version: '0.62'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -118,7 +119,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodnameFromFilename
       name: '@Author::PERLANCAR/PodnameFromFilename'
-      version: '0.01'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
@@ -304,7 +305,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.23'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -345,11 +346,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.01'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.003'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: 'PruneFiles additional'

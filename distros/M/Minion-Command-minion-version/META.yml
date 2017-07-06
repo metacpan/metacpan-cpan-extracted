@@ -1,0 +1,25 @@
+---
+abstract: 'Minion version command'
+author:
+  - 'Bob Faist <bfaist@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Minion-Command-minion-version
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Minion: '6.0'
+  Mojolicious: '6.0'
+  perl: '5.010001'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

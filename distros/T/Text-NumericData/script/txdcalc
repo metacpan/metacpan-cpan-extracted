@@ -237,7 +237,7 @@ use this separator for input (otherwise deduce from data; TAB is another way to 
 
 	0
 
-shortcut for enforcing spline interpolation (overrules --line)
+shortcut for enforcing spline interpolation (overrules --lin)
 
 =item B<stdhead>, B<s> (scalar)
 
@@ -271,6 +271,6 @@ Thomas Orgis <thomas@orgis.org>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2005-2016 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
+Copyright (c) 2005-2017 Thomas Orgis, Free Software licensed under the same terms as Perl 5.10
 
 =cut

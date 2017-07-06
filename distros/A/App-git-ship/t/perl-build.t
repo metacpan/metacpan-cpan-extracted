@@ -34,7 +34,7 @@ t::Util->goto_workdir('perl-build', 0);
 
 TODO: {
     local $TODO = -x "bin/e-x-e" ? "" : "Cannot test on $^O";
-    t::Util->test_file('Makefile.PL', qr{EXE_FILES => \[qw\( bin/e-x-e \)\]}s);
+    t::Util->test_file('Makefile.PL', qr{EXE_FILES => \[qw\(bin/e-x-e\)\]}s);
   }
 
   t::Util->test_file('Changes', qr/^[\d\.]+ Not Released$/m);

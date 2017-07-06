@@ -9,10 +9,10 @@
 #include "../spvm_constant_pool.h"
 #include "../spvm_bytecode_array.h"
 #include "../spvm_runtime.h"
-#include "../spvm_runtime_api.h"
 #include "../spvm_runtime_allocator.h"
 #include "../spvm_op.h"
 #include "../spvm_sub.h"
+#include "../spvm_dumper.h"
 #include "../spvm_api.h"
 
 int main(int argc, char *argv[])
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   SPVM_COMPILER_compile(compiler);
   
   if (compiler->error_count > 0) {
-    return;
+    return 1;
   }
   else {
 #ifdef DEBUG
@@ -47,15 +47,8 @@ int main(int argc, char *argv[])
 
   
   // Create run-time
-  SPVM_RUNTIME* runtime = SPVM_RUNTIME_new();
-  
-  // Copy constant pool to runtime
-  runtime->env->constant_pool = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(compiler->constant_pool->length, sizeof(int32_t));
-  memcpy(runtime->env->constant_pool, compiler->constant_pool->values, compiler->constant_pool->length * sizeof(int32_t));
-
-  // Copy bytecodes to runtime
-  runtime->bytecodes = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(compiler->bytecode_array->length, sizeof(uint8_t));
-  memcpy(runtime->bytecodes, compiler->bytecode_array->values, compiler->bytecode_array->length * sizeof(uint8_t));
+  SPVM_RUNTIME* runtime = SPVM_COMPILER_new_runtime(compiler);
+  SPVM_API* api = runtime->api;
 
   // Entry point subroutine address
   const char* entry_point_sub_name = compiler->entry_point_sub_name;
@@ -79,26 +72,23 @@ int main(int argc, char *argv[])
   // Free compiler
   SPVM_COMPILER_free(compiler);
   
-  // Initialize runtime before push arguments and call subroutine
-  SPVM_RUNTIME_init(runtime);
-  
   // Push argument
-  SPVM_RUNTIME_API_push_var_long(runtime, 2);
-
+  api->push_var_int(api, 2);
+  
   // Run
-  SPVM_RUNTIME_call_sub(runtime, sub_constant_pool_index);
+  api->call_sub(api, sub_constant_pool_index);
   
 #ifdef DEBUG
   if (runtime->abort) {
-    void* message_address = SPVM_RUNTIME_API_pop_return_value_address(runtime);
-    int8_t* message = SPVM_API_get_array_values_byte(runtime->env, message_address);
+    void* message_object = api->pop_retval_object(api);
+    int8_t* message = api->get_byte_array_elements(api, message_object);
     
     printf("%s", (char*)message);
     printf("\n");
   }
   else {
     // Get return value
-    int64_t return_value = SPVM_RUNTIME_API_pop_return_value_long(runtime);
+    int64_t return_value = api->pop_retval_int(api);
     
     printf("TEST return_value: %ld\n", return_value);
   }

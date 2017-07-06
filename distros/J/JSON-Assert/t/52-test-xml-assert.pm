@@ -32,7 +32,7 @@ BEGIN {
     ];
 
     require Test::Builder::Tester;
-    Test::Builder::Tester->import(tests => 2);
+    Test::Builder::Tester->import(tests => 3);
 }
 
 require Test::JSON::Assert;

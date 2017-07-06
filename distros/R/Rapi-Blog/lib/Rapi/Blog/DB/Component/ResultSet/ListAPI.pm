@@ -323,7 +323,7 @@ L<RapidApp>
 
 =item * 
 
-L<Rapi::Blog::Manual::Scaffolds>
+L<Rapi::Blog::Manual>
 
 =back
 

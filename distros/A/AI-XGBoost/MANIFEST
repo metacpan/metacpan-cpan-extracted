@@ -8,11 +8,16 @@ README
 dist.ini
 examples/agaricus.txt.test
 examples/agaricus.txt.train
+examples/basic.pl
 examples/capi.pl
+examples/capi_dump_model.pl
 examples/capi_raw.pl
+examples/featmap.txt
 lib/AI/XGBoost.pm
+lib/AI/XGBoost/Booster.pm
 lib/AI/XGBoost/CAPI.pm
 lib/AI/XGBoost/CAPI/RAW.pm
+lib/AI/XGBoost/DMatrix.pm
 misc/using_capi.c
 t/00-load.t
 t/10-cast_arguments.t

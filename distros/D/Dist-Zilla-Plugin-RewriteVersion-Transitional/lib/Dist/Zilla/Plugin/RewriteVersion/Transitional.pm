@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::RewriteVersion::Transitional; # git description: v0.006-2-gc821b7b
+package Dist::Zilla::Plugin::RewriteVersion::Transitional; # git description: v0.007-12-ge819041
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Ease the transition to [RewriteVersion] in your distribution
 # KEYWORDS: plugin version rewrite munge module
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 
 use Moose;
 extends 'Dist::Zilla::Plugin::RewriteVersion';
@@ -61,7 +61,8 @@ around dump_config => sub
     $config->{+__PACKAGE__} = {
         $self->_using_fallback_version_provider
             ? ( map { $_ => $self->$_ } qw(fallback_version_provider _fallback_version_provider_args) )
-            : ()
+            : (),
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     $config->{ $self->fallback_version_provider } = $self->_fallback_version_provider_obj->dump_config
@@ -116,7 +117,7 @@ Dist::Zilla::Plugin::RewriteVersion::Transitional - Ease the transition to [Rewr
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -124,7 +125,6 @@ In your F<dist.ini>:
 
     [RewriteVersion::Transitional]
     fallback_version_provider = Git::NextVersion
-    version_regexp = ^v([\d._]+)$
 
 =head1 DESCRIPTION
 
@@ -177,14 +177,6 @@ L<Dist::Zilla::Plugin::RewriteVersion/skip_version_provider> is true.
 Don't forget to add this plugin as a runtime-requires prerequisite in your
 plugin bundle!
 
-=head1 SUPPORT
-
-=for stopwords irc
-
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-RewriteVersion-Transitional>
-(or L<bug-Dist-Zilla-Plugin-RewriteVersion-Transitional@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-RewriteVersion-Transitional@rt.cpan.org>).
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
-
 =head1 SEE ALSO
 
 =over 4
@@ -203,11 +195,24 @@ L<Dist::Zilla::Plugin::BumpVersionAfterRelease>
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-RewriteVersion-Transitional>
+(or L<bug-Dist-Zilla-Plugin-RewriteVersion-Transitional@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-RewriteVersion-Transitional@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2014 by Karen Etheridge.
 

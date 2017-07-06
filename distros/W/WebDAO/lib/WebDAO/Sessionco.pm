@@ -10,7 +10,7 @@ WebDAO::Sessionco - Session with store session id in cookie
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use WebDAO;
 use WebDAO::Session;
 use MIME::Base64;
@@ -32,9 +32,11 @@ sub _init {
     Cookie_name $self (
         {
             name    => "$id",
-            expires => "+3M",
+            expires =>  defined($param{expires}) ? $param{expires} :  "+3M",
             path    => "/",
-            value   => "0"
+            value   => "0",
+            secure  => defined($param{secure}) ? $param{secure} : 0,
+            httponly => 1
         }
     );
     my $cv = $self->Cgi_obj();
@@ -44,7 +46,6 @@ sub _init {
     }
      U_id $self ( $coo );
     $self->Cookie_name()->{value} = $coo;
-    $self->Cookie_name()->{expires} = time()+ 60*60*24*30*3; # 3 month
     $cv->set_header('Set-Cookie', $self->Cookie_name());
     1
 }
@@ -68,7 +69,7 @@ Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002-2015 by Zahatski Aliaksandr
+Copyright 2002-2017 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

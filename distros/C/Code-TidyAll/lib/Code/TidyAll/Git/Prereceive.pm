@@ -13,7 +13,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 # Public
 has 'allow_repeated_push' => ( is => 'ro', default => 3 );
@@ -168,7 +168,7 @@ tidyall'd
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 

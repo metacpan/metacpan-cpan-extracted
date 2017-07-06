@@ -29,6 +29,7 @@ use Mojo::UserAgent;
     pid_file           => '/foo/bar.pid',
     proxy              => 1,
     requests           => 3,
+    spare              => 4,
     upgrade_timeout    => 45,
     workers            => 7
   };
@@ -47,7 +48,8 @@ use Mojo::UserAgent;
   is $hypnotoad->prefork->max_requests, 3,              'right value';
   is $hypnotoad->prefork->pid_file,     '/foo/bar.pid', 'right value';
   ok $hypnotoad->prefork->reverse_proxy, 'reverse proxy enabled';
-  is $hypnotoad->prefork->workers, 7, 'right value';
+  is $hypnotoad->prefork->spare,         4, 'right value';
+  is $hypnotoad->prefork->workers,       7, 'right value';
   is $hypnotoad->upgrade_timeout, 45, 'right value';
 }
 
@@ -250,9 +252,10 @@ sleep 1 while _port($port2);
 
 # Check log
 $log = $log->slurp;
-like $log, qr/Worker \d+ started/,                      'right message';
-like $log, qr/Starting zero downtime software upgrade/, 'right message';
-like $log, qr/Upgrade successful, stopping $old/,       'right message';
+like $log, qr/Worker \d+ started/, 'right message';
+like $log, qr/Starting zero downtime software upgrade \(60 seconds\)/,
+  'right message';
+like $log, qr/Upgrade successful, stopping $old/, 'right message';
 
 sub _pid {
   return undef unless open my $file, '<', $dir->child('hypnotoad.pid');

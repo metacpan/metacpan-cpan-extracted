@@ -1,0 +1,20 @@
+SYNOPSIS
+
+     use Log::ger::Output ArrayWithLimits => (
+         array         => $ary,
+         max_elems     => 100,  # defaults unlimited
+     );
+
+DESCRIPTION
+
+    Currently only limiting number of elements is provided. Future limits
+    will be added.
+
+CONFIGURATION
+
+SEE ALSO
+
+    Log::ger
+
+    Modelled after Log::Dispatch::ArrayWithLimits
+

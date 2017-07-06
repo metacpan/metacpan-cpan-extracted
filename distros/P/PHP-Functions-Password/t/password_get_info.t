@@ -1,9 +1,10 @@
-# $Id: password_get_info.t,v 1.1 2017/06/21 19:29:22 cmanley Exp $
+# $Id: password_get_info.t,v 1.2 2017/06/24 13:25:32 cmanley Exp $
 # This file must be saved in UTF-8 encoding!
 use strict;
 use warnings;
-use Test::More; #qw(no_plan);
+use Test::More;
 use lib qw(../lib);
+use PHP::Functions::Password;
 
 my %tests_info = (
 	'$2a$10$O0fG6ExZRx4mEZxsRHqPKuDy9U2HW9M4UONC1hnsx84tW/bb5URFO' => {
@@ -73,9 +74,8 @@ if (!($ENV{'HARNESS_ACTIVE'} || ($^O eq 'MSWin32'))) {	# experimental: that's wh
 	}
 }
 
-plan tests => 1 + scalar(@methods) + ($php ? 3 : 2) * scalar(keys(%tests_info));
+plan tests => scalar(@methods) + ($php ? 3 : 2) * scalar(keys(%tests_info));
 my $class = 'PHP::Functions::Password';
-require_ok($class) || BAIL_OUT("$class has errors");
 foreach my $method (@methods) {
 	can_ok($class, $method);
 	if ($method =~ /^password/) {

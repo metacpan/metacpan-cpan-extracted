@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-$VERSION = '3.59';
+$VERSION = '3.60';
 
 =head1 NAME
 
@@ -108,10 +108,12 @@ sub Reports {
     # get author summary
     my @summary = $dbi->GetQuery('hash','GetAuthorSummary',$cgiparams{name});
     unless(@summary) {
+        # summary doesn't exist, request a build
         unless($settings{crawler}) {
             $dbi->DoQuery('PushAuthor',$cgiparams{name});
             $tvars{update} = 1;
         }
+
         $tvars{perlvers}    = $cpan->mklist_perls;
         $tvars{osnames}     = $cpan->osnames;
         return;
@@ -130,6 +132,8 @@ sub Reports {
     my $parms = decode_json($summary[0]->{dataset});
     for my $key (keys %$parms) { $tvars{$key} = $parms->{$key}; }
     $tvars{processed} = formatDate(8,$parms->{processed}) if($parms->{processed});
+    $tvars{perlvers}  = $cpan->mklist_perls;
+    $tvars{osnames}   = $cpan->osnames;
 }
 
 1;

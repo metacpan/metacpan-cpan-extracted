@@ -44,7 +44,7 @@
          "web" : "https://github.com/neilb/csvgrep"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

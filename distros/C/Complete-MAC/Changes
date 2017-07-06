@@ -1,4 +1,9 @@
-Revision history for Complete-MAC
+0.002   2017-07-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::ger.
+
 
 0.001   2016-10-18 (PERLANCAR)
 

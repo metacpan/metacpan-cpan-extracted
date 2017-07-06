@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Fatal;
 
 use Future;
 use Future::Utils qw( fmap_concat fmap_scalar );
@@ -41,6 +42,19 @@ use Future::Utils qw( fmap_concat fmap_scalar );
    $subf[1]->done( "C", "D" );
 
    is_deeply( [ $future->get ], [qw( A B C D E )], '$future->get for fmap_concat out of order' );
+}
+
+# fmap_concat cancel
+{
+   my $f = Future->new;
+   my $fmap = fmap_concat { $f }
+      foreach => [ $f ],
+      concurrent => 2;
+
+   ok( !exception {
+      $fmap->cancel;
+   }, '$fmap_concat->cancel does not throw on undef slots' );
+   ok( $fmap->is_cancelled, 'was cancelled correctly' );
 }
 
 # fmap_scalar no concurrency

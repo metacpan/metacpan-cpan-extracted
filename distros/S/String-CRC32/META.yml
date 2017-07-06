@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-CRC32
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/leejo/string-crc32/issues
+  homepage: https://metacpan.org/module/String::CRC32
+  license: https://wiki.creativecommons.org/wiki/Public_domain
+  repository: https://github.com/leejo/string-crc32
+version: '1.6'

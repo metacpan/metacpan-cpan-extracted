@@ -46,8 +46,8 @@ The following tags define all what you need per version.
 
 =head1 SEE ALSO
 
-This module is part of Geo-GML distribution version 0.16,
-built on January 05, 2014. Website: F<http://perl.overmeer.net/geo/>
+This module is part of Geo-GML distribution version 0.17,
+built on June 29, 2017. Website: F<http://perl.overmeer.net/geo/>
 All modules in this suite:
 L</Geo::GML>,
 L</Geo::ISO19139>,
@@ -65,11 +65,11 @@ F<https://list.hut.fi/mailman/listinfo/geo-perl|the Geo-Perl mailinglist>
 =head2 License of the CODE
 
 Copyrights of the perl code and the related documentation by
-2008-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+2008-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 
 =head2 License of the SCHEMAS
 

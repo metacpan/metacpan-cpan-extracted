@@ -133,13 +133,13 @@ subtest "arg:remaining" => sub {
         word => 'a,',
         elems => [qw/a -a b -b/],
         remaining => $remaining,
-        result => [qw/a,-b a,b/],
+        result => ['a,-b', 'a,b'],
     );
     test_complete(
         word => '-a,',
         elems => [qw/a -a b -b/],
         remaining => $remaining,
-        result => [qw/-a,-b -a,b/],
+        result => ['-a,-b', '-a,b'],
     );
 };
 

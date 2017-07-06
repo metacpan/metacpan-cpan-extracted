@@ -13,3 +13,7 @@ Revision history for Text-vFile-toXML
 0.04    2007-12-28T16:10-0600
         Added some tests to make Devel::Cover happy; moved to Module::Install.
         No functionality changes (as far as I know!).
+
+0.05    2017-06-24T11:04-0700
+        Mend incorrect test-time dependency on insignificant XML element order,
+        most probably caused by hash order changes.

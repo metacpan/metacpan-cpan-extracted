@@ -1,11 +1,11 @@
 [%- IF User -%]
  <i class="fa fa-user"></i>&nbsp;[% User.username %] 
- | <a class="blog-nav-item" target="_top" href="[% c.mount_url %]/auth/logout_to_referer">
+ | <a class="blog-nav-item" target="_top" href="[% mount_url %]/auth/logout_to_referer">
      Sign out&nbsp;<i class="fa fa-sign-out"></i>
    </a>
 [%- ELSE -%]
  
- <a class="blog-nav-item" target="_top" href="[% c.mount_url %]/auth/to_referer">
+ <a class="blog-nav-item" target="_top" href="[% mount_url %]/auth/to_referer">
   <i class="fa fa-sign-in"></i>&nbsp;Sign in
  </a>
 [%- END -%]

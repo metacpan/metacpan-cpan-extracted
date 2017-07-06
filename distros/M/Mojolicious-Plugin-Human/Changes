@@ -1,5 +1,8 @@
 Revision history for Mojolicious-Plugin-Human
 
+1.01    28-06-2017
+    - Fix timezone for input date and time by ref
+
 1.0     08-06-2017
     - Fix version
 

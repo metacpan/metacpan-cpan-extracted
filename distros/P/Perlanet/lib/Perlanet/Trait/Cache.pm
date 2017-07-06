@@ -3,9 +3,6 @@ package Perlanet::Trait::Cache;
 use strict;
 use warnings;
 
-use 5.6.0;
-our $VERSION = '0.58';
-
 use Moose::Role;
 use namespace::autoclean;
 

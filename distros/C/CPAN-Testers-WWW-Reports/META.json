@@ -1,6 +1,6 @@
 {
     "name": "CPAN-Testers-WWW-Reports",
-    "version": "3.59",
+    "version": "3.60",
     "abstract": "The CPAN Testers Reports website",
     "author": [
         "Barbie (BARBIE) <barbie@cpan.org>"
@@ -74,35 +74,35 @@
     "provides": {
         "CPAN::Testers::WWW::Reports": {
             "file": "lib/CPAN/Testers/WWW/Reports.pm",
-            "version": "3.59"
+            "version": "3.60"
         },
         "Labyrinth::Plugin::CPAN::Authors": {
             "file": "lib/Labyrinth/Plugin/CPAN/Authors.pm",
-            "version": "3.59"
+            "version": "3.60"
         },
         "Labyrinth::Plugin::CPAN::Builder": {
             "file": "lib/Labyrinth/Plugin/CPAN/Builder.pm",
-            "version": "3.59"
+            "version": "3.60"
         },
         "Labyrinth::Plugin::CPAN::Distros": {
             "file": "lib/Labyrinth/Plugin/CPAN/Distros.pm",
-            "version": "3.59"
+            "version": "3.60"
         },
         "Labyrinth::Plugin::CPAN::Monitor": {
             "file": "lib/Labyrinth/Plugin/CPAN/Monitor.pm",
-            "version": "3.59"
+            "version": "3.60"
         },
         "Labyrinth::Plugin::CPAN::Release": {
             "file": "lib/Labyrinth/Plugin/CPAN/Release.pm",
-            "version": "3.59"
+            "version": "3.60"
         },
         "Labyrinth::Plugin::CPAN::Report": {
             "file": "lib/Labyrinth/Plugin/CPAN/Report.pm",
-            "version": "3.59"
+            "version": "3.60"
         },
         "Labyrinth::Plugin::Metabase::Parser": {
             "file": "lib/Labyrinth/Plugin/Metabase/Parser.pm",
-            "version": "3.59"
+            "version": "3.60"
         }
     },
     "no_index": {

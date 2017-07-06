@@ -1,0 +1,14 @@
+SYNOPSIS
+
+     use Log::ger::UseDataDump;
+
+DESCRIPTION
+
+SEE ALSO
+
+    Log::ger
+
+    Data::Dump
+
+    Log::ger::UseDataDumpColor
+

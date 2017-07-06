@@ -1,13 +1,22 @@
-# $Id: 01-resolver.t 1512 2016-10-26 09:14:27Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1573 2017-06-12 11:03:59Z willem $	-*-perl-*-
 
 use strict;
-use Test::More tests => 24;
+use Test::More tests => 26;
+
+
+BEGIN {
+	eval {
+		open( TOUCH, '>.resolv.conf' ) || die $!;	# owned by effective UID
+		close(TOUCH);
+	};
+}
+
 
 use Net::DNS;
 
 
-my $resolver = Net::DNS::Resolver->new( prefer_v4 => 1 );
-my $class = ref($resolver);
+my $resolver = Net::DNS::Resolver->new();
+my $class    = ref($resolver);
 
 for (@Net::DNS::Resolver::ISA) {
 	diag $_ unless /[:]UNIX$/;
@@ -19,28 +28,51 @@ ok( $resolver->print, '$resolver->print' );
 
 ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' );
 
+
 {					## check class methods
-	ok( $class->domain('example.com'),     'class->domain' );
-	ok( $class->searchlist('example.com'), 'class->searchlist' );
 	$class->nameservers(qw(127.0.0.1 ::1));
-	ok( $class->srcport(1234), 'class->srcport' );
-	ok( $class->string(),	   'class->string' );
+	ok( scalar( $class->nameservers ), '$class->nameservers' );
+	$class->searchlist(qw(sub1.example.com sub2.example.com));
+	ok( scalar( $class->searchlist ), '$class->searchlist' );
+	$class->domain('example.com');
+	ok( $class->domain,	   '$class->domain' );
+	ok( $class->srcport(1234), '$class->srcport' );
+	ok( $class->string(),	   '$class->string' );
 }
 
 
 {					## check instance methods
-	ok( $resolver->domain('example.com'),	  'resolver->domain' );
-	ok( $resolver->searchlist('example.com'), 'resolver->searchlist' );
+	ok( $resolver->domain('example.com'),	  '$resolver->domain' );
+	ok( $resolver->searchlist('example.com'), '$resolver->searchlist' );
 	$resolver->nameservers(qw(127.0.0.1 ::1));
-	ok( $resolver->nameservers(), 'resolver->nameservers' );
-	ok( $resolver->nameserver(),  'resolver->nameserver' );
+	ok( scalar( $resolver->nameservers() ), '$resolver->nameservers' );
+}
+
+
+{
+	my $resolver = Net::DNS::Resolver->new();
+	$resolver->nameservers(qw(127.0.0.1 ::1));
+	$resolver->force_v4(0);					# set by default if no IPv6
+	$resolver->prefer_v6(1);
+	my ($address) = $resolver->nameserver();
+	is( $address, '::1', '$resolver->prefer_v6(1)' );
+}
+
+
+{
+	my $resolver = Net::DNS::Resolver->new();
+	$resolver->nameservers(qw(127.0.0.1 ::1));
+	$resolver->force_v6(0);
+	$resolver->prefer_v4(1);
+	my ($address) = $resolver->nameserver();
+	is( $address, '127.0.0.1', '$resolver->prefer_v4(1)' );
 }
 
 
 {
 	my $resolver = Net::DNS::Resolver->new();
 	$resolver->force_v6(1);
-	ok( !$resolver->nameservers(qw(127.0.0.1)), 'no IPv4 nameservers' );
+	ok( !$resolver->nameservers(qw(127.0.0.1)), '$resolver->force_v6(1)' );
 	like( $resolver->errorstring, '/IPv4.+disabled/', 'errorstring: IPv4 disabled' );
 }
 
@@ -48,7 +80,7 @@ ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' 
 {
 	my $resolver = Net::DNS::Resolver->new();
 	$resolver->force_v4(1);
-	ok( !$resolver->nameservers(qw(::)), 'no IPv6 nameservers' );
+	ok( !$resolver->nameservers(qw(::)), '$resolver->force_v4(1)' );
 	like( $resolver->errorstring, '/IPv6.+disabled/', 'errorstring: IPv6 disabled' );
 }
 
@@ -56,7 +88,7 @@ ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' 
 {
 	my $resolver = Net::DNS::Resolver->new();
 	foreach my $value (qw(1.2.3.4 ::1 ::1.2.3.4)) {
-		is( $resolver->srcaddr($value), $value, "resolver->srcaddr($value)" );
+		is( $resolver->srcaddr($value), $value, "\$resolver->srcaddr($value)" );
 	}
 }
 

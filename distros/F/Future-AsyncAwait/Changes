@@ -1,5 +1,21 @@
 Revision history for Future-AsyncAwait
 
+0.06    2017/06/29 17:43:19
+        [CHANGES]
+         * Support suspend/resume within while loops and plain loop blocks
+         * Import the syntax keywords by default, rather than having to
+           request them as an import symbol
+         * Added some initial documentation to explain the new syntax
+
+        [BUGFIXES]
+         * Declare (for now) dependency on perl 5.24 to prevent older versions
+           from attempting it and failing. We hope to support older versions
+           back to 5.14 in due course.
+
+0.05    2017/06/27 15:20:54
+        [BUGFIXES]
+         * Fix await op so it can await multiple times within the same sub
+
 0.04    2017/06/06 18:42:15
         [CHANGES]
          * Suspend and resume the PAD around an await so lexical variables are

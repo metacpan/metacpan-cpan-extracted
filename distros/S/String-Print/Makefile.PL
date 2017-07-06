@@ -2,13 +2,14 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '0.90';
+my $version = '0.92';
 
 my %prereq  =
   ( Test::More        => 0.86
   , Unicode::GCString => 0
   , Encode            => 0
   , HTML::Entities    => 0
+  , Date::Parse       => 2.30
   );
 
 WriteMakefile
@@ -29,9 +30,9 @@ DISTDIR         = ../public_html/string-print/source
 LICENSE         = artistic
 
 # for OODoc's oodist, POD
-FIRST_YEAR      = 2013
+FIRST_YEAR      = 2016
 EMAIL           = perl@overmeer.net
 WEBSITE         = http://perl.overmeer.net/log-report/
-EXTENDS		=
+EXTENDS         =
 
 __POSTAMBLE

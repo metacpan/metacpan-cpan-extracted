@@ -12,12 +12,7 @@ use Carp;
 use XML::Parser;                                                                # https://metacpan.org/pod/XML::Parser
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Table::Text qw(:all);
-our $VERSION = 2017.223;
-
-if (0)                                                                          # Save to S3:- this will not work, unless you're me, or you happen, to know the key
- {my $z = 'DataXmlEdit.zip';
-  print for qx(zip $z $0 && aws s3 cp $z s3://AppaAppsSourceVersions/$z && rm $z);
- }
+our $VERSION = 2017.631;
 
 # Static initialization
 my $userParametersTable = <<END;                                                # Parameters that the user can set
@@ -27,6 +22,7 @@ name        a symbolic name for this parse used in messages about this parse and
 output      a directory into which to write output files
 errors      a sub directory of 'output' into which to write a copy of the string to be parsed in the event that an xml parse error is encountered while parsing this string
 END
+
 our $userParametersIndent = ("\n"x2).indentString($userParametersTable, '  ');  # User settable parameters string for use in the documentation
 my  $userParametersHash   = loadHashFromLines($userParametersTable);            # Parameters that the user can set
 
@@ -119,6 +115,27 @@ sub tree($$$$)                                                                  
   $parent->indexNode;                                                           # Index this node
  }
 
+sub newText($$)                                                                 # Create a new text node
+ {my (undef, $text) = @_;                                                       # Content of text node
+  my $node = bless {};                                                          # New node
+  $node->tag  = cdata;                                                          # Text node
+  $node->text = $text;                                                          # Content of node
+  $node                                                                         # Return new non text node
+ }
+
+sub newTag($$%)                                                                 # Create a new non text node
+ {my (undef, $command, %attributes) = @_;                                       # The command for the node, attributes as a hash
+  my $node = bless {};                                                          # New node
+  $node->tag = $command;                                                        # Tag for node
+  $node->attributes = \%attributes;                                             # Attributes for node
+  $node                                                                         # Return new node
+ }
+
+sub newTree($%)                                                                 # Create a new tree - this is a static method
+ {my ($command, %attributes) = @_;                                              # The command for the first node in the tree, attributes of the first node in the tree as a hash
+  &newTag(undef, @_)
+ }
+
 sub indexNode($)                                                                ## Index the children of a node so that we can access them by tag and number
  {my ($node) = @_;                                                              # Node to index
   delete $node->{indexes};                                                      # Delete the indexes
@@ -134,6 +151,13 @@ sub replaceSpecialChars($)                                                      
   $s =~ s/\</&lt;/gr =~ s/\>/&gt;/gr;                                           # Larry Wall's parser unfortunately replaces &lt and &gt with their expansions in text and does not seem to provide away to stop this behaviour, so we have to put them back
  }
 
+sub tags($)                                                                     # The number of tags in a parse tree
+ {my ($node) = @_;                                                              # Parse tree
+  my $n = 0;
+  $node->by(sub {++$n});                                                        # Count tags including CDATA
+  $n                                                                            # Number of tags encountered
+ }
+
 #1 Stringification                                                              # Print the parse tree
 sub string($)                                                                   # Build a string from a node of a parse tree and the nodes below it
  {my ($node) = @_;                                                              # Start node
@@ -145,6 +169,41 @@ sub string($)                                                                   
   my $s = '<'.$t.$node->printAttributes.'>';                                    # Has sub commands
   $s .= $_->string for @$content;                                               # Recurse to get the sub content
   return $s.'</'.$t.'>';
+ }
+
+sub contentString($)                                                            # Build a string from the content of a node
+ {my ($node) = @_;                                                              # Start node
+  my $s = '';
+  $s .= $_->string for $node->contents;                                         # Recurse to get the sub content
+  $s
+ }
+
+sub prettyString($;$)                                                           # Create a readable string
+ {my ($node, $depth) = @_;                                                      # Start node, depth
+  $depth //= 0;                                                                 # Start depth if none supplied
+
+  if ($node->isText)                                                            # Text node
+   {my $n = $node->next;
+    my $s = $n && $n->isText ? '' : "\n";                                       # Add a new line after contiguous blocks of text to offset next command
+    return $node->text.$s;
+   }
+
+  my $t = $node->tag;                                                           # Not text so it has a tag
+  my $content = $node->content;                                                 # Sub commands
+  my $space   = "\t"x($depth//0);
+  return $space.'<'.$t.$node->printAttributes.'/>'."\n" if !@$content;          # No sub commands
+
+  my $s = $space.'<'.$t.$node->printAttributes.'>'.                             # Has sub commands
+    ($node->first->isText ? '' : "\n");                                         # Continue text on the same line, otherwise place commands on following lines
+  $s .= $_->prettyString($depth+2) for @$content;                               # Recurse to get the sub content
+  return $s.$space.'</'.$t.'>'."\n";
+ }
+
+sub PrettyContentString($)                                                      # Build a pretty string from the content of a node - low use hence initial Capital
+ {my ($node) = @_;                                                              # Start node
+  my $s = '';
+  $s .= $_->prettyString for $node->contents;                                   # Recurse to get the sub content
+  $s
  }
 
 sub stringWithCondition($@)                                                     # Build a string from a node of a parse tree and the nodes below it subject to conditions to reject some nodes
@@ -185,7 +244,7 @@ sub isText($)                                                                   
 sub printAttributes($)                                                          ## Print the attributes of a node
  {my ($node) = @_;                                                              # Node whose attributes are to be printed
   my $a = $node->attributes;                                                    # Attributes
-  $$a{$_} ? undef : delete $$a{$_} for keys %$a;                                # Remove undefined attributes
+  defined($$a{$_}) ? undef : delete $$a{$_} for keys %$a;                       # Remove undefined attributes
   return '' unless keys %$a;                                                    # No attributes
   my $s = ' '; $s .= $_.'="'.$a->{$_}.'" ' for sort keys %$a; chop($s);         # Attributes enclosed in "" in alphabetical order
   $s
@@ -197,12 +256,26 @@ sub attr($$) :lvalue                                                            
   $node->attributes->{$attribute}
  }
 
-for(qw(id href))                                                                # Well known attributes
+sub attrs($@)                                                                   # Get the value of zero or more attributes
+ {my ($node, @attributes) = @_;                                                 # Node in parse tree, attribute names
+  my @v;
+  my $a = $node->attributes;
+  push @v, $a->{$_} for @attributes;
+  @v
+ }
+
+sub attrCount($)                                                                # Get the number of attributes for a node
+ {my ($node) = @_;                                                              # Node in parse tree, attribute names
+  my $a = $node->attributes;
+  $a ? keys %$a : 0
+ }
+
+for(qw(class id href))                                                          # Well known attributes
  {eval 'sub '.$_.'($) :lvalue {&attr($_[0], qw('.$_.'))}';
   $@ and confess "Cannot create well known attribute $_\n$@";
  }
 
-sub setAttr($$@)                                                                # Set the value of an attribute in a command
+sub setAttr($@)                                                                 # Set the value of an attribute in a command
  {my ($node, %values) = @_;                                                     # Node in parse tree, (attribute name=>new value)*
   $node->attributes->{$_} = $values{$_} for keys %values;
   $node
@@ -211,7 +284,8 @@ sub setAttr($$@)                                                                
 #1 Contents                                                                     # Contents of the current node
 sub contents($)                                                                 # Get all the nodes contained by this node as an array (not an array reference)
  {my ($node) = @_;                                                              # Node
-  @{$node->content}                                                             # Contents
+  my $c = $node->content;                                                       # Contents reference
+  $c ? (wantarray ? @$c : $c) : (wantarray ? () : ($node->content = []))        # Contents if there are any either as an array or an array reference
  }
 
 sub contentBeyond($)                                                            # Get all the nodes beyond this node at the level of this node
@@ -312,12 +386,26 @@ sub get($@)                                                                     
 
 sub c($$$)                                                                      # Get all the nodes with the tag of the specified name below the current node
  {my ($node, $tag, $position) = @_;                                             # Node, tag
-  $node->indexes->{$tag}                                                        # Index for specified tags
+  my $c = $node->indexes->{$tag};                                               # Index for specified tags
+  $c ? (wantarray ? @$c : $c) : (wantarray ? () : [])                           # Contents if there are any either as an array or an array reference
+ }
+
+sub nc($@)                                                                      # Check that a tag does not contain any of the specified sub tags at the next level
+ {my ($node, @keys) = @_;                                                       # Node, possible tags immediately under the node
+  for(@keys)
+   {return 0 if $node->indexes->{$_};                                           # False - one of the tags has been found
+   }
+  1                                                                             # True - none of the specified tags were found
  }
 
 sub first($)                                                                    # Get the first node below this node
  {my ($node) = @_;                                                              # Node
   $node->content->[0]
+ }
+
+sub firstOf($@)                                                                 # The tags for the nodes under this node for which we want the first elements
+ {my ($node, @names) = @_;                                                      # Node, tags to find the first instance of
+  map {$node->indexes->{$_}->[0]} @names;                                       # Find first tag with the specified name or undef
  }
 
 sub last($)                                                                     # Get the last node below this node
@@ -342,6 +430,11 @@ sub isLast($)                                                                   
 sub isOnlyChild($)                                                              # Is this the only child of its parent?
  {my ($node) = @_;                                                              # Node
   $node->isFirst and $node->isLast
+ }
+
+sub isEmpty($)                                                                  # Check whether the node is empty
+ {my ($node) = @_;                                                              # Node
+  !$node->first;                                                                # If it has no first descendant it must be empty
  }
 
 sub next($)                                                                     # Get the node next to the current node
@@ -374,11 +467,36 @@ sub by($$;@)                                                                    
   $node
  }
 
+sub byReverse($$;@)                                                             # Reverse post-order traversal of a parse tree or sub tree
+ {my ($node, $sub, @context) = @_;                                              # Starting node, sub to call for each sub node, accumulated context
+  my @n = $node->contents;                                                      # Clone the content array so that the tree can be modified if desired
+  $_->by($sub, $node, @context) for reverse @n;                                 # Recurse to process sub nodes in deeper context
+  &$sub($node, @context);                                                       # Process current node last
+  $node
+ }
+
 sub down($$;@)                                                                  # Pre-order traversal down through a parse tree or sub tree
  {my ($node, $sub, @context) = @_;                                              # Starting node, sub to call for each sub node, accumulated context
   my @n = $node->contents;                                                      # Clone the content array so that the tree can be modified if desired
-  &$sub($node, @context);                                                       # Process current node last
+  &$sub($node, @context);                                                       # Process current node first
   $_->down($sub, $node, @context) for @n;                                       # Recurse to process sub nodes in deeper context
+  $node
+ }
+
+sub downReverse($$;@)                                                           # Reverse pre-order traversal down through a parse tree or sub tree
+ {my ($node, $sub, @context) = @_;                                              # Starting node, sub to call for each sub node, accumulated context
+  my @n = $node->contents;                                                      # Clone the content array so that the tree can be modified if desired
+  &$sub($node, @context);                                                       # Process current node first
+  $_->down($sub, $node, @context) for reverse @n;                               # Recurse to process sub nodes in deeper context
+  $node
+ }
+
+sub through($$;@)                                                               # Traverse parse tree visiting each node twice
+ {my ($node, $before, $after, @context) = @_;                                   # Starting node, sub to call when we meet a node, sub to call we leave a node, accumulated context
+  my @n = $node->contents;                                                      # Clone the content array so that the tree can be modified if desired
+  &$before($node, @context);                                                    # Process current node first with before()
+  $_->through($before, $after, $node, @context) for @n;                         # Recurse to process sub nodes in deeper context
+  &$after($node, @context);                                                     # Process current node last with after()
   $node
  }
 
@@ -444,6 +562,13 @@ sub deleteAttr($$;$)                                                            
   $node
  }
 
+sub deleteAttrs($@)            ## needs test                                                 # Delete any attributes mentioned in a list without checking their values
+ {my ($node, @attrs) = @_;                                                      # Node, attribute name, optional attribute value to check first
+  my $a = $node->attributes;                                                    # Attributes hash
+  delete $a->{$_} for @attrs;
+  $node
+ }
+
 sub renameAttr($$$)                                                             # Change the name of an attribute regardless of whether the new attribute already exists
  {my ($node, $old, $new) = @_;                                                  # Node, existing attribute name, new attribute name
   my $a = $node->attributes;                                                    # Attributes hash
@@ -477,6 +602,11 @@ sub changeAttrValue($$$$$)                                                      
  }
 
 #2 Structure                                                                    # Change the structure of the parse tree
+sub create($$)                                                                  # Create a new node with a specified tag
+ {my ($old, $tag) = @_;                                                         # Any existing node, tag for new node
+  bless {tag=>$tag};                                                            # Return new node
+ }
+
 sub wrapWith($$)                                                                # Wrap the original node in a new node forcing the original node down deepening the parse tree
  {my ($old, $tag) = @_;                                                         # Node, tag for new node
   my $new = bless {tag=>$tag};                                                  # Create wrapping node
@@ -497,6 +627,11 @@ sub wrapWith($$)                                                                
     $new->indexNode;                                                            # Create index for wrapping node
    }
   $new                                                                          # Return wrapping node
+ }
+
+sub wrapUp($@)                                                                  # Wrap the original node in a sequence of new nodes forcing the original node down deepening the parse tree
+ {my ($node, @tags) = @_;                                                       # Node to wrap, tags to wrap the node with - with the uppermost tag rightmost
+  map {$node = $node->wrapWith($_)} @tags;                                      # Wrap up
  }
 
 sub wrapContentWith($$)                                                         # Wrap the content of a node in a new node, the original content then contains the new node which contains the original node's content
@@ -590,6 +725,24 @@ sub putLast($$)                                                                 
   $new                                                                          # Return the new node
  }
 
+sub putFirstAsText($$)                                                          ## Add a text node first under a parent
+ {my ($parent, $parse) = @_;                                                    # The parent node, the string to be added which might contain unparsed xml as well as text
+  my $node = bless {};                                                          # New node
+  $node->tag = cdata;                                                           # Text node
+  $node->text = $parse;                                                         # Save text
+  unshift @{$parent->content}, $node;                                           # Add new node to parent
+  $parent                                                                       # Return parent
+ }
+
+sub putLastAsText($$)                                                           ## Add a text node last under a parent
+ {my ($parent, $parse) = @_;                                                    # The parent node, the string to be added which might contain unparsed xml as well as text
+  my $node = bless {};                                                          # New node
+  $node->tag = cdata;                                                           # Text node
+  $node->text = $parse;                                                         # Save text
+  push @{$parent->content}, $node;                                              # Add new node to parent
+  $parent                                                                       # Return parent
+ }
+
 # Examples
 
 # Test
@@ -675,17 +828,43 @@ END
 
 New parse - call this method statically as in Data::Edit::Xml::new() with keyword parameters=> chosen from:
 
-  inputString a string of xml to be parsed
-  inputFile   a file of xml to be parsed
-  name        a symbolic name for this parse used in messages about this parse and to name output files generated by this parse
-  output      a directory into which to write output files
-  errors      a sub directory of 'output' into which to write a copy of the string to be parsed in the event that an xml parse error is encountered while parsing this string
+  Parameter   Description
+  inputString => string of xml to be parsed
+  inputFile   => file of xml to be parsed
+  name        => symbolic name for this parse used in messages about this parse and to name output files generated by this parse
+  output      => directory into which to write output files
+  errors      => sub directory of 'output' into which to write a copy of the string to be parsed in the event that an xml parse error is encountered while parsing this string
 
+
+=head3 newText()
+
+Create a new text node which can then be inserted into a parse tree
+
+     Parameter  Description
+  1  $tree      Parse tree in which to create the new text node
+  2  $text      Text of the new node
+
+=head3 newTag()
+
+Create a new non text node which can then be inserted into a parse tree
+
+     Parameter   Description
+  1  $tree       Parse tree in which to create the new node
+  2  $tag        Tag for the new node
+  3  %attributes attributes for the node
+
+=head3 Data::Edit::Xml::newTree()
+
+Create a new non text root node to create a new parse tree into which other
+nodes can be inserted
+
+     Parameter   Description
+  1  $tag        Tag for the new node
+  2  %attributes attributes for the node
 
 =head3 cdata()
 
 The name of the command name to use to represent text
-
 
 =head2 Stringification
 
@@ -694,6 +873,27 @@ Print the parse tree
 =head3 string($node)
 
 Build a string from a node of a parse tree and the nodes below it
+
+     Parameter  Description
+  1  $node      Start node
+
+=head3 contentString($node)
+
+Build a string from the contents of a node
+
+     Parameter  Description
+  1  $node      Start node
+
+=head3 prettyString($node)
+
+Build a readable, prettified string from a node of a parse tree and the nodes below it
+
+     Parameter  Description
+  1  $node      Start node
+
+=head3 PrettyContentString($node)
+
+Build a readable, prettified string from the content of a node
 
      Parameter  Description
   1  $node      Start node
@@ -747,6 +947,21 @@ Value of attribute in current command
      Parameter   Description
   1  $node       Node in parse tree
   2  $attribute  attribute name
+
+=head3 attrs($node, @attributes)
+
+Get the value of zero or more attributes
+
+     Parameter   Description
+  1  $node       Node in parse tree
+  2  @attribute  attribute names whose values are to be retrieved
+
+=head3 attrCount($node)
+
+Get the number of attributes for a node
+
+     Parameter   Description
+  1  $node       Node in parse tree
 
 =head3 setAttr($node, %values)
 
@@ -851,6 +1066,14 @@ Get the first node below this node
      Parameter  Description
   1  $node      Node
 
+=head3 firstOf($node, @tags)
+
+Get the first node below this node
+
+     Parameter  Description
+  1  $node      Node
+  2  @tags      The tags for the nodes under this node for which we want the first elements
+
 =head3 last($node)
 
 Get the last node below this node
@@ -878,6 +1101,13 @@ Is this the only child of its parent?
 
      Parameter  Description
   1  $node      Node
+
+=head3 isEmpty($node)
+
+Check whether the node is empty
+
+     Parameter  Description
+  1  $node      Start node
 
 =head3 next($node)
 
@@ -970,6 +1200,14 @@ Delete the attribute, optionally checking its value first
   2  $attr      attribute name
   3  $value     optional attribute value to check first
 
+=head3 deleteAttrs($node, @attrs)
+
+Delete the named attributes if present, without checking their values first
+
+     Parameter  Description
+  1  $node      Node
+  2  @attr      Attributes to delete
+
 =head3 renameAttr($node, $old, $new)
 
 Change the name of an attribute regardless of whether the new attribute already exists
@@ -1021,6 +1259,14 @@ Wrap the original node in a new node forcing the original node down deepening th
      Parameter  Description
   1  $old       Node
   2  $tag       tag for new node
+
+=head4 wrapUp($node, @tags)
+
+Wrap the original node in a sequence of new nodes forcing the original node down deepening the parse tree
+
+     Parameter  Description
+  1  $old       Node
+  2  @tags      Tags to wrap the node with - with the uppermost tag rightmost
 
 =head4 wrapContentWith($old, $tag)
 
@@ -1095,6 +1341,8 @@ L</addConditions($node, @conditions)>
 L</after($node, $re)>
 L</at()>
 L</attr :lvalue($node, $attribute)>
+L</attrCount($node)>
+L</attrs($node, @attributes)>
 L</before($node, $re)>
 L</by($node, $sub, @context)>
 L</c($node, $tag, $position)>
@@ -1108,13 +1356,17 @@ L</contentBeforeAsTags($node)>
 L</contentBeyond($node)>
 L</contentBeyondAsTags($node)>
 L</contents($node)>
+L</contentString($node)>
 L</context($node)>
 L</cut($node)>
 L</deleteAttr($node, $attr, $value)>
+L</deleteAttrs($node, @attr)>
 L</deleteConditions($node, @conditions)>
 L</first($node)>
+L</firstOf($node, @tags)>
 L</get($node, @position)>
 L</index($node)>
+L</isEmpty($node)>
 L</isFirst($node)>
 L</isLast($node)>
 L</isOnlyChild($node)>
@@ -1122,10 +1374,15 @@ L</isText($node)>
 L</last($node)>
 L</listConditions($node)>
 L</new()>
+L</newTag()>
+L</newText()>
+L</Data::Edit::Xml::newTree()>
 L</next($node)>
 L</over($node, $re)>
 L</position($node)>
 L</prev($node)>
+L</PrettyContentString($node)>
+L</prettyString($node)>
 L</putFirst($old, $new)>
 L</putLast($old, $new)>
 L</putNext($old, $new)>
@@ -1139,12 +1396,13 @@ L</stringWithCondition($node, @conditions)>
 L</unwrap($node)>
 L</up($node, @tags)>
 L</wrapContentWith($old, $tag)>
+L</wrapUp($old, @tags)>
 L</wrapWith($old, $tag)>
 
 =head1 Installation
 
-This module is written in 100% Pure Perl and is thus easy to read, modify and
-install.
+This module is written in 100% Pure Perl and is thus easy to read, use, modify
+and install.
 
 Standard Module::Build process for building and installing modules:
 
@@ -1161,7 +1419,7 @@ http://www.appaapps.com
 
 =head1 Copyright
 
-Copyright (c) 2016 Philip R Brenan.
+Copyright (c) 2016-2017 Philip R Brenan.
 
 This module is free software. It may be used, redistributed and/or modified
 under the same terms as Perl itself.
@@ -1171,7 +1429,7 @@ under the same terms as Perl itself.
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>63;
+use Test::More tests=>96;
 use Data::Table::Text qw(:all);
 
 sub sample1{Data::Edit::Xml::new(inputString=><<END)}                           # Sample test xml
@@ -1207,6 +1465,17 @@ doo
   <head id="A" key="AAAA BBBB" start="123">HHHHello
     <b>to you</b></head><tail><foot id="11"/><middle id="mm"/><foot id="22"/></tail></foo>
 END
+    ok $x->prettyString  =~ s/\n/N/gsr =~ s/\t/T/gsr eq '<foo start="yes">NTT<head id="a" key="aaa bbb" start="123">HelloN    NTTTT<em>thereNTTTT</em>NTT</head>NTT<bar>HowdyN    NTTTT<ref/>NTT</bar>NdoNdooN  NTT<head id="A" key="AAAA BBBB" start="123">HHHHelloN    NTTTT<b>to youNTTTT</b>NTT</head>NTT<tail>NTTTT<foot id="11"/>NTTTT<middle id="mm"/>NTTTT<foot id="22"/>NTT</tail>N</foo>N';
+    ok $x->contentString =~ s/\n/N/gsr =~ s/\t/T/gsr eq '<head id="a" key="aaa bbb" start="123">HelloN    <em>there</em></head><bar>HowdyN    <ref/></bar>doNdooN  <head id="A" key="AAAA BBBB" start="123">HHHHelloN    <b>to you</b></head><tail><foot id="11"/><middle id="mm"/><foot id="22"/></tail>';
+    ok $x->attr(qq(start)) eq "yes";
+       $x->id  = 11;
+    ok $x->id == 11;
+       $x->deleteAttr(qq(id));
+    ok !$x->id;
+    ok join(' ', $x->get(qw(head))->attrs(qw(id start))) eq "a 123";
+    ok $x->PrettyContentString  =~ s/\n/N/gsr =~ s/\t/T/gsr eq '<head id="a" key="aaa bbb" start="123">HelloN    NTT<em>thereNTT</em>N</head>N<bar>HowdyN    NTT<ref/>N</bar>NdoNdooN  N<head id="A" key="AAAA BBBB" start="123">HHHHelloN    NTT<b>to youNTT</b>N</head>N<tail>NTT<foot id="11"/>NTT<middle id="mm"/>NTT<foot id="22"/>N</tail>N';
+    ok $x->tags == 17;
+    ok $x->get(qw(head 1))->tags == 4;
    }
   if (1)                                                                        # Conditions
    {my $m = $x->get(qw(tail middle));
@@ -1263,6 +1532,15 @@ END
   ok $x->get(qw(head),1)->before(qr(\Ahead bar CDATA\Z));
 
   ok @{$x->c(qw(head))}  == 2;
+  ok $x->c("head")->[0]->nc(qw(aa bb cc)) == 1;                                 # First head does not contain aa or bb or cc
+  ok $x->c("head")->[0]->nc(qw(em bb cc)) == 0;                                 # First head does not not contain em or bb or cc
+
+  if (1)                                                                        # First of
+   {my ($foot, $middle) = $x->get(qw(tail))->firstOf(qw(foot middle));
+    ok $foot  ->id == 11;
+    ok $middle->id eq qq(mm);
+   }
+
   ok $x->get(qw(head *)) == 2;
   ok $x->get(qw(head),1)->position == 3;
 
@@ -1273,6 +1551,7 @@ END
 
   ok sample2->first->isOnlyChild;
   ok sample2->first->first->isOnlyChild;
+  ok sample2->first->first->isEmpty;
   ok !$x->get(qw(tail))->last->isOnlyChild;
 
   ok $x->get(qw(tail))->first->next->id eq 'mm';
@@ -1366,6 +1645,15 @@ END
   ok !sample2->changeAttrValue(qw(ID AA id aa));
  }
 
+if (1)                                                                          # Create
+ {my $x = sample2;
+  my $c = $x->get(qw(b c));
+  my $d = $c->create(qw(d));
+  $d->id = qw(dd);
+  $c->putFirst($d);
+  ok $x->string eq '<a id="aa"><b id="bb"><c id="cc"><d id="dd"/></c></b></a>';
+ }
+
 if (1)                                                                          # Under
  {my $x = sample2;
   my $c = $x->get(qw(b c));
@@ -1381,7 +1669,7 @@ if (1)                                                                          
   ok !$p;
  }
 
-if (1)                                                                          # Down parameters
+if (1)                                                                          # Down
  {my $x = sample1;
   my $s;
   $x->down(sub
@@ -1390,13 +1678,77 @@ if (1)                                                                          
   ok $s eq "(foo)(head foo)(CDATA head foo)(em head foo)(CDATA em head foo)(bar foo)(CDATA bar foo)(ref bar foo)(CDATA foo)(head foo)(CDATA head foo)(b head foo)(CDATA b head foo)(tail foo)(foot tail foo)(middle tail foo)(foot tail foo)";
  }
 
-if (1)                                                                          # By parameters
+if (1)                                                                          # Down revese
+ {my $x = sample1;
+  my $s;
+  $x->downReverse(sub
+   {$s .= "(".join(' ', map {$_->tag} @_).")";
+   });
+  ok $s eq "(foo)(tail foo)(foot tail foo)(middle tail foo)(foot tail foo)(head foo)(CDATA head foo)(b head foo)(CDATA b head foo)(CDATA foo)(bar foo)(CDATA bar foo)(ref bar foo)(head foo)(CDATA head foo)(em head foo)(CDATA em head foo)";
+ }
+
+if (1)                                                                          # By
  {my $x = sample1;
   my $s;
   $x->by(sub
    {$s .= "(".join(' ', map {$_->tag} @_).")";
    });
   ok $s eq "(CDATA head foo)(CDATA em head foo)(em head foo)(head foo)(CDATA bar foo)(ref bar foo)(bar foo)(CDATA foo)(CDATA head foo)(CDATA b head foo)(b head foo)(head foo)(foot tail foo)(middle tail foo)(foot tail foo)(tail foo)(foo)";
+ }
+
+if (1)                                                                          # By - reverse
+ {my $x = sample1;
+  my $s;
+  $x->byReverse(sub
+   {$s .= "(".join(' ', map {$_->tag} @_).")";
+   });
+  ok $s eq "(foot tail foo)(middle tail foo)(foot tail foo)(tail foo)(CDATA head foo)(CDATA b head foo)(b head foo)(head foo)(CDATA foo)(CDATA bar foo)(ref bar foo)(bar foo)(CDATA head foo)(CDATA em head foo)(em head foo)(head foo)(foo)";
+ }
+
+if (1)                                                                          # Through
+ {my $x = sample1;
+  my $s;
+  $x->through(sub{$s .= "(".join(' ', map {$_->tag} @_).")"},
+              sub{$s .= "[".join(' ', map {$_->tag} @_)."]"});
+  ok $s eq "(foo)(head foo)(CDATA head foo)[CDATA head foo](em head foo)(CDATA em head foo)[CDATA em head foo][em head foo][head foo](bar foo)(CDATA bar foo)[CDATA bar foo](ref bar foo)[ref bar foo][bar foo](CDATA foo)[CDATA foo](head foo)(CDATA head foo)[CDATA head foo](b head foo)(CDATA b head foo)[CDATA b head foo][b head foo][head foo](tail foo)(foot tail foo)[foot tail foo](middle tail foo)[middle tail foo](foot tail foo)[foot tail foo][tail foo][foo]";
+ }
+
+if (1)                                                                          # Put as text
+ {my $x = sample2;
+  my $c = $x->get(qw(b c));
+  $c->putFirstAsText("<d id=\"dd\">DDDD</d>");
+  ok $x->string eq "<a id=\"aa\"><b id=\"bb\"><c id=\"cc\"><d id=\"dd\">DDDD</d></c></b></a>";
+  $c->putLastAsText("<e id=\"ee\">EEEE</e>");
+  ok $x->string eq "<a id=\"aa\"><b id=\"bb\"><c id=\"cc\"><d id=\"dd\">DDDD</d><e id=\"ee\">EEEE</e></c></b></a>"
+ }
+
+if (1)                                                                          # New
+ {my $x = Data::Edit::Xml::newTree("a", id=>1, class=>"aa");
+  ok $x->attrCount == 2;
+  $x->putLast($x->newTag("b", id=>2, class=>"bb"));
+  ok $x->get(qw(b))->attrCount == 2;
+  ok $x->string eq '<a class="aa" id="1"><b class="bb" id="2"/></a>';
+  $x->putLast($x->newText("t"));
+  ok $x->string eq '<a class="aa" id="1"><b class="bb" id="2"/>t</a>';
+ }
+
+if (1)                                                                          # deleteAttrs
+ {my $x = Data::Edit::Xml::newTree("a", id=>1, class=>"aa", name=>"a1");
+  ok $x->attrCount == 3;
+  $x->deleteAttrs(qw(class a aa bb a1 name));
+  ok $x->attrCount == 1;
+  ok $x->id == 1;
+  ok !$x->class;
+  ok !$x->attr(qw(name));
+  ok !$x->attr(qw(aa));
+ }
+
+if (1)                                                                          # Wrap up
+ {my $x = Data::Edit::Xml::newTree("c", id=>33);
+  my ($b, $a) = $x->wrapUp(qw(b a));
+  ok $a->tag eq qq(a);
+  ok $b->tag eq qq(b);
+  ok $a->get(qw(b c))->id == 33;
  }
 
 ok Data::Edit::Xml::new(inputString=><<END)->                                   # Docbook

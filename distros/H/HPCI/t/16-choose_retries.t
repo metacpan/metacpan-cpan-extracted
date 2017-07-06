@@ -44,7 +44,7 @@ my $num_tests_expected;
 			my $stderr = shift;
 			is( ref($stats), 'HASH', 'stats arg should be a hash' );
 			like( $stderr, qr{/stderr$}, 'stderr filename must be stderr' );
-			like( `cat $stderr`, qr{^\+ exit 1$}, 'stderr contains exit 1 command echo' );
+			like( `cat $stderr`, qr{^\+ exit 1$}m, 'stderr contains exit 1 command echo' );
 			return $prev_retries++ < 2;
 		};
 

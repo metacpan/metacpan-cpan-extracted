@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -44,8 +44,14 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.11",
-   "x_resource" : {
-      "repository" : "https://github.com/DrHyde/perl-modules-Class-Mockable"
-   }
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-Class-Mockable/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-Class-Mockable"
+      }
+   },
+   "version" : "1.2000",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

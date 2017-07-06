@@ -1,2 +1,4 @@
 \B\.svn\b
+\B\.git\b
 blib
+rpm

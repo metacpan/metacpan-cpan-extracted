@@ -28,9 +28,11 @@
             "Exporter" : "0",
             "File::Basename" : "0",
             "File::Spec::Functions" : "0",
+            "Mojo::Base" : "0",
             "Mojolicious::Commands" : "0",
             "Mojolicious::Lite" : "0",
             "Mojolicious::Plugin::JSONConfig" : "0",
+            "Mojolicious::Plugin::Webtail" : "0",
             "Net::Ping" : "0",
             "Regexp::Common" : "0",
             "Telegram::Bot::Message" : "0",
@@ -57,7 +59,7 @@
          "web" : "https://github.com/pavelsr/camshotbot"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

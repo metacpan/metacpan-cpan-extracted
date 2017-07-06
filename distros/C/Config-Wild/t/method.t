@@ -129,25 +129,25 @@ subtest 'other' => sub {
 
     for my $mth ( keys %method ) {
 
-	{
-	    my $cfg = $method{$mth}->( 'conf', { path => [ cwd, $data_dir, $data_dir->child('b') ] } );
-	    is( $cfg->value( 'file' ), 'data/method/conf', "$mth(path): duplicate conf entries in path, element 1" );
-	}
+        {
+            my $cfg = $method{$mth}->( 'conf', { path => [ cwd, $data_dir, $data_dir->child('b') ] } );
+            is( $cfg->value( 'file' ), 'data/method/conf', "$mth(path): duplicate conf entries in path, element 1" );
+        }
 
-	{
-	    my $cfg = $method{$mth}->( 'conf', { path => [ cwd, $data_dir->child('b'), $data_dir  ] } );
-	    is( $cfg->value( 'file' ), 'data/method/b/conf', "$mth(path): duplicate conf entries in path, alternate order" );
-	}
+        {
+            my $cfg = $method{$mth}->( 'conf', { path => [ cwd, $data_dir->child('b'), $data_dir  ] } );
+            is( $cfg->value( 'file' ), 'data/method/b/conf', "$mth(path): duplicate conf entries in path, alternate order" );
+        }
 
-	{
-	    my $cfg = $method{$mth}->( 'a.cnf', { path => [ $data_dir ] } );
-	    is( $cfg->value( 'file' ), 'data/method/a.cnf', "$mth(path): first in path" );
-	}
+        {
+            my $cfg = $method{$mth}->( 'a.cnf', { path => [ $data_dir ] } );
+            is( $cfg->value( 'file' ), 'data/method/a.cnf', "$mth(path): first in path" );
+        }
 
-	{
-	    my $cfg = $method{$mth}->( 'c.cnf', { path => [ $data_dir, $data_dir->child('b'), $data_dir->child('b')->child('c') ] } );
-	    is( $cfg->value( 'file' ), 'data/method/b/c/c.cnf', "$mth(path): last in path" );
-	}
+        {
+            my $cfg = $method{$mth}->( 'c.cnf', { path => [ $data_dir, $data_dir->child('b'), $data_dir->child('b')->child('c') ] } );
+            is( $cfg->value( 'file' ), 'data/method/b/c/c.cnf', "$mth(path): last in path" );
+        }
     }
 
 

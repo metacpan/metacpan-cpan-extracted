@@ -15,6 +15,7 @@
 package Google::Ads::Common::ReportUtils;
 
 use strict;
+use warnings;
 use utf8;
 use version;
 

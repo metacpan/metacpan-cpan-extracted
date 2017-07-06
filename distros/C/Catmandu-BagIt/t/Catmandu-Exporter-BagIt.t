@@ -53,7 +53,7 @@ ok $first->{version} , 'checking version bug';
 ok exists $first->{manifest}->{'data/poem.txt'} , 'found a manifest';
 
 done_testing 13;
- 
+
 sub user_agent  {
     my $ua = Test::LWP::UserAgent->new(agent => 'Test/1.0');
 

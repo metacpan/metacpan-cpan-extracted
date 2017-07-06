@@ -1,0 +1,241 @@
+NAME
+    Template::Compiled - templates which compile into coderefs
+
+SYNOPSIS
+       use Template::Compiled;
+       use Types::Standard -types;
+   
+       my $template = Template::Compiled->new(
+          signature  => [ name => Str, age => Optional[Int] ],
+          delimiters => [ qw( [% %] ) ],
+          outdent    => 2,
+          trim       => 1,
+          escape     => 'html',
+          template   => q{
+             <p>Dear [%= $name %]</p>
+             [% if (defined($age)) { %]
+             <p>I see you are [%= $age %] years old.</p>
+             [% } %]
+          },
+       );
+   
+       print $template->( name => 'Alice & Bob', age => 99 );
+
+DESCRIPTION
+    Template::Compiled allows you to define a template which will be compiled
+    into a coderef that renders the template, filling in values. Templates can
+    contain variables and chunks of Perl code.
+
+    Technically, the template is an object which overloads `&{}` so that it
+    can act like a coderef, but you can get a real coderef by calling
+    `$template->sub`.
+
+    Compiling the coderef might be slower than some other template modules,
+    but rendering the template should be pretty much as fast as a pure Perl
+    template module can get. So in a persistent environment, where the same
+    template may be used over and over, this should be pretty fast.
+
+  Attributes
+    The class provides a standard Moose-style constructor with the following
+    attributes.
+
+    `template` (Str, required)
+        The template as a string of text. Details of the template format are
+        described below. This attribute will coerce from an arrayref of
+        strings by joining them.
+
+    `signature` (ArrayRef, optional)
+        A sub signature for validating arguments passed to the template when
+        rendering it. Must be suitable for Type::Params `compile_named`.
+
+    `delimiters` (Tuple[Str, Str], optional)
+        The strings which delimit code within the template. The default
+        delimiters are the PHP-ish `<?` and `?>`.
+
+    `escape` (CodeRef, optional)
+        A coderef to autoescape strings. For example:
+
+           my $template = Template::Compiled->new(
+              ...,
+              escape => sub {
+                 my $text = shift;
+                 HTML::Entities::encode_entities_numeric($text);
+              },
+           );
+
+        As a shortcut, you may say `escape => "html"` or `escape => "xml"`.
+
+    `trim` (Bool, optional)
+        If set to true, leading and trailing whitespace will be trimmed from
+        the rendered output. (Not from each line!)
+
+        Defaults to false.
+
+    `outdent` (Int, optional)
+        This many whitespace characters are trimmed from the start of every
+        line. If negitive, all whitespace is trimmed from the start of every
+        line.
+
+        Defaults to zero.
+
+    `post_process` (CodeRef, optional)
+        If provided, this coderef gets a chance to modify the rendered output
+        right at the end. It should be a coderef manipulating $_.
+
+    `utils_package` (Str, optional)
+        A package to import into the namespace the coderef is compiled in.
+        Defaults to Template::Compiled::Utils which provides some useful
+        functions.
+
+    `sub` (CodeRef, optional)
+        The whole point of this module is to let us generate this for you.
+        Don't provide it to the constructor!
+
+        The sub doesn't contain any references back to the Template::Compiled
+        object, so it can be garbage collected by Perl.
+
+           my $template = Template::Compiled->new( ... );
+           my $compiled = $template->sub;
+           undef $template;   # free memory used by object
+   
+           print $compiled->( %args );
+
+  Methods
+    These are not especially necessary, but this module provides some methods
+    which may make your code a little clearer.
+
+    `$template->render( %args )`
+        Alternative way to write `$template->( %args )`.
+
+    `$template->print( %args )`
+        Alternative way to write `print( $template->( %args ) )`.
+
+    `$template->print( $fh, %args )`
+        Alternative way to write `$fh->print( $template->( %args ) )`.
+
+  Overloads
+    Template::Compiled overloads the following operations:
+
+    `bool`
+        Always true.
+
+    `&{}`
+        Returns `sub`.
+
+    ""  Returns `template`.
+
+    Future versions may overload concatenation to do something useful.
+
+TEMPLATE FORMAT
+    Templates are strings with embedded Perl code. Although the delimeters can
+    be changed, there are two basic forms for the Perl code:
+
+       <?=  EXPR  ?>
+       <?   CODE  ?>
+
+    The first form evaluates EXPR and appends it to the output string,
+    escaping it if necessary. (The expression is actually evaluated in a `do`
+    block, so may include multiple semicolon-delimited statements, and has its
+    own lexical scope.)
+
+    The second form evaluates CODE but does not automatically append anything
+    to the output. If you need to append anything to the output string in your
+    code block, you can do `$OUT .= "blah"` or `echo "blah"`. (Don't use
+    `print` because this will print immediately rather than appending to the
+    output!)
+
+  Variables
+    Within the template, the following variables are available to you:
+
+    $OUT
+        The output of the template so far. May be altered or appended to.
+
+    $INDENT
+        A string of whitespace equivalent to how much this block of code is
+        indented, minus outdenting.
+
+    %_  A hash of the arguments provided when rendering the template.
+
+        For example, with:
+
+           $template->render( foo => 1, bar => [ 2, 3, 4 ] );
+
+        Then:
+
+           <?= $_{foo}    ?>     # 1
+           <?= $_{bar}[0] ?>     # 2
+
+        If your template declared a signature, then named aliases are provided
+        for arguments.
+
+           <?
+              $foo;       # 1
+              $bar;       # [ 2, 3, 4 ]
+      
+              # And if the signature declared that 'bar' was an
+              # ArrayRef, then...
+              #
+              @bar;       # ( 2, 3, 4 )
+           ?>
+
+        So, yeah, use signatures.
+
+    Scalar variables named with a leading underscore are reserved for internal
+    use. Avoid them in your templates.
+
+  Functions
+    Within the template, the following functions are available to you:
+
+    `_($string)`
+        The `<?= $foo ?>` syntax automatically passes the variable through the
+        template's escaping mechanism, but if you're using `<? CODE ?>` you
+        will need to escape strings manually. The `_()` function can escape
+        stuff for you.
+
+    `echo($string)`
+        Equivalent to `$OUT .= $string`.
+
+        Provided by Template::Compiled::Utils, so may not be available if
+        you're using a different utils package.
+
+    `echof($format, @data)`
+        Equivalent to `$OUT .= sprintf($format, @data)`.
+
+        Provided by Template::Compiled::Utils, so may not be available if
+        you're using a different utils package.
+
+  Escaping
+    The start and end delimiters for code *cannot be escaped*.
+
+    But this isn't really as bad as it seems. If you need to output them
+    literally:
+
+       <? echo '<?' ?>
+       <? echo '?'.'>' ?>
+
+    If that becomes inconvenient, then you can simply choose different
+    delimiters.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Template-Compiled>.
+
+SEE ALSO
+    Template::Perlish is pretty similar really.
+
+    Type::Params provides the signatures for this module.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2017 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

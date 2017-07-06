@@ -38,7 +38,7 @@
             "Const::Fast" : "0",
             "Data::Alias" : "0",
             "Data::Dump" : "0",
-            "Keyword::Declare" : "0",
+            "Keyword::Declare" : "0.001000",
             "Object::InsideOut" : "0",
             "Sub::Uplevel" : "0.24",
             "Variable::Magic" : "0.59",
@@ -47,5 +47,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.002000"
+   "version" : "0.002002"
 }

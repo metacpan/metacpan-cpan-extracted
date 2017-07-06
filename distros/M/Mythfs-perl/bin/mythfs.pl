@@ -26,7 +26,10 @@ Options:
   --option=default_permissions  enable permission checking by kernel (false)
   --option=fsname=name          set filesystem name (none)
   --option=use_ino              let filesystem set inode numbers (false)
+  --option=direct_io            disable page cache (false)
   --option=nonempty             allow mounts over non-empty file/dir (false)
+  --option=ro                   mount read-only
+  -o ro,direct_io,etc           shorter version of options
 
   --help                        this text
   --man                         full manual page
@@ -47,6 +50,34 @@ subdirectories. Empty directory names will be collapsed. The default
 is "%T/%S", the recording title followed by the subtitle.  Run this
 command with "-p help" to get a list of all the substitution patterns
 recognized.
+
+A special pattern is %PLX, which is intended to be used on its own. It
+creates a hierarchy of directories and video files using the Plex
+Media Server filenaming conventions
+(https://support.plex.tv/hc/en-us/categories/200028098-Media-Preparation). Example
+of its usage is as follows:
+
+  % mythfs.pl -p %PLX MyBackEndHost /tmp/mythfs
+  % ls -r /tmp/mythfs
+    /tmp/mythfs:
+    Movies  STATUS  TV Shows  UPCOMING
+
+   /tmp/mythfs/Movies:
+   District 9 (2009)       House of Flying Daggers (2004)     Pitch Perfect (2012) 
+   Happy Go Lovely (1951)  Made for Each Other (1939)         Some Like It Hot (1959)
+   Henry V (1945)          Mad Max Beyond Thunderdome (1985)  Stardust (2007)
+   His Girl Friday (1940)  Perfect Alibi (1994)               The Breakfast Club (1985)
+   ...
+   /tmp/mythfs/TV Shows/Orphan Black:
+   Season 3   Season 4
+  
+   /tmp/mythfs/TV Shows/Orphan Black/Season 3:
+   Orphan Black - s03e01 - 2015-04-18 - The Weight of This Combination.mpg
+   ...
+
+Note that where I live at least the on air EPG data is terrible and
+season/episode fields tend to be missing. This module uses various
+heuristics to compensate.
 
 By default, files will be streamed as needed from the MythTV
 backend. However, if the recording files are accessible directly from
@@ -235,7 +266,7 @@ you use, and dangling/extra delimiters will be trimmed:
 </pre>
 
 If after applying the pattern to a recording the resulting path is not
-unique, then this script will uniqueify the path by appending to it
+unique, then this script will make the path unique by appending to it
 the channel number and recording start time, for example:
 
  Masterpiece Classic/Downtown Abbey_17_1-2013-02-11T02:00.mpg
@@ -246,14 +277,25 @@ the channel number and recording start time, for example:
 New and updated recordings will appear in the filesystem after a
 slight delay due to the manner in which the script caches the
 recording list. By default the backend is only checked for updates
-every 10 minutes, but you can adjust this using the --cachetime
-option, which takes the interval in minutes at which the system
-checks for new and updated recordings.
+every 5 minutes, but you can adjust this using the --cachetime option,
+which takes the interval in minutes at which the system checks for new
+and updated recordings.
 
 For example, this command will reduce the update interval to 2
 minutes:
 
   $ mythfs.pl MyHost --cachetime=2 /tmp/mythfs
+
+You can provide a fractional number, such as 0.5, for sub-minute
+intervals.
+
+=head2 File Removal
+
+Removing a file (with the rm command) will cause the backend to delete
+the corresponding recording. You may recursively delete entire
+directories, and all the recordings contained within them will be
+deleted. Mount the file system read-only ("-o ro") to make it
+impossible to delete recordings inadvertently.
 
 =head2 Fuse Notes
 
@@ -341,7 +383,7 @@ my $host       = shift or pod2usage(1);
 my $mountpoint = shift or pod2usage(1);
 $mountpoint    = File::Spec->rel2abs($mountpoint);
 
-my $options  = join(',',@FuseOptions,'ro');
+my $options  = join(',',@FuseOptions);
 
 die "Myth filesystem is already mounted on $mountpoint. Use fusermount -u $mountpoint to unmount.\n"
     if -e "$mountpoint/".Net::MythTV::Fuse->marker_file;
@@ -397,6 +439,7 @@ sub list_patterns_and_die {
 __END__
 The following substitution patterns can be used in recording paths.
 
+    %PLX = Fully formed path in format expected by Plex Media Server (use alone)
     %T   = Title (show name)
     %S   = Subtitle (episode name)
     %R   = Description
@@ -408,6 +451,9 @@ The following substitution patterns can be used in recording paths.
     %PI  = Program ID
     %SI  = Series ID
     %st  = Stars
+    %se  = Season
+    %e   = Episode
+    %see = Season & Episode in sXXeYY format
     %c   = Channel:  MythTV chanid
     %cn  = Channel:  channum
     %cc  = Channel:  callsign

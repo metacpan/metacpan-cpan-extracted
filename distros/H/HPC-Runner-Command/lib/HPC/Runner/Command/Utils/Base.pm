@@ -3,6 +3,7 @@ package HPC::Runner::Command::Utils::Base;
 use Cwd;
 use File::Path qw(make_path remove_tree);
 use List::Uniq ':all';
+use File::Spec;
 
 use MooseX::App::Role;
 use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
@@ -20,20 +21,6 @@ This is a Moose Role. To use in any another applications or plugins call as
 
 =head2 Command Line Options
 
-=head3 project
-
-When submitting jobs we will prepend the jobname with the project name
-
-=cut
-
-option 'project' => (
-    is            => 'rw',
-    isa           => 'Str',
-    documentation => 'Give your jobnames an additional project name. '
-      . '#HPC jobname=gzip will be submitted as 001_project_gzip',
-    required  => 0,
-    predicate => 'has_project',
-);
 
 =head3 infile
 
@@ -46,8 +33,9 @@ option 'infile' => (
     required => 1,
     documentation =>
 q{File of commands separated by newline. The command 'wait' indicates all previous commands should finish before starting the next one.},
-    isa    => AbsFile,
-    coerce => 1,
+    isa         => AbsFile,
+    coerce      => 1,
+    cmd_aliases => ['i'],
 );
 
 =head3 outdir
@@ -87,6 +75,23 @@ option 'procs' => (
       q{Total number of concurrently running jobs allowed at any time.}
 );
 
+option 'poll_time' => (
+    is  => 'rw',
+    isa => 'Num',
+    documentation =>
+      'Time in seconds to poll the process for memory profiling.',
+    default     => 5,
+    cmd_aliases => ['pt'],
+);
+
+option 'memory_diff' => (
+    is            => 'rw',
+    isa           => 'Num',
+    documentation => 'Difference from last memory profile in order to record.',
+    default       => 0.10,
+    cmd_aliases   => ['md'],
+);
+
 =head2 Attributes
 
 =cut
@@ -110,6 +115,8 @@ Internal variable
 
 =cut
 
+##Why is this different from set logdir?
+
 sub set_outdir {
     my $self = shift;
 
@@ -123,21 +130,21 @@ sub set_outdir {
     if ( $self->has_version && $self->has_git ) {
         if ( $self->has_project ) {
             $outdir =
-                "hpc-runner/"
-              . $self->project . "/"
-              . $self->version
-              . "/scratch";
+              File::Spec->catdir( 'hpc-runner', $self->project, $self->version,
+                'scratch' );
         }
         else {
-            $outdir = "hpc-runner/" . $self->version . "/scratch";
+            $outdir =
+              File::Spec->catdir( 'hpc-runner', $self->version, 'scratch' );
         }
     }
     else {
         if ( $self->has_project ) {
-            $outdir = "hpc-runner/" . $self->project . "/scratch";
+            $outdir =
+              File::Spec->catdir( 'hpc-runner', $self->project, 'scratch' );
         }
         else {
-            $outdir = "hpc-runner/" . "scratch";
+            $outdir = File::Spec->catdir( 'hpc-runner', 'scratch' );
         }
     }
 

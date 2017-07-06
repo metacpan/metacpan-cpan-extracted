@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package camshotbot;
-$camshotbot::VERSION = '0.01';
+$camshotbot::VERSION = '0.03';
 # ABSTRACT: Telegram::Camhshotbot CLI tool. For more information run camshotbot --help
 
 use strict;
@@ -31,7 +31,7 @@ camshotbot - Telegram::Camhshotbot CLI tool. For more information run camshotbot
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 DEVELOPMENT
 

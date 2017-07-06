@@ -39,6 +39,18 @@ int fetch (int channel, const int input){
 
     if (channel > 1){
         cs = channel;
+
+        /*
+         * FIXME
+         * because we're using GPIO, we 'dummy' out
+         * the channel back to zero, so core can work.
+         * I don't think wiringPi can understand this,
+         * so using a GPIO along with sending 0 as a
+         * channel will likely cause havoc if something
+         * is at CE0.
+         * *** need to investigate
+         */
+
         channel = 0;
     }
 

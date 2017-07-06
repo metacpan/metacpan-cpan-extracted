@@ -1,5 +1,10 @@
 Revision history for Alien-libtermkey
 
+0.18    2017/06/24 18:54:51
+        [CHANGES]
+         * Wrap libtermkey 0.20
+         * configure_requires at least perl 5.10 because of // operator
+
 0.17    2016/12/05 00:02:52
         [CHANGES]
          * Wrap libtermkey 0.18

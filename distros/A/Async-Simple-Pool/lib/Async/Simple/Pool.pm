@@ -188,14 +188,13 @@ The main difference of this package is convenience and simplicity of usage.
 # Proc::Simple - wery similar byt not flexible enough
 
 
-use v5.10.0;
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
 use Class::Load;
 use Clone;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head2 data
 

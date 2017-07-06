@@ -1,7 +1,7 @@
 package Acme::CPANLists::PERLANCAR;
 
-our $DATE = '2017-06-19'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2017-07-01'; # DATE
+our $VERSION = '0.23'; # VERSION
 
 our @Module_Lists = (
 );
@@ -24,7 +24,7 @@ Acme::CPANLists::PERLANCAR - PERLANCAR's CPAN lists
 
 =head1 VERSION
 
-This document describes version 0.22 of Acme::CPANLists::PERLANCAR (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-06-19.
+This document describes version 0.23 of Acme::CPANLists::PERLANCAR (from Perl distribution Acme-CPANLists-PERLANCAR), released on 2017-07-01.
 
 =head1 DESCRIPTION
 

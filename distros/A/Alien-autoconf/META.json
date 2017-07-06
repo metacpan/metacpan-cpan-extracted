@@ -1,0 +1,78 @@
+{
+   "abstract" : "Build or find autoconf",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-autoconf",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.49",
+            "Alien::Build::MM" : "0.40",
+            "Alien::Build::Plugin::Build::Autoconf" : "0.47",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.40",
+            "Alien::Build::MM" : "0.40",
+            "ExtUtils::MakeMaker" : "6.52",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Env" : "0",
+            "Test2::V0" : "0.000060",
+            "Test::Alien" : "0",
+            "Test::More" : "0.94",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-autoconf/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::autoconf",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-autoconf.git",
+         "web" : "https://github.com/plicease/Alien-autoconf"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

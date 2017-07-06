@@ -5,7 +5,7 @@
 ```perl
 use Mojolicious::Lite;
 
-plugin Minion => {File => '/some/path/minion.data'};
+plugin Minion => {Storable => '/some/path/minion.data'};
 
 # Slow task
 app->minion->add_task(slow_log => sub {

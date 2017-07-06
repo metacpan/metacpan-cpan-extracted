@@ -119,7 +119,7 @@ note 'real';
             size        => [1 => 200],
             default     => undef,
         ), 'aaa@bbb.com, ccc@bbb.com', 'email4 only valid';
-        is $self->verror('email4'), 2, 'email4 errors';
+        is $self->verror('email4'), 1, 'email4 errors';
 
         $self->render(text => 'OK.');
     });

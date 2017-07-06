@@ -1,12 +1,11 @@
 package Complete::Path;
 
-our $DATE = '2016-06-17'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.24'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
 
 use Complete::Common qw(:all);
 
@@ -307,14 +306,18 @@ Complete::Path - Complete path
 
 =head1 VERSION
 
-This document describes version 0.23 of Complete::Path (from Perl distribution Complete-Path), released on 2016-06-17.
+This document describes version 0.24 of Complete::Path (from Perl distribution Complete-Path), released on 2017-07-03.
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
 
-=head2 complete_path(%args) -> array
+=head2 complete_path
+
+Usage:
+
+ complete_path(%args) -> array
 
 Complete path.
 
@@ -406,7 +409,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

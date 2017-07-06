@@ -3,7 +3,7 @@ package PDF::API2::Resource::Font::CoreFont::helveticaboldoblique;
 use strict;
 use warnings;
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 sub data { return {
     'fontname' => 'Helvetica-BoldOblique',

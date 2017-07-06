@@ -1,4 +1,4 @@
-package Pcore v0.41.0;
+package Pcore v0.42.1;
 
 use v5.26.0;
 use common::header;
@@ -16,10 +16,10 @@ our $EXPORT_PRAGMA = {
     embedded => 0,    # run in embedded mode
     export   => 1,    # install standart import method
     inline   => 0,    # package use Inline
-    promise  => 0,    # export Pcore::Util::Promise qw[promise]
     result   => 0,    # export Pcore::Util::Result qw[result]
     role     => 0,    # package is a Moo role
     rpc      => 0,    # run class as RPC server
+    sql      => 0,    # export Pcore::Handle::DBI::Const qw[:TYPES]
     types    => 0,    # export types
 };
 
@@ -168,11 +168,11 @@ sub import {
             Pcore::Util::Result->import( -caller => $caller, qw[result] );
         }
 
-        # process -promise pragma
-        if ( $import->{pragma}->{promise} ) {
-            state $PROMISE_INIT = !!require Pcore::Util::Promise;
+        # process -sql pragma
+        if ( $import->{pragma}->{sql} ) {
+            state $SQL_INIT = !!require Pcore::Handle::DBI::Const;
 
-            Pcore::Util::Promise->import( -caller => $caller, qw[promise] );
+            Pcore::Handle::DBI::Const->import( -caller => $caller, qw[:TYPES] );
         }
 
         # re-export Moo

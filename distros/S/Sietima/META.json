@@ -36,8 +36,8 @@
       },
       "runtime" : {
          "requires" : {
-            "App::Spec" : "0.004",
-            "App::Spec::Run" : "0.004",
+            "App::Spec" : ">= 0.004, != 0.004_001",
+            "App::Spec::Run" : ">= 0.004, != 0.004_001",
             "Digest::SHA" : "5.96",
             "Email::Address" : "1.908",
             "Email::MIME" : "1.940",
@@ -85,7 +85,7 @@
          "web" : "https://www.thenautilus.net/cgit/Sietima"
       }
    },
-   "version" : "1.0.2",
+   "version" : "1.0.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

@@ -1,0 +1,10 @@
+Revision history for Alien::JPCRE2.
+
+0.002000 2017-07-04
+
+    - Remove Extraneous Debugging Output
+
+0.001000 2017-07-03
+
+    - Initial Release!
+    - Linux Support

@@ -1,0 +1,132 @@
+NAME
+
+    Module::CheckDep::Version - List prereqs that need a version bump for
+    an author's distributions
+
+SYNOPSIS
+
+        use Module::CheckDep::Version qw(check_deps);
+    
+        # list only the author's own prereqs that are behind
+    
+        check_deps('STEVEB');
+        
+        # list all prereqs that are behind by all authors
+    
+        check_deps('STEVEB', all => 1);
+    
+        # check only a single distribution
+    
+        check_deps('STEVEB', module => 'RPi::WiringPi');
+    
+        # return the data within a hash reference instead of printing
+    
+        check_deps('STEVEB', return => 1);
+    
+        # send in your own custom function to manage the data
+    
+        check_deps('STEVEB', handler => \&my_handler);
+    
+        sub my_handler {
+            # this is the actual code from the default
+            # handler
+    
+            my $dists = shift;
+            
+            for my $dist (keys %$dists){
+                print "$dist:\n";
+                for my $dep (keys %{ $dists->{$dist} }){
+                    print "\t$_:\n" .
+                          "\t\t$dists->{$dist}{$dep}{dep_ver} -> " .
+                          "$dists->{$dist}{$dep}{cur_ver}\n";
+                }
+                print "\n";
+            }
+        }
+    
+        # by default, we skip over dependencies that are listed with a version of
+        # 0 (zero). This version value means 'any version of this prereq is fine'.
+        # You can include these in your listing if you wish
+    
+        check_deps('STEVEB', ignore_any => 0);
+
+DESCRIPTION
+
+    See "checkdep" for a binary script that you can use directly instead of
+    using this API. You can also run `perldoc checkdep` at the command line
+    after installation to read its manual.
+
+    This module retrieves all [http://cpan.org|CPAN] distributions for a
+    single author, extracts out all of the dependencies for each
+    distribution, then lists all dependencies that have updated versions so
+    you're aware which prerequisite distributions are behind in version
+    than what is currently being required.
+
+    Can list only the prerequisites that are written by the same author, or
+    optionally all prerequisite distributions by all authors.
+
+EXPORT_OK
+
+    We export only a single function upon request: check_deps().
+
+FUNCTIONS
+
+ check_deps($author, [%args])
+
+    Fetches a list of a CPAN author's distributions using MetaCPAN::Client,
+    extracts out the list of each distribution's prerequisite
+    distributions, compares the required version listed against the
+    currently available version and either returns or prints to the screen
+    a list of each dependency that requires a version bump.
+
+    Parameters:
+
+        $author
+
+    Mandatory, String: A valid CPAN author's user name.
+
+        module => 'Some::Module'
+
+    Optional, String. The name of a valid CPAN distribution by the author
+    specified. We'll only look up the results for this single distribution
+    if this param is sent in.
+
+        all => 1
+
+    Optional, Bool. By default, we'll only list prerequisites by the same
+    $author. Setting this to true will list prereq version bumps required
+    for all listed prerequisite distributions. Defaults to off/false.
+
+        return => 1
+
+    Optional, Bool. By default we print results to STDOUT. Set this to true
+    to have the data in hash reference form returned to you instead.
+    Default is off/false.
+
+        ignore_any => 0
+
+    Optional, Bool. By default, we skip over any prerequisite modules that
+    are listed with a version of 0 (zero). This says that any version of
+    the prerequisite module will do. Set this parameter to a false value to
+    have those distributions listed as well. Defaults to on/true.
+
+        handler => \&function
+
+    Optional, code reference. You can send in a reference to a function you
+    create to handle the data. See "SYNOPSIS" for an example of the format
+    of the single hash reference we pass into your function.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

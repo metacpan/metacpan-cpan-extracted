@@ -30,6 +30,16 @@ sub new
 	}, $class;
 }
 
+sub dup
+{
+	my $self = shift;
+	return ref($self)->new( undef,
+		%$self,
+		canvas   => $self->{canvas},
+		commands => [ @{ $self->{commands} } ],
+	);
+}
+
 sub cmd
 {
 	my $self = shift;
@@ -51,8 +61,8 @@ sub rcmd
 
 sub append           { push @{shift->{commands}}, @{shift->{commands}} }
 sub commands         { shift->{commands} }
-sub save             { shift->cmd('save', 0) }
-sub path             { shift->cmd('save', 1) }
+sub save             { shift->cmd('save') }
+sub close            { shift->cmd('close') }
 sub restore          { shift->cmd('restore') } # no checks for underflow here, to allow append paths
 sub precision        { shift->cmd(set => precision => shift) }
 
@@ -153,7 +163,7 @@ sub arc
 	@_ > 5 or Carp::croak('bad parameters to arcto');
 	my ( $cx, $cy, $dx, $dy, $from, $to, $tilt) = @_;
 	return $self if $from == $to;
-	$self-> path->
+	$self-> save->
 		matrix( $dx / 2, 0, 0, $dy / 2, $cx, $cy )->
 		rotate( $tilt // 0.0)->
 		circular_arc( $from, $to )->
@@ -179,7 +189,7 @@ sub ellipse
 	@_ > 2 or Carp::croak('bad parameters to ellipse');
 	my ( $cx, $cy, $dx, $dy, $tilt) = @_;
 	$dy //= $dx;
-	$self-> path->
+	$self-> save->
 		matrix( $dx / 2, 0, 0, $dy / 2, $cx, $cy )->
 		rotate( $tilt // 0.0)->
 		circular_arc( 0.0, 360.0 )->
@@ -192,9 +202,7 @@ sub points
 	unless ( $self->{points} ) {
 		local $self->{stack} = [];
 		local $self->{curr}  = {
-			matrix_inner  => [ identity ],
-			matrix_outer  => [ identity ],
-			matrix_actual => [ identity ],
+			matrix => [ identity ],
 			( map { $_, $self->{$_} } qw(precision ) )
 		};
 		$self->{points} = Prima::array->new_int;
@@ -202,16 +210,24 @@ sub points
 		while ( my $cmd = shift @c ) {
 			$self-> can("_$cmd")-> ( $self, \@c );
 		}
+		$self->{last_matrix} = $self->{curr}->{matrix};
 	}
 
 	return $self->{points};
+}
+
+sub last_matrix
+{
+	my $self = shift;
+	$self->points;
+	return $self->{last_matrix};
 }
 
 sub matrix_apply
 {
 	my $self   = shift;
 	my ($ref, $points) = $#_ ? (0, [@_]) : (1, $_[0]);
-	my $m  = $self->{curr}->{matrix_actual};
+	my $m  = $self->{curr}->{matrix};
 	my @ret;
 	for ( my $i = 0; $i < @$points; $i += 2 ) {
 		my ( $x, $y ) = @{$points}[$i,$i+1];
@@ -228,21 +244,10 @@ sub _save
 	my ( $self, $cmd )  = @_;
 
 	push @{ $self->{stack} }, $self->{curr};
-
-	my ( $m1, $m2, $m3 ) = @_;
-	if ( shift @$cmd ) {
-		$m1 = [ identity ];
-		$m2 = [ @{ $self->{curr}->{matrix_actual} } ];
-	} else {
-		$m1 = [ @{ $self->{curr}->{matrix_inner}  } ];
-		$m2 = [ @{ $self->{curr}->{matrix_outer}  } ];
-	}
-	$m3 = [ @{ $self->{curr}->{matrix_actual} } ];
+	my $m = [ @{ $self->{curr}->{matrix} } ];
 	$self->{curr} = {
 		%{ $self->{curr} },
-		matrix_inner  => $m1,
-		matrix_outer  => $m2,
-		matrix_actual => $m3,
+		matrix => $m,
 	};
 }
 
@@ -264,8 +269,7 @@ sub _matrix
 {
 	my ( $self, $cmd ) = @_;
 	my $new = [ splice( @$cmd, 0, 6 ) ];
-	$self->{curr}->{matrix_inner}  = matrix_multiply( $self->{curr}->{matrix_inner}, $new );
-	$self->{curr}->{matrix_actual} = matrix_multiply( $self->{curr}->{matrix_inner}, $self->{curr}->{matrix_outer} );
+	$self->{curr}->{matrix}  = matrix_multiply( $new, $self->{curr}->{matrix} );
 }
 
 sub _relative
@@ -273,10 +277,17 @@ sub _relative
 	my $self = shift;
 	my $p  = $self->{points};
 	return unless @$p;
-	my $m  = $self->{curr}->{matrix_actual};
+	my $m  = $self->{curr}->{matrix};
 	my ( $x0, $y0 ) = $self-> matrix_apply(0, 0);
 	$m->[X] += $p->[-2] - $x0;
 	$m->[Y] += $p->[-1] - $y0;
+}
+
+sub _close
+{
+	my $self = shift;
+	my $p = $self->{points};
+	push @$p, $p->[0], $p->[1] if @$p;
 }
 
 sub _line
@@ -366,7 +377,7 @@ sub _arc
 		my $p  = $self->{points};
 		if ( @$p ) {
 			my $pts = $nurbset->[0]->[0];
-			my $m = $self->{curr}->{matrix_actual};
+			my $m = $self->{curr}->{matrix};
 			my @s = $self->matrix_apply( $pts->[0], $pts->[1]);
 			$m->[X] += $p->[-2] - $s[0];
 			$m->[Y] += $p->[-1] - $s[1];
@@ -506,19 +517,12 @@ Adds B-spline to path. See L<Prima::Drawable/spline> for C<%OPTIONS> description
 
 Transformation calls change the current path properties (matrix etc)
 so that all subsequent calls will use them until a call to C<restore>
-is used. C<save>/C<path> and C<restore> implement a stacking mechanism, so that
+is used. C<save> and C<restore> implement a stacking mechanism, so that
 local transformations can be made.
 
-The final transformations calculate coordinates using two matrices, inner and outer,
-so that final point becomes
+The final transformations calculate coordinates the new and the existing matrices:
 
-  P' = P * M_inner * M_outer
-
-where translation calls C<rotate>, C<scale> etc operate on the inner matrix only:
-
-  M_inner' = M_inner * scaling
-
-while C<path> operates on M_outer as well.
+  P' = NewMatrix * P
 
 =over
 
@@ -535,29 +539,6 @@ and when applied to 2D coordinates, is calculated as
 
   X' = AX + CY + Tx
   Y' = BX + DY + Ty
-
-=item path
-
-Duplicates the current matrix and graphic properties and pushes them to the stack.
-Sets the inner matrix to identity, and the outer matrix to the previous current matrix:
-
-   M_outer   = M_current
-   M_inner   = identity
-   M_current = M_inner * M_outer
-
-Can be used used to create own primitives, f.ex:
-
-  sub my_symbol {
-     $self-> path-> spline( ... )-> restore;
-  }
-
-  $path->rotate(45);
-  my_symbol($path, ..);
-  $path->rotate(90);
-  my_symbol($path, ..);
-  $path->stroke;
-
-will draw same spline twice but rotated 45 and 135 degrees.
 
 =item precision INTEGER
 
@@ -607,8 +588,12 @@ Returns 2 points that box the path.
 
 =item points
 
-Runs all allcumulated commands, and returns rendered set of points, suitable
+Runs all accumulated commands, and returns rendered set of points, suitable
 for further calls to C<Prima::Drawable::polyline> and C<Prima::Drawable::fillpoly>.
+
+=item last_matrix
+
+Return CTM resulted after running all commands
 
 =item fill
 
@@ -632,7 +617,7 @@ mode (see L<Drawable/fillWinding> for more).
 =item append PATH
 
 Copies all commands from another PATH object. The PATH object doesn't need to
-have balanced stacking brackets C<save>/C<path> and C<restore>, and can be viewed
+have balanced stacking brackets C<save> and C<restore>, and can be viewed
 as a macro.
 
 =item identity

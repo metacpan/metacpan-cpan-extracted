@@ -394,6 +394,7 @@ sub profile_default
 		backColor       => cl::White,
 		fillWinding     => 0,
 		fillPattern     => fp::Solid,
+		fillPatternOffset => [0,0],
 		font            => {
 			height      => 16,
 			width       => 0,
@@ -724,6 +725,8 @@ sub profile_default
 	return $def;
 }
 
+sub toggle { $_[0]->get_active ? $_[0]->stop : $_[0]->start }
+
 package Prima::Printer;
 use vars qw(@ISA);
 @ISA = qw(Prima::Drawable);
@@ -791,6 +794,7 @@ sub notification_types { return \%RNT; }
 	backColor         => cl::Normal,
 	briefKeys         => 1,
 	buffered          => 0,
+	clipChildren      => 1,
 	capture           => 0,
 	clipOwner         => 1,
 	color             => cl::NormalText,
@@ -1234,7 +1238,7 @@ sub rect_bevel
 
 	return $canvas-> rect3d( $x, $y, $x1, $y1, $width, @c3d, $fill)
 		if $width < 2;
-	my $back  = defined($fill) ? $fill : $self-> backColor;
+	my $back  = (defined($fill) && !ref($fill)) ? $fill : $self-> backColor;
 
 	# 0 - upper left under 2 -- inner square
 	# 1 - lower right over 3
@@ -1248,14 +1252,10 @@ sub rect_bevel
 		push @c3d, $back, 0x404040;
 	}
 
-	if ( my $g = $opt{gradient} ) {
-		for (@{$g->{palette} // []}) {
-			$_ = $self->map_color($_) if $_ & cl::SysFlag;
-		}
-	}
+	$fill = $fill->clone( widgetClass => $self->widgetClass ) if $fill && ref($fill);
 
 	my $hw = int( $width / 2);
-	$canvas-> rect3d( $x, $y, $x1, $y1, $hw, @c3d[2,3], $opt{gradient} // $fill);
+	$canvas-> rect3d( $x, $y, $x1, $y1, $hw, @c3d[2,3], $fill);
 	$canvas-> rect3d( $x + $hw, $y + $hw, $x1 - $hw, $y1 - $hw, $width - $hw, @c3d[0,1]);
 }
 

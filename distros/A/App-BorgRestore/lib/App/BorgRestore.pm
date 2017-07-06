@@ -3,7 +3,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = "2.0.1";
+our $VERSION = "2.1.0";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;
@@ -14,6 +14,7 @@ use autodie;
 use Carp;
 use Cwd qw(abs_path getcwd);
 use File::Basename;
+use File::pushd;
 use File::Spec;
 use File::Temp;
 use Function::Parameters;
@@ -41,6 +42,8 @@ App::BorgRestore - Restore paths from borg backups
 
     # Restore a path from a backup that is at least 5 days old. Optionally
     # restore it to a different directory than the original.
+    # Look at the implementation of this method if you want to know how the
+    # other parts of this module work together.
     $app->restore_simple($path, "5days", $optional_destination_directory);
 
 =head1 DESCRIPTION
@@ -60,28 +63,29 @@ usage.
 
 This package uses L<Log::Any> for logging.
 
-=head1 LICENSE
+=head1 METHODS
 
-Copyright (C) 2016-2017  Florian Pritz E<lt>bluewind@xinu.atE<gt>
+=head2 Constructors
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+=head3 new
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+ App::BorgRestore->new(\%deps);
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Returns a new instance. The following dependencies can be injected:
 
-See LICENSE for the full license text.
+=over
 
-=head1 AUTHOR
+=item * borg (optional)
 
-Florian Pritz E<lt>bluewind@xinu.atE<gt>
+This object is used to interact with the borg repository of the system.
+Defaults to L<App::BorgRestore::Borg>
+
+=item * db (optional)
+
+This object is used to store the extracted data (the cache). Defaults to
+L<App::BorgRestore::DB>
+
+=back
 
 =cut
 
@@ -98,6 +102,13 @@ method new($class: $deps = {}) {
 	return $self;
 }
 
+=head3 new_no_defaults
+
+Same as C<new> except that this does not initialize unset dependencies with
+their default values. This is probably only useful for tests.
+
+=cut
+
 method new_no_defaults($class: $deps) {
 	my $self = {};
 	bless $self, $class;
@@ -107,6 +118,16 @@ method new_no_defaults($class: $deps) {
 
 	return $self;
 }
+
+=head2 Public Methods
+
+=head3 resolve_relative_path
+
+ my $abs_path = $app->resolve_relative_path($path);
+
+Returns an absolute path for a given path.
+
+=cut
 
 method resolve_relative_path($path) {
 	my $canon_path = File::Spec->canonpath($path);
@@ -121,6 +142,18 @@ method resolve_relative_path($path) {
 	return $abs_path;
 }
 
+=head3 map_path_to_backup_path
+
+ my $path_in_backup = $app->map_path_to_backup_path($abs_path);
+
+Maps an absolute path from the system to the path that needs to be looked up in
+/ extracted from the backup using C<@backup_prefixes> from
+L<App::BorgRestore::Settings>.
+
+Returns the mapped path (string).
+
+=cut
+
 method map_path_to_backup_path($abs_path) {
 	my $backup_path = $abs_path;
 
@@ -133,6 +166,17 @@ method map_path_to_backup_path($abs_path) {
 
 	return $backup_path;
 }
+
+=head3 find_archives
+
+ my $archives = $app->find_archives($path);
+
+Returns an arrayref of archives (hash with "modification_time" and "archive")
+from the database that contain a path.  Duplicates are filtered based on the
+modification time of the path in the
+archives.
+
+=cut
 
 method find_archives($path) {
 	my %seen_modtime;
@@ -160,8 +204,19 @@ method find_archives($path) {
 	return \@ret;
 }
 
+=head3 get_all_archives
+
+ my $archives = $app->get_all_archives();
+
+Returns an arrayref of archives (hash with "modification_time" and "archive")
+from borg directly. This does not require the database to be populated. Instead
+it just fetches a list of archives from borg at runtime and returns it.
+
+The returned data structure is the same as that returned by C<find_archives>.
+
+=cut
+
 method get_all_archives() {
-	#my %seen_modtime;
 	my @ret;
 
 	$log->debugf("Fetching list of all archives");
@@ -181,6 +236,18 @@ method get_all_archives() {
 
 	return \@ret;
 }
+
+=head3 select_archive_timespec
+
+ my $archive = $app->select_archive_timespec($archives, $timespec);
+
+Returns one archive from C<$archives> that is older than the value of
+C<$timespec>.
+
+I<timespec> is a string of the form "<I<number>><I<unit>>" with I<unit> being one of the following:
+s (seconds), min (minutes), h (hours), d (days), m (months = 31 days), y (year). Example: "5.5d"
+
+=cut
 
 method select_archive_timespec($archives, $timespec) {
 	my $seconds = $self->_timespec_to_seconds($timespec);
@@ -236,6 +303,22 @@ method _timespec_to_seconds($timespec) {
 	return;
 }
 
+=head3 restore
+
+ $app->restore($backup_path, $archive, $destination);
+
+Restore a backup path (returned by C<map_path_to_backup_path>) from an archive
+(returned by C<find_archives> or C<get_all_archives>) to a destination
+directory.
+
+If the destination path (C<$destination/$last_elem_of_backup_path>) exists, it
+is removed before beginning extraction from the backup.
+
+Warning: This method temporarily modifies the current working directory of the
+process during method execution since this is required by C<`borg extract`>.
+
+=cut
+
 method restore($path, $archive, $destination) {
 	$destination = App::BorgRestore::Helper::untaint($destination, qr(.*));
 	$path = App::BorgRestore::Helper::untaint($path, qr(.*));
@@ -247,17 +330,32 @@ method restore($path, $archive, $destination) {
 	my $components_to_strip =()= $path =~ /\//g;
 
 	$log->debugf("CWD is %s", getcwd());
-	$log->debugf("Changing CWD to %s", $destination);
-	mkdir($destination) unless -d $destination;
-	chdir($destination) or die "Failed to chdir: $!";
-	# TODO chdir back to original after restore
+	{
+		$log->debugf("Changing CWD to %s", $destination);
+		mkdir($destination) unless -d $destination;
+		my $workdir = pushd($destination, {untaint_pattern => qr{^(.*)$}});
 
-	my $final_destination = abs_path($basename);
-	$final_destination = App::BorgRestore::Helper::untaint($final_destination, qr(.*));
-	$log->debugf("Removing %s", $final_destination);
-	File::Path::remove_tree($final_destination);
-	$self->{borg}->restore($components_to_strip, $archive_name, $path);
+		my $final_destination = abs_path($basename);
+		$final_destination = App::BorgRestore::Helper::untaint($final_destination, qr(.*));
+		$log->debugf("Removing %s", $final_destination);
+		File::Path::remove_tree($final_destination);
+		$self->{borg}->restore($components_to_strip, $archive_name, $path);
+	}
+	$log->debugf("CWD is %s", getcwd());
 }
+
+=head3 restore_simple
+
+ $app->restore_simple($path, $timespec, $destination);
+
+Restores a C<$path> based on a C<$timespec> to an optional C<$destination>. If
+C<$destination> is not specified, it is set to the parent directory of C<$path>
+so that C<$path> is restored to its original place.
+
+Refer to L</"select_archive_timespec"> for an explanation of the C<$timespec>
+variable.
+
+=cut
 
 method restore_simple($path, $timespec, $destination) {
 	my $abs_path = $self->resolve_relative_path($path);
@@ -295,6 +393,14 @@ method _add_path_to_hash($hash, $path, $time) {
 		$node = $$node[0]->{$component};
 	}
 }
+
+=head3 get_missing_items
+
+ my $items = $app->get_missing_items($have, $want);
+
+Returns an arrayref of items that are part of C<$want>, but not of C<$have>.
+
+=cut
 
 method get_missing_items($have, $want) {
 	my $ret = [];
@@ -381,6 +487,15 @@ method _save_node($archive_id, $prefix, $node) {
 	}
 }
 
+
+=head3 update_cache
+
+ $app->update_cache();
+
+Updates the database used by e.g. C<find_archives>.
+
+=cut
+
 method update_cache() {
 	$log->debug("Updating cache if required");
 
@@ -395,3 +510,28 @@ method update_cache() {
 
 1;
 __END__
+
+=head1 LICENSE
+
+Copyright (C) 2016-2017  Florian Pritz E<lt>bluewind@xinu.atE<gt>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+See LICENSE for the full license text.
+
+=head1 AUTHOR
+
+Florian Pritz E<lt>bluewind@xinu.atE<gt>
+
+=cut

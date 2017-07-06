@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Dancer2::Plugin;
-$Dancer2::Plugin::Locale::VERSION = '0.06';
+$Dancer2::Plugin::Locale::VERSION = '0.07';
 
 package Dancer2::Plugin::Locale::Obj;
 use Locales 0.33 unicode => 1;
@@ -82,7 +82,11 @@ sub BUILD {
         eval "package Dancer2::Plugin::Locale::Obj::$tag;use base 'Dancer2::Plugin::Locale::Obj';our \$Encoding='utf8';our \%Lexicon;package Dancer2::Plugin::Locale;";    ## no critic
 
         no strict 'refs';                                                                                                                                                  ## no critic
-        %{"Dancer2::Plugin::Locale::Obj::$tag\::Lexicon"} = $tag eq 'en' && !-e $file ? () : ( %{ _from_json_file($file) } );                                              # TODO 1: instead: tie %{"Dancer2::Plugin::Locale::$tag\::Lexicon"}, 'Tie::Hash::ReadonlyStack', _from_json_file($file);
+                                                                                                                                                                           #
+        my $hr = $tag eq 'en' && !-e $file ? {} : ( _from_json_file($file) || {} );
+        %{"Dancer2::Plugin::Locale::Obj::$tag\::Lexicon"} = %{$hr};
+
+        # TODO 1: instead: tie %{"Dancer2::Plugin::Locale::$tag\::Lexicon"}, 'Tie::Hash::ReadonlyStack', _from_json_file($file);
     }
 
     # TODO 2: Is there a better way to add template keyword?
@@ -107,7 +111,8 @@ sub _from_json_file {
         );
     };
     if ($@) {
-        warn "Ignoring lexicon, $file, since it containes invalid JSON: $@";
+
+        warn "Ignoring lexicon, $file, since it containes invalid JSON:\n\t$@";
     }
     return $ref;
 }
@@ -127,7 +132,7 @@ Dancer2::Plugin::Locale - Localize your Dancer2 application
 
 =head1 VERSION
 
-This document describes Dancer2::Plugin::Locale version 0.06
+This document describes Dancer2::Plugin::Locale version 0.07
 
 =head1 SYNOPSIS
 
@@ -253,11 +258,25 @@ TODO items in the POD obviously, will list more if there are any left after the 
 
 =head1 DIAGNOSTICS
 
-Throws no errors of its own.
+=head2 Errors
 
-The only warning is during startup if you have a mis-named file in your C<locale/> directory:
+If the C<locale/> directory exists but can not be opened:
+
+C<<Could not read locale directory (%s): $!>>
+
+=head2 Warnings
+
+If you have a mis-named file in your C<locale/> directory:
 
 C<<Skipping un-normalized locale named lexicon (%s.json) …>>
+
+If you have a properly named lexicon that is not a file in your C<locale/> directory:
+
+C<<Skipping non-file lexicon (%s.json) …>>
+
+If you have a lexicon that can’t be loaded (e.g. broken JSON):
+
+C<<Ignoring lexicon, %s, since it containes invalid JSON:\n\t$@>>
 
 =head1 CONFIGURATION AND ENVIRONMENT
 

@@ -10,7 +10,7 @@ eval 'use Test::Pod::Coverage';
 my $xerror = Prima::XOpenDisplay;
 plan skip_all => $xerror if defined $xerror;
 
-my $tests = 2;
+my $tests = 3;
 plan tests => $tests;
 $::application = Prima::Application-> new;
 $::application-> begin_paint;
@@ -23,6 +23,8 @@ unless ( ok( $ctx, 'create_context')) {
 	exit;
 }
 
+my $direct = Prima::OpenGL::is_direct($ctx);
+ok( 1, "direct: $direct");
 ok(Prima::OpenGL::context_make_current($ctx));
 
 Prima::OpenGL::context_destroy($ctx);

@@ -747,15 +747,16 @@ Outthentic provides some helpers and variables:
 
 ### Recognized OS list
 
-- centos5
-- centos6
-- centos7
-- ubuntu
-- debian
-- minoca
-- archlinux
-- fedora
-- amazon
+* centos5
+* centos6
+* centos7
+* ubuntu
+* debian
+* minoca
+* archlinux
+* fedora
+* amazon
+* alpine
 
 ## Meta stories
 
@@ -898,6 +899,10 @@ This make it easy to place custom Perl modules under project root directory:
 * `--root`  
 
 Root directory of outthentic project. If root parameter is not set current working directory is assumed as project root directory.
+
+* `--cwd`  
+
+Sets working directory when strun executes. Default value is unset. Optional.
 
 * `--debug` 
 
@@ -1065,6 +1070,8 @@ This way we will override foo.bar to value \`20'.
 * `SPARROW_ROOT` - if set, used as prefix for test root directory.
 
 * `SPARROW_NO_COLOR` - disable color output (see --nocolor option of `strun`)
+
+* `OUTTHENTIC_CWD` - sets working directory for strun, see strun's `--cwd` parameter
 
 Test root directory resolution table:
     

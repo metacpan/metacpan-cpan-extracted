@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -1537,9 +1537,23 @@ falls sie existiert.
 
 =item -recursive => 0 | 1 (Default: 0)
 
-Erzeuge übergeordnete Verzeichnisse, wenn nötig.
+Erzeuge nicht-existente Verzeichnisse des Zielpfads
+und entferne leere Verzeichnisse des Quellpfads.
 
 =back
+
+=head4 Example
+
+Zielpfad erzeugen, Quellpfad entfernen mit -recursive=>1.
+Ausgangslage: Unterhalb von /tmp existieren weder a noch x.
+
+    my $srcPath = '/tmp/a/b/c/d/f';
+    my $destPath = '/tmp/x/b/c/d/f';
+    Prty::Path->write($srcPath,'',-recursive=>1);
+    Prty::Path->rename($srcPath,$destPath,-recursive=>1);
+
+Nach Ausführung existiert der der Pfad /tmp/x/b/c/d/f, aber der Pfad
+/tmp/a nicht mehr.
 
 =cut
 
@@ -1568,12 +1582,12 @@ sub rename {
         );
     }
 
-    # Erzeuge Verzeichnis, wenn nötig
+    # Erzeuge Zielverzeichnis, wenn nicht vorhanden
 
     if ($recursive) {
-        my $dir = (Prty::Path->split($newPath))[0];
-        if ($dir && !-d $dir) {
-            $class->mkdir($dir,-recursive=>1);
+        my $newDir = (Prty::Path->split($newPath))[0];
+        if ($newDir && !-d $newDir) {
+            $class->mkdir($newDir,-recursive=>1);
         }
     }
 
@@ -1585,6 +1599,18 @@ sub rename {
             NewPath=>$newPath,
         );
     };
+
+    # Lösche Quellverzeichnisse, sofern sie leer sind
+
+    if ($recursive) {
+        while (1) {
+            ($oldPath) = Prty::Path->split($oldPath);
+            eval {Prty::Path->rmdir($oldPath)};
+            if ($@) {
+                last;
+            }
+        }
+    }
 
     return;
 }
@@ -1762,7 +1788,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

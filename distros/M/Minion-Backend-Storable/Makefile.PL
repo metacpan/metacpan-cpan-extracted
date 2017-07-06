@@ -24,8 +24,9 @@ WriteMakefile(
   BUILD_REQUIRES     => {'Test::More' => 0},
   CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.3},
   PREREQ_PM          => {
-    Mojolicious => 6.3,
-    Minion => 6.05
+    Mojolicious => 6,
+    Minion => 6,
+    Sereal => 3
   },
   test               => {TESTS => 'test/*.t'}
 );

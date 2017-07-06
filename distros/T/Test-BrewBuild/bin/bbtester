@@ -6,7 +6,7 @@ use Getopt::Long;
 use Test::BrewBuild;
 use Test::BrewBuild::Tester;
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 my $auto;
 my $auto_csum_match;
@@ -18,13 +18,13 @@ my $logfile;
 my $debug;
 my $help;
 
-if (@ARGV && $ARGV[0] !~ /(?:start|stop|--fg|-f)/ || ! @ARGV){
+if (! @ARGV  || $ARGV[0] !~ /(?:start|stop|--fg|-f)/){
     $help = 1;
 }
 
 my $op = '';
 
-if ($ARGV[0] !~ /(?:--fg|-f)/){
+if (@ARGV && $ARGV[0] !~ /(?:--fg|-f)/){
     $op = shift @ARGV;
 }
 

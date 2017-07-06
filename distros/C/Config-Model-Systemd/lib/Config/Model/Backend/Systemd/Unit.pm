@@ -1,14 +1,14 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2016 by Dominique Dumont.
+# This software is Copyright (c) 2015-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd::Unit ;
-$Config::Model::Backend::Systemd::Unit::VERSION = '0.232.6';
+$Config::Model::Backend::Systemd::Unit::VERSION = '0.232.7';
 use strict;
 use warnings;
 use 5.010;
@@ -37,10 +37,15 @@ sub read {
     # io_handle  => $io           # IO::File object
     # check      => yes|no|skip
 
-    if ($self->node->instance->layered) {
-        # avoid deep recursion in layered mode
-        return $self->SUPER::read(%args);
-    };
+    # file write is handled by Unit backend
+    if ($self->instance->application =~ /systemd-(?!user)/) {
+        # file_path overridden by model => how can config_dir be found ?
+        my $file = $args{file_path};
+        # allow non-existent file to let user start from scratch
+        return 1 unless  path( $file )->exists;
+
+        return $self->load_ini_file(%args, file_path => $file);
+    }
 
     my $unit_type = $self->node->element_name;
     my $unit_name   = $self->node->index_value;
@@ -55,29 +60,50 @@ sub read {
         next unless $file->exists;
 
         $logger->debug("reading default layer from unit $unit_type name $unit_name from $file");
-        my $fh = new IO::File;
-        $fh->open($file);
-        $fh->binmode(":utf8");
+        $self->load_ini_file(%args, file_path => $file);
 
-        my $res = $self->read(
-            io_handle => $fh,
-            check => $args{check},
-        );
-        $fh->close;
-        die "failed $file read " unless $res;
+        # TODO: may also need to read files in
+        # $unit_name.'.'.$unit_type.'.d' to get all default values
+        # (e.g. /lib/systemd/system/rc-local.service.d/debian.conf)
     }
     $self->node->instance->layered_stop;
 
-    my $file_path = path($args{file_path});
+    # now read editable file (files that can be edited with systemctl edit <unit>.<type>
+    # for systemd -> /etc/ systemd/system/unit.type.d/override.conf
+    # for user -> ~/.local/systemd/user/*.conf
+    # for local file -> $args{filexx}
+
+    # TODO: document limitations (can't read arbitrary files in /etc/
+    # systemd/system/unit.type.d/ and
+    # ~/.local/systemd/user/unit.type.d/*.conf
+
+    my $app = $self->instance->application;
+    $args{file_path} .= '.d/override.conf' if $app eq 'systemd';
+    my $file_path = path( $args{file_path} );
+
     if ($file_path->exists and $file_path->realpath eq '/dev/null') {
         $logger->debug("skipping  unit $unit_type name $unit_name from ".$args{config_dir});
     }
-    else {
-        $logger->debug("reading unit $unit_type name $unit_name from ".$args{config_dir});
-
-        # mouse super() does not work...
-        $self->SUPER::read(%args);
+    elsif ($file_path->exists) {
+        $logger->debug("reading unit $unit_type name $unit_name from ".$args{file_path});
+        $self->load_ini_file(%args);
     }
+}
+
+sub load_ini_file {
+    my ($self, %args) = @_ ;
+
+    $logger->debug("opening file '".$args{file_path}."' to read");
+    my $file = path($args{file_path});
+
+    my $fh = $file->openr_utf8;
+
+    my $res = $self->SUPER::read(
+        %args,
+        io_handle => $fh,
+    );
+    $fh->close;
+    die "failed $file read " unless $res;
 }
 
 # overrides call to node->load_data
@@ -88,7 +114,6 @@ sub load_data {
     my $check = $args{check};
     my $data = $args{data} ;
 
-    # use ObjTreeScanner ?
     my $disp_leaf = sub {
         my ($scanner, $data, $node,$element_name,$index, $leaf_object) = @_ ;
         if (ref($data) eq 'ARRAY') {
@@ -167,11 +192,22 @@ sub write {
             $fp->remove;
             symlink ('/dev/null', $fp->stringify);
         }
+        return 1;
     }
-    else {
-        # mouse super() does not work...
-        $self->SUPER::write(@_);
+
+    my $app = $self->instance->application;
+    if ($app eq 'systemd') {
+        my $dir = path ($args{file_path} . '.d');
+        $dir->mkpath;
+        my $file_path = $dir->child('override.conf');
+        $logger->debug("open $file_path to write");
+        $args{file_path} = $file_path->stringify;
+        $args{io_handle} = $file_path->openw_utf8;
     }
+
+    $logger->debug("writing unit to ".$args{file_path});
+    # mouse super() does not work...
+    $self->SUPER::write(%args);
 }
 
 sub _write_leaf{
@@ -203,7 +239,7 @@ Config::Model::Backend::Systemd::Unit - R/W backend for systemd unit files
 
 =head1 VERSION
 
-version 0.232.6
+version 0.232.7
 
 =head1 SYNOPSIS
 
@@ -244,7 +280,7 @@ Dominique Dumont
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015-2016 by Dominique Dumont.
+This software is Copyright (c) 2015-2017 by Dominique Dumont.
 
 This is free software, licensed under:
 

@@ -5,13 +5,45 @@ use MooseX::App qw(Color);
 with 'HPC::Runner::Command::Utils::Plugin';
 with 'HPC::Runner::Command::Utils::ManyConfigs';
 
-option '+config_base' => (
-    default       => '.hpcrunner',
+use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
+
+option '+config_base' => ( default => '.hpcrunner', );
+
+=head3 project
+
+When submitting jobs we will prepend the jobname with the project name
+
+=cut
+
+option 'project' => (
+    is            => 'rw',
+    isa           => 'Str',
+    documentation => 'Give your jobnames an additional project name. '
+      . '#HPC jobname=gzip will be submitted as 001_project_gzip',
+    required    => 0,
+    predicate   => 'has_project',
+    cmd_aliases => ['p'],
 );
 
-our $VERSION = '3.2.5';
+option 'verbose' => (
+    is      => 'rw',
+    isa     => 'Bool',
+    default => 0,
+);
+
+
+has 'submission_uuid' => (
+    is        => 'rw',
+    isa       => 'Str',
+    required  => 0,
+    predicate => 'has_submissions_uuid',
+);
+
+our $VERSION = '3.2.6';
 
 app_strict 0;
+
+sub BUILD { }
 
 =encoding utf-8
 
@@ -19,7 +51,9 @@ app_strict 0;
 
 =begin HTML
 
-<p><img src="http://github.com/jerowe/HPC-Runner-Command/blob/master/_docs/images/rabbit.jpeg" width="500" height="250" alt="HPC::Runner::Command" /></p>
+<p><img
+src="http://github.com/jerowe/HPC-Runner-Command/blob/master/_docs/images/rabbit.jpeg"
+width="500" height="250" alt="HPC::Runner::Command" /></p>
 
 =end HTML
 
@@ -33,11 +67,11 @@ To create a new project
 
 To submit jobs to a cluster
 
-    hpcrunner.pl submit_jobs
+    hpcrunner.pl submit_jobs --infile my_submission.sh
 
 To run jobs on an interactive queue or workstation
 
-    hpcrunner.pl execute_job
+    hpcrunner.pl single_node --infile my_submission.sh
 
 =head1 DESCRIPTION
 
@@ -45,9 +79,11 @@ HPC::Runner::Command is a set of libraries for scaffolding data analysis project
 submitting and executing jobs on an HPC cluster or workstation, and obsessively
 logging results.
 
-Get help by heading on over to github and raising an issue L<https://github.com/biosails/HPC-Runner-Command/issues>.
+Get help by heading on over to github and raising an issue. L<GitHub |
+https://github.com/biosails/HPC-Runner-Command/issues>.
 
-Please see the complete documentation at L<HPC::Runner::Command GitBooks | https://jerowe.gitbooks.io/hpc-runner-command-docs/content/>.
+Please see the complete documentation at L<HPC::Runner::Command GitBooks |
+https://jerowe.gitbooks.io/hpc-runner-command-docs/content/>.
 
 =head1 Quick Start - Create a New Project
 
@@ -59,7 +95,8 @@ You can create a new project, with a sane directory structure by using
 
 =head2 Simple Example
 
-Our simplest example is a single job type with no dependencies - each task is independent of all other tasks.
+Our simplest example is a single job type with no dependencies - each task is
+independent of all other tasks.
 
 =head3 Workflow file
 
@@ -76,6 +113,11 @@ Our simplest example is a single job type with no dependencies - each task is in
 =head3 Look at results!
 
 	tree hpc-runner
+
+=head3 Audit your results
+
+  hpcrunner.pl stats -h
+  hpcrunner.pl stats
 
 =head2 Job Type Dependencency Declaration
 
@@ -137,15 +179,24 @@ Within a job type we can declare dependencies on particular tasks.
 
 	tree hpc-runner
 
+=head3 Audit your results
+
+  hpcrunner.pl stats -h
+  hpcrunner.pl stats
+
 =cut
 
 =head2 Declare Scheduler Variables
 
 Each scheduler has its own set of variables. HPC::Runner::Command has a set of
-generalized variables for declaring types across templates. For more
-information please see L<< Job Scheduler Comparison|https://jerowe.gitbooks.io/hpc-runner-command-docs/content/job_submission/comparison.html >>
+generalized variables for declaring types across templates. For more information
+please see L<Job Scheduler
+Comparison|https://jerowe.gitbooks.io/hpc-runner-command-docs/content/job_submission/comparison.html>
 
-Additionally, for workflows with a large number of tasks, please see L<< Considerations for Workflows with a Large Number of Tasks|https://jerowe.gitbooks.io/hpc-runner-command-docs/content/design_workflow.html#considerations-for-workflows-with-a-large-number-of-tasks >> for information on how to group tasks together.
+Additionally, for workflows with a large number of tasks, please see
+L<Considerations for Workflows with a Large Number of
+Tasks|https://jerowe.gitbooks.io/hpc-runner-command-docs/content/design_workflow.html#considerations-for-workflows-with-a-large-number-of-tasks>
+for information on how to group tasks together.
 
 =head3 Workflow file
 
@@ -155,6 +206,7 @@ Additionally, for workflows with a large number of tasks, please see L<< Conside
 	#HPC cpus_per_task=1
 	#HPC partition=serial
 	#HPC commands_per_node=1
+  #HPC mem=4GB
 	#TASK tags=Sample1
 	unzip Sample1.zip
 	#TASK tags=Sample2
@@ -180,7 +232,14 @@ Additionally, for workflows with a large number of tasks, please see L<< Conside
 
 	tree hpc-runner
 
+=head3 Audit your results
+
+  hpcrunner.pl stats -h
+  hpcrunner.pl stats
+
 =cut
+
+__PACKAGE__->meta()->make_immutable();
 
 1;
 
@@ -202,7 +261,7 @@ As of Version 2.41:
 
 This modules continuing development is supported by NYU Abu Dhabi in the Center
 for Genomics and Systems Biology. With approval from NYUAD, this information was
-generalized and put on bitbucket, for which the authors would like to express
+generalized and put on github, for which the authors would like to express
 their gratitude.
 
 Before Version 2.41

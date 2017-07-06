@@ -19,7 +19,7 @@ yars_balance - Fix all files
 
 =head1 VERSION
 
-version 1.27
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -37,6 +37,13 @@ command, which is buggy and not as fast as this one.
 
 The number of threads to run in parallel.  Only one thread per disk will execute
 at a  time.
+
+=head2 --backup | -b
+
+After copying files to the correct bucket (either as a local file copy, or as
+a Yars file transfer), rename the original file to a backup directory, instead of
+unlinking it.  This is particularlly useful when adding new untested disks to
+a yars cluster.
 
 =head1 AUTHOR
 

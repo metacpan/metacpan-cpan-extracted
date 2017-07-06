@@ -1,7 +1,6 @@
 package HPC::Runner::Command::Utils::Git;
 
 use MooseX::App::Role;
-
 use namespace::autoclean;
 
 use Git::Wrapper;
@@ -43,7 +42,7 @@ option 'version' => (
     required  => 0,
     predicate => 'has_version',
     documentation =>
-        'Submission version. Each version has a corresponding git tag. See the difference between tags with `git diff tag1 tag2`. Tags are always version numbers, starting with 0.01.',
+'Submission version. Each version has a corresponding git tag. See the difference between tags with `git diff tag1 tag2`. Tags are always version numbers, starting with 0.01.',
 );
 
 option 'autocommit' => (
@@ -98,7 +97,7 @@ sub init_git {
     my $self = shift;
 
     my $git = Git::Wrapper->new( cwd() )
-        or die print "Could not initialize Git::Wrapper $!\n";
+      or die print "Could not initialize Git::Wrapper $!\n";
 
     try {
         my @output = $git->rev_parse(qw(--show-toplevel));
@@ -134,12 +133,12 @@ sub dirty_run {
 
     if ( $dirty_flag && !$self->autocommit ) {
         $self->app_log->warn(
-            "There are uncommited files in your repo!\n\tPlease commit these files."
+"There are uncommited files in your repo!\n\tPlease commit these files."
         );
     }
     elsif ( $dirty_flag && $self->autocommit ) {
         $self->app_log->warn(
-            "There are uncommited files in your repo!\n\tWe will try to commit these files before running."
+"There are uncommited files in your repo!\n\tWe will try to commit these files before running."
         );
         try {
             $self->git->add(qw/ -A /);
@@ -148,9 +147,9 @@ sub dirty_run {
         }
         catch {
             $self->app_log->warn("Were not able to commit files to git");
-            $self->app_log->warn("STDERR: ".$_->error);
-            $self->app_log->warn("STDOUT: ".$_->output);
-            $self->app_log->warn("STATUS: ".$_->status);
+            $self->app_log->warn( "STDERR: " . $_->error );
+            $self->app_log->warn( "STDOUT: " . $_->output );
+            $self->app_log->warn( "STATUS: " . $_->status );
         }
     }
 }
@@ -235,7 +234,7 @@ sub git_push_tags {
     return unless $self->has_git;
     return unless $self->has_version;
 
-    return if  $self->git->status->is_dirty;
+    return if $self->git->status->is_dirty;
 
     my @remote = $self->git->remote;
 
@@ -246,6 +245,7 @@ sub git_push_tags {
     }
 }
 
+##Create Release git
 sub create_release {
     my ($self) = @_;
 
@@ -254,14 +254,13 @@ sub create_release {
 
     return unless @filelist;
 
+    my $archive =
+      File::Spec->catdir( $self->git_dir, 'hpc-runner', 'archive',
+        'archive-' . $self->version . '.tar.gz' );
+
     #make git_dir/archive if it doesn't exist
-    make_path( $self->git_dir . '/hpc-runner/archive' );
-    Archive::Tar->create_archive(
-        $self->git_dir
-            . "/hpc-runner/archive/archive" . "-"
-            . $self->version . ".tgz",
-        COMPRESS_GZIP, @filelist
-    );
+    make_path( File::Spec->catdir( $self->git_dir, 'hpc-runner', 'archive' ) );
+    Archive::Tar->create_archive( $archive, @filelist );
 }
 
 1;

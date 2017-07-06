@@ -1,12 +1,12 @@
 # RubyMoney - Money
 
-[![Gem Version](https://badge.fury.io/rb/money.svg)](http://badge.fury.io/rb/money)
+[![Gem Version](https://badge.fury.io/rb/money.svg)](https://rubygems.org/gems/money)
 [![Build Status](https://travis-ci.org/RubyMoney/money.svg?branch=master)](https://travis-ci.org/RubyMoney/money)
 [![Code Climate](https://codeclimate.com/github/RubyMoney/money.svg)](https://codeclimate.com/github/RubyMoney/money)
 [![Coverage Status](https://coveralls.io/repos/RubyMoney/money/badge.svg?branch=master)](https://coveralls.io/r/RubyMoney/money?branch=master)
-[![Inline docs](http://inch-ci.org/github/RubyMoney/money.svg)](http://inch-ci.org/github/RubyMoney/money)
+[![Inline docs](https://inch-ci.org/github/RubyMoney/money.svg)](https://inch-ci.org/github/RubyMoney/money)
 [![Dependency Status](https://gemnasium.com/RubyMoney/money.svg)](https://gemnasium.com/RubyMoney/money)
-[![License](https://img.shields.io/github/license/RubyMoney/money.svg)](http://opensource.org/licenses/MIT)
+[![License](https://img.shields.io/github/license/RubyMoney/money.svg)](https://opensource.org/licenses/MIT)
 
 :warning: Please read the [migration notes](#migration-notes) before upgrading to a new major version.
 
@@ -34,7 +34,7 @@ A Ruby Library for dealing with money and currency conversion.
 
 ### Resources
 
-- [Website](http://rubymoney.github.io/money/)
+- [Website](https://rubymoney.github.io/money/)
 - [API Documentation](http://www.rubydoc.info/gems/money/frames)
 - [Git Repository](https://github.com/RubyMoney/money)
 
@@ -157,7 +157,7 @@ The priority attribute is an arbitrary numerical value you can assign to the
 
 For instance, let's assume your Rails application needs to render a currency
 selector like the one available
-[here](http://finance.yahoo.com/currency-converter/). You can create a couple of
+[here](https://finance.yahoo.com/currency-converter/). You can create a couple of
 custom methods to return the list of major currencies and all currencies as
 follows:
 
@@ -202,8 +202,8 @@ If you use Rails, then `environment.rb` is a very good place to put this.
 
 The exponent of a money value is the number of digits after the decimal
 separator (which separates the major unit from the minor unit). See e.g.
-[ISO 4217](http://www.currency-iso.org/en/shared/amendments/iso-4217-amendment.html) for more
-information.  You can find the exponent (as an `Integer`) by
+[ISO 4217](https://www.currency-iso.org/en/shared/amendments/iso-4217-amendment.html) for more
+information. You can find the exponent (as an `Integer`) by
 
 ``` ruby
 Money::Currency.new("USD").exponent  # => 2
@@ -316,12 +316,12 @@ The following example implements an `ActiveRecord` store to save exchange rates 
 
 class ExchangeRate < ActiveRecord::Base
   def self.get_rate(from_iso_code, to_iso_code)
-    rate = find_by_from_and_to(from_iso_code, to_iso_code)
+    rate = find_by(:from => from_iso_code, :to => to_iso_code)
     rate.present? ? rate.rate : nil
   end
 
   def self.add_rate(from_iso_code, to_iso_code, rate)
-    exrate = find_or_initialize_by_from_and_to(from_iso_code, to_iso_code)
+    exrate = find_or_initialize_by(:from => from_iso_code, :to => to_iso_code)
     exrate.rate = rate
     exrate.save!
   end
@@ -434,6 +434,10 @@ If you wish to format money according to the EU's [Rules for expressing monetary
 m = Money.new('123', :gbp) # => #<Money fractional:123 currency:GBP>
 m.format( symbol: m.currency.to_s + ' ') # => "GBP 1.23"
 ```
+
+## Heuristics
+
+Prior to v6.9.0 heuristic analysis of string input was part of this gem. Since then it was extracted in to [money-heuristics gem](https://github.com/RubyMoney/money-heuristics).
 
 ## Migration Notes
 

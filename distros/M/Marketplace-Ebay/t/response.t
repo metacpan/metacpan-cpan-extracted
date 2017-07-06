@@ -11,9 +11,6 @@ use Data::Dumper;
 # use Log::Report  mode => "DEBUG";
 
 
-plan tests => 19;
-
-
 my $ebay = Marketplace::Ebay->new(
                                   production => 0,
                                   site_id => 77,
@@ -561,5 +558,101 @@ $response = Marketplace::Ebay::Response->new(struct => $struct);
 is_deeply($response->errors, $struct->{Errors}, "found errors");
 diag $response->errors_as_string;
 like $response->errors_as_string, qr/21919067/;
+is_deeply([$response->error_codes], [21919067]);
 like $response->errors_as_string, qr/Listing violates the Duplicate Listing policy/;
 like $response->errors_as_string, qr/This Listing is a duplicate of your item: Blab lbal bal/;
+
+$struct = {
+           'Errors' => [
+                        {
+                         'LongMessage' => "Diese Sendungsnummer wird bereits verwendet und kann nicht f\x{fc}r mehrere Transaktionen eingesetzt werden. Der Artikel wurde jedoch bereits als verschickt markiert.",
+                         'ErrorClassification' => 'RequestError',
+                         'SeverityCode' => 'Error',
+                         'ShortMessage' => 'Sendungsnummer wird bereits verwendet.',
+                         'ErrorCode' => '21919089'
+                        }
+                       ],
+           'Version' => '975',
+           'Ack' => 'Failure',
+           'Build' => 'E975_XXXX',
+           'Timestamp' => '2016-09-03T12:20:04.700Z'
+          };
+
+$response = Marketplace::Ebay::Response->new(struct => $struct);
+is_deeply($response->errors, $struct->{Errors}, "found errors");
+ok ($response->is_error_code('21919089'));
+ok ($response->has_error_code('21919089'));
+
+$struct = {
+           'Errors' => [
+                        {
+                         'LongMessage' => "Diese Sendungsnummer wird bereits verwendet und kann nicht f\x{fc}r mehrere Transaktionen eingesetzt werden. Der Artikel wurde jedoch bereits als verschickt markiert.",
+                         'ErrorClassification' => 'RequestError',
+                         'SeverityCode' => 'Error',
+                         'ShortMessage' => 'Sendungsnummer wird bereits verwendet.',
+                         'ErrorCode' => '21919089'
+                        },
+                        {
+                         'ErrorParameters' => [
+                                               {
+                                                'ParamID' => '0',
+                                                'Value' => 'Blab lbal bal'
+                                               },
+                                               {
+                                                'Value' => 'XXXXXXXX',
+                                                'ParamID' => '1'
+                                               }
+                                              ],
+                         'ErrorClassification' => 'RequestError',
+                         'LongMessage' => 'This Listing is a duplicate of your item: Blab lbal bal (XXXXXXXX). Under the Duplicate Listing policy, sellers can\'t have multiple Fixed Price listings, multiple Auction-style (with the Buy It Now option) listings, or in both the Fixed Price and Auction-style (with the Buy It Now option) listings for identical items at the same time. We recommend you create a multiple quantity Fixed Price listing to sell identical items.',
+                         'ShortMessage' => 'Listing violates the Duplicate Listing policy.',
+                         'SeverityCode' => 'Error',
+                         'ErrorCode' => '21919067'
+                        }
+                       ],
+           'Version' => '975',
+           'Ack' => 'Failure',
+           'Build' => 'E975_XXXX',
+           'Timestamp' => '2016-09-03T12:20:04.700Z'
+          };
+
+$response = Marketplace::Ebay::Response->new(struct => $struct);
+is_deeply($response->errors, $struct->{Errors}, "found errors");
+ok (!$response->is_error_code('21919089'), "Multiple errors, is not a single one");
+ok ($response->has_error_code('21919089'), "Found the error");
+is ($response->errors_count, 2, "Two errors");
+
+
+$struct = {
+           'Errors' => [
+                        {
+                         'LongMessage' => "Diese Sendungsnummer wird bereits verwendet und kann nicht f\x{fc}r mehrere Transaktionen eingesetzt werden. Der Artikel wurde jedoch bereits als verschickt markiert.",
+                         'ErrorClassification' => 'RequestError',
+                         'SeverityCode' => 'Error',
+                         'ShortMessage' => 'Sendungsnummer wird bereits verwendet.',
+                         'ErrorCode' => '21919089'
+                        },
+                        {
+                         'LongMessage' => "Diese Sendungsnummer wird bereits verwendet und kann nicht f\x{fc}r mehrere Transaktionen eingesetzt werden. Der Artikel wurde jedoch bereits als verschickt markiert.",
+                         'ErrorClassification' => 'RequestError',
+                         'SeverityCode' => 'Error',
+                         'ShortMessage' => 'Sendungsnummer wird bereits verwendet.',
+                         'ErrorCode' => '21919089'
+                        }
+                       ],
+           'Version' => '975',
+           'Ack' => 'Failure',
+           'Build' => 'E975_XXXX',
+           'Timestamp' => '2016-09-03T12:20:04.700Z'
+          };
+
+$response = Marketplace::Ebay::Response->new(struct => $struct);
+is_deeply($response->errors, $struct->{Errors}, "found errors");
+ok ($response->is_error_code('21919089'));
+ok ($response->has_error_code('21919089'));
+is ($response->errors_count, 2, "Two errors, but they have the same code");
+eval { $response->has_error_code() };
+ok $@, "Found error $@ with missing argument";
+eval { $response->is_error_code() };
+ok $@, "Found error $@ with missing argument";
+done_testing;

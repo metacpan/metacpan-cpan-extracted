@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.003
+    version 0.004
 
 SYNOPSIS
 
@@ -39,14 +39,14 @@ l_* functions
 
     The l_* functions are:
 
- l_concat(@sources)
+ l_concat
 
       my $lazy = l_concat @sources;
 
     l_concat returns a Lazy::Iterator object which will simply return each
     subsequent value from the list of sources it's given.
 
- l_first($n, @sources)
+ l_first
 
       my $lazy = l_first $n, @sources;
 
@@ -55,7 +55,7 @@ l_* functions
     'break' an otherwise infinite list to only return a certain number of
     results.
 
- l_grep($code, @sources)
+ l_grep
 
       my $lazy = l_grep { ... } @sources;
 
@@ -63,7 +63,7 @@ l_* functions
     value which doesn't return true from the $code block in the first
     argument.
 
- l_map($code, @sources)
+ l_map
 
       my $lazy = l_map { ... } @sources;
 
@@ -76,7 +76,7 @@ l_* functions
     returned, the @sources will be poked again until a list of at least one
     element is returned, or the source returns undef.
 
- l_until($code, @sources)
+ l_until
 
       my $lazy = l_until { ... } @sources;
 
@@ -88,7 +88,7 @@ g_* functions
 
     The g_* functions are:
 
-  g_count(@sources)
+ g_count
 
       my $count = g_count @sources;
 
@@ -96,7 +96,7 @@ g_* functions
     many there were. This has the potential to never return if given a
     source of infinite values.
 
- g_first(@sources)
+ g_first
 
       my $val = g_first @sources;
 
@@ -104,7 +104,7 @@ g_* functions
     evaluating them. Equivalent to l_concat(...)->get();. If @sources is
     empty, it will return undef.
 
- g_join($sep, @sources)
+ g_join
 
       my $lines = g_join $str, @sources;
 
@@ -113,7 +113,7 @@ g_* functions
     of memory if given a source of infinite values. If @sources is empty,
     it will return undef.
 
- g_last(@sources)
+ g_last
 
       my $val = g_last @sources;
 
@@ -121,7 +121,7 @@ g_* functions
     This has the potential to never return if given a source of infinite
     values. If @sources is empty, it will return undef.
 
- g_max(@sources)
+ g_max
 
       my $val = g_max @sources;
 
@@ -129,7 +129,7 @@ g_* functions
     This has the potential to never return if given a source of infinite
     values. If @sources is empty, it will return undef.
 
- g_min(@sources)
+ g_min
 
       my $val = g_min @sources;
 
@@ -137,7 +137,7 @@ g_* functions
     This has the potential to never return if given a source of infinite
     values. If @sources is empty, it will return undef.
 
- g_prod(@sources)
+ g_prod
 
       my $val = g_prod @sources;
 
@@ -146,7 +146,7 @@ g_* functions
     of infinite values. Unless one of them is 0. If so, it will
     short-circuit and return 0. If @sources is empty, it will return 1.
 
- g_sum(@sources)
+ g_sum
 
       my $val = g_sum @sources;
 

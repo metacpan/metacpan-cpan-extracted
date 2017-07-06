@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::App::Checksum;
 use 5.010;
 
-# ABSTRACT: DBIx::SchemaChecksum command checksum
+# ABSTRACT: get the current DB checksum
 
 use MooseX::App::Command;
 extends qw(DBIx::SchemaChecksum::App);
@@ -31,11 +31,16 @@ __END__
 
 =head1 NAME
 
-DBIx::SchemaChecksum::App::Checksum - DBIx::SchemaChecksum command checksum
+DBIx::SchemaChecksum::App::Checksum - get the current DB checksum
 
 =head1 VERSION
 
-version 1.006
+version 1.101
+
+=head1 DESCRIPTION
+
+Calculate the current checksum and report it. Use C<--show_dump> to
+show the string dump on which the checksum is based.
 
 =head1 AUTHORS
 

@@ -56,42 +56,45 @@ foreach (sort __PACKAGE__->section_data_names) {
 
 #
 # From https://github.com/nst/JSONTestSuite/tree/master/test_parsing
+#      https://github.com/nst/JSONTestSuite/tree/master/test_transform
 #
-my $test_parsing_dir = File::Spec->catdir($Bin, 'test_parsing');
-opendir(my $d, $test_parsing_dir) || die "Failed to open $test_parsing_dir, $!";
-my @files = sort grep { /\.json$/ } readdir($d);
-closedir($d) || warn "Failed to close $test_parsing_dir, $!";
-foreach my $basename (@files) {
-    my $file_path = File::Spec->catfile($test_parsing_dir, $basename);
+foreach my $dir_basename (qw/test_parsing test_transform/) {
+    my $test_dir = File::Spec->catdir($Bin, $dir_basename);
+    opendir(my $d, $test_dir) || die "Failed to open $test_dir, $!";
+    my @files = sort grep { /\.json$/ } readdir($d);
+    closedir($d) || warn "Failed to close $test_dir, $!";
+    foreach my $basename (@files) {
+        my $file_path = File::Spec->catfile($test_dir, $basename);
 
-    open(my $f, '<', $file_path) || die "Cannot open $file_path, $!";
-    binmode($f);
-    my $data = do { local $/; <$f> };
-    close($f) || warn "Failed to close $_, $!";
+        open(my $f, '<', $file_path) || die "Cannot open $file_path, $!";
+        binmode($f);
+        my $data = do { local $/; <$f> };
+        close($f) || warn "Failed to close $_, $!";
 
-    #
-    # Encoding - letting MarpaX::ESLIF guess is proned to errors
-    #
-    my $encoding;
-    if ($basename =~ /utf16be/i) {
-        $encoding = 'UTF-16BE';
-    } elsif ($basename =~ /utf16le/i) {
-        $encoding = 'UTF-16LE';
-    } elsif ($basename =~ /utf\-?8/i) {
-        $encoding = 'UTF-8';
-    } elsif (! ($basename =~ /bom/i)) {
         #
-        # Just to please OLD versions of perl, 5.10 for example.
-        # In general this is not needed.
+        # Encoding - letting MarpaX::ESLIF guess is proned to errors
         #
-        $encoding = 'UTF-8';
-    }
+        my $encoding;
+        if ($basename =~ /utf16be/i) {
+            $encoding = 'UTF-16BE';
+        } elsif ($basename =~ /utf16le/i) {
+            $encoding = 'UTF-16LE';
+        } elsif ($basename =~ /utf\-?8/i) {
+            $encoding = 'UTF-8';
+        } elsif (! ($basename =~ /bom/i)) {
+            #
+            # Just to please OLD versions of perl, 5.10 for example.
+            # In general this is not needed.
+            #
+            $encoding = 'UTF-8';
+        }
 
-    my $want_ko = ($basename =~ /^n/);
-    if ($want_ko) {
-      ok(!defined($ecma404->decode($data, $encoding)), $basename);
-    } else {
-      ok(defined($ecma404->decode($data, $encoding)), $basename);
+        my $want_ko = ($dir_basename eq 'test_transform') ? 0 : ($basename =~ /^n/);
+        if ($want_ko) {
+            ok(!defined($ecma404->decode($data, $encoding)), $basename);
+        } else {
+            ok(defined($ecma404->decode($data, $encoding)), $basename);
+        }
     }
 }
 

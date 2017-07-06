@@ -1,3 +1,6 @@
+0.003 2017-06-24
+- Include notice that this module is abandoned
+- Fix bug which would cause error, thanks brian m. carlson
 0.002 2015-03-02
  - Recognise more edge-cases with for-loops and anonymous subroutines.
  - Recognise when we're using Try::Tiny

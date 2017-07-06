@@ -1,0 +1,31 @@
+SYNOPSIS
+
+    To get logger object:
+
+     use Log::ger::Like::LogAny '$log';
+
+    or:
+
+     use Log::ger::Like::LogAny;
+
+    To log:
+
+     $log->debug("blah ...");
+    
+     if ($log->is_trace) {
+         $log->tracef("Foo is %s", $foo);
+     }
+
+    To set output, use one of the available Log::ger::Output::*. You can
+    send logs to Log::Any using Log::ger::Output::LogAny.
+
+DESCRIPTION
+
+    This module mimics Log::Any-like logging interface.
+
+SEE ALSO
+
+    Log::ger
+
+    Log::Any
+

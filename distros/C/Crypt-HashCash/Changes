@@ -2,3 +2,6 @@ Revision history for Crypt-HashCash
 
 1.115   Sat Jun 10 01:44:28 2017 -0700
         First release
+
+1.126   Sat Jun 24 02:05:11 2017 -0700
+        Update vault-worker.pl, vault-queuer.pl

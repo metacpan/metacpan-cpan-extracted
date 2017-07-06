@@ -26,5 +26,5 @@ requires:
   perl: '5.01'
 resources:
   repository: https://github.com/kenneth-olwing/Grep-Query.git
-version: '1.005'
+version: '1.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,12 +1,12 @@
 #!perl
 
-our $DATE = '2016-12-29'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-07-04'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Perinci::Object;
 use Perinci::CmdLine::Any;
@@ -52,7 +52,7 @@ sub update_fatpack_snippets {
 
     for my $filename (@$filenames) {
         unless (-f $filename) {
-            $log->warnf("File %s does not exist, skipped", $filename);
+            log_warn("File %s does not exist, skipped", $filename);
             $envres->add_result(404, "File does not exist", {item_id=>$filename});
             next;
         }
@@ -60,17 +60,17 @@ sub update_fatpack_snippets {
         my $orig_content = $content;
 
         my $code_gen_snippet = sub {
-            my @mods = @_;
-            for (@mods) { s/\.pm\z//; s!/!::!g }
+            my @mod_pms = @_;
 
             my $res = Module::FatPack::fatpack_modules(
-                module_names => \@mods,
+                module_names => \@mod_pms,
                 pm => 1,
                 stripper => 1,
             );
 
-            die "Can't generate fatpack code for [", join(" ", @mods), "]: $res->[0] - $res->[1]"
-                unless $res->[0] == 200;
+            die "Can't generate fatpack code for [" . join(" ", @mod_pms) .
+                "]: $res->[0] - $res->[1]"
+                    unless $res->[0] == 200;
 
             # remove extraneous newlines
             $res->[2] =~ s/^(# END OF FATPACK CODE\n)\n+/$1/m;
@@ -111,7 +111,7 @@ update-fatpack-snippets - Update fatpack snippets in a module source code
 
 =head1 VERSION
 
-This document describes version 0.08 of update-fatpack-snippets (from Perl distribution App-FatPackUtils), released on 2016-12-29.
+This document describes version 0.11 of update-fatpack-snippets (from Perl distribution App-FatPackUtils), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -247,7 +247,7 @@ To activate bash completion for this script, put:
 
  complete -C update-fatpack-snippets update-fatpack-snippets
 
-in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
@@ -255,8 +255,8 @@ It is recommended, however, that you install L<shcompgen> which allows you to
 activate completion scripts for several kinds of scripts on multiple shells.
 Some CPAN distributions (those that are built with
 L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+completion for their included scripts (using L<shcompgen>) at installation time,
+so you can immediately have tab completion.
 
 =head2 tcsh
 
@@ -264,15 +264,15 @@ To activate tcsh completion for this script, put:
 
  complete update-fatpack-snippets 'p/*/`update-fatpack-snippets`/'
 
-in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is also recommended to install C<shcompgen> (see above).
+It is also recommended to install L<shcompgen> (see above).
 
 =head2 other shells
 
-For fish and zsh, install C<shcompgen> as described above.
+For fish and zsh, install L<shcompgen> as described above.
 
 =head1 CONFIGURATION FILE
 
@@ -300,15 +300,15 @@ List of available configuration parameters:
 
 =head2 UPDATE_FATPACK_SNIPPETS_OPT => str
 
-Specify additional command-line options
+Specify additional command-line options.
 
 =head1 FILES
 
-~/.config/update-fatpack-snippets.conf
+F<~/.config/update-fatpack-snippets.conf>
 
-~/update-fatpack-snippets.conf
+F<~/update-fatpack-snippets.conf>
 
-/etc/update-fatpack-snippets.conf
+F</etc/update-fatpack-snippets.conf>
 
 =head1 HOMEPAGE
 
@@ -332,7 +332,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -16,7 +16,7 @@ my @FIELDS   = qw( id type description state last_update time_zone );
 my @INTERNAL = qw( _factory );
 __PACKAGE__->mk_accessors( @FIELDS, @INTERNAL );
 
-$Workflow::VERSION = '1.43';
+$Workflow::VERSION = '1.45';
 
 use constant NO_CHANGE_VALUE => 'NOCHANGE';
 
@@ -362,6 +362,7 @@ __END__
 [![CPAN version](https://badge.fury.io/pl/Workflow.svg)](http://badge.fury.io/pl/Workflow)
 [![Build Status](https://travis-ci.org/jonasbn/perl-workflow.svg?branch=master)](https://travis-ci.org/jonasbn/perl-workflow)
 [![Coverage Status](https://coveralls.io/repos/jonasbn/perl-workflow/badge.png)](https://coveralls.io/r/jonasbn/perl-workflow)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/perl-workflow)
 
 =end markdown
 
@@ -1453,6 +1454,8 @@ Chris Winters E<lt>chris@cwinters.comE<gt>, original author.
 
 The following folks have also helped out (listed here in no particular order):
 
+Bug report from Slaven Rezić resulting in maintenance release 1.45
+
 Feature and bug fix by dtikhonov resulting in 1.40 (first pull request on Github)
 
 Sérgio Alves, patch to timezone handling for workflow history deserialized using
@@ -1465,7 +1468,7 @@ Changes file: 1.35
 
 Oliver Welter, patch implementing custom workflows, see Changes file: 1.35 and
 patch related to this in 1.37 and factory subclassing also in 1.35. Improvements
-in logging for condition validation in 1.43
+in logging for condition validation in 1.43 and 1.44
 
 Steven van der Vegt, patch for autorun in initial state and improved exception
 handling for validators, see Changes file: 1.34_1

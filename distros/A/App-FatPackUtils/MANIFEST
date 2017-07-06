@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README
+bin/fatpack-extract
 bin/fatpack-info
 bin/fatpack-modules
 bin/update-fatpack-snippets

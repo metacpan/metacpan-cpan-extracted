@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::VNASweep;
-$Lab::Moose::Instrument::VNASweep::VERSION = '3.550';
+$Lab::Moose::Instrument::VNASweep::VERSION = '3.552';
 use Moose::Role;
 use Moose::Util::TypeConstraints;
 use MooseX::Params::Validate;

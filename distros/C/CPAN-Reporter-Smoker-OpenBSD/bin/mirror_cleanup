@@ -1,0 +1,155 @@
+#!perl
+use warnings;
+use strict;
+use DBI 1.636;
+use Set::Tiny 0.04;
+use CPAN;
+use Getopt::Long;
+use Pod::Usage 1.69;
+use CPAN::Mini 1.111016;
+use File::Spec;
+our $VERSION = '0.007'; # VERSION
+
+my ($help, $version_check);
+
+GetOptions(
+    'help'         => \$help,
+    'version'      => \$version_check
+) or pod2usage(1);
+pod2usage( -exitval => 0, -verbose => 2 ) if $help;
+
+if ($version_check) {
+    print "mirror_cleanup - version $VERSION\n";
+    exit(0);
+}
+
+print "Readloading CPAN client indexes...\n";
+CPAN::HandleConfig->load;
+CPAN::Shell::setup_output;
+CPAN::Index->force_reload;
+print "Starting cleanup...\n";
+my $dbfile = '/home/vagrant/.cpan/cpandb.sql';
+my $dbh = DBI->connect("dbi:SQLite:dbname=$dbfile","","");
+my $query_distros = $dbh->prepare(q{select A.dist_file from dists A join auths B on A.auth_id = B.auth_id where B.cpanid = ?});
+my $query_authors = $dbh->prepare(q{select cpanid from auths});
+$query_authors->execute();
+my $removed = 0;
+
+my $minicpan_root = get_root();
+
+while (my $row = $query_authors->fetchrow_arrayref()) {
+    my $distros = get_distro_files($dbh, $query_distros, $row->[0]);
+    my $path = File::Spec->catdir( $minicpan_root, 'authors', 'id', substr($row->[0],0,1), substr($row->[0],0,2), $row->[0] );
+    next unless ( -d $path );
+    opendir(DIR,$path) or die "Cannot read $path: $!";
+    my @files = readdir(DIR);
+    close(DIR);
+    shift(@files);
+    shift(@files);
+
+    foreach my $distro_file(@files) {
+        next if $distro_file eq 'CHECKSUMS';
+        my $to_remove = File::Spec->catfile( $path, $distro_file );
+        next unless (-f $to_remove);
+        
+        unless ($distros->has($distro_file)) {
+            my $to_remove = File::Spec->catfile( $path, $distro_file );
+            print "$to_remove can be removed\n";
+            unlink( $to_remove ) or warn "could not remove $to_remove: $!";
+            $removed++;
+        }
+    }
+    
+}
+
+$dbh->disconnect();
+print "Total removed: $removed\n";
+
+sub get_root {
+    my %config = CPAN::Mini->read_config();
+    return $config{local};
+}
+    
+sub get_distro_files {
+    my ($dbh, $sth, $author) = @_;
+    $sth->bind_param(1, $author);
+    $sth->execute();
+    my @distros;
+
+    while ( my $row = $sth->fetchrow_arrayref() ) {
+        push(@distros, $row->[0]);
+    }
+    
+    return Set::Tiny->new(@distros);
+}
+
+__END__
+
+=head1 mirror_cleanup
+
+mirror_cleanup - cleanups a CPAN::Mini mirror
+
+=head1 SYNOPSIS
+
+    mirror_cleanup
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+This help message.
+
+=item B<--version>
+
+Prints the version number and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+The main objective of this program is to reduce the size of storage required to have a L<CPAN> local repository.
+
+This program assumes that the same user that has a mirror setup with L<CPAN::Mini> is running it.
+
+Also, it expects that the user has the L<CPAN> client configured to use a SQLite backend.
+
+It will run over all the distributions available on the database, and check the corresponding directories on the mirror
+(right now hardcoded to C</minicpan/authors/id/> but may change in the future): if there is any tarball that is not 
+listed as the most current distribution for an author, it will be removed.
+
+At this moment, it is unclear why those older distribution are still available, but when it does it is not for any particular distribution. It might be a
+problem with the mirror itself.
+
+Nevertheless, since the mirror is intended to be used for L<CPAN::Reporter::Smoker> and that only the most recent distribution
+matters, it will release some storage space.
+
+=head1 CAVEATS
+
+This program should be considered experimental, may be there unknown side effects.
+
+=head1 AUTHOR
+
+Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 of Alceu Rodrigues de Freitas Junior, arfreitas@cpan.org
+
+This file is part of CPAN OpenBSD Smoker.
+
+CPAN OpenBSD Smoker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CPAN OpenBSD Smoker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with CPAN OpenBSD Smoker.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

@@ -1,5 +1,8 @@
 Revision history for Test-More-UTF8
 
+0.05    2017-06-24
+        Fix "." in @INC. Blame on you, p5p
+
 0.04    2012-09-06
         Fix META
 

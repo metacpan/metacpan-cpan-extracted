@@ -49,6 +49,9 @@ if (ref {} eq ref setting('database')) {
     }
 }
 
+# always set this
+$ENV{DBIC_TRACE_PROFILE} = 'console';
+
 # defaults for workers
 setting('workers')->{queue} ||= 'PostgreSQL';
 if (exists setting('workers')->{interactives}
@@ -65,6 +68,27 @@ if (exists setting('workers')->{interactives}
 # force skipped DNS resolution, if unset
 setting('dns')->{hosts_file} ||= '/etc/hosts';
 setting('dns')->{no} ||= ['fe80::/64','169.254.0.0/16'];
+
+# set max outstanding requests for AnyEvent::DNS
+$ENV{'PERL_ANYEVENT_MAX_OUTSTANDING_DNS'}
+  = setting('dns')->{max_outstanding} || 50;
+$ENV{'PERL_ANYEVENT_HOSTS'} = setting('dns')->{hosts_file};
+
+# load /etc/hosts
+setting('dns')->{'ETCHOSTS'} = {};
+{
+  # AE::DNS::EtcHosts only works for A/AAAA/SRV, but we want PTR.
+  # this loads+parses /etc/hosts file using AE. dirty hack.
+  use AnyEvent::Socket 'format_address';
+  use AnyEvent::DNS::EtcHosts;
+  AnyEvent::DNS::EtcHosts::_load_hosts_unless(sub{},AE::cv);
+  no AnyEvent::DNS::EtcHosts; # unimport
+
+  setting('dns')->{'ETCHOSTS'}->{$_} =
+    [ map { [ $_ ? (format_address $_->[0]) : '' ] }
+          @{ $AnyEvent::DNS::EtcHosts::HOSTS{ $_ } } ]
+    for keys %AnyEvent::DNS::EtcHosts::HOSTS;
+}
 
 # support unordered dictionary as if it were a single item list
 if (ref {} eq ref setting('device_identity')) {
@@ -110,14 +134,5 @@ if (setting('reports') and ref {} eq ref setting('reports')) {
         %{ setting('reports')->{$_} }
     }} keys %{ setting('reports') } ];
 }
-
-# set max outstanding requests for AnyEvent::DNS
-$ENV{'PERL_ANYEVENT_MAX_OUTSTANDING_DNS'}
-  = setting('dns')->{max_outstanding} || 50;
-$ENV{'PERL_ANYEVENT_HOSTS'}
-  = setting('dns')->{hosts_file} || '/etc/hosts';
-
-# always set this
-$ENV{DBIC_TRACE_PROFILE} = 'console';
 
 true;

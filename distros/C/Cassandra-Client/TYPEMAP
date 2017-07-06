@@ -1,0 +1,2 @@
+TYPEMAP
+Cassandra::Client::RowMeta* T_PTROBJ

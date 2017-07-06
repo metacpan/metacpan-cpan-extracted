@@ -1,6 +1,12 @@
 
 ===== ChangeLog of Mail::Box::IMAP4 version 3.*
 
+version 3.002: Thu 29 Jun 15:21:39 CEST 2017
+
+	Fixes:
+	- license accidentally changed to 'artistic', back to 'perl'
+	  rt.cpan.org#120319 [Jitka Plesnikova]
+
 version 3.001: Thu  2 Feb 16:02:23 CET 2017
 
 	Fixes:

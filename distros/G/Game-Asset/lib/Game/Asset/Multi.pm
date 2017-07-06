@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Asset::Multi;
-$Game::Asset::Multi::VERSION = '0.5';
+$Game::Asset::Multi::VERSION = '0.6';
 use strict;
 use warnings;
 use Moose::Role;

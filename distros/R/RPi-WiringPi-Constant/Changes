@@ -1,5 +1,9 @@
 Revision history for RPi-WiringPi-Constant
 
+1.00    2017-06-24
+        - added new tag :altmode that contains the value for the Pi pin ALT
+          modes
+
 0.02
         - added edge detection constants
         - added PUD constants

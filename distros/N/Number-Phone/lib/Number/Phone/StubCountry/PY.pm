@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -58,12 +58,12 @@ my $formatters = [
                   'leading_digits' => '9[1-9]'
                 },
                 {
-                  'leading_digits' => '8700',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '8700'
                 },
                 {
-                  'leading_digits' => '[2-8][1-9]',
-                  'pattern' => '(\\d{3})(\\d{4,5})'
+                  'pattern' => '(\\d{3})(\\d{4,5})',
+                  'leading_digits' => '[2-8][1-9]'
                 },
                 {
                   'leading_digits' => '[2-8][1-9]',
@@ -72,6 +72,16 @@ my $formatters = [
               ];
 
 my $validators = {
+                'voip' => '8700[0-4]\\d{4}',
+                'toll_free' => '',
+                'pager' => '',
+                'mobile' => '
+          9(?:
+            6[12]|
+            [78][1-6]|
+            9[1-5]
+          )\\d{6}
+        ',
                 'fixed_line' => '
           (?:
             [26]1|
@@ -120,10 +130,6 @@ my $validators = {
             858
           )\\d{5,6}
         ',
-                'voip' => '8700[0-4]\\d{4}',
-                'pager' => '',
-                'toll_free' => '',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             [26]1|
@@ -172,14 +178,8 @@ my $validators = {
             858
           )\\d{5,6}
         ',
-                'mobile' => '
-          9(?:
-            6[12]|
-            [78][1-6]|
-            9[1-5]
-          )\\d{6}
-        ',
-                'specialrate' => '([2-9]0\\d{4,7})'
+                'specialrate' => '([2-9]0\\d{4,7})',
+                'personal_number' => ''
               };
 
     sub new {

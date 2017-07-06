@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-LTSV-Liner
 
+0.04 2017-07-03T06:26:06Z
+    - [Feature] Implement '--no-buffer' option by @xaicron (#1)
+
 0.03 2014-07-25T19:17:03Z
     - Add document for some methods
 

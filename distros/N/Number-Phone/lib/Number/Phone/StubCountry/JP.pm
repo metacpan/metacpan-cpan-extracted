@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -40,12 +40,12 @@ my $formatters = [
                   'leading_digits' => '800'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{4})',
-                  'leading_digits' => '0077'
+                  'leading_digits' => '0077',
+                  'pattern' => '(\\d{4})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{4})(\\d{2})(\\d{3,4})',
-                  'leading_digits' => '0077'
+                  'leading_digits' => '0077',
+                  'pattern' => '(\\d{4})(\\d{2})(\\d{3,4})'
                 },
                 {
                   'pattern' => '(\\d{4})(\\d{2})(\\d{4})',
@@ -61,13 +61,13 @@ my $formatters = [
           '
                 },
                 {
+                  'pattern' => '(\\d{4})(\\d{4})(\\d{4,5})',
                   'leading_digits' => '
             00(?:
                37|
                66
             )
-          ',
-                  'pattern' => '(\\d{4})(\\d{4})(\\d{4,5})'
+          '
                 },
                 {
                   'pattern' => '(\\d{4})(\\d{5})(\\d{5,6})',
@@ -290,6 +290,7 @@ my $formatters = [
           '
                 },
                 {
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
                   'leading_digits' => '
             1|
             2(?:
@@ -333,8 +334,7 @@ my $formatters = [
                 4
               )
             )
-          ',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+          '
                 },
                 {
                   'leading_digits' => '
@@ -361,15 +361,12 @@ my $formatters = [
           '
                 },
                 {
-                  'leading_digits' => '[2479][1-9]',
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
+                  'leading_digits' => '[2479][1-9]'
                 }
               ];
 
 my $validators = {
-                'specialrate' => '(990\\d{6})|(570\\d{6})',
-                'mobile' => '[7-9]0[1-9]\\d{7}',
-                'personal_number' => '60\\d{7}',
                 'geographic' => '
           (?:
             1(?:
@@ -412,6 +409,9 @@ my $validators = {
             )
           )\\d{6}
         ',
+                'specialrate' => '(990\\d{6})|(570\\d{6})',
+                'personal_number' => '60\\d{7}',
+                'voip' => '50[1-9]\\d{7}',
                 'toll_free' => '
           120\\d{6}|
           800\\d{7}|
@@ -426,8 +426,8 @@ my $validators = {
              882[1245]\\d{4}
           )
         ',
-                'voip' => '50[1-9]\\d{7}',
                 'pager' => '20\\d{8}',
+                'mobile' => '[7-9]0[1-9]\\d{7}',
                 'fixed_line' => '
           (?:
             1(?:

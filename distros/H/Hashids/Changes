@@ -1,5 +1,23 @@
 Revision history for Perl extension Hashids
 
+1.000005 2017-06-24T13:42:15Z
+
+    - Hashids::Util: ensure we carry a bignum() upon reduce() in
+      from_alphabet(), fixes #11
+    - Add appveyor CI (no badge yet though, needs fix in Minilla)
+
+1.000004 2017-06-23T06:40:54Z
+
+    - Reduce calls to Hashids::Util::bignum() to further simplify code
+
+1.000003 2017-06-23T05:51:41Z
+
+    - Add test for encoding lists with set minHashLength
+    - Move private functions into Hashids::Util module
+    - Rename _hash/_unhash to to_alphabet/from_alphabet for
+      consistency with upstream JS methods
+    - Use Horner's method on from_alphabet
+
 1.000002 2015-01-22T09:01:42Z
 
     - Switched calculations to use Math::BigInt, thanks to Troy

@@ -1,34 +1,43 @@
-1.004  Wed May 11 13:49:02 BST 2016
+Release history for Catalyst-Authentication-Store-Htpasswd
+
+1.006     2017-07-03 19:30:35Z
+    - pod formatting fixes (RT#102187, Christopher Hoskin)
+
+1.005     2017-06-23 18:04:28Z
+    - modernized the tooling, for 5.26 compatibility and to remove pod,
+      kwalitee tests from the user-facing test suite
+
+1.004     2016-05-11 12:49:02Z
     - Fix pod error for Hyperlinks
     - Fix pod nit from RT#51733
 
-1.003  Sat Oct   04 22:17:30 GMT 2008
+1.003     2008-10-04 22:17:30Z
     - Typo in Makefile.PL makes the .tgz unpack to
       improperly, RT#39817
 
-1.002  Thu Oct   02 09:20:30 GMT 2008
+1.002     2008-10-02 09:20:30Z
     - Add Test::WWW::Mechanize::Catalyst and Test::use::ok
-      to build_requires. CPANTs will keep hitting me until 
+      to build_requires. CPANTs will keep hitting me until
       I get it right :(
     - Add code and docs for user_field configuration option
     - Add code and docs for user_class configuration option
 
-1.001  Mon Sept  29 18:56:30 GMT 2008
+1.001     2008-09-29 18:56:30Z
     - Remove Tangram from test application models so that tests
       pass for other people. FAIL.
 
-1.000  Sun Sept  28 16:58:30 GMT 2008
+1.000     2008-09-28 16:58:30Z
     - Change from Module::Build to Module::Install
     - Update to the new authentication framework.
     - Bump revision number due to moving to new repository layout.
 
-0.02  Wed Feb  8 01:18:17 CET 2006
+0.02      2006-02-07 23:18:17Z
     - work properly again with roles
     - fix condition where $user is false and still gets a method call on it
     - embarracing doc typos copy pasted by Yuval were fixed too ;-)
 
-0.011 Sun Nov 27 23:18:21 CET 2005
+0.011     2005-11-27 21:18:21Z
     - doh, add Authen::Htpasswd to requirements
 
-0.01 Sun Nov 27 22:53:50 CET 2005
+0.01      2005-11-27 20:53:50Z
     - initial release

@@ -5,12 +5,13 @@ use base 'PDF::API2::Resource';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 use Compress::Zlib;
 use Encode qw(:all);
 use PDF::API2::Basic::PDF::Utils;
 use PDF::API2::Util;
+use Scalar::Util qw(weaken);
 
 =head1 NAME
 
@@ -38,6 +39,7 @@ sub new {
     $self->{Type} = PDFName('Font');
 
     $self->{' apipdf'}=$pdf;
+    weaken $self->{' apipdf'};
     return($self);
 }
 

@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,7 +31,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
@@ -60,11 +60,13 @@
          "web" : "https://github.com/skaji/Mojo-SlackRTM"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_contributors" : [
-      "Doug Bell <doug@preaction.me>"
+      "Doug Bell <doug@preaction.me>",
+      "Joel Berger <joel.a.berger@gmail.com>",
+      "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233",
    "x_static_install" : 1
 }
 

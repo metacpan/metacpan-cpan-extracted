@@ -1,5 +1,4 @@
 use Test::More;
-use Data::Dumper;
 BEGIN{
 };
 eval "use Template::Extract;";
@@ -24,7 +23,6 @@ $str1 = [qw"A B C D E F"];
 $str2 = [qw"A B C E F"];
 $parts = $rev->detect($str1,$str2);
 $temps = $regexp->Convert($parts);
-print Dumper $temps;
 is_deeply( $temps, [qr'ABC(.+?)EF'] );
 
 $temp = $temps->[0];
@@ -41,12 +39,10 @@ $str1 = [qw"가격 1200 원"];
 $str2 = [qw"가격 1300 원"];
 $parts = $rev->detect($str1,$str2);
 $temps = $regexp->Convert($parts);
-print Dumper $temps;
 is_deeply( $temps, [qr'가격(.+?)원'] );
 
-use re 'regexp_pattern';
-my ($asstr) = regexp_pattern $temps->[0];
-is $asstr,'가격(.+?)원';
+my $asstr = $temps->[0];
+is $asstr,qr'가격(.+?)원';
 
 $temp = $temps->[0];
 "가격1200원"=~/$temp/;
@@ -66,7 +62,6 @@ my $str3 = "I am king of the world, and I am a richest man";
 $parts = $rev->detect($str1, $str2);
 #print Dumper $parts;
 $temps = $regexp->Convert($parts);
-print Dumper $temps;
 
 $temp = $temps->[0];
 $str3 =~ /$temp/;

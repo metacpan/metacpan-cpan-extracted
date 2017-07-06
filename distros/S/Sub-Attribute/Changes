@@ -1,5 +1,13 @@
 Revision history for Perl extension Sub::Attribute
 
+0.06 Mon Jul 3 22:29:00 2017
+    - Identical to 0.05_01
+
+0.05_01
+    - Fix panic caused by PL_stack_sp moving during call_sv() (since perl
+      v5.19.x) [RT #107588]
+    - DCANTRELL taking over as maintainer
+
 0.05 Tue Jan 19 11:10:46 2010
     - Work around RT #53776 (Thanks to Andreas Koenig)
     - Work around RT #53793 (Thanks to Markus Peter)

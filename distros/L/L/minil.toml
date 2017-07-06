@@ -1,0 +1,6 @@
+name = "L"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+

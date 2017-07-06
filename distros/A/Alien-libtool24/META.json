@@ -1,10 +1,10 @@
 {
-   "abstract" : "Built or find libtool 2.4.x",
+   "abstract" : "(Deprecated) Built or find libtool 2.4.x",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -24,9 +24,6 @@
          }
       },
       "develop" : {
-         "recommends" : {
-            "YAML::XS" : "0"
-         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -62,7 +59,7 @@
       "bugtracker" : {
          "web" : "https://github.com/plicease/Alien-libtool24/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Alien-libtool24",
+      "homepage" : "https://metacpan.org/pod/Alien::libtool24",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/plicease/Alien-libtool24.git",
@@ -70,6 +67,8 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.04"
+   "version" : "0.05",
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

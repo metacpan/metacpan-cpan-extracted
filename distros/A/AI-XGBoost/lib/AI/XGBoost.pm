@@ -2,7 +2,7 @@ package AI::XGBoost;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';    # VERSION
+our $VERSION = '0.005';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost>
 
@@ -20,7 +20,7 @@ AI::XGBoost - Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ version 0.004
      XGBoosterUpdateOneIter($booster, $iter, $dtrain);
  }
  
- my $predictions = XGBoosterPredict($booster, $dtest, 0, 0);
+ my $predictions = XGBoosterPredict($booster, $dtest);
  # say join "\n", @$predictions;
  
  XGBoosterFree($booster);

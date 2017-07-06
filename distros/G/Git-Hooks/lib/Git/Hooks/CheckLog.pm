@@ -2,13 +2,13 @@
 
 package Git::Hooks::CheckLog;
 # ABSTRACT: Git::Hooks plugin to enforce commit log policies
-$Git::Hooks::CheckLog::VERSION = '1.16.0';
+$Git::Hooks::CheckLog::VERSION = '2.0.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Git::Hooks qw/:DEFAULT :utils/;
-use Git::More::Message;
+use Git::Hooks;
+use Git::Message;
 use List::MoreUtils qw/uniq/;
 
 my $PKG = __PACKAGE__;
@@ -213,7 +213,7 @@ sub message_errors {
 
     # assert(defined $msg)
 
-    my $id = defined $commit ? $commit->{commit} : '';
+    my $id = defined $commit ? $commit->commit : '';
 
     my $errors = 0;
 
@@ -221,7 +221,7 @@ sub message_errors {
 
     $errors += pattern_errors($git, $id, $msg);
 
-    my $cmsg = Git::More::Message->new($msg);
+    my $cmsg = Git::Message->new($msg);
 
     $errors += title_errors($git, $id, $cmsg->title);
 
@@ -238,7 +238,7 @@ sub check_message_file {
     _setup_config($git);
 
     my $current_branch = $git->get_current_branch();
-    return 1 unless is_ref_enabled($current_branch, $git->get_config($CFG => 'ref'));
+    return 1 unless $git->is_ref_enabled($current_branch, $git->get_config($CFG => 'ref'));
 
     my $msg = eval {$git->read_commit_msg_file($commit_msg_file)};
 
@@ -253,12 +253,12 @@ sub check_message_file {
 sub check_ref {
     my ($git, $ref) = @_;
 
-    return 1 unless is_ref_enabled($ref, $git->get_config($CFG => 'ref'));
+    return 1 unless $git->is_ref_enabled($ref, $git->get_config($CFG => 'ref'));
 
     my $errors = 0;
 
     foreach my $commit ($git->get_affected_ref_commits($ref)) {
-        $errors += message_errors($git, $commit, $commit->{body});
+        $errors += message_errors($git, $commit, $commit->message);
     }
 
     return $errors == 0;
@@ -270,7 +270,7 @@ sub check_affected_refs {
 
     _setup_config($git);
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     my $errors = 0;
 
@@ -287,7 +287,7 @@ sub check_patchset {
 
     _setup_config($git);
 
-    return 1 if im_admin($git);
+    return 1 if $git->im_admin();
 
     my $sha1   = $opts->{'--commit'};
     my $commit = $git->get_commit($sha1);
@@ -299,9 +299,9 @@ sub check_patchset {
     $branch = "refs/heads/$branch"
         unless $branch =~ m:^refs/:;
 
-    return 1 unless is_ref_enabled($branch, $git->get_config($CFG => 'ref'));
+    return 1 unless $git->is_ref_enabled($branch, $git->get_config($CFG => 'ref'));
 
-    return message_errors($git, $commit, $commit->{body}) == 0;
+    return message_errors($git, $commit, $commit->message) == 0;
 }
 
 # Install hooks
@@ -326,11 +326,11 @@ Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =head1 DESCRIPTION
 
-This Git::Hooks plugin hooks itself to the hooks below to enforce
+This L<Git::Hooks> plugin hooks itself to the hooks below to enforce
 policies on the commit log messages.
 
 =over
@@ -379,11 +379,11 @@ option:
 
     git config --add githooks.plugin CheckLog
 
-=for Pod::Coverage spelling_errors pattern_errors title_errors body_errors footer_errors message_errors check_ref
+=for Pod::Coverage spelling_errors pattern_errors title_errors body_errors footer_errors message_errors check_ref check_affected_refs check_message_file check_patchset
 
 =head1 NAME
 
-Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies.
+Git::Hooks::CheckLog - Git::Hooks plugin to enforce commit log policies
 
 =head1 CONFIGURATION
 
@@ -484,28 +484,6 @@ language passing its ISO code to this option.
 This option requires the commit to have at least one C<Signed-off-by>
 footer.
 
-=head1 EXPORTS
-
-This module exports the following routines that can be used directly
-without using all of Git::Hooks infrastructure.
-
-=head2 check_message_file GIT, MSGFILE
-
-This is the routine used to implement the C<commit-msg> hook. It needs
-a C<Git::More> object and the name of a file containing the commit
-message.
-
-=head2 check_affected_refs GIT
-
-This is the routing used to implement the C<update> and the
-C<pre-receive> hooks. It needs a C<Git::More> object.
-
-=head2 check_patchset GIT, HASH
-
-This is the routine used to implement the C<patchset-created> Gerrit
-hook. It needs a C<Git::More> object and the hash containing the
-arguments passed to the hook by Gerrit.
-
 =head1 REFERENCES
 
 =over
@@ -513,9 +491,8 @@ arguments passed to the hook by Gerrit.
 =item * B<git-commit(1) Manual Page>
 
 This L<Git manual
-page|<http://www.kernel.org/pub/software/scm/git/docs/git-commit.html>
-has a section called DISCUSSION which discusses some common log
-message policies.
+page|http://www.kernel.org/pub/software/scm/git/docs/git-commit.html> has a
+section called DISCUSSION which discusses some common log message policies.
 
 =item * B<Linus Torvalds GitHub rant>
 

@@ -4,11 +4,13 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Module::Build: '0.3601'
-  Test::More: '0'
+  Test::More: '0.94'
+  perl: '5.008001'
 configure_requires:
   Module::Build: '0.3601'
+  perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,12 +20,13 @@ recommends:
   Win32::Shortcut: '0'
 requires:
   Archive::Zip: '0'
-  File::HomeDir: '0'
+  File::HomeDir: '0.91'
   File::ShareDir: '0'
   HTTP::Tiny: '0'
-  perl: '5.006'
+  perl: '5.008001'
 resources:
-  bugtracker: https://github.com/plicease/alien-msys/issues
-  homepage: http://perl.wdlabs.com/Alien-MSYS/
-  repository: git://github.com/plicease/alien-msys.git
-version: '0.07'
+  bugtracker: https://github.com/plicease/Alien-MSYS/issues
+  homepage: https://metacpan.org/pod/Alien::MSYS
+  repository: git://github.com/plicease/Alien-MSYS.git
+version: '0.08'
+x_serialization_backend: 'YAML::Tiny version 1.70'

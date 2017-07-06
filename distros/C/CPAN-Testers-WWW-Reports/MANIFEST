@@ -42,6 +42,7 @@ vhost/cgi-bin/pages.cgi
 vhost/cgi-bin/release-summary.cgi
 vhost/cgi-bin/reports-metadata.cgi
 vhost/cgi-bin/reports-summary.cgi
+vhost/cgi-bin/reports-statistics.cgi
 vhost/cgi-bin/templates/admin/backend_index.html
 vhost/cgi-bin/templates/admin/layout.html
 vhost/cgi-bin/templates/articles/arts-adminblock.html
@@ -69,6 +70,7 @@ vhost/cgi-bin/templates/cpan/distro.js
 vhost/cgi-bin/templates/cpan/distro-list.html
 vhost/cgi-bin/templates/cpan/distro-reports.html
 vhost/cgi-bin/templates/cpan/distro-reports-static.html
+vhost/cgi-bin/templates/cpan/distro-stats-table.html
 vhost/cgi-bin/templates/cpan/distro-unknown.html
 vhost/cgi-bin/templates/cpan/layout-static.html
 vhost/cgi-bin/templates/cpan/layout-stats-static.html

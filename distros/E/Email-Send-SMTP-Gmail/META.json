@@ -36,14 +36,13 @@
             "File::Spec" : "0",
             "LWP::MediaTypes" : "0",
             "MIME::Base64" : "0",
-            "Net::SMTP" : "0",
-            "Net::SMTPS" : "0",
+            "Net::SMTP" : "3.1",
             "Net::SMTP_auth" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.06",
+   "version" : "1.21",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

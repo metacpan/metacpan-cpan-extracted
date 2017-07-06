@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.45
+    version 0.52
 
 SYNOPSIS
 
@@ -138,6 +138,10 @@ PROPERTIES
 
       Same as destdir_filter except applies to build_ffi instead of build.
 
+    env
+
+      Environment variables to override during the build stage.
+
     platform
 
       Hash reference. Contains information about the platform beyond just
@@ -176,6 +180,10 @@ PROPERTIES
       /C/foo which are understood by the MSYS tools, but not by Perl. You
       should only use this if you are using Alien::Build::Plugin::Autoconf
       in your alienfile.
+
+    env
+
+      Environment variables to override during the build stage.
 
     old
 
@@ -477,7 +485,6 @@ META METHODS
  prop
 
      my $href = $build->meta->prop;
-     my $href = Alien::Build->meta->prop;
 
     Meta properties. This is the same as calling meta_prop on the class or
     Alien::Build instance.
@@ -608,6 +615,8 @@ AUTHOR
     Diab Jerius (DJERIUS)
 
     Roy Storey
+
+    Ilya Pavlov
 
 COPYRIGHT AND LICENSE
 

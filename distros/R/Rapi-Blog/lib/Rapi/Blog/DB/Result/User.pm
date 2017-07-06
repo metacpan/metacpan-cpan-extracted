@@ -95,9 +95,15 @@ __PACKAGE__->apply_TableSpec;
 
 sub insert {
   my $self = shift;
-	
-  my $User = Rapi::Blog::Util->get_User;
-  die usererr "Create User: PERMISSION DENIED" if ($User && $User->id && !$User->admin);
+
+  # Fix GitHub Issue #1 - we want to do this perm check, however, if this insert is being
+  # generated via automatic inflation from the CoreSchema LinkedRow, this will result in
+  # a deep recursion (i.e. the current user *is* being inserted). For this case, we bail
+  # out of the perm check if we detect that a linkedRow sync is already in-progress
+  unless($self->{_pulling_linkedRow}) {
+    my $User = Rapi::Blog::Util->get_User;
+    die usererr "Create User: PERMISSION DENIED" if ($User && $User->id && !$User->admin);
+  }
 	
   $self->next::method(@_);
   

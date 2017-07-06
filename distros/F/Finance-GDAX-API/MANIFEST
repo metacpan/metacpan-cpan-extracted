@@ -1,0 +1,46 @@
+Changes
+cpanfile
+lib/Finance/GDAX/API.pm
+lib/Finance/GDAX/API/Account.pm
+lib/Finance/GDAX/API/CoinbaseAccount.pm
+lib/Finance/GDAX/API/Currency.pm
+lib/Finance/GDAX/API/Deposit.pm
+lib/Finance/GDAX/API/Fill.pm
+lib/Finance/GDAX/API/Funding.pm
+lib/Finance/GDAX/API/MarginTransfer.pm
+lib/Finance/GDAX/API/Order.pm
+lib/Finance/GDAX/API/PaymentMethod.pm
+lib/Finance/GDAX/API/Position.pm
+lib/Finance/GDAX/API/Product.pm
+lib/Finance/GDAX/API/Quote.pm
+lib/Finance/GDAX/API/Report.pm
+lib/Finance/GDAX/API/Time.pm
+lib/Finance/GDAX/API/TypeConstraints.pm
+lib/Finance/GDAX/API/URL.pm
+lib/Finance/GDAX/API/UserAccount.pm
+lib/Finance/GDAX/API/Withdrawl.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+t/010-initial.t
+t/020-account.t
+t/030-order.t
+t/040-fill.t
+t/050-funding.t
+t/060-margintransfer.t
+t/070-position.t
+t/080-deposit.t
+t/090-withdrawl.t
+t/100-paymentmethods.t
+t/110-coinbaseaccounts.t
+t/120-report.t
+t/130-useraccount.t
+t/140-product.t
+t/150-currency.t
+t/160-time.t
+t/lib/GDAXTestHelper.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,5 @@
 package Lab::XPRESS::hub;
-$Lab::XPRESS::hub::VERSION = '3.550';
+$Lab::XPRESS::hub::VERSION = '3.552';
 use Lab::Exception;
 use strict;
 use Exporter 'import';

@@ -1,5 +1,9 @@
 Revision history for Perl extension App-BorgRestore
 
+2.1.0 2017-06-24T15:26:08Z
+	- Improve documentation
+	- chdir back to original working directory after restore
+
 2.0.1 2017-06-04T17:44:27Z
 
 	- Add github to META.json

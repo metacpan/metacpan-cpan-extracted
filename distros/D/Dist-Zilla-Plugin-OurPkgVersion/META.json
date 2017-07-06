@@ -5,7 +5,7 @@
       "Grahan Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -36,11 +36,14 @@
             "Test::CPAN::Meta::JSON" : "0.16",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Version" : "1"
          }
@@ -89,7 +92,7 @@
          "web" : "https://github.com/plicease/dist-zilla-plugin-ourpkgversion"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
       "Alexandr Ciornii <alexchorny@gmail.com>",
       "Alexei Znamensky <russoz@cpan.org>",
@@ -98,7 +101,9 @@
       "David Golden <dagolden@cpan.org>",
       "Graham Ollis <perl@wdlabs.com>",
       "Graham Ollis <plicease@cpan.org>",
-      "Ian Sealy <git@iansealy.com>"
-   ]
+      "Ian Sealy <git@iansealy.com>",
+      "Stephan Loyd <stephanloyd9@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

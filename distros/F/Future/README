@@ -1158,6 +1158,10 @@ SEE ALSO
 
       http://leonerds-code.blogspot.co.uk/2013/12/futures-advent-day-1.html
 
+      * "Asynchronous Programming with Futures" - YAPC::EU 2014
+
+      https://www.youtube.com/watch?v=u9dZgFM6FtE
+
 TODO
 
       * Consider the ability to pass the constructor an await CODEref,

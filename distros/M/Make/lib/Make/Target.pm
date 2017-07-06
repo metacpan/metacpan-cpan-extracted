@@ -3,7 +3,7 @@ package Make::Target;
 use strict;
 use warnings;
 
-our $VERSION = '1.1.4';
+our $VERSION = '1.1.5';
 
 use Carp;
 use Cwd;

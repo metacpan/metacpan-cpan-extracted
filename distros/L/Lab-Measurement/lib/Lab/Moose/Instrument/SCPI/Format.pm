@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Format;
-$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.550';
+$Lab::Moose::Instrument::SCPI::Format::VERSION = '3.552';
 use Moose::Role;
 use Lab::Moose::Instrument qw/setter_params getter_params validated_getter/;
 use Lab::Moose::Instrument::Cache;

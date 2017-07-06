@@ -4,11 +4,12 @@ NAME
 
 VERSION
 
-    version 0.10
+    version 0.11
 
 SYNOPSIS
 
      af download   --help
+     af probe      --help
      af install    --help
      af requires   --help
      af missing    --help
@@ -65,6 +66,44 @@ SUBCOMMANDS
 
     The location to store the downloaded resource. The current directory if
     not specified.
+
+ probe
+
+  Usage
+
+     af probe
+       [ ( -f | --file ) alienfile | ( -c | --class ) class ]
+       [ --root directory ]
+       [ --before hook command ] [ --after hook command ]
+       [ -I lib ] [ --blib ]
+
+  description
+
+    Probe system for existing library or tool using the given alienfile.
+
+   -f | --file
+
+    The alienfile. If neither this option, nor -c is specified, then
+    alienfile in the current directory will be assumed.
+
+   -c | --class
+
+    Get the alienfile from the already installed Alien module. You may omit
+    the Alien:: prefix, so for example Alien::curl may be specified as
+    simply curl. If you do not specify the --prefix option, the package
+    will replace the already installed one.
+
+   --root
+
+    Build in root
+
+   -I
+
+    Add directory to the Perl search lib (like -I on perl).
+
+   --blib
+
+    Use the blib from the current directory.
 
  install
 

@@ -6,6 +6,13 @@
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
 
+#if OPENSSL_VERSION_NUMBER < 0x10100000
+static const ASN1_INTEGER *X509_REVOKED_get0_serialNumber(const X509_REVOKED *x)
+{
+	return x->serialNumber;
+}
+#endif
+
 MODULE = POE::Filter::SSL      PACKAGE = POE::Filter::SSL
 
 ASN1_INTEGER *
@@ -21,6 +28,7 @@ verify_serial_against_crl_file(crlfile, serial)
    CODE:
    X509_CRL *crl=NULL;
    X509_REVOKED *revoked;
+   STACK_OF(X509_REVOKED) *revokes;
    BIO *in=NULL;
    int n,i,retval = 0;
    STRLEN len, lenser;
@@ -51,14 +59,18 @@ verify_serial_against_crl_file(crlfile, serial)
       goto end;
    }
 
-   n = sk_num(X509_CRL_get_REVOKED(crl));
+   revokes = X509_CRL_get_REVOKED(crl);
+   n = sk_X509_REVOKED_num(revokes);
    if (n > 0) {
       for (i = 0; i < n; i++) {
-         revoked = (X509_REVOKED *)sk_value(X509_CRL_get_REVOKED(crl), i);
-         if ( (revoked->serialNumber->length > 0) &&
-              (revoked->serialNumber->length == lenser) &&
-              (strncmp(revoked->serialNumber->data, serial, lenser) == 0)) {
-            sv_setpvn( ST(0), revoked->serialNumber->data, revoked->serialNumber->length);
+         const ASN1_INTEGER *asn_ser;
+
+         revoked = sk_X509_REVOKED_value(revokes, i);
+         asn_ser = X509_REVOKED_get0_serialNumber(revoked);
+         if ( (asn_ser->length > 0) &&
+              (asn_ser->length == lenser) &&
+              (strncmp(asn_ser->data, serial, lenser) == 0)) {
+            sv_setpvn( ST(0), asn_ser->data, asn_ser->length);
             goto end;
          }
       }

@@ -1,6 +1,5 @@
 #!perl -T
 
-use 5.10.0;
 use Modern::Perl;
 use POSIX;
 use Test::Spec;
@@ -12,7 +11,7 @@ plan tests => 66;
 # use lib '../lib';
 use Async::Simple::Pool;
 
-my $timeout = 0.05;
+my $timeout = 0.3;
 my $full_cycle_worst_time = 3 * $timeout * 10 * 1.5;
 my $worker_delay = $timeout * 10;
 

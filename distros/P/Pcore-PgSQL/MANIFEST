@@ -5,11 +5,9 @@ MANIFEST
 META.json
 README.md
 cpanfile
-lib/Pcore/DBH/DDL/pgsql.pm
-lib/Pcore/DBH/PgSQL.pm
-lib/Pcore/DBH/Query/pgsql.pm
 lib/Pcore/Handle/pgsql.pm
 lib/Pcore/PgSQL.pm
+lib/Pcore/PgSQL/DBH.pm
 lib/README.md
 share/dist-id.json
 share/dist.perl

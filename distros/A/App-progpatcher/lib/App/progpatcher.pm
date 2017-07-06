@@ -1,12 +1,12 @@
 package App::progpatcher;
 
-our $DATE = '2016-11-27'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use IPC::System::Options qw(system);
 use String::ShellQuote;
@@ -99,7 +99,7 @@ sub progpatcher {
         or return [400, "Please specify patches_dir"];
     $patches_dir =~ s!/\z!!; # convenience
 
-    $log->tracef("Opening patches_dir '%s' ...", $patches_dir);
+    log_trace("Opening patches_dir '%s' ...", $patches_dir);
     opendir my($dh), $patches_dir
         or return [500, "Can't open patches_dir '$patches_dir': $!"];
 
@@ -108,27 +108,27 @@ sub progpatcher {
   FILE:
     for my $fname (sort readdir $dh) {
         next if $fname eq '.' || $fname eq '..';
-        $log->tracef("Considering file '%s' ...", $fname);
+        log_trace("Considering file '%s' ...", $fname);
         unless ($fname =~ /\A
                            prog-
                            (.+)\.
                            ([^.]+)
                            \.patch\z/x) {
-            $log->tracef("Skipped file '%s' (doesn't match pattern)", $fname);
+            log_trace("Skipped file '%s' (doesn't match pattern)", $fname);
             next FILE;
         }
         my ($prog, $topic) = ($1, $2);
 
         my $prog_path = File::Which::which($prog);
         unless ($prog_path) {
-            $log->infof("Skipping patch '%s' (program %s not found in PATH)",
+            log_info("Skipping patch '%s' (program %s not found in PATH)",
                         $fname, $prog);
             next FILE;
         }
         (my $prog_dir = $prog_path) =~ s!(.+)[/\\].+!$1!;
 
         open my($fh), "<", "$patches_dir/$fname" or do {
-            $log->errorf("Skipping patch '%s' (can't open file: %s)",
+            log_error("Skipping patch '%s' (can't open file: %s)",
                          $fname, $!);
             $envres->add_result(500, "Can't open: $!", {item_id=>$fname});
             next FILE;
@@ -146,7 +146,7 @@ sub progpatcher {
         );
 
         if ($?) {
-            $log->errorf("Skipping patch '%s' (can't patch(1) to detect applied: %s)",
+            log_error("Skipping patch '%s' (can't patch(1) to detect applied: %s)",
                          $fname, $?);
             $envres->add_result(
                 500, "Can't patch(1) to detect applied: $?", {item_id=>$fname});
@@ -160,7 +160,7 @@ sub progpatcher {
 
         if ($args{reverse}) {
             if (!$already_applied) {
-                $log->infof("Skipping patch '%s' (already reversed)", $fname);
+                log_info("Skipping patch '%s' (already reversed)", $fname);
                 $envres->add_result(
                     304, "Already reversed", {item_id=>$fname});
                 next FILE;
@@ -179,7 +179,7 @@ sub progpatcher {
                      ),
                 );
                 if ($?) {
-                    $log->errorf("Skipping patch '%s' (can't patch(2b) to reverse-apply: %s)",
+                    log_error("Skipping patch '%s' (can't patch(2b) to reverse-apply: %s)",
                                  $fname, $?);
                     $envres->add_result(
                         500, "Can't patch(2b) to reverse-apply: $?", {item_id=>$fname});
@@ -188,7 +188,7 @@ sub progpatcher {
             }
         } else {
             if ($already_applied) {
-                $log->infof("Skipping patch '%s' (already applied)", $fname);
+                log_info("Skipping patch '%s' (already applied)", $fname);
                 $envres->add_result(
                     304, "Already applied", {item_id=>$fname});
                 next FILE;
@@ -207,7 +207,7 @@ sub progpatcher {
                      ),
                 );
                 if ($?) {
-                    $log->errorf("Skipping patch '%s' (can't patch(2) to apply: %s)",
+                    log_error("Skipping patch '%s' (can't patch(2) to apply: %s)",
                                  $fname, $?);
                     $envres->add_result(
                         500, "Can't patch(2) to apply: $?", {item_id=>$fname});
@@ -243,7 +243,7 @@ App::progpatcher - Apply a set of patches to your programs
 
 =head1 VERSION
 
-This document describes version 0.001 of App::progpatcher (from Perl distribution App-progpatcher), released on 2016-11-27.
+This document describes version 0.002 of App::progpatcher (from Perl distribution App-progpatcher), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,11 @@ See L<progpatcher> CLI.
 =head1 FUNCTIONS
 
 
-=head2 progpatcher(%args) -> [status, msg, result, meta]
+=head2 progpatcher
+
+Usage:
+
+ progpatcher(%args) -> [status, msg, result, meta]
 
 Apply a set of patches to your programs.
 
@@ -371,7 +375,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -575,13 +575,14 @@ The private plugins features:
 
 * they are not versioned, a simple \`git clone/pull' command is executed to install/update a plugin
 
-* private plugins should be listed at sparrow plugin list file (SPL file)
+* private plugins could be used by two methods:
+
+1) by SPL file
+2) by custom sparrow repository ( aka remote SPL file )
 
 ### SPL file
 
-Sparrow plugin list is represented by text file placed at `\~/sparrow.list'
-
-SPL file should contains lines in the following format:
+SPL file is located at `\~/sparrow.list' and contains lines in the following format:
 
 *$plugin\_name $git\_repo\_url*
 
@@ -601,7 +602,25 @@ Example entries:
 
 Once you add a proper entries into SPL file you may list and install a private plugins:
 
+    $ sparrow index update
     $ sparrow plg show package-generic
+
+### Custom sparrow repository
+
+Custom sparrow repository is abstraction for _remote SPL file_. 
+
+To use existed custom repository add this to sparrow configuration file:
+
+    $ cat ~/sparrow.yaml
+
+    repo: 192.168.0.1:4441
+
+This entry defines a custom repository accessible at remote host 192.168.0.1 port 4441
+
+Once custom repository is set up you search and install custom repository plugins the same
+way as with private plugins defined at SPL file.
+
+To run your own sparrow custom reposository use [Sparrow::Nest](https://github.com/melezhik/sparrow-nest) module.
 
 # Developing sparrow plugins
 
@@ -729,10 +748,13 @@ To every action you may optionally add `--nocolor` flag to disable color output:
 
 ## SPARROW_ROOT
 
-Sets sparrow root directory. If set than sparrow will be looking sparrow index and SPL files at following locations:
+Sets sparrow root directory. 
+
+If set than sparrow will be looking sparrow index, SPL and configuration files at following locations:
 
     $SPARROW_ROOT/sparrow.index 
     $SPARROW_ROOT/sparrow.list 
+    $SPARROW_ROOT/sparrow.yaml 
  
 As well as projects, tasks and plugins data will be kept at $SPARROW_ROOT directory.
 
@@ -747,6 +769,10 @@ Disable color output.
     $ export SPARROW_NO_COLOR=1
 
 Also see "Disable color output" section.
+
+## SPARROW_CONF_PATH
+
+If set defines an alternative location for sparrow configuration file.
 
 # Remote Tasks
 

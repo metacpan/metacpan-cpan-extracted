@@ -1,5 +1,9 @@
 Revision history for Struct-Path
 
+0.71    2017-06-27
+        'assign' opt to spath() added
+        grow arrays smoothly if 'append' for 'expand' specified in spath() (experimental)
+
 0.70    2017-06-20
         slist() now returns path-ref pairs in common list
         spath w opt expand may overwrite existed values now if strict opt permit so

@@ -1,5 +1,8 @@
 Revision history for WWW::Google::URLShortener
 
+0.23   Thu Jun 29 14:35:00 2017
+       - Added test scripts t/meta-json.t and t/meta-yml.t.
+
 0.22   Wed Jun 21 13:50:00 2017
        - Added key 'provides' to the Makefile.PL script.
 

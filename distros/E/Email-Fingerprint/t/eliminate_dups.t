@@ -15,4 +15,4 @@ plan skip_all => "You need Data::Dump and Test::Trap to test the application" if
 # Run the rest of the test from a separate file, because Test::Trap
 # doesn't work when loaded *with* an eval, but it crashes the test script
 # if it's loaded *without* an eval. Sigh.
-require "t/eliminate_dups.pl";
+require "./t/eliminate_dups.pl";

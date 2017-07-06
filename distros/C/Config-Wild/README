@@ -1,43 +1,146 @@
-			     Config::Wild
-			     ============
+Config::Wild
 
-NAME
+This module reads *key - value* data pairs from a file. What sets it
+apart from other configuration systems is that keys may contain Perl
+regular expressions, allowing one entry to match multiple requested
+keys.
 
-Parse an application configuration file with wildcard keywords
+Configuration information in the file has the form
 
+  key = value
+
+where *key* is a token which may contain Perl regular expressions
+surrounded by curly brackets, e.g.
+
+  foobar.{\d+}.name = goo
+
+and *value* is the remainder of the line after any whitespace following
+the "=" character is removed.
+
+Keys which contain regular expressions are termed *wildcard* keys; those
+without are called *absolute* keys. Wildcard keys serve as templates to
+allow grouping of keys which have the same value. For instance, say
+you've got a set of keys which normally have the same value, but where
+on occasion you'd like to override the default:
+
+  p.{\d+}.foo = goo
+  p.99.foo = flabber
+
+*value* may reference environment variables or other Config::Wild
+variables via the following expressions:
+
+*   Environment variables may be accessed via "${var}":
+
+      foo = ${HOME}/foo
+
+    If the variable doesn't exist, the expression is replaced with an
+    empty string.
+
+*   Other Config::Wild variables may be accessed via "$(var)".
+
+      root = ${HOME}
+      foo = $(root)/foo
+
+    If the variable doesn't exist, the expression is replaced with an
+    empty string. Variable expansions can be nested, as in
+
+      root = /root
+      branch = $(root)/branch
+      tree = $(branch)/tree
+
+    "tree" will evaluate to "/root/branch/tree".
+
+*   *Either* type of variable may be accessed via $var. In this case, if
+    *var* is not a Config::Wild variable, it is assumed to be an
+    environment variable. If the variable doesn't exist, the expression
+    is left as is.
+
+Substitutions are made when the value method is called, not when the
+values are first read in.
+
+Lines which begin with the "#" character are ignored. There is also a
+set of directives which alter where and how Config::Wild reads
+configuration information. Each directive begins with the "%" character
+and appears alone on a line in the config file:
+
+%include path
+    Temporarily interrupt parsing of the current configuration file, and
+    switch the input stream to the file specified via *path*. See
+    "Finding Configuration Files".
+
+  Finding Configuration Files
+
+The "dir" and "path" options to the constructor determine where
+configuration files are searched for. They are optional and may not be
+specified in combination.
+
+In the following tables:
+
+*   "file" is the provided path to the configuration file.
+
+*   "option = default" indicates that neither "dir" nor "path" has been
+    specified.
+
+*   The file patterns are,
+
+      /*         absolute path
+      ./* ../*   paths relative to the current directory
+      *          all other paths
+
+*   In the results,
+
+      cwd        the current working directory
+      path       an entry in the path option array
+
+   Files loaded via new and load
+
+  +==========================================+
+  |         |            file                |
+  |---------+--------------------------------|
+  | option  |  /*  |  ./* ../*   |  *        |
+  |==========================================|
+  | default | file | cwd/file    | cwd/file  |
+  | path    | file | cwd/file    | path/file |
+  | dir     | file | dir/file    | dir/file  |
+  +---------+------+-------------+-----------+
+
+   Files included from other files
+
+"incdir" is the directory containing the file including the new
+configuration file, e.g. the one with the %include directive.
+
+  +==========================================+
+  |         |            file                |
+  |---------+--------------------------------|
+  | option  |  /*  |  ./* ../*   |  *        |
+  |==========================================|
+  | default | file | incdir/file | cwd/file  |
+  | path    | file | incdir/file | path/file |
+  | dir     | file | dir/file    | dir/file  |
+  +---------+------+-------------+-----------+
 
 INSTALLATION
 
-To install this module type the following:
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-DEPENDENCIES
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-None
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-COPYRIGHT AND LICENCE
+COPYRIGHT AND LICENSE
 
---8<--8<--8<--8<--
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
 
-Copyright (C) 1998-2011 Smithsonian Astrophysical Observatory
+This is free software, licensed under:
 
-This file is part of Config-Wild
-
-Config-Wild is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
--->8-->8-->8-->8--
+  The GNU General Public License, Version 3, June 2007

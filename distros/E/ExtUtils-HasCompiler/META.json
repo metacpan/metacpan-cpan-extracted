@@ -50,6 +50,9 @@
       },
       "test" : {
          "requires" : {
+            "Cwd" : "0",
+            "File::Path" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0",
             "perl" : "5.006"
          }
@@ -58,7 +61,7 @@
    "provides" : {
       "ExtUtils::HasCompiler" : {
          "file" : "lib/ExtUtils/HasCompiler.pm",
-         "version" : "0.017"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -73,7 +76,7 @@
          "web" : "https://github.com/Leont/extutils-hascompiler"
       }
    },
-   "version" : "0.017",
+   "version" : "0.021",
    "x_contributors" : [
       "bulk88 <bulk88@hotmail.com>",
       "Craig A. Berry <craigberry@mac.com>",

@@ -1,3 +1,27 @@
+7.012 2017-06-26
+  - Upgrade v7.00->v7.01.
+    - Add job notes.
+    - Modify locking with zero duration.
+
+7.001 2017-06-24
+  - Upgrade v6.05->v7.00.
+    - Add lock & unlock.
+    - Absent parent treated as finished.
+
+6.101 2017-06-23
+  - Add Sereal backend.
+
+6.081 2017-06-22
+  - Fix README :bug:
+  - Test Minion version.
+  - Make benchmark config easier.
+
+6.071 2017-06-21
+  - Fix list_jobs for undefined params (#7, Manuel Mausz).
+
+6.061 2017-06-20
+  - Fix repair for dependent jobs (#8, Manuel Mausz).
+
 6.051 2017-06-18
   - Upgrade v6.00->v6.05.
     - Add status to register_worker options.

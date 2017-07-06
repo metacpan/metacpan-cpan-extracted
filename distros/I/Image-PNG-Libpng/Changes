@@ -1,3 +1,7 @@
+0.44 2017-06-28
+
+- Revert back to old method of detecting libpng, discard Devel::CheckLib
+
 0.43 2016-02-27
 
 - Documents png_compare function

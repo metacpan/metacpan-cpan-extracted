@@ -1,0 +1,87 @@
+package Log::ger::Manual::ForLog4perl;
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Log::ger for Log::Log4perl users
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Log::ger::Manual::ForLog4perl - Log::ger for Log::Log4perl users
+
+=head1 VERSION
+
+version 0.012
+
+=head1 WHY LOG::LOG4PERL
+
+Log4perl is a port of Log4j, a logging library for Java. It's mature (first
+release is in 2002, Log4j is even older), featureful, and quite performant. You
+can send logs to multiple outputs, decorate (layout) the message with various
+extra information, and filter by level and category. Different outputs can be
+applied different filters. You can define your own logging levels.
+
+For logging in modules, you can avoid specifying level/output and just start
+logging:
+
+ use Log::Log4perl ':easy';
+
+ sub foo {
+     DEBUG "Entering foo ...";
+     ...
+ }
+
+=head1 WHY LOG::GER OVER LOG::LOG4PERL
+
+Log::ger is significantly more lightweight (in terms of lines of code, startup
+overhead, as well as null/stealth logging overhead) while still having the
+abovementioned features. See L<Benchmark::Scenarios::LogGer> for more
+benchmarks. This makes Log::ger more suitable when you want to add logging to
+modules instead of application as Log::ger creates minimum impact to your module
+users.
+
+Log4perl influenced other logging libraries in Perl, at least in some aspects.
+
+IMO, Log::Log4perl is not very Perlish, which is understandable since it is a
+port of a Java library. With Perl you can configure and accomplish stuffs in a
+more compact syntax.
+
+Log::ger allows you to log in a custom format, e.g. using block a la
+L<Log::Contextual>, log raw data structure as JSON, etc. Note: you can also
+layout message as JSON in Log4perl using L<Log::Log4perl::Layout::JSON> but your
+message is still a string.
+
+=head1 MIGRATING
+
+Some modules can ease migration. L<Log::ger::Plugin::Log4perl> provides
+uppercase subroutine names: TRACE, DEBUG, INFO, ERROR, WARN, FATAL like what you
+get when you "use Log::Log4perl ':easy'" instead of the Log::ger default
+log_trace(), log_debug(), log_info(), log_warn(), log_error(), log_fatal(). It
+also provides additional log methods: log(), logdie(), logwarn(), error_warn(),
+error_die(), logcarp(), logcluck(), logcroak(), logconfess().
+
+The layout module L<Log::ger::Layout::Pattern> uses many of the same placeholder
+names like C<%c> for category, C<%C> for package/class name, and so on, although
+some details differ.
+
+=head1 FAQ
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

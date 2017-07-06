@@ -223,7 +223,11 @@ my @cOptions = (
     # matrixsslConfig.h - enable ALPN
     'USE_ALPN',
 
-    'USE_DTLS',
+    # We'll let DTLS disabled by default and define default buffer sizes below
+    #'USE_DTLS',
+
+    'SSL_DEFAULT_IN_BUF_SIZE=1500',
+    'SSL_DEFAULT_OUT_BUF_SIZE=1500',
 
     # matrixsslConfig.h - enable server preferrer ciphers
     'USE_SERVER_PREFERRED_CIPHERS',
@@ -344,7 +348,7 @@ foreach my $d (@cOptions) {
 my $os_src = ($^O =~ /Win32/ms) ? 'core/WIN32' : 'core/POSIX';
 my $o = $Config{obj_ext};
 my $c = '.c';
-my $mxbase = 'inc/matrixssl-3-9-1-open';
+my $mxbase = 'inc/matrixssl-3-9-3-open';
 my $mxfiles = "$mxbase.files";
 my $mxmodfiles = 'modfiles';
 
@@ -450,7 +454,7 @@ VERSION_FROM       => undef,
   'ABSTRACT' => 'Perl extension for SSL and TLS using MatrixSSL.org v3.7.2b',
   'AUTHOR' => 'C. N. Drake <christopher@pobox.com>',
   'LICENSE' => 'gpl',
-  'VERSION' => 'v3.9.0',
+  'VERSION' => 'v3.9.1',
   'CONFIGURE_REQUIRES' => {
     'Archive::Tar' => '0',
     'ExtUtils::Constant' => '0',

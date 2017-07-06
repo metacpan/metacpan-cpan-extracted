@@ -3,6 +3,18 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 1.03: Tue 27 Jun 16:39:41 CEST 2017
+
+	Fixes:
+	- manpage, change SYNOPSYS into SYNOPSIS
+	  rt.cpan.org#113351 [Shlomi Fish]
+	- formatter PRINTP cannot be used
+
+	Improvements:
+	- more flexible formatter construction
+	- textdomain compatible with full implementation
+	- changed formatter constructor to be more flexible
+
 version 1.02: Mon 18 Jan 13:53:03 CET 2016
 
 	Improvements:

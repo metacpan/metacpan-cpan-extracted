@@ -1,6 +1,6 @@
 package PMLTQ::Command::webdelete;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::webdelete::VERSION = '1.3.2';
+$PMLTQ::Command::webdelete::VERSION = '1.4.0';
 # ABSTRACT: Remove treebank from web interface
 
 use PMLTQ::Base 'PMLTQ::Command';
@@ -35,7 +35,7 @@ PMLTQ::Command::webdelete - Remove treebank from web interface
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 SYNOPSIS
 

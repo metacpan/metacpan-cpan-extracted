@@ -1,4 +1,6 @@
 package Cassandra::Client::Protocol;
+our $AUTHORITY = 'cpan:TVDW';
+$Cassandra::Client::Protocol::VERSION = '0.13';
 use 5.010;
 use strict;
 use warnings;
@@ -98,7 +100,7 @@ BEGIN {
             pack_inet               unpack_inet
             pack_char               unpack_char
 
-                                    unpack_metadata
+            pack_metadata           unpack_metadata
                                     unpack_errordata
             pack_queryparameters
 
@@ -106,6 +108,7 @@ BEGIN {
             %batch_type_lookup
 
             BIGINT_SUPPORTED
+                                    unpack_metadata2
         /
     );
 
@@ -319,7 +322,32 @@ sub unpack_inet {
 
 # TYPE: option_type
 sub pack_option_type {
-    die 'Not implemented';
+    my ($type)= @_;
+    my ($id, @value)= @$type;
+    if ($id == TYPE_CUSTOM) {
+        return pack_short($id).pack_string($value[0]);
+    } elsif ($id < 0x20) {
+        return pack_short($id);
+    } elsif ($id == TYPE_LIST || $id == TYPE_SET) {
+        return pack_short($id).pack_option_type($value[0]);
+    } elsif ($id == TYPE_MAP) {
+        return pack_short($id).pack_option_type($value[0]).pack_option_type($value[1]);
+    } elsif ($id == TYPE_UDT) {
+        my $out= pack_short($id).pack_string($value[0]).pack_string($value[1]);
+        my @fields= @{$value[2]};
+        $out .= pack_short(0+@fields);
+        for my $field (@fields) {
+            $out .= pack_string($field->[0]).pack_option_type($field->[1]);
+        }
+        return $out;
+    } elsif ($id == TYPE_TUPLE) {
+        my @fields= @{$value[0]};
+        my $out= pack_short($id).pack_short(0+@fields);
+        $out .= pack_option_type($_) for @fields;
+        return $out;
+    } else {
+        die 'Unable to pack_option_type for type '.$id;
+    }
 }
 
 sub unpack_option_type {
@@ -416,6 +444,26 @@ sub unpack_stringmultimap {
 }
 
 # Metadata
+sub pack_metadata {
+    my ($metadata)= @_;
+    my $columns= $metadata->{columns};
+    my $paging_state= $metadata->{paging_state};
+
+    my $flags= ($columns ? 0 : 4) | (defined($paging_state) ? 2 : 0);
+
+    my $out= pack_int($flags);
+    $out .= pack_int($columns ? (0+@$columns) : 0);
+    $out .= pack_bytes($paging_state) if $flags & 2;
+    unless ($flags & 4) {
+        for my $column (@$columns) {
+            $out .= pack_string($column->[0]).pack_string($column->[1]);
+            $out .= pack_string($column->[2]).pack_option_type($column->[3]);
+        }
+    }
+
+    return $out;
+}
+
 sub unpack_metadata {
     my ($flags, $columns_count, $paging_state, $keyspace_name, $table_name, @columns);
 
@@ -541,3 +589,28 @@ sub bytes_to_bigint {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Cassandra::Client::Protocol
+
+=head1 VERSION
+
+version 0.13
+
+=head1 AUTHOR
+
+Tom van der Woerdt <tvdw@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

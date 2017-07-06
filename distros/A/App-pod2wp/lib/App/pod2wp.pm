@@ -1,12 +1,12 @@
 package App::pod2wp;
 
-our $DATE = '2017-06-17'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use POSIX qw(strftime);
 
@@ -201,13 +201,13 @@ sub pod2wp {
     require File::Slurper;
     my $pod = File::Slurper::read_text($filename);
 
-    $log->infof("Converting POD to HTML ...");
+    log_info("Converting POD to HTML ...");
     my $html = _pod2html($filename);
 
     my $title;
     if ($pod =~ /^=for pod2wp TITLE:\s*(.+)\R\R/m) {
         $title = $1;
-        $log->tracef("Extracted title from POD document: %s", $title);
+        log_trace("Extracted title from POD document: %s", $title);
     } else {
         $title = "(No title)";
     }
@@ -215,7 +215,7 @@ sub pod2wp {
     my $post_tags;
     if ($pod =~ /^=for pod2wp TAGS?:\s*(.+)\R\R/m) {
         $post_tags = [split /\s*,\s*/, $1];
-        $log->tracef("Extracted tags from POD document: %s", $post_tags);
+        log_trace("Extracted tags from POD document: %s", $post_tags);
     } else {
         $post_tags = [];
     }
@@ -223,7 +223,7 @@ sub pod2wp {
     my $post_cats;
     if ($pod =~ /^=for pod2wp CATEGOR(?:Y|IES):\s*(.+)\R\R/m) {
         $post_cats = [split /\s*,\s*/, $1];
-        $log->tracef("Extracted categories from POD document: %s", $post_cats);
+        log_trace("Extracted categories from POD document: %s", $post_cats);
     } else {
         $post_cats = [];
     }
@@ -231,7 +231,7 @@ sub pod2wp {
     my $postid;
     if ($pod =~ /^=for pod2wp POSTID:\s*(\d+)\R\R/m) {
         $postid = $1;
-        $log->tracef("POD document already has post ID: %s", $postid);
+        log_trace("POD document already has post ID: %s", $postid);
     }
 
     require XMLRPC::Lite;
@@ -240,7 +240,7 @@ sub pod2wp {
     # create categories if necessary
     my $cat_ids = {};
     {
-        $log->infof("[api] Listing categories ...");
+        log_info("[api] Listing categories ...");
         $call = XMLRPC::Lite->proxy($args{proxy})->call(
             'wp.getTerms',
             1, # blog id, set to 1
@@ -254,14 +254,14 @@ sub pod2wp {
         for my $cat (@$post_cats) {
             if (my ($cat_detail) = grep { $_->{name} eq $cat } @$all_cats) {
                 $cat_ids->{$cat} = $cat_detail->{term_id};
-                $log->tracef("Category %s already exists", $cat);
+                log_trace("Category %s already exists", $cat);
                 next;
             }
             if ($dry_run) {
-                $log->infof("(DRY_RUN) [api] Creating category %s ...", $cat);
+                log_info("(DRY_RUN) [api] Creating category %s ...", $cat);
                 next;
             }
-            $log->infof("[api] Creating category %s ...", $cat);
+            log_info("[api] Creating category %s ...", $cat);
             $call = XMLRPC::Lite->proxy($args{proxy})->call(
                 'wp.newTerm',
                 1, # blog id, set to 1
@@ -279,7 +279,7 @@ sub pod2wp {
     # create categories if necessary
     my $tag_ids = {};
     {
-        $log->infof("[api] Listing tags ...");
+        log_info("[api] Listing tags ...");
         $call = XMLRPC::Lite->proxy($args{proxy})->call(
             'wp.getTerms',
             1, # blog id, set to 1
@@ -293,14 +293,14 @@ sub pod2wp {
         for my $tag (@$post_tags) {
             if (my ($tag_detail) = grep { $_->{name} eq $tag } @$all_tags) {
                 $tag_ids->{$tag} = $tag_detail->{term_id};
-                $log->tracef("Tag %s already exists", $tag);
+                log_trace("Tag %s already exists", $tag);
                 next;
             }
             if ($dry_run) {
-                $log->infof("(DRY_RUN) [api] Creating tag %s ...", $tag);
+                log_info("(DRY_RUN) [api] Creating tag %s ...", $tag);
                 next;
             }
-            $log->infof("[api] Creating tag %s ...", $tag);
+            log_info("[api] Creating tag %s ...", $tag);
             $call = XMLRPC::Lite->proxy($args{proxy})->call(
                 'wp.newTerm',
                 1, # blog id, set to 1
@@ -361,12 +361,12 @@ sub pod2wp {
             push @xmlrpc_args, $content;
         }
         if ($dry_run) {
-            $log->infof("(DRY_RUN) [api] Create/edit post, content: %s", $content);
+            log_info("(DRY_RUN) [api] Create/edit post, content: %s", $content);
             return [304, "Dry-run"];
         }
 
-        $log->infof("[api] Creating/editing post ...");
-        $log->tracef("[api] xmlrpc method=%s, args=%s", $meth, \@xmlrpc_args);
+        log_info("[api] Creating/editing post ...");
+        log_trace("[api] xmlrpc method=%s, args=%s", $meth, \@xmlrpc_args);
         $call = XMLRPC::Lite->proxy($args{proxy})->call($meth, @xmlrpc_args);
         return [$call->fault->{faultCode}, "Can't create/edit post: ".$call->fault->{faultString}]
             if $call->fault && $call->fault->{faultCode};
@@ -376,7 +376,7 @@ sub pod2wp {
     unless ($postid) {
         $postid = $call->result;
         $pod =~ s/^/=for pod2wp POSTID: $postid\n\n/;
-        $log->infof("[api] Inserting POSTID to %s ...", $filename);
+        log_info("[api] Inserting POSTID to %s ...", $filename);
         File::Slurper::write_text($filename, $pod);
     }
 
@@ -398,7 +398,7 @@ App::pod2wp - Publish POD document to WordPress as blog post
 
 =head1 VERSION
 
-This document describes version 0.003 of App::pod2wp (from Perl distribution App-pod2wp), released on 2017-06-17.
+This document describes version 0.004 of App::pod2wp (from Perl distribution App-pod2wp), released on 2017-07-03.
 
 =head1 FUNCTIONS
 

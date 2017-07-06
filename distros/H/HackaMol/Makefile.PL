@@ -19,8 +19,8 @@ my %WriteMakefileArgs = (
     "Capture::Tiny" => "0.28",
     "Cwd" => "0.0",
     "File::Slurp" => "0.00",
+    "HTTP::Tiny" => "0.070",
     "JSON::XS" => "3.01",
-    "LWP::Simple" => "6.13",
     "List::MoreUtils" => "0.410",
     "MCE" => "1.52",
     "Math::Vector::Real" => "0.14",
@@ -41,9 +41,9 @@ my %WriteMakefileArgs = (
     "Time::HiRes" => "0.0",
     "YAML::XS" => "0.41"
   },
-  "VERSION" => "0.040",
+  "VERSION" => "0.043",
   "test" => {
-    "TESTS" => "t/*.t t/Roles/*.t"
+    "TESTS" => "t/*.t t/HackaMol/*.t t/HackaMol/Roles/*.t"
   }
 );
 
@@ -52,8 +52,8 @@ my %FallbackPrereqs = (
   "Capture::Tiny" => "0.28",
   "Cwd" => "0.0",
   "File::Slurp" => "0.00",
+  "HTTP::Tiny" => "0.070",
   "JSON::XS" => "3.01",
-  "LWP::Simple" => "6.13",
   "List::MoreUtils" => "0.410",
   "MCE" => "1.52",
   "Math::Vector::Real" => "0.14",

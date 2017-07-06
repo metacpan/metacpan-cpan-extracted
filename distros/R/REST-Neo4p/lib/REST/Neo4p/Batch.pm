@@ -13,8 +13,7 @@ use warnings;
 no warnings qw(once);
 
 BEGIN {
-  $REST::Neo4p::Batch::VERSION = '0.3012';
-  $REST::Neo4p::Batch::VERSION = '0.3012';
+  $REST::Neo4p::Batch::VERSION = '0.3020';
 }
 
 our @EXPORT = qw(batch);
@@ -245,7 +244,7 @@ L<REST::Neo4p>, L<REST::Neo4p::Agent>
 
 =head1 LICENSE
 
-Copyright (c) 2012-2015 Mark A. Jensen. This program is free software; you
+Copyright (c) 2012-2017 Mark A. Jensen. This program is free software; you
 can redistribute it and/or modify it under the same terms as Perl
 itself.
 

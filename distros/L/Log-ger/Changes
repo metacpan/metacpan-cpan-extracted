@@ -1,3 +1,74 @@
+0.012   2017-07-02 (PERLANCAR)
+
+	- [optimize] init_target: Reuse multilevel log routine from hook
+	  for log routines of all levels.
+
+	- [Bugfix] Fix string level passed to layouter when logger is a
+	  multilevel logger.
+
+
+0.011   2017-06-30 (PERLANCAR)
+
+        - [Incompatible change] In hook argument "routines", change $flags to
+          $type to be more general. The value can be 'log_sub', 'log_method',
+          'logml_sub', 'logml_method', 'is_sub', 'is_method'.
+
+        - Support multilevel log statement log($level, ...) by using
+          LGP:MultilevelLog (included in core distribution).
+
+        - [Internal] Introduce phase 'create_logml_routine'.
+
+        - [Test] Add test for LG:Format::None.
+
+        - [Bugfix] reinit_target() didn't find the correct hash key.
+
+
+0.010   2017-06-28 (PERLANCAR)
+
+	- [Bugfix] Don't install log methods to package (vice versa, don't
+	  install log subroutines to object package).
+
+	- [doc] Remove mention of filter.
+
+
+0.009   2017-06-28 (PERLANCAR)
+
+        - Remove Log::ger::Filter and 'create_filter' phase because they are
+          unused.
+
+        - Add Layout.
+
+        - Add formatter: None.
+
+
+0.008   2017-06-26 (PERLANCAR)
+
+	- Util: Add string_level().
+
+
+0.007   2017-06-25 (PERLANCAR)
+
+	- Add custom level test.
+
+	- Add output: Array.
+
+
+0.006   2017-06-24 (PERLANCAR)
+
+	- [Bugfix] Use the correct package when initializing object.
+
+
+0.005   2017-06-23 (PERLANCAR)
+
+        - [Incompatible change] Another round of internal refactoring and
+          interface changes. New: Log::ger::{Plugin,Format,Filter}. Every plugin
+          (including filter, format, output) can be set on a per-target basis or
+          globally. The term 'hooks' is in again. Add 'create_routine_names'
+          phase. Remove 'after_create_log_routine',
+          'after_create_log_is_routine'. Move FAQ & internals doc to
+          Log-ger-Manual dist.
+
+
 0.004   2017-06-21 (PERLANCAR)
 
 	- [Bugfix] Log::ger::Output didn't have VERSION.
@@ -5,9 +76,9 @@
 
 0.003   2017-06-21 (PERLANCAR)
 
-	- Split Log::err::Output::Screen to its own dist so this dist can
-	  be more minimalist and that module can be tested e.g. with
-	  Capture::Tiny etc.
+	- Split Log::ger::Output::Screen to its own dist so this dist can be
+	  more minimalist and that module can be tested e.g. with Capture::Tiny
+	  etc.
 
 	- String output: add option append_newline to allow disable
 	  appending newline.
@@ -19,7 +90,8 @@
 
 0.002    2017-06-21 (PERLANCAR)
 
-         - Reorganize internals & fix a couple of doc typos.
+         - [Incompatible change] Reorganize internals & fix a couple of doc
+           typos.
 
          - Add outputs: Null, String (mainly for testing).
 

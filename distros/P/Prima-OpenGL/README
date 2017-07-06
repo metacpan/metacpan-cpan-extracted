@@ -1,6 +1,12 @@
 Prima extension for OpenGL drawing.
 
-Works on win32, cygwin and x11. To use in cygwin/x11 mode recompile Prima with CYGWIN_X11=1
+Works on win32, cygwin and x11.
+
+Dependencies:
+    apt-get install libgl-dev
+
+Optional dependencies:
+    cpan OpenGL::Modern
 
 Howto:
 

@@ -16,55 +16,55 @@ package main;
 
 subtest "basics" => sub {
     my $str = "";
-    Log::ger::Util::reset_plugins('create_log_routine');
+    Log::ger::Util::reset_hooks('create_log_routine');
     require Log::ger::Output;
     Log::ger::Output->set('Screen');
-    my $h = Log::ger::setup_hash();
+    my $h = {}; Log::ger::init_target(hash => $h);
 
     my ($stdout, $stderr, $exit) = capture {
-        $h->{log_fatal}("fatal");
-        $h->{log_error}("error");
-        $h->{log_warn}("warn");
-        $h->{log_info}("info");
-        $h->{log_debug}("debug");
-        $h->{log_trace}("trace");
+        $h->{fatal}("fatal");
+        $h->{error}("error");
+        $h->{warn}("warn");
+        $h->{info}("info");
+        $h->{debug}("debug");
+        $h->{trace}("trace");
     };
     is($stderr, "fatal\nerror\nwarn\n");
     is($stdout, "");
 
     Log::ger::Util::set_level(1);
-    $h = Log::ger::setup_hash();
+    Log::ger::init_target(hash => $h);
 
     ($stdout, $stderr, $exit) = capture {
-        $h->{log_fatal}("fatal");
-        $h->{log_error}("error");
-        $h->{log_warn}("warn");
-        $h->{log_info}("info");
-        $h->{log_debug}("debug");
-        $h->{log_trace}("trace");
+        $h->{fatal}("fatal");
+        $h->{error}("error");
+        $h->{warn}("warn");
+        $h->{info}("info");
+        $h->{debug}("debug");
+        $h->{trace}("trace");
     };
     is($stderr, "fatal\n");
     is($stdout, "");
 
     subtest "opt:use_color=1" => sub {
         Log::ger::Output->set('Screen', use_color=>1);
-        my $h = Log::ger::setup_hash();
+        Log::ger::init_target(hash => $h);
         ($stdout, $stderr, $exit) = capture {
-            $h->{log_fatal}("fatal");
+            $h->{fatal}("fatal");
         };
         is($stderr, "\e[31mfatal\e[0m\n");
     };
 
     subtest "opt:stderr=0" => sub {
         Log::ger::Output->set('Screen', stderr => 0);
-        my $h = Log::ger::setup_hash();
+        Log::ger::init_target(hash => $h);
         ($stdout, $stderr, $exit) = capture {
-            $h->{log_fatal}("fatal");
-            $h->{log_error}("error");
-            $h->{log_warn}("warn");
-            $h->{log_info}("info");
-            $h->{log_debug}("debug");
-            $h->{log_trace}("trace");
+            $h->{fatal}("fatal");
+            $h->{error}("error");
+            $h->{warn}("warn");
+            $h->{info}("info");
+            $h->{debug}("debug");
+            $h->{trace}("trace");
         };
         is($stderr, "");
         is($stdout, "fatal\n");

@@ -5,6 +5,15 @@ TODO: document encode_cbor_sharing?
 TODO: weaken cyclic structures?
 TODO: large negative integers
 
+1.7  Tue Jun 27 04:02:23 CEST 2017
+	- SECURITY FIX: fix two bugs found by american fuzzy lop,
+          upgrade is advised if you accept data from untrusted
+          sources.
+        - an out-of bound sharedref or stringref index could cause an
+          out of bounds access - might be exploitable.
+        - a decoding error during indefinite array or hash decoding
+          could cause an endless loop.
+
 1.6  Wed Dec  7 15:13:23 CET 2016
         - greatly expand the SECURITY IMPLICATIONS and similar sections.
         - new constructor new_safe, to create a secure CBOR::XS object.

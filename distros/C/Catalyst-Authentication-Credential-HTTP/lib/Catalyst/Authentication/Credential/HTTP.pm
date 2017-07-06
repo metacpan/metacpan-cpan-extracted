@@ -1,4 +1,6 @@
-package Catalyst::Authentication::Credential::HTTP;
+package Catalyst::Authentication::Credential::HTTP; # git description: v1.017-2-g36df161
+# ABSTRACT: HTTP Basic and Digest authentication for Catalyst
+
 use base qw/Catalyst::Authentication::Credential::Password/;
 
 use strict;
@@ -23,7 +25,7 @@ __PACKAGE__->mk_accessors(qw/
     broken_dotnet_digest_without_query_string
 /);
 
-our $VERSION = '1.016';
+our $VERSION = '1.018';
 
 sub new {
     my ($class, $config, $app, $realm) = @_;
@@ -373,13 +375,12 @@ sub store_digest_authorization_nonce {
     return $c->cache->set( $key, $nonce );
 }
 
-package Catalyst::Authentication::Credential::HTTP::Nonce;
+package # hide from PAUSE
+    Catalyst::Authentication::Credential::HTTP::Nonce;
 
 use strict;
 use base qw[ Class::Accessor::Fast ];
-use Data::UUID ();
-
-our $VERSION = '0.02';
+use Data::UUID 0.11 ();
 
 __PACKAGE__->mk_accessors(qw[ nonce nonce_count qop opaque algorithm ]);
 
@@ -402,10 +403,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Catalyst::Authentication::Credential::HTTP - HTTP Basic and Digest authentication
-for Catalyst.
+Catalyst::Authentication::Credential::HTTP - HTTP Basic and Digest authentication for Catalyst
+
+=head1 VERSION
+
+version 1.018
 
 =head1 SYNOPSIS
 
@@ -485,6 +491,11 @@ C<store_digest_authorization_nonce> and
 C<get_digest_authorization_nonce> methods as shown below.
 
 =back
+
+=for stopwords rfc
+rfc2617
+auth
+sess
 
 =head1 METHODS
 
@@ -660,46 +671,86 @@ with L<Catalyst::Authentication::Store::Htpasswd>, or
 L<Catalyst::Authentication::Store::DBIC> stores whose
 C<password> methods return a hashed or salted version of the password.
 
-=head1 AUTHORS
-
-Updated to current name space and currently maintained
-by: Tomas Doran C<bobtfish@bobtfish.net>.
-
-Original module by:
-
-=over
-
-=item Yuval Kogman, C<nothingmuch@woobling.org>
-
-=item Jess Robinson
-
-=item Sascha Kiefer C<esskar@cpan.org>
-
-=back
-
-=head1 CONTRIBUTORS
-
-Patches contributed by:
-
-=over
-
-=item Peter Corlett
-
-=item Devin Austin (dhoss) C<dhoss@cpan.org>
-
-=item Ronald J Kimball
-
-=back
-
 =head1 SEE ALSO
 
 RFC 2617 (or its successors), L<Catalyst::Plugin::Cache>, L<Catalyst::Plugin::Authentication>
 
-=head1 COPYRIGHT & LICENSE
+=head1 SUPPORT
 
-        Copyright (c) 2005-2008 the aforementioned authors. All rights
-        reserved. This program is free software; you can redistribute
-        it and/or modify it under the same terms as Perl itself.
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Authentication-Credential-HTTP>
+(or L<bug-Catalyst-Authentication-Credential-HTTP@rt.cpan.org|mailto:bug-Catalyst-Authentication-Credential-HTTP@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#catalyst> on C<irc.perl.org>|irc://irc.perl.org/#catalyst>.
+
+=head1 AUTHOR
+
+יובל קוג'מן (Yuval Kogman) <nothingmuch@woobling.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Tomas Doran Karen Etheridge Sascha Kiefer Devin Austin Ronald J Kimball Jess Robinson Ton Voon J. Shirley Brian Cassidy Jonathan Rockway
+
+=over 4
+
+=item *
+
+Tomas Doran <bobtfish@bobtfish.net>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Sascha Kiefer <esskar@cpan.org>
+
+=item *
+
+Devin Austin <devin.austin@gmail.com>
+
+=item *
+
+Ronald J Kimball <rjk@linguist.dartmouth.edu>
+
+=item *
+
+Jess Robinson <cpan@desert-island.me.uk>
+
+=item *
+
+Ronald J Kimball <rjk@tamias.net>
+
+=item *
+
+Tomas Doran <tdoran@yelp.com>
+
+=item *
+
+Ton Voon <ton.voon@opsera.com>
+
+=item *
+
+J. Shirley <jshirley+cpan@gmail.com>
+
+=item *
+
+Brian Cassidy <bricas@cpan.org>
+
+=item *
+
+Jonathan Rockway <jon@jrock.us>
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2006 by יובל קוג'מן (Yuval Kogman).
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

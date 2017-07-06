@@ -1,12 +1,12 @@
 package Test::BDD::Cucumber::Harness::TermColor;
-$Test::BDD::Cucumber::Harness::TermColor::VERSION = '0.52';
+$Test::BDD::Cucumber::Harness::TermColor::VERSION = '0.53';
 =head1 NAME
 
 Test::BDD::Cucumber::Harness::TermColor - Prints colorized text to the screen
 
 =head1 VERSION
 
-version 0.52
+version 0.53
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,8 @@ in the output.
 
 use strict;
 use warnings;
-use Moose;
+use Moo;
+use Types::Standard qw( Str HashRef FileHandle );
 
 use Getopt::Long;
 
@@ -63,7 +64,7 @@ A filehandle to write output to; defaults to C<STDOUT>
 
 =cut
 
-has 'fh' => ( is => 'rw', isa => 'FileHandle', default => sub { \*STDOUT } );
+has 'fh' => ( is => 'rw', isa => FileHandle, default => sub { \*STDOUT } );
 
 =head2 theme
 
@@ -74,7 +75,7 @@ in the private attribute C<_themes>, and currently include `light` and `dark`
 
 has theme => (
     'is'    => 'ro',
-    isa     => 'Str',
+    isa     => Str,
     lazy    => 1,
     default => sub {
         my $theme = 'dark';
@@ -86,7 +87,7 @@ has theme => (
 
 has _themes => (
     is      => 'ro',
-    isa     => 'HashRef[HashRef]',
+    isa     => HashRef[HashRef],
     lazy    => 1,
     default => sub {
         {

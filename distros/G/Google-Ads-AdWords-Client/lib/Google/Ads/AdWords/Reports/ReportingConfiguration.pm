@@ -15,6 +15,7 @@
 package Google::Ads::AdWords::Reports::ReportingConfiguration;
 
 use strict;
+use warnings;
 use utf8;
 use version;
 

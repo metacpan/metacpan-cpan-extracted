@@ -7,7 +7,7 @@ use Test::More;
 
 use Future;
 
-use Future::AsyncAwait qw( async );
+use Future::AsyncAwait;
 
 my $before;
 my $after;
@@ -20,25 +20,25 @@ async sub identity
 # scalar
 {
    my $f1 = Future->new;
-   my $f2 = identity( $f1 );
+   my $fret = identity( $f1 );
 
-   isa_ok( $f2, "Future", 'identity() returns a Future' ) and do {
-      ok( !$f2->is_ready, '$f2 is not immediate for pending scalar' );
+   isa_ok( $fret, "Future", 'identity() returns a Future' ) and do {
+      ok( !$fret->is_ready, '$fret is not immediate for pending scalar' );
    };
 
    $f1->done( "result" );
-   is( scalar $f2->get, "result", '$f2->get for scalar' );
+   is( scalar $fret->get, "result", '$fret->get for scalar' );
 }
 
 # list
 {
    my $f1 = Future->new;
-   my $f2 = identity( $f1 );
+   my $fret = identity( $f1 );
 
-   isa_ok( $f2, "Future", 'identity() returns a Future' );
+   isa_ok( $fret, "Future", 'identity() returns a Future' );
 
    $f1->done( list => "goes", "here" );
-   is_deeply( [ $f2->get ], [qw( list goes here )], '$f2->get for list' );
+   is_deeply( [ $fret->get ], [qw( list goes here )], '$fret->get for list' );
 }
 
 async sub makelist
@@ -49,11 +49,11 @@ async sub makelist
 # stack discipline test
 {
    my $f1 = Future->new;
-   my $f2 = makelist( $f1 );
+   my $fret = makelist( $f1 );
 
    $f1->done( 4, 5 );
 
-   is_deeply( [ $f2->get ],
+   is_deeply( [ $fret->get ],
               [ 1, 2, [ 3, 4, 5, 6 ], 7, 8 ],
               'async/await respects stack discipline' );
 }
@@ -61,13 +61,13 @@ async sub makelist
 # failure
 {
    my $f1 = Future->new;
-   my $f2 = identity( $f1 );
+   my $fret = identity( $f1 );
 
-   isa_ok( $f2, "Future", 'identity() returns a Future' );
+   isa_ok( $fret, "Future", 'identity() returns a Future' );
 
    $f1->fail( "It failed\n" );
 
-   is( $f2->failure, "It failed\n", '$f2->failure for fail' );
+   is( $fret->failure, "It failed\n", '$fret->failure for fail' );
 }
 
 # ANON sub
@@ -77,12 +77,12 @@ async sub makelist
    };
 
    my $f1 = Future->new;
-   my $f2 = $func->( $f1 );
+   my $fret = $func->( $f1 );
 
-   ok( !$f2->is_ready, '$f2 is not immediate for pending ANON' );
+   ok( !$fret->is_ready, '$fret is not immediate for pending ANON' );
 
    $f1->done( "later" );
-   is( scalar $f2->get, "later", '$f2->get for ANON' );
+   is( scalar $fret->get, "later", '$fret->get for ANON' );
 }
 
 # ANON sub closure
@@ -93,12 +93,12 @@ async sub makelist
       return await $f1;
    };
 
-   my $f2 = $func->( $f1 );
+   my $fret = $func->( $f1 );
 
-   ok( !$f2->is_ready, '$f2 is not immediate for pending ANON closure' );
+   ok( !$fret->is_ready, '$fret is not immediate for pending ANON closure' );
 
    $f1->done( "later" );
-   is( scalar $f2->get, "later", '$f2->get for ANON closure' );
+   is( scalar $fret->get, "later", '$fret->get for ANON closure' );
 }
 
 done_testing;

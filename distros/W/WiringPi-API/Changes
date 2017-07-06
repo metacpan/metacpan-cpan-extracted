@@ -1,5 +1,34 @@
 Revision history for Perl extension WiringPi::API.
 
+2.3613  2017-07-01
+        - integrated wiringSerial, providing basic serial interface support
+
+2.3612  2017-06-24
+        - added pin_mode_alt() due to an issue found in RPi::WiringPi. Upon
+          that module's cleanup() routine, we need to ensure all pins are back
+          to real default
+        - in relation to stevieb9/rpi-lcd#6, added a warning in lcd_init() POD
+          to always check the return value of the function for a -1 error, else
+          if you continue on, the code will segfault
+
+2.3611  2017-06-23
+        - fix i2c_read_word(). It had the same issue with not sending $data in
+          as i2c_write_word() did in the last releases Changes entry
+        - the issue in the last release regarding Arduino I2C comms has been
+          solved. See the forum post update in the last entry
+
+2.3610_02 2017-06-22
+        - updated Changes with proper date
+        - removed all traces of Software PWM from code and documentation, as
+          even Gordon himself advises not to use it
+        - added file information and copyright to the .h and .xs files
+        - fix bug in i2c_write_word(), $data param wasn't being sent in, which
+          resulted in an argument error being thrown from the wiringPi
+          library
+        - putting out as a trial. There are issues with RPi to Arduino I2C
+          comms...
+          (see https://www.raspberrypi.org/forums/viewtopic.php?f=33&t=186661)
+
 2.3609  2017-03-26
         - fix unicode POD error
         - fix declaration issue for digitalReadByte2()

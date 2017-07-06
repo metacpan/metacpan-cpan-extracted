@@ -17,6 +17,7 @@ Image::PNG::Libpng - Perl interface to the C library "libpng".
 =head1 SYNOPSIS
 
     
+    use Image::PNG::Libpng ':all';
     my $png = create_read_struct ();
     open my $file, '<:raw', 'nice.png';
     $png->init_io ($file);
@@ -37,8 +38,8 @@ This example is in F<examples/synopsis.pl> in the distribution.
 
 =head1 VERSION
 
-This document describes Image::PNG::Libpng version 0.43,
-corresponding to git commit f314404c4a2cde24cbf570930864bfd897adf0a9 at Sat Feb 27 11:16:14 2016 +0900.
+This document describes Image::PNG::Libpng version 0.44,
+corresponding to git commit 430def21322365ef035c98689e28ac74526c3b7b at Wed Jun 28 15:10:26 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -116,6 +117,7 @@ reads in all the data from the structure on being called.
 This is useful when image data is stored in a Perl scalar. For example
 
     
+    use Image::PNG::Libpng 'read_from_scalar';
     use LWP::Simple;
     my $image_data = get 'http://libpng.org/pub/png/img_png/libpng-88x31.png';
     # Now $image_data contains the PNG file
@@ -145,6 +147,10 @@ So, for example,
     
     # This CGI script prints a PNG in a random colour.
     
+    use lib '/home/ben/projects/image-png-libpng/blib/arch';
+    use lib '/home/ben/projects/image-png-libpng/blib/lib';
+    use Image::PNG::Libpng ':all';
+    use Image::PNG::Const ':all';
     my $png = create_write_struct ();
     my $size = 100;
     $png->set_IHDR ({height => $size, width => $size, bit_depth => 8,
@@ -178,6 +184,20 @@ kinds of object, "read a png" objects created by
 L</create_read_struct> and "write a png" objects created by
 L</create_write_struct>. This function copies all the valid chunks
 from a read structure to a write structure.
+
+The following example demonstrates copying a PNG.
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Image::PNG::Libpng qw(read_png_file write_png_file) ;
+    my $pngin = read_png_file ("$Bin/../t/tantei-san.png");
+    my $pngout = $pngin->copy_png ();
+    $pngout->set_text ([{key => 'Name', text => 'Shunsaku Kudo'}]); 
+    # $pngout->write_png_file ('copy.png');
+
+This example is in F<examples/copy-png.pl> in the distribution.
+
 
 =head2 set_transforms
 
@@ -583,6 +603,7 @@ name. The name is in upper case, with words separated by underscores,
 as in C<RGB_ALPHA>.
 
     
+    use Image::PNG::Libpng ':all';
     my $png = read_png_file ('tantei-san.png');
     my $name = color_type_name ($png->get_IHDR->{color_type});
     print "Your PNG has colour type $name.\n";
@@ -1824,7 +1845,7 @@ instances of unevaluated arguments, which have all been eliminated
 from this module.
 
 If you are interested in exactly which libpng arguments are omitted,
-you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|http://cpansearch.perl.org/src/BKB/Image-PNG-Libpng-0.43/perl-libpng.c> in the macro
+you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|http://cpansearch.perl.org/src/BKB/Image-PNG-Libpng-0.44/perl-libpng.c> in the macro
 C<UNUSED_ZERO_ARG>.
 
 =head2 Function return values are used to return values
@@ -1976,6 +1997,12 @@ The module may produce the following error or warning messages. Errors
 are marked "(F)" and warnings are marked "(W)".
 
 =over
+
+
+=item The %s chunk is not supported in this libpng
+
+(W) 
+
 
 
 =item libpng error: %s
@@ -2190,6 +2217,14 @@ The user's name for a private chunk was not a valid length. In this case the chu
 
 
 
+=item Unknown whether '%s' is supported
+
+(W) 
+The user asked whether something was supported, but we don't know what that thing is.
+
+
+
+
 =item undefined chunk name at offset %d in chunk list
 
 (F) 
@@ -2288,19 +2323,18 @@ with PNG and other image formats.
 
 =item Image::Info
 
-L<Image::Info> is a module for getting information out of various
-types of images. It has good support for PNG and is written in pure
-Perl (doesn't require a C compiler). As well as basics such as height,
-width, and colour type, it can get text chunks, modification time,
-palette, gamma (gAMA chunk), resolution (pHYs chunk), and significant
-bits (sBIT chunk). At the time of writing (version 1.31) it doesn't
-support other chunks.
+L<Image::Info> gets information out of images. It supports PNG and is
+written in pure Perl, so it doesn't require a C compiler. As well as
+basics such as height, width, and colour type, it can get text chunks,
+modification time, palette, gamma (gAMA chunk), resolution (pHYs
+chunk), and significant bits (sBIT chunk). At the time of writing
+(version 1.31) it doesn't support other chunks.
 
 =item Image::ExifTool
 
 L<Image::ExifTool> is a pure Perl (doesn't require a C compiler)
-solution for accessing the text segments of images. It has extensive
-support for PNG text segments.
+solution for accessing the text segments of images. It supports PNG
+text segments.
 
 =item Alien::PNG
 
@@ -2331,6 +2365,10 @@ for reading and writing PNGs via libpng, as well as support for
 reading and writing various other kinds of image files, changing the
 images, converting, and more.
 
+=item Image::PNG::Write::BW
+
+L<Image::PNG::Write::BW> writes black and white PNGs from strings.
+
 =back
 
 
@@ -2339,18 +2377,10 @@ images, converting, and more.
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2016
+2011-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated
@@ -2359,8 +2389,6 @@ Licence.
 
 
 
-
-=cut
 
 # Local Variables:
 # mode: perl

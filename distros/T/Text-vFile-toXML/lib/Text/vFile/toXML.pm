@@ -9,11 +9,11 @@ Text::vFile::toXML - Convert vFiles into equivalent XML
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Carp qw(croak);
 use Text::vFile::asData;
@@ -145,7 +145,7 @@ point of nearly trivializing this module.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006 Darren Kulp.
+Copyright 2006-2017 Darren Kulp.
 
 This program is released under the terms of the BSD license.
 

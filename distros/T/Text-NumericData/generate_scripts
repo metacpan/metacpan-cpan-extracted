@@ -1,13 +1,15 @@
 #!/bin/bash
 
-for i in lib/Text/NumericData/App/txd*.pm
-do
-  app=$(basename $i)
-  app=${app/.pm/}
-  script=script/$app
-  echo "$script"
-  mod=$(echo $i | perl -pe 's:^lib/(.+)\.pm:$1:; s,/,::,g;')
-  echo "#!/usr/bin/env perl
+generate()
+{
+  for i in "$@"
+  do
+    app=$(basename $i)
+    app=${app/.pm/}
+    script=script/$app
+    echo "$script"
+    mod=$(echo $i | perl -pe 's:^lib/(.+)\.pm:$1:; s,/,::,g;')
+    echo "#!/usr/bin/env perl
 
 use $mod;
 
@@ -16,5 +18,12 @@ exit \$app->run();
 
 __END__
 " > $script && chmod +x $script &&
-  perl -Ilib $script -h=-100 >> $script
-done
+    perl -Ilib $script -h=-100 >> $script
+  done
+}
+
+if test $# = 0; then
+  generate lib/Text/NumericData/App/txd*.pm
+else
+  generate "$@"
+fi

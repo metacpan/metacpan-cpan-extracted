@@ -1,0 +1,519 @@
+#!/usr/bin/env perl
+
+package Prty::Hash::Test;
+use base qw/Prty::Test::Class/;
+
+use strict;
+use warnings;
+use utf8;
+
+# -----------------------------------------------------------------------------
+
+sub test_loadClass : Init(1) {
+    shift->useOk('Prty::Hash');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_new_keyVal : Test(5) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+    $self->is(ref($h),'Prty::Hash','new: Test Klasse');
+    $self->is($h->{'a'},1,'new: Test a');
+    $self->is($h->{'b'},2,'new: Test b');
+    $self->is($h->{'c'},3,'new: Test c');
+    $self->ok(!$h->exists('d'),'new: Test d');
+}
+
+sub test_new_keys_vals : Test(5) {
+    my $self = shift;
+
+    my @keys = qw/a b c/;
+    my @vals = qw/1 2 3/;
+
+    my $h = Prty::Hash->new(\@keys,\@vals);
+    $self->is(ref($h),'Prty::Hash','new: Test Klasse');
+    $self->is($h->{'a'},1,'new: Test a');
+    $self->is($h->{'b'},2,'new: Test b');
+    $self->is($h->{'c'},3,'new: Test c');
+    $self->ok(!$h->exists('d'),'new: Test d');
+}
+
+sub test_new_keys_val : Test(5) {
+    my $self = shift;
+
+    my @keys = qw/a b c/;
+
+    my $h = Prty::Hash->new(\@keys,1);
+    $self->is(ref($h),'Prty::Hash','new: Test Klasse');
+    $self->is($h->{'a'},1,'new: Test a');
+    $self->is($h->{'b'},1,'new: Test b');
+    $self->is($h->{'c'},1,'new: Test c');
+    $self->ok(!$h->exists('d'),'new: Test d');
+}
+
+sub test_new_hash : Test(5) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new({a=>1,b=>2,c=>3});
+    $self->is(ref($h),'Prty::Hash','new: Test Klasse');
+    $self->is($h->{'a'},1,'new: Test a');
+    $self->is($h->{'b'},2,'new: Test b');
+    $self->is($h->{'c'},3,'new: Test c');
+    $self->ok(!$h->exists('d'),'new: Test d');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_get : Test(5) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    my $val = $h->get('b');
+    $self->is($val,2,'get: Skalarkontext');
+
+    $val = $h->{'b'};
+    $self->is($val,2,'get: direkter Hashzugriff');
+
+    my @arr = $h->get('b','a');
+    $self->isDeeply(\@arr,[2,1],'get: Listkontext');
+
+    @arr = @{$h}{'b','a'};
+    $self->isDeeply(\@arr,[2,1],'get: direkter Hashzugriff');
+
+    $val = eval {$h->get('d')};
+    $self->ok($@,'get: unerlaubter Schlüssel -> Exception');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_getRef : Test(1) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    my $valS = $h->getRef('b');
+    $$valS .= 'a';
+    $self->is($h->{'b'},'2a');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_getArray : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>[1..5],c=>3);
+
+    my $arr = $h->getArray('b');
+    $self->isDeeply($arr,[1..5]);
+
+    my @arr = $h->getArray('b');
+    $self->isDeeply(\@arr,[1..5]);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_try : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    my $val = $h->try('b');
+    $self->is($val,2,'try: Skalarkontext');
+    
+    my @arr = $h->try('b','a');
+    $self->isDeeply(\@arr,[2,1],'try: Listkontext');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_set : Test(5) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    $h->set(b=>5);
+    $self->is($h->{'b'},5);
+
+    $h->{'b'} = 5;
+    $self->is($h->{'b'},5);
+
+    @{$h}{'b','c'} = (6,7);
+    $self->is($h->{'b'},6);
+    $self->is($h->{'c'},7);
+
+    eval {$h->set(d=>7)};
+    $self->ok($@);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_add : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    $h->add(b=>5,d=>7);
+    $self->is($h->{'b'},5,'add: neuer Wert');
+    $self->is($h->{'d'},7,'add: neues Schlüssel/Wert-Paar');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_memoize : Test(1) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>undef);
+    my $val = $h->memoize('a',sub {5});
+    $self->is($val,5);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_compute : Test(1) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1);
+
+    my $val = $h->compute('a',sub {
+        my ($h,$key) = @_;
+        return ++$h->{$key};
+    });
+    $self->is($val,2);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_AUTOLOAD : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    my $val = $h->a;
+    $self->is($val,1);
+
+    eval{$h->d};
+    $self->like($@,qr/HASH-00001/);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_keys : Test(3) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    my @keys = $h->keys;
+    @keys = sort @keys;
+    $self->isDeeply(\@keys,[qw/a b c/]);
+
+    my $keyA = $h->keys;
+    $self->is(ref($keyA),'ARRAY');
+    @keys = sort @$keyA;
+    $self->isDeeply(\@keys,[qw/a b c/]);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_hashSize : Test(1) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+    my $n = $h->hashSize;
+    $self->is($n,3,'hashSize');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_validate : Test(2) {
+    my $self = shift;
+
+    my $h = {a=>1,b=>2,c=>3};
+
+    eval{Prty::Hash->validate($h,[qw/a b c/])};
+    $self->ok(!$@);
+
+    eval{Prty::Hash->validate($h,[qw/a b d/])};
+    $self->ok($@);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_copy : Test(2) {
+    my $self = shift;
+
+    my $h1 = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    my $h2 = $h1->copy;
+    $self->isnt($h1,$h2,'copy: Referenzen verschieden');
+    $self->isDeeply($h1,$h2,'copy: gleiche Schlüssel/Wert-Paare');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_join : Test(1) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+    my %hash = (b=>4);
+    my $expectedH = Prty::Hash->new(a=>1,b=>4,c=>3);
+    
+    $h->join(\%hash);
+    $self->isDeeply($h,$expectedH);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_delete : Test(4) {
+    my $self = shift;
+
+    # Test-Hash erzeugen
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    # Schlüssel entfernen
+
+    $h->delete('a','c');
+    my $keyA = $h->keys;
+    $self->isDeeply($keyA,['b']);
+
+    # Entfernte Schlüssel erneut setzen
+
+    $h->set(a=>4,c=>5);
+    my @arr = $h->get(qw/a b c/);
+    $self->isDeeply(\@arr,[4,2,5]);
+
+    # Mehrere Schlüssel auf konventionelle Weise entfernen
+
+    delete @{$h}{'a','c'};
+    $keyA = $h->keys;
+    $self->isDeeply($keyA,['b']);
+
+    # Neue Schlüssel können nicht hinzugeügt werden
+
+    eval{$h->set(d=>6)};
+    $self->ok($@);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_clear : Test(4) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+    my $b1 = $h->buckets;
+    $h->clear;
+    my $b2 = $h->buckets;
+    $self->is($b1,$b2,'clear: Anzahl Buckets bleibt identisch');
+
+    my $n = $h->hashSize;
+    $self->is($n,0,'clear: Hash ist leer');
+
+    $h->set(a=>1);
+    $self->is($h->{'a'},1,'clear: zulässiger Schlüssel bleibt zugreifbar');
+
+    eval{$h->set(d=>4)};
+    $self->ok($@);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_exists : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1);
+
+    my $bool = $h->exists('a');
+    $self->ok($bool,'exists: a existiert');
+
+    $bool = $h->exists('b');
+    $self->ok(!$bool,'exists: b existiert nicht');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_defined : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>undef);
+
+    my $bool = $h->defined('a');
+    $self->ok($bool,'defined: a ist definiert');
+
+    $bool = $h->defined('b');
+    $self->ok(!$bool,'defined: b ist nicht definiert');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_isEmpty : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+    my $bool = $h->isEmpty;
+    $self->ok(!$bool,'isEmpty: nicht leer');
+
+    $h->clear;
+    $bool = $h->isEmpty;
+    $self->ok($bool,'isEmpty: leer');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_isLocked : Test(3) {
+    my $self = shift;
+
+    # Leerer Hash
+
+    my $h = Prty::Hash->new;
+    $self->ok($h->isLocked);
+
+    # Nicht-Leerer Hash
+
+    $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    my $isLocked = $h->isLocked;
+    $self->ok($isLocked);
+
+    $h->unlockKeys;
+    $isLocked = $h->isLocked;
+    # Fehler unter Perl 5.10.1
+    $self->ok(!$isLocked);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_lockKeys : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+
+    $h->lockKeys;
+
+    my $val = $h->{'b'};
+    $self->is($val,2,'lockKeys: Key b');
+
+    $val = eval {$h->{'d'}};
+    $self->like($@,qr/disallowed key 'd'/,'lockKeys: Key d - Exception');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_unlockKeys : Test(3) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
+    $h->lockKeys;
+
+    my $val = $h->{'b'};
+    $self->is($val,2,'unlockKeys: Key b');
+
+    $val = eval { $h->{'d'} };
+    $self->like($@,qr/disallowed key 'd'/,'unlockKeys: Key d - Exception');
+
+    $h->unlockKeys;
+
+    $val = $h->{'d'};
+    $self->is($val,undef,'unlockKeys: Key d - undef');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_arraySize : Test(3) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>[1..5],b=>undef,c=>{});
+
+    my $n = $h->arraySize('a');
+    $self->is($n,5);
+
+    $n = $h->arraySize('b');
+    $self->is($n,0);
+
+    eval{$h->arraySize('c')};
+    $self->like($@,qr/HASH-00005/);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_push : Test(1) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>[1..5],b=>undef,c=>{});
+
+    $h->push(a=>10);
+    my $arr = $h->get('a');
+    $self->isDeeply($arr,[1..5,10]);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_increment : Test(1) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new(a=>1);
+
+    my $n = $h->increment('a');
+    $self->is($n,2);
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_weaken : Test(2) {
+    my $self = shift;
+
+    my $child = Prty::Hash->new;
+    my $parent = Prty::Hash->new(child=>$child);
+    $parent->weaken('child');
+    $self->ok($parent->get('child'),'weaken: Schwache Referenz');
+    $child = undef;
+    $self->is($parent->get('child'),undef,'weaken: Referenz entfernt');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_buckets : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new;
+    my $n = $h->buckets(1000);
+    $self->is($n,1024,'buckets: Bucket-Anzahl');
+    $n = $h->hashSize;
+    $self->is($n,0,'buckets: Hash bleibt leer');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_bucketsUsed : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new;
+    my $n = $h->bucketsUsed;
+    $self->is($n,0,'bucketsUsed: Hash ist leer');
+
+    $h->add(a=>1,b=>2,c=>3);
+    $n = $h->bucketsUsed;
+    $self->ok($n,'bucketsUsed: Buckets vorhanden (Anzahl schwankt)');
+}
+
+# -----------------------------------------------------------------------------
+
+sub test_debugMode : Test(2) {
+    my $self = shift;
+
+    my $h = Prty::Hash->new;
+    eval {$h->set(a=>1)};
+    $self->ok($@);
+
+    $h->debugMode(1);
+    eval {$h->set(a=>1)};
+    $self->like($@,qr/HASH-00004/);
+}
+
+# -----------------------------------------------------------------------------
+
+package main;
+Prty::Hash::Test->runTests;
+
+# eof

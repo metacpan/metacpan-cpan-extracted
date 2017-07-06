@@ -11,6 +11,8 @@ lib/Crypt/HashCash/Coin/Blinded.pm
 lib/Crypt/HashCash/CoinRequest.pm
 lib/Crypt/HashCash/Vault/Bitcoin.pm
 bin/vault.pl
+bin/vault-queuer.pl
+bin/vault-worker.pl
 bin/hashcash.pl
 t/00-load.t
 t/01-hashcash.t

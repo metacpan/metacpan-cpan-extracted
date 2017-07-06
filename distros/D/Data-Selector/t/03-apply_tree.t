@@ -15,10 +15,12 @@ my $data_tree = {
     },
     '+foo_4' => 'leading_plus',
     '-foo_4' => 'leading_hyphen',
+    bar => bless( {}, 'Bar' ),
 };
 
 my @cases = (
     [ '*', $data_tree, 0.001, ],
+    [ '*.*', $data_tree, 0.001, ],
     [ '-*', {}, 0.001, ],
     [
         '[foo_3,foo_1]', { map { ( $_, $data_tree->{$_}, ); } qw(foo_3 foo_1) },
@@ -26,7 +28,8 @@ my @cases = (
     ],
     [
         'foo_1,-foo_1',
-        { map { ( $_, $data_tree->{$_}, ); } qw(foo_2 foo_3 +foo_4 -foo_4 ) },
+        { map { ( $_, $data_tree->{$_}, ); }
+          qw(foo_2 foo_3 +foo_4 -foo_4 bar) },
         0.001,
     ],
     [ '-foo_1,foo_1', { foo_1 => 'a', }, 0.001, ],
@@ -46,7 +49,8 @@ my @cases = (
     [ '-foo_3,*', $data_tree, 0.001, ],
     [
         '*,-foo_3',
-        { map { ( $_, $data_tree->{$_}, ); } qw(foo_1 foo_2 +foo_4 -foo_4) },
+        { map { ( $_, $data_tree->{$_}, ); }
+          qw(foo_1 foo_2 +foo_4 -foo_4 bar) },
         0.001,
     ],
     [ 'foo_3,-*', {}, 0.001, ],
@@ -56,7 +60,8 @@ my @cases = (
         { map { ( $_, $data_tree->{$_}, ); } qw(foo_1 foo_2 foo_3) }, 0.001,
     ],
     [
-        'foo*,-foo*', { map { ( $_, $data_tree->{$_}, ); } qw(+foo_4 -foo_4) },
+        'foo*,-foo*',
+        { map { ( $_, $data_tree->{$_}, ); } qw(+foo_4 -foo_4 bar) },
         0.001,
     ],
     [

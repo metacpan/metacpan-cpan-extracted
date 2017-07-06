@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Log-Report-Optional",
    "no_index" : {
@@ -32,11 +32,11 @@
       },
       "runtime" : {
          "requires" : {
-            "String::Print" : "0.13",
+            "String::Print" : "0.91",
             "Test::More" : "0.86"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.02"
+   "version" : "1.03"
 }

@@ -7,6 +7,8 @@ use List::MoreUtils qw(firstidx);
 
 =head1 HPC::Runner::Command::submit_jobs::Utils::Scheduler::JobStats
 
+This will be undergoing serious revision in the near future
+
 =head2 Attributes
 
 Package Attributes
@@ -100,6 +102,10 @@ sub create_meta_str {
     $batch->{jobname}         = $current_job;
     $batch->{job_counter}     = $counter;
     $batch->{job_tasks}       = $job->cmd_counter;
+    $batch->{job_cmd_start}   = $job->{cmd_start};
+
+    $batch->{task_index_start} = $job->{cmd_start};
+    $batch->{task_index_end} = $job->{cmd_counter} + $job->{cmd_start} - 1;
 
     if ($use_batches) {
         $batch->{batch_index} = $batch_counter . "/" . $self->total_batches;
@@ -112,7 +118,8 @@ sub create_meta_str {
     my $json      = JSON->new->allow_nonref;
     my $json_text = $json->encode($batch);
 
-    $batch->{meta_str} = $json_text;
+    # $batch->{meta_str} = $json_text;
+    # delete $batch->{meta_str};
     $json_text = "--metastr \'$json_text\'";
     return $json_text;
 }
@@ -136,12 +143,11 @@ sub collect_stats {
     my $command_count = ( $self->total_processes - $cmd_counter ) + 1;
 
     $self->set_batches(
-        $batch_counter . "_"
-          . $current_job => {
-            # commands => $cmd_counter,
-            jobname  => $current_job,
-            batch    => $batch_counter,
-          }
+        $batch_counter . "_" . $current_job => {
+            commands => $cmd_counter,
+            jobname => $current_job,
+            batch   => $batch_counter,
+        }
     );
 
     my $jobhref = {};

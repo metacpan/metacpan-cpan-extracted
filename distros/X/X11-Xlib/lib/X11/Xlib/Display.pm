@@ -9,6 +9,7 @@ require X11::Xlib::Screen;
 require X11::Xlib::Colormap;
 require X11::Xlib::Window;
 require X11::Xlib::Pixmap;
+require X11::Xlib::XserverRegion;
 
 =head1 NAME
 
@@ -134,6 +135,7 @@ sub new {
     event_type => $type,
     event_mask => $mask,
     timeout    => $seconds,
+    loop       => $bool_keep_trying,
   );
 
 Each argument is optional.  If you specify C<window>, it will only return events
@@ -146,7 +148,9 @@ event.  If C<timeout> is zero, the function acts like C<XCheckEvent> and returns
 immediately.  If C<timeout> is not specified the function will wait indefinitely.
 However, the wait is always interrupted by pending data from the X11 server, or
 signals, so in practice the wait won't be very long and you should call it in
-an appropriate loop.
+an appropriate loop.  Or, if you want this module to take care of that detail,
+add "loop => 1" to the arguments and then wait_event will wait up to the full
+timeout before returning false.
 
 Returns an L<X11::Xlib::XEvent> on success, or undef on timeout or interruption.
 
@@ -154,15 +158,20 @@ Returns an L<X11::Xlib::XEvent> on success, or undef on timeout or interruption.
 
 sub wait_event {
     my ($self, %args)= @_;
+    my $timeout= defined $args{timeout}? int($args{timeout} * 1000) : 0x7FFFFFFF;
+    require Time::HiRes;
+    my $start= Time::HiRes::time();
     my $event;
-    $self->_wait_event(
-        $args{window}||0,
-        $args{event_type}||0,
-        $args{event_mask}||0x7FFFFFFF,
-        $event,
-        ($args{timeout}||0)*1000 || 0x7FFFFFFF
-    )
-    ? $event : undef;
+    do {
+        $self->_wait_event(
+            $args{window}||0,
+            $args{event_type}||0,
+            $args{event_mask}||0x7FFFFFFF,
+            $event,
+            $timeout
+        ) and return $event;
+    } while ($args{loop} and (Time::HiRes::time() - $start)*1000 < $timeout);
+    return undef;
 }
 
 =head3 send_event
@@ -334,6 +343,14 @@ You can specify as many or as few fields as you like.
 
 =cut
 
+# Attach a pointer to self to each of the returned structs
+sub XGetVisualInfo {
+    my $self= $_[0];
+    my @list= &X11::Xlib::XGetVisualInfo;
+    $_->display($self) for @list;
+    @list;
+}
+
 sub visual_info {
     my ($self, $visual_or_id)= @_;
     my $id= !defined $visual_or_id? $self->default_screen->visual->id
@@ -447,6 +464,11 @@ sub XCreatePixmapFromBitmapData {
         autofree => 1,
     );
 }
+
+*X11::Xlib::Display::XCompositeNameWindowPixmap= sub {
+    my $xid= &X11::Xlib::XCompositeNameWindowPixmap;
+    $_[0]->get_cached_pixmap($xid, autofree => 1);
+} if X11::Xlib->can('XCompositeNameWindowPixmap');
 
 =head3 new_window
 
@@ -574,6 +596,23 @@ sub XCreateSimpleWindow {
     $_[0]->get_cached_window( &X11::Xlib::XCreateSimpleWindow, autofree => 1);
 }
 
+*X11::Xlib::Display::XCompositeGetOverlayWindow= sub {
+    my $xid= &X11::Xlib::XCompositeGetOverlayWindow;
+    $_[0]->get_cached_window( $xid, autofree => 0 ); # can be only one, and needs freed specially
+} if X11::Xlib->can('XCompositeGetOverlayWindow');
+
+*X11::Xlib::Display::XCompositeCreateRegionFromBorderClip= sub {
+    my $self= $_[0];
+    my $xid= &X11::Xlib::XCompositeCreateRegionFromBorderClip;
+    $self->get_cached_region( $xid, autofree => 1 );
+} if X11::Xlib->can('XCompositeCreateRegionFromBorderClip');
+
+*X11::Xlib::Display::XFixesCreateRegion= sub {
+    my $self= $_[0];
+    my $xid= &X11::Xlib::XFixesCreateRegion;
+    $self->get_cached_region( $xid, autofree => 1 );
+} if X11::Xlib->can('XFixesCreateRegion');
+
 =head2 INPUT
 
 =head3 keymap
@@ -631,6 +670,9 @@ that if you fetch the same resource again, you get the same object instance as
 last time.  These methods are made public so that you can get the same behavior
 when working with XIDs that weren't already wrapped by this module.
 
+There is also a cache of wrapper objects of the opaque pointers allocated for
+a display.  This cache is private.
+
 =head3 get_cached_xobj
 
   my $obj= $display->get_cached_xobj( $xid, $class, @new_args );
@@ -645,9 +687,15 @@ sub _xid_cache { $_[0]{_xid_cache} }
 sub get_cached_xobj {
     my ($self, $xid)= (shift, shift);
     my $obj;
+    # In case an object is accidentally passed, prevent confusion by returning
+    # the canonical version, or making the passed object the canonical one.
+    if (ref $xid and ref($xid)->isa($_[0])) {
+        $obj= $xid;
+        $xid= $obj->xid;
+    }
     return $self->{_xid_cache}{$xid} || do {
         my $class= shift || 'X11::Xlib::XID';
-        $obj= $class->new(display => $self, xid => $xid, @_);
+        $obj ||= $class->new(display => $self, xid => $xid, @_);
         Scalar::Util::weaken( $self->{_xid_cache}{$xid}= $obj );
         $obj;
     };
@@ -681,6 +729,9 @@ sub get_cached_pixmap {
 }
 sub get_cached_window {
     shift->get_cached_xobj(shift, 'X11::Xlib::Window', @_);
+}
+sub get_cached_region {
+    shift->get_cached_xobj(shift, 'X11::Xlib::XserverRegion', @_);
 }
 
 1;

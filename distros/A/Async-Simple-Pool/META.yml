@@ -31,13 +31,13 @@ no_index:
 provides:
   Async::Simple::Pool:
     file: lib/Async/Simple/Pool.pm
-    version: '0.07'
+    version: '0.08'
   Async::Simple::Task:
     file: lib/Async/Simple/Task.pm
-    version: '0.07'
+    version: '0.08'
   Async::Simple::Task::Fork:
     file: lib/Async/Simple/Task/Fork.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   Class::Load: '0'
   Clone: '0'
@@ -47,6 +47,6 @@ requires:
   Moose: '0'
   Time::HiRes: '0'
   namespace::autoclean: '0'
-  perl: '5.010000'
-version: '0.07'
+  perl: '5.014000'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

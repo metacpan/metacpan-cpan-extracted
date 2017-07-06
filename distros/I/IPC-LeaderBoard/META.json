@@ -4,7 +4,7 @@
       "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -59,7 +59,8 @@
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
             "Test::Fatal" : "0",
-            "Test::More" : "0.94"
+            "Test::More" : "0.94",
+            "Test::Warnings" : "0"
          }
       }
    },
@@ -74,7 +75,7 @@
          "web" : "https://github.com/binary-com/perl-IPC-LeaderBoard"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
+   "version" : "0.04",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
 }
 

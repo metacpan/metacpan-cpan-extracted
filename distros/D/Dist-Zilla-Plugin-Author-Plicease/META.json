@@ -83,7 +83,7 @@
          "web" : "https://github.com/plicease/Dist-Zilla-Plugin-Author-Plicease"
       }
    },
-   "version" : "2.15",
+   "version" : "2.16",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

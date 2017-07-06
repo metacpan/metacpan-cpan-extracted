@@ -2,9 +2,8 @@
 #
 #  DESCRIPTION:  Test Controller
 #
-#       AUTHOR:  Aliaksandr P. Zahatski, <zahatski@gmail.com>
+#       AUTHOR:  Aliaksandr P. Zahatski, <zag@cpan.org>
 #===============================================================================
-#$Id$
 
 package Test::Writer;
 
@@ -36,7 +35,7 @@ sub make_cv {
 
 }
 
-use Test::More tests => 12;                      # last test to print
+use Test::More tests => 14;                      # last test to print
 use_ok('WebDAO::CV');
 use_ok('WebDAO::Response');
 
@@ -94,9 +93,18 @@ is_deeply {@{ $r->_cv_obj->{fd}->headers}} ,
     'Content-Length' => 2345,
     'Content-Type'   => 'text/html; charset=utf-8',
     'Set-Cookie'     => 'test=1; path=/',
-    'Set-Cookie'     => 'test1=2; path=/ ;expires=Wed, 25-Jan-2012 14:19:48 GMT'
+    'Set-Cookie'     => 'test1=2; path=/; expires=Wed, 25-Jan-2012 14:19:48 GMT'
   },
   'Set Cookies';
+
+my $cv_2 = &make_cv;
+my $r2 = new WebDAO::Response:: cv => $cv_2;
+$r2->set_cookie(  name => 'test', value => 1, secure=>1, httponly=>1 , expires=>'+3M' );
+$r2->print_header();
+
+my $cokies_str = { @{ $r2->_cv_obj->{fd}->headers}}->{'Set-Cookie'};
+ok $cokies_str =~ /secure/i, 'Secure option';
+ok $cokies_str =~ /httponly/i, 'httponly option';
 
 my $cv2 = $fcgi;
 
@@ -105,8 +113,6 @@ is_deeply $cv2->get_cookie(),{
            'Yert' => 'Terst'
          }, "Get cookie";
 
-#package WebDAO::CV;
-#use Data::Dumper;
 
 1;
 

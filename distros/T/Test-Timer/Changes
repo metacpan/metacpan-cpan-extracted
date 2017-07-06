@@ -1,5 +1,19 @@
 Revision history for Test-Timer
 
+2.03 2017-07-01 Maintenance release, update not required
+
+- Minor clean up in code and tests
+
+
+2.02 2017-06-30 Maintenance release, update recommended
+
+- Correction to documentation
+
+- Improvements to alarm signal handling and other internal parts
+
+- Addressed issue #15 meaning we thresholds are now included in the assertions
+
+
 2.01 2017-06-12 Bug fix release, update recommended
 
 - Fixed bug where execution/time would be reported as 0 (#13)

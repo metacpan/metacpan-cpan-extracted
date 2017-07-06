@@ -1,7 +1,7 @@
 package Bencher::Scenario::CBlocks::Startup;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -46,7 +46,7 @@ Bencher::Scenario::CBlocks::Startup - Benchmark startup of C::Blocks compared to
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenario::CBlocks::Startup (from Perl distribution Bencher-Scenarios-CBlocks), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenario::CBlocks::Startup (from Perl distribution Bencher-Scenarios-CBlocks), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -85,13 +85,13 @@ Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2
 Benchmark with default options (C<< bencher -m CBlocks::Startup >>):
 
  #table1#
- +----------------------------+-----------+-----------+------------+-----------+---------+
- | participant                | rate (/s) | time (ms) | vs_slowest |  errors   | samples |
- +----------------------------+-----------+-----------+------------+-----------+---------+
- | load_cblocks_perlapi_types |        25 |      40   |        1   |   0.00011 |      21 |
- | load_cblocks               |        43 |      23   |        1.7 |   0.0001  |      21 |
- | perl                       |       120 |       8.2 |        4.9 | 3.9e-05   |      20 |
- +----------------------------+-----------+-----------+------------+-----------+---------+
+ +----------------------------+-----------+-----------+------------+---------+---------+
+ | participant                | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+ +----------------------------+-----------+-----------+------------+---------+---------+
+ | load_cblocks_perlapi_types |        28 |        36 |        1   | 4.8e-05 |      20 |
+ | load_cblocks               |        47 |        21 |        1.7 | 7.4e-05 |      21 |
+ | perl                       |       140 |         7 |        5.1 | 1.8e-05 |      20 |
+ +----------------------------+-----------+-----------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

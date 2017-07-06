@@ -18,7 +18,7 @@ DEPENDENCIES
   * File::Temp
   * Moose
   * version
-  * Nagios::Plugin
+  * Monitoring::Plugin
 
 SYNOPSIS
 ========

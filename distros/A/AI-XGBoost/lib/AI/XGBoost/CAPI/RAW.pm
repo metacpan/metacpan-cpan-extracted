@@ -4,7 +4,7 @@ use warnings;
 
 use parent 'NativeCall';
 
-our $VERSION = '0.004';    # VERSION
+our $VERSION = '0.005';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost C API https://github.com/dmlc/xgboost
 
@@ -12,13 +12,13 @@ sub XGBGetLastError : Args() : Native(xgboost) : Returns(string) { }
 
 sub XGDMatrixCreateFromFile : Args(string, int, opaque*) : Native(xgboost) : Returns(int) { }
 
-sub XGDMatrixCreateFromCSREx : Args(size_t*, uint*, float*, size_t, size_t, size_t, opaque*) : Native(xgboost) :
+sub XGDMatrixCreateFromCSREx : Args(size_t[], uint[], float[], size_t, size_t, size_t, opaque*) : Native(xgboost) :
   Returns(int) { }
 
-sub XGDMatrixCreateFromCSCEx : Args(size_t*, uint*, float*, size_t, size_t, size_t, opaque*) : Native(xgboost) :
+sub XGDMatrixCreateFromCSCEx : Args(size_t[], uint[], float[], size_t, size_t, size_t, opaque*) : Native(xgboost) :
   Returns(int) { }
 
-sub XGDMatrixCreateFromMat : Args(float *, uint64, uint64, float, opaque*) : Native(xgboost) : Returns(int) { }
+sub XGDMatrixCreateFromMat : Args(float[], uint64, uint64, float, opaque*) : Native(xgboost) : Returns(int) { }
 
 sub XGDMatrixSliceDMatrix : Args(opaque, int *, uint64, opaque*) : Native(xgboost) : Returns(int) { }
 
@@ -28,7 +28,7 @@ sub XGDMatrixNumCol : Args(opaque, uint64*) : Native(xgboost) : Returns(int) { }
 
 sub XGDMatrixSaveBinary : Args(opaque, string, int) : Native(xgboost) : Returns(int) { }
 
-sub XGDMatrixSetFloatInfo : Args(opaque, string, float *, uint64) : Native(xgboost) : Returns(int) { }
+sub XGDMatrixSetFloatInfo : Args(opaque, string, float[], uint64) : Native(xgboost) : Returns(int) { }
 
 sub XGDMatrixSetUIntInfo : Args(opaque, string, uint32 *, uint64) : Native(xgboost) : Returns(int) { }
 
@@ -46,15 +46,37 @@ sub XGBoosterFree : Args(opaque) : Native(xgboost) : Returns(int) { }
 
 sub XGBoosterSetParam : Args(opaque, string, string) : Native(xgboost) : Returns(int) { }
 
-sub XGBoosterBoostOneIter : Args(opaque, opaque, float*, float*, uint64) : Native(xgboost) : Returns(int) { }
+sub XGBoosterBoostOneIter : Args(opaque, opaque, float[], float[], uint64) : Native(xgboost) : Returns(int) { }
 
 sub XGBoosterUpdateOneIter : Args(opaque, int, opaque) : Native(xgboost) : Returns(int) { }
+
+sub XGBoosterEvalOneIter : Args(opaque, int, opaque[], opaque[], uint64, opaque*) : Native(xgboost) : Returns(int) { }
 
 sub XGBoosterPredict : Args(opaque, opaque, int, uint, uint64*, opaque*) : Native(xgboost) : Returns(int) { }
 
 sub XGBoosterLoadModel : Args(opaque, string) : Native(xgboost) : Returns(int) { }
 
 sub XGBoosterSaveModel : Args(opaque, string) : Native(xgboost) : Returns(int) { }
+
+sub XGBoosterLoadModelFromBuffer : Args(opaque, opaque, uint64) : Native(xgboost) : Returns(int) { }
+
+sub XGBoosterGetModelRaw : Args(opaque, uint64*, opaque*) : Native(xgboost) : Returns(int) { }
+
+sub XGBoosterDumpModel : Args(opaque, string, int, uint64*, opaque*) : Native(xgboost) : Returns(int) { }
+
+sub XGBoosterDumpModelEx : Args(opaque, string, int, string, uint64*, opaque*) : Native(xgboost) : Returns(int) { }
+
+sub XGBoosterDumpModelWithFeatures : Args(opaque, int, opaque[], opaque[], int, uint64*, opaque*) Native(xgboost) :
+  Returns(int) { }
+
+sub XGBoosterDumpModelExWithFeatures : Args(opaque, int, opaque[], opaque[], int, string, uint64*, opaque*)
+  Native(xgboost) : Returns(int) { }
+
+sub XGBoosterSetAttr : Args(opaque, string, string) : Native(xgboost) : Returns(int) { }
+
+sub XGBoosterGetAttr : Args(opaque, string, opaque*, int*) : Native(xgboost) : Returns(int) { }
+
+sub XGBoosterGetAttrNames : Args(opaque, uint64*, opaque*) : Native(xgboost) : Returns(int) { }
 
 1;
 
@@ -70,7 +92,7 @@ AI::XGBoost::CAPI::RAW - Perl wrapper for XGBoost C API https://github.com/dmlc/
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -579,6 +601,8 @@ training data
 
 =back
 
+=head2 XGBoosterEvalOneIter
+
 =head2 XGBoosterPredict
 
 Make prediction based on dmat
@@ -669,6 +693,24 @@ handle
 file name
 
 =back
+
+=head2 XGBoosterLoadModelFromBuffer
+
+=head2 XGBoosterGetModelRaw
+
+=head2 XGBoosterDumpModel
+
+=head2 XGBoosterDumpModelEx
+
+=head2 XGBoosterDumpModelWithFeatures
+
+=head2 XGBoosterDumpModelExWithFeatures
+
+=head2 XGBoosterSetAttr
+
+=head2 XGBoosterGetAttr
+
+=head2 XGBoosterGetAttrNames
 
 =head1 AUTHOR
 

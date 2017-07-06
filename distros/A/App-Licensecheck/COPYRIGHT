@@ -7,6 +7,32 @@ Files: INSTALL
  LICENSE
  README
  scripts/licensecheck.bash_completion
+ t/OSI/AFL-3.0
+ t/OSI/AGPL-3.0
+ t/OSI/Apache-2.0
+ t/OSI/Artistic-1.0
+ t/OSI/Artistic-2.0
+ t/OSI/BSD-2
+ t/OSI/BSD-3
+ t/OSI/BSL-1.0
+ t/OSI/CDDL-1.0
+ t/OSI/CECILL-2.1
+ t/OSI/EPL-1.0
+ t/OSI/GPL-2.0
+ t/OSI/ISC
+ t/OSI/LGPL-2.0
+ t/OSI/LGPL-2.1
+ t/OSI/MIT
+ t/OSI/MPL-1.0
+ t/OSI/MPL-1.1
+ t/OSI/MPL-2.0
+ t/OSI/NTP
+ t/OSI/OFL-1.1
+ t/OSI/PostgreSQL
+ t/OSI/Python-2.0
+ t/OSI/QPL-1.0
+ t/OSI/RPSL-1.0
+ t/OSI/Zlib
  t/SPDX/AFL-1.1.txt
  t/SPDX/AFL-1.2.txt
  t/SPDX/AFL-2.0.txt
@@ -62,6 +88,7 @@ Files: INSTALL
  t/SPDX/CECILL-B.txt
  t/SPDX/CECILL-C.txt
  t/SPDX/Cube.txt
+ t/SPDX/EPL-1.0.txt
  t/SPDX/Eurosym.txt
  t/SPDX/FTL.txt
  t/SPDX/ICU.txt
@@ -184,6 +211,7 @@ Files: Changes
  lib/App/Licensecheck.pm
  lib/Regexp/Pattern/License.pm
  lib/Regexp/Pattern/License/Parts.pm
+ t/OSI.t
  t/grant.t
 Copyright: Copyright 2017 Jonas Smedegaard.
 License: GPL-3.0

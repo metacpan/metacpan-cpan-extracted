@@ -1,25 +1,6 @@
-# --8<--8<--8<--8<--
-#
-# Copyright (C) 2007, 2014 Smithsonian Astrophysical Observatory
-#
-# This file is part of String::Interpolate::RE
-#
-# String::Interpolate::RE is free software: you can redistribute it
-# and/or modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation, either version 3 of
-# the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-# -->8-->8-->8-->8--
-
 package String::Interpolate::RE;
+
+# ABSTRACT: interpolate variables into strings using regular expressions
 
 use strict;
 use warnings;
@@ -28,7 +9,7 @@ use Carp;
 use Exporter qw[ import ];
 our @EXPORT_OK = qw( strinterp );
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 ## no critic (ProhibitAccessOfPrivateData)
 
@@ -70,91 +51,103 @@ sub _strinterp {
     my $fmt = $opt->{fmt};
 
     $_[0] =~ s{
-	       \$                # find a literal dollar sign
-	      (                  # followed by either
-	       {(\w+)(?:$fmt)?}  #  a variable name in curly brackets ($2)
-				 #  and an optional sprintf format
-	       |                 # or
-		(\w+)            #   a bareword ($3)
-	      )
-	    }{
-	      my $t = defined $4 ? $4 : $2;
+               \$                # find a literal dollar sign
+              (                  # followed by either
+               {(\w+)(?:$fmt)?}  #  a variable name in curly brackets ($2)
+                                 #  and an optional sprintf format
+               |                 # or
+                (\w+)            #   a bareword ($3)
+              )
+            }{
+              my $t = defined $4 ? $4 : $2;
 
-	      my $user_value = 'CODE' eq ref $var ? $var->($t) : $var->{$t};
+              my $user_value = 'CODE' eq ref $var ? $var->($t) : $var->{$t};
 
-	      my $v =
-	      # user provided?
-		defined $user_value               ? $user_value
+              my $v =
+              # user provided?
+                defined $user_value               ? $user_value
 
-	      # maybe in the environment
-	      : $opt->{useenv} && exists $ENV{$t}   ? $ENV{$t}
+              # maybe in the environment
+              : $opt->{useenv} && exists $ENV{$t}   ? $ENV{$t}
 
-	      # undefined: throw an error?
-	      : $opt->{raiseundef}                  ? croak( "undefined variable: $t\n" )
+              # undefined: throw an error?
+              : $opt->{raiseundef}                  ? croak( "undefined variable: $t\n" )
 
-	      # undefined: replace with ''?
-	      : $opt->{emptyundef}                  ? ''
+              # undefined: replace with ''?
+              : $opt->{emptyundef}                  ? ''
 
-	      # undefined
-	      :                                     undef
+              # undefined
+              :                                     undef
 
-	      ;
+              ;
 
-	      if ( $opt->{recurse} && defined $v ) {
+              if ( $opt->{recurse} && defined $v ) {
 
 
-		RECURSE:
-		  {
+                RECURSE:
+                  {
 
-		      croak(
-			  "circular interpolation loop detected with repeated interpolation of <\$$t>\n"
-		      ) if $opt->{track}{$t}++;
+                      croak(
+                          "circular interpolation loop detected with repeated interpolation of <\$$t>\n"
+                      ) if $opt->{track}{$t}++;
 
-		      ++$opt->{loop};
+                      ++$opt->{loop};
 
-		      last RECURSE if $opt->{recurse_limit} && $opt->{loop} > $opt->{recurse_limit};
+                      last RECURSE if $opt->{recurse_limit} && $opt->{loop} > $opt->{recurse_limit};
 
-		      croak(
-			  "recursion fail-safe limit ($opt->{recurse_fail_limit}) reached at interpolation of <\$$t>\n"
-		      ) if $opt->{recurse_fail_limit} && $opt->{loop} > $opt->{recurse_fail_limit};
+                      croak(
+                          "recursion fail-safe limit ($opt->{recurse_fail_limit}) reached at interpolation of <\$$t>\n"
+                      ) if $opt->{recurse_fail_limit} && $opt->{loop} > $opt->{recurse_fail_limit};
 
-		      _strinterp( $v, $_[1], $_[2] );
+                      _strinterp( $v, $_[1], $_[2] );
 
-		  }
+                  }
 
-		  delete $opt->{track}{$t};
-		  --$opt->{loop};
-	      }
+                  delete $opt->{track}{$t};
+                  --$opt->{loop};
+              }
 
-	      # if not defined, just put it back into the string
-		 ! defined $v                     ? '$' . $1
+              # if not defined, just put it back into the string
+                 ! defined $v                     ? '$' . $1
 
-	      # no format? return as is
-	      :  ! defined $3 || $3 eq ''         ? $v
+              # no format? return as is
+              :  ! defined $3 || $3 eq ''         ? $v
 
-	      # format it
-	      :                                     sprintf( $3, $v)
+              # format it
+              :                                     sprintf( $3, $v)
 
-	      ;
+              ;
 
-	}egx;
+        }egx;
 }
 
 1;
 
-__END__
+#
+# This file is part of String-Interpolate-RE
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
+=pod
 
 =head1 NAME
 
-String::Interpolate::RE - interpolate variables into strings
+String::Interpolate::RE - interpolate variables into strings using regular expressions
 
+=head1 VERSION
+
+version 0.06
 
 =head1 SYNOPSIS
 
     use String::Interpolate::RE qw( strinterp );
 
     $str = strinterp( "${Var1} $Var2", $vars, \%opts );
-
 
 =head1 DESCRIPTION
 
@@ -163,7 +156,6 @@ expression matching rather than Perl's built-in interpolation
 mechanism and thus hopefully does not suffer from the security
 problems inherent in using B<eval> to interpolate into strings of
 suspect ancestry.
-
 
 =head1 INTERFACE
 
@@ -215,7 +207,6 @@ would result in
 
     003
 
-
 =item raiseundef I<boolean>
 
 If true, a variable which has not been defined will result in an
@@ -263,11 +254,9 @@ The number of recursion levels to descend when recursing into a
 variable's value before giving up and croaking.  The default is C<100>.
 Setting this to C<0> means no limit.
 
-
 =back
 
 =back
-
 
 =head1 DIAGNOSTICS
 
@@ -292,37 +281,164 @@ interpolating nested variable values (with the C<recurse> option true ).
 
 =head1 BUGS AND LIMITATIONS
 
-No bugs have been reported.
-
-Please report any bugs or feature requests to
-C<bug-string-interpolate-re@rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=String-Interpolate-RE>.
-
-=head1 SEE ALSO
-
-Other CPAN Modules which interpolate into strings are
-L<String::Interpolate> and L<Interpolate>.  This module avoids the use
-of B<eval()> and presents a simpler interface.
-
-=head1 LICENSE AND COPYRIGHT
-
-Copyright (c) 2007, 2014 The Smithsonian Astrophysical Observatory
-
-String::Interpolate::RE is free software: you can redistribute
-it and/or modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=String-Interpolate-RE>.
 
 =head1 AUTHOR
 
-Diab Jerius  E<lt>djerius@cpan.orgE<gt>
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut
+
+__END__
 
 
+#pod =head1 SYNOPSIS
+#pod
+#pod     use String::Interpolate::RE qw( strinterp );
+#pod
+#pod     $str = strinterp( "${Var1} $Var2", $vars, \%opts );
+#pod
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module interpolates variables into strings using regular
+#pod expression matching rather than Perl's built-in interpolation
+#pod mechanism and thus hopefully does not suffer from the security
+#pod problems inherent in using B<eval> to interpolate into strings of
+#pod suspect ancestry.
+#pod
+#pod
+#pod =head1 INTERFACE
+#pod
+#pod =over
+#pod
+#pod =item strinterp
+#pod
+#pod     $str = strinterp( $template );
+#pod     $str = strinterp( $template, $vars );
+#pod     $str = strinterp( $template, $vars, \%opts );
+#pod
+#pod Interpolate variables into a template string, returning the
+#pod resultant string.  The template string is scanned for tokens of the
+#pod form
+#pod
+#pod     $VAR
+#pod     ${VAR}
+#pod
+#pod where C<VAR> is composed of one or more word characters (as defined by
+#pod the C<\w> Perl regular expression pattern). C<VAR> is resolved using
+#pod the optional C<$vars> argument, which may either by a hashref (in
+#pod which case C<VAR> must be a key), or a function reference (which is
+#pod passed C<VAR> as its only argument and must return the value).
+#pod
+#pod If the value returned for C<VAR> is defined, it will be interpolated
+#pod into the string at that point.  By default, variables which are not
+#pod defined are by default left as is in the string.
+#pod
+#pod The C<%opts> parameter may be used to modify the behavior of this
+#pod function.  The following (case insensitive) keys are recognized:
+#pod
+#pod =over
+#pod
+#pod =item format I<boolean>
+#pod
+#pod If this flag is true, the template string may provide a C<sprintf>
+#pod compatible format which will be used to generate the interpolated
+#pod value.  The format should be appended to the variable name with
+#pod an intervening C<:> character, e.g.
+#pod
+#pod     ${VAR:fmt}
+#pod
+#pod For example,
+#pod
+#pod     %var = ( foo => 3 );
+#pod     print strinterp( '${foo:%03d}', \%var, { format => 1 } );
+#pod
+#pod would result in
+#pod
+#pod     003
+#pod
+#pod
+#pod =item raiseundef I<boolean>
+#pod
+#pod If true, a variable which has not been defined will result in an
+#pod exception being raised.  This defaults to false.
+#pod
+#pod =item emptyundef I<boolean>
+#pod
+#pod If true, a variable which has not been defined will be replaced with
+#pod the empty string.  This defaults to false.
+#pod
+#pod =item useENV I<boolean>
+#pod
+#pod If true, the C<%ENV> hash will be searched for variables which are not
+#pod defined in the passed C<%var> hash.  This defaults to true.
+#pod
+#pod =item recurse I<boolean>
+#pod
+#pod If true, derived values are themselves scanned for variables to
+#pod interpolate.  To specify a limit to the number of levels of recursions
+#pod to attempt, set the C<recurse_limit> option.  Circular dependencies
+#pod are caught, but just to be safe there's a limit of recursion levels
+#pod specified by C<recurse_fail_limit>, beyond which an exception is
+#pod thrown.
+#pod
+#pod For example,
+#pod
+#pod   my %var = ( a => '$b', b => '$c', c => 'd' );
+#pod   strinterp( '$a', \%var ) => '$b'
+#pod   strinterp( '$a', \%var, { recurse => 1 } ) => 'd'
+#pod   strinterp( '$a', \%var, { recurse => 1, recurse_limit => 1 } ) => '$c'
+#pod
+#pod   strinterp( '$a', { a => '$b', b => '$a' } , { recurse => 1 }
+#pod         recursive interpolation loop detected with repeated
+#pod         interpolation of $a
+#pod
+#pod =item recurse_limit I<integer>
+#pod
+#pod The number of recursion levels to descend when recursing into a
+#pod variable's value before stopping.  The default is C<0>, which means no
+#pod limit.
+#pod
+#pod =item recurse_fail_limit I<integer>
+#pod
+#pod The number of recursion levels to descend when recursing into a
+#pod variable's value before giving up and croaking.  The default is C<100>.
+#pod Setting this to C<0> means no limit.
+#pod
+#pod
+#pod =back
+#pod
+#pod =back
+#pod
+#pod
+#pod =head1 DIAGNOSTICS
+#pod
+#pod =over
+#pod
+#pod =item C<< undefined variable: %s >>
+#pod
+#pod This string is thrown if the C<RaiseUndef> option is set and the
+#pod variable C<%s> is not defined.
+#pod
+#pod =item C<< recursive interpolation loop detected with repeated interpolation of <%s> >>
+#pod
+#pod When resolving nested interpolated values (with the C<recurse> option
+#pod true ) a circular loop was found.
+#pod
+#pod =item C<< recursion fail-safe limit (%d) reached at interpolation of <%s> >>
+#pod
+#pod The recursion fail safe limit (C<recurse_fail_limit>) was reached while
+#pod interpolating nested variable values (with the C<recurse> option true ).
+#pod
+#pod =back
+#pod

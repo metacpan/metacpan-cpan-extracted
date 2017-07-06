@@ -3,46 +3,106 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test::More tests => 3;
+BEGIN { *note = \&diag if not defined &note };
 use ExtUtils::HasCompiler ':all';
 use File::Temp 'tempfile';
 
-if (eval { require ExtUtils::CBuilder}) {
-	plan tests => 1;
-	my @warnings;
-	local $SIG{__WARN__} = sub { push @warnings, @_ };
-	my $can_compile = can_compile_loadable_object();
-	is($can_compile, have_compiler(ExtUtils::CBuilder->new), 'Have a C compiler if CBuilder agrees') or diag(@warnings);
-	note(($can_compile ? 'Can' : "Can't") , ' compile');
-}
-else {
-	plan skip_all => 'Can\'t compare to CBuilder without CBuilder';
-}
+use Config;
+use Cwd;
+use IPC::Open3;
+use File::Path 'mkpath';
+use File::Spec::Functions qw/catfile catdir devnull/;
+use File::Temp 'tempdir';
 
-sub have_compiler {
-	my $builder = shift;
+my $Makefile_PL = <<'END';
+use ExtUtils::MakeMaker;
+WriteMakefile(NAME => 'EUHC::Test', %s);
+END
 
-	my ($FH, $tmpfile) = tempfile( 'compilet-XXXXX', SUFFIX => '.c');
-	binmode $FH;
-	print $FH "int boot_compilet() { return 1; }\n";
-	close $FH;
+my $PM_file = <<'END';
+package EUHC::Test;
+require XSLoader;
+XSLoader::load(__PACKAGE__);
+END
 
-	my ($obj_file, $lib_file, @other_files);
-	eval {
-		local $^W = 0;
-		local $builder->{quiet} = 1;
-		$obj_file = $builder->compile(source => $tmpfile);
-		($lib_file, @other_files) = $builder->link(objects => $obj_file, module_name => 'compilet');
-		my $handle = DynaLoader::dl_load_file(File::Spec->rel2abs($lib_file));
-		die "Couldn't load result" if not defined $handle;
-	};
-	my $result = $@ ? () : 1;
-	warn $@ if $@;
+my $XS_file = <<'END';
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
 
-	foreach (grep defined, $tmpfile, $obj_file, $lib_file, @other_files) {
-		1 while unlink;
+MODULE = EUHC::Test PACKAGE = EUHC::Test
+PROTOTYPES: DISABLED
+
+IV
+compiled_xs()
+	PPCODE:
+	XSRETURN_IV(1);
+END
+
+my $test_file = <<'END';
+use Test::More tests => 1;
+use EUHC::Test;
+ok EUHC::Test::compiled_xs(), 'compiled_xs returns true';
+END
+
+my %types = (
+	static  => \&can_compile_static_library,
+	dynamic => \&can_compile_loadable_object,
+	default => \&can_compile_extension,
+);
+
+for my $linktype (reverse sort keys %types) {
+	my $checker = $types{$linktype};
+	SKIP: {
+		skip 'static is unreliable on EUMM < 7.26', 1 if $linktype eq 'static' && !$ENV{AUTHOR_TESTING} && not eval { require ExtUtils::MakeMaker; ExtUtils::MakeMaker->VERSION('7.26') };
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		my $output;
+		my $filename = $] >= 5.008 ? \$output : devnull;
+		open my $fh, '>', $filename;
+		my $can_compile = $checker->(output => $fh);
+		note($output);
+		my $can = $can_compile ? 'can' : "can't";
+		is($can_compile, compile_with_mm($linktype), "MakeMaker agrees we $can compile $linktype") or diag(@warnings);
 	}
-
-	return $result;
 }
 
+sub compile_with_mm {
+	my $linktype = shift;
+	my $cwd = cwd;
+	my $ret = eval {
+		local $SIG{__DIE__} = sub { warn $_[0] };
+		chdir tempdir(CLEANUP => 1);
+		write_file('Makefile.PL', sprintf $Makefile_PL, $linktype eq 'default' ? '' : "LINKTYPE => '$linktype'");
+		mkpath(catdir(qw/lib EUHC/));
+		write_file(catfile(qw/lib EUHC Test.pm/), $PM_file);
+		write_file('Test.xs', $XS_file);
+		mkdir('t');
+		write_file(catfile(qw/t compiled.t/), $test_file);
+
+		capture($^X, "Makefile.PL");
+		capture($Config{make});
+		capture($Config{make}, 'test');
+		return 1;
+	};
+	chdir $cwd;
+	return $ret;
+}
+
+sub write_file {
+	my ($filename, $content) = @_;
+	open my $fh, '>', $filename or die "Couldn't open file $filename: $!";
+	print $fh $content or die "Couldn't write to file: $!";
+	close $fh or die "Couldn't close file: $!";
+}
+
+sub capture {
+	my @args = @_;
+	my $pid = open3(my $in, my $out, undef, @args);
+	close $in;
+	my $output = do { local $/; <$out> };
+	waitpid $pid, 0 or die "Couldn't wait for @args: $!";
+	die "Couldn't run @args: $output" if $? != 0;
+	note($output);
+}

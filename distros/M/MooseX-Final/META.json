@@ -1,0 +1,85 @@
+{
+   "abstract" : "mark a class as \"final\" (cannot be inherited from)",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "MooseX-Final",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "1.000000",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Tiny" : "1.001",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "Test::Requires" : "0",
+            "parent" : "0.217"
+         },
+         "suggests" : {
+            "Moo" : "0",
+            "Moose" : "0",
+            "Mouse" : "0",
+            "UNIVERSAL::Object" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "MooseX::Final" : {
+         "file" : "lib/MooseX/Final.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-Final"
+      },
+      "homepage" : "https://metacpan.org/release/MooseX-Final",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-moosex-final.git",
+         "web" : "https://github.com/tobyink/p5-moosex-final"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-Final/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

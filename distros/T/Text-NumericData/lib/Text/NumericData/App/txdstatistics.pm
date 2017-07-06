@@ -3,6 +3,12 @@ package Text::NumericData::App::txdstatistics;
 use Text::NumericData::Stat;
 use Text::NumericData::App;
 
+# This is just a placeholder because of a past build system bug.
+# The one and only version for Text::NumericData is kept in
+# the Text::NumericData module itself.
+our $VERSION = '1';
+$VERSION = eval $VERSION;
+
 #the infostring says it all
 my $infostring = "do basic statistics on textual data files
 

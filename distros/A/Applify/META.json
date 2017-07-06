@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "artistic_2"
    ],
@@ -49,5 +49,6 @@
          "url" : "https://github.com/jhthorsen/applify.git"
       }
    },
-   "version" : "0.12"
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

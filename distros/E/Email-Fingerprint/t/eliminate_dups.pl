@@ -133,6 +133,10 @@ EOF
 # That's all, folks!
 done_testing();
 
+# Restore permissions before deleting stuff
+chmod (0777, $tmp);
+chmod (0666, $_) for glob("$tmp/*");
+
 # Clean up a little
 unlink "$_" for glob ".maildups*";
 remove_tree($tmp);

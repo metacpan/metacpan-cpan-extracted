@@ -13,7 +13,7 @@ use Storable;
 use Test::BrewBuild;
 use Test::BrewBuild::Git;
 
-our $VERSION = '2.17';
+our $VERSION = '2.18';
 
 $| = 1;
 
@@ -248,7 +248,8 @@ sub listen {
             platform => $Config{archname},
         };
 
-        $log->_7("platform: $res->{platform} waiting for a connection...\n");
+        $log->_7("TESTER: $self->{ip} PLATFORM: $res->{platform}");
+        $log->_7("waiting for a connection...\n");
 
         my $dispatch = $sock->accept;
 
@@ -303,6 +304,7 @@ sub listen {
             $log->_7("before all checks, repo set to $repo");
 
             my $repo_name = $git->name($repo);
+            my $csums_differ;
 
             if (-d $repo_name){
                 chdir $repo_name or croak $!;
@@ -321,10 +323,12 @@ sub listen {
                         repo => $git->link
                     );
 
+                    $csums_differ = 1 if $local_sum ne $remote_sum;
+
                     $log->_7(
                         "\nGit check:" .
                         "\n\tstatus: $status" .
-                        "\n\tlocal: $local_sum" .
+                        "\n\tlocal:  $local_sum" .
                         "\n\tremote: $remote_sum"
                     );
 
@@ -353,10 +357,16 @@ sub listen {
                     }
                 }
 
-                $log->_7("pulling $repo_name");
+                my $pull_output;
 
-                my $pull_output = $git->pull;
-                $log->_7($pull_output);
+                if ($csums_differ){
+                    $log->_7("pulling $repo_name");
+                    $pull_output = $git->pull;
+                    $log->_7($pull_output);
+                }
+                else {
+                    $log->_7("commit checksums are equal; no need to pull");
+                }
             }
             else {
                 $log->_7("repo doesn't exist... cloning");
@@ -505,7 +515,7 @@ execution, for Windows & Unix.
 
 =head1 DESCRIPTION
 
-Builds and puts into the background a L<Test::BrewBuild> remote tester
+Builds and puts into the background a L<Test::BrewBuild::Tester> remote tester
 listening service.
 
 Note that by default, the working directory is C<~/brewbuild> on all platforms.

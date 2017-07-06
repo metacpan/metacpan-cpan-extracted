@@ -4,34 +4,36 @@ SYNOPSIS
          outputs => {
              # single screen output
              Screen => {
-                 level => 'info', # set mper-output level. optional.
-                 args => { use_color=>1 },
+                 conf   => { use_color=>1 },                        # output config, optional.
+                 level  => 'info',                                  # set per-output level. optional.
+                 layout => [Pattern => {format=>'%d (%F:%L)> %m'}], # add per-output layout, optional.
              },
              # multiple file outputs
-             File   => [
+             File => [
                  {
+                     conf  => { path=>'/var/log/myapp.log' },
                      level => 'warn',
-                     # set per-category, per-output level. optional.
-                     category_level => {
-                         # don't log myapp.security messages to this file
-                         'myapp.security' => 'off',
+                     category_level => {                            # set per-category, per-output level. optional.
+                         # don't log MyApp::Security messages to this file
+                         'MyApp::Security' => 'off',
+                         ...
                      },
-                     args => { path=>'/var/log/myapp.log' },
                  },
                  {
-                     path => '/var/log/myapp-security.log',
-                     level => 'off',
+                     conf => { path => '/var/log/myapp-security.log' },
+                     level => 'warn',
                      category_level => {
-                         # only myapp.security messages go to this file
-                         'myapp.security' => 'warn',
+                         # only MyApp::Security messages go to this file
+                         'MyApp::Security' => 'warn',
+                         ...
                      },
                  },
              ],
          },
-         # set per-category level. optional.
-         category_level => {
-            'category1.sub1' => 'info',
-            'category2' => 'debug',
+         category_level => {                                        # set per-category level. optional.
+    
+            'MyApp::SubModule1' => 'info',
+            'MyApp::SubModule2' => 'debug',
             ...
          },
      );
@@ -41,28 +43,73 @@ SYNOPSIS
 
 DESCRIPTION
 
-    EARLY RELEASE.
-
-    This is a Log::ger output that can multiplex output to multiple outputs
-    and do filtering using per-category level, per-output level, or
-    per-output per-category level.
+    This is a Log::ger output that can multiplex output to several outputs
+    and do filtering on the basis of per-category level, per-output level,
+    or per-output per-category level. It can also apply per-output layout.
 
 CONFIGURATION
 
  outputs => hash
 
+    Specify outputs. It's a hash with output name as keys and output
+    specification as values.
+
+    Output name is the name of output module without the Log::ger::Output::
+    prefix, e.g. Screen or File.
+
+    Output specification is either a hashref or arrayref of hashrefs to
+    specify multiple outputs per type (e.g. if you want to output to two
+    File's). Known hashref keys:
+
+      * conf => hashref
+
+      Specify output configuration. Optional. See each output documentation
+      for the list of available configuration parameters.
+
+      * level => str|int|[min, max]
+
+      Specify per-output level. Optional. If specified, logging will be
+      done at this level instead of the general level. For example, if this
+      is set to debug then debug messages and higher will be sent to output
+      even though the general level is warn. Vice versa, if this is set to
+      error then even though the general level is warn, warning messages
+      won't be sent to this output; only error messages and higher will be
+      sent.
+
+      You can specify a single level (e.g. 1 or "trace") or a two-element
+      array to specify minimum and maximum level (e.g. <["trace",
+      "info"]>). If you accidentally mix up minimum and maximum, this
+      module will helpfully fix it for you.
+
+      * category_level => hash
+
+      Specify per-output per-category level. Optional. Hash key is category
+      name, value is level (which can be a string/numeric level or a
+      two-element array containing minimum and maximum level).
+
+      * layout => [Name => {conf1=>..., conf2=>..., ...}]
+
+      Specify per-output layout. Optional. Value is two-element array
+      containing layout name (without the Log::ger::Layout:: prefix, e.g.
+      Pattern) and configuration hash. See each layout module documentation
+      for the list of available configuration parameters.
+
+      Note that if you also use a layout module outside of Composite
+      configuration, e.g.:
+
+       use Log::ger::Output Composite => (...);
+       use Log::ger::Layout Pattern => (format => '...');
+
+      then both layouts will be applied, the general layout will be applied
+      before the per-output layout.
+
  category_level => hash
 
-
-TODO
-
-    Per-category level has not been implemented.
-
-    Per-output per-category level has not been implemented.
+    Specify per-category level. Optional. Hash key is category name, value
+    is level (which can be a string/numeric level or a two-element array
+    containing minimum and maximum level).
 
 ENVIRONMENT
 
 SEE ALSO
-
-    Modelled after Log::Any::App.
 

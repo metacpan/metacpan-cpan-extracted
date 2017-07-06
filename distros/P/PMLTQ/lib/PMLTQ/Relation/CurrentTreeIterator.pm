@@ -1,6 +1,6 @@
 package PMLTQ::Relation::CurrentTreeIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::CurrentTreeIterator::VERSION = '1.3.2';
+$PMLTQ::Relation::CurrentTreeIterator::VERSION = '1.4.0';
 # ABSTRACT: Iterates over nodes of current tree
 
 use 5.006;
@@ -53,7 +53,7 @@ PMLTQ::Relation::CurrentTreeIterator - Iterates over nodes of current tree
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 AUTHORS
 

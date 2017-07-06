@@ -174,7 +174,7 @@ Unbuffered:
 	XX-> gtransform = XX-> transform;
 
 	prima_get_gc( XX);
-	XX-> gcv. subwindow_mode = (self == application ? IncludeInferiors : ClipByChildren);
+	XX-> gcv. subwindow_mode = (XX->flags.clip_by_children ? ClipByChildren : IncludeInferiors);
 	
 	XChangeGC( DISP, XX-> gc, mask, &XX-> gcv);
 	XCHECKPOINT;
@@ -231,6 +231,8 @@ Unbuffered:
 	memcpy( XX-> saved_fill_pattern, XX-> fill_pattern, sizeof( FillPattern));
 	XX-> fill_pattern[0]++; /* force  */
 	apc_gp_set_fill_pattern( self, XX-> saved_fill_pattern);
+	XX-> saved_fill_pattern_offset = XX-> fill_pattern_offset;
+	apc_gp_set_fill_pattern_offset( self, XX-> saved_fill_pattern_offset);
 
 	if ( !XX-> flags. reload_font && XX-> font && XX-> font-> id) {
 		XSetFont( DISP, XX-> gc, XX-> font-> id);
@@ -282,6 +284,7 @@ prima_cleanup_drawable_after_painting( Handle self)
 	}
 	prima_release_gc(XX);
 	memcpy( XX-> fill_pattern, XX-> saved_fill_pattern, sizeof( FillPattern));
+	XX-> fill_pattern_offset = XX-> saved_fill_pattern_offset;
 	if ( XX-> font && ( --XX-> font-> refCnt <= 0)) {
 		prima_free_rotated_entry( XX-> font);
 		XX-> font-> refCnt = 0;
@@ -1646,6 +1649,7 @@ apc_gp_text_out( Handle self, const char * text, int x, int y, int len, Bool utf
 	if ( !XF_IN_PAINT(XX)) return false;
 
 	if ( len == 0) return true;
+	if ( len > 65535 ) len = 65535;
 	
 #ifdef USE_XFT
 	if ( XX-> font-> xft) 
@@ -1956,6 +1960,12 @@ apc_gp_get_fill_pattern( Handle self)
 	return &(X(self)-> fill_pattern);
 }
 
+Point
+apc_gp_get_fill_pattern_offset( Handle self)
+{
+	return X(self)-> fill_pattern_offset;
+}
+
 int
 apc_gp_get_line_end( Handle self)
 {
@@ -2088,6 +2098,8 @@ apc_gp_get_text_width( Handle self, const char * text, int len, Bool addOverhang
 {
 	int ret;
 
+	if ( len > 65535 ) len = 65535;
+
 #ifdef USE_XFT
 	if ( X(self)-> font-> xft)
 		return prima_xft_get_text_width( X(self)-> font, text, len, addOverhang, utf8, 
@@ -2155,6 +2167,9 @@ Point *
 apc_gp_get_text_box( Handle self, const char * text, int len, Bool utf8)
 {
 	Point * ret;
+	
+	if ( len > 65535 ) len = 65535;
+
 #ifdef USE_XFT
 	if ( X(self)-> font-> xft)
 		return prima_xft_get_text_box( self, text, len, utf8);
@@ -2251,6 +2266,27 @@ apc_gp_set_fill_pattern( Handle self, FillPattern pattern)
 	XX-> flags. brush_null_hatch = 
 	( memcmp( pattern, fillPatterns[fpSolid], sizeof(FillPattern)) == 0);
 	memcpy( XX-> fill_pattern, pattern, sizeof( FillPattern));
+	return true;
+}
+
+Bool
+apc_gp_set_fill_pattern_offset( Handle self, Point fpo)
+{
+	DEFXX;
+	XGCValues gcv;
+	
+	fpo. y = 8 - fpo.y;
+	XX-> fill_pattern_offset = fpo;
+
+	if ( XF_IN_PAINT(XX)) {
+		gcv. ts_x_origin = fpo. x;
+		gcv. ts_y_origin = fpo. y;
+		XChangeGC( DISP, XX-> gc, GCTileStipXOrigin | GCTileStipYOrigin, &gcv);
+		XCHECKPOINT;
+	} else {
+		XX-> gcv. ts_x_origin = fpo. x;
+		XX-> gcv. ts_y_origin = fpo. y;
+	}
 	return true;
 }
 

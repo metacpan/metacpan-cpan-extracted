@@ -6,8 +6,9 @@ use App::cpm::Distribution;
 use App::cpm::Job;
 use App::cpm::Logger;
 use Module::Metadata;
+use IO::Handle;
 use version;
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 sub new {
     my ($class, %option) = @_;
@@ -19,7 +20,6 @@ sub new {
         _fail_resolve => +{},
         _fail_install => +{},
         _is_installed => +{},
-        _artifacts => +{},
     }, $class;
     if ($self->{target_perl}) {
         require Module::CoreList;
@@ -27,18 +27,6 @@ sub new {
             die "Module::CoreList does not have target perl $self->{target_perl} entry, abort.\n";
         }
     }
-    $self;
-}
-
-sub clear {
-    my $self = shift;
-    $self->{installed_distributions} = 0;
-    $self->{jobs} = {};
-    $self->{distributions} = {};
-    $self->{_fail_resolve} = {};
-    $self->{_fail_install} = {};
-    $self->{_is_installed} = {};
-    $self->{_artifacts} = {};
     $self;
 }
 
@@ -84,10 +72,48 @@ sub register_result {
 
     %{$job} = %{$result}; # XXX
 
+    my $logged = $self->info($job);
     my $method = "_register_@{[$job->{type}]}_result";
     $self->$method($job);
     $self->remove_job($job);
+    $self->_show_progress if $logged && $self->{show_progress};
+
     return 1;
+}
+
+sub info {
+    my ($self, $job) = @_;
+    my $type = $job->type;
+    return if !$App::cpm::Logger::VERBOSE && $type ne "install";
+    my $name = $job->distvname;
+    my ($message, $optional);
+    if ($type eq "resolve") {
+        $message = $job->{package};
+        $message .= " -> $name" . ($job->{ref} ? "\@$job->{ref}" : "") if $job->{ok};
+        $optional = "from $job->{from}" if $job->{ok} and $job->{from};
+    } else {
+        $message = $name;
+        $optional = "using cache" if $type eq "fetch" and $job->{using_cache};
+        $optional = "using prebuilt" if $job->{prebuilt};
+    }
+    my $elapsed = defined $job->{elapsed} ? sprintf "(%.3fsec) ", $job->{elapsed} : "";
+
+    App::cpm::Logger->log(
+        pid => $job->{pid},
+        type => $type,
+        result => $job->{ok} ? "DONE" : "FAIL",
+        message => "$elapsed$message",
+        optional => $optional,
+    );
+    return 1;
+}
+
+sub _show_progress {
+    my $self = shift;
+    my $all = keys %{$self->{distributions}};
+    my $num = $self->installed_distributions;
+    print STDERR "--- $num/$all ---";
+    STDERR->flush; # this is needed at least with perl <= 5.24
 }
 
 sub remove_job {
@@ -169,6 +195,7 @@ sub _calculate_jobs {
                     distfile => $dist->{distfile},
                     uri => $dist->uri,
                     static_builder => $dist->static_builder,
+                    prebuilt => $dist->prebuilt,
                 );
             } elsif (@need_resolve and !$dist->deps_registered) {
                 $dist->deps_registered(1);
@@ -293,11 +320,15 @@ sub _register_resolve_result {
         $self->{_fail_resolve}{$job->{package}}++;
         return;
     }
+
+    local $self->{logger}{context} = $job->{package};
     if ($job->{distfile} and $job->{distfile} =~ m{/perl-5[^/]+$}) {
+        my $message = "Cannot upgrade core module $job->{package}.";
+        $self->{logger}->log($message);
         App::cpm::Logger->log(
             result => "FAIL",
             type => "install",
-            message => "Cannot upgrade core module $job->{package}.",
+            message => $message,
         );
         $self->{_fail_install}{$job->{package}}++; # XXX
         return;
@@ -305,10 +336,12 @@ sub _register_resolve_result {
 
     if ($self->is_installed($job->{package}, "== $job->{version}")) { # XXX
         my $version = $job->{version} || 0;
+        my $message = "$job->{package} is up to date. ($version)";
+        $self->{logger}->log($message);
         App::cpm::Logger->log(
             result => "DONE",
             type => "install",
-            message => "$job->{package} is up to date. ($version)",
+            message => $message,
         );
         return;
     }
@@ -334,11 +367,18 @@ sub _register_fetch_result {
         return;
     }
     my $distribution = $self->distribution($job->distfile);
-    $distribution->fetched(1);
-    $distribution->configure_requirements($job->{configure_requirements});
     $distribution->directory($job->{directory});
     $distribution->meta($job->{meta});
     $distribution->provides($job->{provides});
+
+    if ($job->{prebuilt}) {
+        $distribution->configured(1);
+        $distribution->requirements($job->{requirements});
+        $distribution->prebuilt(1);
+    } else {
+        $distribution->fetched(1);
+        $distribution->configure_requirements($job->{configure_requirements});
+    }
     return 1;
 }
 
@@ -365,7 +405,6 @@ sub _register_install_result {
     my $distribution = $self->distribution($job->distfile);
     $distribution->installed(1);
     $self->{installed_distributions}++;
-    $self->{_artifacts}{$job->distvname} = $job->{directory};
     return 1;
 }
 

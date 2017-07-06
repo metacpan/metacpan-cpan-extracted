@@ -1,5 +1,11 @@
 Revision history for WWW::Google::PageSpeedOnline
 
+0.24   Sun Jul 02 09:45:00 2017
+       - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.23    Tue Jun 27 11:30:00 2017
+        - Added key 'provides' to the Makefile.PL script.
+
 0.22    Sat Jun 17 09:45:00 2017
         - Added $AUTHORITY
         - Tidied up attribute definitions.

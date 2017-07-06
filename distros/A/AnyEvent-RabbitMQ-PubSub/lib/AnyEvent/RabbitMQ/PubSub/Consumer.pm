@@ -7,6 +7,12 @@ use Time::HiRes qw(usleep);
 use AnyEvent;
 use Promises qw(deferred collect);
 
+=head1 NAME
+
+AnyEvent::RabbitMQ::PubSub::Consumer - rabbitmq consumer
+
+=cut
+
 has channel => (
     is => 'ro', isa => 'AnyEvent::RabbitMQ::Channel', required => 1
 );
@@ -23,6 +29,16 @@ has prefetch_count => (
     is => 'ro', isa => 'Int', default => 5,
 );
 
+=head1 METHODS
+
+=head2 init()
+
+set prefetch_count
+
+declare exchange and queue
+
+=cut
+
 sub init {
     my ($self) = @_;
 
@@ -38,6 +54,27 @@ sub init {
     $cv->recv();
     return
 }
+
+=head2 consume($cv, $on_consume)
+
+run consume C<$on_consume> code on channel
+
+return L<Promise>
+
+    my $cv = AnyEvent->condvar();
+    $self->consume(
+        $cv,
+        sub {
+            my ($consumer, $msg) = @_;
+
+            ...
+        }
+    )->then(sub {
+        say 'Consumer was started...';
+    });
+
+
+=cut
 
 sub consume {
     my ($self, $cv, $on_consume) = @_;
@@ -56,13 +93,21 @@ sub consume {
     return $d->promise
 }
 
+=head2 reject_and_republish($msg)
+
+reject (drop) message
+
+and after 10ms (to avoid 100% CPU)
+
+republish message back (to end of queue)
+
+=cut
+
 sub reject_and_republish {
     my ($self, $msg) = @_;
 
     usleep 10_000; # wait 10 ms before republish to avoid 100 % CPU
-    my $delivery_tag = $msg->{deliver}{method_frame}{delivery_tag};
-
-    $self->channel->reject(delivery_tag => $delivery_tag);
+    $self->reject($msg);
 
     $msg->{header}{headers}{trials}++;
     $self->channel->publish(
@@ -72,6 +117,29 @@ sub reject_and_republish {
         routing_key => $self->queue->{queue},
     );
 }
+
+=head2 reject($msg)
+
+reject (drop) message
+
+=cut
+
+sub reject {
+    my ($self, $msg) = @_;
+
+    warn "Message to reject not specified" if !defined $msg;
+
+    my $delivery_tag = $msg->{deliver}{method_frame}{delivery_tag};
+    $self->channel->reject(delivery_tag => $delivery_tag);
+}
+
+=head2 ack($msg)
+
+ack C<$msg> same as
+
+    $consumer->channel->ack(delivery_tag => $msg->{deliver}{method_frame}{delivery_tag});
+
+=cut
 
 sub ack {
     my ($self, $msg) = @_;

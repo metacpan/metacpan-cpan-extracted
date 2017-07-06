@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Initiate;
-$Lab::Moose::Instrument::SCPI::Initiate::VERSION = '3.550';
+$Lab::Moose::Instrument::SCPI::Initiate::VERSION = '3.552';
 use Moose::Role;
 use Lab::Moose::Instrument
     qw/validated_no_param_setter validated_setter validated_getter/;

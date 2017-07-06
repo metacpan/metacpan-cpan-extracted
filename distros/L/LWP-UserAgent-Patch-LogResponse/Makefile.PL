@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "LWP::UserAgent::Patch::LogResponse",
   "PREREQ_PM" => {
     "LWP::UserAgent" => "6.04",
-    "Log::Any::IfLOG" => "0.07",
+    "Log::ger" => "0.008",
     "Module::Patch" => "0.17",
     "base" => 0,
     "strict" => 0,
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +42,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "LWP::UserAgent" => "6.04",
-  "Log::Any::IfLOG" => "0.07",
+  "Log::ger" => "0.008",
   "Module::Patch" => "0.17",
   "Test::More" => 0,
   "base" => 0,

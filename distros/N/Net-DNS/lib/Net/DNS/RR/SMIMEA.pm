@@ -1,9 +1,9 @@
 package Net::DNS::RR::SMIMEA;
 
 #
-# $Id: SMIMEA.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: SMIMEA.pm 1571 2017-06-03 20:14:15Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1571 $)[1];
 
 
 use strict;
@@ -227,7 +227,7 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, draft-ietf-dane-smimea,
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, RFC8162,
 RFC6698
 
 =cut

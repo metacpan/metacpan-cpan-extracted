@@ -38,6 +38,8 @@ no_index:
     - string
     - unknown
 requires:
+  Alien::JPCRE2: '0.002'
+  Alien::PCRE2: '0.006'
   Alien::astyle: '0.009'
   App::Pod2CpanHtml: '0.04'
   CPAN::Meta: '2.150005'
@@ -73,5 +75,5 @@ resources:
   homepage: http://www.rperl.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/rperl.git
-version: '2.800000'
+version: '3.000000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

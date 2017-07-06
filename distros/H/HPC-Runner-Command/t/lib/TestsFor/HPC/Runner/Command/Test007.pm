@@ -13,14 +13,15 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use Slurp;
 use File::Slurp;
+use File::Spec;
 
 extends 'TestMethods::Base';
 
 sub write_test_file {
     my $test_dir = shift;
 
-    open( my $fh, ">$test_dir/script/test002.1.sh" );
-    print $fh <<EOF;
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
+    my $text = <<EOF;
 #
 # Starting raw_fastqc
 #
@@ -90,7 +91,7 @@ trimmomatic_fastqc sample5_read2
 
 EOF
 
-    close($fh);
+    write_file( $file, $text );
 }
 
 sub construct {
@@ -100,14 +101,9 @@ sub construct {
     my $test_dir     = $test_methods->make_test_dir();
     write_test_file($test_dir);
 
-    my $t = "$test_dir/script/test002.1.sh";
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
     MooseX::App::ParsedArgv->new(
-        argv => [
-            "submit_jobs",    "--infile",
-            $t,               "--outdir",
-            "$test_dir/logs", "--hpc_plugins",
-            "Dummy",
-        ]
+        argv => [ "submit_jobs", "--infile", $file, "--hpc_plugins", "Dummy", ]
     );
 
     my $test = HPC::Runner::Command->new_with_command();
@@ -133,18 +129,18 @@ sub test_001 : Tags(job_stats) {
     my $logdir = $test->logdir;
     my $outdir = $test->outdir;
 
-    my @files = glob( $test->outdir . "/*" );
+    my @files = glob( File::Spec->catdir( $test->outdir, "*" ) );
 
     #print "Files are ".join("\n", @files)."\n";
 
-    my $submit_file = $outdir."/001_raw_fastqc.sh";
-    my $text = read_file($submit_file ) ;
+    my $submit_file = File::Spec->catdir( $outdir, "001_raw_fastqc.sh" );
+    my $text = read_file($submit_file);
 
     #print "Submit file is \n$text\n";
     #diag "MOdules are ".Dumper($test->jobs->{'raw_fastqc'}->module);
 
     #foreach my $module (@{$test->jobs->{raw_fastqc}->module}){
-	#diag("Module is ".Dumper($module));
+    #diag("Module is ".Dumper($module));
     #}
 
     #is( scalar @files, 18, "Got the right number of files" );

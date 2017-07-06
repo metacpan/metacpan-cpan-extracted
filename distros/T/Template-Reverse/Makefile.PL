@@ -18,18 +18,15 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Algorithm::Diff" => 0,
     "Exporter" => 0,
+    "List::Util" => 0,
     "Moo" => 0,
-    "Scalar::Util" => 0,
     "constant::Atom" => 0,
     "utf8" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Dump" => 0,
-    "Data::Dumper" => 0,
-    "Test::More" => 0,
-    "re" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.150",
+  "VERSION" => "0.202",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,14 +35,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Algorithm::Diff" => 0,
-  "Data::Dump" => 0,
-  "Data::Dumper" => 0,
   "Exporter" => 0,
+  "List::Util" => 0,
   "Moo" => 0,
-  "Scalar::Util" => 0,
   "Test::More" => 0,
   "constant::Atom" => 0,
-  "re" => 0,
   "utf8" => 0
 );
 

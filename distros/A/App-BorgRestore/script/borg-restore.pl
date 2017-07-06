@@ -19,6 +19,7 @@ borg-restore.pl [options] <path>
                              <time spec> old
   --adhoc                    Do not use the cache, instead provide an
                              unfiltered list of archive to choose from
+  --version                  display the version of the program
 
  Time spec:
   Select the newest backup that is at least <time spec> old.
@@ -92,6 +93,10 @@ directly from borg at run time.  Use this when the cache has not been created
 yet and you want to restore a file without having to manually call borg
 extract. Using this option will show all archives that borg knows about, even
 if they do not contain the file that shall be restored.
+
+=item B<--version>
+
+Output the program version.
 
 =back
 
@@ -206,8 +211,13 @@ sub main {
 	$ENV{PATH} = App::BorgRestore::Helper::untaint($ENV{PATH}, qr(.*));
 
 	Getopt::Long::Configure ("bundling");
-	GetOptions(\%opts, "help|h", "debug", "update-cache|u", "destination|d=s", "time|t=s", "adhoc") or pod2usage(2);
+	GetOptions(\%opts, "help|h", "debug", "update-cache|u", "destination|d=s", "time|t=s", "adhoc", "version") or pod2usage(2);
 	pod2usage(0) if $opts{help};
+
+	if ($opts{version}) {
+		printf "Version: %s\n", $App::BorgRestore::VERSION;
+		return 0;
+	}
 
 	pod2usage(-verbose => 0) if (@ARGV== 0 and !$opts{"update-cache"});
 

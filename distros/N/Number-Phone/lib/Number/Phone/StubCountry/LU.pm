@@ -22,20 +22,9 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
-                {
-                  'pattern' => '(\\d{2})(\\d{3})',
-                  'leading_digits' => '
-            [2-5]|
-            7[1-9]|
-            [89](?:
-              [1-9]|
-              0[2-9]
-            )
-          '
-                },
                 {
                   'leading_digits' => '
             [2-5]|
@@ -45,33 +34,44 @@ my $formatters = [
               0[2-9]
             )
           ',
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})'
+                  'pattern' => '(\\d{2})(\\d{3})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})',
-                  'leading_digits' => '20'
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})',
+                  'leading_digits' => '
+            [2-5]|
+            7[1-9]|
+            [89](?:
+              [1-9]|
+              0[2-9]
+            )
+          '
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})',
+                  'leading_digits' => '20',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{3})'
+                },
+                {
                   'leading_digits' => '
             2(?:
               [0367]|
               4[3-8]
             )
-          '
+          ',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{3})',
                   'leading_digits' => '20'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})',
                   'leading_digits' => '
             2(?:
               [0367]|
               4[3-8]
             )
-          '
+          ',
+                  'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{2})(\\d{1,2})'
                 },
                 {
                   'pattern' => '(\\d{2})(\\d{2})(\\d{2})(\\d{1,4})',
@@ -114,6 +114,8 @@ my $validators = {
           )
         ',
                 'pager' => '',
+                'toll_free' => '800\\d{5}',
+                'mobile' => '6[25-79][18]\\d{6}',
                 'fixed_line' => '
           (?:
             2[2-9]\\d{2,9}|
@@ -130,9 +132,6 @@ my $validators = {
             )\\d{1,8}
           )
         ',
-                'specialrate' => '(801\\d{5})|(90[015]\\d{5})',
-                'mobile' => '6[2679][18]\\d{6}',
-                'personal_number' => '70\\d{6}',
                 'geographic' => '
           (?:
             2[2-9]\\d{2,9}|
@@ -149,7 +148,8 @@ my $validators = {
             )\\d{1,8}
           )
         ',
-                'toll_free' => '800\\d{5}'
+                'specialrate' => '(801\\d{5})|(90[015]\\d{5})',
+                'personal_number' => '70\\d{6}'
               };
 my %areanames = (
   35221 => "Weicherdange",

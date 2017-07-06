@@ -3,55 +3,58 @@ use Test::More;
 BEGIN{
 use_ok('Template::Reverse');
 }
-use Data::Dumper;
 sub detect{
 my $diff= shift;
-my $r = Template::Reverse::_detect($diff);
-return [map{$_->as_arrayref}@{$r}];
+my $r = Template::Reverse::_detect($diff, 10);
+return $r;
 }
 
 
-my $W = Template::Reverse::WILDCARD;
 
-@diff = qw(A B C D E);
+@diff = (BOF, qw(A B C D E), EOF);
 $patt = detect(\@diff);
 is_deeply($patt, [] ) ;
 
-@diff = (qw(A B),$W,qw(D E));
+@diff = (BOF, qw(A B),WILDCARD,qw(D E), EOF);
 $patt = detect(\@diff);
-is_deeply($patt, [ [[qw(A B)],[qw(D E)]] ] ) ;
+is_deeply($patt, [ {pre=>[BOF,qw(A B)],post=>[qw(D E),EOF]} ] ) ;
 
-@diff = (qw(A B C D),$W);
+@diff = (BOF,qw(A B C D),WILDCARD,EOF);
 $patt = detect(\@diff);
-is_deeply($patt, [ [[qw(A B C D)],[]] ] ) ;
+is_deeply($patt, [ {pre=>[BOF,qw(A B C D)],post=>[EOF]} ] ) ;
 
-@diff = ($W,qw(B C D E));
+@diff = (BOF,WILDCARD,qw(B C D E),EOF);
 $patt = detect(\@diff);
-is_deeply($patt, [ [[],[qw(B C D E)]] ] ) ;
+is_deeply($patt, [ {pre=>[BOF],post=>[qw(B C D E), EOF]} ] ) ;
 
-@diff = (qw(A),$W,qw(C),$W,qw(E));
+
+@diff = (BOF,WILDCARD,qw(C),WILDCARD,qw(E),EOF);
 $patt = detect(\@diff);
+is_deeply($patt, [ {pre=>[BOF],post=>[qw(C)]},{pre=>[qw(C)],post=>[qw(E),EOF]} ] ) ;
 
-@diff = (qw(A B C),$W,qw(G H I J K),$W,qw(M N));
+@diff = (BOF,qw(A B C),WILDCARD,qw(G H I J K),WILDCARD,qw(M N),EOF);
 $patt = detect(\@diff);
-is_deeply($patt, [ [[qw(A B C)],[qw(G H I J K)]], [[qw(G H I J K)],[qw(M N)]]] ) ;
+is_deeply($patt, [ {pre=>[BOF,qw(A B C)],post=>[qw(G H I J K)]}, {pre=>[qw(G H I J K)],post=>[qw(M N), EOF]}] ) ;
 
-@diff = ($W,qw( A B C),$W,qw(G H I J K),$W,qw(M N),$W);
+@diff = (BOF,WILDCARD,qw( A B C),WILDCARD,qw(G H I J K),WILDCARD,qw(M N),WILDCARD,EOF);
 $patt = detect(\@diff);
-is_deeply($patt, [ [[],[qw(A B C)]],[[qw(A B C)],[qw(G H I J K)]], [[qw(G H I J K)],[qw(M N)]], [[qw(M N)],[]]] ) ;
+is_deeply($patt, [ {pre=>[BOF],post=>[qw(A B C)]},{pre=>[qw(A B C)],post=>[qw(G H I J K)]}, {pre=>[qw(G H I J K)],post=>[qw(M N)]}, {pre=>[qw(M N)],post=>[EOF]}] ) ;
 
 
-@diff = (qw(I went to the),$W,qw(when i had met the),$W);
+@diff = (BOF,qw(I went to the),WILDCARD,qw(when i had met the),WILDCARD,EOF);
 $patt = detect(\@diff);
 is_deeply($patt, 
         [
-          [
+          {
+            pre=>
             [
+              BOF,
               'I',
               'went',
               'to',
               'the'
             ],
+            post=>
             [
               'when',
               'i',
@@ -59,8 +62,9 @@ is_deeply($patt,
               'met',
               'the'
             ]
-          ],
-          [
+          },
+          {
+            pre=>
             [
               'when',
               'i',
@@ -68,8 +72,9 @@ is_deeply($patt,
               'met',
               'the'
             ],
-            []
-          ]
+            post=>
+            [EOF]
+          }
         ]);
 
 done_testing();

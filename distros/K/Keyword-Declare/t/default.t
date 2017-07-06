@@ -1,12 +1,13 @@
+use 5.012;
 use warnings;
 use strict;
 
 use Keyword::Declare;
 
 keyword  okay (Int $n = '$default') {{{ print "ok «$n»\n" }}}
-keyword dokay (Int $n = '$default') :keepspace {{{ print "ok «$n=~s{^\s+}{}r»\n" }}}
+keyword dokay (Int $n = '$default') :keepspace {{{ print "ok «$n=~s{^\s+}{};$n»\n" }}}
 keyword aokay (Int @n = '$default') {{{ print "ok «@n»\n" }}}
-keyword kokay (Int @n = '$default') :keepspace {{{ print "ok «map { s{^\s+}{}r } @n»\n" }}}
+keyword kokay (Int @n = '$default') :keepspace {{{ print "ok «map { s{^\s+}{}; $_ } @n»\n" }}}
 
 print "1..12\n";
 my $default = 1;

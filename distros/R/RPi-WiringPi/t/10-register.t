@@ -1,7 +1,9 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
+use lib 't/';
+
+use RPiTest qw(check_pin_status);
 use RPi::WiringPi;
 use Test::More;
 
@@ -15,29 +17,29 @@ if (! $ENV{PI_BOARD}){
 
 my $pi = $mod->new(fatal_exit => 0);
 
-{# register, unregister
+my $pin26 = $pi->pin(26);
+my $pin12 = $pi->pin(12);
+my $pin18 = $pi->pin(18);
 
-    my $pin1 = $pi->pin(1);
-    my $pin2 = $pi->pin(2);
-    my $pin3 = $pi->pin(3);
+my %pin_map = (
+    26 => $pin26,
+    12 => $pin12,
+    18 => $pin18,
+);
 
-    my %pin_map = (
-        1 => $pin1,
-        2 => $pin2,
-        3 => $pin3,
-    );
+my $pins = $pi->registered_pins;
 
-    my $pins = $pi->registered_pins;
-    is ((split /,/, $pins), 3, "proper num of pins registered");
+is @$pins, 3, "proper num of pins registered";
 
-    for (keys %pin_map){
-        is $pin_map{$_}->num, $_, "\$pin$_ has proper num()";
-    }
+for (keys %pin_map){
+    is $pin_map{$_}->num, $_, "\$pin$_ has proper num()";
 }
 
 $pi->cleanup;
 
-is $pi->registered_pins, undef, "after cleanup, all pins unregistered";
+is @{ $pi->registered_pins }, 0, "after cleanup, all pins unregistered";
+
+check_pin_status();
 
 done_testing();
 

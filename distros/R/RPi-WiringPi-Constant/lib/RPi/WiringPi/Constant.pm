@@ -3,7 +3,7 @@ package RPi::WiringPi::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 require Exporter;
 use base qw( Exporter );
@@ -33,6 +33,29 @@ use constant {
 
     push @EXPORT_OK, @const;
     $EXPORT_TAGS{pinmode} = \@const;
+}
+
+use constant {
+    ALT0 => 4,
+    ALT1 => 5,
+    ALT2 => 6,
+    ALT3 => 7,
+    ALT4 => 3,
+    ALT5 => 2,
+};
+
+{ # alt modes
+    my @const = qw(
+        ALT0
+        ALT1
+        ALT2
+        ALT3
+        ALT4
+        ALT5
+    );
+
+    push @EXPORT_OK, @const;
+    $EXPORT_TAGS{altmode} = \@const;
 }
 
 use constant {
@@ -164,6 +187,17 @@ Pin modes.
     SOFT_PWM_OUTPUT  => 4,  # reserved
     SOFT_TONE_OUTPUT => 5,  # reserved
     PWM_TONE_OUTPUT  => 6,  # reserved
+
+=head2 :altmode
+
+Pin ALT modes.
+
+    ALT0 => 4,
+    ALT1 => 5,
+    ALT2 => 6,
+    ALT3 => 7,
+    ALT4 => 3,
+    ALT5 => 2,
 
 =head2 :pull
 

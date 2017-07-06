@@ -1,12 +1,12 @@
 package App::ListNewCPANDists;
 
-our $DATE = '2017-06-16'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 
 our %SPEC;
 
@@ -57,7 +57,7 @@ sub _connect_db {
     my ($cpan, $index_name) = @_;
 
     my $db_path = _db_path($cpan, $index_name);
-    $log->tracef("Connecting to SQLite database at %s ...", $db_path);
+    log_trace("Connecting to SQLite database at %s ...", $db_path);
     my $dbh = DBI->connect("dbi:SQLite:dbname=$db_path", undef, undef,
                            {RaiseError=>1});
     #$dbh->do("PRAGMA cache_size = 400000"); # 400M
@@ -177,8 +177,8 @@ sub list_new_cpan_dists {
         $to_time->set_second(59);
     }
 
-    $log->tracef("Retrieving releases from %s to %s ...",
-                 $from_time->datetime, $to_time->datetime);
+    log_trace("Retrieving releases from %s to %s ...",
+              $from_time->datetime, $to_time->datetime);
 
     # list all releases in the time period and collect unique list of
     # distributions
@@ -201,15 +201,18 @@ sub list_new_cpan_dists {
     my $api_res = _json_decode($res->{content});
     my %dists;
     my @res;
+    my $num_hits = @{ $api_res->{hits}{hits} };
+    my $i = 0;
     for my $hit (@{ $api_res->{hits}{hits} }) {
+        $i++;
         my $dist = $hit->{fields}{distribution};
         next if $dists{ $dist }++;
-        $log->tracef("Got distribution %s", $dist);
+        log_trace("[#%d/%d] Got distribution %s", $i, $num_hits, $dist);
         # find the first release of this distribution
         my $relinfo = _get_dist_first_release($state, $dist);
         unless ($relinfo->{time} >= $args{from_time}->epoch &&
                     $relinfo->{time} <= $args{to_time}->epoch) {
-            $log->tracef("First release of distribution %s is not in this time period, skipped", $dist);
+            log_trace("First release of distribution %s is not in this time period, skipped", $dist);
             next;
         }
         push @res, {
@@ -336,7 +339,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2017-06-16.
+This document describes version 0.005 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2017-07-02.
 
 =head1 FUNCTIONS
 

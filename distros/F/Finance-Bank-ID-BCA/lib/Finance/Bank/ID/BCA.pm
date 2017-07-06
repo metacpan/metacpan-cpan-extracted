@@ -1,12 +1,11 @@
 package Finance::Bank::ID::BCA;
 
-our $DATE = '2017-05-16'; # DATE
-our $VERSION = '0.45'; # VERSION
+our $DATE = '2017-07-01'; # DATE
+our $VERSION = '0.46'; # VERSION
 
 use 5.010001;
 use Moo;
 use DateTime;
-use Log::Any::IfLOG '$log';
 
 extends 'Finance::Bank::ID::Base';
 
@@ -440,7 +439,7 @@ Finance::Bank::ID::BCA - Check your BCA accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.45 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2017-05-16.
+This document describes version 0.46 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-01.
 
 =head1 SYNOPSIS
 
@@ -452,11 +451,8 @@ If you want to use the library in your Perl application:
 
     use Finance::Bank::ID::BCA;
 
-    # FBI::BCA uses Log::Any. to show logs using, e.g., Log4perl:
-    use Log::Log4perl qw(:easy);
-    use Log::Any::Adapter;
-    Log::Log4perl->easy_init($DEBUG);
-    Log::Any::Adapter->set('Log4perl');
+    # FBI::BCA uses Log::ger. to show logs to, for example, screen:
+    use Log::ger::Output 'Screen';
 
     my $ibank = Finance::Bank::ID::BCA->new(
         username => 'ABCDEFGH1234', # opt if only using parse_statement()
@@ -584,16 +580,17 @@ B<verify_https> is on.
 
 =item * logger
 
-Optional. You can supply a L<Log::Any>-like logger object here. If not
-specified, this module will use a default logger.
+Optional. You can supply any object that responds to trace(), debug(), info(),
+warn(), error(), or fatal() here. If not specified, this module will use a
+default logger.
 
 =item * logger_dump
 
-Optional. You can supply a L<Log::Any>-like logger object here. This is just
-like C<logger> but this module will log contents of response here instead of to
-C<logger> for debugging purposes. You can configure using something like
-L<Log::Dispatch::Dir> to save web pages more conveniently as separate files. If
-unspecified, the default logger is used (same as C<logger>).
+Optional. This is just like C<logger> but this module will log contents of
+response here instead of to C<logger> for debugging purposes. You can configure
+something like L<Log::ger::Output::DirWriteRotate> to save web pages more
+conveniently as separate files. If unspecified, the default logger is used (same
+as C<logger>).
 
 =back
 

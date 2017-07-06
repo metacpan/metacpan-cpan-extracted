@@ -1,6 +1,6 @@
 package PMLTQ::Relation::OptionalIterator;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Relation::OptionalIterator::VERSION = '1.3.2';
+$PMLTQ::Relation::OptionalIterator::VERSION = '1.4.0';
 # ABSTRACT: Creates optional interator branch
 
 use 5.006;
@@ -66,7 +66,7 @@ PMLTQ::Relation::OptionalIterator - Creates optional interator branch
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 AUTHORS
 

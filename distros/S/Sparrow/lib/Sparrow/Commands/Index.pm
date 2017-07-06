@@ -12,6 +12,7 @@ use Carp;
 our @EXPORT = qw{
 
     update_index
+    update_custom_index
     index_summary
 
 };
@@ -24,10 +25,22 @@ sub update_index {
 
 };
 
+sub update_custom_index {
+
+    my $repo = sparrow_config()->{repo};
+
+    if ($repo){
+      print "get index updates from custom repo $repo ... ";
+      execute_shell_command("curl -s -k -L -f  -o ".spci_file.' '.$repo." && echo OK")
+    }
+
+};
+
 sub index_summary {
 
     print "[sparrow index summary]\n\n";
     execute_shell_command("ls -l ".spi_file);
+    execute_shell_command("ls -l ".spci_file);
     execute_shell_command("ls -l ".spl_file);
 
 };

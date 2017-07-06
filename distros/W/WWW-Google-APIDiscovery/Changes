@@ -1,5 +1,8 @@
 Revision history for WWW::Google::APIDiscovery
 
+0.23    Sat Jul 01 21:50:00 2017
+        - Added key 'provides' to the Makefile.PL script.
+
 0.22    Wed Jun 14 10:30:00 2017
         - Tidied up test scripts and removed "-T" switch.
 

@@ -1,17 +1,22 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
-
 use lib 'inc';
-
-use Devel::CheckLib;
-
-check_lib_or_exit (lib => 'png', header => 'png.h');
+use CheckForLibPng;
 
 my $pm = 'lib/Image/PNG/QRCode.pm';
 my $pod = 'lib/Image/PNG/QRCode.pod';
 my $github = 'github.com/benkasminbullock/image-png-qrcode';
 my $repo = "https://$github";
+
+my $verbose;# = 1;
+
+my $vars = check_for_libpng ($verbose);
+
+if (! $vars) {
+    print STDERR "Could not find libpng, exiting.\n";
+    exit;
+}
 
 WriteMakefile (
     NAME => 'Image::PNG::QRCode',
@@ -21,7 +26,8 @@ WriteMakefile (
     LICENSE => 'gpl_3',
     PREREQ_PM => {
     },
-    LIBS => '-lpng',
+    LIBS => $vars->{libs},
+    INC => $vars->{inc},
     META_MERGE => {
 	'meta-spec' => {
 	    version => 2,

@@ -17,13 +17,14 @@
 package Google::Ads::AdWords::Constants;
 
 use strict;
+use warnings;
 use version;
 
 use File::HomeDir;
 use File::Spec::Functions;
 
 # Main version number that the rest of the modules pick up off of.
-our $VERSION = qv("4.14.0");
+our $VERSION = qv("4.15.0");
 
 use constant DEFAULT_PROPERTIES_FILE =>
   catfile(File::HomeDir->my_home, "adwords.properties");

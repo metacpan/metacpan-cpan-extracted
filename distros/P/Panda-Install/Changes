@@ -1,5 +1,7 @@
+1.2.8    06.06.2017
+           - failure to sync binary deps is no longer fatal
 1.2.7    11.04.2017
-		   - support CLIB custom make command BUILD_CMD
+           - support CLIB custom make command BUILD_CMD
 1.2.6    17.01.2017
            - support CPLUS version
            - support CPLUS version inheritance (by descendant modules)

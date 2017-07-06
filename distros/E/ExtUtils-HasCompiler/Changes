@@ -1,5 +1,21 @@
 Revision history for ExtUtils-HasCompiler
 
+0.021     2017-06-26 14:37:05+02:00 Europe/Amsterdam
+          Released 0.020 as 0.021
+
+0.020     2017-05-14 15:28:51+02:00 Europe/Paris (TRIAL RELEASE)
+          - Fix skipping tests on EUMM<7.26
+
+0.019     2017-05-14 12:44:56+02:00 Europe/Paris (TRIAL RELEASE)
+          - Skip static tests unless user has EUMM 7.26
+          - Can't compile static libraries on Windows
+          - Can't compile static libraries on shrplib perls
+
+0.018     2017-04-14 18:09:34+02:00 Europe/Amsterdam (TRIAL RELEASE)
+          - can_compile_static_library and can_compile_extension
+            The former checks if one can compile a static library, the latter
+            checks for dynamic or static depending on your configuration.
+
 0.017     2017-02-08 23:00:22+01:00 Europe/Amsterdam
           - Don't pass the compiler's optimization flags to the ld command. On
             systems where these two commands are different (AIX and some

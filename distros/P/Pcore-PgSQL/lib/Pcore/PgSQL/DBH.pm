@@ -1,0 +1,975 @@
+package Pcore::PgSQL::DBH;
+
+use Pcore -class, -result, -const, -sql;
+use Pcore::Handle::pgsql qw[:ALL];
+use Pcore::Util::Scalar qw[weaken looks_like_number is_plain_arrayref is_plain_coderef];
+use Pcore::Util::UUID qw[uuid_str];
+use Pcore::Util::Digest qw[md5_hex];
+use Pcore::AE::Handle;
+
+has handle => ( is => 'ro', isa => InstanceOf ['Pcore::Handle::pgsql'], required => 1 );
+has password => ( is => 'ro', isa => Str );
+has on_connect => ( is => 'ro', isa => CodeRef, required => 1 );
+
+has is_pgsql => ( is => 'ro', isa => Bool, default => 1, init_arg => undef );
+
+has state => ( is => 'ro', isa => Enum [ $STATE_CONNECT, $STATE_READY, $STATE_BUSY, $STATE_DISCONNECTED ], default => $STATE_CONNECT, init_arg => undef );
+has h => ( is => 'ro', isa => InstanceOf ['Pcore::AE::Handle'], init_arg => undef );
+has parameter => ( is => 'ro', isa => HashRef, init_arg => undef );
+has key_data  => ( is => 'ro', isa => HashRef, init_arg => undef );
+has tx_status => ( is => 'ro', isa => Enum [ $TX_STATUS_IDLE, $TX_STATUS_TRANS, $TX_STATUS_ERROR ], init_arg => undef );    # current transaction status
+has wbuf         => ( is => 'ro', isa => ArrayRef, init_arg => undef );                                                     # outgoing messages buffer
+has sth          => ( is => 'ro', isa => HashRef,  init_arg => undef );                                                     # currently executed sth
+has prepared_sth => ( is => 'ro', isa => HashRef,  init_arg => undef );
+
+const our $PROTOCOL_VER => "\x00\x03\x00\x00";                                                                              # v3
+
+# FRONTEND
+const our $PG_MSG_BIND             => 'B';
+const our $PG_MSG_CANCEL_REQUEST   => q[];
+const our $PG_MSG_CLOSE            => 'C';
+const our $PG_MSG_CLOSE_STATEMENT  => 'S';
+const our $PG_MSG_CLOSE_PORTAL     => 'P';
+const our $PG_MSG_DESCRIBE         => 'D';
+const our $PG_MSG_EXECUTE          => 'E';
+const our $PG_MSG_FLUSH            => 'H';
+const our $PG_MSG_FUNCTION_CALL    => 'F';
+const our $PG_MSG_PARSE            => 'P';
+const our $PG_MSG_PASSWORD_MESSAGE => 'p';
+const our $PG_MSG_QUERY            => 'Q';
+const our $PG_MSG_SSL_REQUEST      => q[];
+const our $PG_MSG_STARTUP_MESSAGE  => q[];
+const our $PG_MSG_SYNC             => 'S';
+const our $PG_MSG_TERMINATE        => 'X';
+
+# BACKEND
+const our $PG_MSG_AUTHENTICATION                    => 'R';
+const our $PG_MSG_AUTHENTICATION_OK                 => 0;
+const our $PG_MSG_AUTHENTICATION_KERBEROS_V5        => 2;
+const our $PG_MSG_AUTHENTICATION_CLEARTEXT_PASSWORD => 3;
+const our $PG_MSG_AUTHENTICATION_MD5_PASSWORD       => 5;
+const our $PG_MSG_AUTHENTICATION_SCM_CREDENTIAL     => 6;
+const our $PG_MSG_AUTHENTICATION_GSS                => 7;
+const our $PG_MSG_AUTHENTICATION_GSS_CONTINUE       => 8;
+const our $PG_MSG_AUTHENTICATION_SSPI               => 9;
+const our $PG_MSG_BACKEND_KEY_DATA                  => 'K';
+const our $PG_MSG_BIND_COMPLETE                     => 2;
+const our $PG_MSG_CLOSE_COMPLETE                    => 3;
+const our $PG_MSG_COMMAND_COMPLETE                  => 'C';
+const our $PG_MSG_DATA_ROW                          => 'D';
+const our $PG_MSG_EMPTY_QUERY_RESPONSE              => 'I';
+const our $PG_MSG_ERROR_RESPONSE                    => 'E';
+const our $PG_MSG_FUNCTION_CALL_RESPONSE            => 'V';
+const our $PG_MSG_NO_DATA                           => 'n';
+const our $PG_MSG_NOTICE_RESPONSE                   => 'N';
+const our $PG_MSG_NOTIFICATION_RESPONSE             => 'A';
+const our $PG_MSG_PARAMETER_DESCRIPTION             => 't';
+const our $PG_MSG_PARAMETER_STATUS                  => 'S';
+const our $PG_MSG_PARSE_COMPLETE                    => 1;
+const our $PG_MSG_PORTAL_SUSPENDED                  => 's';
+const our $PG_MSG_READY_FOR_QUERY                   => 'Z';
+const our $PG_MSG_ROW_DESCRIPTION                   => 'T';
+
+# COPY
+const our $PG_MSG_COPY_DATA          => 'd';    # frontend, backend
+const our $PG_MSG_COPY_DONE          => 'c';    # frontend, backend
+const our $PG_MSG_COPY_FAIL          => 'f';    # frontend
+const our $PG_MSG_COPY_IN_RESPONSE   => 'G';    # backend
+const our $PG_MSG_COPY_OUT_RESPONSE  => 'H';    # backend
+const our $PG_MSG_COPY_BOTH_RESPONSE => 'W';    # backend
+
+const our $ERROR_STRING_TYPE => {
+    S => 'severity',
+    C => 'code',
+    M => 'message',
+    D => 'detail',
+    H => 'hint',
+    P => 'position',
+    p => 'internal_position',
+    q => 'internal_query',
+    W => 'where',
+    F => 'file',
+    L => 'line',
+    R => 'routine',
+    V => 'text',
+};
+
+P->init_demolish(__PACKAGE__);
+
+sub DEMOLISH ( $self, $global ) {
+    $self->{handle}->push_dbh($self) if !$global && defined $self->{handle};
+
+    return;
+}
+
+# https://www.postgresql.org/docs/current/static/protocol-flow.html#PROTOCOL-FLOW-EXT-QUERY
+# https://www.postgresql.org/docs/current/static/protocol-message-formats.html
+sub connect ( $self, %args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    my $on_connect = delete $args{on_connect};
+
+    $self = bless \%args, $self;
+
+    $self->{is_pgsql} = 1;
+
+    $self->{state} = $STATE_CONNECT;
+
+    $self->{on_connect} = sub ( $status, $dbh ) {
+        undef $self;
+
+        $on_connect->(@_);
+
+        return;
+    };
+
+    my $host = $self->{handle}->host;
+    my $port = $self->{handle}->port;
+
+    Pcore::AE::Handle->new(
+        connect => "pgsql://$host:$port",
+        on_error => sub ( $h, $fatal, $reason ) {
+            $self->_on_error( $reason, 1 );
+
+            return;
+        },
+        on_connect => sub ( $h, $host, $port, $retry ) {
+            $self->{h} = $h;
+
+            my $params = [
+                user                        => $self->{handle}->username,
+                database                    => $self->{handle}->database,
+                client_encoding             => 'UTF8',
+                bytea_output                => 'hex',
+                backslash_quote             => 'off',
+                standard_conforming_strings => 'on',
+                options                     => '--client-min-messages=warning',
+            ];
+
+            # send start message
+            push $self->{wbuf}->@*, [ $PG_MSG_STARTUP_MESSAGE, $PROTOCOL_VER . join( "\x00", $params->@* ) . "\x00\x00" ];
+
+            $self->_flush;
+
+            # start listen for messages
+            $self->_start_listen;
+
+            return;
+        }
+    );
+
+    return;
+}
+
+sub _start_listen ($self) {
+    weaken $self;
+
+    $self->{h}->on_read(
+        sub {
+            my \$rbuf = \$_[0]->{rbuf};
+
+          REDO:
+            if ( length $rbuf > 4 ) {
+                my ( $type, $msg_len ) = unpack 'AN', $rbuf;
+
+                if ( length $rbuf > $msg_len ) {
+                    my $data = substr $rbuf, 0, $msg_len + 1, q[];
+
+                    substr $data, 0, 5, q[];
+
+                    # GENERAL MESSAGES
+                    if    ( $type eq $PG_MSG_AUTHENTICATION )   { $self->_ON_AUTHENTICATION( \$data ) }
+                    elsif ( $type eq $PG_MSG_PARAMETER_STATUS ) { $self->_ON_PARAMETER_STATUS( \$data ) }
+                    elsif ( $type eq $PG_MSG_BACKEND_KEY_DATA ) { $self->_ON_BACKEND_KEY_DATA( \$data ) }
+                    elsif ( $type eq $PG_MSG_READY_FOR_QUERY )  { $self->_ON_READY_FOR_QUERY( \$data ) }
+                    elsif ( $type eq $PG_MSG_ERROR_RESPONSE )   { $self->_ON_ERROR_RESPONSE( \$data ) }
+                    elsif ( $type eq $PG_MSG_NOTICE_RESPONSE )  { $self->_ON_NOTICE_RESPONSE( \$data ) }
+
+                    # STH RELATED MESSAGES
+                    elsif ( $type eq $PG_MSG_PARSE_COMPLETE )   { $self->_ON_PARSE_COMPLETE }
+                    elsif ( $type eq $PG_MSG_BIND_COMPLETE )    { $self->_ON_BIND_COMPLETE }
+                    elsif ( $type eq $PG_MSG_ROW_DESCRIPTION )  { $self->_ON_ROW_DESCRIPTION( \$data ) }
+                    elsif ( $type eq $PG_MSG_NO_DATA )          { $self->_ON_NO_DATA }
+                    elsif ( $type eq $PG_MSG_DATA_ROW )         { $self->_ON_DATA_ROW( \$data ) }
+                    elsif ( $type eq $PG_MSG_PORTAL_SUSPENDED ) { $self->_ON_PORTAL_SUSPENDED }
+                    elsif ( $type eq $PG_MSG_COMMAND_COMPLETE ) { $self->_ON_COMMAND_COMPLETE( \$data ) }
+                    elsif ( $type eq $PG_MSG_CLOSE_COMPLETE )   { $self->_ON_CLOSE_COMPLETE }
+
+                    # UNSUPPORTED MESSAGE EXCEPTION
+                    else {
+                        die qq[Unknown message "$type"];
+                    }
+
+                    goto REDO;
+                }
+            }
+
+            return;
+        }
+    );
+
+    return;
+}
+
+sub _on_error ( $self, $reason, $fatal ) {
+    my $state = $self->{state};
+
+    # error on connect state is always fatal
+    $fatal = 1 if $state == $STATE_CONNECT;
+
+    # disconnect on fatal error
+    if ($fatal) {
+        $self->{h}->destroy;
+
+        $self->{state} = $STATE_DISCONNECTED;
+    }
+
+    if ( $state == $STATE_BUSY ) {
+        $self->{sth}->{error} = $reason;
+    }
+    elsif ( $state == $STATE_CONNECT ) {
+        delete( $self->{on_connect} )->( result( [ 500, $reason ] ), undef );
+    }
+
+    return;
+}
+
+# PG MESSAGES HANDLERS
+sub _ON_AUTHENTICATION ( $self, $dataref ) {
+
+    # we are expecting authentication messages only on connect state
+    die q[Unexpected] if $self->{state} != $STATE_CONNECT;
+
+    my $auth_type = unpack 'N', substr $dataref->$*, 0, 4, q[];
+
+    if ( $auth_type != $PG_MSG_AUTHENTICATION_OK ) {
+        if ( $auth_type == $PG_MSG_AUTHENTICATION_CLEARTEXT_PASSWORD ) {
+            $self->{h}->push_write( $PG_MSG_PASSWORD_MESSAGE . pack 'NZ*', 5 + length $self->{handle}->password, $self->{handle}->password );
+        }
+        elsif ( $auth_type == $PG_MSG_AUTHENTICATION_MD5_PASSWORD ) {
+            my $pwdhash = md5_hex $self->{handle}->password . $self->{handle}->username;
+
+            my $hash = 'md5' . md5_hex $pwdhash . $dataref->$*;
+
+            $self->{h}->push_write( $PG_MSG_PASSWORD_MESSAGE . pack 'NZ*', 5 + length $hash, $hash );
+        }
+
+        # unsupported auth type
+        else {
+            $self->_on_error( qq[Unimplemented authentication type: "$auth_type"], 1 );
+        }
+    }
+
+    return;
+}
+
+sub _ON_PARAMETER_STATUS ( $self, $dataref ) {
+    my ( $key, $val ) = split /\x00/sm, $dataref->$*;
+
+    $self->{parameter}->{$key} = $val;
+
+    return;
+}
+
+sub _ON_BACKEND_KEY_DATA ( $self, $dataref ) {
+    ( $self->{key_data}->{pid}, $self->{key_data}->{secret} ) = unpack 'NN', $dataref->$*;
+
+    return;
+}
+
+sub _ON_READY_FOR_QUERY ( $self, $dataref ) {
+    $self->{tx_status} = $dataref->$*;
+
+    my $state = $self->{state};
+
+    $self->{state} = $STATE_READY;
+
+    # connected
+    if ( $state == $STATE_CONNECT ) {
+        delete( $self->{on_connect} )->( result(200), $self );
+    }
+    elsif ( $state == $STATE_BUSY ) {
+        my $sth = delete $self->{sth};
+
+        my $cb = delete $sth->{cb};
+
+        if ( $sth->{error} ) {
+            $cb->( result( [ 500, $sth->{error} ] ), $sth );
+        }
+        else {
+            $cb->( result( 200, $sth->{tag}->%* ), $sth );
+        }
+    }
+
+    return;
+}
+
+sub _ON_ERROR_RESPONSE ( $self, $dataref ) {
+    my $error;
+
+    for my $str ( split /\x00/sm, $dataref->$* ) {
+        my $str_type = substr $str, 0, 1, q[];
+
+        $error->{ $ERROR_STRING_TYPE->{$str_type} } = $str if exists $ERROR_STRING_TYPE->{$str_type};
+    }
+
+    $self->_on_error( $error->{message}, 0 );
+
+    return;
+}
+
+sub _ON_NOTICE_RESPONSE ( $self, $dataref ) {
+    my $warn;
+
+    for my $str ( split /\x00/sm, $dataref->$* ) {
+        my $str_type = substr $str, 0, 1, q[];
+
+        $warn->{ $ERROR_STRING_TYPE->{$str_type} } = $str if exists $ERROR_STRING_TYPE->{$str_type};
+    }
+
+    warn join q[, ], $warn->{message} // q[], $warn->{hint} // q[];
+
+    return;
+}
+
+sub _ON_PARSE_COMPLETE ($self) {
+    $self->{sth}->{is_parse_complete} = 1;
+
+    # store query id in prepared sth
+    $self->{prepared_sth}->{ $self->{sth}->{id} } = undef if defined $self->{sth}->{id};
+
+    return;
+}
+
+sub _ON_BIND_COMPLETE ($self) {
+    $self->{sth}->{is_bind_complete} = 1;
+
+    return;
+}
+
+sub _ON_ROW_DESCRIPTION ( $self, $dataref ) {
+    my $num_of_cols = unpack 'n', substr $dataref->$*, 0, 2;
+
+    my $pos = 2;
+
+    my $cols;
+
+    for my $i ( 1 .. $num_of_cols ) {
+        my $idx = index $dataref->$*, "\x00", $pos;
+
+        # 0 - The field name.
+        # 1 - If the field can be identified as a column of a specific table, the object ID of the table; otherwise zero.
+        # 2 - If the field can be identified as a column of a specific table, the attribute number of the column; otherwise zero.
+        # 3 - The object ID of the field's data type.
+        # 4 - The data type size (see pg_type.typlen). Note that negative values denote variable-width types.
+        #         -1 - indicates a "varlena" type (one that has a length word);
+        #         -2 - indicates a null-terminated C string;
+        # 5 - The type modifier (see pg_attribute.atttypmod). The meaning of the modifier is type-specific.
+        # 6 - The format code being used for the field. Currently will be 0 (text) or 1 (binary). In a RowDescription returned from the statement variant of Describe, the format code is not yet known and will always be zero.
+
+        push $cols->@*, [ unpack 'Z*l>s>l>s>l>s>', substr $dataref->$*, $pos, $idx + 18 ];
+
+        $pos += $idx - $pos + 19;
+    }
+
+    $self->{sth}->{cols} = $cols;
+
+    # store description in prepared sth
+    if ( defined $self->{sth}->{id} && exists $self->{prepared_sth}->{ $self->{sth}->{id} } ) {
+        $self->{prepared_sth}->{ $self->{sth}->{id} } = $cols;
+    }
+
+    return;
+}
+
+sub _ON_NO_DATA ( $self ) {
+    $self->{sth}->{cols} = [];
+
+    # store description in prepared sth
+    if ( defined $self->{sth}->{id} && exists $self->{prepared_sth}->{ $self->{sth}->{id} } ) {
+        $self->{prepared_sth}->{ $self->{sth}->{id} } = [];
+    }
+
+    return;
+}
+
+sub _ON_DATA_ROW ( $self, $dataref ) {
+    my $num_of_cols = unpack 'n', substr $dataref->$*, 0, 2;
+
+    my $pos = 2;
+
+    my $row;
+
+    my \$sth = \$self->{sth};
+
+    for my $i ( 1 .. $num_of_cols ) {
+        my $len = unpack 'l>', substr $dataref->$*, $pos, 4;
+
+        $pos += 4;
+
+        my $col;
+
+        if ($len) {
+
+            # col value is defined
+            if ( $len != -1 ) {
+                $col = substr $dataref->$*, $pos, $len;
+
+                $pos += $len;
+
+                # get col type
+                my $type = $sth->{cols}->[ $i - 1 ]->[3];
+
+                # decode bytes array
+                if ( $type eq $SQL_BYTEA ) {
+                    $col = pack 'H*', substr $col, 2;
+                }
+
+                # decode text value
+                else {
+                    utf8::decode $col;
+                }
+            }
+        }
+        else {
+            $col = q[];
+        }
+
+        push $row->@*, $col;
+    }
+
+    push $sth->{rows}->@*, $row;
+
+    return;
+}
+
+sub _ON_PORTAL_SUSPENDED ( $self ) {
+    $self->{sth}->{portal_suspended} = 1;
+
+    return;
+}
+
+sub _ON_COMMAND_COMPLETE ( $self, $dataref ) {
+
+    # remove trailing "\x00"
+    chop $dataref->$*;
+
+    my @val = split /\s/sm, $dataref->$*;
+
+    my $tag;
+
+    if ( $val[0] eq 'INSERT' ) {
+        $tag = {
+            tag  => $val[0],
+            oid  => $val[1],
+            rows => $val[2],
+        };
+    }
+    else {
+        $tag = {
+            tag  => $val[0],
+            rows => $val[1],
+        };
+    }
+
+    if ( exists $self->{sth}->{tag} ) {
+        $self->{sth}->{tag}->{rows} += $tag->{rows};
+    }
+    else {
+        $self->{sth}->{tag} = $tag;
+    }
+
+    return;
+}
+
+sub _ON_CLOSE_COMPLETE ( $self ) {
+    return;
+}
+
+# flush outgoing messages buffer
+sub _flush ( $self ) {
+    my $buf;
+
+    while ( my $msg = shift $self->{wbuf}->@* ) {
+        $buf .= $msg->[0];
+
+        if ( defined $msg->[1] ) {
+            $buf .= pack 'NA*', 4 + length $msg->[1], $msg->[1];
+        }
+        else {
+            $buf .= "\x00\x00\x00\x04";
+        }
+    }
+
+    $self->{h}->push_write($buf) if defined $buf;
+
+    return;
+}
+
+sub _execute ( $self, $query, $bind, $cb, %args ) {
+    if ( $self->{state} != $STATE_READY ) {
+        $cb->( result( [ 500, 'DBH is busy' ] ), undef );
+
+        return;
+    }
+
+    $self->{state} = $STATE_BUSY;
+
+    $self->{sth}->{cb} = $cb;
+
+    my $use_extended_query = defined $bind || defined $args{max_rows};
+
+    # query is prepared sth
+    if ( ref $query eq 'Pcore::Handle::DBI::STH' ) {
+        $use_extended_query = 1;
+
+        $self->{sth}->{id} = $query->{id};
+
+        # query is already prepared
+        if ( exists $self->{prepared_sth}->{ $query->{id} } ) {
+            $self->{sth}->{is_parse_complete} = 1;
+
+            # query is already described
+            if ( defined $self->{prepared_sth}->{ $query->{id} } ) {
+                $self->{sth}->{cols} = $self->{prepared_sth}->{ $query->{id} };
+            }
+        }
+
+        $query = $query->{query};
+    }
+
+    # query is ArrayRef
+    elsif ( is_plain_arrayref $query) {
+        ( $query, $bind ) = $self->{handle}->prepare_query($query);
+
+        $use_extended_query = defined $bind;
+    }
+
+    # query is plain text
+    else {
+
+        # convert "?" placeholders to postgres "$1" style
+        if ( index( $query, '?' ) != -1 ) {
+            my $i;
+
+            $query =~ s/[?]/'$' . ++$i/smge;
+        }
+
+        utf8::encode $query if utf8::is_utf8 $query;
+    }
+
+    # simple query mode
+    # multiple queries in single statement are allowed
+    if ( !$use_extended_query ) {
+        push $self->{wbuf}->@*, [ $PG_MSG_QUERY, "$query\x00" ];
+    }
+
+    # extended query mode
+    else {
+        my $query_id = $self->{sth}->{id} // q[];
+        my $portal_id = q[];    # uuid_str;
+
+        # parse query
+        if ( !$self->{sth}->{is_parse_complete} ) {
+            push $self->{wbuf}->@*, [ $PG_MSG_PARSE, "$query_id\x00$query\x00\x00\x00" ];
+        }
+
+        # prepare bind params
+        my ( $params_vals, $param_format_codes );
+
+        # query has bind params
+        if ( defined $bind ) {
+            $params_vals = $param_format_codes = pack 'n', scalar $bind->@*;
+
+            # make a copy
+            my @bind = $bind->@*;
+
+            for my $param (@bind) {
+                if ( is_plain_arrayref $param) {
+                    if ( $param->[1] == $SQL_BYTEA ) {
+                        $param_format_codes .= "\x00\x01";    # binary
+                    }
+                    else {
+                        $param_format_codes .= "\x00\x00";    # text
+                    }
+
+                    \$param = \$param->[0];
+                }
+                else {
+                    $param_format_codes .= "\x00\x00";        # text
+                }
+
+                if ( defined $param ) {
+                    utf8::encode $param if utf8::is_utf8 $param;
+
+                    $params_vals .= pack 'NA*', length $param, $param;
+                }
+                else {
+                    $params_vals .= "\xFF\xFF\xFF\xFF";
+                }
+            }
+        }
+
+        # no bind params specified
+        else {
+            $params_vals = $param_format_codes = "\x00\x00";
+        }
+
+        # bind
+        push $self->{wbuf}->@*, [ $PG_MSG_BIND, "$portal_id\x00$query_id\x00${param_format_codes}${params_vals}\x00\x00" ];
+
+        # request portal description if not described
+        if ( !defined $self->{sth}->{cols} ) {
+            push $self->{wbuf}->@*, [ $PG_MSG_DESCRIBE, "${PG_MSG_CLOSE_PORTAL}$portal_id\x00" ];
+        }
+
+        # execute
+        push $self->{wbuf}->@*, [ $PG_MSG_EXECUTE, "$portal_id\x00" . pack 'N', ( $args{max_rows} // 0 ) ];
+
+        # close portal if max_rows was used
+        push $self->{wbuf}->@*, [ $PG_MSG_CLOSE, "${PG_MSG_CLOSE_PORTAL}$portal_id\x00" ] if defined $args{max_rows};
+
+        # sync
+        push $self->{wbuf}->@*, [$PG_MSG_SYNC];
+
+        # flush
+        # push $self->{wbuf}->@*, [$PG_MSG_FLUSH];
+    }
+
+    $self->_flush;
+
+    return;
+}
+
+sub _parse_args ( $args ) {
+    my $bind = is_plain_arrayref $args->[0] ? shift $args->@* : undef;
+    my $cb   = is_plain_coderef $args->[-1] ? pop $args->@*   : undef;
+    my %args = $args->@*;
+
+    return $bind, \%args, $cb;
+}
+
+# STH
+sub prepare ( $self, $query ) {
+    return $self->{handle}->prepare($query);
+}
+
+# TODO
+sub destroy_sth ( $self, $id ) {
+    if ( exists $self->{prepared_sth}->{$id} ) {
+
+        # TODO run command and delete after command complete
+        # delete $self->{prepared_sth}->{$id};
+    }
+
+    return;
+}
+
+# PUBLIC DBI METHODS
+sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
+    my ( $bind, $args, $cb ) = _parse_args( \@args );
+
+    my $on_finish = sub ( $status, $sth ) {
+        my $data;
+
+        if ( $status && defined $sth->{rows} ) {
+            my @cols_names = map { $_->[0] } $sth->{cols}->@*;
+
+            for my $row ( $sth->{rows}->@* ) {
+                my $data_row->@{@cols_names} = $row->@*;
+
+                push $data->@*, $data_row;
+            }
+        }
+
+        $cb->( $status, $self, $data );
+
+        return;
+    };
+
+    $self->_execute( $query, $bind, $on_finish );
+
+    return;
+}
+
+# key_field => [0, 1, 'id'], key_field => 'id'
+sub selectall ( $self, $query, @args ) {
+    my ( $bind, $args, $cb ) = _parse_args( \@args );
+
+    my $on_finish = sub ( $status, $sth ) {
+        my $data;
+
+        if ( $status && defined $sth->{rows} ) {
+            my @cols_names = map { $_->[0] } $sth->{cols}->@*;
+
+            if ( defined $args->{key_field} ) {
+                my $name2idx;
+
+                # create columns index
+                for ( my $i = 0; $i <= $sth->{cols}->$#*; $i++ ) {
+                    $name2idx->{ $sth->{cols}->[$i]->[0] } = $i;
+                }
+
+                my $num_of_fields = $sth->{cols}->@*;
+                my @key_field_idx;
+
+                for my $key_field ( is_plain_arrayref $args->{key_field} ? $args->{key_field}->@* : $args->{key_field} ) {
+                    if ( looks_like_number $key_field) {
+                        if ( $key_field + 1 > $num_of_fields ) {
+                            $cb->( result( [ 500, qq[Invalid field index "$key_field"] ] ), $self, undef );
+
+                            return;
+                        }
+
+                        push @key_field_idx, $key_field;
+                    }
+                    else {
+                        my $idx = $name2idx->{$key_field};
+
+                        if ( !defined $idx ) {
+                            $cb->( result( [ 500, qq[Invalid field name "$key_field"] ] ), $self, undef );
+
+                            return;
+                        }
+
+                        push @key_field_idx, $idx;
+                    }
+                }
+
+                $data = {};
+
+                for my $row ( $sth->{rows}->@* ) {
+                    my $ref = $data;
+
+                    $ref = $ref->{ $row->[$_] // q[] } //= {} for @key_field_idx;
+
+                    $ref->@{@cols_names} = $row->@*;
+                }
+            }
+            else {
+                for my $row ( $sth->{rows}->@* ) {
+                    my $row_hashref->@{@cols_names} = $row->@*;
+
+                    push $data->@*, $row_hashref;
+                }
+            }
+        }
+
+        $cb->( $status, $self, $data );
+
+        return;
+    };
+
+    $self->_execute( $query, $bind, $on_finish );
+
+    return;
+}
+
+sub selectall_arrayref ( $self, $query, @args ) {
+    my ( $bind, $args, $cb ) = _parse_args( \@args );
+
+    my $on_finish = sub ( $status, $sth ) {
+        my $data;
+
+        if ( $status && defined $sth->{rows} ) {
+            $data = $sth->{rows};
+        }
+
+        $cb->( $status, $self, $data );
+
+        return;
+    };
+
+    $self->_execute( $query, $bind, $on_finish );
+
+    return;
+}
+
+sub selectrow ( $self, $query, @args ) {
+    my ( $bind, $args, $cb ) = _parse_args( \@args );
+
+    my $on_finish = sub ( $status, $sth ) {
+        my $data;
+
+        if ( $status && defined $sth->{rows} ) {
+            if ( $sth->{rows} ) {
+                my @cols_names = map { $_->[0] } $sth->{cols}->@*;
+
+                $data->@{@cols_names} = $sth->{rows}->[0]->@*;
+            }
+        }
+
+        $cb->( $status, $self, $data );
+
+        return;
+    };
+
+    $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
+
+    return;
+}
+
+sub selectrow_arrayref ( $self, $query, @args ) {
+    my ( $bind, $args, $cb ) = _parse_args( \@args );
+
+    my $on_finish = sub ( $status, $sth ) {
+        my $data;
+
+        if ( $status && defined $sth->{rows} ) {
+            $data = $sth->{rows}->[0];
+        }
+
+        $cb->( $status, $self, $data );
+
+        return;
+    };
+
+    $self->_execute( $query, $bind, $on_finish, max_rows => 1 );
+
+    return;
+}
+
+# col => [0, 'id'], col => 'id', default col => 0
+sub selectcol ( $self, $query, @args ) {
+    my ( $bind, $args, $cb ) = _parse_args( \@args );
+
+    my $on_finish = sub ( $status, $sth ) {
+        my $data;
+
+        if ( $status && defined $sth->{rows} ) {
+            my @slice;
+
+            my $num_of_fields = $sth->{cols}->@* - 1;
+
+            if ( !defined $args->{col} ) {
+                push @slice, 0;
+            }
+            else {
+                for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
+                    if ( looks_like_number $col) {
+                        if ( $col > $num_of_fields ) { $cb->( result( [ 500, qq[Invalid column index: "$col"] ] ), $self, undef ); return }
+
+                        push @slice, $col;
+                    }
+                    else {
+
+                        # create columns index
+                        my $name2idx;
+
+                        if ( !defined $name2idx ) {
+                            $name2idx = {};
+
+                            for ( my $i = 0; $i <= $sth->{cols}->$#*; $i++ ) {
+                                $name2idx->{ $sth->{cols}->[$i]->[0] } = $i;
+                            }
+                        }
+
+                        if ( !exists $name2idx->{$col} ) { $cb->( result( [ 500, qq[Invalid column name: "$col"] ] ), $self, undef ); return }
+
+                        push @slice, $name2idx->{$col};
+                    }
+                }
+            }
+
+            for my $row ( $sth->{rows}->@* ) {
+                push $data->@*, $row->@[@slice];
+            }
+        }
+
+        $cb->( $status, $self, $data );
+
+        return;
+    };
+
+    $self->_execute( $query, $bind, $on_finish );
+
+    return;
+}
+
+# TRANSACTIONS
+sub begin_work ( $self, $cb ) {
+    my $on_finish = sub ( $status, $sth ) {
+        $cb->( $status, $self );
+
+        return;
+    };
+
+    $self->_execute( 'BEGIN', undef, $on_finish );
+
+    return;
+}
+
+sub commit ( $self, $cb ) {
+    my $on_finish = sub ( $status, $sth ) {
+        $cb->( $status, $self );
+
+        return;
+    };
+
+    $self->_execute( 'COMMIT', undef, $on_finish );
+
+    return;
+}
+
+sub rollback ( $self, $cb ) {
+    my $on_finish = sub ( $status, $sth ) {
+        $cb->( $status, $self );
+
+        return;
+    };
+
+    $self->_execute( 'ROLLBACK', undef, $on_finish );
+
+    return;
+}
+
+# QUOTE
+# https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html
+sub quote_id ( $self, $id ) {
+    $id =~ s/"/""/smg;
+
+    return qq["$id"];
+}
+
+1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    3 | 179                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 507                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (25)                  |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    3 | 860                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 25, 148, 356, 498,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 562, 572, 588, 591,  |                                                                                                                |
+## |      | 597, 606, 613, 617,  |                                                                                                                |
+## |      | 621, 625, 628        |                                                                                                                |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 707, 860             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    2 | 742                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
+__END__
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Pcore::PgSQL::DBH
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+=head1 METHODS
+
+=head1 SEE ALSO
+
+=cut

@@ -10,7 +10,7 @@ our $FFFD = chr(0xFFFD);
 
 # ABSTRACT: MarpaX::ESLIF::ECMA404 Value Interface
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -172,7 +172,8 @@ sub pairs {
 
 
 sub elements {
-    @_ ? \@_ : []
+    my ($self, @elements) = @_;
+    \@elements
 }
 
 
@@ -190,7 +191,7 @@ MarpaX::ESLIF::ECMA404::ValueInterface - MarpaX::ESLIF::ECMA404 Value Interface
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

@@ -27,5 +27,5 @@ resources:
   homepage: http://mojolicious.org
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/kraih/minion.git
-version: '7.0'
+version: '7.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

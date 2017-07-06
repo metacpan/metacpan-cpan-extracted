@@ -1,5 +1,8 @@
 Revision history for Data-MoneyCurrency
 
+0.03    Mon 26 Jun 14:36:07 UTC 2017
+        update ruby-money config, no code changes
+
 0.02    Fri 21 Oct 21:55:09 UTC 2016
         Update metadata to point to GitHub
 

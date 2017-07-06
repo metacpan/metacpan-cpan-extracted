@@ -4,7 +4,7 @@
 # hashcash.pl - Wallet for HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: bin/hashcash.pl v1.124 Mon Jun 19 15:52:00 PDT 2017 $
+# $Id: bin/hashcash.pl v1.126 Sat Jun 24 02:15:18 PDT 2017 $
 
 use warnings;
 
@@ -1048,8 +1048,8 @@ hashcash.pl - Wallet for HashCash digital cash
 
 =head1 VERSION
 
- $Revision: 1.124 $
- $Date: Mon Jun 19 15:52:00 PDT 2017 $
+ $Revision: 1.126 $
+ $Date: Sat Jun 24 02:15:18 PDT 2017 $
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package DBIx::SchemaChecksum::App::ApplyChanges;
 use 5.010;
 
-# ABSTRACT: DBIx::SchemaChecksum command apply_changes
+# ABSTRACT: Apply changes based on current checksum
 
 use MooseX::App::Command;
 extends qw(DBIx::SchemaChecksum::App);
@@ -156,11 +156,19 @@ __END__
 
 =head1 NAME
 
-DBIx::SchemaChecksum::App::ApplyChanges - DBIx::SchemaChecksum command apply_changes
+DBIx::SchemaChecksum::App::ApplyChanges - Apply changes based on current checksum
 
 =head1 VERSION
 
-version 1.006
+version 1.101
+
+=head1 DESCRIPTION
+
+Apply all changes found in C<sqlsnippetdir> based on the current
+checksum. For each file there will be a prompt asking if you want to
+apply the file. Use C<--no_prompt> to always accept each change
+(useful for deployment scripts etc). Use C<--dry_run> to run all
+changes, but do not apply them.
 
 =head1 METHODS
 

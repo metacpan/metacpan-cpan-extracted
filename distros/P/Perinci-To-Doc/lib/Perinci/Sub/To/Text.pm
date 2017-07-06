@@ -1,10 +1,10 @@
 package Perinci::Sub::To::Text;
 
-our $DATE = '2017-02-27'; # DATE
-our $VERSION = '0.84'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.85'; # VERSION
 
 use 5.010001;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo;
 
 use Locale::TextDomain::UTF8 'Perinci-To-Doc';
@@ -106,7 +106,7 @@ Perinci::Sub::To::Text - Generate text documentation from Rinci function metadat
 
 =head1 VERSION
 
-This document describes version 0.84 of Perinci::Sub::To::Text (from Perl distribution Perinci-To-Doc), released on 2017-02-27.
+This document describes version 0.85 of Perinci::Sub::To::Text (from Perl distribution Perinci-To-Doc), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-To
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-To-Doc>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-To-Doc>.
 
 =head1 BUGS
 

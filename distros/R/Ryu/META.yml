@@ -30,7 +30,7 @@ recommends:
   JSON::MaybeXS: '0'
   MIME::Base64: '0'
 requires:
-  Future: '0.34'
+  Future: '0.35'
   List::UtilsBy: '0.10'
   Log::Any: '1.045'
   Log::Any::Adapter: '1.045'
@@ -39,12 +39,12 @@ requires:
   Scalar::Util: '1.47'
   Syntax::Keyword::Try: '0.04'
   Variable::Disposition: '0.004'
-  curry: '0'
+  curry: '1.001'
   indirect: '0'
   namespace::clean: '0.27'
   parent: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Ryu/issues
   repository: git://github.com/team-at-cpan/Ryu.git
-version: '0.020'
+version: '0.021'
 x_serialization_backend: 'YAML::Tiny version 1.70'

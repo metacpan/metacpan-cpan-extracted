@@ -1,3 +1,13 @@
+0.22    2017-06-24 (PERLANCAR)
+
+        - No functional changes.
+
+        - [Build] Fix build that tries to load Data::Sah compile-time modules
+          [RT#122145].
+
+        - Switch from Log::Any to Log::ger.
+
+
 0.21    2017-06-15 (PERLANCAR)
 
 	- [Bugfix] Fix logic bug, don't test diff when schema is still at

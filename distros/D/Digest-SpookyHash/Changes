@@ -1,5 +1,8 @@
 Revision history for Digest::Spooky
 
+1.06 2017-06-22T18:05:51Z
+    - Update Build.PL for perl-5.26
+
 1.05 2014-09-11T17:49:42Z
     - Fixed violation of CPAN Meta Spec
 

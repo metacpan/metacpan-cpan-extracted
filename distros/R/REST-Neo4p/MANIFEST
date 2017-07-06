@@ -4,7 +4,6 @@ LICENSE
 MANIFEST
 Makefile.PL
 README
-Todo
 lib/REST/Neo4p.pm
 lib/REST/Neo4p/Agent.pm
 lib/REST/Neo4p/Agent/HTTP/Thin.pm

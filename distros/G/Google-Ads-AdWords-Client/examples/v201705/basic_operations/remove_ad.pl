@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 # This example removes an ad using the 'REMOVE' operator. To get ads, run
-# basic_operations/get_text_ads.pl.
+# basic_operations/get_expanded_text_ads.pl.
 
 use strict;
 use lib "../../../lib";

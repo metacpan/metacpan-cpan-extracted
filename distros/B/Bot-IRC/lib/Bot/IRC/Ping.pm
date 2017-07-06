@@ -5,7 +5,7 @@ use 5.012;
 use strict;
 use warnings;
 
-our $VERSION = '1.14'; # VERSION
+our $VERSION = '1.15'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -47,7 +47,7 @@ Bot::IRC::Ping - Bot::IRC ping the bot and check its health
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 SYNOPSIS
 

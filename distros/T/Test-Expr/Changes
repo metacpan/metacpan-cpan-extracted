@@ -13,3 +13,16 @@ Revision history for Test-Expr
 
         Fixed bug with multiline tests involving comments
         (Thanks, Chad!)
+
+
+0.000004  Thu Jul  6 05:40:46 2017
+
+        Doc bug corrected
+        (Thanks, Stephen)
+
+
+
+0.000005  Thu Jul  6 13:02:19 2017
+
+        Now works with Perl 5.12 or greater
+        (under Keyword::Declare 0.001003 or later)

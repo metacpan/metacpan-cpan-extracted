@@ -1,0 +1,44 @@
+package Log::ger::Manual::ForLogDispatch;
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Log::ger for Log::Dispatch users
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Log::ger::Manual::ForLogDispatch - Log::ger for Log::Dispatch users
+
+=head1 VERSION
+
+version 0.012
+
+=head1 WHY LOG::DISPATCH
+
+=head1 WHY LOG::GER OVER LOG::DISPATCH
+
+Log::ger can be used in procedural style in addition to OO style. Aside from
+preference, this gives the benefit of being able to optimize away unneeded
+logging statements to avoid runtime overhead (see L<Log::ger::Plugin::OptAway>).
+
+=head1 FAQ
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

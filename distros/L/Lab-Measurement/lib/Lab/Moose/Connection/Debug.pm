@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Debug;
-$Lab::Moose::Connection::Debug::VERSION = '3.550';
+$Lab::Moose::Connection::Debug::VERSION = '3.552';
 use Moose;
 use 5.010;
 use namespace::autoclean;

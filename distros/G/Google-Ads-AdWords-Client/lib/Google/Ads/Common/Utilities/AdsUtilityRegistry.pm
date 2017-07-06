@@ -21,6 +21,7 @@
 package Google::Ads::Common::Utilities::AdsUtilityRegistry;
 
 use strict;
+use warnings;
 use utf8;
 use version;
 
@@ -115,8 +116,6 @@ every time the string representation of the registry is retrieved.
 
 The following properties may be accessed using get_PROPERTY methods:
 
-=back
-
 =head1 METHODS
 
 =head2 add_ads_utilities
@@ -138,7 +137,7 @@ Google::Ads::Common::Utilities::AdsUtilityRegistry->add_ads_utilities(
 One or more strings representing ad utilities. These strings can be found in
 the keys of Google::Ads::Common::Utilities::AdsUtilityRegistry::ADS_UTILITIES.
 
-= back
+=back
 
 =head2 __get_ads_utilities
 

@@ -76,7 +76,7 @@ public-facing IP addresses, so we'll specify just the local loopback:
 
 =head1 STEP 2: CONFIGURE DISPATCHER
 
-=head2 COMMAND LINE BASIC RUN
+=head2 Command line basic run
 
 C<brewbuild> itself can send in test run to remotes in an extremely basic way,
 but we're going to focus on C<bbdispatch> here which allows for far more complex
@@ -95,6 +95,9 @@ To specify a different command string:
 To specify a different repository:
 
     bbdispatch -r https://github.com/user/repo -t 127.0.0.1 -t 172.16.1.1:9999 -t 10.1.1.1
+
+Note that the repository flag (C<-r>) will prepend C<https://github.com/> by
+default if you only specify C<user/repo>.
 
 Example output of a basic run where I'm in a git repository directory:
 
@@ -129,7 +132,7 @@ All FAIL log files are stored locally when dispatching to identify the issues:
     localhost_5.22.1-FAIL.bblog
 
 
-=head2 CONFIGURATION FILE RUN
+=head2 Configuration file run
 
 In your configuration file, you can set up all of your testers, along with the
 preferred command string (and repository if need be):
@@ -141,6 +144,30 @@ preferred command string (and repository if need be):
 Then your dispatch run can be initiated simply by:
 
     bbdispatch
+
+=head1 SETTING A PLUGIN
+
+There are a handful of plugins available for L<Test::BrewBuild>. The default is
+L<Test::BrewBuild::Plugin::DefaultExec>, which performs the most basic of runs.
+
+L<Test::BrewBuild::Plugin::Author> will perform the same tests as the default
+plugin, but will additionally attempt to set C<RELEASE_TESTING=1> while logging
+on failure, and will also proceed to attempt an install of the basic
+distributions that perform the author tests (eg: L<Pod::Coverage>,
+L<Test::Pod::Coverage> and L<Test::Manifest>).
+
+Search the CPAN for other C<Test::BrewBuild::Plugin> plugins.
+
+To use a plugin, use the C<--plugin> or C<-p> argument to C<brewbuild>.
+
+    brewbuild --plugin Test::BrewBuild::Plugin::Author
+
+Some plugins allow you to send in arguments to it. The way this works is that
+the args are sent in within a list, and on each iteration of a test run, the
+next arg in the list is passed in. Each run gets exactly one argument from the
+list:
+
+    brewbuild -p Test::BrewBuild::Plugin::TestAgainst -a Module:A -a Module::B
 
 =head1 TROUBLESHOOTING
 

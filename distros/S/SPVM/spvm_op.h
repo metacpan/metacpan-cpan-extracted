@@ -59,7 +59,7 @@ enum {
   SPVM_OP_C_CODE_NAME,
   SPVM_OP_C_CODE_PACKAGE,
   SPVM_OP_C_CODE_MY_VAR,
-  SPVM_OP_C_CODE_MY_VAR_INIT,
+  SPVM_OP_C_CODE_MY_VAR_PROCESS,
   SPVM_OP_C_CODE_FIELD,
   SPVM_OP_C_CODE_SUB,
   SPVM_OP_C_CODE_ENUM,
@@ -182,6 +182,7 @@ struct SPVM_op {
   int32_t line;
   _Bool moresib;
   _Bool lvalue;
+  _Bool rvalue;
 };
 
 SPVM_OP* SPVM_OP_new_op_use_from_package_name(SPVM_COMPILER* compiler, const char* package_name, const char* file, int32_t line);

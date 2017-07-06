@@ -2,7 +2,7 @@ package PICA::Writer::Binary;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use charnames qw(:full);
 

@@ -2,14 +2,14 @@
 
 package Git::Hooks::CheckRewrite;
 # ABSTRACT: Git::Hooks plugin for checking against unsafe rewrites
-$Git::Hooks::CheckRewrite::VERSION = '1.16.0';
+$Git::Hooks::CheckRewrite::VERSION = '2.0.1';
 use 5.010;
 use utf8;
 use strict;
 use warnings;
-use Error qw(:try);
+use Try::Tiny;
 use Path::Tiny;
-use Git::Hooks qw/:DEFAULT :utils/;
+use Git::Hooks;
 
 my $PKG = __PACKAGE__;
 (my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
@@ -22,7 +22,7 @@ my $PKG = __PACKAGE__;
 sub _record_filename {
     my ($git) = @_;
 
-    return path($git->repo_path())->child('GITHOOKS_CHECKREWRITE');
+    return path($git->git_dir())->child('GITHOOKS_CHECKREWRITE');
 }
 
 # Returns all branches containing a specific commit. The command "git
@@ -30,7 +30,7 @@ sub _record_filename {
 # we have to get rid of using substr.
 sub _branches_containing {
     my ($git, $commit) = @_;
-    return map { substr($_, 2) } $git->command('branch', '-a', '--contains', $commit);
+    return map { substr($_, 2) } $git->run('branch', '-a', '--contains', $commit);
 }
 
 sub record_commit_parents {
@@ -48,9 +48,7 @@ sub record_commit_parents {
     # HEAD dies in error because HEAD isn't defined yet. This is why we
     # evaluate the command and replace its value by the empty string below.
 
-    my $commit_parents = eval {
-        $git->command([qw/rev-list --pretty=format:%P -n 1 HEAD/], { STDERR => 0 })
-    } || '';
+    my $commit_parents = eval { $git->run(qw/rev-list --pretty=format:%P -n 1 HEAD/) } || '';
 
     _record_filename($git)->spew($commit_parents);
 
@@ -82,7 +80,7 @@ sub check_commit_amend {
         $old_parents = '';
     }
 
-    my $new_parents = ($git->command(qw/rev-list --pretty=format:%P -n 1 HEAD/))[1];
+    my $new_parents = ($git->run(qw/rev-list --pretty=format:%P -n 1 HEAD/))[1];
 
     return 1 if $new_parents ne $old_parents;
 
@@ -116,18 +114,19 @@ sub check_rebase {
     unless (defined $branch) {
         # This means we're rebasing the current branch. We try to grok
         # it's name using git symbolic-ref.
-        try {
-            chomp($branch = $git->command(qw/symbolic-ref -q HEAD/));
-        } otherwise {
+        my $success = try {
+            chomp($branch = $git->run(qw/symbolic-ref -q HEAD/));
+        } catch {
             # The command git symbolic-ref fails if we're in a
             # detached HEAD. In this situation we don't care about the
             # rewriting.
-            return 1;
+            undef;
         };
+        return 1 unless defined $success;
     }
 
     # Find the base commit of the rebased sequence
-    my $base_commit = $git->command_oneline('rev-list', '--topo-order', '--reverse', "$upstream..$branch");
+    my $base_commit = $git->run(qw/rev-list --topo-order --reverse/, "$upstream..$branch");
 
     # If $upstream is a decendant of $branch, $base_commit is
     # empty. In this situation the rebase will turn out to be a simple
@@ -173,13 +172,13 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 
 =head1 VERSION
 
-version 1.16.0
+version 2.0.1
 
 =head1 DESCRIPTION
 
-This Git::Hooks plugin hooks itself to the B<pre-rebase> hook to
-guarantee that it is safe in the sense that no rewritten commit is
-reachable by other branch than the one being rebased.
+This L<Git::Hooks> plugin hooks itself to the B<pre-rebase> hook to
+guarantee that it is safe in the sense that no rewritten commit is reachable
+by other branch than the one being rebased.
 
 It also hooks itself to the B<pre-commit> and the B<post-commit> hooks
 to detect unsafe B<git commit --amend> commands after the fact. An
@@ -192,6 +191,8 @@ option:
 
     git config --add githooks.plugin CheckRewrite
 
+=for Pod::Coverage check_commit_amend check_rebase record_commit_parents
+
 =head1 NAME
 
 Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrites
@@ -199,38 +200,6 @@ Git::Hooks::CheckRewrite - Git::Hooks plugin for checking against unsafe rewrite
 =head1 CONFIGURATION
 
 There's no configuration needed or provided.
-
-=head1 EXPORTS
-
-This module exports the following routines that can be used directly
-without using all of Git::Hooks infrastructure.
-
-=head2 record_commit_parents GIT
-
-This is the routine used to implement the C<pre-commit> hook. It needs
-a C<Git::More> object. It simply record the original commit id and its
-parents in a file called C<GITHOOKS_CHECKREWRITE> inside the git
-repository directory
-
-=head2 check_commit_amend GIT
-
-This is the routine used to implement the C<post-commit> hook. It
-needs a C<Git::More> object. It reads the original commit id and its
-parents from a file called C<GITHOOKS_CHECKREWRITE> inside the git
-repository directory, which must have been created by the
-C<record_commit_parents> routine during the C<pre-commit> hook. Using
-this information it detects if this was an unsafe amend and tells the
-user so.
-
-=head2 check_rebase GIT, UPSTREAM [, BRANCH]
-
-This is the routine used to implement the C<pre-rebase> hook. It needs
-a B<Git::More> object, the name of the upstream branch onto which
-we're rebasing and the name of the branch being rebased. (If BRANCH is
-undefined it means that we're rebasing the current branch.
-
-The routine dies with a suitable message if it detects that it will be
-an unsafe rebase.
 
 =head1 REFERENCES
 

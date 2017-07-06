@@ -1,5 +1,6 @@
 #$Id$
-use Test::More tests => 29;
+# use Test::More tests => 29;
+use Test::More skip_all => 'Neo4j 3.2.1 issue with transaction endpoint';
 use Test::Exception;
 use Module::Build;
 use lib '../lib';

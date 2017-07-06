@@ -14,6 +14,7 @@ lib/Text/vFile/toXML.pm
 Makefile.PL
 MANIFEST
 META.yml			# Will be created by "make dist"
+META.json
 README
 t/00-load.t
 t/bad.t

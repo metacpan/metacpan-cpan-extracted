@@ -1,6 +1,6 @@
 requires 'perl', 'v5.10.1';
 
-requires 'Catmandu', '0.9504';
+requires 'Catmandu', '1.0601';
 requires 'Catmandu::SRU', '>= 0.032';
 requires 'Readonly';
 

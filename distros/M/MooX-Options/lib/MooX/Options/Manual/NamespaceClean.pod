@@ -1,22 +1,13 @@
-# PODNAME: MooX::Options::Manual::NamespaceClean
-# ABSTRACT: Use namespace::clean with MooX::Options
-
-__END__
-
-=pod
-
 =head1 NAME
 
 MooX::Options::Manual::NamespaceClean - Use namespace::clean with MooX::Options
 
-=head1 VERSION
-
-version 4.023
-
 =head1 DESCRIPTION
 
 L<MooX::Options> export private methods to keep track of all your options.
-You need to keep some of them to make it work.
+You need to keep some of them to make it work. In addition to the advises
+of L<Moo|Moo/CLEANING UP IMPORTS>, some of the imported methods needs to
+be visible ...
 
 =head1 USAGE
 
@@ -25,16 +16,9 @@ You need to keep some of them to make it work.
 
 =head1 SEE ALSO
 
+L<Moo/CLEANING UP IMPORTS>
+
 L<MooX::Options>
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website
-https://github.com/celogeek/MooX-Options/issues
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 AUTHOR
 
@@ -44,7 +28,8 @@ celogeek <me@celogeek.com>
 
 This software is copyright (c) 2013 by celogeek <me@celogeek.com>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This software is copyright (c) 2017 by Jens Rehsack.
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
 
 =cut

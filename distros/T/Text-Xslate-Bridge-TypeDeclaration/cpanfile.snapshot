@@ -1,0 +1,355 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Algorithm-Diff-1.1903
+    pathname: T/TY/TYEMQ/Algorithm-Diff-1.1903.tar.gz
+    provides:
+      Algorithm::Diff 1.1903
+      Algorithm::Diff::_impl 1.1903
+    requirements:
+      ExtUtils::MakeMaker 0
+  Capture-Tiny-0.46
+    pathname: D/DA/DAGOLDEN/Capture-Tiny-0.46.tar.gz
+    provides:
+      Capture::Tiny 0.46
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Spec 0
+      File::Temp 0
+      IO::Handle 0
+      Scalar::Util 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Data-MessagePack-1.00
+    pathname: S/SY/SYOHEX/Data-MessagePack-1.00.tar.gz
+    provides:
+      Data::MessagePack 1.00
+      Data::MessagePack::Boolean undef
+      Data::MessagePack::PP undef
+    requirements:
+      Devel::PPPort 3.19
+      ExtUtils::MakeMaker 6.59
+      ExtUtils::ParseXS 3.18
+      File::Copy::Recursive 0
+      Test::More 0.94
+      Test::Requires 0
+      XSLoader 0.02
+      perl 5.008001
+  Data-Section-Simple-0.07
+    pathname: M/MI/MIYAGAWA/Data-Section-Simple-0.07.tar.gz
+    provides:
+      Data::Section::Simple 0.07
+    requirements:
+      ExtUtils::MakeMaker 6.30
+  Devel-CheckCompiler-0.07
+    pathname: S/SY/SYOHEX/Devel-CheckCompiler-0.07.tar.gz
+    provides:
+      Devel::AssertC99 undef
+      Devel::CheckCompiler 0.07
+    requirements:
+      Exporter 0
+      ExtUtils::CBuilder 0
+      File::Temp 0
+      Module::Build::Tiny 0.035
+      Test::More 0.98
+      parent 0
+      perl 5.008001
+  ExtUtils-Config-0.008
+    pathname: L/LE/LEONT/ExtUtils-Config-0.008.tar.gz
+    provides:
+      ExtUtils::Config 0.008
+    requirements:
+      Data::Dumper 0
+      ExtUtils::MakeMaker 6.30
+      strict 0
+      warnings 0
+  ExtUtils-Helpers-0.026
+    pathname: L/LE/LEONT/ExtUtils-Helpers-0.026.tar.gz
+    provides:
+      ExtUtils::Helpers 0.026
+      ExtUtils::Helpers::Unix 0.026
+      ExtUtils::Helpers::VMS 0.026
+      ExtUtils::Helpers::Windows 0.026
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      File::Basename 0
+      File::Copy 0
+      File::Spec::Functions 0
+      Text::ParseWords 3.24
+      perl 5.006
+      strict 0
+      warnings 0
+  ExtUtils-InstallPaths-0.011
+    pathname: L/LE/LEONT/ExtUtils-InstallPaths-0.011.tar.gz
+    provides:
+      ExtUtils::InstallPaths 0.011
+    requirements:
+      Carp 0
+      ExtUtils::Config 0.002
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      perl 5.006
+      strict 0
+      warnings 0
+  File-Copy-Recursive-0.38
+    pathname: D/DM/DMUEY/File-Copy-Recursive-0.38.tar.gz
+    provides:
+      File::Copy::Recursive 0.38
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Copy 0
+      File::Spec 0
+  File-Slurp-9999.19
+    pathname: U/UR/URI/File-Slurp-9999.19.tar.gz
+    provides:
+      File::Slurp 9999.19
+      FileSlurp_12 9999.13
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Fcntl 0
+      POSIX 0
+      perl 5.004
+  Module-Build-0.4224
+    pathname: L/LE/LEONT/Module-Build-0.4224.tar.gz
+    provides:
+      Module::Build 0.4224
+      Module::Build::Base 0.4224
+      Module::Build::Compat 0.4224
+      Module::Build::Config 0.4224
+      Module::Build::Cookbook 0.4224
+      Module::Build::Dumper 0.4224
+      Module::Build::Notes 0.4224
+      Module::Build::PPMMaker 0.4224
+      Module::Build::Platform::Default 0.4224
+      Module::Build::Platform::MacOS 0.4224
+      Module::Build::Platform::Unix 0.4224
+      Module::Build::Platform::VMS 0.4224
+      Module::Build::Platform::VOS 0.4224
+      Module::Build::Platform::Windows 0.4224
+      Module::Build::Platform::aix 0.4224
+      Module::Build::Platform::cygwin 0.4224
+      Module::Build::Platform::darwin 0.4224
+      Module::Build::Platform::os2 0.4224
+      Module::Build::PodParser 0.4224
+    requirements:
+      CPAN::Meta 2.142060
+      CPAN::Meta::YAML 0.003
+      Cwd 0
+      Data::Dumper 0
+      ExtUtils::CBuilder 0.27
+      ExtUtils::Install 0
+      ExtUtils::Manifest 0
+      ExtUtils::Mkbootstrap 0
+      ExtUtils::ParseXS 2.21
+      File::Basename 0
+      File::Compare 0
+      File::Copy 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0.82
+      File::Temp 0.15
+      Getopt::Long 0
+      Module::Metadata 1.000002
+      Parse::CPAN::Meta 1.4401
+      Perl::OSType 1
+      Pod::Man 2.17
+      TAP::Harness 3.29
+      Test::More 0.49
+      Text::Abbrev 0
+      Text::ParseWords 0
+      perl 5.006001
+      version 0.87
+  Module-Build-Tiny-0.039
+    pathname: L/LE/LEONT/Module-Build-Tiny-0.039.tar.gz
+    provides:
+      Module::Build::Tiny 0.039
+    requirements:
+      CPAN::Meta 0
+      DynaLoader 0
+      Exporter 5.57
+      ExtUtils::CBuilder 0
+      ExtUtils::Config 0.003
+      ExtUtils::Helpers 0.020
+      ExtUtils::Install 0
+      ExtUtils::InstallPaths 0.002
+      ExtUtils::ParseXS 0
+      File::Basename 0
+      File::Find 0
+      File::Path 0
+      File::Spec::Functions 0
+      Getopt::Long 2.36
+      JSON::PP 2
+      Pod::Man 0
+      TAP::Harness::Env 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Module-Build-XSUtil-0.16
+    pathname: H/HI/HIDEAKIO/Module-Build-XSUtil-0.16.tar.gz
+    provides:
+      Module::Build::XSUtil 0.16
+    requirements:
+      Devel::CheckCompiler 0
+      Devel::PPPort 0
+      Exporter 0
+      ExtUtils::CBuilder 0
+      File::Basename 0
+      File::Path 0
+      Module::Build 0.4005
+      XSLoader 0
+      parent 0
+      perl 5.008005
+  Mouse-v2.4.9
+    pathname: S/SY/SYOHEX/Mouse-v2.4.9.tar.gz
+    provides:
+      Mouse v2.4.9
+      Mouse::Exporter undef
+      Mouse::Meta::Attribute undef
+      Mouse::Meta::Class undef
+      Mouse::Meta::Method undef
+      Mouse::Meta::Method::Accessor undef
+      Mouse::Meta::Method::Constructor undef
+      Mouse::Meta::Method::Delegation undef
+      Mouse::Meta::Method::Destructor undef
+      Mouse::Meta::Module undef
+      Mouse::Meta::Role undef
+      Mouse::Meta::Role::Application undef
+      Mouse::Meta::Role::Application::RoleSummation undef
+      Mouse::Meta::Role::Composite undef
+      Mouse::Meta::Role::Method undef
+      Mouse::Meta::TypeConstraint undef
+      Mouse::Object undef
+      Mouse::PurePerl undef
+      Mouse::Role v2.4.9
+      Mouse::Spec v2.4.9
+      Mouse::Tiny v2.4.8
+      Mouse::TypeRegistry undef
+      Mouse::Util v2.4.9
+      Mouse::Util::MetaRole undef
+      Mouse::Util::TypeConstraints undef
+      Squirrel undef
+      Squirrel::Role undef
+      Test::Mouse undef
+      ouse undef
+    requirements:
+      ExtUtils::CBuilder 0
+      Module::Build 0.4005
+      Module::Build::XSUtil 0.16
+      Scalar::Util 1.14
+      XSLoader 0.02
+      perl 5.008005
+  Test-Differences-0.64
+    pathname: D/DC/DCANTRELL/Test-Differences-0.64.tar.gz
+    provides:
+      Test::Differences 0.64
+    requirements:
+      Capture::Tiny 0.24
+      Data::Dumper 2.126
+      Test::More 0.88
+      Text::Diff 0.35
+  Test-Fatal-0.014
+    pathname: R/RJ/RJBS/Test-Fatal-0.014.tar.gz
+    provides:
+      Test::Fatal 0.014
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      Test::Builder 0
+      Try::Tiny 0.07
+      strict 0
+      warnings 0
+  Test-Name-FromLine-0.13
+    pathname: S/SA/SATOH/Test-Name-FromLine-0.13.tar.gz
+    provides:
+      Test::Name::FromLine 0.13
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      ExtUtils::CBuilder 0
+      ExtUtils::MakeMaker 6.36
+      File::Slurp 0
+      Filter::Util::Call 0
+      Module::Build 0.38
+      Test::Builder 0
+      Test::Differences 0
+      Test::Fatal 0
+      Test::More 0
+  Test-Requires-0.10
+    pathname: T/TO/TOKUHIROM/Test-Requires-0.10.tar.gz
+    provides:
+      Test::Requires 0.10
+    requirements:
+      ExtUtils::MakeMaker 6.64
+      Test::Builder::Module 0
+      Test::More 0.47
+      perl 5.006
+  Text-Diff-1.44
+    pathname: N/NE/NEILB/Text-Diff-1.44.tar.gz
+    provides:
+      Text::Diff 1.44
+      Text::Diff::Base 1.44
+      Text::Diff::Config 1.44
+      Text::Diff::Table 1.44
+    requirements:
+      Algorithm::Diff 1.19
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      perl 5.006
+  Text-Xslate-3.4.0
+    pathname: S/SY/SYOHEX/Text-Xslate-3.4.0.tar.gz
+    provides:
+      Text::Xslate 3.004000
+      Text::Xslate::Bridge undef
+      Text::Xslate::Bridge::Star undef
+      Text::Xslate::Compiler undef
+      Text::Xslate::Engine 3.004000
+      Text::Xslate::HashWithDefault undef
+      Text::Xslate::PP 3.004000
+      Text::Xslate::PP::Const undef
+      Text::Xslate::PP::Method undef
+      Text::Xslate::PP::Opcode 3.004000
+      Text::Xslate::PP::State undef
+      Text::Xslate::PP::Type::Macro undef
+      Text::Xslate::PP::Type::Pair undef
+      Text::Xslate::PP::Type::Raw undef
+      Text::Xslate::Parser undef
+      Text::Xslate::Runner undef
+      Text::Xslate::Symbol undef
+      Text::Xslate::Syntax::Kolon undef
+      Text::Xslate::Syntax::Metakolon undef
+      Text::Xslate::Syntax::TTerse undef
+      Text::Xslate::Type::Raw undef
+      Text::Xslate::Util undef
+    requirements:
+      Data::MessagePack 0.38
+      Devel::PPPort 3.19
+      ExtUtils::MakeMaker 6.59
+      ExtUtils::ParseXS 3.18
+      File::Copy::Recursive 0
+      File::Path 2.07
+      Mouse v2.4.5
+      Scalar::Util 1.14
+      Test::More 0.88
+      Test::Requires 0
+      XSLoader 0.02
+      parent 0.221
+      perl 5.008001
+  Try-Tiny-0.28
+    pathname: E/ET/ETHER/Try-Tiny-0.28.tar.gz
+    provides:
+      Try::Tiny 0.28
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      constant 0
+      perl 5.006
+      strict 0
+      warnings 0

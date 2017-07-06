@@ -11,12 +11,14 @@ use RPi::ADC::MCP3008;
 use RPi::BMP180;
 use RPi::DAC::MCP4922;
 use RPi::DigiPot::MCP4XXXX;
+use RPi::I2C;
 use RPi::LCD;
 use RPi::Pin;
+use RPi::Serial;
 use RPi::SPI;
 use RPi::WiringPi::Constant qw(:all);
 
-our $VERSION = '2.3614';
+our $VERSION = '2.3619';
 
 my $fatal_exit = 1;
 
@@ -33,7 +35,6 @@ BEGIN {
     $SIG{__DIE__} = \&_error;
     $SIG{INT} = \&_error;
 };
-
 # core
 
 sub new {
@@ -89,20 +90,26 @@ sub adc {
     my $adc;
 
     if (defined $args{model} && $args{model} eq 'MCP3008'){
-        $adc = RPi::ADC::MCP3008->new($args{channel});
+        my $pin = $self->pin($args{channel});
+        $adc = RPi::ADC::MCP3008->new($pin->num);
     }
     else {
+        # ADSxxxx ADCs don't require any pins
         $adc = RPi::ADC::ADS->new(%args);
     }
     return $adc;
 }
 sub dac {
     my ($self, %args) = @_;
+    my $cs_pin = $self->pin($args{cs});
+    my $shdn_pin = $self->pin($args{shdn}) if defined $args{shdn};
+    $args{model} = 'MCP4922' if ! defined $args{model};
     my $dac = RPi::DAC::MCP4922->new(%args);
     return $dac;
 }
 sub dpot {
     my ($self, $cs, $channel) = @_;
+    $self->register($self->pin($cs));
     my $dpot = RPi::DigiPot::MCP4XXXX->new($cs, $channel);
     return $dpot;
 }
@@ -117,7 +124,7 @@ sub pin {
     my $pins_in_use = $self->registered_pins;
     my $gpio = $self->pin_to_gpio($pin_num);
 
-    if (defined $ENV{RPI_PINS} && grep {$gpio == $_} split /,/, $pins_in_use){
+    if (grep {$gpio == $_} @{ $self->registered_pins }){
         die "\npin $pin_num is already in use... can't create second object\n";
     }
 
@@ -125,9 +132,30 @@ sub pin {
     $self->register_pin($pin);
     return $pin;
 }
+sub serial {
+    my ($self, $device, $baud) = @_;
+    return RPi::Serial->new($device, $baud);
+}
+sub i2c {
+    my ($self, $addr, $i2c_device) = @_;
+    return RPi::I2C->new($addr, $i2c_device);
+}
 sub lcd {
-    my $self = shift;
+    my ($self, %args) = @_;
+
+    # pre-register all pins so we can clean them up
+    # accordingly upon cleanup
+
+    for (qw(rs strb d0 d1 d2 d3 d4 d5 d6 d7)){
+        if (! exists $args{$_} || $args{$_} !~ /^\d+$/){
+            die "lcd() requires pin configuration within a hash\n";
+        }
+        next if $args{$_} == 0;
+        my $pin = $self->pin($args{$_});
+    }
+
     my $lcd = RPi::LCD->new;
+    $lcd->init(%args);
     return $lcd;
 }
 sub bmp {
@@ -136,6 +164,7 @@ sub bmp {
 }
 sub hygrometer {
     my ($self, $pin) = @_;
+    $self->register_pin($pin);
     my $sensor = RPi::DHT11->new($pin);
     return $sensor;
 }
@@ -147,14 +176,22 @@ sub spi {
 sub shift_register {
     my ($self, $base, $num_pins, $data, $clk, $latch) = @_;
 
-    $self->shift_reg_setup($base, $num_pins, $data, $clk, $latch);
+    my @pin_nums;
+
+    for ($data, $clk, $latch){
+        my $pin = $self->pin($_);
+        push @pin_nums, $pin->num;
+    }
+    $self->shift_reg_setup($base, $num_pins, @pin_nums);
 }
 
 # private
 
 sub _fatal_exit {
     my $self = shift;
+    $self->{fatal_exit} = shift if @_;
     $fatal_exit = $self->{fatal_exit} if defined $self->{fatal_exit};
+    return $self->{fatal_exit};
 }
 sub _setup {
     return $_[0]->{setup};
@@ -207,6 +244,22 @@ various items
     print $adc->percent(0);
 
     #
+    # I2C
+    #
+
+    my $device_addr = 0x7c;
+
+    my $i2c_device = $pi->i2c($device_addr);
+
+    my $register = 0x0A;
+
+    $i2c_device->write_block([55, 29, 255], $register);
+
+    my $byte = $i2c_device->read;
+
+    my @bytes = $i2c_device->read_block;
+
+    #
     # SPI
     #
 
@@ -218,6 +271,28 @@ various items
     my $len = scalar @$buf;
 
     my @read_bytes = $spi->rw($buf, $len);
+
+    #
+    # Serial
+    #
+
+    my $dev  = "/dev/ttyAMA0";
+    my $baud = 115200;
+
+    my $ser = $pi->serial($dev, $baud);
+
+    $ser->putc(5);
+
+    my $char = $ser->getc;
+
+    $ser->puts("hello, world!");
+
+    my $num_bytes = 12;
+    my $str  = $ser->gets($num_bytes);
+
+    $ser->flush;
+
+    my $bytes_available = $ser->avail;
 
     #
     # digital to analog converter (DAC)
@@ -297,7 +372,7 @@ various items
     my $temp      = $env->temp; # celcius
     my $farenheit = $env->temp('f');
 
-    # GPS (requires gpsd to be installed and running
+    # GPS (requires gpsd to be installed and running)
 
     my $gps = $pi->gps;
 
@@ -310,9 +385,7 @@ various items
     # LCD
     #
 
-    my $lcd = $pi->lcd;
-
-    $lcd->init(...);
+    my $lcd = $pi->lcd(...);
 
     # first column, first row
     
@@ -335,7 +408,7 @@ This is the root module for the C<RPi::WiringPi> system. It interfaces to a
 Raspberry Pi board, its accessories and its GPIO pins via the
 L<wiringPi|http://wiringpi.com> library through the Perl wrapper
 L<WiringPi::API|https://metacpan.org/pod/WiringPi::API>
-module.
+module, and various other custom device specific  modules.
 
 L<wiringPi|http://wiringpi.com> must be installed prior to installing/using
 this module (v2.36+).
@@ -364,7 +437,7 @@ command.
 See L<RPi::WiringPi::Util> for utility/helper methods that are imported into
 an C<RPi::WiringPi> object.
 
-=head2 new(%args)
+=head2 new([%args])
 
 Returns a new C<RPi::WiringPi> object. We exclusively use the C<GPIO>
 (Broadcom (BCM) GPIO) pin numbering scheme. These pin numbers are printed on the
@@ -391,12 +464,31 @@ Parameters:
 
 Mandatory, Integer: The pin number to attach to.
 
-=head2 lcd()
+=head2 lcd(...)
 
 Returns a L<RPi::LCD> object, which allows you to fully manipulate
 LCD displays connected to your Raspberry Pi.
 
-=head2 spi($channel, $speed);
+Please see the linked documentation for information regarding the parameters
+required.
+
+=head2 i2c($addr, [$device])
+
+Creates a new L<RPi::I2C> device object which allows you to communicate with
+the devices on an I2C bus.
+
+See the linked documentation for full documentation on usage, or the
+L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+
+=head2 serial($device, $baud)
+
+Creates a new L<RPi::Serial> object which allows basic read/write access to a
+serial bus.
+
+See the linked documentation for full documentation on usage, or the
+L<RPi::WiringPi::FAQ-Tutorial> for usage examples.
+
+=head2 spi($channel, $speed)
 
 Creates a new L<RPi::SPI> object which allows you to communicate on the Serial
 Peripheral Interface (SPI) bus with attached devices.
@@ -490,12 +582,14 @@ Mandatory, Integer. C<0> or C<1> for the Pi's onboard hardware CS/SS CE0 and CE1
 pins, or any GPIO number above C<1> in order to use an arbitrary GPIO pin for
 the CS pin, and we'll do the bit-banging of the SPI bus automatically.
 
-=head2 dac()
+=head2 dac(model => 'MCP4922')
 
 Returns a L<RPi::DAC::MCP4922> object (supports all 49x2 series DACs). These
 chips provide analog output signals from the Pi's digital output. Please
 see the documentation of that module for further information on both the
 configuration and use of the DAC object.
+
+Note that if the C<model> parameter is not sent in, we default to C<MCP4922>.
 
 =head2 bmp()
 
@@ -513,7 +607,7 @@ the temperature (celcius or farenheit) as well as the current humidity level.
 =head1 RUNNING TESTS
 
 Please see L<RUNNING TESTS|RPi::WiringPi::FAQ/RUNNING-TESTS> in the
-L<FAQ|RPi::WiringPi::FAQ-Tutorial>.
+L<FAQ|RPi::WiringPi::FAQ>.
 
 =head1 AUTHOR
 

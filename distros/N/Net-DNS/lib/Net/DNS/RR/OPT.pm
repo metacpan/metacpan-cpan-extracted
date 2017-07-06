@@ -1,9 +1,9 @@
 package Net::DNS::RR::OPT;
 
 #
-# $Id: OPT.pm 1561 2017-04-19 13:08:13Z willem $
+# $Id: OPT.pm 1578 2017-06-20 12:49:23Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1561 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1578 $)[1];
 
 
 use strict;
@@ -119,7 +119,7 @@ sub size {
 	for ( $self->{size} ) {
 		my $UDP_size = 0;
 		( $UDP_size, $_ ) = ( shift || 0 ) if scalar @_;
-		return $UDP_size > 512 ? ( $_ = $UDP_size ) : 512 unless $_;
+		return $UDP_size < 512 ? 512 : ( $_ = $UDP_size ) unless $_;
 		return $_ > 512 ? $_ : 512;
 	}
 }

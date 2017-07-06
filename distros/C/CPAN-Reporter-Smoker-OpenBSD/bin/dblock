@@ -1,0 +1,106 @@
+#!perl
+use warnings;
+use strict;
+use YAML::XS 0.63 qw(DumpFile);
+use File::Spec;
+use Getopt::Long;
+use Pod::Usage 1.69;
+use CPAN;
+use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok);
+our $VERSION = '0.007'; # VERSION
+my ($distro,$help,$version_check);
+
+GetOptions(
+    'help'         => \$help,
+    'distro=s'     => \$distro,
+    'version'      => \$version_check
+) or pod2usage(1);
+
+pod2usage( -exitval => 0, -verbose => 2 ) if $help;
+
+if ($version_check) {
+    print "dblock - version $VERSION\n\n";
+    exit(0);
+}
+
+pod2usage( -exitval => 1, -verbose => 1) unless (is_distro_ok($distro));
+
+my $distribution= '^' . $distro;
+my $filename = "$distro.yml";
+$filename =~ s/\//./;
+my %data = ( comment => 'Tests hang smoker',
+             match => { distribution => $distribution },
+             disabled => 1 );
+
+CPAN::HandleConfig->load;
+my $prefs_dir = $CPAN::Config->{prefs_dir};
+die "$prefs_dir does not exist or it is not readable\n" unless (-d $prefs_dir);
+DumpFile( File::Spec->catfile( $prefs_dir, $filename), \%data );
+
+__END__
+
+=head1 dblock
+
+dblock - program to write a distribution preferences files to disable the smoker from testing it
+
+=head1 SYNOPSIS
+
+    dblock --distro='ARFREITAS/Siebel-Srvrmgr'
+
+=head1 OPTIONS
+
+=over
+
+=item B<--distro>
+
+This parameter expects a string describing the Perl distribution to be disabled regarding testing on the smoker.
+The string must have the format <AUTHOR>/<DISTRIBUTION>.
+This is a required parameter: not providing it will cause the program to abort with an error.
+
+=item B<--help>
+
+This help message.
+
+=item B<--version>
+
+Prints the version number and exits.
+
+=back
+
+=head1 DESCRIPTION
+
+This program creates a YAML file that describes a Perl distribution preferences specifically to disable L<CPAN::Reporter> to skip
+trying to test the distribution itself.
+
+Sometimes this is required to be included for CPAN Smokers (see L<CPAN::Reporter::Smoker>) because some distributions just cannot be tested
+automatically and makes a smoker to hand during the tests, having the related processes to be terminated manually.
+
+The YAML file will be created on the respective home directory of the user, followed by C<.cpan> and C<prefs>.
+
+See L<CPAN::Reporter> Pod for details. You can check examples of those files on this project webpage at Github. Those preferences files were
+created during several tests executed.
+
+=head1 AUTHOR
+
+Alceu Rodrigues de Freitas Junior, E<lt>arfreitas@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 of Alceu Rodrigues de Freitas Junior, arfreitas@cpan.org
+
+This file is part of CPAN OpenBSD Smoker.
+
+CPAN OpenBSD Smoker is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+CPAN OpenBSD Smoker is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with CPAN OpenBSD Smoker.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

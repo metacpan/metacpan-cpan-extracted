@@ -82,14 +82,16 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'File::Which' => '0',
+                                   'File::pushd' => '0',
                                    'Hash::Objectify' => '0',
                                    'Test::Class::Moose' => '0.82',
                                    'Test::Class::Moose::AttributeRegistry' => '0',
-                                   'Test::Class::Moose::Load' => '0',
-                                   'Test::Class::Moose::Runner' => '0',
+                                   'Test::Class::Moose::CLI' => '0',
                                    'Test::Differences' => '0',
                                    'Test::More' => '0.96',
-                                   'Test::Output' => '0'
+                                   'Test::Output' => '0',
+                                   'Try::Tiny' => '0'
                                  }
                  }
      };

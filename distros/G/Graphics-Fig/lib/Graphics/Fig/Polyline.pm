@@ -15,16 +15,22 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Polyline;
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use strict;
 use warnings;
 use Carp;
 use Math::Trig;
 use Image::Info qw(image_info);
-use Regexp::Common qw (number);
 use Graphics::Fig::Color;
 use Graphics::Fig::Parameters;
+
+#
+# RE_REAL regular expression matching a floating point number
+#
+my $RE_REAL = "(?:(?i)(?:[-+]?)(?:(?=[.]?[0123456789])(?:[0123456789]*)" .
+	      "(?:(?:[.])(?:[0123456789]{0,}))?)(?:(?:[E])(?:(?:[-+]?)" .
+	      "(?:[0123456789]+))|))";
 
 my $DEFAULT_RESOLUTION = 100.0;		# dpi
 
@@ -49,8 +55,8 @@ sub _parseResolution {
     #
     # Match against pattern.
     #
-    my $pattern = "\\s*($RE{num}{real})" .
-		  "(\\s*[/xX,]?\\s*($RE{num}{real}))?" .
+    my $pattern = "\\s*($RE_REAL)" .
+		  "(\\s*[/xX,]?\\s*($RE_REAL))?" .
 		  "(\\s*(dpi|dpcm|dpm))?\\s*";
     if (defined($value) && $value =~ m/^${pattern}$/) {
 	my $x = $1;

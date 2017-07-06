@@ -17,7 +17,7 @@ name: Nagios-Passive
 provides:
   Nagios::Passive:
     file: lib/Nagios/Passive.pm
-    version: v0.4.0
+    version: v0.4.1
   Nagios::Passive::Base:
     file: lib/Nagios/Passive/Base.pm
   Nagios::Passive::BulkResult:
@@ -36,14 +36,14 @@ requires:
   File::Temp: '0'
   Gearman::Client: '0'
   MIME::Base64: '0'
+  Monitoring::Plugin: '0'
   Moo: '0'
   MooX::HandlesVia: '0'
   MooX::late: '0'
-  Nagios::Plugin: '0'
   Types::Standard: '0'
   perl: '5.010'
   version: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/datamuc/Nagios-Passive
-version: v0.4.0
+version: v0.4.1

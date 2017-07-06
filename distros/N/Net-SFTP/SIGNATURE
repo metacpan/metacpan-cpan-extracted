@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 bc72e46169905baf4293accf3b45273cc3861599 Changes
+SHA1 c17b0fc58538e16a1475999e09e9edbf5384542b LICENSE
+SHA1 5fd8cbfd9a11b7df3a6c4a91610e518229bae5e0 MANIFEST
+SHA1 5fc251a0bf10190e33a54628ebdc0302826d367e MANIFEST.SKIP
+SHA1 9334fcf280cf6b136d946aacb4d965f446913913 META.json
+SHA1 ad6482db6a4af7815fc68e45793a822defdec0c1 META.yml
+SHA1 b35d1d4e7f2107e10413bf24b987642df05f235b Makefile.PL
+SHA1 ad4c087c85a5cf3ebd0c90c4cdc1dc18979b5a88 README
+SHA1 3b5bba6eccb5069c52db7d24418a05ad3c7bb004 ToDo
+SHA1 aa4cbef8c5ece2b87a323735512d5ee74f526bdd eg/psftp
+SHA1 3d71873ba5cf3ae242a779d57320bebd5bba1f0e lib/Net/SFTP.pm
+SHA1 45e4a308da3cb18270a5bafb43d558cefc47af1e lib/Net/SFTP/Attributes.pm
+SHA1 2efcf4d3dc12d54f21b840eef8bc089f7dd05e87 lib/Net/SFTP/Buffer.pm
+SHA1 f8022c20ba6a94c9c24b4576c76527bf16a9f94a lib/Net/SFTP/Constants.pm
+SHA1 0c32c77688f35877944eb886a1005edf1e425116 lib/Net/SFTP/Util.pm
+SHA1 f16f22aefa48564da5c7d5186a35ce7900933f07 t/01-load.t
+SHA1 9f73570113ff6c5110b5ac5a63ce73236f420fa4 t/06-circular.t
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iQEcBAEBCAAGBQJZUtOuAAoJEC3vSbXAsR2+54MIAJH88INyz4A52lY7ub/mrlsh
+EHtjSXj4tC/dZEQ66mBYmJyceB3MtmSDRar66qwirW12FDrvyA+ZlyWEo7ijThRE
+PDAASsMFOUtJRhN9ppQJQetBhvvdXFi0YJAQScScVXql6D6KEdoKpQHk+IMbq2nc
+K5Fn8DJOMszIXusB5FOrqzwk6wlDc0+jBlMS/Rj3xsKa9xGBZoHLVAXLlR5hWYBL
+0M9gAswf2jyI+bTKLLLpjOJyIUR3MOEvCI63MzT26JE8URJr7YSaO88kNnwbDR6m
+OtAol8K5tFi5zycCSiVy6Z8pbjXPOfcevYj+/u+dkdh9CvjxBUaMiGsWd7cKmaE=
+=Fvnz
+-----END PGP SIGNATURE-----

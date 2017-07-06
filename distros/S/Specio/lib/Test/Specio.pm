@@ -3,7 +3,7 @@ package Test::Specio;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use B ();
 use IO::File;
@@ -1268,7 +1268,7 @@ Test::Specio - Test helpers for Specio
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "spvm_compiler.h"
 #include "spvm_type.h"
 #include "spvm_package.h"
@@ -17,6 +16,32 @@
 #include "spvm_bytecode_array.h"
 #include "spvm_sub.h"
 #include "spvm_constant_pool.h"
+#include "spvm_runtime.h"
+
+SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
+  
+  SPVM_RUNTIME* runtime = SPVM_RUNTIME_new();
+  
+  // Copy constant pool to runtime
+  runtime->constant_pool = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(compiler->constant_pool->length, sizeof(int32_t));
+  memcpy(runtime->constant_pool, compiler->constant_pool->values, compiler->constant_pool->length * sizeof(int32_t));
+  
+  // Copy bytecodes to runtime
+  runtime->bytecodes = SPVM_UTIL_ALLOCATOR_safe_malloc_i32(compiler->bytecode_array->length, sizeof(uint8_t));
+  memcpy(runtime->bytecodes, compiler->bytecode_array->values, compiler->bytecode_array->length * sizeof(uint8_t));
+  
+  SPVM_ARRAY* op_packages = compiler->op_packages;
+  
+  runtime->packages_length = op_packages->length;
+  
+  runtime->package_indexes_constant_pool_index = compiler->package_indexes_constant_pool_index;
+  
+  runtime->sub_indexes_constant_pool_index = compiler->sub_indexes_constant_pool_index;
+  
+  runtime->subs_length = compiler->subs_length;
+  
+  return runtime;
+}
 
 SPVM_COMPILER* SPVM_COMPILER_new() {
   SPVM_COMPILER* compiler = malloc(sizeof(SPVM_COMPILER));
@@ -62,16 +87,28 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->entry_point_sub_name = NULL;
 
   // Add core types
-  for (int32_t i = 0; i < SPVM_TYPE_C_CORE_LENGTH; i++) {
-    // Type
-    SPVM_TYPE* type = SPVM_TYPE_new(compiler);
-    const char* name = SPVM_TYPE_C_CORE_NAMES[i];
-    type->name = name;
-    type->name_length = strlen(name);
-    type->id = i;
-    SPVM_ARRAY_push(compiler->types, type);
-    SPVM_HASH_insert(compiler->type_symtable, name, strlen(name), type);
+  {
+    int32_t i;
+    for (i = 0; i < SPVM_TYPE_C_CORE_LENGTH; i++) {
+      // Type
+      SPVM_TYPE* type = SPVM_TYPE_new(compiler);
+      const char* name = SPVM_TYPE_C_CORE_NAMES[i];
+      type->name = name;
+      type->name_length = strlen(name);
+      type->id = i;
+      SPVM_ARRAY_push(compiler->types, type);
+      SPVM_HASH_insert(compiler->type_symtable, name, strlen(name), type);
+    }
   }
+  
+  // Package indexes constant pool index
+  compiler->package_indexes_constant_pool_index = -1;
+  
+  // Subroutine indexes constant pool index
+  compiler->sub_indexes_constant_pool_index = -1;
+  
+  // Subroutine length
+  compiler->subs_length = 0;
   
   return compiler;
 }

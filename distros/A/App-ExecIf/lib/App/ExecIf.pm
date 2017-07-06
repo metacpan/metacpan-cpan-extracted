@@ -1,6 +1,6 @@
 package App::ExecIf;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 1;
 # ABSTRACT: Execute command on some condition
@@ -17,7 +17,7 @@ App::ExecIf - Execute command on some condition
 
 =head1 VERSION
 
-version 0.01
+This document describes version 0.02 of App::ExecIf (from Perl distribution App-ExecIf), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -44,11 +44,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2017, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

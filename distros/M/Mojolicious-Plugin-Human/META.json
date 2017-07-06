@@ -5,7 +5,7 @@
       "Roman V. Nikolaev <rshadow@rambler.ru>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -52,5 +52,5 @@
          "url" : "https://github.com/dr-co/libmojolicious-plugin-human-perl"
       }
    },
-   "version" : "1.0"
+   "version" : "1.01"
 }

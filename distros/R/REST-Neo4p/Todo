@@ -1,9 +1,0 @@
-TODO list for Perl module REST::Neo4p
-
-- Create convenience index objects for auto indexes
-- parse service errors and pass up to user with better context
-
-- use :content_file in Agent to bring large queries down to disk
-- modify the fetchrow_array iterator to stream the json from the content on disk
-- then can't use the response content accessor directly
-

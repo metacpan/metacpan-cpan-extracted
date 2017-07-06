@@ -1,0 +1,32 @@
+---
+abstract: 'Extract Repeated Phrases from Text'
+author:
+  - 'Faelin Landy <faelin.landy@gmail.com>'
+build_requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Summarizer
+provides:
+  Text::Summarizer:
+    file: lib/Text/Summarizer.pm
+    version: '0.02'
+requires:
+  Data::Dumper: '0'
+  Lingua::Sentence: '1.100'
+  List::AllUtils: '0'
+  Moo: '2.003002'
+  Types::Standard: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/faelin/text-summarizer/tree/master
+version: '0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

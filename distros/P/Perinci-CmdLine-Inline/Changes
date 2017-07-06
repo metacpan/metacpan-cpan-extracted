@@ -1,7 +1,25 @@
+0.53    2017-07-04 (PERLANCAR)
+
+	- [Bugfix] Properly set argument value from --no-ARG.
+
+
+0.52    2017-07-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test][dist] Add test prereq to Log::ger::Output::Screen 0.004+
+	  to prevent failure reports [CT].
+
+
+0.51    2017-06-28 (PERLANCAR)
+
+        - Switch from Log::Any to Log::ger.
+
+
 0.50    2017-01-19 (PERLANCAR)
 
-	- [Bugfix] Do not add no-longer-used module
-	  JSON::Tiny::Subclassable [CT].
+	- [Bugfix] Do not add no-longer-used module JSON::Tiny::Subclassable
+          [CT].
 
 
 0.49    2017-01-16 (PERLANCAR)

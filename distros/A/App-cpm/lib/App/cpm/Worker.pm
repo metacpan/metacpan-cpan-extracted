@@ -2,12 +2,12 @@ package App::cpm::Worker;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 use App::cpm::Worker::Installer;
 use App::cpm::Worker::Resolver;
-use App::cpm::Logger;
-use CPAN::DistnameInfo;
+use Config;
+use Digest::MD5 ();
 use Time::HiRes qw(gettimeofday tv_interval);
 
 sub new {
@@ -19,10 +19,21 @@ sub new {
         logger => $logger,
         base => "$home/work/" . time . ".$$",
         cache => "$home/cache",
+        $option{prebuilt} ? (prebuilt_base => $class->prebuilt_base($home)) : (),
     );
     my $installer = App::cpm::Worker::Installer->new(%option);
     my $resolver  = App::cpm::Worker::Resolver->new(%option, impl => $option{resolver});
     bless { %option, installer => $installer, resolver => $resolver }, $class;
+}
+
+sub prebuilt_base {
+    my ($class, $home) = @_;
+
+    # XXX Taking account of relocatable perls, we also use $Config{startperl}
+    my $identity = $Config{startperl} . Config->myconfig;
+    my $digest = Digest::MD5::md5_hex($identity);
+    $digest = substr $digest, 0, 8;
+    "$home/builds/$Config{version}-$Config{archname}-$digest";
 }
 
 sub work {
@@ -41,33 +52,8 @@ sub work {
     }
     my $elapsed = $start ? tv_interval($start) : undef;
     $result ||= { ok => 0 };
-    $job->merge($result);
-    $self->info($job, $elapsed);
+    $job->merge({%$result, pid => $$, elapsed => $elapsed});
     return $job;
-}
-
-sub info {
-    my ($self, $job, $elapsed) = @_;
-    my $type = $job->type;
-    return if !$App::cpm::Logger::VERBOSE && $type ne "install";
-    my $name = $job->distvname;
-    my ($message, $optional);
-    if ($type eq "resolve") {
-        $message = $job->{package};
-        $message .= " -> $name" . ($job->{ref} ? "\@$job->{ref}" : "") if $job->{ok};
-        $optional = "from $job->{from}" if $job->{ok} and $job->{from};
-    } else {
-        $message = $name;
-        $optional = "using cache" if $type eq "fetch" and $job->{using_cache};
-    }
-    $elapsed = defined $elapsed ? sprintf "(%.3fsec) ", $elapsed : "";
-
-    App::cpm::Logger->log(
-        type => $type,
-        result => $job->{ok} ? "DONE" : "FAIL",
-        message => "$elapsed$message",
-        optional => $optional,
-    );
 }
 
 1;

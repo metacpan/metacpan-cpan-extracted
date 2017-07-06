@@ -1,0 +1,28 @@
+---
+abstract: 'Perl interface to the Zotero Write API'
+author:
+  - 'FranE<ccedil>ois Rappaz (rappazf@gmail.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Zotero-Write
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  JSON: '0'
+  Moo: '1'
+  Test::More: '1.001014'
+  URI::Escape: '0'
+  WWW::Zotero: '0.04'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

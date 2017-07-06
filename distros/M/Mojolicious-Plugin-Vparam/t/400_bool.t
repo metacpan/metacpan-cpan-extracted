@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests => 34;
+use Test::More tests => 39;
 use Encode qw(decode encode);
 
 BEGIN {
@@ -69,21 +69,6 @@ note 'bool';
         is $self->vparam( bool11 => 'bool' ),   0,      'bool11 FAIL';
         is $self->verror('bool11'),             0,      'bool11 no error';
 
-        is $self->vparam( checkbox1 => {type => 'bool', default => 1}),
-            1,
-            'checkbox1 default true';
-        is $self->verror('checkbox1'),             0,   'checkbox1 no error';
-
-        is $self->vparam( checkbox2 => {type => 'bool', default => 0}),
-            0,
-            'checkbox2 default false';
-        is $self->verror('checkbox2'),             0,   'checkbox2 no error';
-
-        is $self->vparam( checkbox3 => 'bool' ),
-            undef,
-            'checkbox3 undefined';
-        is $self->verror('checkbox3'),             0,   'checkbox3 no error';
-
         $self->render(text => 'OK.');
     });
 
@@ -104,6 +89,46 @@ note 'bool';
 
     diag decode utf8 => $t->tx->res->body unless $t->tx->success;
 }
+
+note 'checkbox';
+{
+    $t->app->routes->post("/test/bool/unknown")->to( cb => sub {
+        my ($self) = @_;
+
+        is $self->vparam( checkbox1 => {type => 'bool', default => 1}),
+            1,
+            'checkbox1 default true';
+        is $self->verror('checkbox1'),             0,   'checkbox1 no error';
+
+        is $self->vparam( checkbox2 => {type => 'bool', default => 0}),
+            0,
+            'checkbox2 default false';
+        is $self->verror('checkbox2'),             0,   'checkbox2 no error';
+
+        is $self->vparam( checkbox3 => 'bool' ),
+            0,
+            'checkbox3 undefined';
+        is $self->verror('checkbox3'),             0,   'checkbox3 no error';
+
+        is $self->vparam( checkbox4 => '?bool'),
+            0,
+            'checkbox4 optional';
+        is $self->verror('checkbox4'),             0,   'checkbox4 no error';
+
+        is $self->vparam( checkbox5 => {type => 'bool', default => undef}),
+            undef,
+            'checkbox5 default undef';
+        is $self->verror('checkbox5'),             0,   'checkbox5 no error';
+
+        $self->render(text => 'OK.');
+    });
+
+    $t->post_ok("/test/bool/unknown", form => {
+    });
+
+    diag decode utf8 => $t->tx->res->body unless $t->tx->success;
+}
+
 
 =head1 COPYRIGHT
 

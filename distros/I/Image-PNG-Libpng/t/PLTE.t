@@ -1,10 +1,10 @@
 use warnings;
 use strict;
-use FindBin;
+use FindBin '$Bin';
 use Image::PNG::Libpng;
 use Test::More tests => 3;
 
-my $file_name = "$FindBin::Bin/tantei-san.png";
+my $file_name = "$Bin/tantei-san.png";
 my $png = Image::PNG::Libpng::create_read_struct ();
 open my $file, "<:raw", $file_name or die $!;
 Image::PNG::Libpng::init_io ($png, $file);

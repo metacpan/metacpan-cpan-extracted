@@ -5,7 +5,7 @@ use warnings;
 use base qw/Catalyst::Model/;
 use Carp qw/croak/;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 NAME
 
@@ -169,6 +169,8 @@ sub ACCEPT_CONTEXT {
 =item * Adam Jacob E<lt>holoway@cpan.orgE<gt> (TLS support)
 
 =item * Marcus Ramberg (paging support and entry AUTOLOAD)
+
+=item * Gavin Henry <ghenry@surevoip.co.uk> (authz and raw support, plus bug fixes)
 
 =back
 

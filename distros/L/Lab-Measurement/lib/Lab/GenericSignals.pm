@@ -1,6 +1,6 @@
 
 package Lab::GenericSignals;
-$Lab::GenericSignals::VERSION = '3.550';
+$Lab::GenericSignals::VERSION = '3.552';
 use warnings;
 use strict;
 

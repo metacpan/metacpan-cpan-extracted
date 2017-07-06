@@ -8,14 +8,15 @@ use Alien::Build::Util qw( _destdir_prefix );
 use File::Copy ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 sub init
 {
   my($self, $meta) = @_;
-  
-  $meta->add_requires('share' => 'Alien::Build::Plugin::Gather::IsolateDynamic' => '0.42' );
+
+  # plugin was introduced in 0.42, but had a bug which was fixed in 0.48  
+  $meta->add_requires('share' => 'Alien::Build::Plugin::Gather::IsolateDynamic' => '0.48' );
   
   $meta->after_hook(
     gather_share => sub {
@@ -35,6 +36,7 @@ sub init
 
       foreach my $dir (map { $install_root->child($_) } qw( bin lib ))
       {
+        next unless -d $dir;
         foreach my $from ($dir->children)
         {
           next unless $from->basename =~ /\.so/
@@ -66,7 +68,7 @@ Alien::Build::Plugin::Gather::IsolateDynamic - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -95,6 +97,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,9 +1,11 @@
 package HPC::Runner::Command::single_node;
 
 use MooseX::App::Command;
+use namespace::autoclean;
 
 extends 'HPC::Runner::Command';
 
+with 'HPC::Runner::Command::Logger::JSON';
 with 'HPC::Runner::Command::Utils::Base';
 with 'HPC::Runner::Command::Utils::Log';
 with 'HPC::Runner::Command::Utils::Git';
@@ -33,7 +35,7 @@ sub BUILD {
 
 sub execute {
     my $self = shift;
-    
+
     $self->single_node(1);
     $self->run_mce;
 }

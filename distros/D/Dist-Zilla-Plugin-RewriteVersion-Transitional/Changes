@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-RewriteVersion-Transitional
 
+0.008     2017-06-25 01:49:45Z
+          - re-enable a test that will pass again after
+            [BumpVersionAfterRelease] added the 'add_tarball_name' option
+
 0.007     2015-07-16 18:58:00Z
           - work around (hopefully temporary) breakage with the addition of
             extra comments after $VERSION declarations by [RewriteVersion]

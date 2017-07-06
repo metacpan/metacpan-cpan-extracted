@@ -1,5 +1,14 @@
 Revision history for Dancer2-Plugin-Locale
 
+0.07  2017-06-30 16:24:02
+    - test and POD warnings better
+    - rt 122281 test failure fixes:
+        - remove File::Slurp dep to address t/00.load.t:
+            - syswrite() is deprecated on :utf8 handles at …/File/Slurp.pm line 506.
+            - lex: valid .json is used
+        - Avoid using package YourDancerApp {} syntax to address t/00.load.t:
+            - Invalid version format (non-numeric data) at t/00.load.t line 10, near "package YourDancerApp "
+
 0.06  2016-12-30 22:03:39
     - Issue #4 from_json() is not defined anymore
     - Tests for lexicon file logic

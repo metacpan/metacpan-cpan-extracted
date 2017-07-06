@@ -1,10 +1,11 @@
 package Cassandra::Client;
+our $AUTHORITY = 'cpan:TVDW';
+$Cassandra::Client::VERSION = '0.13';
+# ABSTRACT: Perl library for accessing Cassandra using its binary network protocol
 
 use 5.010;
 use strict;
 use warnings;
-
-our $VERSION = '0.11';
 
 use Cassandra::Client::AsyncAnyEvent;
 use Cassandra::Client::AsyncEV;
@@ -19,12 +20,17 @@ use Cassandra::Client::Pool;
 use Cassandra::Client::TLSHandling;
 use Cassandra::Client::Util qw/series whilst/;
 
-use Clone qw/clone/;
+use Clone 0.36 qw/clone/;
 use List::Util qw/shuffle/;
-use Promises qw/deferred/;
+use Promises 0.93 qw/deferred/;
 use Time::HiRes ();
-use Ref::Util qw/is_ref/;
-use Devel::GlobalDestruction;
+use Ref::Util 0.008 qw/is_ref/;
+use Devel::GlobalDestruction 0.11;
+use XSLoader;
+
+our $XS_VERSION = ($Cassandra::Client::VERSION || '');
+$XS_VERSION =~ s/\A(\d+)\.(\d+)(\d{3})\z/$1.$2_$3/;
+XSLoader::load(__PACKAGE__, $XS_VERSION);
 
 sub new {
     my ($class, %args)= @_;
@@ -516,11 +522,21 @@ PUBLIC_METHODS: {
 
 1;
 
+__END__
+
 =pod
 
 =head1 NAME
 
-Cassandra::Client - Perl interface to Cassandra's native protocol
+Cassandra::Client - Perl library for accessing Cassandra using its binary network protocol
+
+=head1 VERSION
+
+version 0.13
+
+=head1 DESCRIPTION
+
+C<Cassandra::Client> is a Perl library giving its users access to the Cassandra database, through the native protocol. Both synchronous and asynchronous querying is supported, through various common calling styles.
 
 =head1 EXAMPLE
 
@@ -539,10 +555,6 @@ Cassandra::Client - Perl interface to Cassandra's native protocol
             say "$id: $column";
         }
     });
-
-=head1 DESCRIPTION
-
-C<Cassandra::Client> is a Perl library giving its users access to the Cassandra database, through the native protocol. Both synchronous and asynchronous querying is supported, through various common calling styles.
 
 =head1 METHODS
 
@@ -746,12 +758,15 @@ unexpected behavior.
 
 =back
 
-=head1 LICENSE
+=head1 AUTHOR
 
-Copyright (C) 2016 L<Tom van der Woerdt|mailto:tvdw@cpan.org>
+Tom van der Woerdt <tvdw@cpan.org>
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+=head1 COPYRIGHT AND LICENSE
 
-See L<http://dev.perl.org/licenses/> for more information.
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

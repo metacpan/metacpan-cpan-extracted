@@ -13,6 +13,7 @@ use Data::Dumper;
 use Capture::Tiny ':all';
 use Slurp;
 use File::Slurp;
+use File::Spec;
 
 extends 'TestMethods::Base';
 
@@ -25,10 +26,8 @@ Test for non linear task deps
 sub write_test_file {
     my $test_dir = shift;
 
-    my $t = "$test_dir/script/test002.1.sh";
-    open( my $fh, ">$t" );
-    print $fh <<EOF;
-
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
+    my $text = <<EOF;
 #HPC jobname=fastqc
 #HPC module=gencore/1 gencore_dev gencore_qc
 
@@ -93,7 +92,7 @@ remove Sample_2
 
 EOF
 
-    close($fh);
+    write_file( $file, $text );
 }
 
 sub construct {
@@ -103,11 +102,11 @@ sub construct {
     my $test_dir     = $test_methods->make_test_dir();
     write_test_file($test_dir);
 
-    my $t = "$test_dir/script/test002.1.sh";
+    my $file = File::Spec->catdir( $test_dir, 'script', 'test001.1.sh' );
     MooseX::App::ParsedArgv->new(
         argv => [
             "submit_jobs", "--infile",
-            $t,            "--max_array_size",
+            $file,            "--max_array_size",
             2,             "--hpc_plugins",
             "Dummy",
         ]

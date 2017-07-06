@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Dist::Zilla::Role::AfterRelease' => '0',
+                                      'Dist::Zilla::Role::Plugin' => '0',
+                                      'List::UtilsBy' => '0',
+                                      'MetaCPAN::Client' => '0',
+                                      'Moose' => '0',
+                                      'perl' => 'v5.14.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'List::Lazy' => '0',
+                                   'Test::DZil' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::MockObject' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,5 +1,5 @@
 package HackaMol;
-$HackaMol::VERSION = '0.040';
+$HackaMol::VERSION = '0.043';
 #ABSTRACT: HackaMol: Object-Oriented Library for Molecular Hacking
 use 5.008;
 use Moose;
@@ -23,8 +23,8 @@ with 'HackaMol::Roles::NameRole',
 sub pdbid_mol {
   my $self  = shift;
   my $pdbid = shift || croak "Croak on passing pdbid, e.g. 2cba";
-  my ($file,$rc) = $self->getstore_pdbid($pdbid);
-  return($self->read_file_mol($file));
+  my ($file) = $self->getstore_pdbid($pdbid);
+  return($self->read_file_mol($file)) if $file;
 }
 
 sub read_file_push_coords_mol{
@@ -326,7 +326,7 @@ HackaMol - HackaMol: Object-Oriented Library for Molecular Hacking
 
 =head1 VERSION
 
-version 0.040
+version 0.043
 
 =head1 DESCRIPTION
 

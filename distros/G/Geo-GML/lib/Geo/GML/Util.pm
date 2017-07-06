@@ -1,13 +1,13 @@
-# Copyrights 2008-2014 by [Mark Overmeer].
+# Copyrights 2008-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
-# Pod stripped from pm file by OODoc 2.01.
+# Pod stripped from pm file by OODoc 2.02.
 use warnings;
 use strict;
 
 package Geo::GML::Util;
 use vars '$VERSION';
-$VERSION = '0.16';
+$VERSION = '0.17';
 
 use base 'Exporter';
 

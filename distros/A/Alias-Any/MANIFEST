@@ -1,0 +1,11 @@
+Changes
+lib/Alias/Any.pm
+Makefile.PL
+MANIFEST
+README
+t/00.load.t
+t/array.t
+t/hash.t
+t/scalar.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

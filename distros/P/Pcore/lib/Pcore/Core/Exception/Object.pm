@@ -38,21 +38,28 @@ around new => sub ( $orig, $self, $msg, %args ) {
     if ( blessed $msg ) {
         my $ref = ref $msg;
 
-        if ( $ref eq __PACKAGE__ ) {    # already cought
+        # already cought
+        if ( $ref eq __PACKAGE__ ) {
             return $msg;
         }
-        elsif ( $ref eq 'Error::TypeTiny::Assertion' ) {    # catch TypeTiny exceptions
+
+        # catch TypeTiny exceptions
+        elsif ( $ref eq 'Error::TypeTiny::Assertion' ) {
             $msg = $msg->message;
 
             # skip frames: Error::TypeTiny::throw
             $args{skip_frames} += 1;
         }
-        elsif ( $ref =~ /\AMoose::Exception/sm ) {          # catch Moose exceptions
+
+        # catch Moose exceptions
+        elsif ( $ref =~ /\AMoose::Exception/sm ) {
             $msg = $msg->message;
         }
-        else {                                              # other foreign exception objects are returned as-is
-            return;
-        }
+
+        # other foreign exception objects are returned as-is
+        # else {
+        #     return;
+        # }
     }
 
     # cut trailing "\n" from $msg

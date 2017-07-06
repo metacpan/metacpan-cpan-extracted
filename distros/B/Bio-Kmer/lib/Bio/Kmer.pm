@@ -5,7 +5,7 @@
 
 package Bio::Kmer;
 require 5.10.0;
-our $VERSION=0.17;
+our $VERSION=0.19;
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ use List::Util qw/max/;
 use File::Basename qw/basename fileparse dirname/;
 use File::Temp qw/tempdir tempfile/;
 use File::Path qw/remove_tree/;
-use Data::Dumper;
+use Data::Dumper qw/Dumper/;
 use IO::Uncompress::Gunzip;
 
 use threads;
@@ -58,6 +58,21 @@ A module for helping with kmer analysis.
   my $kmerHash=$kmer->kmers();
   my $countOfCounts=$kmer->histogram();
 
+The BioPerl way
+
+  use strict;
+  use warnings;
+  use Bio::SeqIO;
+  use Bio::Kmer;
+
+  # Load up any Bio::SeqIO object. Quality values will be
+  # faked internally to help with compatibility even if
+  # a fastq file is given.
+  my $seqin = Bio::SeqIO->new(-file=>"input.fasta");
+  my $kmer=Bio::Kmer->new($seqin);
+  my $kmerHash=$kmer->kmers();
+  my $countOfCounts=$kmer->histogram();
+
 =head1 DESCRIPTION
 
 A module for helping with kmer analysis. The basic methods help count kmers and can produce a count of counts.  Currently this module only supports fastq format.  Although this module can count kmers with pure perl, it is recommended to give the option for a different kmer counter such as Jellyfish.
@@ -96,21 +111,58 @@ Create a new instance of the kmer counter.  One object per file.
 sub new{
   my($class,$seqfile,$settings)=@_;
 
-  die "ERROR: need a sequence file" if(!$seqfile);
-  die "ERROR: could not locate the sequence file" if(!-e $seqfile);
+  die "ERROR: need a sequence file or a Bio::SeqIO object" if(!$seqfile);
 
   # Set optional parameter defaults
   $$settings{kmerlength}  ||=21;
   $$settings{numcpus}     ||=1;
   $$settings{gt}          ||=1;
   $$settings{kmercounter} ||="perl";
+  $$settings{tempdir}     ||=tempdir("Kmer.pm.XXXXXX",TMPDIR=>1,CLEANUP=>1);
+
+  # If the first parameter $seqfile is a Bio::SeqIO object,
+  # then send it to a file to dovetail with the rest of
+  # this module.
+  if(ref($seqfile) && $seqfile->isa("Bio::SeqIO")){
+    # BioPerl isn't required at compile tile but is
+    # required if the user starts with a BioPerl object.
+    eval {
+      require Bio::SeqIO;
+      require Bio::Seq::Quality;
+    };
+    if($@){
+      die "ERROR: cannot load Bio::SeqIO and Bio::Seq::Quality, but you supplied a Bio::SeqIO object";
+    }
+    my $tempfile="$$settings{tempdir}/bioperl_input.fastq";
+    my $out=Bio::SeqIO->new(-file=>">".$tempfile);
+    while(my $seq=$seqfile->next_seq){
+      my $seqWithQual = Bio::Seq::Quality->new(
+        # TODO preserve qual values if they exist, but
+        # for now, it doesn't really matter.
+        -qual=> "I" x $seq->length,
+        -seq => $seq->seq,
+        -id  => $seq->id,
+        -verbose => -1,
+      );
+      $out->write_seq($seqWithQual);
+    }
+    $out->close; # make sure output is flushed
+
+    # now redefine the seqfile as the new file on disk.
+    $seqfile=$tempfile;
+  }
+
+  # Check if we have a valid sequence file path or at
+  # the very least, double check that the file path we just
+  # made from the Bio::SeqIO object is valid.
+  die "ERROR: could not locate the sequence file $seqfile" if(!-e $seqfile);
 
   # Initialize the object and then bless it
   my $self={
     seqfile    =>$seqfile,
     kmerlength =>$$settings{kmerlength},
     numcpus    =>$$settings{numcpus},
-    tempdir    =>tempdir("Kmer.pm.XXXXXX",TMPDIR=>1,CLEANUP=>1),
+    tempdir    =>$$settings{tempdir},
     gt         =>$$settings{gt},
     kmercounter=>$$settings{kmercounter},
 

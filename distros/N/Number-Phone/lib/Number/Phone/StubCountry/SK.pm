@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -38,21 +38,57 @@ my $formatters = [
                   'leading_digits' => '2'
                 },
                 {
-                  'pattern' => '([3-5]\\d)(\\d{3})(\\d{2})(\\d{2})',
-                  'leading_digits' => '[3-5]'
+                  'leading_digits' => '[3-5]',
+                  'pattern' => '([3-5]\\d)(\\d{3})(\\d{2})(\\d{2})'
                 },
                 {
-                  'pattern' => '([689]\\d{2})(\\d{3})(\\d{3})',
-                  'leading_digits' => '[689]'
+                  'leading_digits' => '[689]',
+                  'pattern' => '([689]\\d{2})(\\d{3})(\\d{3})'
                 },
                 {
-                  'pattern' => '(9090)(\\d{3})',
-                  'leading_digits' => '9090'
+                  'leading_digits' => '9090',
+                  'pattern' => '(9090)(\\d{3})'
                 }
               ];
 
 my $validators = {
                 'toll_free' => '800\\d{6}',
+                'pager' => '9090\\d{3}',
+                'voip' => '
+          6(?:
+            02|
+            5[0-4]|
+            9[0-6]
+          )\\d{6}
+        ',
+                'fixed_line' => '
+          2(?:
+            1(?:
+              6\\d{3,4}|
+              7\\d{3}
+            )|
+            [2-9]\\d{7}
+          )|
+          [3-5][1-8](?:
+            1(?:
+              6\\d{2,3}|
+              7\\d{3}
+            )|
+            \\d{7}
+          )
+        ',
+                'mobile' => '
+          9(?:
+            0(?:
+              [1-8]\\d|
+              9[1-9]
+            )|
+            (?:
+              1[0-24-9]|
+              [45]\\d
+            )\\d
+          )\\d{5}
+        ',
                 'personal_number' => '',
                 'geographic' => '
           2(?:
@@ -75,43 +111,7 @@ my $validators = {
             [78]\\d{7}|
             00\\d{6}
           )
-        )|(96\\d{7})',
-                'mobile' => '
-          9(?:
-            0(?:
-              [1-8]\\d|
-              9[1-9]
-            )|
-            (?:
-              1[0-24-9]|
-              [45]\\d
-            )\\d
-          )\\d{5}
-        ',
-                'fixed_line' => '
-          2(?:
-            1(?:
-              6\\d{3,4}|
-              7\\d{3}
-            )|
-            [2-9]\\d{7}
-          )|
-          [3-5][1-8](?:
-            1(?:
-              6\\d{2,3}|
-              7\\d{3}
-            )|
-            \\d{7}
-          )
-        ',
-                'voip' => '
-          6(?:
-            02|
-            5[0-4]|
-            9[0-6]
-          )\\d{6}
-        ',
-                'pager' => '9090\\d{3}'
+        )|(96\\d{7})'
               };
 my %areanames = (
   4212 => "Bratislava",

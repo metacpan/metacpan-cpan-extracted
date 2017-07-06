@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.07
+    version 0.08
 
 SYNOPSIS
 
@@ -12,7 +12,7 @@ SYNOPSIS
 
      use Alien::MSYS;
      # runs uname from MSYS
-     my $uname = mysy { `uname` };
+     my $uname = msys { `uname` };
 
     From Prompt/Makefile
 
@@ -30,6 +30,11 @@ DESCRIPTION
     When installing, this distribution will look for an existing MSYS using
     the following methods in this order:
 
+    environment variable ALIEN_INSTALL_TYPE or ALIEN_MSYS_INSTALL_TYPE
+
+      If set to share a system install will not be attempted. If set to
+      system then a share install will not be attempted.
+
     environment variable PERL_ALIEN_MSYS_BIN
 
       If set, this environment variable should be set to the root of MSYS
@@ -44,22 +49,21 @@ DESCRIPTION
 
     search PATH for mingw-get.exe
 
-      First Alien::MSYS searches the PATH environment variable for the
+      Second, Alien::MSYS searches the PATH environment variable for the
       mingw-get.exe program, which is a common method for installing MinGW
       and MSYS. From there if it can deduce the location of MSYS it will
       use that.
 
     try C:\MinGW\msys\1.0\bin
 
-      This is usually the default location, so Alien::MSYS will try this
-      directory even if it isn't found by another method.
+      Next, Alien::MSYS tries the default install location.
 
     Use desktop shortcut for MinGW Installer
 
-      Usually when you install the MinGW installer it creates a shortcut on
-      the desktop. if Win32::Shortcut is installed (it is an optional
-      dependency), then Alien::MSYS can use that information to determine
-      the location of MSYS.
+      Finally, Alien::MSYS will try to find MSYS from the desktop shortcut
+      created by the GUI installer for MinGW. This method only works if you
+      already have Win32::Shortcut installed, as it is an optional
+      dependency.
 
     If MSYS cannot be found using any of these methods, then it will
     download and install MSYS in this distribution's share directory (via

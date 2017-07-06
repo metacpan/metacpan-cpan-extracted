@@ -1,5 +1,9 @@
 Revision history for perl module Game::Asset
 
+0.6 2017-06-25
+
+- Fix bug where an archive with an empty index would fail
+
 0.5 2017-06-15
 
 - For real pass arguments along to the handling class

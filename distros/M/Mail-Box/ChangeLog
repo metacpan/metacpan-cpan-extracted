@@ -1,6 +1,12 @@
 
 ===== ChangeLog of Mail::Box version 3.*
 
+version 3.003: Thu 29 Jun 15:18:15 CEST 2017
+
+	Fixes:
+	- change license back to "perl" after accidental change
+	  rt.cpan.org#120319 [Jitka Plesnikova]
+
 version 3.002: Fri 31 Mar 14:22:17 CEST 2017
 
 	Fixes:

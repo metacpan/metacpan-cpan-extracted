@@ -1,10 +1,10 @@
 package Perinci::Sub::To::FuncBase;
 
-our $DATE = '2017-02-27'; # DATE
-our $VERSION = '0.84'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.85'; # VERSION
 
 use 5.010;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo;
 
 use Data::Dump::OneLine qw(dump1);
@@ -63,7 +63,7 @@ sub BUILD {
 
 sub before_gen_doc {
     my ($self, %opts) = @_;
-    $log->tracef("=> FuncBase's before_gen_doc(opts=%s)", \%opts);
+    log_trace("=> FuncBase's before_gen_doc(opts=%s)", \%opts);
 
     $self->{_orig_meta} = $self->{meta};
     $self->{meta} = normalize_function_metadata($self->{meta});
@@ -226,7 +226,7 @@ Perinci::Sub::To::FuncBase - Base class for Perinci::Sub::To::* function documen
 
 =head1 VERSION
 
-This document describes version 0.84 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2017-02-27.
+This document describes version 0.85 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2017-07-03.
 
 =for Pod::Coverage .+
 
@@ -236,7 +236,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-To
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-To-Doc>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-To-Doc>.
 
 =head1 BUGS
 

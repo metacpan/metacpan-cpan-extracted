@@ -6,7 +6,10 @@ local $OUTPUT_AUTOFLUSH = 1;
 
 use Test::More tests => 12;
 use Test::Deep;
-use t::lib::Debugger;
+BEGIN {
+  require "./t/lib/Debugger.pm";
+  t::lib::Debugger->import;
+}
 
 my ( $dir, $pid ) = start_script('t/eg/05-io.pl');
 my $path = $dir;

@@ -1,4 +1,9 @@
-Revision history for Data-Graph-Util
+0.003   2017-07-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add note in toposort() about dying when graph cannot be sorted.
+
 
 0.002   2016-06-24 (PERLANCAR)
 

@@ -23,15 +23,15 @@ around BUILDARGS => sub {
     my %parms = ( @_ );
 
     # support historical boolean parms for a while
-    if ( delete $parms{abort_group_on_failure} ) {
+    if (delete $parms{abort_group_on_failure}) {
         $parms{failure_action} = 'abort_group';
     }
 
-    if ( delete $parms{abort_deps_on_failure} ) {
+    if (delete $parms{abort_deps_on_failure}) {
         $parms{failure_action} = 'abort_deps';
     }
 
-    if ( delete $parms{ignore_failure} ) {
+    if (delete $parms{ignore_failure}) {
         $parms{failure_action} = 'ignore';
     }
 
@@ -266,22 +266,76 @@ point where you specify the command you can do something like:
     # set the command to: perl $program -f --flag -v $value --val $value \
     #    -l a -l b -l c --list a --list b --list c f1 f2
 
+As an alternative to the command attribute, you can specify the code
+attribute described below.
+It is required that one of these be provided before the group tries to
+execute this stage.-, and only one of them can be provided (no9t both)
+
 =cut
 
 has 'command' => (
     is        => 'rw',
     isa       => 'Str',
     predicate => '_has_command',
+	trigger   => sub { shift->_only_one( '_has_code' ) },
 );
+
+=head2 code
+
+The code attribute is an alternate to the command attribute described
+above.  Its value is a code reference, which will be called directly
+to carry out the activity of the Stage.  You can use this for a stage
+activity that is simple enough to code as a perl routine that it does
+not make sense to go through the overhead of creating a new job on a
+cluster node to do this activity.  You may not specify B<both> B<code>
+and B<command> for the same stage; but you must specify one of them
+before the stage is ready to execute.
+
+The code in the reference is called with no arguments when the stage
+is ready to be executed.  The return value is treated as a boolean to
+indicate whether the stage succeeded: a false value for success, or a
+true value for failure (with the value usually being a text message
+describing the cause of the failure).  This mimics the exit_status
+that is returned from a separately executed program (except for being
+able to provide a more easily understood failure code than a simple
+integer) - however, it does mean that some common purposes for this
+attribute will need some wrapping code.  For example, any B<code> that
+is just providig a system call (e.g. unlink, link, rename) will need to
+invert the boolean result, and expand the failure result to provide the
+errno value, such as:
+
+    stage(
+        ...
+        code => sub {
+             unlink $tmpfile ? 0 : $!
+        },
+        ...
+    )
+
+=cut
+
+has 'code' => (
+    is        => 'ro',
+    isa       => 'CodeRef',
+    predicate => '_has_code',
+	trigger   => sub { shift->_only_one( '_has_command' ) },
+);
+
+sub _only_one {
+	my $self      = shift;
+	my $has_other = shift;
+	$self->croak( "Exactly one of 'code' or 'command' attributes must be specified, not both" )
+		if $self->$has_other;
+}
 
 sub assert_command_filled {
     my $self     = shift;
     $self->_croak(
             "Trying to submit stage ("
             . $self->name
-            . "), but command has not been set"
+            . "), but neither command nor code have been set"
         )
-        unless $self->_has_command;
+        unless $self->_has_command || $self->_has_code;
 }
 
 has 'stage_dir_name' => (
@@ -342,13 +396,15 @@ has '_use_resources_required' => (
     is      => 'ro',
     isa     => 'HashRef[Str]',
     lazy    => 1,
-    default => sub {
-        my $self = shift;
-        $self->res_hash_map( $self->resources_required,
-            $self->_default_resources,
-        );
-    },
+	builder => '_init_use_resources_required',
 );
+
+sub _init_use_resources_required {
+	my $self = shift;
+	$self->res_hash_map( $self->resources_required,
+		$self->_default_resources,
+	);
+}
 
 =head2 retry_resources_required
 
@@ -426,6 +482,110 @@ sub res_hash_map {
     }
     return $determined;
 }
+
+=head2 native_args_string
+
+The native program mechanism used by the driver to submit a stage
+for execution can have many arguments.  Some of those will be provided
+automatically from the generic HPCI attributes, but there may be extra
+capabilities that do not match the standard HPCI definition.
+
+Using these extra capabilities can lead to non-portable programs, unless
+you are careful.  HPCI provides two ways to be careful but also
+allows you to be careless.
+
+If you (carelessly) provide this attribute directly, then it will be used
+for any type of cluster that your program is run on - using such
+cluster-specific parameters can have dangerous or obscure effects when
+applied to a different cluster type.
+
+You can be careful, by providing this attribute only within an
+attribute set included in the cluster_specific attribute.
+The alternate way to be careful is to provide this attribute indirectly,
+using the cluster-specific name which the driver specifies as the
+native_args_string_name attribute.
+
+The value provided to native_args_string will be passed to the native
+submissions mechanism when-ever that makes sense.  A driver that uses a
+submission mechanism that does not provide for any non-standard HPCI
+capabilities may choose to ignore this attribute.
+
+So, for example, if you wished to provide extra args for the qsub command
+when running on an SGE cluster you could code that as either:
+
+    $group->stage(
+        name => 'stage_name',
+        ...
+        cluster_specific => {
+            SGE => { native_args_string => '-q myqueue -m beas' },
+            ... # put args strings for other cluster types here
+        },
+        ...
+    );
+
+or as:
+
+    $group->stage(
+        name => 'stage_name',
+        ...
+        extra_sge_args_string => '-q myqueue -m beas',
+        ... # put args strings for other cluster types here
+            # using the appropriate cluster-specific attribute name
+        ...
+    );
+
+=head2 native_args_string_name
+
+This attribute is one way in which a driver can help you to use native
+arguments in a portable way.  Drivers that actually use the native_args_string
+attribute will specify a value for this attribute internally - it is never
+provided directly as a Stage attribute.  If this attribute is provided by the
+driver, then only the value of the attribute it names will be used for the
+source text of native_args_string.
+
+=head2 _native_args_string_parsing_info
+
+This internal attribute is provided by the driver.  It specifies how the
+native_args_string is parsed, controlling how it is separated into
+parameters and values, which parameters are normally provided by altenate
+HPCI mechanisms, how the parameters and values are displayed in the log
+(if it is different from how they are inserted into the command line for
+execution), etc.  Only people writing drivers need to worry about this attribute.
+
+=head2 native_args* support not implemented yet
+
+The attributes related to native_args_string processing are not yet ready for
+use; they are being implemented by copying and generalizing the code from the
+SGE and Slurm drivers, that is still in progress.
+
+=cut
+
+has 'native_args_string' => (
+	is       => 'ro',
+	isa      => 'Str',
+	default  => ''
+);
+
+has 'native_args_string_name' => (
+	is       => 'ro',
+	isa      => 'Maybe[Str]',
+	init_arg => undef,
+	default  => undef    # driver can over-ride this setting
+);
+
+has 'native_args_string_parsing_info' => (
+	is       => 'ro',
+	isa      => 'HashRef',
+	init_arg => undef,
+	builder  => 'default_args_string_parsing_info'
+);
+
+# driver can over-ride this method to provide a non-empty list
+# of parsing info
+sub default_args_string_parsing_info {
+	return {}
+}
+
 
 =head2 group
 
@@ -699,12 +859,22 @@ after '_analyse_completion_state' => sub {
         my $files = $self->files;
         FILE:
         for my $file (map { ref($_) ? @$_ : $_ } $files->{out}{req} ) {
+			sleep 10 unless -e $file && -M _ <= $script_time;
             unless (-e $file && (-M _ <= $script_time)) {
                 $self->_set_state('fail');
                 $self->error(
                     "Stage (", $self->name,
                     ") status changed to failed because required output file $file was not updated"
                 );
+				if (-e $file) {
+					$self->error( "mod time: (" . -M _ . ") should be le script time ($script_time)" );
+				}
+				else {
+					$self->error( "file does not exist" );
+					sleep 10;
+					my $e = -e $file ? "does" : "does not";
+					$self->error( "after 10 seconds, it $e exist" );
+				}
                 $run->stats->{failure_detected} = "required output file $file not updated";
                 last FILE;
             }
@@ -712,11 +882,11 @@ after '_analyse_completion_state' => sub {
     }
     if ($self->_has_verify_completion_state) {
         my $code   = $self->verify_completion_state->(
-			$run->stats,
-			$run->_stdout,
-			$run->_stderr,
-			$self->state
-		);
+            $run->stats,
+            $run->_stdout,
+            $run->_stderr,
+            $self->state
+        );
         if ($code eq 'retry') {
             $code = 'fail';
             $run->_analysis_chose_retry(1);

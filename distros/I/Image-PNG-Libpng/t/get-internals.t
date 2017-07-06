@@ -3,9 +3,9 @@
 use warnings;
 use strict;
 use Test::More;
-use FindBin;
+use FindBin '$Bin';
 use Image::PNG::Libpng ':all';
-my $png = read_png_file ("$FindBin::Bin/tantei-san.png");
+my $png = read_png_file ("$Bin/tantei-san.png");
 my ($x, $y) = get_internals ($png);
 ok ($x);
 ok ($y);

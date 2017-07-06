@@ -21,7 +21,7 @@ use Moxie::Object;
 use Moxie::Object::Immutable;
 use Moxie::Traits::Provider;
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import ($class, %opts) {
@@ -162,7 +162,7 @@ Moxie - Not Another Moose Clone
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

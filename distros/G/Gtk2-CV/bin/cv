@@ -7,7 +7,7 @@ use Encode ();
 use File::Glob ();
 use Scalar::Util ();
 
-use Gtk2 -init;
+use Gtk2;
 use Gtk2::Gdk::Keysyms;
 
 use Gtk2::CV;
@@ -20,11 +20,18 @@ BEGIN {
    require "$ENV{HOME}/.cvrc" if -r "$ENV{HOME}/.cvrc";
 }
 
+use Carp (); $Carp::MaxArgLen = 256;#d#
+
 use Gtk2::CV::Plugin::NameCluster;
 use Gtk2::CV::Plugin::RCluster;
 use Gtk2::CV::Plugin::PatRenamer;
 
-Gtk2::CV::Jobber::start_slaves;
+use AnyEvent::Fork::Template;
+
+Gtk2::CV::Jobber::set_template $AnyEvent::Fork::Template;
+
+# now we can initialize Gtk2 etc.
+init Gtk2;
 
 Gtk2::Rc->parse (Gtk2::CV::find_rcfile "gtkrc");
 
@@ -150,6 +157,8 @@ sub std_keys {
       }
 
       $help->show_all;
+   } elsif (!$state && $Gtk2::Gdk::Keysyms{a} <= $key && $key <= $Gtk2::Gdk::Keysyms{z}) {
+      #
    } else {
       return 0;
    }
@@ -184,7 +193,14 @@ sub std_keys {
 if (@ARGV) {
    my $show_first = sub {
       $schnauzer->show_all;
-      $schnauzer->handle_key ($Gtk2::Gdk::Keysyms{space}, []);
+
+      # activate first file, but avoid dirs
+      my $entry = $schnauzer->{entry}[0];
+      my $path = "$entry->[0]/$entry->[1]";
+
+      $schnauzer->handle_key ($Gtk2::Gdk::Keysyms{space}, new Gtk2::Gdk::ModifierType [])
+         unless -d $path;
+
       $viewer->show_all;
    };
 
@@ -221,7 +237,15 @@ cv - a fast gtk+ image viewer loosely modeled after XV
 
 =head1 SYNOPSIS
 
-   cv [file...]
+   cv
+
+   cv directory
+
+   cv path...
+
+   cv -g <glob expression...>
+
+   find .. -print0 | cv -0r
 
 =head1 FEATURES
 
@@ -337,10 +361,12 @@ You can use the following keys in the image window:
  t            rotate clockwise 90°
  T            rotate counterclockwise°
  a            apply all rotations loslessly to a jpeg file (using exiftran)
+ ctrl-shift-t apply current rotation for future image loads
  ctrl-v       open a new visual schnauzer window for the current dir
  ctrl-c       clone the current image window
  ctrl-e       run an editor ($CV_EDITOR or "gimp") on the current image
  ctrl-p       fire up the print dialog
+ ctrl-shift-p same as ctrl-p, but automatically selects "ok"
  escape       cancel a crop action
 
 And when playing movies, these additional keys are active:
@@ -387,7 +413,8 @@ You can use the following keys in the schnauzer window:
  ctrl-a       select all files
  ctrl-shift-a select all files currently displayed in the schnauzer window
  ctrl-d       delete selected files WITHOUT ASKING AGAIN
- ctrl-g       force generation of thumbnais for the selected files
+ ctrl-g       force generation of thumbnails for the selected files
+ ctrl-shift-g remove thumbnails for the selected files
  ctrl-s       rescan current direcory or files updates/deletes etc.
  ctrl-u       update selected (or all) icons if neccessary
  ctrl--       unselected thumbnailed images

@@ -1,12 +1,12 @@
 package App::ScanPrereqs;
 
-our $DATE = '2017-03-08'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 
 our %SPEC;
 
@@ -121,14 +121,14 @@ sub scan_prereqs {
             return unless -f;
             my $path = "$File::Find::dir/$_";
             if (Filename::Backup::check_backup_filename(filename=>$_)) {
-                $log->debugf("Skipping backup file %s ...", $path);
+                log_debug("Skipping backup file %s ...", $path);
                 return;
             }
             if (/\A(\.git)\z/) {
-                $log->debugf("Skipping %s ...", $path);
+                log_debug("Skipping %s ...", $path);
                 return;
             }
-            $log->debugf("Scanning file %s ...", $path);
+            log_debug("Scanning file %s ...", $path);
             my $scanres = $scanner->scan_file($_);
 
             # if we use PP::NotQuiteLite, it returns PPN::Context which supports
@@ -156,11 +156,11 @@ sub scan_prereqs {
                     my $ans = Module::CoreList->is_core(
                         $mod, $v, $perlver);
                     if ($ans && !$args{show_core}) {
-                        $log->debugf("Skipped prereq %s %s (core)", $mod, $v);
+                        log_debug("Skipped prereq %s %s (core)", $mod, $v);
                         $excluded_mods{$mod} = 1;
                         next;
                     } elsif (!$ans && !$args{show_noncore}) {
-                        $log->debugf("Skipped prereq %s %s (non-core)", $mod, $v);
+                        log_debug("Skipped prereq %s %s (non-core)", $mod, $v);
                         $excluded_mods{$mod} = 1;
                         next;
                     }
@@ -169,7 +169,7 @@ sub scan_prereqs {
                     $mods{$mod} = $v if
                         version->parse($v) > version->parse($mods{$mod});
                 } else {
-                    $log->infof("Added prereq %s (from %s)", $mod, $path);
+                    log_info("Added prereq %s (from %s)", $mod, $path);
                     $mods{$mod} = $v;
                 }
             }
@@ -204,7 +204,7 @@ App::ScanPrereqs - Scan source code for prerequisites
 
 =head1 VERSION
 
-This document describes version 0.002 of App::ScanPrereqs (from Perl distribution App-ScanPrereqs), released on 2017-03-08.
+This document describes version 0.003 of App::ScanPrereqs (from Perl distribution App-ScanPrereqs), released on 2017-07-03.
 
 =head1 SYNOPSIS
 

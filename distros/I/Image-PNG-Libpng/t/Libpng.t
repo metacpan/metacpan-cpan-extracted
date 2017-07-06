@@ -5,7 +5,7 @@
 use warnings;
 use strict;
 use Test::More;
-use FindBin;
+use FindBin '$Bin';
 use File::Compare;
 use Image::PNG::Libpng;
 use utf8;
@@ -21,7 +21,7 @@ binmode STDOUT, ":utf8";
 my $png = Image::PNG::Libpng::create_read_struct ();
 ok ($png, 'call "create_read_struct" and get something');
 $png->set_verbosity (1);
-my $file_name = "$FindBin::Bin/test.png";
+my $file_name = "$Bin/test.png";
 
 open my $file, "<", $file_name or die "Can't open '$file_name': $!";
 
@@ -34,7 +34,7 @@ is ($IHDR->{height}, 100, "height");
 $png->destroy_read_struct ();
 close $file or die $!;
 
-my $file_in_name = "$FindBin::Bin/test.png";
+my $file_in_name = "$Bin/test.png";
 open my $file_in, "<", $file_in_name or die "Can't open '$file_in_name': $!";
 
 my $png_in = Image::PNG::Libpng::create_read_struct ();
@@ -42,10 +42,10 @@ $png_in->init_io ($file_in);
 $png_in->read_png (0);
 close $file_in or die $!;
 
-my $file_out_name = "$FindBin::Bin/test-write.png";
+my $file_out_name = "$Bin/test-write.png";
 my $png_out = Image::PNG::Libpng::create_write_struct ();
 
-my $png3 = Image::PNG::Libpng::read_png_file ("$FindBin::Bin/tantei-san.png");
+my $png3 = Image::PNG::Libpng::read_png_file ("$Bin/tantei-san.png");
 eval {
     Image::PNG::Libpng::destroy_read_struct ($png3);
 };
@@ -69,7 +69,7 @@ if ($number_version > 100000) {
 # perl-libpng.c.tmpl. The error was fixed in 0.03 but this test is new
 # in 0.04.
 
-my $badpngfile = "$FindBin::Bin/libpng/xlfn0g04.png";
+my $badpngfile = "$Bin/libpng/xlfn0g04.png";
 if (! -f $badpngfile) {
     die "You are missing a test file";
 }

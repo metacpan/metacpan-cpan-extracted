@@ -1,5 +1,8 @@
 Revision history for Mojo-SlackRTM
 
+0.04  2017-06-30 06:20:04 JST
+    - Make reconnect a little safer (jberger #2)
+
 0.03  2017-04-22 08:43:08 JST
     - Encode data structures as json during call_api (preaction #1)
 

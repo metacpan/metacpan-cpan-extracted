@@ -44,11 +44,10 @@ fill_default_font( Font * font )
 {
 	bzero( font, sizeof( Font));
 	strcpy( font-> name, "Default");
-	font-> height = C_NUMERIC_UNDEF;
 	font-> size = 12;
-	font-> width = C_NUMERIC_UNDEF;
 	font-> style = fsNormal;
 	font-> pitch = fpDefault;
+	font-> undef. height = font-> undef. width = 1;
 }
 
 /* Extracts font name, charset, foundry etc from X properties, if available.
@@ -1137,7 +1136,7 @@ detail_font_info( PFontInfo f, PFont font, Bool addToCache, Bool bySize)
 
 AGAIN:
 	if ( f-> vecname) {
-		memcpy( &fi, f, sizeof( fi));
+		memmove( &fi, f, sizeof( fi));
 		fi. flags. size = fi. flags. height = fi. flags. width = fi. flags. ascent =
 			fi. flags. descent = fi. flags. internalLeading = fi. flags. externalLeading = 0;
 		f = &fi;

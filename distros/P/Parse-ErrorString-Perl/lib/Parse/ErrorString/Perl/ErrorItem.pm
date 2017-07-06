@@ -4,7 +4,7 @@ package Parse::ErrorString::Perl::ErrorItem;
 use strict;
 use warnings;
 
-our $VERSION = '0.22';
+our $VERSION = '0.26';
 
 use Class::XSAccessor getters => {
 	type             => 'type',
@@ -35,7 +35,7 @@ sub stack {
 
 __END__
 
-=head1 NAME 
+=head1 NAME
 
 Parse::ErrorString::Perl::ErrorItem - a Perl error item object
 

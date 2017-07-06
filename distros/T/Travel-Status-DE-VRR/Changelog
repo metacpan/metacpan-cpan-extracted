@@ -1,3 +1,7 @@
+Travel::Status::DE::VRR 1.15 - Wed Jul 05 2017
+
+    * Fix encoding issues caused by recent API changes
+
 Travel::Status::DE::VRR 1.14 - Sat Oct 08 2016
 
     * efa-m: Fix broken encoding in --list output

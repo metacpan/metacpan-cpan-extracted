@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-GML",
    "no_index" : {
@@ -36,12 +36,11 @@
             "Log::Report" : "0.19",
             "Test::More" : "0.54",
             "Test::Pod" : "1.00",
-            "XML::Compile" : "1.28",
-            "XML::Compile::Cache" : "0.995",
-            "XML::Compile::Tester" : "0.04"
+            "XML::Compile" : "1.58",
+            "XML::Compile::Cache" : "1.05"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.16"
+   "version" : "0.17"
 }

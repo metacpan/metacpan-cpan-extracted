@@ -1,7 +1,7 @@
-# $Id: 03-rr.t 1530 2017-01-27 10:40:37Z willem $	-*-perl-*-
+# $Id: 03-rr.t 1569 2017-05-31 09:01:09Z willem $	-*-perl-*-
 
 use strict;
-use Test::More tests => 101;
+use Test::More tests => 105;
 
 
 BEGIN {
@@ -155,13 +155,19 @@ BEGIN {
 
 
 {				## check for exception for nonexistent attribute
-	foreach my $testcase (
-		[ type => 'A', nonexistent => 'x' ],
-		[ type => 'ATMA', nonexistent => 'x' ],
-		) {
-		eval { new Net::DNS::RR( @$testcase ) };
-		my $exception = $1 if $@ =~ /^(.+)\n/;
-		ok( $exception ||= '', "unknown method:\t[$exception]" );
+	my $method = 'bogus';
+	for my $basedir ( undef, 'invalid' ) {
+		local $Net::DNS::Parameters::DNSEXTLANG = $basedir;
+		foreach my $testcase (
+			[ type => 'A' ],
+			[ type => 'ATMA' ],
+			[ type => 'ATMA', nonexistent => 'x' ],
+			) {
+			eval { new Net::DNS::RR( @$testcase )->$method('x') };
+			my $exception = $1 if $@ =~ /^(.+)\n/;
+			ok( $exception ||= '', "unknown method:\t[$exception]" );
+		}
+		$method = 'nonexistent';
 	}
 	my $rr = new Net::DNS::RR( type => 'A' );
         is( $rr->nonexistent, undef, 'suppress repeated unknown method exception' );

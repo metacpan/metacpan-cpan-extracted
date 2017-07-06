@@ -1,9 +1,9 @@
 package Net::DNS::RR::DHCID;
 
 #
-# $Id: DHCID.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: DHCID.pm 1567 2017-05-19 09:52:52Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
 
 
 use strict;
@@ -55,23 +55,23 @@ sub _parse_rdata {			## populate RR from rdata in argument list
 }
 
 
-#   +------------------+------------------------------------------------+
-#   |  Identifier Type | Identifier                                     |
-#   |       Code       |                                                |
-#   +------------------+------------------------------------------------+
-#   |      0x0000      | The 1-octet 'htype' followed by 'hlen' octets  |
-#   |                  | of 'chaddr' from a DHCPv4 client's DHCPREQUEST |
-#   |                  | [7].                                           |
-#   |      0x0001      | The data octets (i.e., the Type and            |
-#   |                  | Client-Identifier fields) from a DHCPv4        |
-#   |                  | client's Client Identifier option [10].        |
-#   |      0x0002      | The client's DUID (i.e., the data octets of a  |
-#   |                  | DHCPv6 client's Client Identifier option [11]  |
-#   |                  | or the DUID field from a DHCPv4 client's       |
-#   |                  | Client Identifier option [6]).                 |
-#   |  0x0003 - 0xfffe | Undefined; available to be assigned by IANA.   |
-#   |      0xffff      | Undefined; RESERVED.                           |
-#   +------------------+------------------------------------------------+
+#	+------------------+------------------------------------------------+
+#	|  Identifier Type | Identifier					    |
+#	|	Code	   |						    |
+#	+------------------+------------------------------------------------+
+#	|      0x0000	   | The 1-octet 'htype' followed by 'hlen' octets  |
+#	|		   | of 'chaddr' from a DHCPv4 client's DHCPREQUEST |
+#	|		   | [7].					    |
+#	|      0x0001	   | The data octets (i.e., the Type and	    |
+#	|		   | Client-Identifier fields) from a DHCPv4	    |
+#	|		   | client's Client Identifier option [10].	    |
+#	|      0x0002	   | The client's DUID (i.e., the data octets of a  |
+#	|		   | DHCPv6 client's Client Identifier option [11]  |
+#	|		   | or the DUID field from a DHCPv4 client's	    |
+#	|		   | Client Identifier option [6]).		    |
+#	|  0x0003 - 0xfffe | Undefined; available to be assigned by IANA.   |
+#	|      0xffff	   | Undefined; RESERVED.			    |
+#	+------------------+------------------------------------------------+
 
 
 sub identifiertype {

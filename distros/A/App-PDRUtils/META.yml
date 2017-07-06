@@ -17,7 +17,7 @@ meta-spec:
   version: '1.4'
 name: App-PDRUtils
 requires:
-  Config::IOD: '0.30'
+  Config::IOD: '0.31'
   Config::IOD::Constants: '0.29'
   Data::Sah::Coerce::perl::str::str_normalize_perl_modname: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
@@ -28,7 +28,7 @@ requires:
   File::chdir: '0'
   Function::Fallback::CoreOrPP: '0'
   Log::Any: '0'
-  Log::Any::IfLOG: '0.07'
+  Log::ger: '0.011'
   PERLANCAR::Module::List: '0'
   POSIX: '0'
   Perinci::CmdLine::Any: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-PDRUtils
   homepage: https://metacpan.org/release/App-PDRUtils
   repository: git://github.com/perlancar/perl-App-PDRUtils.git
-version: '0.09'
+version: '0.10'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -116,6 +116,10 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
       version: '6.008'
     -
+      class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
+      name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
+      version: '0.55'
+    -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
       version: '0.09'
@@ -126,7 +130,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
@@ -139,6 +143,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -236,17 +244,13 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
               version: '0.08'
             -
-              class: Pod::Weaver::Section::Completion::GetoptLongMore
-              name: '@Author::PERLANCAR/Completion::GetoptLongMore'
-              version: '0.001'
-            -
               class: Pod::Weaver::Section::Completion::GetoptLongSubcommand
               name: '@Author::PERLANCAR/Completion::GetoptLongSubcommand'
               version: '0.04'
             -
-              class: Pod::Weaver::Section::Completion::PerinciCmdLine
-              name: '@Author::PERLANCAR/Completion::PerinciCmdLine'
-              version: '0.14'
+              class: Pod::Weaver::Section::Completion::GetoptLongMore
+              name: '@Author::PERLANCAR/Completion::GetoptLongMore'
+              version: '0.001'
             -
               class: Pod::Weaver::Section::Homepage::DefaultCPAN
               name: '@Author::PERLANCAR/Homepage::DefaultCPAN'
@@ -270,7 +274,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.72'
+              version: '0.76'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -286,7 +290,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.04'
+              version: '0.06'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -308,7 +312,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.23'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -337,7 +341,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest
       name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'

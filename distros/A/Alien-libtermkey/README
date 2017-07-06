@@ -12,7 +12,7 @@ DESCRIPTION
     process of installing it will install a locally-bundled copy of the
     library into perl's arch-specific library directory.
 
-    This module bundles libtermkey version 0.18.
+    This module bundles libtermkey version 0.20.
 
 METHODS
 

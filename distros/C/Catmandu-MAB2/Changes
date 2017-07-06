@@ -1,5 +1,10 @@
 Changelog for Catmandu-MAB2
 
+0.15  2017-06-30 17:26:58 CEST
+ - Delete perl-5.12 from .travis.yml due to Dist::Zilla build fails
+ - Update and fix .travis.yml
+ - Upgrading Catmandu using new group binds for mab_each
+
 0.14  2016-03-18 17:14:18 CET
  - Fix issue with leader for MAB2::Writer
 

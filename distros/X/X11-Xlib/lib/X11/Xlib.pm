@@ -8,27 +8,27 @@ use base qw(Exporter DynaLoader);
 use Carp;
 use Try::Tiny;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub dl_load_flags { 1 } # Make PerlXLib.c functions available to other XS modules
 
 bootstrap X11::Xlib;
 
 require X11::Xlib::Struct;
-require X11::Xlib::Visual;
+require X11::Xlib::Opaque;
 
 my %_constants= (
 # BEGIN GENERATED XS CONSTANT LIST
   const_cmap => [qw( AllocAll AllocNone )],
   const_error => [qw( BadAccess BadAlloc BadAtom BadColor BadCursor BadDrawable
     BadFont BadGC BadIDChoice BadImplementation BadLength BadMatch BadName
-    BadPixmap BadRequest BadValue BadWindow )],
+    BadPixmap BadRequest BadValue BadWindow Success )],
   const_event => [qw( ButtonPress ButtonRelease CirculateNotify ClientMessage
     ColormapNotify ConfigureNotify CreateNotify DestroyNotify EnterNotify
     Expose FocusIn FocusOut GraphicsExpose GravityNotify KeyPress KeyRelease
-    KeymapNotify LeaveNotify MapNotify MappingNotify MotionNotify NoExpose
-    PropertyNotify ReparentNotify ResizeRequest SelectionClear SelectionNotify
-    SelectionRequest UnmapNotify VisibilityNotify )],
+    KeymapNotify LeaveNotify MapNotify MapRequest MappingNotify MotionNotify
+    NoExpose PropertyNotify ReparentNotify ResizeRequest SelectionClear
+    SelectionNotify SelectionRequest UnmapNotify VisibilityNotify )],
   const_event_mask => [qw( Button1MotionMask Button2MotionMask
     Button3MotionMask Button4MotionMask Button5MotionMask ButtonMotionMask
     ButtonPressMask ButtonReleaseMask ColormapChangeMask EnterWindowMask
@@ -52,9 +52,10 @@ my %_constants= (
   const_visual => [qw( VisualAllMask VisualBitsPerRGBMask VisualBlueMaskMask
     VisualClassMask VisualColormapSizeMask VisualDepthMask VisualGreenMaskMask
     VisualIDMask VisualRedMaskMask VisualScreenMask )],
-  const_win => [qw( Above Below BottomIf CenterGravity CopyFromParent
-    EastGravity ForgetGravity InputOnly InputOutput LowerHighest
-    NorthEastGravity NorthGravity NorthWestGravity Opposite RaiseLowest
+  const_win => [qw( Above AnyPropertyType Below BottomIf CenterGravity
+    CopyFromParent EastGravity ForgetGravity InputOnly InputOutput
+    LowerHighest NorthEastGravity NorthGravity NorthWestGravity Opposite
+    PropModeAppend PropModePrepend PropModeReplace RaiseLowest
     SouthEastGravity SouthGravity SouthWestGravity StaticGravity TopIf
     UnmapGravity WestGravity )],
   const_winattr => [qw( CWBackPixel CWBackPixmap CWBackingPixel CWBackingPlanes
@@ -67,11 +68,13 @@ my %_constants= (
 );
 my %_functions= (
 # BEGIN GENERATED XS FUNCTION LIST
-  fn_conn => [qw( ConnectionNumber XCloseDisplay XOpenDisplay XServerVendor
-    XSetCloseDownMode XVendorRelease )],
+  fn_atom => [qw( XGetAtomName XGetAtomNames XInternAtom XInternAtoms )],
+  fn_conn => [qw( ConnectionNumber XCloseDisplay XDisplayName XOpenDisplay
+    XServerVendor XSetCloseDownMode XVendorRelease )],
   fn_event => [qw( XCheckMaskEvent XCheckTypedEvent XCheckTypedWindowEvent
-    XCheckWindowEvent XEventsQueued XFlush XNextEvent XPending XPutBackEvent
-    XQLength XSelectInput XSendEvent XSync )],
+    XCheckWindowEvent XEventsQueued XFlush XGetErrorDatabaseText XGetErrorText
+    XNextEvent XPending XPutBackEvent XQLength XSelectInput XSendEvent XSync
+    )],
   fn_input => [qw( XAllowEvents XBell XGrabButton XGrabKey XGrabKeyboard
     XGrabPointer XQueryKeymap XQueryPointer XSetInputFocus XUngrabButton
     XUngrabKey XUngrabKeyboard XUngrabPointer keyboard_leds )],
@@ -89,12 +92,13 @@ my %_functions= (
   fn_thread => [qw( XInitThreads XLockDisplay XUnlockDisplay )],
   fn_vis => [qw( XCreateColormap XFreeColormap XGetVisualInfo XMatchVisualInfo
     XVisualIDFromVisual )],
-  fn_win => [qw( XChangeWindowAttributes XCirculateSubwindows XConfigureWindow
-    XCreateSimpleWindow XCreateWindow XDefineCursor XDestroyWindow
-    XGetGeometry XGetWMNormalHints XGetWMSizeHints XGetWindowAttributes
-    XLowerWindow XMapWindow XMoveResizeWindow XMoveWindow XQueryTree
-    XRaiseWindow XReparentWindow XResizeWindow XRestackWindows
-    XSetWMNormalHints XSetWMSizeHints XSetWindowBackground
+  fn_win => [qw( XChangeProperty XChangeWindowAttributes XCirculateSubwindows
+    XConfigureWindow XCreateSimpleWindow XCreateWindow XDefineCursor
+    XDeleteProperty XDestroyWindow XGetGeometry XGetWMNormalHints
+    XGetWMProtocols XGetWMSizeHints XGetWindowAttributes XGetWindowProperty
+    XListProperties XLowerWindow XMapWindow XMoveResizeWindow XMoveWindow
+    XQueryTree XRaiseWindow XReparentWindow XResizeWindow XRestackWindows
+    XSetWMNormalHints XSetWMProtocols XSetWMSizeHints XSetWindowBackground
     XSetWindowBackgroundPixmap XSetWindowBorder XSetWindowBorderPixmap
     XSetWindowBorderWidth XSetWindowColormap XTranslateCoordinates
     XUndefineCursor XUnmapWindow )],
@@ -116,6 +120,7 @@ our @EXPORT= @{ $EXPORT_TAGS{fn_keysym} }; # backward compatibility
 #  as needed, the XS code exposes its globals to Perl.
 our (
     %_connections,              # weak-ref set of all connection objects, keyed by *raw pointer*
+    %_display_attr,             # inside-out ->display attribute for any Xlib objects derived from Display*
     $_error_nonfatal_installed, # boolean, whether handler is installed
     $_error_fatal_installed,    # boolean, whether handler is installed
     $_error_fatal_trapped,      # boolean, whether Xlib is dead from fatal error
@@ -343,6 +348,14 @@ Release the lock taken by L</XLockDisplay>.
 
 =head2 CONNECTION FUNCTIONS
 
+=head3 XDisplayName
+
+  my $conn_string= X11::Xlib::XDisplayName();
+  my $conn_string= X11::Xlib::XDisplayName( $str );
+
+Returns the official connection string Xlib will use if you were to call
+C<XOpenDisplay($str)>.
+
 =head3 XOpenDisplay
 
   my $display= X11::Xlib::XOpenDisplay($connection_string);
@@ -384,6 +397,46 @@ This is useful for select/poll designs.
   XSetCloseDownMode($display, $close_mode)
 
 Determines what resources are freed upon disconnect.  See X11 documentation.
+
+=head2 ATOM FUNCTIONS
+
+The X11 server maintains an enumeration of strings, called Atoms.  By enumerating
+the strings, it allows small integers to be exchanged instead of variable-length
+identifiers, which makes parsing the protocol more efficient for both sides.
+However clients need to look up (or create) the relevant atoms before they can be
+used.  Be careful when creating atoms; they remain until the server is restarted.
+
+=head3 XInternAtom
+
+  my $atom_value= XInternAtom($display, $atom_name, $only_existing);
+
+Get the value of a named atom.  If C<$only_existing> is true and the atom does
+not already exist on the server, this function returns 0.  (which is not a valid
+atom value)
+
+=head3 XInternAtoms
+
+  my $atoms_array= XInternAtoms($display, \@atom_names, $only_existing);
+
+Same as above, but look up multiple atoms at once, for round-trip efficiency.
+The returned array will always be the same length as C<@atom_names>, but will
+have 0 for any atom value that didn't exist if C<$only_existing> was true.
+
+=head3 XGetAtomName
+
+  my $name= XGetAtomName($display, $atom_value);
+
+Return the name of an atom.  If the atom is not defined this generates a
+protocol error (can be caught by C</on_error> handler) and returns undef.
+
+=head3 XGetAtomNames
+
+  my $names_array= XGetAtomNames($display, \@atom_values);
+
+Same as above, but look up multiple atoms at once, for round-trip efficiency.
+If any atom does not exist, this generates a protocol error, but if you catch
+the error then this function will return an array the same length as
+C<@atom_values> with C<undef> for each atom that didn't exist.
 
 =head2 COMMUNICATION FUNCTIONS
 
@@ -483,6 +536,27 @@ incoming event queue.
 Change the event mask for a window.  Note that event masks are B<per-client>,
 so one client can listen to a window with a different mask than a second
 client listening to the same window.
+
+=head3 XGetErrorText
+
+  my $error_description= XGetErrorText($display, $error_code);
+
+=head3 XGetErrorDatabaseText
+
+  my $msg= XGetErrorDatabaseText($display, $name, $message, $default_string);
+
+$name indicates what sort of thing to look up. $message is a stringified code
+of some sort.  Yes this is really weird for a C API.
+
+  my $msg= XGetErrorDatabaseText($display, 'XProtoError', $error_code, $default);
+  my $msg= sprintf(
+    XGetErrorDatabaseText($display, 'XlibMessage', 'MajorCode', "Request Major Code %d"),
+    $event->request_code
+  );
+  my $message= XGetErrorDatabaseText($display, 'XRequest', $request_code);
+
+Just use L<X11::Xlib::XEvent/summarize> on an XErrorEvent and save yourself
+the trouble.
 
 =head2 SCREEN ATTRIBUTES
 
@@ -849,6 +923,76 @@ front (C<direction == RaiseLowest>), or the front-most to the back
   XRestackWindows($display, \@windows);
 
 Reset the stacking order of the specified windows, from front to back.
+
+=head3 XListProperties
+
+  my @prop_atoms= XListProperties($display, $window);
+  print "Window has these properties: ".join(", ", @{ XGetAtomNames($display, \@prop_atoms, 1) });
+
+Returns an arrayref of all defined properties on the specified window.
+
+=head3 XGetWindowProperty
+
+  my $success= XGetWindowProperty($display, $wnd, $prop_atom, $offset, $length, $delete, $req_type,
+        my $actual_type, my $actual_format, my $nitems, my $bytes_after, my $data);
+
+Welcome to the wonderful world of X11 Window Properties!  You pick the
+property using C<$prop_atom> (see L</XInternAtom>) and then request some range
+of the bytes that compose it (using C<$offset>*4 and C<$length>*4, which are
+a count of 4-byte units, not bytes) request to delete it with C<$delete>,
+request the resource be given to you as C<$req_type> (also an Atom), and then
+receive all the actual values in the last 5 variables.
+
+C<$actual_format> is either 8, 16, or 32 indicating the multiplier for
+C<$nitems>.  But you can just check C<length($data)> to save time.
+
+The details are complicated enough you should go read the X11 docs, but a quick
+example is:
+
+  my $netwmname= XInternAtom($display, "_NET_WM_NAME");
+  my $type_utf8= XInternAtom($display, "UTF8_STRING");
+  if (XGetWindowProperty($display, $wnd, $netwmname, 0, 32, 0, $type_utf8,
+        my $actual_type, my $actual_format, my $n, my $remaining, my $data)
+  ) {
+    say $data; # should check $actual_type, but it's probably readable text.
+    say "window title was longer than 128 bytes" if $remaining > 0;
+  }
+
+=head3 XChangeProperty
+
+  XChangeProperty($display, $wnd, $prop_atom, $type_atom, $format, $mode, $data, $nitems);
+
+C<$prop_atom> determines what property is being written.  C<$type_atom>
+declares the logical type of the data.  C<$format> is 8, 16, or 32 to determine
+the word size of the data (used by X server for endian swapping).  C<$mode> is
+one of: C<PropModeReplace>, C<PropModePrepend>, C<PropModeAppend>.  C<$data>
+is a scalar that must be at least as long as C<$nitems> * C<$format> bits.
+
+=head3 XDeleteProperty
+
+  XDeleteProperty($display, $window, $prop_atom);
+
+Deletes the property from the window if it exists.  No error is raised if it
+doesn't exist.
+
+=head3 XGetWMProtocols
+
+  my @atoms= XGetWMProtocols($display, $wnd);
+
+Returns a list of protocols (identifiers, represented as L<atoms|/"ATOM FUNCTIONS">)
+which the owner of this window claims to support.  If a protocol's atom is in
+this list then you can send that sort of ClientMessage events to this window.
+
+=head3 XSetWMProtocols
+
+  XSetWMProtocols($display, $wnd, \@procol_atoms)
+    or die "Failed to set WM_PROTOCOLS";
+
+Set the list of protocols you want to respond to for this window.
+For example, to advertise support for standard "close" events:
+
+  my $close_atom= XInternAtrom($display, "WM_DELETE_WINDOW", 0);
+  XSetWMProtocols($display, $window, [ $close_atom ]);
 
 =head3 XGetWMNormalHints
 
@@ -1221,6 +1365,8 @@ This is an optional extension.  If you have Xcomposite available when this
 module was installed, then the following functions will be available.
 None of these functions are exportable.
 
+  sudo apt-get install libxcomposite-dev   # Debian/Mint/Ubuntu
+
 =head3 XCompositeVersion
 
   my $version_integer= X11::Xlib::XCompositeVersion()
@@ -1235,10 +1381,6 @@ None of these functions are exportable.
 
   my ($major, $minor)= $display->XCompositeQueryVersion
     if $display->can('XCompositeQueryVersion');
-  # or, to request "no higher than version X":
-  my ($major, $minor)= (1,2);
-  $display->XCompositeQueryVersion($major, $minor) # alters these vars
-    or die;
 
 =head3 XCompositeRedirectWindow
 
@@ -1271,6 +1413,30 @@ None of these functions are exportable.
 =head3 XCompositeReleaseOverlayWindow
 
   $display->XCompositeReleaseOverlayWindow($window);
+
+=head2 EXTENSION XRENDER
+
+This is an optional extension.  If you have Xrender available when this
+module was installed, then the following functions will be available.
+None of these functions are exportable.
+
+  sudo apt-get install libxrender-dev   # Debian/Mint/Ubuntu
+
+=head3 XRenderQueryExtension
+
+  my ($event_base, $error_base)= $display->XRenderQueryExtension()
+    if $display->can('XRenderQueryExtension');
+
+=head3 XRenderQueryVersion
+
+  my ($major, $minor)= $display->XRenderQueryVersion()
+    if $display->can('XRenderQueryVersion');
+
+=head3 XRenderFindVisualFormat
+
+  my $pfmt= $display->XRenderFindVisualFormat( $visual );
+
+Takes a L<X11::Xlib::Visual>, and returns a L<X11::Xlib::XRenderPictFormat>.
 
 =head1 STRUCTURES
 

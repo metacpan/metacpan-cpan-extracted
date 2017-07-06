@@ -26,7 +26,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::libuv" : "0",
+            "Alien::libuv" : "0.004",
             "Config" : "0",
             "ExtUtils::MakeMaker" : "7.12"
          }
@@ -56,7 +56,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::libuv" : "0",
+            "Alien::libuv" : "0.004",
+            "Exporter" : "5.57",
+            "XSLoader" : "0.14",
             "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
@@ -76,7 +78,7 @@
    "provides" : {
       "UV::Util" : {
          "file" : "lib/UV/Util.pm",
-         "version" : "0.003"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -91,10 +93,10 @@
          "web" : "https://github.com/genio/p5-UV-Util"
       }
    },
-   "version" : "0.003",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026000"
+         "version" : "5.024001"
       },
       "plugins" : [
          {
@@ -105,7 +107,8 @@
                      "LICENSE",
                      "META.json",
                      "Makefile.PL",
-                     "README.md"
+                     "README.md",
+                     "t/00-report-prereqs.t"
                   ],
                   "exclude_match" : [],
                   "follow_symlinks" : 0,
@@ -332,7 +335,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.11.0 (Apple Git-81)",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -362,7 +365,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.11.0 (Apple Git-81)",
                   "repo_root" : "."
                }
             },
@@ -385,7 +388,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.11.0 (Apple Git-81)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -402,12 +405,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.003",
+                  "tag" : "v0.007",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.11.0 (Apple Git-81)",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -427,7 +430,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.11.0 (Apple Git-81)",
                   "repo_root" : "."
                }
             },

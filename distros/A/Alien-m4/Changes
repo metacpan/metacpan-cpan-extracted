@@ -1,5 +1,8 @@
 Revision history for Alien-m4
 
+0.11      2017-06-27 05:03:44 -0400
+  - Require Alien::MSYS 0.08 on Windows, if needed
+
 0.10      2017-06-17 11:48:36 -0400
   - Use the Alien::MSYS version of m4 on Windows
     if no other version can be found.

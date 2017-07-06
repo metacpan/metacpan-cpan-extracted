@@ -4,13 +4,13 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-MSYS",
    "prereqs" : {
@@ -24,7 +24,23 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.3601",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
@@ -33,30 +49,32 @@
          },
          "requires" : {
             "Archive::Zip" : "0",
-            "File::HomeDir" : "0",
+            "File::HomeDir" : "0.91",
             "File::ShareDir" : "0",
             "HTTP::Tiny" : "0",
-            "perl" : "5.006"
+            "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0.94",
+            "perl" : "5.008001"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/plicease/alien-msys/issues"
+         "web" : "https://github.com/plicease/Alien-MSYS/issues"
       },
-      "homepage" : "http://perl.wdlabs.com/Alien-MSYS/",
+      "homepage" : "https://metacpan.org/pod/Alien::MSYS",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/plicease/alien-msys.git",
-         "web" : "https://github.com/plicease/alien-msys"
+         "url" : "git://github.com/plicease/Alien-MSYS.git",
+         "web" : "https://github.com/plicease/Alien-MSYS"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

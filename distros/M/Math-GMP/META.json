@@ -4,13 +4,13 @@
       "Shlomi Fish <shlomif@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "lgpl_2_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Math-GMP",
    "prereqs" : {
@@ -41,7 +41,7 @@
             "DynaLoader" : "0",
             "Exporter" : "0",
             "overload" : "0",
-            "perl" : "5.006",
+            "perl" : "5.010",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -62,7 +62,7 @@
    "provides" : {
       "Math::GMP" : {
          "file" : "lib/Math/GMP.pm",
-         "version" : "2.14"
+         "version" : "2.15"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,6 @@
          "web" : "https://github.com/turnstep/perl-Math-GMP"
       }
    },
-   "version" : "2.14",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "2.15"
 }
 

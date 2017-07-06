@@ -1,7 +1,7 @@
 package Algorithm::DecisionTreeWithBagging;
 
 #--------------------------------------------------------------------------------------
-# Copyright (c) 2016 Avinash Kak. All rights reserved.  This program is free
+# Copyright (c) 2017 Avinash Kak. All rights reserved.  This program is free
 # software.  You may modify and/or distribute it under the same terms as Perl itself.
 # This copyright notice must remain attached to the file.
 #
@@ -9,15 +9,15 @@ package Algorithm::DecisionTreeWithBagging;
 # decision tree construction and in classification using decision trees.
 # -------------------------------------------------------------------------------------
 
-use lib 'blib/lib', 'blib/arch';
+#use lib 'blib/lib', 'blib/arch';
 
 #use 5.10.0;
 use strict;
 use warnings;
 use Carp;
-use Algorithm::DecisionTree 3.42;
+use Algorithm::DecisionTree 3.43;
 
-our $VERSION = '3.42';
+our $VERSION = '3.43';
 
 ############################################   Constructor  ##############################################
 sub new { 
@@ -403,11 +403,12 @@ sub fisher_yates_shuffle {
 sub cleanup_csv {
     my $line = shift;
     $line =~ tr/\/:?()[]{}'/          /;
-    my @double_quoted = substr($line, index($line,',')) =~ /\"[^\"]+\"/g;
+#    my @double_quoted = substr($line, index($line,',')) =~ /\"[^\"]+\"/g;
+    my @double_quoted = substr($line, index($line,',')) =~ /\"[^\"]*\"/g;
     for (@double_quoted) {
         my $item = $_;
         $item = substr($item, 1, -1);
-        $item =~ s/^s+|,|\s+$//g;
+        $item =~ s/^\s+|,|\s+$//g;
         $item = join '_',  split /\s+/, $item;
         substr($line, index($line, $_), length($_)) = $item;
     }

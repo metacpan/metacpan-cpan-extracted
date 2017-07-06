@@ -1,9 +1,9 @@
 package Net::DNS::Resolver::android;
 
 #
-# $Id: android.pm 1527 2017-01-18 21:42:48Z willem $
+# $Id: android.pm 1568 2017-05-27 06:40:20Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1527 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1568 $)[1];
 
 
 =head1 NAME
@@ -18,44 +18,33 @@ use warnings;
 use base qw(Net::DNS::Resolver::Base);
 
 
-my $config_dir	= $ENV{ANDROID_ROOT} || '/system';
-my $resolv_conf = "$config_dir/etc/resolv.conf";
-my $dotfile	= '.resolv.conf';
+my $config_file = 'resolv.conf';
+my @config_path = ( $ENV{ANDROID_ROOT} || '/system' );
+my @config_file = grep -f $_ && -r _, map "$_/etc/$config_file", @config_path;
 
-my @resolv_conf = grep -f $_ && -r _, $resolv_conf;
-
-my @config_path;
-push( @config_path, $ENV{HOME} ) if exists $ENV{HOME};
-push( @config_path, '.' );
-
-my @config_file = grep -f $_ && -o _, map "$_/$dotfile", @config_path;
-
-
-sub _untaint {
-	map { m/^(.*)$/; $1 } grep defined, @_;
-}
+my $dotfile = '.resolv.conf';
+my @dotpath = grep defined, $ENV{HOME}, '.';
+my @dotfile = grep -f $_ && -o _, map "$_/$dotfile", @dotpath;
 
 
 sub _init {
 	my $defaults = shift->_defaults;
 
-	foreach (@resolv_conf) {
-		$defaults->_read_config_file($_);
-	}
-
-	my @nameservers = $defaults->nameservers;
+	my @nameserver;
 	for ( 1 .. 4 ) {
 		my $ret = `getprop net.dns$_` || next;
 		chomp $ret;
-		push @nameservers, $ret || next;
+		push @nameserver, $ret || next;
 	}
 
-	$defaults->nameservers( _untaint @nameservers );
-	$defaults->searchlist( _untaint $defaults->searchlist );
+	$defaults->nameserver(@nameserver) if @nameserver;
 
-	foreach (@config_file) {
-		$defaults->_read_config_file($_);
-	}
+
+	map $defaults->_read_config_file($_), @config_file;
+
+	%$defaults = Net::DNS::Resolver::Base::_untaint(%$defaults);
+
+	map $defaults->_read_config_file($_), @dotfile;
 
 	$defaults->_read_env;
 }

@@ -27,7 +27,7 @@
       <ul>
         [% FOREACH tag IN tags %]
           <li>
-            <a href="../list?tag=[% tag.name %]">[% tag.name %]</a> 
+            <a href="[%- mount_url -%]/list?tag=[% tag.name %]">[% tag.name %]</a> 
             ([% tag.posts_count %])
           </li>
         [% END %]

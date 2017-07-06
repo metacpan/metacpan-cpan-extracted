@@ -59,11 +59,38 @@ use Gtk2::CV::Jobber;
 
 use base Gtk2::CV::Jobber::Client::;
 
-use strict qw(subs vars);
-
 my %dir;
 my $dirid;
 my %directory_visited;
+
+our $UTF8_RE = qr{^
+ ( ([\x00-\x7f])              # 1-byte pattern
+ | ([\xc2-\xdf][\x80-\xbf])   # 2-byte pattern
+ | ((([\xe0][\xa0-\xbf])|([\xed][\x80-\x9f])|([\xe1-\xec\xee-\xef][\x80-\xbf]))([\x80-\xbf])) # 3-byte pattern
+ | ((([\xf0][\x90-\xbf])|([\xf1-\xf3][\x80-\xbf])|([\xf4][\x80-\x8f]))([\x80-\xbf]{2}))       # 4-byte pattern
+ )*
+$}x;
+
+# quote for shell, but assume it is being interactively pasted
+# input is octet string, output is unicode string
+sub shellquote_selection($) {
+   local $_ = $_[0];
+
+   if ($_ =~ $UTF8_RE) {
+      utf8::decode $_;
+
+      # it really is that complicated
+      s/([\$`\\"])/\\$1/g;
+      s/!/"\\!"/g;
+      s/'/"\\'"/g;
+      "\"$_\""
+
+   } else {
+      # we use bash's syntax
+      s/([^\x20-\x26\x28-\x7e])/sprintf "\\x%02x", ord $1/ge;
+      "\$\'$_\'"
+   }
+}
 
 sub regdir($) {
    $dir{$_[0]} ||= ++$dirid;
@@ -86,7 +113,15 @@ sub IX() { 20 }
 sub IY() { 16 }
 sub FY() { 12 } # font-y
 
-sub SCROLL_Y()    { 1  }
+BEGIN {
+   no integer;
+   my $scale = $ENV{CV_THUMBNAIL_SCALE} || 1;
+   eval "sub ISCALE() { $scale }";
+   eval "sub IWD()    { IW * $scale }";
+   eval "sub IHD()    { IH * $scale }";
+}
+
+sub SCROLL_Y()    {  1 }
 sub SCROLL_X()    { 10 }
 sub SCROLL_TIME() { 500 }
 
@@ -136,6 +171,7 @@ my %ext_logo = (
 
    mp2  => "mp2",
    mp3  => "mp3",
+   m4a  => "audio",
    pcm  => "audio", # rare
    sun  => "audio", # rare
    au   => "audio",
@@ -149,14 +185,17 @@ my %ext_logo = (
    mpv  => "mpeg",
    mpa  => "mpeg",
    mpe  => "mpeg",
-   m1v  => "mpeg",
    mp4  => "mpeg",
+   m1v  => "mpeg",
+   m2v  => "mpeg",
+   m4v  => "mpeg",
    
    ogm  => "ogm",
    mkv  => "ogm", # sigh
 
    mov  => "mov",
    qt   => "mov",
+   flv  => "mov", # todo
 
    divx => "avi",
    avi  => "avi",
@@ -182,19 +221,31 @@ my %ext_logo = (
    par2 => "par",
 );
 
-my $file_img = img "file.png";
-my $diru_img = img "dir-unvisited.png";
-my $dirv_img = img "dir-visited.png";
+my $file_img;
+my $diru_img;
+my $dirv_img;
 
-my $dirx_layer = Gtk2::CV::require_image "dir-xvpics.png";
-my $dire_layer = Gtk2::CV::require_image "dir-empty.png";
-my $dirs_layer = Gtk2::CV::require_image "dir-symlink.png";
+my $dirx_layer;
+my $dire_layer;
+my $dirs_layer;
 
-my %file_img = do {
-   my %logo = reverse %ext_logo;
+my %file_img;
 
-   map +($_ => img "file-$_.png"), keys %logo
-};
+sub init {
+   $file_img = img "file.png";
+   $diru_img = img "dir-unvisited.png";
+   $dirv_img = img "dir-visited.png";
+  
+   $dirx_layer = Gtk2::CV::require_image "dir-xvpics.png";
+   $dire_layer = Gtk2::CV::require_image "dir-empty.png";
+   $dirs_layer = Gtk2::CV::require_image "dir-symlink.png";
+  
+   %file_img = do {
+      my %logo = reverse %ext_logo;
+
+      map +($_ => img "file-$_.png"), keys %logo
+   };
+}
 
 # get pathname of corresponding xvpics-dir
 sub xvdir($) {
@@ -227,6 +278,7 @@ sub read_thumb($) {
       return Gtk2::CV::dealpha $pb;
    } elsif (open my $p7, "<:raw", $_[0]) {
       if (<$p7> =~ /^P7 332/) {
+         local $_;
          1 while ($_ = <$p7>) =~ /^#/;
          if (/^(\d+)\s+(\d+)\s+255/) {
             local $/;
@@ -254,7 +306,7 @@ sub {
       die "can only rotate regular files"
          unless Fcntl::S_ISREG ($job->{stat}[2]);
 
-      $rot = $rot eq "auto"      ? -a
+      $rot = $rot eq "auto"      ? "-a"
            : ($rot % 360) ==   0 ? undef
            : ($rot % 360) ==  90 ? -9
            : ($rot % 360) == 180 ? -1
@@ -277,7 +329,7 @@ sub video_thumbnail_at {
    
    if (0) {
       # fucking ffmpeg can't be told to be quiet except on errors
-      open my $fh, "exec ffmpeg -i \Q$path\E -ss $time -vframes 1 -an -f rawvideo -vcodec ppm -y /dev/fd/3 3>&1 1>&2 2>/dev/null |"
+      open my $fh, "exec ffmpeg -ss $time -i \Q$path\E -vframes 1 -an -f rawvideo -vcodec ppm -y /dev/fd/3 3>&1 1>&2 2>/dev/null |"
 #   open my $fh, "exec totem-gstreamer-video-thumbnailer -t $time -s $w \Q$path\E /dev/fd/3 3>&1 1>&2 |"
          or die "ffmpeg: $!";
 
@@ -286,15 +338,18 @@ sub video_thumbnail_at {
       $pb->close;
       return $pb->get_pixbuf;
    } else {
-      my $dir = File::Temp::tempdir DIR => "/dev/shm"
+      my $dir = File::Temp::tempdir DIR => $Gtk2::CV::FAST_TMP
          or return;
 
-      system "exec mplayer -really-quiet -nosound -ss $time -frames 2 -vo pnm:outdir=$dir \Q$path\E >/dev/null 2>&1 </dev/null";
+      system "exec mplayer -really-quiet -noautosub -nosound -input nodefault-bindings -noconfig all -ss $time -frames 2 -vf scale=" . IW . ":-2::::::1 -vo pnm:outdir=\Q$dir\E \Q$path\E >/dev/null 2>&1 </dev/null";
 
       my $pb = eval { new_from_file Gtk2::Gdk::Pixbuf "$dir/00000002.ppm" };
 
-      unlink "$dir/00000001.ppm";
-      unlink "$dir/00000002.ppm";
+      # mplayer can write a large number of files when a single one is requested...
+      if (opendir my $fh, $dir) {
+         unlink map "$dir/$_", readdir $fh;
+      }
+
       rmdir $dir;
 
       return $pb;
@@ -329,7 +384,7 @@ sub video_thumbnail {
    $t3->copy_area (0, 0, $tw, $th, $pb,   0, $th) if $t3;
    $t4->copy_area (0, 0, $tw, $th, $pb, $tw, $th) if $t4;
 
-   return $pb;
+   $pb
 }
 
 # generate a thumbnail for a file
@@ -347,19 +402,24 @@ sub {
       die "can only generate thumbnail for regular files"
          unless Fcntl::S_ISREG ($job->{stat}[2]);
 
-      utf8::downgrade $path;
       mkdir +(dirname $path) . "/.xvpics", 0777;
 
-      my $pb = eval { $path =~ /\.jpe?g$/i && Gtk2::CV::load_jpeg $path, 1 }
+      my $pb = eval { $path =~ /\.jpe?g$/i && Gtk2::CV::load_jpeg $path, 1, IWD, IHD }
                || eval {
                      # pixbuf only supports utf-8 filenames so do I/O ourselves. sigh.
-                     open my $fh, "<", $path
+                     open my $fh, "<:perlio", $path
                         or die "$path: $!";
                      my $loader = new Gtk2::Gdk::PixbufLoader;
-                     #$loader->set_size (IW, IH);
+
                      # should set size-prepared callback to scale down, but
                      # we only really care about this for jpegs, which are handled above.
-                     local $/; $loader->write (<$fh>);
+                     #$loader->set_size (IW, IH);
+
+                     my $buf;
+                     1
+                        while (0 < sysread $fh, $buf, 65536)
+                              && $loader->write ($buf);
+
                      $loader->close;
                      $loader->get_pixbuf
                   }
@@ -370,12 +430,12 @@ sub {
 
       my ($w, $h) = ($pb->get_width, $pb->get_height);
 
-      if ($w * IH > $h * IW) {
-         $h = (int $h * IW / $w + 0.5) || 1;
-         $w = IW;
+      if ($w * IHD > $h * IWD) {
+         $h = (int $h * IWD / $w + 0.5) || 1;
+         $w = IWD;
       } else {
-         $w = (int $w * IH / $h + 0.5) || 1;
-         $h = IH;
+         $w = (int $w * IHD / $h + 0.5) || 1;
+         $h = IHD;
       }
 
       $pb = Gtk2::CV::dealpha $pb->scale_simple ($w, $h, 'tiles');
@@ -463,12 +523,8 @@ sub {
    };
 };
 
-Gtk2::CV::Jobber::define mv =>
-   pri   => -2000,
-   class => "read",
-   hide  => 1,
-sub {
-   my ($job) = @_;
+sub do_cpmv {
+   my ($move, $job) = @_;
    my $src = $job->{path};
    my $dst = $job->{data};
    
@@ -496,25 +552,28 @@ sub {
                if (my $fh = $_[0]) {
                   close $_[0];
 
+                  my $cpmv = $move ? \&aio_move : \&aio_copy;
+
                   undef $try_open;
                   aioreq_pri -2;
-                  aio_move $src, $dst, sub {
+                  $cpmv->($src, $dst, sub {
                      if ($_[0]) {
-                        print "$src => $dst [ERROR $1]\n";
+                        print "$src => $dst [ERROR $!]\n";
                         aio_unlink $dst, sub {
                            $job->finish;
                         };
                      } else {
-                        $job->event (unlink => $src);
+                        $job->event (unlink => $src) if $move;
                         $job->event (create => $dst);
-                        aioreq_pri -2;
-                        aio_move xvpic $src, xvpic $dst, sub {
+
+                        aioreq_pri 1;
+                        $cpmv->(xvpic $src, xvpic $dst, sub {
                            # we do not care about the xvpic being copied correctly
-                           print "$src to $dst\n";
+                           printf "%s %s to %s\n", $src, $move ? "moved " : "copied", $dst;
                            $job->finish;
-                        };
+                        });
                      }
-                  };
+                  });
                } elsif ($! == Errno::EEXIST) {
                   $dst = sprintf "%s-%03d", $basedst, $idx++;
                   $try_open->();
@@ -536,6 +595,21 @@ sub {
 #      if -e xvpic $path;
 #   $job->event (unlink => $src);
 #   $job->event (create => $dest);
+};
+
+Gtk2::CV::Jobber::define cp =>
+   pri   => -2500,
+   class => "read",
+sub {
+   do_cpmv 0, @_;
+};
+
+Gtk2::CV::Jobber::define mv =>
+   pri   => -3000,
+   class => "read",
+   hide  => 1,
+sub {
+   do_cpmv 1, @_;
 };
 
 sub jobber_update {
@@ -602,6 +676,13 @@ sub force_pixmap($$) {
 
       my ($w, $h) = ($pb->get_width, $pb->get_height);
 
+      if (($w != IWD and $h != IHD) or $w > IWD or $h > IHD) {
+         ($w, $h) = ($w * IHD / $h, IHD);
+         ($w, $h) = (IWD, $h * IWD / $w) if $w > IWD;
+
+         $pb = $pb->scale_simple ($w, $h, "bilinear");
+      }
+
       $entry->[3] = new Gtk2::Gdk::Pixmap $self->{window}, $w, $h, -1;
       $entry->[3]->draw_pixbuf ($self->style->white_gc, $pb, 0, 0, 0, 0, $w, $h, "max",  0, 0);
    } else {
@@ -667,8 +748,8 @@ sub prefetch_cancel {
 sub coord {
    my ($self, $event) = @_;
 
-   my $x = $event->x / (IW + IX);
-   my $y = $event->y / (IH + IY);
+   my $x = $event->x / (IWD + IX);
+   my $y = $event->y / (IHD + IY);
 
    (
       (max 0, min $self->{cols} - 1, $x),
@@ -678,6 +759,8 @@ sub coord {
 
 sub INIT_INSTANCE {
    my ($self) = @_;
+
+   init unless %file_img;
 
    $self->{cols}  = 1; # just pretend, simplifies code a lot
    $self->{page}  = 1;
@@ -711,9 +794,9 @@ sub INIT_INSTANCE {
          if ($self->{window}) {
             if ($self->{page} > abs $diff) {
                if ($diff > 0) {
-                  $self->{window}->scroll (0, $diff * (IH + IY));
+                  $self->{window}->scroll (0, $diff * (IHD + IY));
                } else {
-                  $self->{window}->scroll (0, $diff * (IH + IY));
+                  $self->{window}->scroll (0, $diff * (IHD + IY));
                }
                $self->{window}->process_all_updates;
             } else {
@@ -729,8 +812,8 @@ sub INIT_INSTANCE {
    $self->{draw}->double_buffered (1);
 
    $self->{draw}->signal_connect (size_request => sub {
-      $_[1]->width  ((IW + IX) * 4);
-      $_[1]->height ((IH + IY) * 3);
+      $_[1]->width  ((IWD + IX) * 4);
+      $_[1]->height ((IHD + IY) * 3);
 
       1
    });
@@ -747,8 +830,8 @@ sub INIT_INSTANCE {
    $self->{draw}->signal_connect (configure_event => sub {
       $self->{width}  = $_[1]->width;
       $self->{height} = $_[1]->height;
-      $self->{cols} = ($self->{width}  / (IW + IX)) || 1;
-      $self->{page} = ($self->{height} / (IH + IY)) || 1;
+      $self->{cols} = ($self->{width}  / (IWD + IX)) || 1;
+      $self->{page} = ($self->{height} / (IHD + IY)) || 1;
 
       $self->{row} = ($self->{offs} + $self->{cols} / 2) / $self->{cols};
       $self->{offs} = $self->{row} * $self->{cols};
@@ -788,7 +871,7 @@ sub INIT_INSTANCE {
    });
 
    $self->{draw}->signal_connect (button_press_event => sub {
-      my ($x, $y) = $self->coord ($_[1]); 
+      my ($x, $y) = $self->coord ($_[1]);
       my $cursor = $x + $y * $self->{cols};
 
       $self->prefetch_cancel;
@@ -847,7 +930,7 @@ sub INIT_INSTANCE {
          $self->sel_scroll ($self->{sel_mouse_scroll}[1] - $dx);
          $self->{sel_mouse_scroll}[1] = $dx;
          $scroll_diff = -1;
-      } elsif ($y > $self->{page} * (IH + IY) + SCROLL_Y) {
+      } elsif ($y > $self->{page} * (IHD + IY) + SCROLL_Y) {
          $self->sel_scroll ($self->{sel_mouse_scroll}[1] - $dx);
          $self->{sel_mouse_scroll}[1] = $dx;
          $scroll_diff = +1;
@@ -898,11 +981,9 @@ sub INIT_INSTANCE {
 
       $data->set_text (
          join " ",
-            map /[^\x2b-\x39\x3d\x40-\x5a\x5e-\x5f\x61-\x7a\xa0-]/
-                   ? do { s/([\x00-\x1f\"\\!])/\\$1/g; "\"$_\"" }
-                   : $_,
+            map shellquote_selection $_,
                sort
-                  map Glib::filename_to_unicode "$_->[0]/$_->[1]",
+                  map "$_->[0]/$_->[1]",
                      values %{$self->{sel} || {}}
       );
    });
@@ -925,8 +1006,8 @@ sub INIT_INSTANCE {
 }
 
 sub do_size_allocate_rounded {
-   $_[1]->width  ($_[1]->width  / (IW + IX) * (IW + IX));
-   $_[1]->height ($_[1]->height / (IH + IY) * (IH + IY));
+   $_[1]->width  ($_[1]->width  / (IWD + IX) * (IWD + IX));
+   $_[1]->height ($_[1]->height / (IHD + IY) * (IHD + IY));
    $_[0]->signal_chain_from_overridden ($_[1]);
 }
 
@@ -937,8 +1018,8 @@ sub set_geometry_hints {
       or return;
 
    my $hints = new Gtk2::Gdk::Geometry;
-   $hints->base_width  (IW + IX); $hints->base_height (IH + IY);
-   $hints->width_inc   (IW + IX); $hints->height_inc  (IH + IY);
+   $hints->base_width  (IWD + IX); $hints->base_height (IHD + IY);
+   $hints->width_inc   (IWD + IX); $hints->height_inc  (IHD + IY);
    $window->set_geometry_hints ($self->{draw}, $hints, [qw(base-size resize-inc)]);
 }
 
@@ -1103,7 +1184,9 @@ sub emit_popup {
             or next;
          $sum += $cnt;
          my $pfx = substr $entry->[1], 0, $len;
-         $by_pfx->append (my $item = new Gtk2::MenuItem "$pfx*\t($sum)");
+         my $label = "$pfx*\t($sum)";
+         $label =~ s/_/__/g;
+         $by_pfx->append (my $item = new Gtk2::MenuItem $label);
          $item->signal_connect (activate => sub {
             delete $self->{sel};
 
@@ -1216,6 +1299,7 @@ sub cursor_move {
             $cursor++ while $cursor < $#{$self->{entry}}
                             && -d "$self->{entry}[$cursor][0]/$self->{entry}[$cursor][1]/$curdir";
 
+            $cursor = 0 if $cursor == $#{$self->{entry}};
          }
       } else {
          my $entry = $self->{entry}[$cursor];
@@ -1267,7 +1351,7 @@ sub clear_selection {
 sub get_selection {
    my ($self) = @_;
 
-   $self->{sel};
+   $self->{sel}
 }
 
 =item $schnauzer->rotate( degrees, idx[, idx...])
@@ -1421,20 +1505,16 @@ sub handle_key {
 
    $self->prefetch_cancel;
 
-   if ($state * "control-mask") {
+   if ($state * ["meta-mask", "shift-mask", "control-mask"] == ["control-mask"]) {
       if ($key == $Gtk2::Gdk::Keysyms{g}) {
          my @sel = keys %{$self->{sel}};
          $self->generate_thumbnails (@sel ? @sel : 0 .. $#{$self->{entry}});
       } elsif ($key == $Gtk2::Gdk::Keysyms{a}) {
          $self->select_all;
-      } elsif ($key == $Gtk2::Gdk::Keysyms{A}) {
-         $self->select_range ($self->{offs}, $self->{offs} + $self->{cols} * $self->{page} - 1);
       } elsif ($key == $Gtk2::Gdk::Keysyms{s}) {
          $self->rescan;
       } elsif ($key == $Gtk2::Gdk::Keysyms{d}) {
          $self->unlink (0, keys %{$self->{sel}});
-      } elsif ($key == $Gtk2::Gdk::Keysyms{D}) {
-         $self->unlink (1, keys %{$self->{sel}});
       } elsif ($key == $Gtk2::Gdk::Keysyms{u}) {
          my @sel = keys %{$self->{sel}};
          $self->update_thumbnails (@sel ? @sel : 0 .. $#{$self->{entry}});
@@ -1460,7 +1540,17 @@ sub handle_key {
       } else {
          return 0;
       }
-   } else {
+   } elsif ($state * ["meta-mask", "shift-mask", "control-mask"] == ["shift-mask", "control-mask"]) {
+      if ($key == $Gtk2::Gdk::Keysyms{A}) {
+         $self->select_range ($self->{offs}, $self->{offs} + $self->{cols} * $self->{page} - 1);
+      } elsif ($key == $Gtk2::Gdk::Keysyms{D}) {
+         $self->unlink (1, keys %{$self->{sel}});
+      } elsif ($key == $Gtk2::Gdk::Keysyms{G}) {
+         $self->unlink_thumbnails (keys %{$self->{sel}});
+      } else {
+         return 0;
+      }
+   } elsif ($state * ["meta-mask", "shift-mask", "control-mask"] == []) {
       if ($key == $Gtk2::Gdk::Keysyms{Page_Up}) {
          my $value = $self->{adj}->value;
          $self->{adj}->set_value ($value >= $self->{page} ? $value - $self->{page} : 0);
@@ -1528,6 +1618,8 @@ sub handle_key {
       } else {
          return 0;
       }
+   } else {
+      return 0;
    }
 
    1
@@ -1539,8 +1631,8 @@ sub invalidate {
    return unless $self->{window};
 
    $self->{draw}->queue_draw_area (
-      $x1 * (IW + IX), $y1 * (IH + IY),
-      ($x2 - $x1 + 1) * (IW + IX), ($y2 - $y1 + 1) * (IH + IY),
+      $x1 * (IWD + IX), $y1 * (IHD + IY),
+      ($x2 - $x1 + 1) * (IWD + IX), ($y2 - $y1 + 1) * (IHD + IY),
    );
 }
 
@@ -1694,19 +1786,19 @@ sub expose {
    $x2 += $x1;
    $y2 += $y1;
 
-   $x1 -= IW + IX;
-   $y1 -= IH + IY;
+   $x1 -= IWD + IX;
+   $y1 -= IHD + IY;
 
-   my @x = map $_ * (IW + IX), 0 .. $self->{cols} - 1;
-   my @y = map $_ * (IH + IY), 0 .. $self->{page} - 1;
+   my @x = map $_ * (IWD + IX), 0 .. $self->{cols} - 1;
+   my @y = map $_ * (IHD + IY), 0 .. $self->{page} - 1;
 
-   # 'orrible, why do they deprecate _convinience_ functions? :(
+   # 'orrible, why do they deprecate _convenience_ functions? :(
    my $context = $self->get_pango_context;
    my $font = $context->get_font_description;
 
    $font->set_absolute_size (FY * Gtk2::Pango->scale);
 
-   my $maxwidth = IW + IX * 0.85;
+   my $maxwidth = IWD + IX * 0.85;
    my $idx = $self->{offs} + 0;
 
    my $layout = new Gtk2::Pango::Layout $context;
@@ -1732,7 +1824,7 @@ outer:
             # selected?
             if (exists $self->{sel}{$idx}) {
                $self->{window}->draw_rectangle ($black_gc, 1,
-                       $x, $y, IW + IX, IH + IY);
+                       $x, $y, IWD + IX, IHD + IY);
                $text_gc = $white_gc;
             } else {
                $text_gc = $black_gc;
@@ -1742,7 +1834,7 @@ outer:
                push @jobs, $path;
 
                $self->{window}->draw_rectangle ($self->style->dark_gc ('normal'), 1,
-                       $x + IX * 0.1, $y, IW + IX * 0.8, IH);
+                       $x + IX * 0.1, $y, IWD + IX * 0.8, IHD);
             }
 
             # pre-render thumb into pixmap
@@ -1758,8 +1850,8 @@ outer:
             $self->{window}->draw_drawable ($white_gc,
                      $pm,
                      0, 0,
-                     $x + (IX + IW - $pw) * 0.5,
-                     $y + (     IH - $ph) * 0.5,
+                     $x + (IX + IWD - $pw) * 0.5,
+                     $y + (     IHD - $ph) * 0.5,
                      $pw, $ph);
 
             utf8::downgrade $entry->[1];#d# ugly workaround for Glib-bug, costs performance like nothing :)
@@ -1770,7 +1862,7 @@ outer:
 
             $self->{window}->draw_layout (
                $text_gc,
-               $x + (IX + IW - $w) * 0.5, $y + IH,
+               $x + (IX + IWD - $w) * 0.5, $y + IHD,
                $layout
             );
          }
@@ -1784,7 +1876,7 @@ outer:
    $self->{idle_check_idx} = $first_unchecked
       if defined $first_unchecked;
 
-   1;
+   1
 }
 
 sub do_activate {
@@ -1867,6 +1959,7 @@ sub idle_check {
 
                   opendir my $fh, $path #d# no clue how to do this sensibly with IO::AIO
                      or return;
+                     local $_;
                      while (defined ($_ = readdir $fh)) {
                         next if $_ eq $updir;
                         next if $_ eq $curdir;
@@ -1917,12 +2010,22 @@ sub do_chpaths {
 sub chpaths {
    my ($self, $paths, $nosort, $cb) = @_;
 
-   $self->{chpaths_grp}->cancel if $self->{chpaths_grp};
+   (delete $self->{chpaths_grp})->cancel if $self->{chpaths_grp};
 
    my $all_group = $self->{chpaths_grp} = aio_group $cb;
 
    $self->set_sensitive (0);
    my $inhibit_guard = Gtk2::CV::Jobber::inhibit_guard;
+
+   my $guard = Guard::guard {
+      delete $self->{chpaths_grp};
+      undef $inhibit_guard;
+      $self->set_sensitive (1);
+      $self->{draw}->grab_focus unless eval { $self->get_toplevel->get_focus };
+   };
+
+   $self->start_idle_check;
+   $self->signal_emit ("chpaths");
 
    my $base = $self->{dir};
 
@@ -2054,7 +2157,7 @@ sub chpaths {
 
          # remove extraneous .xvpics files (but only after an extra check)
          my @xvpics = keys %xvpics;
-         $progress = new Gtk2::CV::Progress title => "clean thumbails...", work => scalar @xvpics;
+         $progress = new Gtk2::CV::Progress title => "clean thumbnails...", work => scalar @xvpics;
 
          my $grp = aio_group sub {
             # try to nuke .xvpics at the end, maybe it is empty
@@ -2078,13 +2181,7 @@ sub chpaths {
             };
          };
 
-         delete $self->{chpaths_grp};
-         undef $inhibit_guard;
-         $self->set_sensitive (1);
-         $self->{draw}->grab_focus unless eval { $self->get_toplevel->get_focus };
-
-         $self->start_idle_check;
-         $self->signal_emit ("chpaths");
+         undef $guard;
       };
    };
 }

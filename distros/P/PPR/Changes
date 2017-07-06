@@ -1,17 +1,63 @@
 Revision history for PPR
 
 0.000001  Wed May 27 15:12:24 2015
-       Initial release.
 
+    * Initial release.
 
 
 0.000003  Tue Jun 20 06:05:22 2017
-          No changes logged
+
+    * No changes logged
 
 
 0.000005  Tue Jun 20 19:27:37 2017
 
-    Added missing PPR::X module
-    (Thanks MST)
+    * Added missing PPR::X module
+      (Thanks MST)
 
 
+0.000006  Thu Jun 22 21:04:14 2017
+
+    * Fixed documentation bug with slurp (pre-)example.
+      (Thanks, Randal!)
+
+    * Optimized matching of builtins slightly
+
+    * Added $PPR::ERROR variable to assist error reporting on failure to match
+      (Many thanks, MST!)
+
+
+
+0.000007  Fri Jun 23 06:45:49 2017
+
+    * Improved $PPR::ERROR API by adding origin location and diagnostics
+
+
+0.000008  Sun Jun 25 15:24:13 2017
+
+    * Unknotted POD nits.
+
+    * Small optimizations to keyword and identifier recognition.
+
+    * Fixed handling of multiline quotelikes that span heredoc contents.
+      (Thanks Lukas)
+
+    * SIGNIFICANT CHANGE: The $PPR::GRAMMAR variable now has to be
+      interpolated at the start of any regex using it.
+
+    * Fixed handling of layered heredocs (at the cost of having to install
+      $PPR::GRAMMAR at the start of each grammar).
+      (Thanks Lukas)
+
+    * Fixed diamond operator parsing.
+      (Thanks Lukas)
+
+
+0.000009  Thu Jun 29 08:17:24 2017
+
+    * SIGNIFICANT REVERSION: The $PPR::GRAMMAR variable no longer
+      has to be interpolated at the start of any regex using it.
+      Indeed, that placement is not recommended due to its effects
+      on the numbering of positional captures within the main regex.
+
+    * Fixed test files to allow testing under 5.10+, rather than 5.14+

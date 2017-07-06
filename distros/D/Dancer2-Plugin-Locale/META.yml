@@ -20,7 +20,6 @@ no_index:
 requires:
   Dancer2::Plugin: '0'
   File::Path::Tiny: '0'
-  File::Slurp: '0'
   File::Spec: '0'
   HTTP::Request::Common: '0'
   Locale::Maketext::Utils: '0'
@@ -28,4 +27,4 @@ requires:
   Plack::Test: '0'
   Template: '0'
   Test::More: '0'
-version: '0.06'
+version: '0.07'

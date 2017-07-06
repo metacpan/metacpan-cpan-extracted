@@ -1,0 +1,15 @@
+Revision history for RL
+
+0.04 Mon Jul  3 11:09:36 CDT 2017
+    - Save history in ~/.pl_history
+
+0.03 Sun Jul  2 23:12:21 CDT 2017
+    - Add a usage statement in the pl script
+
+0.02 Sun Jul  2 12:39:51 CDT 2017
+    - nonfatal warnings in pl script
+    - POD in pl script
+
+0.01 Sat Jul  1 21:51:51 CDT 2017
+    - RL an interface into the readline library
+

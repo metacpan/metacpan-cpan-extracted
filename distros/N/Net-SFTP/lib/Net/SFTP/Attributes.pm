@@ -58,6 +58,14 @@ sub init {
             $a->{atime} = $buf->get_int32;
             $a->{mtime} = $buf->get_int32;
         }
+        if ($a->{flags} & SSH2_FILEXFER_ATTR_EXTENDED) {
+            my $extended_count = $buf->get_int32;
+            for (1..$extended_count) {
+                my $name = $buf->get_str;
+                my $value = $buf->get_str;
+                $a->{$name} = $value;
+            }
+        }
     }
     $a;
 }

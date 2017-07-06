@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.002';
+my $VERSION = '3.003';
 
 my %prereq =
  ( Carp           => 0
@@ -82,8 +82,6 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/mailbox/raw
 DISTDIR         = ../public_html/mailbox/source
-
-LICENSE         = artistic
 EXTENDS         = ../UserIdentity:../MimeTypes:../ORL:../MailTools2:../MailBoxC:../MailMessage:../MailTransport:../MailIMAP:../MailPOP:../MailDbx
 
 # for POD

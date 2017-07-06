@@ -1,0 +1,5 @@
+Revision history for Tie-FileSection
+
+0.171861  2017-07-05 19:47:59+02:00 Europe/Paris
+	add use_real_line_nr support.
+	First release.

@@ -7,9 +7,10 @@ use Test::Exception;
 use Digest::MD5;
 use IO::File;
 use IO::Handle;
+use IO::Pipe;
 use POSIX qw(strftime);
 use File::Path qw(remove_tree);
-use File::Slurper 'read_text';
+use Path::Tiny;
 use Test::LWP::UserAgent;
 use utf8;
 
@@ -39,6 +40,7 @@ note("basic metadata");
     is $bagit->size , '0.000 KB' , 'size';
     is $bagit->payload_oxum , '0.0' , 'payload_oxum';
     ok $bagit->dirty , 'bag is dirty';
+    is ref($bagit->user_agent) , 'LWP::UserAgent' , 'got a user_agent';
 }
 
 note("info");
@@ -83,6 +85,8 @@ BagIt-Version: 0.97
 Tag-File-Character-Encoding: UTF-8
 EOF
 
+    dies_ok { $bagit->get_tagsum() } 'get_tagsum without parameters dies';
+
     is $bagit->get_tagsum('bagit.txt') , Digest::MD5::md5_hex($bagit_txt) , 'get_tagsum(bagit.txt)';
 
     my $today = strftime "%Y-%m-%d", gmtime;
@@ -126,9 +130,8 @@ note("files");
     ok @files == 1 , 'count 1 file';
 
     is $files[0]->filename   , 'test1.txt' , 'file->filename';
-    ok !$files[0]->is_io , 'file->is_io failes';
-    is $files[0]->data   , 'abcdefghijklmnopqrstuvwxyz' , 'file->data';
-    is ref($files[0]->fh) , 'IO::String', 'file->fh blessed';
+    is path($files[0]->path)->slurp_utf8 , 'abcdefghijklmnopqrstuvwxyz' , 'file->data';
+    is ref($files[0]->open) , 'IO::File', 'file->fh blessed';
 
     ok ! $bagit->remove_file("testxxx.txt") , 'remove_file that does not exist failes';
     ok $bagit->remove_file("test1.txt") , 'remove_file';
@@ -136,19 +139,29 @@ note("files");
     @files = $bagit->list_files;
     ok @files == 0 , 'count 0 files';
 
-    ok $bagit->is_dirty , 'bag is still dirty'; 
+    ok $bagit->is_dirty , 'bag is still dirty';
 
-    ok $bagit->add_file("日本.txt","日本") , 'add_file utf8';  
+    ok $bagit->add_file("日本.txt","日本") , 'add_file utf8';
 
-    is [$bagit->list_files]->[0]->data , '日本' , 'utf8 data test';
+    is path([$bagit->list_files]->[0]->path)->slurp_utf8 , '日本' , 'utf8 data test';
+
+    dies_ok { $bagit->get_file() } "get_file without parameters";
+
+    my $file = $bagit->get_file("日本.txt");
+
+    ok $file, 'get_file()';
+
+    is path($file->path)->slurp_utf8 , '日本' , 'utf8 data test';
+
+    ok ! $bagit->get_file("日本123.txt") , 'get_file() non existing';
 
     ok $bagit->remove_file("日本.txt") , 'remove_file';
 
     ok $bagit->add_file('LICENSE', IO::File->new("LICENSE")) , 'add_file(IO::File)';
 
-    my $file = [ $bagit->list_files ]->[0];
+    $file = [ $bagit->list_files ]->[0];
 
-    is ref($file->fh) , 'IO::File' , 'file->fh is IO::File'; 
+    is ref($file->open) , 'IO::File' , 'file->fh is IO::File';
 }
 
 note("fetch");
@@ -174,7 +187,7 @@ note("fetch");
 
     ok @fetches == 0 , 'list_fetch';
 
-    ok $bagit->is_dirty , 'bag is still dirty'; 
+    ok $bagit->is_dirty , 'bag is still dirty';
 }
 
 note("complete & valid");
@@ -193,6 +206,10 @@ note("complete & valid");
 
 note("reading operations demo01 (valid bag)");
 {
+    dies_ok { Catmandu::BagIt->read() } "read without parameters dies";
+
+    ok ! Catmandu::BagIt->read("bag/123123123") , "read on non-existing returned undef";
+
     my $bagit = Catmandu::BagIt->read("bags/demo01");
 
     ok $bagit , 'read(bags/demo01)';
@@ -219,7 +236,10 @@ note("reading operations demo01 (valid bag)");
 
     is ref($file)  , 'Catmandu::BagIt::Payload' , 'file is a payload';
     is $file->filename , 'Catmandu-0.9204.tar.gz' , 'file->filename';
-    is ref($file->fh) , 'IO::File' , 'file->fh';
+    is ref($file->open) , 'IO::File' , 'file->fh';
+
+    dies_ok { $bagit->get_checksum } "get_checksum without parameters";
+
     is $bagit->get_checksum($file->filename) , 'c8accb44741272d63f6e0d72f34b0fde' , 'get_checksum';
 
     my @checksums = $bagit->list_checksum;
@@ -245,7 +265,7 @@ note("reading operations demo02 (invalid bag)");
     ok $bagit , 'read(bags/demo02)';
     ok !$bagit->complete , 'bag is not complete';
     ok !$bagit->valid , 'bag is not valid';
-    ok $bagit->errors , 'bag contains errors'; 
+    ok $bagit->errors , 'bag contains errors';
     ok !$bagit->is_holey , 'bag is not holey';
     ok !$bagit->is_dirty , 'bag is not dirty';
     is $bagit->path , 'bags/demo02' , 'path';
@@ -258,7 +278,7 @@ note("reading operations demo02 (invalid bag)");
     is $bagit->get_info('Bagging-Date') , '2014-10-03' , 'Bagging-Date info';
     is $bagit->get_info('Payload-Oxum') , '40447.19' , 'Payload-Oxum info';
 
-    my $text = "\"Well, Prince, so Genoa and Lucca are now just family estates "  . 
+    my $text = "\"Well, Prince, so Genoa and Lucca are now just family estates "  .
                "of the Buonapartes. But I warn you, if you don't tell me that "   .
                "this means war, if you still try to defend the infamies and "     .
                "horrors perpetrated by that Antichrist- I really believe he is "  .
@@ -288,7 +308,7 @@ note("reading operations demo03 (holey bag)");
     ok !$bagit->complete , 'bag is not complete';
     ok $bagit->valid , 'bag is not valid';
     ok !$bagit->is_dirty , 'bag is not dirty';
-    ok !$bagit->errors , 'bag contains errors'; 
+    ok !$bagit->errors , 'bag contains errors';
     ok $bagit->is_holey , 'bag is holey';
 
     my @fetches = $bagit->list_fetch;
@@ -307,7 +327,10 @@ note("write to disk");
     ok $bagit , 'new';
 
     ok $bagit->is_dirty, 'bag is dirty';
-    ok $bagit->write("t/my-bag") , 'write(t/my-bag)'; 
+
+    dies_ok { $bagit->write() } "write() without parameters dies";
+
+    ok $bagit->write("t/my-bag") , 'write(t/my-bag)';
     ok $bagit->complete, 'bag is now complete';
     ok $bagit->valid , 'bag is now valid';
     ok !$bagit->is_dirty , 'bag is not dirty anymore';
@@ -317,13 +340,13 @@ note("write to disk");
     ok -f "t/my-bag/bagit.txt" , "got a t/my-bag/bagit.txt";
     ok -f "t/my-bag/bag-info.txt" , "got a t/my-bag/bag-info.txt";
     ok -f "t/my-bag/manifest-md5.txt" , "got a t/my-bag/manifest-md5.txt";
-    ok -f "t/my-bag/tag-manifest-md5.txt" , "got a t/my-bag/tag-manifest-md5.txt";
+    ok -f "t/my-bag/tagmanifest-md5.txt" , "got a t/my-bag/tagmanifest-md5.txt";
 
     my $bagit2 = Catmandu::BagIt->new;
     $bagit2->add_info('Test',123);
 
     ok ! $bagit2->write("t/my-bag") , 'failed to overwrite existing bag';
-    
+
     ok $bagit2->is_dirty, 'bag is dirty';
 
     ok $bagit2->write("t/my-bag", overwrite => 1) , 'write with overwrite';
@@ -374,7 +397,7 @@ note("update bag");
 
     ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
 
-    is read_text("t/my-bag/data/test.txt") , "test456" , "file content is correctly updated";
+    is path("t/my-bag/data/test.txt")->slurp_utf8 , "test456" , "file content is correctly updated";
 
     ok $bagit->remove_file("test.txt") , 'remove_file';
 
@@ -396,31 +419,38 @@ note("update bag");
 
     ok $bagit->add_file("poem.txt",$fh) , 'add_file(IO::File)';
 
-    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
+    ok $bagit->add_file("results.txt", sub {
+        my $io = shift;
+        for (0..9) {
+            $io->print($_);
+        }
+    });
 
-    ok !$fh->opened , 'file handle open closed';
+    ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
 
     ok -f "t/my-bag/data/test.txt" , 'got a t/my-bag/data/test.txt';
     ok -f "t/my-bag/data/poem.txt" , 'got a t/my-bag/data/poem.txt';
+    ok -f "t/my-bag/data/results.txt" , 'got a t/my-bag/data/results.txt';
 
-    like read_text("t/my-bag/data/test.txt") , qr/test789/, 'file content is correct';
-    like read_text("t/my-bag/data/poem.txt") , qr/Violets are blue/ , 'file content is correct';
+    like path("t/my-bag/data/test.txt")->slurp_utf8 , qr/test789/, 'file content is correct';
+    like path("t/my-bag/data/poem.txt")->slurp_utf8 , qr/Violets are blue/ , 'file content is correct';
+    like path("t/my-bag/data/results.txt")->slurp_utf8 , qr/0123456789/ , 'file content is correct';
 
     ok $bagit->add_file("poem.txt",IO::File->new("t/poem2.txt"), overwrite => 1) , 'setting new file content';
 
     ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
-    
-    like read_text("t/my-bag/data/poem.txt") , qr/The rose is red, the violet's blue/ , 'file content is correct';
+
+    like path("t/my-bag/data/poem.txt")->slurp_utf8 , qr/The rose is red, the violet's blue/ , 'file content is correct';
 
     my $payload_oxum = $bagit->payload_oxum;
 
-    is $payload_oxum , '208.2' , 'payload oxum';
+    is $payload_oxum , '218.3' , 'payload oxum';
 
     ok $bagit->add_fetch("http://www.gutenberg.org/cache/epub/1980/pg1980.txt","290000","shortstories.txt") , 'adding payload';
 
     $payload_oxum = $bagit->payload_oxum;
-    
-    is $payload_oxum , '290208.3' , 'new payload oxum reflects the fetch file';
+
+    is $payload_oxum , '290218.4' , 'new payload oxum reflects the fetch file';
 
     remove_path("t/my-bag");
 }
@@ -431,7 +461,13 @@ note("mirror fetch");
 
     $bagit->add_fetch("http://demo.org/","65","poem.txt");
 
+    dies_ok { $bagit->get_fetch() } 'get_fetch without parameters dies';
+
+    ok ! $bagit->get_fetch("poem123.txt") , 'get_fetch() on non-existing';
+
     my $fetch = $bagit->get_fetch("poem.txt");
+
+    ok $fetch , 'get_fetch()';
 
     ok $bagit->write("t/my-bag", overwrite => 1) , 'write bag overwrite';
 
@@ -452,10 +488,10 @@ note("lock");
 {
     my $bagit = Catmandu::BagIt->read("bags/demo03");
 
-    ok ! $bagit->locked , '! locked';
+    ok ! $bagit->locked , '!locked';
 
     $bagit = Catmandu::BagIt->new;
-   
+
     ok $bagit->write("t/my-bag");
 
     $bagit->touch("t/my-bag/.lock");
@@ -463,6 +499,36 @@ note("lock");
     ok $bagit->locked , 'locked';
 
     remove_path("t/my-bag");
+}
+
+note("pipe");
+{
+    my $pipe = new IO::Pipe;
+
+    if(my $pid = fork()) { # Parent
+        $pipe->reader();
+
+        my $bagit = Catmandu::BagIt->new;
+
+        ok $bagit->add_file("test.txt",$pipe) , 'add_file() pipe';
+
+        ok $bagit->write("t/my-bag") , 'write()';
+
+        my $file = $bagit->get_file("test.txt");
+
+        ok $file;
+
+        is path($file->path)->slurp_utf8 , "Hello, parent!\n" , 'file->data';
+
+        remove_path("t/my-bag");
+    }
+    elsif(defined $pid) { # Child
+        $pipe->writer();
+
+        print $pipe "Hello, parent!\n";
+
+        exit(0);
+    }
 }
 
 done_testing;

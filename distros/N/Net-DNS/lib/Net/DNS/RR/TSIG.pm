@@ -1,9 +1,9 @@
 package Net::DNS::RR::TSIG;
 
 #
-# $Id: TSIG.pm 1561 2017-04-19 13:08:13Z willem $
+# $Id: TSIG.pm 1567 2017-05-19 09:52:52Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1561 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
 
 
 use strict;
@@ -43,27 +43,19 @@ use constant TSIG => typebyname qw(TSIG);
 		'HMAC-SHA512'		   => 165,
 		);
 
-	my @algbyalias = (
+	my @algalias = (
 		'HMAC-MD5' => 157,
 		'HMAC-SHA' => 161,
 		);
 
-
 	my %algbyval = reverse @algbyname;
 
-	my $map = sub {
-		my $arg = shift;
-		return $arg if $arg =~ /^\d/;
-		$arg =~ s/[^A-Za-z0-9]//g;			# strip non-alphanumerics
-		uc($arg);
-	};
-
-	my @pairedval = sort ( 1 .. 254, 1 .. 254 );		# also accept number
-	my %algbyname = map &$map($_), @algbyalias, @algbyname, @pairedval;
+	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @algbyname, @algalias;
+	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
 		my $key = uc shift;				# synthetic key
-		$key =~ s/[^A-Z0-9]//g;				# strip non-alphanumerics
+		$key =~ s/[\W_]//g;				# strip non-alphanumerics
 		$algbyname{$key};
 	}
 

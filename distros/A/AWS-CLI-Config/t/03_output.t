@@ -9,7 +9,7 @@ subtest 'From credentials file' => sub {
     no strict 'refs';
     no warnings 'redefine';
     *AWS::CLI::Config::credentials = sub {
-        return AWS::CLI::Config::Profile->_new(+{
+        return AWS::CLI::Config::Profile->new({
                 output => $output,
             });
     };
@@ -24,7 +24,7 @@ subtest 'From config file' => sub {
         return undef;
     };
     *AWS::CLI::Config::config = sub {
-        return AWS::CLI::Config::Profile->_new(+{
+        return AWS::CLI::Config::Profile->new({
                 output => $output,
             });
     };

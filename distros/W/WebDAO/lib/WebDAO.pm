@@ -8,7 +8,7 @@ use WebDAO::Container;
 use WebDAO::Engine;
 our @ISA = qw(WebDAO::Element Exporter);
 
-our $VERSION = '2.25';
+our $VERSION = '2.26';
 @WebDAO::EXPORT = qw( mk_route mk_attr _log1 _log2 _log3
   _log4 _log5 _log6);
 
@@ -66,7 +66,7 @@ Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2002-2015 by Zahatski Aliaksandr
+Copyright 2002-2017 by Zahatski Aliaksandr
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 

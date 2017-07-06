@@ -1,12 +1,12 @@
 package Tie::Handle::FileWriteRotate;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 
 use File::Write::Rotate;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 sub TIEHANDLE {
     my ($class, %args) = @_;
@@ -24,9 +24,11 @@ sub PRINT {
 1;
 # ABSTRACT: Filehandle tie to write to autorotated file with File::Write::Rotate
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -34,7 +36,7 @@ Tie::Handle::FileWriteRotate - Filehandle tie to write to autorotated file with 
 
 =head1 VERSION
 
-version 0.02
+This document describes version 0.03 of Tie::Handle::FileWriteRotate (from Perl distribution Tie-Handle-FileWriteRotate), released on 2017-07-04.
 
 =head1 SYNOPSIS
 
@@ -51,13 +53,6 @@ This module ties a filehandle to L<File::Write::Rotate> object.
 I first wrote this module to tie STDERR, so that warnings/errors are logged to
 file instead of terminal (with autorotation, for good behavior).
 
-=head1 METHODS
-
-=head2 TIEHANDLE classname, LIST
-
-Tie this package to file handle. C<LIST> will be passed to
-L<File::Write::Rotate>'s constructor.
-
 =head1 TIPS
 
 To log warnings/errors to terminal I<as well as> autorotated file, you can do
@@ -73,20 +68,42 @@ something like this instead:
      die $_[0];
  };
 
+=head1 METHODS
+
+=head2 TIEHANDLE classname, LIST
+
+Tie this package to file handle. C<LIST> will be passed to
+L<File::Write::Rotate>'s constructor.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Tie-Handle-FileWriteRotate>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-Tie-Handle-FileWriteRotate>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Tie-Handle-FileWriteRotate>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 SEE ALSO
 
 L<File::Write::Rotate>
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Steven Haryanto.
+This software is copyright (c) 2017, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

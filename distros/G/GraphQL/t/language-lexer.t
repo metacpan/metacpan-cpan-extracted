@@ -45,17 +45,69 @@ throws_ok { do_lex(string_make("hi\nthere")) } qr/line:\s*1.*column:\s*21/s, 'er
 throws_ok { do_lex(string_make("hi\rthere")) } qr/line:\s*1.*column:\s*21/s, 'error on MacOS multi-line string';
 
 throws_ok { do_lex(string_make('\z')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid escape';
+throws_ok { do_lex(string_make('bad \\x esc')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid escape';
+throws_ok { do_lex(string_make('bad \\u1 esc')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid escape';
+throws_ok { do_lex(string_make('bad \\u0XX1 esc')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid escape';
+throws_ok { do_lex(string_make('bad \\uXXXX esc')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid escape';
+throws_ok { do_lex(string_make('bad \\uFXXX esc')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid escape';
+throws_ok { do_lex(string_make('bad \\uXXXF esc')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid escape';
+
+number_test('4', 'int', 'simple int');
+number_test('4.123', 'float', 'simple float');
+number_test('9', 'int', 'simple int');
+number_test('0', 'int', 'simple int');
+number_test('-4.123', 'float', 'negative float');
+number_test('0.123', 'float', 'simple float 0');
+number_test('123e4', 'float', 'float exp lower');
+number_test('123E4', 'float', 'float exp upper');
+number_test('123e-4', 'float', 'float negexp lower');
+number_test('123e+4', 'float', 'float posexp lower');
+number_test('-1.123e4', 'float', 'neg float exp lower');
+number_test('-1.123E4', 'float', 'neg float exp upper');
+number_test('-1.123e-4', 'float', 'neg float negexp lower');
+number_test('-1.123e+4', 'float', 'neg float posexp lower');
+number_test('-1.123e4567', 'float', 'neg float longexp lower');
+
+throws_ok { do_lex(number_make('00')) } qr/line:\s*1.*column:\s*22/s, 'error on invalid int';
+throws_ok { do_lex(number_make('+1')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid int';
+throws_ok { do_lex(number_make('1.')) } qr/line:\s*1.*column:\s*22/s, 'error on invalid int';
+throws_ok { do_lex(number_make('.123')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid float';
+throws_ok { do_lex(number_make('1.A')) } qr/line:\s*1.*column:\s*22/s, 'error on invalid int';
+throws_ok { do_lex(number_make('-A')) } qr/line:\s*1.*column:\s*21/s, 'error on invalid int';
+throws_ok { do_lex(number_make('1.0e')) } qr/line:\s*1.*column:\s*25/s, 'error on invalid int';
+throws_ok { do_lex(number_make('1.0eA')) } qr/line:\s*1.*column:\s*26/s, 'error on invalid int';
 
 done_testing;
 
+sub number_test {
+  my ($text, $type, $label) = @_;
+  my $got = do_lex(number_make($text));
+  is query_lookup($got, $type), $text, $label or diag Dumper $got;
+}
+
+sub number_make {
+  my ($text) = @_;
+  return query_make($text);
+}
+
 sub string_make {
   my ($text) = @_;
-  return sprintf 'query q { foo(name: "%s") { id } }', $text;
+  return query_make(sprintf '"%s"', $text);
+}
+
+sub query_make {
+  my ($text) = @_;
+  return sprintf 'query q { foo(name: %s) { id } }', $text;
 }
 
 sub string_lookup {
   my ($got) = @_;
-  return $got->{graphql}[0][0]{definition}[0]{operationDefinition}[2]{selectionSet}[0][0]{selection}{field}[1]{arguments}[0][0]{argument}[1]{value}{string};
+  return query_lookup($got, 'string');
+}
+
+sub query_lookup {
+  my ($got, $type) = @_;
+  return $got->{graphql}[0][0]{definition}[0]{operationDefinition}[2]{selectionSet}[0][0]{selection}{field}[1]{arguments}[0][0]{argument}[1]{value}{$type};
 }
 
 sub do_lex {
@@ -165,12 +217,12 @@ __DATA__
                                           [
                                             {
                                               'value' => {
-                                                'number' => '123'
+                                                'int' => '123'
                                               }
                                             },
                                             {
                                               'value' => {
-                                                'number' => '456'
+                                                'int' => '456'
                                               }
                                             }
                                           ]
@@ -261,7 +313,7 @@ __DATA__
                                                                         },
                                                                         {
                                                                           'value' => {
-                                                                            'number' => '10'
+                                                                            'int' => '10'
                                                                           }
                                                                         }
                                                                       ]
@@ -476,7 +528,7 @@ __DATA__
                                     },
                                     {
                                       'value' => {
-                                        'number' => '123'
+                                        'int' => '123'
                                       }
                                     }
                                   ]

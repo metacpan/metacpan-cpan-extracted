@@ -66,13 +66,13 @@ no_index:
 provides:
   MarpaX::ESLIF:
     file: lib/MarpaX/ESLIF.pm
-    version: v2.0.13
+    version: v2.0.14
   MarpaX::ESLIF::Event::Type:
     file: lib/MarpaX/ESLIF/Event/Type.pm
-    version: v2.0.13
+    version: v2.0.14
   MarpaX::ESLIF::Logger::Level:
     file: lib/MarpaX/ESLIF/Logger/Level.pm
-    version: v2.0.13
+    version: v2.0.14
 requires:
   Carp: '0'
   XSLoader: '0'
@@ -84,7 +84,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=MarpaX-ESLIF
   homepage: https://metacpan.org/release/MarpaX-ESLIF
   repository: git://github.com/jddurand/c-marpaeslif.git
-version: 2.0.13
+version: 2.0.14
 x_authority: cpan:JDDPAUSE
 x_contributors:
   - 'Jeffrey Kegler <jeffreykegler@jeffreykegler.com>'

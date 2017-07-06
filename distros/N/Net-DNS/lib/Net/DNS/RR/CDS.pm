@@ -1,9 +1,9 @@
 package Net::DNS::RR::CDS;
 
 #
-# $Id: CDS.pm 1552 2017-03-13 09:44:07Z willem $
+# $Id: CDS.pm 1580 2017-06-26 11:44:49Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1552 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1580 $)[1];
 
 
 use strict;
@@ -39,20 +39,17 @@ sub _format_rdata {			## format rdata portion of RR string.
 sub algorithm {
 	my ( $self, $arg ) = @_;
 
-	return $self->{algorithm} unless defined $arg;
-	return Net::DNS::RR::DS::_algbyval( $self->{algorithm} ) if uc($arg) eq 'MNEMONIC';
-	my $val = Net::DNS::RR::DS::_algbyname($arg);
-	@{$self}{qw(keytag digtype digestbin)} = ( 0, 0, '' ) unless $val;
-	return $self->{algorithm} = $val;
+	return $self->SUPER::algorithm($arg) if $arg;
+	@{$self}{qw(keytag algorithm digtype digestbin)} = ( 0, 0, 0, '' ) if defined $arg;
+	return $self->SUPER::algorithm();
 }
 
 
 sub digtype {
 	my ( $self, $arg ) = @_;
 
-	return $self->{digtype} unless defined $arg;
-	return Net::DNS::RR::DS::_digestbyval( $self->{digtype} ) if uc($arg) eq 'MNEMONIC';
-	return $self->{digtype} = Net::DNS::RR::DS::_digestbyname($arg);
+	return $self->SUPER::digtype($arg) if $arg;
+	return $self->SUPER::digtype();
 }
 
 

@@ -10,7 +10,11 @@ local $| = 1;
 use Test::More tests => 5;
 use Test::Deep;
 use PadWalker;
-use t::lib::Debugger;
+
+BEGIN {
+  require "./t/lib/Debugger.pm";
+  t::lib::Debugger->import;
+}
 
 ok( start_script('t/eg/14-y_zero.pl'), 'start script' );
 

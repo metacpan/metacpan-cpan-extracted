@@ -1,0 +1,33 @@
+SYNOPSIS
+
+    In the command-line:
+
+     % perl -MModule::Load::In::INIT=Mod::One,Mod::Two='Some;Import;Args' somescript.pl
+
+    Mod::One and Mod::Two will be loaded in the INIT phase instead of BEGIN
+    phase.
+
+DESCRIPTION
+
+    This module can load (or perhaps defer loading) modules in the INIT
+    phase instead of the BEGIN phase. One use-case where it is useful:
+    monkey-patching a module (using a Module::Patch-based module) in a
+    fatpacked script (see Module::FatPack or App::FatPacker), e.g.:
+
+     % perl -MSome::Module::Patch::Foo fatpacked-script.pl
+
+    Some::Module::Patch::Foo will try to load Some::Module then patch it.
+    This might fail when module is loaded by the fatpack handler (which is
+    a require hook) as by the time Some::Module::Patch::Foo is loaded, the
+    fatpack handler has not been setup yet, and Some::Module is not
+    available elsewhere (on the filesystem). This, however, works:
+
+     % perl -MModule::Load::In::INIT=Some::Module::Patch::Foo fatpacked-script.pl
+
+    Loading of Some::Module::Patch::Foo (and by extension, Some::Module) is
+    deferred to the INIT phase. By that time, the fatpack require hook has
+    been setup and Some::Module can be (or might already be) loaded by it.
+
+    Caveat: Module::Load::In::INIT itself must be loaded in the BEGIN
+    phase, or INIT phase at the latest.
+

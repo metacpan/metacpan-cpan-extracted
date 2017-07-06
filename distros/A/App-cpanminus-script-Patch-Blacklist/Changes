@@ -1,0 +1,16 @@
+0.003   2017-07-04 (PERLANCAR)
+
+	- [Bugfix][doc] Don't use PERL5OPT in example as they won't work
+	  (it will load the patch on every perl invocation).
+
+
+0.002   2017-07-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Simplify example in Synopsis.
+
+
+0.001   2017-07-04 (PERLANCAR)
+
+        - First release.

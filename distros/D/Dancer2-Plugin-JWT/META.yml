@@ -27,5 +27,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ambs/Dancer2-Plugin-JWT
-version: '0.010'
+version: '0.011'
 x_serialization_backend: 'YAML::Tiny version 1.70'

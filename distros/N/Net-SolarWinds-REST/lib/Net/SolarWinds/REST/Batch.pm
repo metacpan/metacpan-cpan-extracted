@@ -265,7 +265,7 @@ sub set_managed {
   my $node=$result->get_data;
   my $node_id=$node->{NodeID};
 
-  return $self->UpdateNodeProps($node_id,UnManaged=>JSON::true);
+  return $self->UpdateNodeProps($node_id,UnManaged=>&JSON::true);
 }
 
 =item * my $result=$self->get_management_config($thing);
@@ -945,6 +945,148 @@ sub build_unmanaged {
 
   return $target;
 }
+
+=item * my $result=$self->GetAlertSettingsMap($thing);
+
+When true, returns a data structure that represents alerting thresholds and custom properties for the node, and its interfaces, templates, and volumes.
+when fals: returns why it failed
+
+$thing can be a nodeid, hostname or ipaddress.
+
+=cut
+
+sub GetAlertSettingsMap {
+  my ($self,$thing)=@_;
+  $self->log_info("Starting $thing");
+  my $nodeid;
+  my $result=$self->get_node($thing);
+  my $node;
+  if($result) {
+    $nodeid=$result->get_data->{NodeID};
+    $node=$result->get_data;
+  } else {
+    $self->log_info("Failed $thing");
+    return $result;
+  }
+  my $caption=$result->get_data->{Caption};
+  my $map={};
+  foreach my $method ('GetAlertSettings','getVolumeMap','getInterfacesOnNode') {
+    my $result=$self->$method($nodeid);
+
+    unless($result) {
+      $self->log_info("Failed $thing");
+      return $result;
+    }
+    $map->{$method}=$result->get_data;
+    if(ref($map->{$method}) eq 'ARRAY') {
+      # honnestly.. we do nothing
+    } elsif(exists $map->{$method}->{map}) {
+      $map->{$method}=$map->{$method}->{map};
+    }elsif(exists $map->{$method}->{results}) {
+      $map->{$method}=$map->{$method}->{results};
+    }
+  }
+  my $node_settings=[];
+
+  # used to just map what keys we want in our data set
+  foreach my $ref (@{$map->{GetAlertSettings}}) {
+    next if $caption ne $ref->{InstanceCaption};
+    my $row={};
+    push @{$node_settings},$ref
+  }
+  my $alertsettings=$map->{GetAlertSettings};
+  delete $map->{GetAlertSettings};
+
+
+  # walk our template objects
+  $result=$self->getTemplatesOnNode($nodeid);
+  my $tmpls=[];
+  my $tree={Templates=>$tmpls,Caption=>$caption,NodeID=>$nodeid,NodeAlertSettings=>$node_settings};
+  unless($result) {
+    $self->log_error("Faield to \$self->getTemplatesOnNode($nodeid)");
+    return $result;
+  }
+
+  foreach my $tmpl (@{$result->get_data}) {
+    my $obj={Caption=>$tmpl->{Name}};
+    my $uri=$tmpl->{Uri}.'/CustomProperties';
+    my $result=$self->getSwisProps($uri);
+    unless($result) {
+      $self->log_error("Faield fetching Application: $obj->{Caption} Custom Properties");
+      return $result;
+    }
+    $obj->{CustomProperties}=$result->get_data;
+    $obj->{CustomProperties}->{Uri}=$uri unless defined($obj->{CustomProperties}->{Uri});
+    push @{$tmpls},$obj;
+
+  }
+
+  my %rename=(qw(
+    getVolumeMap Volumes
+    getInterfacesOnNode Interfaces
+  ));
+
+  while(my ($method,$ref) =each %{$map}) {
+    my $key=$rename{$method};
+    while(my ($name,$obj)=each %{$ref}) {
+      $tree->{$key}=[] unless exists $tree->{$key};
+
+      my $sets=$tree->{$key};
+
+      my $list=[];
+      my $set={Caption=>$name,Uri=>$obj->{Uri},AlertSettings=>$list};
+      foreach my $setting (@{$alertsettings}) {
+        next if $name ne $setting->{InstanceCaption};
+
+	push @{$list},$setting;
+      }
+      my $result=$self->getSwisProps($obj->{Uri}.'/CustomProperties');
+      unless($result) {
+        $self->log_error("Faield fetching $thing");
+	return $result;
+      }
+      my $copy={};
+      while(my ($key,$value)=each %{$result->get_data}) {
+        #next unless defined($value);
+	$copy->{$key}=$value;
+      }
+      $set->{CustomProperties}=$copy;
+      push @{$sets},$set;
+    }
+  }
+  $result=$self->NodeCustomProperties($nodeid);
+  unless($result) {
+    $self->log_error("Failed $thing");
+    return $result;
+  }
+  my $custom={};
+  $tree->{NodeCustomProperties}=$custom;
+  while(my ($key,$value)= each %{$result->get_data}) {
+    #next unless defined($value);
+    $custom->{$key}=$value;
+  }
+  
+  $tree->{NodeDetails}=$node;
+  $self->log_info("Finsihed $thing");
+  return $self->RESULT_CLASS->new_true($tree);
+}
+
+=item * my $result=$self->bulk_ip_lookup(@ip_list)
+
+Returns a SolarWinds::Result Object.
+
+When true it contains the search results of all the ips that were looked up
+
+=cut
+
+sub bulk_ip_lookup {
+  my ($self,@ips)=@_;
+  my $join=join "','",@ips;
+  my $query=$self->query_lookup($join);
+  my $result=$self->Query($query);
+  return $result;
+}
+
 
 =back
 

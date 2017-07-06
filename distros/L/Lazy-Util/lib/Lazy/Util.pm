@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Lazy::Util;
-$Lazy::Util::VERSION = '0.003';
+$Lazy::Util::VERSION = '0.004';
 #ABSTRACT: Perl utilities for lazy evaluation
 
 
@@ -239,7 +239,7 @@ Lazy::Util - Perl utilities for lazy evaluation
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -261,46 +261,46 @@ Perl utility functions for lazy evaluation.
 =head1 FUNCTIONS
 
 This module has two sets of functions, the C<l_*> functions and the C<g_*>
-functions. The C<l_*> functions are designed to return a L<C<Lazy::Iterator>>
+functions. The C<l_*> functions are designed to return a L<Lazy::Iterator>
 object which you can get values from, the C<g_*> functions are designed to get
-a value out of a L<C<Lazy::Iterator>> object. Some of the C<g_*> functions may
+a value out of a L<Lazy::Iterator> object. Some of the C<g_*> functions may
 never return if the source of values is infinite, but they are for the most
 part designed to not eat up all of your memory at least ;).
 
 All these functions can be exported, but none are exported by default. You can
 use the C<:all> export tag to export all of them.
 
-=head1 C<l_*> functions
+=head1 l_* functions
 
 The C<l_*> functions are:
 
-=head2 C<l_concat(@sources)>
+=head2 l_concat
 
   my $lazy = l_concat @sources;
 
-C<l_concat> returns a L<C<Lazy::Iterator>> object which will simply return each
+C<l_concat> returns a L<Lazy::Iterator> object which will simply return each
 subsequent value from the list of sources it's given.
 
-=head2 C<l_first($n, @sources)>
+=head2 l_first
 
   my $lazy = l_first $n, @sources;
 
-C<l_first> will return a L<C<Lazy::Iterator>> object which will only get the
+C<l_first> will return a L<Lazy::Iterator> object which will only get the
 first C<$n> values from the subsequent arguments. This can be used the 'break'
 an otherwise infinite list to only return a certain number of results.
 
-=head2 C<l_grep($code, @sources)>
+=head2 l_grep
 
   my $lazy = l_grep { ... } @sources;
 
-C<l_grep> will return a L<C<Lazy::Iterator>> object which will filter out any
+C<l_grep> will return a L<Lazy::Iterator> object which will filter out any
 value which doesn't return true from the C<$code> block in the first argument.
 
-=head2 C<l_map($code, @sources)>
+=head2 l_map
 
   my $lazy = l_map { ... } @sources;
 
-C<l_map> will return a L<C<Lazy::Iterator>> object which will transform any
+C<l_map> will return a L<Lazy::Iterator> object which will transform any
 value using the C<$code> block in the first argument.
 
 The C<$code> block is evaluated in list context, and each scalar it returns
@@ -309,19 +309,19 @@ until the list is exhausted. If an empty list is returned, the C<@sources> will
 be poked again until a list of at least one element is returned, or the source
 returns C<undef>.
 
-=head2 C<l_until($code, @sources)>
+=head2 l_until
 
   my $lazy = l_until { ... } @sources;
 
-C<l_until> will return a L<C<Lazy::Iterator>> object which will return values
+C<l_until> will return a L<Lazy::Iterator> object which will return values
 from the C<@sources> until the C<$code> block returns true, after which it will
 be exhausted.
 
-=head1 C<g_*> functions
+=head1 g_* functions
 
 The C<g_*> functions are:
 
-=head3 C<g_count(@sources)>
+=head2 g_count
 
   my $count = g_count @sources;
 
@@ -329,7 +329,7 @@ C<g_count> counts the number of values from the C<@sources> and returns how
 many there were. B<This has the potential to never return> if given a source of
 infinite values.
 
-=head2 C<g_first(@sources)>
+=head2 g_first
 
   my $val = g_first @sources;
 
@@ -337,7 +337,7 @@ C<g_first> returns the first value from the list of arguments, lazily
 evaluating them. Equivalent to C<< l_concat(...)->get(); >>.
 If C<@sources> is empty, it will return C<undef>.
 
-=head2 C<g_join($sep, @sources)>
+=head2 g_join
 
   my $lines = g_join $str, @sources;
 
@@ -346,7 +346,7 @@ string. B<This has the potential to never return as well as running out of
 memory> if given a source of infinite values.
 If C<@sources> is empty, it will return C<undef>.
 
-=head2 C<g_last(@sources)>
+=head2 g_last
 
   my $val = g_last @sources;
 
@@ -354,7 +354,7 @@ C<g_last> evaluates all the values it's given and returns the last value.
 B<This has the potential to never return> if given a source of infinite values.
 If C<@sources> is empty, it will return C<undef>.
 
-=head2 C<g_max(@sources)>
+=head2 g_max
 
   my $val = g_max @sources;
 
@@ -362,7 +362,7 @@ C<g_max> evaluates all the values it's given and returns the highest one.
 B<This has the potential to never return> if given a source of infinite values.
 If C<@sources> is empty, it will return C<undef>.
 
-=head2 C<g_min(@sources)>
+=head2 g_min
 
   my $val = g_min @sources;
 
@@ -370,7 +370,7 @@ C<g_min> evaluates all the values it's given and returns the lowest one. B<This
 has the potential to never return> if given a source of infinite values.
 If C<@sources> is empty, it will return C<undef>.
 
-=head2 C<g_prod(@sources)>
+=head2 g_prod
 
   my $val = g_prod @sources;
 
@@ -379,7 +379,7 @@ them. B<This has the potential to never return> if given a source of infinite
 values. Unless one of them is 0. If so, it will short-circuit and return 0.
 If C<@sources> is empty, it will return C<1>.
 
-=head2 C<g_sum(@sources)>
+=head2 g_sum
 
   my $val = g_sum @sources;
 
@@ -388,10 +388,10 @@ them. B<This has the potential to never return> if given a source of infinite
 values.
 If C<@sources> is empty, it will return C<0>.
 
-=head1 C<@sources>
+=head1 @sources
 
 The C<@sources> array that most (all?) of these functions take can be any
-combination of regular scalar values, L<C<Lazy::Iterator>> objects,
+combination of regular scalar values, L<Lazy::Iterator> objects,
 L<Scalar::Defer> variables (see L</"NOTES">), or subroutine references. Each of
 these will be iterated through from start to finish, and if one of them returns
 C<undef>, the next one will be used instead, until the last one returns
@@ -426,7 +426,7 @@ subsequent call to C<< $lazy->get() >> will return C<undef>.
 =head1 NOTES
 
 If L<Scalar::Defer> is installed, it will assume that any variable of type C<0>
-is a C<Scalar::Defer> variable and will treat it as a source of values.
+is a L<Scalar::Defer> variable and will treat it as a source of values.
 
 Not to be confused with L<Lazy::Utils>.
 

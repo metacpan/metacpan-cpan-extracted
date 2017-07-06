@@ -2,7 +2,7 @@ NAME
     Toadfarm - One Mojolicious app to rule them all
 
 VERSION
-    0.77
+    0.78
 
 DESCRIPTION
     Toadfarm is a module for configuring and starting your Mojolicious

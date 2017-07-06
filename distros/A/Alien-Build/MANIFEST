@@ -39,6 +39,7 @@ corpus/lib/auto/share/dist/Alien-libfoo2/dynamic/libfoo.so.2
 corpus/lib/auto/share/dist/Alien-libfoo2/include/foo.h
 corpus/lib/auto/share/dist/Alien-libfoo2/lib/libfoo.a
 corpus/lib/pkgconfig/foo.pc
+corpus/win32/openvpn.reg
 cpanfile
 dist.ini
 example/README.pod
@@ -106,6 +107,7 @@ lib/Alien/Build/Plugin/Fetch/HTTPTiny.pm
 lib/Alien/Build/Plugin/Fetch/LWP.pm
 lib/Alien/Build/Plugin/Fetch/Local.pm
 lib/Alien/Build/Plugin/Fetch/NetFTP.pm
+lib/Alien/Build/Plugin/Fetch/PromptBeforeDownload.pm
 lib/Alien/Build/Plugin/Gather/IsolateDynamic.pm
 lib/Alien/Build/Plugin/PkgConfig/CommandLine.pm
 lib/Alien/Build/Plugin/PkgConfig/LibPkgConf.pm
@@ -119,6 +121,7 @@ lib/Alien/Build/Plugin/Probe/CBuilder.pm
 lib/Alien/Build/Plugin/Probe/CommandLine.pm
 lib/Alien/Build/Plugin/Probe/GnuWin32.pm
 lib/Alien/Build/Util.pm
+lib/Alien/Build/Util/Win32/RegistryDump.pm
 lib/alienfile.pm
 maint/travis-daemon
 maint/travis-dzil
@@ -154,6 +157,7 @@ t/alien_build_plugin_fetch_httptiny.t
 t/alien_build_plugin_fetch_local.t
 t/alien_build_plugin_fetch_lwp.t
 t/alien_build_plugin_fetch_netftp.t
+t/alien_build_plugin_fetch_promptbeforedownload.t
 t/alien_build_plugin_gather_isolatedynamic.t
 t/alien_build_plugin_meta.t
 t/alien_build_plugin_pkgconfig_commandline.t
@@ -167,6 +171,7 @@ t/alien_build_plugin_probe_commandline.t
 t/alien_build_plugin_probe_gnuwin32.t
 t/alien_build_tempdir.t
 t/alien_build_util.t
+t/alien_build_util_win32_registrydump.t
 t/alienfile.t
 t/bin/ftpd
 t/bin/httpd

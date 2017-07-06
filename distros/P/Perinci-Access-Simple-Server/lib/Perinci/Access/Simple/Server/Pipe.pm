@@ -1,12 +1,12 @@
 package Perinci::Access::Simple::Server::Pipe;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.24'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.25'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 
 use Data::Clean::FromJSON;
 use Data::Clean::JSON;
@@ -44,7 +44,7 @@ sub handle {
 sub send_response {
     my $self = shift;
     my $res = $self->res // [500, "BUG: Response not set"];
-    $log->tracef("Sending response to stdout: %s", $res);
+    log_trace("Sending response to stdout: %s", $res);
     my $v = $self->req->{v} // 1.1;
     insert_riap_stuffs_to_res($res, $v);
     $res = $cleanser->clone_and_clean($res);
@@ -55,12 +55,12 @@ sub run {
     my $self = shift;
     my $last;
 
-    $log->tracef("Starting loop ...");
+    log_trace("Starting loop ...");
 
   REQ:
     while (1) {
         my $line = <STDIN>;
-        $log->tracef("Read line from stdin: %s", $line);
+        log_trace("Read line from stdin: %s", $line);
         last REQ unless defined($line);
         my $req_json;
         if ($line =~ /\Aj(.*)/) {
@@ -70,7 +70,7 @@ sub run {
             $last++;
             goto RES;
         }
-        $log->tracef("Read JSON from stdin: %s", $req_json);
+        log_trace("Read JSON from stdin: %s", $req_json);
         my $req;
         eval {
             $req = $json->decode($req_json);
@@ -113,7 +113,7 @@ Perinci::Access::Simple::Server::Pipe - (Base) class for creating Riap::Simple s
 
 =head1 VERSION
 
-This document describes version 0.24 of Perinci::Access::Simple::Server::Pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2016-03-16.
+This document describes version 0.25 of Perinci::Access::Simple::Server::Pipe (from Perl distribution Perinci-Access-Simple-Server), released on 2017-07-03.
 
 =head1 SYNOPSIS
 
@@ -200,7 +200,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -14,7 +14,7 @@ MarpaX::ESLIF::BNF - MarpaX::ESLIF's BNF
 
 =head1 VERSION
 
-version 2.0.13
+version 2.0.14
 
 =head1 DESCRIPTION
 
@@ -69,6 +69,20 @@ They are always enclosed with left and right brackets C<[]>. Modifiers can start
 =item * Regular expression
 
 They are always enclosed within slashes C<//>, and the content must be valid as per the L<PCRE2 Perl Compatible Regular Expression|http://www.pcre.org/> library. Modifiers can start after the slash on the right. Regular expression patterns are by default anchored. The slash character itself must be preceeded by a backslash, i.e. C<\/> in the string I<seen> by the parser (so, in practice, it is coded like this: C<"\\/">).
+
+Regular expressions must be used with care in the two following scenarios:
+
+=over
+
+=item Quantifiers at the end
+
+If the regular expression ends with an unlimited quantifier at the end, i.e. C<*> or C<+>, it is very likely that the data will match partially until the whole input is read, effectively forcing ESLIF to read the entire input. This can break the I<streaming> nature of your implementation.
+
+=item Negative lookahead at the end
+
+If the regular expression ends with a negative lookahead, it can match when you think it should not. This is because negative lookahead does not trigger a partial match. In such a case, you should ensure that your regular expression forces a minimum number of characters in the subject string.
+
+=back
 
 =back
 
@@ -341,6 +355,22 @@ There are two exceptions:
 Its semantic is a single symbol name following by another single symbol name, with C<-> in the middle:
 
   LHS ::= RHS1 - RHS2
+
+Constraints are:
+
+=over
+
+=item Both C<RHS1> and <RHS2> must be lexemes
+
+=item Both C<RHS1> and <RHS2> must not contain sub-lexemes
+
+=back
+
+This mean that the C<LHS> of an exception statement can never be nullable. You must add explicitely declare so if this is wanted, i.e.:
+
+  LHS ::=
+
+Note that managing an exception can be consuming, eventually reading the whole data if it is writen without special care. Trying to minimize the number of characters needed and/or using well-thinked regular expressions often lead to the same result with better performance. Internally it is implemented like this: First the longest C<RHS1> is matched, then ESLIF rollbacks to every C<RHS1>'s start completion until C<RHS2> does not match.
 
 =item The I<sequence statement>
 
@@ -677,10 +707,10 @@ MarpaX::ESLIF BNF can be expressed in itself:
   <discard on>                   ::=
   <string literal inside any>    ::= <string literal inside>*
   <string literal inside>        ::= /[^"\\\n]/
-  <string literal inside>        ::= '\\' /["'?\\abfnrtve]/
-  <string literal inside>        ::= '\\' /x\{[a-fA-F0-9]{2}\}/
-  <string literal inside>        ::= '\\' /u\{[a-fA-F0-9]{4}\}/
-  <string literal inside>        ::= '\\' /U\{[a-fA-F0-9]{8}\}/
+                                   | '\\' /["'?\\abfnrtve]/
+                                   | '\\' /x\{[a-fA-F0-9]{2}\}/
+                                   | '\\' /u\{[a-fA-F0-9]{4}\}/
+                                   | '\\' /U\{[a-fA-F0-9]{8}\}/
   #
   # ---------------------------------------
   # Lexemes of the grammar given above are:

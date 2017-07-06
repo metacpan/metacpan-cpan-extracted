@@ -1,4 +1,4 @@
-package Pcore::WebDriver v0.7.2;
+package Pcore::WebDriver v0.7.3;
 
 use Pcore -dist, -const, -role, -result,
   -export => {

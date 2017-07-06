@@ -3,8 +3,8 @@ package Template::Reverse::Converter::TT2;
 # ABSTRACT: Convert parts to TT2 format simply
 
 use Moo;
-use Scalar::Util qw(blessed);
-our $VERSION = '0.150'; # VERSION
+use utf8;
+our $VERSION = '0.202'; # VERSION
 
 sub Convert{
     my $self = shift;
@@ -12,11 +12,11 @@ sub Convert{
     my @temps;
 
     foreach my $pat (@{$parts}){
-        my @pre = @{$pat->pre};
-        my @post = @{$pat->post};
+        my @pre = @{$pat->{pre}};
+        my @post = @{$pat->{post}};
 
-        @pre = map{blessed($_)?$_->as_string:$_}@pre;
-        @post= map{blessed($_)?$_->as_string:$_}@post;
+        @pre = grep{!ref($_)}@pre;
+        @post= grep{!ref($_)}@post;
         my $pretxt = join '',@pre;
         my $posttxt = join '',@post;
         $pretxt .= '' if $pretxt;
@@ -43,13 +43,15 @@ Template::Reverse::Converter::TT2 - Convert parts to TT2 format simply
 
 =head1 VERSION
 
-version 0.150
+version 0.202
 
 =head1 SYNOPSIS
 
-    package Template::Reverse::Converter::TT2;
+    use Data::Dumper;
+    use Template::Reverse::Converter::TT2;
     my $tt2 = Template::Reverse::Converter::TT2->new;
-    $tt2->Convert([[['pretext'],['posttext']]]);
+    my $templates = $tt2->Convert([{pre=>['The'],post=>['stuff']}]);
+    print Dumper $templates; # [ 'The[% value %]stuff' ];
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@ NAME
     Applify - Write object oriented scripts with ease
 
 VERSION
-    0.12
+    0.13
 
 DESCRIPTION
     This module should keep all the noise away and let you write scripts
@@ -127,6 +127,15 @@ EXPORTED FUNCTIONS
             "1,3". See "Options-with-multiple-values" in Getopt::Long for
             details.
 
+        *   "isa"
+
+            Specify the class an option should be instantiated as. Example:
+
+              option file => output => "output file", isa => "Mojo::File";
+
+            The "output()" attribute will then later return an object of
+            Mojo::File, instead of just a plain string.
+
         *   Other
 
             Any other Moose attribute argument may/will be supported in
@@ -204,6 +213,8 @@ COPYRIGHT & LICENSE
     This library is free software. You can redistribute it and/or modify it
     under the same terms as Perl itself.
 
-AUTHOR
-    Jan Henning Thorsen
+AUTHORS
+    Jan Henning Thorsen - "jhthorsen@cpan.org"
+
+    Roy Storey
 

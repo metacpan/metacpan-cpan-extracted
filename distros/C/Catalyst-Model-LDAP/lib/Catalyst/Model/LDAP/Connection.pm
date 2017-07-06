@@ -5,11 +5,13 @@ use warnings;
 use base qw/Net::LDAP Class::Accessor::Fast/;
 use Carp qw/croak/;
 use Catalyst::Model::LDAP::Search;
+use Data::Dumper;
 use Data::Page;
 use MRO::Compat;
 use Net::LDAP::Constant qw/LDAP_CONTROL_VLVRESPONSE/;
 use Net::LDAP::Control::Sort;
 use Net::LDAP::Control::VLV;
+use Net::LDAP::Control::ProxyAuth;
 
 __PACKAGE__->mk_accessors(qw/base options entry_class/);
 
@@ -71,18 +73,20 @@ On connection failure, an error is thrown using L<Carp/croak>.
 =cut
 
 sub new {
-    my ($class, %args) = @_;
+    my ( $class, %args ) = @_;
 
     my $base = delete $args{base};
-    my %options = %{ ref $args{options} eq 'HASH' ? delete $args{options} : {} };
-    my $entry_class = delete $args{entry_class} || 'Catalyst::Model::LDAP::Entry';
+    my %options =
+      %{ ref $args{options} eq 'HASH' ? delete $args{options} : {} };
+    my $entry_class = delete $args{entry_class}
+      || 'Catalyst::Model::LDAP::Entry';
 
     my $host = delete $args{host};
-    my $self = $class->next::method($host, %args);
+    my $self = $class->next::method( $host, %args );
     croak "Error connecting to $host: $@" unless $self;
 
     $self->base($base);
-    $self->options(\%options);
+    $self->options( \%options );
     $self->entry_class($entry_class);
 
     return $self;
@@ -116,22 +120,21 @@ L</OVERRIDING METHODS>.
 =cut
 
 sub bind {
-    my ($self, %args) = @_;
+    my ( $self, %args ) = @_;
 
     delete $args{$_} for qw/host base options connection_class entry_class/;
 
     # Bind using TLS if configured
-    if (delete $args{start_tls}) {
-        my $mesg = $self->start_tls(
-            %{ delete $args{start_tls_options} || {} },
-        );
+    if ( delete $args{start_tls} ) {
+        my $mesg =
+          $self->start_tls( %{ delete $args{start_tls_options} || {} }, );
         croak 'LDAP TLS error: ' . $mesg->error if $mesg->is_error;
     }
 
     # Bind via DN if configured
     my $dn = delete $args{dn};
 
-    $self->next::method($dn ? ($dn, %args) : %args);
+    $self->next::method( $dn ? ( $dn, %args ) : %args );
 }
 
 =head2 search 
@@ -146,6 +149,30 @@ This method overrides the C<search> method in L<Net::LDAP> to add
 paging support.  The following additional options are supported:
 
 =over 4
+
+=item C<raw>
+
+Use REGEX to denote the names of attributes that are to be considered binary
+in search results.
+
+When this option is given, Net::LDAP converts all values of attributes B<not>
+matching this REGEX into Perl UTF-8 strings so that the regular Perl operators
+(pattern matching, ...) can operate as one expects even on strings with
+international characters.
+
+If this option is not given, attribute values are treated as byte strings.
+
+Generally, you'll only ever need to do this if using RFC'd LDAP attributes 
+and not a custom LDAP schema:
+
+    raw => qr/(?i:^jpegPhoto|;binary)/,
+
+=item C<authz>
+
+This allows you to use LDAPv3 Proxy Authorization control object, i.e.
+(L<Net::LDAP::Control::ProxyAuth>):
+
+    authz => 'uid=gavinhenry,ou=users,dc=surevoip,dc=co,dc=uk',
 
 =item C<page>
 
@@ -169,10 +196,10 @@ L<Data::Page> object.  Otherwise, it returns the server response only.
 
 sub search {
     my $self = shift;
-    my %args = scalar @_ == 1 ? (filter => shift) : @_;
+    my %args = scalar @_ == 1 ? ( filter => shift ) : @_;
 
     croak "Cannot use 'page' without 'order_by'"
-        if $args{page} and not $args{order_by};
+      if $args{page} and not $args{order_by};
 
     # Use default base
     %args = (
@@ -181,40 +208,48 @@ sub search {
         %args,
     );
 
-    # Handle server-side sorting
-    if (my $order_by = delete $args{order_by}) {
-        my $sort = Net::LDAP::Control::Sort->new(order => $order_by);
+    # Allow ProxyAuth by itself
+    if ( my $authz = delete $args{authz} ) {
+        my $authz =
+          Net::LDAP::Control::ProxyAuth->new( authzID => q{dn:} . $authz );
 
-        $args{control} ||= [];
-        push @{ $args{control} }, $sort;
+        $args{control} = [ @{ $args{control} || [] }, $authz ];
     }
 
-    my ($mesg, $pager);
-    if (my $page = delete $args{page}) {
+    # Handle server-side sorting
+    if ( my $order_by = delete $args{order_by} ) {
+        my $sort = Net::LDAP::Control::Sort->new( order => $order_by );
+
+        $args{control} = [ @{ $args{control} || [] }, $sort ];
+    }
+
+    my ( $mesg, $pager );
+    if ( my $page = delete $args{page} ) {
         my $rows = delete $args{rows} || 25;
 
         my $vlv = Net::LDAP::Control::VLV->new(
             before  => 0,
             after   => $rows - 1,
             content => 0,
-            offset  => ($rows * $page) - $rows + 1,
+            offset  => ( $rows * $page ) - $rows + 1,
         );
 
-        push @{ $args{control} }, $vlv;
+        $args{control} = [ @{ $args{control} || [] }, $vlv ];
 
         $mesg = $self->next::method(%args);
-        my @resp = $mesg->control(LDAP_CONTROL_VLVRESPONSE) or
-            croak 'Could not get pager from LDAP response: ' . $mesg->server_error;
-        $pager = Data::Page->new($resp[0]->content, $rows, $page);
+        my @resp = $mesg->control(LDAP_CONTROL_VLVRESPONSE)
+          or croak 'Could not get pager from LDAP response: '
+          . $mesg->server_error;
+        $pager = Data::Page->new( $resp[0]->content, $rows, $page );
     }
     else {
         $mesg = $self->next::method(%args);
     }
 
     bless $mesg, 'Catalyst::Model::LDAP::Search';
-    $mesg->init($self->entry_class);
+    $mesg->init( $self->entry_class );
 
-    return ($pager ? ($mesg, $pager) : $mesg);
+    return ( $pager ? ( $mesg, $pager ) : $mesg );
 }
 
 =head1 SEE ALSO
@@ -232,6 +267,8 @@ sub search {
 =item * Daniel Westermann-Clark
 
 =item * Marcus Ramberg (paging support)
+
+=item * Gavin Henry <ghenry@surevoip.co.uk> (authz and raw support, plus bug fixes)
 
 =back
 

@@ -23,6 +23,6 @@ no_index:
 requires:
   Keyword::Simple: '0'
   List::Util: '1.45'
-  PPR: '0'
-  perl: '5.014'
-version: '0.001000'
+  PPR: '0.000005'
+  perl: '5.012'
+version: '0.001004'

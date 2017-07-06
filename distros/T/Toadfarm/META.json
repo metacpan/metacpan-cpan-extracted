@@ -47,6 +47,6 @@
          "url" : "https://github.com/jhthorsen/toadfarm.git"
       }
    },
-   "version" : "0.77",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.78",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,0 +1,10 @@
+Revision history for Alien-libtool
+
+0.03      2017-07-05 12:50:20 -0400
+  - Add dependency on Alien::m4
+
+0.02      2017-06-27 05:11:19 -0400
+  - Fix requirements for Windows
+
+0.01      2017-06-26 17:24:43 -0400
+  - initial version

@@ -1,0 +1,133 @@
+NAME
+
+    Device::HID - Perl Interface to HIDAPI
+
+SYNOPSIS
+
+        use Device::HID;
+        use Data::Hexdumper;
+    
+        my $dev = Device::HID->new(vendor => 0x1337, product => 0x4242) or die "No such device!\n";
+        $dev->timeout = 0.1;
+        my $buf;
+        while (defined (my $in = $dev->read_data($buf, $len)) {
+            if ($in == 0) {
+                print "Timeout!\n";
+                next;
+            }
+    
+            print Hexdumper($buf), "\n";
+        }
+
+METHODS AND ARGUMENTS
+
+    new()
+
+      Opens specified device and returns the corresponding object
+      reference. Returns undef if an attempt to open the device has failed.
+      Accepts following parameters:
+
+      vendor
+
+	Vendor ID.
+
+      product
+
+	Product ID.
+
+      serial
+
+	Device serial number. By default undefined.
+
+      autodie
+
+	if true, methods on this instance will use "croak" in Carp on
+	failure. Default is 0, where undef is returned on failure.
+
+    read_data
+
+          $dev->read_data($buffer, $size)
+       
+
+      Reads data from the device (up to $size bytes) and stores it in
+      $buffer.
+
+      Returns number of bytes read or 0 on timeout. Returns undef on error
+      unless autodie is in effect.
+
+    timeout
+
+          $dev->timeout = 0.1; # seconds (=100 ms)
+          printf "Timeout is %d\n", $dev->timeout;
+       
+
+      Lvalue subroutine that can be used to set and get the timeout in
+      seconds for read_data. Granularity is 1 millisecond.
+
+      Default value is undef, which means wait indefinitely.
+
+    write_data
+
+          $dev->write_data($reportid, $data)
+       
+
+      Writes data to the device.
+
+      Returns actual number of bytes written or undef on error unless
+      autodie is in effect.
+
+    autodie
+
+          $dev->autodie = 1;
+       
+
+      Lvalue subroutine that can be used to set whether the module "croak"
+      in Carps on failure.
+
+      Default value is 0.
+
+    renew_on_timeout
+
+          $dev->renew_on_timeout;
+       
+
+      Closes HIDAPI handle and opens a new one transparently at read_data
+      timeout and retries reading. When read_data returns successfully the
+      first time, renew_on_timeout is reset and timeout is set to undef,
+      but can be manually adjusted.
+
+      For reasons unknown to me, Valve's Steam controller needs a couple of
+      hid_open calls before hid_read manages to read data. None of the
+      prior hid_open calls fail, they just block indefinitely. For devices
+      that ought to report periodically what they're up to, set the timeout
+      in new to a sensible value and call renew_on_timeout on the handle.
+      The following hid_read will then be retried till data can be read.
+
+TODO
+
+    Use hid_error in croak/carp. Wrap the other information retrieval
+    function. Till then, you can use the XSUBs in Device::HID::XS.
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Device-HID
+
+SEE ALSO
+
+    Device::HID::XS
+
+    Alien::HIDAPI
+
+    The API of this module was modelled after Device::FTDI by Pavel Shaydo.
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

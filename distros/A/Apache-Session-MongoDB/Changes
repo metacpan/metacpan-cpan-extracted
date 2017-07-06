@@ -25,3 +25,6 @@ Revision history for Perl extension Apache::Session::MongoDB.
 
 0.17  Wed May 18 22:01:50 2016
 	- Return undef if no session found
+
+0.18  Thu Jun 22 12:00:00 2017
+    -  Substitute $ and . characters in keys before stroring session contents 

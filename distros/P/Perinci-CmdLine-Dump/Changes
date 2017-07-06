@@ -1,3 +1,10 @@
+0.10    2017-06-24 (PERLANCAR)
+
+	- Bring back patching method because the self-dump method introduced in
+	  0.09 doesn't work yet for /main URLs. Now one can choose the method
+	  using the `method` argument.
+
+
 0.09    2017-06-17 (PERLANCAR)
 
 	- Utilize Perinci::CmdLine 1.73's dumping feature.

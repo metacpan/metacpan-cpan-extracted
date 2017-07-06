@@ -357,7 +357,7 @@ void ner_sentence::resize(unsigned size) {
 
 void ner_sentence::clear_features() {
   for (unsigned i = 0; i < size; i++)
-    features.clear();
+    features[i].clear();
 }
 
 void ner_sentence::clear_probabilities_local_filled() {
@@ -1433,7 +1433,7 @@ void sentence_processor::save(binary_encoder& enc) {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.1.0
+// UniLib version: 3.1.1
 // Unicode version: 8.0.0
 
 namespace unilib {
@@ -1530,7 +1530,7 @@ char32_t unicode::titlecase(char32_t chr) {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.1.0
+// UniLib version: 3.1.1
 // Unicode version: 8.0.0
 
 namespace unilib {
@@ -1594,54 +1594,53 @@ bool utf8::valid(const std::string& str) {
 }
 
 char32_t utf8::decode(const char*& str) {
-  const unsigned char*& ptr = (const unsigned char*&) str;
-  if (*ptr < 0x80) return *ptr++;
-  else if (*ptr < 0xC0) return ++ptr, REPLACEMENT_CHAR;
-  else if (*ptr < 0xE0) {
-    char32_t res = (*ptr++ & 0x1F) << 6;
-    if (*ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    return res + ((*ptr++) & 0x3F);
-  } else if (*ptr < 0xF0) {
-    char32_t res = (*ptr++ & 0x0F) << 12;
-    if (*ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    res += ((*ptr++) & 0x3F) << 6;
-    if (*ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    return res + ((*ptr++) & 0x3F);
-  } else if (*ptr < 0xF8) {
-    char32_t res = (*ptr++ & 0x07) << 18;
-    if (*ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    res += ((*ptr++) & 0x3F) << 12;
-    if (*ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    res += ((*ptr++) & 0x3F) << 6;
-    if (*ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    return res + ((*ptr++) & 0x3F);
-  } else return ++ptr, REPLACEMENT_CHAR;
+  if (((unsigned char)*str) < 0x80) return (unsigned char)*str++;
+  else if (((unsigned char)*str) < 0xC0) return ++str, REPLACEMENT_CHAR;
+  else if (((unsigned char)*str) < 0xE0) {
+    char32_t res = (((unsigned char)*str++) & 0x1F) << 6;
+    if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    return res + (((unsigned char)*str++) & 0x3F);
+  } else if (((unsigned char)*str) < 0xF0) {
+    char32_t res = (((unsigned char)*str++) & 0x0F) << 12;
+    if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    res += (((unsigned char)*str++) & 0x3F) << 6;
+    if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    return res + (((unsigned char)*str++) & 0x3F);
+  } else if (((unsigned char)*str) < 0xF8) {
+    char32_t res = (((unsigned char)*str++) & 0x07) << 18;
+    if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    res += (((unsigned char)*str++) & 0x3F) << 12;
+    if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    res += (((unsigned char)*str++) & 0x3F) << 6;
+    if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    return res + (((unsigned char)*str++) & 0x3F);
+  } else return ++str, REPLACEMENT_CHAR;
 }
 
 char32_t utf8::decode(const char*& str, size_t& len) {
-  const unsigned char*& ptr = (const unsigned char*&) str;
-  if (!len) return 0; len--;
-  if (*ptr < 0x80) return *ptr++;
-  else if (*ptr < 0xC0) return ++ptr, REPLACEMENT_CHAR;
-  else if (*ptr < 0xE0) {
-    char32_t res = (*ptr++ & 0x1F) << 6;
-    if (len <= 0 || *ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    return res + ((--len, *ptr++) & 0x3F);
-  } else if (*ptr < 0xF0) {
-    char32_t res = (*ptr++ & 0x0F) << 12;
-    if (len <= 0 || *ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    res += ((--len, *ptr++) & 0x3F) << 6;
-    if (len <= 0 || *ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    return res + ((--len, *ptr++) & 0x3F);
-  } else if (*ptr < 0xF8) {
-    char32_t res = (*ptr++ & 0x07) << 18;
-    if (len <= 0 || *ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    res += ((--len, *ptr++) & 0x3F) << 12;
-    if (len <= 0 || *ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    res += ((--len, *ptr++) & 0x3F) << 6;
-    if (len <= 0 || *ptr < 0x80 || *ptr >= 0xC0) return REPLACEMENT_CHAR;
-    return res + ((--len, *ptr++) & 0x3F);
-  } else return ++ptr, REPLACEMENT_CHAR;
+  if (!len) return 0;
+  --len;
+  if (((unsigned char)*str) < 0x80) return (unsigned char)*str++;
+  else if (((unsigned char)*str) < 0xC0) return ++str, REPLACEMENT_CHAR;
+  else if (((unsigned char)*str) < 0xE0) {
+    char32_t res = (((unsigned char)*str++) & 0x1F) << 6;
+    if (len <= 0 || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    return res + ((--len, ((unsigned char)*str++)) & 0x3F);
+  } else if (((unsigned char)*str) < 0xF0) {
+    char32_t res = (((unsigned char)*str++) & 0x0F) << 12;
+    if (len <= 0 || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    res += ((--len, ((unsigned char)*str++)) & 0x3F) << 6;
+    if (len <= 0 || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    return res + ((--len, ((unsigned char)*str++)) & 0x3F);
+  } else if (((unsigned char)*str) < 0xF8) {
+    char32_t res = (((unsigned char)*str++) & 0x07) << 18;
+    if (len <= 0 || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    res += ((--len, ((unsigned char)*str++)) & 0x3F) << 12;
+    if (len <= 0 || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    res += ((--len, ((unsigned char)*str++)) & 0x3F) << 6;
+    if (len <= 0 || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return REPLACEMENT_CHAR;
+    return res + ((--len, ((unsigned char)*str++)) & 0x3F);
+  } else return ++str, REPLACEMENT_CHAR;
 }
 
 char32_t utf8::first(const char* str) {
@@ -2370,12 +2369,12 @@ sentence_processor* sentence_processor::create(const string& name) {
 }
 
 /////////
-// File: morphodita/morpho/casing_variants.h
+// File: morphodita/derivator/derivator.h
 /////////
 
 // This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
 //
-// Copyright 2015 Institute of Formal and Applied Linguistics, Faculty of
+// Copyright 2016 Institute of Formal and Applied Linguistics, Faculty of
 // Mathematics and Physics, Charles University in Prague, Czech Republic.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public
@@ -2384,203 +2383,150 @@ sentence_processor* sentence_processor::create(const string& name) {
 
 namespace morphodita {
 
-inline void generate_casing_variants(string_piece form, string& form_uclc, string& form_lc) {
-  using namespace unilib;
-
-  // Detect uppercase+titlecase characters.
-  bool first_Lut = false; // first character is uppercase or titlecase
-  bool rest_has_Lut = false; // any character but first is uppercase or titlecase
-  {
-    string_piece form_tmp = form;
-    first_Lut = unicode::category(utf8::decode(form_tmp.str, form_tmp.len)) & unicode::Lut;
-    while (form_tmp.len && !rest_has_Lut)
-      rest_has_Lut = unicode::category(utf8::decode(form_tmp.str, form_tmp.len)) & unicode::Lut;
-  }
-
-  // Generate all casing variants if needed (they are different than given form).
-  // We only replace letters with their lowercase variants.
-  // - form_uclc: first uppercase, rest lowercase
-  // - form_lc: all lowercase
-
-  if (first_Lut && !rest_has_Lut) { // common case allowing fast execution
-    form_lc.reserve(form.len);
-    string_piece form_tmp = form;
-    utf8::append(form_lc, unicode::lowercase(utf8::decode(form_tmp.str, form_tmp.len)));
-    form_lc.append(form_tmp.str, form_tmp.len);
-  } else if (!first_Lut && rest_has_Lut) {
-    form_lc.reserve(form.len);
-    utf8::map(unicode::lowercase, form.str, form.len, form_lc);
-  } else if (first_Lut && rest_has_Lut) {
-    form_lc.reserve(form.len);
-    form_uclc.reserve(form.len);
-    string_piece form_tmp = form;
-    char32_t first = utf8::decode(form_tmp.str, form_tmp.len);
-    utf8::append(form_lc, unicode::lowercase(first));
-    utf8::append(form_uclc, first);
-    while (form_tmp.len) {
-      char32_t lowercase = unicode::lowercase(utf8::decode(form_tmp.str, form_tmp.len));
-      utf8::append(form_lc, lowercase);
-      utf8::append(form_uclc, lowercase);
-    }
-  }
-}
-
-} // namespace morphodita
-
-/////////
-// File: morphodita/morpho/small_stringops.h
-/////////
-
-// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
-//
-// Copyright 2015 Institute of Formal and Applied Linguistics, Faculty of
-// Mathematics and Physics, Charles University in Prague, Czech Republic.
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-namespace morphodita {
-
-// Declarations
-inline bool small_memeq(const void* a, const void* b, size_t len);
-inline void small_memcpy(void* dest, const void* src, size_t len);
-
-// Definitions
-bool small_memeq(const void* a_void, const void* b_void, size_t len) {
-  const char* a = (const char*)a_void;
-  const char* b = (const char*)b_void;
-
-  while (len--)
-    if (*a++ != *b++)
-      return false;
-  return true;
-}
-
-void small_memcpy(void* dest_void, const void* src_void, size_t len) {
-  char* dest = (char*)dest_void;
-  const char* src = (const char*)src_void;
-
-  while (len--)
-    *dest++ = *src++;
-}
-
-} // namespace morphodita
-
-/////////
-// File: morphodita/morpho/czech_lemma_addinfo.h
-/////////
-
-// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
-//
-// Copyright 2015 Institute of Formal and Applied Linguistics, Faculty of
-// Mathematics and Physics, Charles University in Prague, Czech Republic.
-//
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-namespace morphodita {
-
-// Declarations
-struct czech_lemma_addinfo {
-  inline static int raw_lemma_len(string_piece lemma);
-  inline static int lemma_id_len(string_piece lemma);
-  inline static string format(const unsigned char* addinfo, int addinfo_len);
-  inline static bool generatable(const unsigned char* addinfo, int addinfo_len);
-
-  inline int parse(string_piece lemma, bool die_on_failure = false);
-  inline bool match_lemma_id(const unsigned char* other_addinfo, int other_addinfo_len);
-
-  vector<unsigned char> data;
+struct derivated_lemma {
+  string lemma;
 };
 
-// Definitions
-int czech_lemma_addinfo::raw_lemma_len(string_piece lemma) {
-  // Lemma ends by a '-[0-9]', '`' or '_' on non-first position.
-  for (unsigned len = 1; len < lemma.len; len++)
-    if (lemma.str[len] == '`' || lemma.str[len] == '_' ||
-        (lemma.str[len] == '-' && len+1 < lemma.len && lemma.str[len+1] >= '0' && lemma.str[len+1] <= '9'))
-      return len;
-  return lemma.len;
+class derivator {
+ public:
+  virtual ~derivator() {}
+
+  // For given lemma, return the parent in the derivation graph.
+  // The lemma is assumed to be lemma id and any lemma comments are ignored.
+  virtual bool parent(string_piece lemma, derivated_lemma& parent) const = 0;
+
+  // For given lemma, return the children in the derivation graph.
+  // The lemma is assumed to be lemma id and any lemma comments are ignored.
+  virtual bool children(string_piece lemma, vector<derivated_lemma>& children) const = 0;
+};
+
+} // namespace morphodita
+
+/////////
+// File: morphodita/derivator/derivation_formatter.h
+/////////
+
+// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
+//
+// Copyright 2016 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace morphodita {
+
+class derivation_formatter {
+ public:
+  virtual ~derivation_formatter() {}
+
+  // Perform the required derivation and store it directly in the lemma.
+  virtual void format_derivation(string& lemma) const = 0;
+
+  // Static factory methods.
+  static derivation_formatter* new_none_derivation_formatter();
+  static derivation_formatter* new_root_derivation_formatter(const derivator* derinet);
+  static derivation_formatter* new_path_derivation_formatter(const derivator* derinet);
+  static derivation_formatter* new_tree_derivation_formatter(const derivator* derinet);
+  // String version of static factory method.
+  static derivation_formatter* new_derivation_formatter(string_piece name, const derivator* derinet);
+};
+
+} // namespace morphodita
+
+/////////
+// File: morphodita/derivator/derivation_formatter.cpp
+/////////
+
+// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
+//
+// Copyright 2016 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace morphodita {
+
+class none_derivation_formatter : public derivation_formatter {
+  virtual void format_derivation(string& /*lemma*/) const override {}
+};
+
+derivation_formatter* derivation_formatter::new_none_derivation_formatter() {
+  return new none_derivation_formatter();
 }
 
-int czech_lemma_addinfo::lemma_id_len(string_piece lemma) {
-  // Lemma ends by a '-[0-9]', '`' or '_' on non-first position.
-  for (unsigned len = 1; len < lemma.len; len++) {
-    if (lemma.str[len] == '`' || lemma.str[len] == '_')
-      return len;
-    if (lemma.str[len] == '-' && len+1 < lemma.len && lemma.str[len+1] >= '0' && lemma.str[len+1] <= '9') {
-      len += 2;
-      while (len < lemma.len && lemma.str[len] >= '0' && lemma.str[len] <= '9') len++;
-      return len;
-    }
+class root_derivation_formatter : public derivation_formatter {
+ public:
+  root_derivation_formatter(const derivator* derinet) : derinet(derinet) {}
+
+  virtual void format_derivation(string& lemma) const override {
+    for (derivated_lemma parent; derinet->parent(lemma, parent); )
+      lemma.assign(parent.lemma);
   }
-  return lemma.len;
+
+ private:
+  const derivator* derinet;
+};
+
+derivation_formatter* derivation_formatter::new_root_derivation_formatter(const derivator* derinet) {
+  return derinet ? new root_derivation_formatter(derinet) : nullptr;
 }
 
-string czech_lemma_addinfo::format(const unsigned char* addinfo, int addinfo_len) {
-  string res;
+class path_derivation_formatter : public derivation_formatter {
+ public:
+  path_derivation_formatter(const derivator* derinet) : derinet(derinet) {}
 
-  if (addinfo_len) {
-    res.reserve(addinfo_len + 4);
-    if (addinfo[0] != 255) {
-      char num[5];
-      sprintf(num, "-%u", addinfo[0]);
-      res += num;
-    }
-    for (int i = 1; i < addinfo_len; i++)
-      res += addinfo[i];
+  virtual void format_derivation(string& lemma) const override {
+    string current(lemma);
+    for (derivated_lemma parent; derinet->parent(current, parent); current.swap(parent.lemma))
+      lemma.append(" ").append(parent.lemma);
   }
 
-  return res;
+ private:
+  const derivator* derinet;
+};
+
+derivation_formatter* derivation_formatter::new_path_derivation_formatter(const derivator* derinet) {
+  return derinet ? new path_derivation_formatter(derinet) : nullptr;
 }
 
-bool czech_lemma_addinfo::generatable(const unsigned char* addinfo, int addinfo_len) {
-  for (int i = 1; i + 2 < addinfo_len; i++)
-    if (addinfo[i] == '_' && addinfo[i+1] == ',' && addinfo[i+2] == 'x')
-      return false;
+class tree_derivation_formatter : public derivation_formatter {
+ public:
+  tree_derivation_formatter(const derivator* derinet) : derinet(derinet) {}
 
-  return true;
-}
-
-int czech_lemma_addinfo::parse(string_piece lemma, bool die_on_failure) {
-  data.clear();
-
-  const char* lemma_info = lemma.str + raw_lemma_len(lemma);
-  if (lemma_info < lemma.str + lemma.len) {
-    int lemma_num = 255;
-    const char* lemma_additional_info = lemma_info;
-
-    if (*lemma_info == '-') {
-      lemma_num = strtol(lemma_info + 1, (char**) &lemma_additional_info, 10);
-
-      if (lemma_additional_info == lemma_info + 1 || (*lemma_additional_info != '\0' && *lemma_additional_info != '`' && *lemma_additional_info != '_') || lemma_num < 0 || lemma_num >= 255) {
-        if (die_on_failure)
-          runtime_failure("Lemma number " << lemma_num << " in lemma " << lemma << " out of range!");
-        else
-          lemma_num = 255;
-      }
-    }
-    data.emplace_back(lemma_num);
-    while (lemma_additional_info < lemma.str + lemma.len)
-      data.push_back(*(unsigned char*)lemma_additional_info++);
-
-    if (data.size() > 255) {
-      if (die_on_failure)
-        runtime_failure("Too long lemma info " << lemma_info << " in lemma " << lemma << '!');
-      else
-        data.resize(255);
-    }
+  virtual void format_derivation(string& lemma) const override {
+    string root(lemma);
+    for (derivated_lemma parent; derinet->parent(root, parent); root.swap(parent.lemma)) {}
+    format_tree(root, lemma);
   }
 
-  return lemma_info - lemma.str;
+  void format_tree(const string& root, string& tree) const {
+    vector<derivated_lemma> children;
+
+    tree.append(" ").append(root);
+    if (derinet->children(root, children))
+      for (auto&& child : children)
+        format_tree(child.lemma, tree);
+    tree.push_back(' ');
+  }
+
+ private:
+  const derivator* derinet;
+};
+
+derivation_formatter* derivation_formatter::new_tree_derivation_formatter(const derivator* derinet) {
+  return derinet ? new tree_derivation_formatter(derinet) : nullptr;
 }
 
-bool czech_lemma_addinfo::match_lemma_id(const unsigned char* other_addinfo, int other_addinfo_len) {
-  if (data.empty()) return true;
-  if (data[0] != 255 && (!other_addinfo_len || other_addinfo[0] != data[0])) return false;
-  return true;
+derivation_formatter* derivation_formatter::new_derivation_formatter(string_piece name, const derivator* derinet) {
+  if (name == "none") return new_none_derivation_formatter();
+  if (name == "root") return new_root_derivation_formatter(derinet);
+  if (name == "path") return new_path_derivation_formatter(derinet);
+  if (name == "tree") return new_tree_derivation_formatter(derinet);
+  return nullptr;
 }
 
 } // namespace morphodita
@@ -2718,7 +2664,54 @@ class morpho {
   // Construct a new tokenizer instance appropriate for this morphology.
   // Can return NULL if no such tokenizer exists.
   virtual tokenizer* new_tokenizer() const = 0;
+
+  // Return a derivator for this morphology, or NULL if it does not exist.
+  // The returned instance is owned by the morphology and should not be deleted.
+  virtual const derivator* get_derivator() const;
+
+ protected:
+  unique_ptr<derivator> derinet;
 };
+
+} // namespace morphodita
+
+/////////
+// File: morphodita/morpho/small_stringops.h
+/////////
+
+// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
+//
+// Copyright 2015 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace morphodita {
+
+// Declarations
+inline bool small_memeq(const void* a, const void* b, size_t len);
+inline void small_memcpy(void* dest, const void* src, size_t len);
+
+// Definitions
+bool small_memeq(const void* a_void, const void* b_void, size_t len) {
+  const char* a = (const char*)a_void;
+  const char* b = (const char*)b_void;
+
+  while (len--)
+    if (*a++ != *b++)
+      return false;
+  return true;
+}
+
+void small_memcpy(void* dest_void, const void* src_void, size_t len) {
+  char* dest = (char*)dest_void;
+  const char* src = (const char*)src_void;
+
+  while (len--)
+    *dest++ = *src++;
+}
 
 } // namespace morphodita
 
@@ -3016,6 +3009,369 @@ void persistent_unordered_map::load(binary_decoder& data) {
 } // namespace morphodita
 
 /////////
+// File: morphodita/derivator/derivator_dictionary.h
+/////////
+
+// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
+//
+// Copyright 2016 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace morphodita {
+
+class derivator_dictionary : public derivator {
+ public:
+  virtual bool parent(string_piece lemma, derivated_lemma& parent) const override;
+  virtual bool children(string_piece lemma, vector<derivated_lemma>& children) const override;
+
+  bool load(istream& is);
+
+ private:
+  friend class morpho;
+  const morpho* dictionary;
+  persistent_unordered_map derinet;
+};
+
+} // namespace morphodita
+
+/////////
+// File: morphodita/derivator/derivator_dictionary.cpp
+/////////
+
+// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
+//
+// Copyright 2016 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace morphodita {
+
+bool derivator_dictionary::parent(string_piece lemma, derivated_lemma& parent) const {
+  if (dictionary) lemma.len = dictionary->lemma_id_len(lemma);
+
+  auto lemma_data = derinet.at(lemma.str, lemma.len, [](pointer_decoder& data) {
+    data.next<char>(data.next_1B());
+    data.next_4B();
+    data.next<uint32_t>(data.next_2B());
+  });
+  if (lemma_data) {
+    auto parent_encoded = *(uint32_t*)(lemma_data + 1 + *lemma_data);
+    if (parent_encoded) {
+      unsigned parent_len = parent_encoded & 0xFF;
+      auto parent_data = derinet.data_start(parent_len) + (parent_encoded >> 8);
+      parent.lemma.assign((const char*) parent_data, parent_len);
+      if (parent_data[parent_len])
+        parent.lemma.append((const char*) parent_data + parent_len + 1, parent_data[parent_len]);
+      return true;
+    }
+  }
+  parent.lemma.clear();
+  return false;
+}
+
+bool derivator_dictionary::children(string_piece lemma, vector<derivated_lemma>& children) const {
+  if (dictionary) lemma.len = dictionary->lemma_id_len(lemma);
+
+  auto lemma_data = derinet.at(lemma.str, lemma.len, [](pointer_decoder& data) {
+    data.next<char>(data.next_1B());
+    data.next_4B();
+    data.next<uint32_t>(data.next_2B());
+  });
+  if (lemma_data) {
+    auto children_len = *(uint16_t*)(lemma_data + 1 + *lemma_data + 4);
+    auto children_encoded = (uint32_t*)(lemma_data + 1 + *lemma_data + 4 + 2);
+    if (children_len) {
+      children.resize(children_len);
+      for (unsigned i = 0; i < children_len; i++) {
+        unsigned child_len = children_encoded[i] & 0xFF;
+        auto child_data = derinet.data_start(child_len) + (children_encoded[i] >> 8);
+        children[i].lemma.assign((const char*) child_data, child_len);
+        if (child_data[child_len])
+          children[i].lemma.append((const char*) child_data + child_len + 1, child_data[child_len]);
+      }
+      return true;
+    }
+  }
+  children.clear();
+  return false;
+}
+
+bool derivator_dictionary::load(istream& is) {
+  binary_decoder data;
+  if (!compressor::load(is, data)) return false;
+
+  try {
+    for (int i = data.next_1B(); i > 0; i--)
+      derinet.resize(data.next_4B());
+
+    unsigned data_position = data.tell();
+    vector<char> lemma, parent;
+    for (int pass = 1; pass <= 3; pass++) {
+      if (pass > 1) data.seek(data_position);
+
+      lemma.clear();
+      for (int i = data.next_4B(); i > 0; i--) {
+        lemma.resize(lemma.size() - data.next_1B());
+        for (int i = data.next_1B(); i > 0; i--)
+          lemma.push_back(data.next_1B());
+
+        unsigned char lemma_comment_len = data.next_1B();
+        const char* lemma_comment = lemma_comment_len ? data.next<char>(lemma_comment_len) : nullptr;
+
+        unsigned children = data.next_2B();
+
+        if (pass == 3) parent.clear();
+        enum { REMOVE_START = 1, REMOVE_END = 2, ADD_START = 4, ADD_END = 8 };
+        int operations = data.next_1B();
+        if (operations) {
+          int remove_start = operations & REMOVE_START ? data.next_1B() : 0;
+          int remove_end = operations & REMOVE_END ? data.next_1B() : 0;
+          if (operations & ADD_START) {
+            int add_start = data.next_1B();
+            const char* str = data.next<char>(add_start);
+            if (pass == 3) parent.assign(str, str + add_start);
+          }
+          if (pass == 3) parent.insert(parent.end(), lemma.begin() + remove_start, lemma.end() - remove_end);
+          if (operations & ADD_END) {
+            int add_end = data.next_1B();
+            const char* str = data.next<char>(add_end);
+            if (pass == 3) parent.insert(parent.end(), str, str + add_end);
+          }
+        }
+
+        if (pass == 1) {
+          derinet.add(lemma.data(), lemma.size(), 1 + lemma_comment_len + 4 + 2 + 4 * children);
+        } else if (pass == 2) {
+          unsigned char* lemma_data = derinet.fill(lemma.data(), lemma.size(), 1 + lemma_comment_len + 4 + 2 + 4 * children);
+          *lemma_data++ = lemma_comment_len;
+          while (lemma_comment_len--) *lemma_data++ = *lemma_comment++;
+          *(uint32_t*)(lemma_data) = 0; lemma_data += sizeof(uint32_t);
+          *(uint16_t*)(lemma_data) = children; lemma_data += sizeof(uint16_t);
+          if (children) ((uint32_t*)lemma_data)[children - 1] = 0;
+        } else if (pass == 3 && !parent.empty()) {
+          auto lemma_data = derinet.at(lemma.data(), lemma.size(), [](pointer_decoder& data) {
+            data.next<char>(data.next_1B());
+            data.next_4B();
+            data.next<uint32_t>(data.next_2B());
+          });
+          auto parent_data = derinet.at(parent.data(), parent.size(), [](pointer_decoder& data) {
+            data.next<char>(data.next_1B());
+            data.next_4B();
+            data.next<uint32_t>(data.next_2B());
+          });
+          assert(lemma_data && parent_data);
+
+          unsigned parent_offset = parent_data - parent.size() - derinet.data_start(parent.size());
+          assert(parent.size() < (1<<8) && parent_offset < (1<<24));
+          *(uint32_t*)(lemma_data + 1 + *lemma_data) = (parent_offset << 8) | parent.size();
+
+          unsigned lemma_offset = lemma_data - lemma.size() - derinet.data_start(lemma.size());
+          assert(lemma.size() < (1<<8) && lemma_offset < (1<<24));
+          auto children_len = *(uint16_t*)(parent_data + 1 + *parent_data + 4);
+          auto children = (uint32_t*)(parent_data + 1 + *parent_data + 4 + 2);
+          auto child_index = children[children_len-1];
+          children[child_index] = (lemma_offset << 8) | lemma.size();
+          if (child_index+1 < children_len) children[children_len-1]++;
+        }
+      }
+
+      if (pass == 1)
+        derinet.done_adding();
+      if (pass == 2)
+        derinet.done_filling();
+    }
+  } catch (binary_decoder_error&) {
+    return false;
+  }
+  return true;
+}
+
+} // namespace morphodita
+
+/////////
+// File: morphodita/morpho/casing_variants.h
+/////////
+
+// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
+//
+// Copyright 2015 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace morphodita {
+
+inline void generate_casing_variants(string_piece form, string& form_uclc, string& form_lc) {
+  using namespace unilib;
+
+  // Detect uppercase+titlecase characters.
+  bool first_Lut = false; // first character is uppercase or titlecase
+  bool rest_has_Lut = false; // any character but first is uppercase or titlecase
+  {
+    string_piece form_tmp = form;
+    first_Lut = unicode::category(utf8::decode(form_tmp.str, form_tmp.len)) & unicode::Lut;
+    while (form_tmp.len && !rest_has_Lut)
+      rest_has_Lut = unicode::category(utf8::decode(form_tmp.str, form_tmp.len)) & unicode::Lut;
+  }
+
+  // Generate all casing variants if needed (they are different than given form).
+  // We only replace letters with their lowercase variants.
+  // - form_uclc: first uppercase, rest lowercase
+  // - form_lc: all lowercase
+
+  if (first_Lut && !rest_has_Lut) { // common case allowing fast execution
+    form_lc.reserve(form.len);
+    string_piece form_tmp = form;
+    utf8::append(form_lc, unicode::lowercase(utf8::decode(form_tmp.str, form_tmp.len)));
+    form_lc.append(form_tmp.str, form_tmp.len);
+  } else if (!first_Lut && rest_has_Lut) {
+    form_lc.reserve(form.len);
+    utf8::map(unicode::lowercase, form.str, form.len, form_lc);
+  } else if (first_Lut && rest_has_Lut) {
+    form_lc.reserve(form.len);
+    form_uclc.reserve(form.len);
+    string_piece form_tmp = form;
+    char32_t first = utf8::decode(form_tmp.str, form_tmp.len);
+    utf8::append(form_lc, unicode::lowercase(first));
+    utf8::append(form_uclc, first);
+    while (form_tmp.len) {
+      char32_t lowercase = unicode::lowercase(utf8::decode(form_tmp.str, form_tmp.len));
+      utf8::append(form_lc, lowercase);
+      utf8::append(form_uclc, lowercase);
+    }
+  }
+}
+
+} // namespace morphodita
+
+/////////
+// File: morphodita/morpho/czech_lemma_addinfo.h
+/////////
+
+// This file is part of MorphoDiTa <http://github.com/ufal/morphodita/>.
+//
+// Copyright 2015 Institute of Formal and Applied Linguistics, Faculty of
+// Mathematics and Physics, Charles University in Prague, Czech Republic.
+//
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+namespace morphodita {
+
+// Declarations
+struct czech_lemma_addinfo {
+  inline static int raw_lemma_len(string_piece lemma);
+  inline static int lemma_id_len(string_piece lemma);
+  inline static string format(const unsigned char* addinfo, int addinfo_len);
+  inline static bool generatable(const unsigned char* addinfo, int addinfo_len);
+
+  inline int parse(string_piece lemma, bool die_on_failure = false);
+  inline bool match_lemma_id(const unsigned char* other_addinfo, int other_addinfo_len);
+
+  vector<unsigned char> data;
+};
+
+// Definitions
+int czech_lemma_addinfo::raw_lemma_len(string_piece lemma) {
+  // Lemma ends by a '-[0-9]', '`' or '_' on non-first position.
+  for (unsigned len = 1; len < lemma.len; len++)
+    if (lemma.str[len] == '`' || lemma.str[len] == '_' ||
+        (lemma.str[len] == '-' && len+1 < lemma.len && lemma.str[len+1] >= '0' && lemma.str[len+1] <= '9'))
+      return len;
+  return lemma.len;
+}
+
+int czech_lemma_addinfo::lemma_id_len(string_piece lemma) {
+  // Lemma ends by a '-[0-9]', '`' or '_' on non-first position.
+  for (unsigned len = 1; len < lemma.len; len++) {
+    if (lemma.str[len] == '`' || lemma.str[len] == '_')
+      return len;
+    if (lemma.str[len] == '-' && len+1 < lemma.len && lemma.str[len+1] >= '0' && lemma.str[len+1] <= '9') {
+      len += 2;
+      while (len < lemma.len && lemma.str[len] >= '0' && lemma.str[len] <= '9') len++;
+      return len;
+    }
+  }
+  return lemma.len;
+}
+
+string czech_lemma_addinfo::format(const unsigned char* addinfo, int addinfo_len) {
+  string res;
+
+  if (addinfo_len) {
+    res.reserve(addinfo_len + 4);
+    if (addinfo[0] != 255) {
+      char num[5];
+      sprintf(num, "-%u", addinfo[0]);
+      res += num;
+    }
+    for (int i = 1; i < addinfo_len; i++)
+      res += addinfo[i];
+  }
+
+  return res;
+}
+
+bool czech_lemma_addinfo::generatable(const unsigned char* addinfo, int addinfo_len) {
+  for (int i = 1; i + 2 < addinfo_len; i++)
+    if (addinfo[i] == '_' && addinfo[i+1] == ',' && addinfo[i+2] == 'x')
+      return false;
+
+  return true;
+}
+
+int czech_lemma_addinfo::parse(string_piece lemma, bool die_on_failure) {
+  data.clear();
+
+  const char* lemma_info = lemma.str + raw_lemma_len(lemma);
+  if (lemma_info < lemma.str + lemma.len) {
+    int lemma_num = 255;
+    const char* lemma_additional_info = lemma_info;
+
+    if (*lemma_info == '-') {
+      lemma_num = strtol(lemma_info + 1, (char**) &lemma_additional_info, 10);
+
+      if (lemma_additional_info == lemma_info + 1 || (*lemma_additional_info != '\0' && *lemma_additional_info != '`' && *lemma_additional_info != '_') || lemma_num < 0 || lemma_num >= 255) {
+        if (die_on_failure)
+          runtime_failure("Lemma number " << lemma_num << " in lemma " << lemma << " out of range!");
+        else
+          lemma_num = 255;
+      }
+    }
+    data.emplace_back(lemma_num);
+    while (lemma_additional_info < lemma.str + lemma.len)
+      data.push_back(*(unsigned char*)lemma_additional_info++);
+
+    if (data.size() > 255) {
+      if (die_on_failure)
+        runtime_failure("Too long lemma info " << lemma_info << " in lemma " << lemma << '!');
+      else
+        data.resize(255);
+    }
+  }
+
+  return lemma_info - lemma.str;
+}
+
+bool czech_lemma_addinfo::match_lemma_id(const unsigned char* other_addinfo, int other_addinfo_len) {
+  if (data.empty()) return true;
+  if (data[0] != 255 && (!other_addinfo_len || other_addinfo[0] != data[0])) return false;
+  return true;
+}
+
+} // namespace morphodita
+
+/////////
 // File: morphodita/morpho/tag_filter.h
 /////////
 
@@ -3133,9 +3489,9 @@ void morpho_dictionary<LemmaAddinfo>::load(binary_decoder& data) {
       unsigned lemma_offset /* to keep compiler happy */ = 0;
 
       if (pass == 1) {
-        lemmas.add(lemma.data(), lemma_len, 1 + lemma_info_len + 1 + lemma_roots * (sizeof(uint32_t) + sizeof(uint16_t)));
+        lemmas.add(lemma.data(), lemma_len, 1 + lemma_info_len + 1 + lemma_roots * (sizeof(uint32_t) + sizeof(uint8_t) + sizeof(uint16_t)));
       } else /*if (pass == 2)*/ {
-        lemma_data = lemmas.fill(lemma.data(), lemma_len, 1 + lemma_info_len + 1 + lemma_roots * (sizeof(uint32_t) + sizeof(uint16_t)));
+        lemma_data = lemmas.fill(lemma.data(), lemma_len, 1 + lemma_info_len + 1 + lemma_roots * (sizeof(uint32_t) + sizeof(uint8_t) + sizeof(uint16_t)));
         lemma_offset = lemma_data - lemma_len - lemmas.data_start(lemma_len);
 
         *lemma_data++ = lemma_info_len;
@@ -3159,18 +3515,20 @@ void morpho_dictionary<LemmaAddinfo>::load(binary_decoder& data) {
         uint16_t clas = data.next_2B();
 
         if (pass == 1) { // for each root
-          roots.add(root.data(), root_len, sizeof(uint16_t) + sizeof(uint32_t));
+          roots.add(root.data(), root_len, sizeof(uint16_t) + sizeof(uint32_t) + sizeof(uint8_t));
         } else /*if (pass == 2)*/ {
-          unsigned char* root_data = roots.fill(root.data(), root_len, sizeof(uint16_t) + sizeof(uint32_t));
+          unsigned char* root_data = roots.fill(root.data(), root_len, sizeof(uint16_t) + sizeof(uint32_t) + sizeof(uint8_t));
           unsigned root_offset = root_data - root_len - roots.data_start(root_len);
 
           *(uint16_t*)(root_data) = clas; root_data += sizeof(uint16_t);
-          *(uint32_t*)(root_data) = (lemma_offset << 8) | lemma_len; root_data += sizeof(uint32_t);
-          assert(lemma_offset < (1<<24) && lemma_len < (1<<8));
+          *(uint32_t*)(root_data) = lemma_offset; root_data += sizeof(uint32_t);
+          *(uint8_t*)(root_data) = lemma_len; root_data += sizeof(uint8_t);
+          assert(uint8_t(lemma_len) == lemma_len);
 
-          *(uint32_t*)(lemma_data) = (root_offset << 8) | root_len; lemma_data += sizeof(uint32_t);
+          *(uint32_t*)(lemma_data) = root_offset; lemma_data += sizeof(uint32_t);
+          *(uint8_t*)(lemma_data) = root_len; lemma_data += sizeof(uint8_t);
           *(uint16_t*)(lemma_data) = clas; lemma_data += sizeof(uint16_t);
-          assert(root_offset < (1<<24) && root_len < (1<<8));
+          assert(uint8_t(root_len) == root_len);
         }
       }
     }
@@ -3232,13 +3590,13 @@ void morpho_dictionary<LemmaAddinfo>::analyze(string_piece form, vector<tagged_l
 
       roots.iter(form.str, root_len, [&](const char* root, pointer_decoder& root_data) {
         unsigned root_class = root_data.next_2B();
-        unsigned lemma_encoded = root_data.next_4B();
+        unsigned lemma_offset = root_data.next_4B();
+        unsigned lemma_len = root_data.next_1B();
 
         if (small_memeq(form.str, root, root_len)) {
           uint16_t* suffix_class_ptr = lower_bound(suff_data, suff_data + suff_classes, root_class);
           if (suffix_class_ptr < suff_data + suff_classes && *suffix_class_ptr == root_class) {
-            unsigned lemma_len = lemma_encoded & 0xFF;
-            const unsigned char* lemma_data = this->lemmas.data_start(lemma_len) + (lemma_encoded >> 8);
+            const unsigned char* lemma_data = this->lemmas.data_start(lemma_len) + lemma_offset;
             string lemma((const char*)lemma_data, lemma_len);
             if (lemma_data[lemma_len]) lemma += LemmaAddinfo::format(lemma_data + lemma_len + 1, lemma_data[lemma_len]);
 
@@ -3262,7 +3620,7 @@ bool morpho_dictionary<LemmaAddinfo>::generate(string_piece lemma, const tag_fil
     unsigned lemma_info_len = data.next_1B();
     const auto* lemma_info = data.next<unsigned char>(lemma_info_len);
     unsigned lemma_roots_len = data.next_1B();
-    auto* lemma_roots_ptr = data.next<unsigned char>(lemma_roots_len * (sizeof(uint32_t) + sizeof(uint16_t)));
+    auto* lemma_roots_ptr = data.next<unsigned char>(lemma_roots_len * (sizeof(uint32_t) + sizeof(uint8_t) + sizeof(uint16_t)));
 
     if (small_memeq(lemma.str, lemma_str, raw_lemma_len) && addinfo.match_lemma_id(lemma_info, lemma_info_len) && LemmaAddinfo::generatable(lemma_info, lemma_info_len)) {
       matched_lemma = true;
@@ -3270,11 +3628,11 @@ bool morpho_dictionary<LemmaAddinfo>::generate(string_piece lemma, const tag_fil
       vector<tagged_form>* forms = nullptr;
       pointer_decoder lemma_roots(lemma_roots_ptr);
       for (unsigned i = 0; i < lemma_roots_len; i++) {
-        unsigned root_encoded = lemma_roots.next_4B();
+        unsigned root_offset = lemma_roots.next_4B();
+        unsigned root_len = lemma_roots.next_1B();
         unsigned clas = lemma_roots.next_2B();
 
-        unsigned root_len = root_encoded & 0xFF;
-        const unsigned char* root_data = roots.data_start(root_len) + (root_encoded >> 8);
+        const unsigned char* root_data = roots.data_start(root_len) + root_offset;
         for (auto&& suffix : classes[clas]) {
           string root_with_suffix;
           for (auto&& tag : suffix.second)
@@ -3467,6 +3825,7 @@ namespace morphodita {
 
 class unicode_tokenizer : public tokenizer {
  public:
+  enum { URL_EMAIL_LATEST = 2 };
   unicode_tokenizer(unsigned url_email_tokenizer);
 
   virtual void set_text(string_piece text, bool make_copy = false) override;
@@ -3521,9 +3880,10 @@ class ragel_tokenizer : public unicode_tokenizer {
   static inline uint8_t ragel_char(const char_info& chr);
 
  private:
+  static void initialize_ragel_map();
   static vector<uint8_t> ragel_map;
   static atomic_flag ragel_map_flag;
-  void ragel_map_add(char32_t chr, uint8_t mapping);
+  static void ragel_map_add(char32_t chr, uint8_t mapping);
 
   friend class unicode_tokenizer;
   static bool ragel_url_email(unsigned version, const vector<char_info>& chars, size_t& current_char, vector<token_range>& tokens);
@@ -3767,13 +4127,13 @@ static bool punctuation_additional[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/*ˇ*/};
+  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/*caron*/};
 
 // What characters of unicode Punctuation category are not considered punctuation.
 static bool punctuation_exceptions[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0,0,1/*§*/};
+  0,0,0,0,0,0,0,0,0,1/*paragraph*/};
 
 void czech_morpho::analyze_special(string_piece form, vector<tagged_lemma>& lemmas) const {
   using namespace unilib;
@@ -4201,7 +4561,7 @@ void english_morpho::analyze_special(string_piece form, vector<tagged_lemma>& le
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // This code is a reimplementation of morphologic analyzer Morphium
-// by Johanka Spoustová (Treex::Tool::EnglishMorpho::Analysis Perl module)
+// by Johanka Spoustova (Treex::Tool::EnglishMorpho::Analysis Perl module)
 // and reimplementation of morphologic lemmatizer by Martin Popel
 // (Treex::Tool::EnglishMorpho::Lemmatizer Perl module). The latter is based
 // on morpha:
@@ -7030,6 +7390,7 @@ class morpho_ids {
     ENGLISH_V2 = 4,
     ENGLISH_V3 = 5, ENGLISH = ENGLISH_V3,
     SLOVAK_PDT = 6,
+    DERIVATOR_DICTIONARY = 7,
   };
 
   static bool parse(const string& str, morpho_id& id) {
@@ -7120,6 +7481,17 @@ morpho* morpho::load(istream& is) {
         if (res->load(is)) return res.release();
         break;
       }
+    case morpho_ids::DERIVATOR_DICTIONARY:
+      {
+        auto derinet = new_unique_ptr<derivator_dictionary>();
+        if (!derinet->load(is)) return nullptr;
+
+        unique_ptr<morpho> dictionary(load(is));
+        if (!dictionary) return nullptr;
+        derinet->dictionary = dictionary.get();
+        dictionary->derinet.reset(derinet.release());
+        return dictionary.release();
+      }
   }
 
   return nullptr;
@@ -7130,6 +7502,10 @@ morpho* morpho::load(const char* fname) {
   if (!f) return nullptr;
 
   return load(f);
+}
+
+const derivator* morpho::get_derivator() const {
+  return derinet.get();
 }
 
 } // namespace morphodita
@@ -7414,8 +7790,8 @@ template <class T>
 class vli {
  public:
   static int max_length();
-  static void encode(T value, unsigned char*& where);
-  static T decode(const unsigned char*& from);
+  static void encode(T value, char*& where);
+  static T decode(const char*& from);
 };
 
 // Definitions
@@ -7425,19 +7801,19 @@ inline int vli<uint32_t>::max_length() {
 }
 
 template <>
-inline void vli<uint32_t>::encode(uint32_t value, unsigned char*& where) {
+inline void vli<uint32_t>::encode(uint32_t value, char*& where) {
   if (value < 0x80) *where++ = value;
-  else if (value < 0x4000) *where++ = (value >> 7) | 0x80, *where++ = value & 0x7F;
-  else if (value < 0x200000) *where++ = (value >> 14) | 0x80, *where++ = ((value >> 7) & 0x7F) | 0x80, *where++ = value & 0x7F;
-  else if (value < 0x10000000) *where++ = (value >> 21) | 0x80, *where++ = ((value >> 14) & 0x7F) | 0x80, *where++ = ((value >> 7) & 0x7F) | 0x80, *where++ = value & 0x7F;
-  else *where++ = (value >> 28) | 0x80, *where++ = ((value >> 21) & 0x7F) | 0x80, *where++ = ((value >> 14) & 0x7F) | 0x80, *where++ = ((value >> 7) & 0x7F) | 0x80, *where++ = value & 0x7F;
+  else if (value < 0x4000) *where++ = (value >> 7) | 0x80u, *where++ = value & 0x7Fu;
+  else if (value < 0x200000) *where++ = (value >> 14) | 0x80u, *where++ = ((value >> 7) & 0x7Fu) | 0x80u, *where++ = value & 0x7Fu;
+  else if (value < 0x10000000) *where++ = (value >> 21) | 0x80u, *where++ = ((value >> 14) & 0x7Fu) | 0x80u, *where++ = ((value >> 7) & 0x7Fu) | 0x80u, *where++ = value & 0x7Fu;
+  else *where++ = (value >> 28) | 0x80u, *where++ = ((value >> 21) & 0x7Fu) | 0x80u, *where++ = ((value >> 14) & 0x7Fu) | 0x80u, *where++ = ((value >> 7) & 0x7Fu) | 0x80u, *where++ = value & 0x7Fu;
 }
 
 template <>
-inline uint32_t vli<uint32_t>::decode(const unsigned char*& from) {
+inline uint32_t vli<uint32_t>::decode(const char*& from) {
   uint32_t value = 0;
-  while (*from & 0x80) value = (value << 7) | ((*from++) ^ 0x80);
-  value = (value << 7) | (*from++);
+  while (((unsigned char)(*from)) & 0x80u) value = (value << 7) | (((unsigned char)(*from++)) ^ 0x80u);
+  value = (value << 7) | ((unsigned char)(*from++));
   return value;
 }
 
@@ -7636,7 +8012,7 @@ feature_sequences_score feature_sequences<ElementaryFeatures, Map>::score(int fo
         key = c.key.data();
         break;
       }
-      vli<elementary_feature_value>::encode(value, (unsigned char*&) key);
+      vli<elementary_feature_value>::encode(value, key);
     }
 
     result -= c.caches[i].score;
@@ -7898,14 +8274,14 @@ void conllu_elementary_features<Map>::compute_features(const vector<string_piece
       char separator = tag[0];
       size_t index = tag.find(separator, 1);
       if (index == string::npos) index = tag.size();
-      per_tag[i][j].values[TAG_UPOS] = maps[MAP_TAG_UPOS].value(tag.c_str() + (index ? 1 : 0), index);
+      per_tag[i][j].values[TAG_UPOS] = maps[MAP_TAG_UPOS].value(tag.c_str() + (index ? 1 : 0), index - (index ? 1 : 0));
 
       if (index < tag.size()) index++;
-      index = tag.find(separator, index);
+      if (index < tag.size()) index = tag.find(separator, index);
       if (index < tag.size()) index++;
       for (size_t length; index < tag.size(); index += length + 1) {
         length = tag.find('|', index);
-        if (length == string::npos) length = tag.size() - index;
+        length = (length == string::npos ? tag.size() : length) - index;
 
         for (size_t equal_sign = 0; equal_sign + 1 < length; equal_sign++)
           if (tag[index + equal_sign] == '=') {
@@ -7930,7 +8306,7 @@ void conllu_elementary_features<Map>::compute_features(const vector<string_piece
           }
       }
 
-      if (tag[0] == 'V') {
+      if (tag.size() >= 2 && tag[1] == 'V') {
         int tag_compare;
         verb_candidate = verb_candidate < 0 || (tag_compare = tag.compare(analyses[i][verb_candidate].tag), tag_compare < 0) || (tag_compare == 0 && lemma < analyses[i][verb_candidate].lemma) ? j : verb_candidate;
       }
@@ -8017,7 +8393,7 @@ void conllu_elementary_features<Map>::compute_dynamic_features(const tagged_lemm
     dynamic.values[PREVIOUS_VERB_FORM] = elementary_feature_empty;
   }
 
-  if (tag.tag[0] == 'V') {
+  if (tag.tag.size() >= 2 && tag.tag[1] == 'V') {
     dynamic.values[PREVIOUS_OR_CURRENT_VERB_TAG] = per_tag.values[TAG];
     dynamic.values[PREVIOUS_OR_CURRENT_VERB_FORM] = per_form.values[FORM];
   } else {
@@ -9285,20 +9661,25 @@ static const unsigned char _czech_tokenizer_eof_trans[] = {
 static const int czech_tokenizer_start = 7;
 
 // The list of lower cased words that when preceding eos do not end sentence.
+// Note: because of VS, we cannot list the abbreviations directly in UTF-8,
+// because the compilation of utf-8 encoded sources fail on some locales
+// (e.g., Japanese).
+// perl -CSD -ple 'use Encode;s/([^[:ascii:]])/join("", map {sprintf "\\%o", ord($_)} split(m@@, encode("utf-8", $1)))/ge'
+// perl -CSD -ple 'use Encode;s/\\([0-7]{3})\\([0-7]{3})/decode("utf-8", chr(oct($1)).chr(oct($2)))/ge'
 const unordered_set<string> czech_tokenizer::abbreviations_czech = {
   // Titles
   "prof", "csc", "drsc", "doc", "phd", "ph", "d",
   "judr", "mddr", "mudr", "mvdr", "paeddr", "paedr", "phdr", "rndr", "rsdr", "dr",
   "ing", "arch", "mgr", "bc", "mag", "mba", "bca", "mga",
   "gen", "plk", "pplk", "npor", "por", "ppor", "kpt", "mjr", "sgt", "pls", "p", "s",
-  "p", "pí", "fa", "fy", "mr", "mrs", "ms", "miss", "tr", "sv",
+  "p", "p\303\255", "fa", "fy", "mr", "mrs", "ms", "miss", "tr", "sv",
   // Geographic names
-  "angl", "fr", "čes", "ces", "čs", "cs", "slov", "něm", "nem", "it", "pol", "maď", "mad", "rus",
-  "sev", "vých", "vych", "již", "jiz", "záp", "zap",
+  "angl", "fr", "\304\215es", "ces", "\304\215s", "cs", "slov", "n\304\233m", "nem", "it", "pol", "ma\304\217", "mad", "rus",
+  "sev", "v\303\275ch", "vych", "ji\305\276", "jiz", "z\303\241p", "zap",
   // Common abbrevs
-  "adr", "č", "c", "eg", "ev", "g", "hod", "j", "kr", "m", "max", "min", "mj", "např", "napr",
-  "okr", "popř", "popr", "pozn", "r", "ř", "red", "rep", "resp", "srov", "st", "stř", "str",
-  "sv", "tel", "tj", "tzv", "ú", "u", "uh", "ul", "um", "zl", "zn",
+  "adr", "\304\215", "c", "eg", "ev", "g", "hod", "j", "kr", "m", "max", "min", "mj", "nap\305\231", "napr",
+  "okr", "pop\305\231", "popr", "pozn", "r", "\305\231", "red", "rep", "resp", "srov", "st", "st\305\231", "str",
+  "sv", "tel", "tj", "tzv", "\303\272", "u", "uh", "ul", "um", "zl", "zn",
 };
 
 const unordered_set<string> czech_tokenizer::abbreviations_slovak = {
@@ -9307,14 +9688,14 @@ const unordered_set<string> czech_tokenizer::abbreviations_slovak = {
   "judr", "mddr", "mudr", "mvdr", "paeddr", "paedr", "phdr", "rndr", "rsdr", "dr",
   "ing", "arch", "mgr", "bc", "mag", "mba", "bca", "mga",
   "gen", "plk", "pplk", "npor", "por", "ppor", "kpt", "mjr", "sgt", "pls", "p", "s",
-  "p", "pí", "fa", "fy", "mr", "mrs", "ms", "miss", "tr", "sv",
+  "p", "p\303\255", "fa", "fy", "mr", "mrs", "ms", "miss", "tr", "sv",
   // Geographic names
-  "angl", "fr", "čes", "ces", "čs", "cs", "slov", "nem", "it", "poľ", "pol", "maď", "mad",
-  "rus", "sev", "vých", "vych", "juž", "juz", "záp", "zap",
+  "angl", "fr", "\304\215es", "ces", "\304\215s", "cs", "slov", "nem", "it", "po\304\276", "pol", "ma\304\217", "mad",
+  "rus", "sev", "v\303\275ch", "vych", "ju\305\276", "juz", "z\303\241p", "zap",
   // Common abbrevs
-  "adr", "č", "c", "eg", "ev", "g", "hod", "j", "kr", "m", "max", "min", "mj", "napr",
+  "adr", "\304\215", "c", "eg", "ev", "g", "hod", "j", "kr", "m", "max", "min", "mj", "napr",
   "okr", "popr", "pozn", "r", "red", "rep", "resp", "srov", "st", "str",
-  "sv", "tel", "tj", "tzv", "ú", "u", "uh", "ul", "um", "zl", "zn",
+  "sv", "tel", "tj", "tzv", "\303\272", "u", "uh", "ul", "um", "zl", "zn",
 };
 
 czech_tokenizer::czech_tokenizer(tokenizer_language language, unsigned version, const morpho* m)
@@ -10939,6 +11320,10 @@ vector<uint8_t> ragel_tokenizer::ragel_map;
 atomic_flag ragel_tokenizer::ragel_map_flag = ATOMIC_FLAG_INIT;
 
 ragel_tokenizer::ragel_tokenizer(unsigned url_email_tokenizer) : unicode_tokenizer(url_email_tokenizer) {
+  initialize_ragel_map();
+}
+
+void ragel_tokenizer::initialize_ragel_map() {
   while (ragel_map_flag.test_and_set()) {}
   if (ragel_map.empty()) {
     for (uint8_t ascii = 0; ascii < 128; ascii++)
@@ -11180,6 +11565,8 @@ tokenizer* tokenizer::new_generic_tokenizer() {
 namespace morphodita {
 
 unicode_tokenizer::unicode_tokenizer(unsigned url_email_tokenizer) : url_email_tokenizer(url_email_tokenizer) {
+  ragel_tokenizer::initialize_ragel_map();
+
   set_text(string_piece(nullptr, 0));
 }
 
@@ -11304,7 +11691,7 @@ bool vertical_tokenizer::next_sentence(vector<token_range>& tokens) {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.1.0
+// UniLib version: 3.1.1
 // Unicode version: 8.0.0
 
 namespace unilib {
@@ -11368,7 +11755,7 @@ class version {
 namespace morphodita {
 
 version version::current() {
-  return {1, 9, 0, "devel"};
+  return {1, 9, 3, "devel"};
 }
 
 // Returns multi-line formated version and copyright string.
@@ -11576,7 +11963,7 @@ void bilou_ner::recognize(const vector<string_piece>& forms, vector<named_entity
   // Tag
   tagger->tag(forms, sentence);
 
-  if (sentence.size >= sentence.size) {
+  if (sentence.size) {
     sentence.clear_previous_stage();
 
     // Perform required NER stages
@@ -12179,7 +12566,7 @@ tokenizer* tokenizer::new_vertical_tokenizer() {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.1.0
+// UniLib version: 3.1.1
 // Unicode version: 8.0.0
 
 namespace unilib {
@@ -12380,42 +12767,42 @@ const char32_t unicode::othercase_block[][256] = {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.1.0
+// UniLib version: 3.1.1
 // Unicode version: 8.0.0
 
 namespace unilib {
 
 bool utf8::valid(const char* str) {
-  for (const unsigned char*& ptr = (const unsigned char*&) str; *ptr; ptr++)
-    if (*ptr >= 0x80) {
-      if (*ptr < 0xC0) return false;
-      else if (*ptr < 0xE0) {
-        ptr++; if (*ptr < 0x80 || *ptr >= 0xC0) return false;
-      } else if (*ptr < 0xF0) {
-        ptr++; if (*ptr < 0x80 || *ptr >= 0xC0) return false;
-        ptr++; if (*ptr < 0x80 || *ptr >= 0xC0) return false;
-      } else if (*ptr < 0xF8) {
-        ptr++; if (*ptr < 0x80 || *ptr >= 0xC0) return false;
-        ptr++; if (*ptr < 0x80 || *ptr >= 0xC0) return false;
-        ptr++; if (*ptr < 0x80 || *ptr >= 0xC0) return false;
+  for (; *str; str++)
+    if (((unsigned char)*str) >= 0x80) {
+      if (((unsigned char)*str) < 0xC0) return false;
+      else if (((unsigned char)*str) < 0xE0) {
+        str++; if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+      } else if (((unsigned char)*str) < 0xF0) {
+        str++; if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+        str++; if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+      } else if (((unsigned char)*str) < 0xF8) {
+        str++; if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+        str++; if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+        str++; if (((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
       } else return false;
     }
   return true;
 }
 
 bool utf8::valid(const char* str, size_t len) {
-  for (const unsigned char*& ptr = (const unsigned char*&) str; len > 0; ptr++, len--)
-    if (*ptr >= 0x80) {
-      if (*ptr < 0xC0) return false;
-      else if (*ptr < 0xE0) {
-        ptr++; if (!--len || *ptr < 0x80 || *ptr >= 0xC0) return false;
-      } else if (*ptr < 0xF0) {
-        ptr++; if (!--len || *ptr < 0x80 || *ptr >= 0xC0) return false;
-        ptr++; if (!--len || *ptr < 0x80 || *ptr >= 0xC0) return false;
-      } else if (*ptr < 0xF8) {
-        ptr++; if (!--len || *ptr < 0x80 || *ptr >= 0xC0) return false;
-        ptr++; if (!--len || *ptr < 0x80 || *ptr >= 0xC0) return false;
-        ptr++; if (!--len || *ptr < 0x80 || *ptr >= 0xC0) return false;
+  for (; len > 0; str++, len--)
+    if (((unsigned char)*str) >= 0x80) {
+      if (((unsigned char)*str) < 0xC0) return false;
+      else if (((unsigned char)*str) < 0xE0) {
+        str++; if (!--len || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+      } else if (((unsigned char)*str) < 0xF0) {
+        str++; if (!--len || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+        str++; if (!--len || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+      } else if (((unsigned char)*str) < 0xF8) {
+        str++; if (!--len || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+        str++; if (!--len || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
+        str++; if (!--len || ((unsigned char)*str) < 0x80 || ((unsigned char)*str) >= 0xC0) return false;
       } else return false;
     }
   return true;
@@ -12459,14 +12846,14 @@ const char utf8::REPLACEMENT_CHAR;
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.1.0
+// UniLib version: 3.1.1
 // Unicode version: 8.0.0
 
 namespace unilib {
 
 // Returns current version.
 version version::current() {
-  return {3, 1, 0, ""};
+  return {3, 1, 1, ""};
 }
 
 } // namespace unilib
@@ -15296,7 +15683,7 @@ class version {
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 version version::current() {
-  return {1, 1, 1, ""};
+  return {1, 1, 2, ""};
 }
 
 // Returns multi-line formated version and copyright string.

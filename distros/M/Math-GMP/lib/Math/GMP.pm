@@ -28,7 +28,7 @@ package Math::GMP;
 
 use strict;
 use warnings;
-use 5.006;
+use 5.010;
 use Carp;
 use vars qw(@ISA @EXPORT @EXPORT_OK $AUTOLOAD);
 
@@ -65,7 +65,7 @@ require AutoLoader;
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-our $VERSION = '2.14';
+our $VERSION = '2.15';
 
 
 bootstrap Math::GMP $VERSION;
@@ -118,7 +118,7 @@ Math::GMP - High speed arbitrary size integer math
 
 =head1 VERSION
 
-version 2.14
+version 2.15
 
 =head1 SYNOPSIS
 
@@ -591,8 +591,8 @@ This is free software, licensed under:
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GMP> or by email
-to L<bug-math-gmp@rt.cpan.org|mailto:bug-math-gmp@rt.cpan.org>.
+https://rt.cpan.org/Public/Dist/Display.html?Name=Math-GMP or by email to
+bug-math-gmp@rt.cpan.org.
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

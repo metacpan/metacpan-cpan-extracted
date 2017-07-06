@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173053;
+our $VERSION = 1.20170702164946;
 
 my $formatters = [
                 {
@@ -31,19 +31,6 @@ my $formatters = [
               ];
 
 my $validators = {
-                'specialrate' => '',
-                'mobile' => '
-          (?:
-            0[1-9]|
-            4\\d|
-            5[14-9]|
-            6[015-79]|
-            7[4-9]|
-            8[7-9]
-          )\\d{6}
-        ',
-                'toll_free' => '',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             2(?:
@@ -61,8 +48,8 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'voip' => '',
-                'pager' => '',
+                'specialrate' => '',
+                'personal_number' => '',
                 'fixed_line' => '
           (?:
             2(?:
@@ -79,7 +66,19 @@ my $validators = {
               6[08]
             )
           )\\d{5}
-        '
+        ',
+                'mobile' => '
+          (?:
+            0[1-9]|
+            4\\d|
+            5[14-9]|
+            6[015-79]|
+            [78][4-9]
+          )\\d{6}
+        ',
+                'voip' => '',
+                'pager' => '',
+                'toll_free' => ''
               };
 my %areanames = (
   22520 => "Plateau",

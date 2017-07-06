@@ -1,3 +1,14 @@
+0.52 - script file was being generated before all of the stage roles had been
+       loaded
+     - fixed some tests
+
+0.51 - Added code attribute to stage as atternative to command
+     - fixed creation of script_file to not occur until it is requested
+	     - would fail if anyone was using the command creation methods to
+		   build the command after the stage was created
+		 - was creating the script_file even if code was provided instead of
+		   command
+
 0.50 - Documentation for regexp add_deps
      - fixed some add_dep -> add_deps typos
 

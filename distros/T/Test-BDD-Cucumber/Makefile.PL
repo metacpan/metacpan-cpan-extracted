@@ -30,7 +30,8 @@ my %WriteMakefileArgs = (
     "List::MoreUtils" => 0,
     "List::Util" => 0,
     "Module::Runtime" => 0,
-    "Moose" => 0,
+    "Moo" => 0,
+    "MooX::HandlesVia" => 0,
     "Number::Range" => 0,
     "Path::Class" => 0,
     "Term::ANSIColor" => "3.00",
@@ -38,9 +39,10 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::Exception" => 0,
     "Test::More" => 0,
+    "Type::Tiny" => 0,
     "YAML::Syck" => 0
   },
-  "VERSION" => "0.52",
+  "VERSION" => "0.53",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,7 +60,8 @@ my %FallbackPrereqs = (
   "List::MoreUtils" => 0,
   "List::Util" => 0,
   "Module::Runtime" => 0,
-  "Moose" => 0,
+  "Moo" => 0,
+  "MooX::HandlesVia" => 0,
   "Number::Range" => 0,
   "Path::Class" => 0,
   "Term::ANSIColor" => "3.00",
@@ -66,6 +69,7 @@ my %FallbackPrereqs = (
   "Test::Differences" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "Type::Tiny" => 0,
   "YAML::Syck" => 0
 );
 

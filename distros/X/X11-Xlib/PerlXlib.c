@@ -6,10 +6,14 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/XTest.h>
+#ifdef HAVE_XRENDER
+#include <X11/extensions/Xrender.h>
+#endif
 
 #include "PerlXlib.h"
 
 static MGVTBL PerlXlib_dpy_mg_vtbl;
+static MGVTBL PerlXlib_dpy_innerptr_mg_vtbl;
 
 extern Display * PerlXlib_get_magic_dpy(SV *sv, Bool not_null) {
     MAGIC *mg= NULL;
@@ -69,8 +73,8 @@ extern SV * PerlXlib_set_magic_dpy(SV *sv, Display *dpy) {
         if (*fp && SvROK(*fp) && SvRV(*fp) != SvRV(sv))
             warn("Replacing cached connection object for Display* 0x%p!", dpy);
         /* New weak-ref to this object
-         * Docs warn that sv_setsv might de-allocate mortal sources, so inc ref count temporarily
-         */
+          * Docs warn that sv_setsv might de-allocate mortal sources, so inc ref count temporarily
+          */
         SvREFCNT_inc(sv);
         if (!*fp) *fp= newSVsv(sv); else sv_setsv(*fp, sv);
         sv_2mortal(sv);
@@ -109,6 +113,225 @@ extern SV * PerlXlib_obj_for_display(Display *dpy, int create) {
     }
 }
 
+extern void * PerlXlib_get_magic_dpy_innerptr(SV *sv, Bool not_null) {
+    MAGIC *mg= NULL;
+    if (sv_isobject(sv)) {
+        for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
+            if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &PerlXlib_dpy_innerptr_mg_vtbl) {
+                if (!mg->mg_ptr && not_null) break;
+                return mg->mg_ptr;
+            }
+        }
+    }
+    if (not_null)
+        croak("Object lacks Xlib magic pointer");
+    return NULL;
+}
+
+extern SV * PerlXlib_set_magic_dpy_innerptr(SV *sv, void *innerptr) {
+    MAGIC *mg= NULL;
+    SV **fp;
+    HV *cache;
+    
+    if (!sv_isobject(sv))
+        croak("Can't add magic Xlib pointer to non-object");
+    
+    /* Search for existing Magic that would hold this pointer */
+    for (mg = SvMAGIC(SvRV(sv)); mg; mg = mg->mg_moremagic) {
+        if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &PerlXlib_dpy_innerptr_mg_vtbl) {
+            mg->mg_ptr= innerptr;
+            return sv;
+        }
+    }
+    
+    /* If magic doesn't exist, add it */
+    sv_magicext(SvRV(sv), NULL, PERL_MAGIC_ext, &PerlXlib_dpy_innerptr_mg_vtbl, (const char *) innerptr, 0);
+    return sv;
+}
+
+extern SV * PerlXlib_get_displayobj_of_opaque(void *opaque) {
+    SV **elem= hv_fetch(get_hv("X11::Xlib::_display_attr", GV_ADD),
+        (void*)&opaque, sizeof(void*), 0);
+    return (elem && *elem && sv_isobject(*elem))? *elem : &PL_sv_undef;
+}
+
+extern void PerlXlib_set_displayobj_of_opaque(void *opaque, SV *dpy_sv) {
+    SV **elem;
+    if (dpy_sv && SvOK(dpy_sv)) {
+        elem= hv_fetch(get_hv("X11::Xlib::_display_attr", GV_ADD),
+            (void*)&opaque, sizeof(void*), 1);
+        if (!elem) croak("Can't write X11::Xlib::_display_attr");
+        if (*elem && SvROK(*elem)) {
+            if (SvRV(dpy_sv) == SvRV(*elem))
+                return; /* redundant.  ignore it. */
+            croak("Can't modify display attribute once it is initialized");
+        }
+        if (!*elem) *elem= newSV(0);
+        sv_setsv(*elem, dpy_sv);
+    }
+    else {
+        hv_delete(get_hv("X11::Xlib::_display_attr", GV_ADD),
+            (void*)&opaque, sizeof(void*), G_DISCARD);
+    }
+}
+
+/* Most other opaque pointers related to a Display* connection need paired with
+ * the Display* they represent, and should hold a strong reference to the Display*
+ * else the user might still be holding one after the display is closed.
+ */
+extern SV * PerlXlib_obj_for_display_innerptr(Display *dpy, void *thing, const char *thing_class, int objsvtype, bool create) {
+    SV **elem= NULL, *ret= NULL, *dpy_obj= NULL;
+    HV *obj_cache= NULL;
+    
+    if (!thing)
+        return &PL_sv_undef;
+
+    if (dpy) {
+        dpy_obj= PerlXlib_obj_for_display(dpy, 1);
+        /* record which display it came from, in a strong-ref global */
+        PerlXlib_set_displayobj_of_opaque(thing, dpy_obj);
+    } else {
+        dpy_obj= PerlXlib_get_displayobj_of_opaque(thing);
+    }
+    
+    /* If we have the display object, check its cache to see if this thing
+      * already has a cached wrapper object. */
+    if (dpy_obj && SvOK(dpy_obj)) {
+        /* first get the cache hashref */
+        elem= hv_fetch((HV*)SvRV(dpy_obj), "_obj_cache", 10, 1);
+        if (!elem) croak("Can't create $display->{_obj_cache}");
+        if (*elem && SvROK(*elem) && SvTYPE(SvRV(*elem)) == SVt_PVHV)
+            obj_cache= (HV*) SvRV(*elem);
+        else {
+            obj_cache= newHV();
+            if (*elem) sv_setsv(*elem, sv_2mortal(newRV_noinc((SV*) obj_cache)));
+            else *elem= newRV_noinc((SV*) newHV());
+        }
+        /* then check the obj_cache for a match */
+        elem= hv_fetch(obj_cache, (void*) &thing, sizeof(thing), 1);
+        if (elem && *elem && SvOK(*elem))
+            return *elem;
+    }
+    /* No object, unless we're allowed to create one */
+    if (!create)
+        return &PL_sv_undef;
+    
+    /* if no display was given, we don't have an object cache. */
+    if (obj_cache) {
+        if (!elem) croak("Can't write to $display->{obj_cache}");
+        if (!*elem) *elem= newSV(0);
+    }
+    /* Now, if obj_cache is not null, then we can assign to *elem. */
+    
+    if (objsvtype == SVt_PVMG) {
+        ret= sv_setref_pv(sv_newmortal(), thing_class, thing);
+    }
+    else if (objsvtype == SVt_PVHV) {
+        ret= sv_2mortal(newRV_noinc((SV*) newHV()));
+        sv_bless(ret, gv_stashpv(thing_class, GV_ADD));
+        PerlXlib_set_magic_dpy_innerptr(ret, thing);
+    }
+    else if (objsvtype == SVt_PVAV) {
+        ret= sv_2mortal(newRV_noinc((SV*) newAV()));
+        sv_bless(ret, gv_stashpv(thing_class, GV_ADD));
+        PerlXlib_set_magic_dpy_innerptr(ret, thing);
+    }
+    else
+        croak("Unsupported svtype in PerlXlib_obj_for_display_innerptr");
+    
+    /* store a weak reference in the object cache */
+    if (obj_cache) {
+        /* ret is mortal, and sv_setsv warns that mortals might get freed... so do this silly dance */
+        SvREFCNT_inc(ret);
+        sv_setsv(*elem, ret);
+        sv_rvweaken(*elem);
+        sv_2mortal(ret);
+    }
+    
+    return ret;
+}
+
+extern void * PerlXlib_sv_to_display_innerptr(SV *sv, bool not_null) {
+    void *ptr;
+    if (sv && sv_isobject(sv)) {
+        if (SvTYPE(SvRV(sv)) < SVt_PVAV)
+            ptr= INT2PTR(void*, SvIV((SV*)SvRV(sv)));
+        else
+            ptr= PerlXlib_get_magic_dpy_innerptr(sv, not_null);
+        if (ptr) return ptr;
+    }
+    if (not_null)
+        croak("Not an Xlib opaque pointer");
+    return NULL;
+}
+
+extern Screen * PerlXlib_sv_to_screen(SV *sv, bool not_null) {
+    HV *hv;
+    SV **elem;
+    Display *dpy;
+    int screennum;
+    
+    if (!sv || !SvROK(sv) || !SvTYPE(SvRV(sv)) == SVt_PVHV) {
+        if (not_null || (sv && SvOK(sv)))
+            croak("expected X11::Xlib::Screen object");
+        return NULL;
+    }
+    
+    hv= (HV*) SvRV(sv);
+    elem= hv_fetch(hv, "display", 7, 0);
+    if (!elem || !*elem || !(dpy= PerlXlib_get_magic_dpy(*elem, 1)))
+        croak("missing $screen->{display}");
+    elem= hv_fetch(hv, "screen_number", 13, 0);
+    if (!elem || !*elem || !SvIOK(*elem))
+        croak("missing $screen->{screen_number}");
+    screennum= SvIV(*elem);
+    if (screennum >= ScreenCount(dpy) || screennum < 0)
+        croak("Screen number %d out of bounds for this display (0..%d)",
+            screennum, ScreenCount(dpy)-1);
+    return ScreenOfDisplay(dpy, screennum);
+}
+
+extern SV * PerlXlib_obj_for_screen(Screen *screen) {
+    Display *dpy;
+    SV *dpy_sv, *ret= NULL;
+    int i;
+    
+    if (!screen)
+        return &PL_sv_undef;
+    dpy= DisplayOfScreen(screen);
+    /* There's actually no way to get the screen number from the pointer,
+      * other than subtraction on private pointers...  so just iterate.
+      * There's probably only one anyway. */
+    for (i= 0; i < ScreenCount(dpy); i++) {
+        if (screen == ScreenOfDisplay(dpy, i)) {
+            /* Need a X11::Xlib::Display object */
+            dpy_sv= PerlXlib_obj_for_display(dpy, 1);
+            /* Then call $display->screen(i) method */
+            dSP;
+            ENTER;
+            SAVETMPS;
+            PUSHMARK(SP);
+            EXTEND(SP, 2);
+            PUSHs(sv_mortalcopy(dpy_sv));
+            PUSHs(sv_2mortal(newSViv(i)));
+            PUTBACK;
+            if (call_method("screen", G_SCALAR) != 1)
+                croak("stack assertion failed");
+            SPAGAIN;
+            ret= POPs;
+            SvREFCNT_inc(ret); /* make sure it lives a little longer */
+            PUTBACK;
+            FREETMPS;
+            LEAVE;
+            sv_2mortal(ret);
+            sv_2mortal(dpy_sv);
+            break;
+        }
+    }
+    if (!ret) croak("Corrupt Xlib screen/display structures!");
+    return ret;
+}
+
 /* Allow unsigned integer, or hashref with field ->{xid} */
 XID PerlXlib_sv_to_xid(SV *sv) {
     SV **xid_field;
@@ -122,6 +345,59 @@ XID PerlXlib_sv_to_xid(SV *sv) {
         croak("Invalid XID (Window, etc); must be an unsigned int, or an instance of X11::Xlib::XID");
 
     return (XID) SvUV(*xid_field);
+}
+
+/* Inspect each of the perl data structures that are directly manipulated by XS.
+ * This is only for debugging.
+ */
+void PerlXlib_sanity_check_data_structures() {
+    HV *dpys, *obj_cache, *display_attr;
+    HE *dpy_he, *obj_he;
+    SV *dpy_sv, *obj_sv, **elem;
+    Display *dpy;
+    void *opaque;
+    
+    dpys= get_hv("X11::Xlib::_connections", GV_ADD);
+    /*hv_assert(dpys);*/
+    
+    display_attr= get_hv("X11::Xlib::_display_attr", GV_ADD);
+    /*hv_assert(display_attr);*/
+    
+    /* for each display */
+    for (hv_iterinit(dpys); (dpy_he= hv_iternext(dpys)); ) {
+        dpy_sv= hv_iterval(dpys, dpy_he);
+        /* SV refcnt should be exactly 1, and should be weakref.  Ref'd object should have >1 refcnt */
+        if (SvREFCNT(dpy_sv) != 1) croak("Refcnt of %_connections member is %d", SvREFCNT(dpy_sv));
+        if (!SvROK(dpy_sv) || !SvWEAKREF(dpy_sv)) croak("%_connections member is not a weakref");
+        if (!sv_derived_from(dpy_sv, "X11::Xlib")) croak("%_connections contains non-X11::Xlib object");
+        dpy= PerlXlib_get_magic_dpy(dpy_sv, 1 /* assert non-null */);
+        /* Check each of the objects in the $dpy->{_obj_cache} */
+        elem= hv_fetch((HV*)SvRV(dpy_sv), "_obj_cache", 10, 0);
+        if (elem) {
+            if (!*elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
+                croak("Display contains invalid _obj_cache");
+            if (SvREFCNT(*elem) != 1 || SvREFCNT(SvRV(*elem)) != 1)
+                croak("_obj_cache has wrong refcnt");
+            obj_cache= (HV*) SvRV(*elem);
+            /*hv_assert(obj_cache);*/
+            for (hv_iterinit(obj_cache); (obj_he= hv_iternext(dpys)); ) {
+                obj_sv= hv_iterval(obj_cache, obj_he);
+                if (SvREFCNT(obj_sv) != 1) croak("Refcnt of _obj_cache member is %d", SvREFCNT(obj_sv));
+                if (!SvROK(obj_sv) || !SvWEAKREF(obj_sv)) croak("_obj_cache member is not a weakref");
+                if (!sv_derived_from(obj_sv, "X11::Xlib::Opaque")) croak("_obj_cache member is not a X11::Xlib::Opaque");
+                opaque= (SvTYPE(SvRV(obj_sv)) <= SVt_PVMG)? INT2PTR(void*, SvIV(SvRV(obj_sv)))
+                    : PerlXlib_get_magic_dpy_innerptr(obj_sv, 1 /* not null */);
+                /* the pointer should have a ->display attribute attached */
+                elem= hv_fetch(display_attr, (void*) &opaque, sizeof(void*), 0);
+                if (!elem || !*elem || !SvROK(*elem))
+                    croak("Missing or invalid _display_attr{} reference");
+                if (SvREFCNT(*elem) != 1 || SvWEAKREF(*elem))
+                    croak("_display_attr ref is not strongref with refcnt==1");
+                if (SvRV(dpy_sv) != SvRV(*elem))
+                    croak("_display_attr points to wrong dpy_sv");
+            }
+        }
+    }
 }
 
 /* Xlib warns that some structs might change size, and provide "XAllocFoo"
@@ -150,19 +426,19 @@ XID PerlXlib_sv_to_xid(SV *sv) {
  *   foo( bless(\"buffer_of_correct_length_or_more", "any_struct_class") )
  */
 void* PerlXlib_get_struct_ptr(SV *sv, int lvalue, const char* pkg, int struct_size, PerlXlib_struct_pack_fn *packer) {
-    SV *tmp, *ref= NULL;
+    SV *tmp, *refsv= NULL;
     void* buf;
     size_t n;
 
     if (SvROK(sv)) {
-        ref= sv;
+        refsv= sv;
         sv= SvRV(sv);
         /* Follow scalar refs, to get to the buffer of a blessed object */
         if (SvTYPE(sv) == SVt_PVMG) {
             /* If it is a blessed object, ensure the type matches */
-            if (sv_isobject(ref) && !sv_isa(ref, pkg)) {
-                if (!sv_derived_from(ref, lvalue? "X11::Xlib::Struct" : pkg)) {
-                    buf= SvPV(ref, n);
+            if (sv_isobject(refsv) && !sv_isa(refsv, pkg)) {
+                if (!sv_derived_from(refsv, lvalue? "X11::Xlib::Struct" : pkg)) {
+                    buf= SvPV(refsv, n);
                     croak("Can't coerce %.*s to %s %s", n, buf, pkg, lvalue? "lvalue":"rvalue");
                 }
             }
@@ -180,7 +456,7 @@ void* PerlXlib_get_struct_ptr(SV *sv, int lvalue, const char* pkg, int struct_si
             return buf;
         }
         else if (SvTYPE(sv) >= SVt_PVAV) { /* not a scalar */
-            buf= SvPV(ref, n);
+            buf= SvPV(refsv, n);
             croak("Can't coerce %.*s to %s %s", n, buf, pkg, lvalue? "lvalue":"rvalue");
         }
     }
@@ -189,9 +465,9 @@ void* PerlXlib_get_struct_ptr(SV *sv, int lvalue, const char* pkg, int struct_si
      *  unless we're looking at \undef in which case just initialize to a string
      */
     if (!SvOK(sv)) {
-        if (!lvalue) croak("Can't coerce %sundef to %s rvalue", ref? "\\" : "", pkg);
-        if (!ref) {
-            ref= sv, sv= newSVrv(sv, pkg);
+        if (!lvalue) croak("Can't coerce %sundef to %s rvalue", refsv? "\\" : "", pkg);
+        if (!refsv) {
+            refsv= sv, sv= newSVrv(sv, pkg);
             /* sv is now the referenced scalar, which is undef, and gets inflated next */
         }
         sv_setpvn(sv, "", 0);
@@ -339,6 +615,7 @@ void PerlXlib_install_error_handlers(Bool nonfatal, Bool fatal) {
 
 const char* PerlXlib_xevent_pkg_for_type(int type) {
   switch (type) {
+  case 0: return "X11::Xlib::XErrorEvent";
   case ButtonPress: return "X11::Xlib::XButtonEvent";
   case ButtonRelease: return "X11::Xlib::XButtonEvent";
   case CirculateNotify: return "X11::Xlib::XCirculateEvent";
@@ -398,15 +675,22 @@ void PerlXlib_XEvent_pack(XEvent *s, HV *fields, Bool consume) {
       }
       if (consume) hv_delete(fields, "type", 4, G_DISCARD);
     }
-    
-    fp= hv_fetch(fields, "display", 7, 0);
-    if (fp && *fp) { s->xany.display= PerlXlib_get_magic_dpy(*fp, 0);; if (consume) hv_delete(fields, "display", 7, G_DISCARD); }
-    fp= hv_fetch(fields, "send_event", 10, 0);
-    if (fp && *fp) { s->xany.send_event= SvIV(*fp);; if (consume) hv_delete(fields, "send_event", 10, G_DISCARD); }
-    fp= hv_fetch(fields, "serial", 6, 0);
-    if (fp && *fp) { s->xany.serial= SvUV(*fp);; if (consume) hv_delete(fields, "serial", 6, G_DISCARD); }
-    fp= hv_fetch(fields, "type", 4, 0);
-    if (fp && *fp) { s->xany.type= SvIV(*fp);; if (consume) hv_delete(fields, "type", 4, G_DISCARD); }
+    if (s->type) {
+      fp= hv_fetch(fields, "display", 7, 0);
+      if (fp && *fp) { s->xany.display= PerlXlib_get_magic_dpy(*fp, 0);; if (consume) hv_delete(fields, "display", 7, G_DISCARD); }
+      fp= hv_fetch(fields, "send_event", 10, 0);
+      if (fp && *fp) { s->xany.send_event= SvIV(*fp);; if (consume) hv_delete(fields, "send_event", 10, G_DISCARD); }
+      fp= hv_fetch(fields, "serial", 6, 0);
+      if (fp && *fp) { s->xany.serial= SvUV(*fp);; if (consume) hv_delete(fields, "serial", 6, G_DISCARD); }
+      fp= hv_fetch(fields, "type", 4, 0);
+      if (fp && *fp) { s->xany.type= SvIV(*fp);; if (consume) hv_delete(fields, "type", 4, G_DISCARD); }
+    }
+    else {
+      fp= hv_fetch(fields, "serial", 6, 0);
+      if (fp && *fp) { s->xerror.serial= SvUV(*fp);; if (consume) hv_delete(fields, "serial", 6, G_DISCARD); }
+      fp= hv_fetch(fields, "display", 7, 0);
+      if (fp && *fp) { s->xerror.display= PerlXlib_get_magic_dpy(*fp, 0);; if (consume) hv_delete(fields, "display", 7, G_DISCARD); }
+    }
     switch( s->type ) {
     case ButtonPress:
     case ButtonRelease:
@@ -567,6 +851,16 @@ void PerlXlib_XEvent_pack(XEvent *s, HV *fields, Bool consume) {
       if (fp && *fp) { s->xdestroywindow.event= PerlXlib_sv_to_xid(*fp);; if (consume) hv_delete(fields, "event", 5, G_DISCARD); }
       fp= hv_fetch(fields, "window", 6, 0);
       if (fp && *fp) { s->xdestroywindow.window= PerlXlib_sv_to_xid(*fp);; if (consume) hv_delete(fields, "window", 6, G_DISCARD); }
+      break;
+    case 0:
+      fp= hv_fetch(fields, "error_code", 10, 0);
+      if (fp && *fp) { s->xerror.error_code= SvUV(*fp);; if (consume) hv_delete(fields, "error_code", 10, G_DISCARD); }
+      fp= hv_fetch(fields, "minor_code", 10, 0);
+      if (fp && *fp) { s->xerror.minor_code= SvUV(*fp);; if (consume) hv_delete(fields, "minor_code", 10, G_DISCARD); }
+      fp= hv_fetch(fields, "request_code", 12, 0);
+      if (fp && *fp) { s->xerror.request_code= SvUV(*fp);; if (consume) hv_delete(fields, "request_code", 12, G_DISCARD); }
+      fp= hv_fetch(fields, "resourceid", 10, 0);
+      if (fp && *fp) { s->xerror.resourceid= PerlXlib_sv_to_xid(*fp);; if (consume) hv_delete(fields, "resourceid", 10, G_DISCARD); }
       break;
     case Expose:
       fp= hv_fetch(fields, "count", 5, 0);
@@ -803,10 +1097,16 @@ void PerlXlib_XEvent_unpack(XEvent *s, HV *fields) {
      */
     SV *sv= NULL;
     if (!hv_store(fields, "type", 4, (sv= newSViv(s->type)), 0)) goto store_fail;
-    if (!hv_store(fields, "display"   ,  7, (sv=SvREFCNT_inc(PerlXlib_obj_for_display(s->xany.display, 0))), 0)) goto store_fail;
-    if (!hv_store(fields, "send_event", 10, (sv=newSViv(s->xany.send_event)), 0)) goto store_fail;
-    if (!hv_store(fields, "serial"    ,  6, (sv=newSVuv(s->xany.serial)), 0)) goto store_fail;
-    if (!hv_store(fields, "type"      ,  4, (sv=newSViv(s->xany.type)), 0)) goto store_fail;
+    if (s->type) {
+      if (!hv_store(fields, "display"   ,  7, (sv=newSVsv(s->xany.display? PerlXlib_obj_for_display(s->xany.display, 0) : &PL_sv_undef)), 0)) goto store_fail;
+      if (!hv_store(fields, "send_event", 10, (sv=newSViv(s->xany.send_event)), 0)) goto store_fail;
+      if (!hv_store(fields, "serial"    ,  6, (sv=newSVuv(s->xany.serial)), 0)) goto store_fail;
+      if (!hv_store(fields, "type"      ,  4, (sv=newSViv(s->xany.type)), 0)) goto store_fail;
+    }
+    else {
+      if (!hv_store(fields, "display"   ,  7, (sv=newSVsv(s->xerror.display? PerlXlib_obj_for_display(s->xerror.display, 0) : &PL_sv_undef)), 0)) goto store_fail;
+      if (!hv_store(fields, "serial"    ,  6, (sv=newSVuv(s->xerror.serial)), 0)) goto store_fail;
+    }
     switch( s->type ) {
     case ButtonPress:
     case ButtonRelease:
@@ -898,6 +1198,12 @@ void PerlXlib_XEvent_unpack(XEvent *s, HV *fields) {
     case DestroyNotify:
       if (!hv_store(fields, "event"      ,  5, (sv=newSVuv(s->xdestroywindow.event)), 0)) goto store_fail;
       if (!hv_store(fields, "window"     ,  6, (sv=newSVuv(s->xdestroywindow.window)), 0)) goto store_fail;
+      break;
+    case 0:
+      if (!hv_store(fields, "error_code" , 10, (sv=newSVuv(s->xerror.error_code)), 0)) goto store_fail;
+      if (!hv_store(fields, "minor_code" , 10, (sv=newSVuv(s->xerror.minor_code)), 0)) goto store_fail;
+      if (!hv_store(fields, "request_code", 12, (sv=newSVuv(s->xerror.request_code)), 0)) goto store_fail;
+      if (!hv_store(fields, "resourceid" , 10, (sv=newSVuv(s->xerror.resourceid)), 0)) goto store_fail;
       break;
     case Expose:
       if (!hv_store(fields, "count"      ,  5, (sv=newSViv(s->xexpose.count)), 0)) goto store_fail;
@@ -1047,6 +1353,7 @@ void PerlXlib_XEvent_unpack(XEvent *s, HV *fields) {
 
 void PerlXlib_XVisualInfo_pack(XVisualInfo *s, HV *fields, Bool consume) {
     SV **fp;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
 
     fp= hv_fetch(fields, "bits_per_rgb", 12, 0);
     if (fp && *fp) { s->bits_per_rgb= SvIV(*fp); if (consume) hv_delete(fields, "bits_per_rgb", 12, G_DISCARD); }
@@ -1073,7 +1380,7 @@ void PerlXlib_XVisualInfo_pack(XVisualInfo *s, HV *fields, Bool consume) {
     if (fp && *fp) { s->screen= SvIV(*fp); if (consume) hv_delete(fields, "screen", 6, G_DISCARD); }
 
     fp= hv_fetch(fields, "visual", 6, 0);
-    if (fp && *fp) { { if (SvOK(*fp) && !sv_isa(*fp, "X11::Xlib::Visual"))  croak("Expected X11::Xlib::Visual"); s->visual= SvOK(*fp)? (Visual *) SvIV((SV*)SvRV(*fp)) : NULL;} if (consume) hv_delete(fields, "visual", 6, G_DISCARD); }
+    if (fp && *fp) { s->visual= (Visual *) PerlXlib_sv_to_display_innerptr(*fp, 0); if (consume) hv_delete(fields, "visual", 6, G_DISCARD); }
 
     fp= hv_fetch(fields, "visualid", 8, 0);
     if (fp && *fp) { s->visualid= SvUV(*fp); if (consume) hv_delete(fields, "visualid", 8, G_DISCARD); }
@@ -1084,6 +1391,7 @@ void PerlXlib_XVisualInfo_unpack(XVisualInfo *s, HV *fields) {
      * If it does, we need to clean up the value.
      */
     SV *sv= NULL;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
     if (!hv_store(fields, "bits_per_rgb", 12, (sv=newSViv(s->bits_per_rgb)), 0)) goto store_fail;
     if (!hv_store(fields, "blue_mask" ,  9, (sv=newSVuv(s->blue_mask)), 0)) goto store_fail;
     if (!hv_store(fields, "class"     ,  5, (sv=newSViv(s->class)), 0)) goto store_fail;
@@ -1092,7 +1400,7 @@ void PerlXlib_XVisualInfo_unpack(XVisualInfo *s, HV *fields) {
     if (!hv_store(fields, "green_mask", 10, (sv=newSVuv(s->green_mask)), 0)) goto store_fail;
     if (!hv_store(fields, "red_mask"  ,  8, (sv=newSVuv(s->red_mask)), 0)) goto store_fail;
     if (!hv_store(fields, "screen"    ,  6, (sv=newSViv(s->screen)), 0)) goto store_fail;
-    if (!hv_store(fields, "visual"    ,  6, (sv=(s->visual? sv_setref_pv(newSV(0), "X11::Xlib::Visual", (void*) s->visual) : &PL_sv_undef)), 0)) goto store_fail;
+    if (!hv_store(fields, "visual"    ,  6, (sv=newSVsv(s->visual? PerlXlib_obj_for_display_innerptr(dpy, s->visual, "X11::Xlib::Visual", SVt_PVMG, 1) : &PL_sv_undef)), 0)) goto store_fail;
     if (!hv_store(fields, "visualid"  ,  8, (sv=newSVuv(s->visualid)), 0)) goto store_fail;
     return;
     store_fail:
@@ -1106,6 +1414,7 @@ void PerlXlib_XVisualInfo_unpack(XVisualInfo *s, HV *fields) {
 
 void PerlXlib_XWindowChanges_pack(XWindowChanges *s, HV *fields, Bool consume) {
     SV **fp;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
 
     fp= hv_fetch(fields, "border_width", 12, 0);
     if (fp && *fp) { s->border_width= SvIV(*fp); if (consume) hv_delete(fields, "border_width", 12, G_DISCARD); }
@@ -1134,6 +1443,7 @@ void PerlXlib_XWindowChanges_unpack(XWindowChanges *s, HV *fields) {
      * If it does, we need to clean up the value.
      */
     SV *sv= NULL;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
     if (!hv_store(fields, "border_width", 12, (sv=newSViv(s->border_width)), 0)) goto store_fail;
     if (!hv_store(fields, "height"    ,  6, (sv=newSViv(s->height)), 0)) goto store_fail;
     if (!hv_store(fields, "sibling"   ,  7, (sv=newSVuv(s->sibling)), 0)) goto store_fail;
@@ -1153,6 +1463,7 @@ void PerlXlib_XWindowChanges_unpack(XWindowChanges *s, HV *fields) {
 
 void PerlXlib_XWindowAttributes_pack(XWindowAttributes *s, HV *fields, Bool consume) {
     SV **fp;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
 
     fp= hv_fetch(fields, "all_event_masks", 15, 0);
     if (fp && *fp) { s->all_event_masks= SvIV(*fp); if (consume) hv_delete(fields, "all_event_masks", 15, G_DISCARD); }
@@ -1203,10 +1514,10 @@ void PerlXlib_XWindowAttributes_pack(XWindowAttributes *s, HV *fields, Bool cons
     if (fp && *fp) { s->save_under= SvIV(*fp); if (consume) hv_delete(fields, "save_under", 10, G_DISCARD); }
 
     fp= hv_fetch(fields, "screen", 6, 0);
-    if (fp && *fp) { { if (SvOK(*fp) && !sv_isa(*fp, "X11::Xlib::Screen"))  croak("Expected X11::Xlib::Screen"); s->screen= SvOK(*fp)? (Screen *) SvIV((SV*)SvRV(*fp)) : NULL;} if (consume) hv_delete(fields, "screen", 6, G_DISCARD); }
+    if (fp && *fp) { s->screen= PerlXlib_sv_to_screen(*fp, 0); if (consume) hv_delete(fields, "screen", 6, G_DISCARD); }
 
     fp= hv_fetch(fields, "visual", 6, 0);
-    if (fp && *fp) { { if (SvOK(*fp) && !sv_isa(*fp, "X11::Xlib::Visual"))  croak("Expected X11::Xlib::Visual"); s->visual= SvOK(*fp)? (Visual *) SvIV((SV*)SvRV(*fp)) : NULL;} if (consume) hv_delete(fields, "visual", 6, G_DISCARD); }
+    if (fp && *fp) { s->visual= (Visual *) PerlXlib_sv_to_display_innerptr(*fp, 0); if (consume) hv_delete(fields, "visual", 6, G_DISCARD); }
 
     fp= hv_fetch(fields, "width", 5, 0);
     if (fp && *fp) { s->width= SvIV(*fp); if (consume) hv_delete(fields, "width", 5, G_DISCARD); }
@@ -1229,6 +1540,7 @@ void PerlXlib_XWindowAttributes_unpack(XWindowAttributes *s, HV *fields) {
      * If it does, we need to clean up the value.
      */
     SV *sv= NULL;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
     if (!hv_store(fields, "all_event_masks", 15, (sv=newSViv(s->all_event_masks)), 0)) goto store_fail;
     if (!hv_store(fields, "backing_pixel", 13, (sv=newSVuv(s->backing_pixel)), 0)) goto store_fail;
     if (!hv_store(fields, "backing_planes", 14, (sv=newSVuv(s->backing_planes)), 0)) goto store_fail;
@@ -1245,8 +1557,8 @@ void PerlXlib_XWindowAttributes_unpack(XWindowAttributes *s, HV *fields) {
     if (!hv_store(fields, "override_redirect", 17, (sv=newSViv(s->override_redirect)), 0)) goto store_fail;
     if (!hv_store(fields, "root"      ,  4, (sv=newSVuv(s->root)), 0)) goto store_fail;
     if (!hv_store(fields, "save_under", 10, (sv=newSViv(s->save_under)), 0)) goto store_fail;
-    if (!hv_store(fields, "screen"    ,  6, (sv=(s->screen? sv_setref_pv(newSV(0), "X11::Xlib::Screen", (void*) s->screen) : &PL_sv_undef)), 0)) goto store_fail;
-    if (!hv_store(fields, "visual"    ,  6, (sv=(s->visual? sv_setref_pv(newSV(0), "X11::Xlib::Visual", (void*) s->visual) : &PL_sv_undef)), 0)) goto store_fail;
+    if (!hv_store(fields, "screen"    ,  6, (sv=newSVsv(s->screen? PerlXlib_obj_for_screen(s->screen) : &PL_sv_undef)), 0)) goto store_fail;
+    if (!hv_store(fields, "visual"    ,  6, (sv=newSVsv(s->visual? PerlXlib_obj_for_display_innerptr(dpy, s->visual, "X11::Xlib::Visual", SVt_PVMG, 1) : &PL_sv_undef)), 0)) goto store_fail;
     if (!hv_store(fields, "width"     ,  5, (sv=newSViv(s->width)), 0)) goto store_fail;
     if (!hv_store(fields, "win_gravity", 11, (sv=newSViv(s->win_gravity)), 0)) goto store_fail;
     if (!hv_store(fields, "x"         ,  1, (sv=newSViv(s->x)), 0)) goto store_fail;
@@ -1264,6 +1576,7 @@ void PerlXlib_XWindowAttributes_unpack(XWindowAttributes *s, HV *fields) {
 
 void PerlXlib_XSetWindowAttributes_pack(XSetWindowAttributes *s, HV *fields, Bool consume) {
     SV **fp;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
 
     fp= hv_fetch(fields, "background_pixel", 16, 0);
     if (fp && *fp) { s->background_pixel= SvUV(*fp); if (consume) hv_delete(fields, "background_pixel", 16, G_DISCARD); }
@@ -1316,6 +1629,7 @@ void PerlXlib_XSetWindowAttributes_unpack(XSetWindowAttributes *s, HV *fields) {
      * If it does, we need to clean up the value.
      */
     SV *sv= NULL;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
     if (!hv_store(fields, "background_pixel", 16, (sv=newSVuv(s->background_pixel)), 0)) goto store_fail;
     if (!hv_store(fields, "background_pixmap", 17, (sv=newSVuv(s->background_pixmap)), 0)) goto store_fail;
     if (!hv_store(fields, "backing_pixel", 13, (sv=newSVuv(s->backing_pixel)), 0)) goto store_fail;
@@ -1343,6 +1657,7 @@ void PerlXlib_XSetWindowAttributes_unpack(XSetWindowAttributes *s, HV *fields) {
 
 void PerlXlib_XSizeHints_pack(XSizeHints *s, HV *fields, Bool consume) {
     SV **fp;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
 
     fp= hv_fetch(fields, "base_height", 11, 0);
     if (fp && *fp) { s->flags |= PBaseSize; s->base_height= SvIV(*fp); if (consume) hv_delete(fields, "base_height", 11, G_DISCARD); }
@@ -1404,6 +1719,7 @@ void PerlXlib_XSizeHints_unpack(XSizeHints *s, HV *fields) {
      * If it does, we need to clean up the value.
      */
     SV *sv= NULL;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
 if (s->flags & PBaseSize) {     if (!hv_store(fields, "base_height", 11, (sv=newSViv(s->base_height)), 0)) goto store_fail;
  }if (s->flags & PBaseSize) {     if (!hv_store(fields, "base_width", 10, (sv=newSViv(s->base_width)), 0)) goto store_fail;
  }    if (!hv_store(fields, "flags"     ,  5, (sv=newSViv(s->flags)), 0)) goto store_fail;
@@ -1434,6 +1750,7 @@ if (s->flags & PSize) {     if (!hv_store(fields, "height"    ,  6, (sv=newSViv(
 
 void PerlXlib_XRectangle_pack(XRectangle *s, HV *fields, Bool consume) {
     SV **fp;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
 
     fp= hv_fetch(fields, "height", 6, 0);
     if (fp && *fp) { s->height= SvUV(*fp); if (consume) hv_delete(fields, "height", 6, G_DISCARD); }
@@ -1453,6 +1770,7 @@ void PerlXlib_XRectangle_unpack(XRectangle *s, HV *fields) {
      * If it does, we need to clean up the value.
      */
     SV *sv= NULL;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
     if (!hv_store(fields, "height"    ,  6, (sv=newSVuv(s->height)), 0)) goto store_fail;
     if (!hv_store(fields, "width"     ,  5, (sv=newSVuv(s->width)), 0)) goto store_fail;
     if (!hv_store(fields, "x"         ,  1, (sv=newSViv(s->x)), 0)) goto store_fail;
@@ -1464,4 +1782,75 @@ void PerlXlib_XRectangle_unpack(XRectangle *s, HV *fields) {
 }
 
 /* END GENERATED X11_Xlib_XRectangle */
+/*--------------------------------------------------------------------------*/
+#ifdef HAVE_XRENDER
+/* BEGIN GENERATED X11_Xlib_XRenderPictFormat */
+
+void PerlXlib_XRenderPictFormat_pack(XRenderPictFormat *s, HV *fields, Bool consume) {
+    SV **fp;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
+
+    fp= hv_fetch(fields, "colormap", 8, 0);
+    if (fp && *fp) { s->colormap= PerlXlib_sv_to_xid(*fp); if (consume) hv_delete(fields, "colormap", 8, G_DISCARD); }
+
+    fp= hv_fetch(fields, "depth", 5, 0);
+    if (fp && *fp) { s->depth= SvIV(*fp); if (consume) hv_delete(fields, "depth", 5, G_DISCARD); }
+
+    fp= hv_fetch(fields, "direct_alpha", 12, 0);
+    if (fp && *fp) { s->direct.alpha= SvIV(*fp); if (consume) hv_delete(fields, "direct_alpha", 12, G_DISCARD); }
+
+    fp= hv_fetch(fields, "direct_alphaMask", 16, 0);
+    if (fp && *fp) { s->direct.alphaMask= SvIV(*fp); if (consume) hv_delete(fields, "direct_alphaMask", 16, G_DISCARD); }
+
+    fp= hv_fetch(fields, "direct_blue", 11, 0);
+    if (fp && *fp) { s->direct.blue= SvIV(*fp); if (consume) hv_delete(fields, "direct_blue", 11, G_DISCARD); }
+
+    fp= hv_fetch(fields, "direct_blueMask", 15, 0);
+    if (fp && *fp) { s->direct.blueMask= SvIV(*fp); if (consume) hv_delete(fields, "direct_blueMask", 15, G_DISCARD); }
+
+    fp= hv_fetch(fields, "direct_green", 12, 0);
+    if (fp && *fp) { s->direct.green= SvIV(*fp); if (consume) hv_delete(fields, "direct_green", 12, G_DISCARD); }
+
+    fp= hv_fetch(fields, "direct_greenMask", 16, 0);
+    if (fp && *fp) { s->direct.greenMask= SvIV(*fp); if (consume) hv_delete(fields, "direct_greenMask", 16, G_DISCARD); }
+
+    fp= hv_fetch(fields, "direct_red", 10, 0);
+    if (fp && *fp) { s->direct.red= SvIV(*fp); if (consume) hv_delete(fields, "direct_red", 10, G_DISCARD); }
+
+    fp= hv_fetch(fields, "direct_redMask", 14, 0);
+    if (fp && *fp) { s->direct.redMask= SvIV(*fp); if (consume) hv_delete(fields, "direct_redMask", 14, G_DISCARD); }
+
+    fp= hv_fetch(fields, "id", 2, 0);
+    if (fp && *fp) { s->id= PerlXlib_sv_to_xid(*fp); if (consume) hv_delete(fields, "id", 2, G_DISCARD); }
+
+    fp= hv_fetch(fields, "type", 4, 0);
+    if (fp && *fp) { s->type= SvIV(*fp); if (consume) hv_delete(fields, "type", 4, G_DISCARD); }
+}
+
+void PerlXlib_XRenderPictFormat_unpack(XRenderPictFormat *s, HV *fields) {
+    /* hv_store may return NULL if there is an error, or if the hash is tied.
+     * If it does, we need to clean up the value.
+     */
+    SV *sv= NULL;
+    Display *dpy= NULL; /* not available.  Magic display attribute is handled by caller. */
+    if (!hv_store(fields, "colormap"  ,  8, (sv=newSVuv(s->colormap)), 0)) goto store_fail;
+    if (!hv_store(fields, "depth"     ,  5, (sv=newSViv(s->depth)), 0)) goto store_fail;
+    if (!hv_store(fields, "direct_alpha", 12, (sv=newSViv(s->direct.alpha)), 0)) goto store_fail;
+    if (!hv_store(fields, "direct_alphaMask", 16, (sv=newSViv(s->direct.alphaMask)), 0)) goto store_fail;
+    if (!hv_store(fields, "direct_blue", 11, (sv=newSViv(s->direct.blue)), 0)) goto store_fail;
+    if (!hv_store(fields, "direct_blueMask", 15, (sv=newSViv(s->direct.blueMask)), 0)) goto store_fail;
+    if (!hv_store(fields, "direct_green", 12, (sv=newSViv(s->direct.green)), 0)) goto store_fail;
+    if (!hv_store(fields, "direct_greenMask", 16, (sv=newSViv(s->direct.greenMask)), 0)) goto store_fail;
+    if (!hv_store(fields, "direct_red", 10, (sv=newSViv(s->direct.red)), 0)) goto store_fail;
+    if (!hv_store(fields, "direct_redMask", 14, (sv=newSViv(s->direct.redMask)), 0)) goto store_fail;
+    if (!hv_store(fields, "id"        ,  2, (sv=newSVuv(s->id)), 0)) goto store_fail;
+    if (!hv_store(fields, "type"      ,  4, (sv=newSViv(s->type)), 0)) goto store_fail;
+    return;
+    store_fail:
+        if (sv) sv_2mortal(sv);
+        croak("Can't store field in supplied hash (tied maybe?)");
+}
+
+/* END GENERATED X11_Xlib_XRenderPictFormat */
+#endif
 /*--------------------------------------------------------------------------*/

@@ -2,7 +2,7 @@ package Nagios::Passive;
 use strict;
 use Carp;
 use Class::Load qw/load_class/;
-use version; our $VERSION = qv('0.4.0');
+use version; our $VERSION = qv('0.4.1');
 
 sub create {
   my $this = shift;
@@ -122,7 +122,7 @@ Equivalent to:
      critical => ':97',
   );
 
-This creates a Nagios::Plugin::Threshold object. It can be used
+This creates a Monitoring::Plugin::Threshold object. It can be used
 to set the C<return_code> with C<set_status>.
 
 =head2 set_status VALUE
@@ -139,7 +139,7 @@ created with set_thresholds and the given VALUE. For example:
 =head2 add_perf HASH
 
 This can be used to add performance data to the check result.
-Read L<Nagios::Plugin::Performance> to get the idea of how to use
+Read L<Monitoring::Plugin::Performance> to get the idea of how to use
 this.
 
 =head2 submit

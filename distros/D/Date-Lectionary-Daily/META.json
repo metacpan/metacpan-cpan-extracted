@@ -1,0 +1,80 @@
+{
+   "abstract" : "Date::Lectionary::Daily - Daily Readings for the Christian Lectionary",
+   "author" : [
+      "Michael Wayne Arnold <marmanold@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
+   "keywords" : [
+      "lectionary",
+      "rcl",
+      "acna",
+      "readings",
+      "christian",
+      "liturgical"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Lectionary-Daily",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::CheckManifest" : "0.9",
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.302040"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.11"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.38",
+            "Date::Advent" : "1.20160727",
+            "Date::Easter" : "1.22",
+            "Date::Lectionary" : "1.20161227",
+            "Date::Lectionary::Time" : "1.20170311",
+            "File::Share" : "0.25",
+            "Moose" : "2.1804",
+            "Moose::Util::TypeConstraints" : "2.1804",
+            "MooseX::Aliases" : "0.11",
+            "Time::Piece" : "1.31",
+            "Time::Seconds" : "1.31",
+            "Try::Tiny" : "0.24",
+            "XML::LibXML" : "2.0128",
+            "namespace::autoclean" : "0.28",
+            "perl" : "5.022"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Lectionary::Daily" : {
+         "file" : "lib/Date/Lectionary/Daily.pm",
+         "version" : "1.20170311"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/marmanold/Date-Lectionary-Daily.git",
+         "web" : "https://github.com/marmanold/Date-Lectionary-Daily"
+      }
+   },
+   "version" : "1.20170703",
+   "x_twitter" : "https://www.twitter.com/marmanold/"
+}

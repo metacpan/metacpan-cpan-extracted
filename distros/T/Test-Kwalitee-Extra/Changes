@@ -1,5 +1,11 @@
 Revision history for Test-Kwalitee-Extra
 
+v0.4.0    2017-06-25 14:51:20+09:00 Asia/Tokyo
+    [Functional Change]
+        - Only search existing directories (thanks Erik Carlsson).
+    [Non-functional Change]
+        - Replace MetaCPAN::API::Tiny to MetaCPAN::Client (thanks Ichinose Shogo).
+
 v0.3.1    2015-08-10 23:51:09+09:00 Asia/Tokyo
     [Non-functional Change]
         - Fix false alarm for warnings (gh-20, rt.cpan.org#104113).

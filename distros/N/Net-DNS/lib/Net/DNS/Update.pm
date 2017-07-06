@@ -1,9 +1,9 @@
 package Net::DNS::Update;
 
 #
-# $Id: Update.pm 1527 2017-01-18 21:42:48Z willem $
+# $Id: Update.pm 1571 2017-06-03 20:14:15Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1527 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1571 $)[1];
 
 
 =head1 NAME
@@ -31,9 +31,12 @@ Programmers should refer to RFC2136 for dynamic update semantics.
 
 use strict;
 use warnings;
-use base 'Net::DNS::Packet';
-
+use integer;
 use Carp;
+
+use base qw(Net::DNS::Packet);
+
+use Net::DNS::Resolver;
 
 
 =head1 METHODS
@@ -62,15 +65,12 @@ sub new {
 	shift;
 	my ( $zone, @class ) = @_;
 
-	unless ( defined $zone ) {
-		require Net::DNS::Resolver;
-		($zone) = new Net::DNS::Resolver()->domain;	# default from resolver config
-	}
+	my ($domain) = grep defined && length, $zone, Net::DNS::Resolver->searchlist;
 
 	eval {
 		local $SIG{__DIE__};
 
-		my $self = __PACKAGE__->SUPER::new( $zone, 'SOA', @class );
+		my $self = __PACKAGE__->SUPER::new( $domain, 'SOA', @class );
 
 		my $header = $self->header;
 		$header->opcode('UPDATE');

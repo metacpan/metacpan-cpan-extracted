@@ -1,3 +1,15 @@
+0.005   2017-07-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [ux] Show progress in log message.
+
+
+0.004   2017-07-01 (PERLANCAR)
+
+	- Switch from Log::Any to Log::ger.
+
+
 0.003   2017-06-16 (PERLANCAR)
 
 	- Avoid perl undef warning.

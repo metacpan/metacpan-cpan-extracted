@@ -6,7 +6,7 @@ use warnings;
 
 use Cwd qw(abs_path);
 use File::chdir;
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Spec;
 use Test::More 0.98;
 
@@ -35,7 +35,7 @@ subtest "create (destroyed)" => sub {
 };
 
 subtest "already exists" => sub {
-    write_file("f1", "");
+    write_text("f1", "");
     ok((-f "f1"), "f1 exists before lock");
     my $lock = File::Flock::Retry->lock("f1");
     ok((-f "f1"), "f1 exists after lock");

@@ -74,12 +74,43 @@ left join (
 ) l on p.id=l.id1
 where p.id=? or l.login=?
 
-@@ profile roles?cached=1
-%# Роли пользователя(профиля)
-select g.*
+@@ profile roles0000?cached=1
+---Роли пользователя(профиля)
+select unnest(array_append(("роль/родители"(g.id)).parents_id, g.id))
 from
   "{%= $schema %}"."{%= $tables->{roles} %}" g
   join "{%= $schema %}"."{%= $tables->{refs} %}" r on g.id=r.id1
 where r.id2=?;
---and coalesce(g.disable, 0::bit) <> 1::bit
 
+@@ profile roles?cached=1
+--- Роли пользователя(профиля)
+WITH RECURSIVE rc AS (
+   SELECT g.id, p.id as "parent"
+   FROM 
+    "{%= $schema %}"."{%= $tables->{roles} %}" g
+    left join ( --- parent roles
+      select p.*, r.id2 as child
+      from "{%= $schema %}"."{%= $tables->{roles} %}" p
+        join "{%= $schema %}"."{%= $tables->{refs} %}" r on p.id=r.id1
+    ) p on g.id= p.child
+    
+   UNION
+   
+   SELECT rc.id, p.id as "parent"
+   FROM rc
+      join "{%= $schema %}"."{%= $tables->{refs} %}" r on r.id2=rc."parent"
+      join "{%= $schema %}"."{%= $tables->{roles} %}" p on r.id1= p.id
+)
+, "pr" as (-- direct profile roles
+  select g.*
+  from "{%= $schema %}"."{%= $tables->{refs} %}" r
+    join "{%= $schema %}"."{%= $tables->{roles} %}" g on r.id1=g.id
+  where r.id2=? --- profile id
+)
+
+select distinct g.id, g.name
+from 
+  pr
+  join rc on pr.id=rc.id
+  join "{%= $schema %}"."{%= $tables->{roles} %}" g on g.id = rc.id or g.id = rc."parent"
+;

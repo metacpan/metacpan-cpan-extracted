@@ -19,4 +19,4 @@ no_index:
     - inc
 requires:
   IO::Socket::Timeout: '0.27'
-version: '0.81'
+version: '0.82'

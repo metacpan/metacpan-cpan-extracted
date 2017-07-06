@@ -22,30 +22,14 @@
 #include <mysqld_error.h>  /* Comes MySQL */
 
 #include <errmsg.h> /* Comes with MySQL-devel */
-#include <stdint.h> /* For uint32_t */
 
-#ifndef PERL_STATIC_INLINE
-#define PERL_STATIC_INLINE static
-#endif
-
-#ifndef SvPV_nomg_nolen
-#define SvPV_nomg_nolen(sv) ((SvFLAGS(sv) & (SVf_POK)) == SVf_POK ? SvPVX(sv) : sv_2pv_flags(sv, &PL_na, 0))
-#endif
-
-#ifndef SvTRUE_nomg
-#define SvTRUE_nomg SvTRUE /* SvTRUE does not process get magic for scalars with already cached values, so we are safe */
-#endif
-
-#ifndef SvIV_nomg
-#define SvIV_nomg SvIV /* Sorry, there is no way to handle integer magic scalars properly prior to perl 5.9.1 */
-#endif
-
-#ifndef SvNV_nomg
-#define SvNV_nomg SvNV /* Sorry, there is no way to handle numeric magic scalars properly prior to perl 5.13.2 */
-#endif
-
-#ifndef sv_cmp_flags
-#define sv_cmp_flags(a,b,c) sv_cmp(a,b) /* Sorry, there is no way to compare magic scalars properly prior to perl 5.9.1 */
+/* For now, we hardcode this, but in the future,
+ * we can detect capabilities of the MySQL libraries
+ * we're talking to */
+#if defined(_WIN32)
+#define MYSQL_ASYNC 0
+#else
+#define MYSQL_ASYNC 1
 #endif
 
 
@@ -200,9 +184,13 @@ struct imp_dbh_st {
                                */
     bool use_server_side_prepare;
     bool disable_fallback_for_server_prepare;
+#if MYSQL_ASYNC
     void* async_query_in_flight;
+#endif
+#if defined(sv_utf8_decode) && MYSQL_VERSION_ID >=SERVER_PREPARE_VERSION
     bool enable_utf8;
     bool enable_utf8mb4;
+#endif
     struct {
 	    unsigned int auto_reconnects_ok;
 	    unsigned int auto_reconnects_failed;
@@ -215,30 +203,20 @@ struct imp_dbh_st {
  *  parameters.
  */
 typedef struct imp_sth_ph_st {
-    char* value;
-    STRLEN len;
+    SV* value;
     int type;
-    bool utf8;
 } imp_sth_ph_t;
-
-/*
- *  Storage for numeric value in prepared statement
- */
-typedef union numeric_val_u {
-    unsigned char tval;
-    unsigned short sval;
-    uint32_t lval;
-    my_ulonglong llval;
-    float fval;
-    double dval;
-} numeric_val_t;
 
 /*
  *  The bind_param method internally uses this structure for storing
  *  parameters.
  */
 typedef struct imp_sth_phb_st {
-    numeric_val_t   numeric_val;
+    union
+    {
+      IV     lval;
+      double dval;
+    } numeric_val;
     unsigned long   length;
     char            is_null;
 } imp_sth_phb_t;
@@ -246,6 +224,9 @@ typedef struct imp_sth_phb_st {
 /*
  *  The dbd_describe uses this structure for storing
  *  fields meta info.
+ *  Added ddata, ldata, lldata for accomodate
+ *  being able to use different data types
+ *  12.02.20004 PMG
  */
 typedef struct imp_sth_fbh_st {
     unsigned long  length;
@@ -253,7 +234,8 @@ typedef struct imp_sth_fbh_st {
     bool           error;
     char           *data;
     int            charsetnr;
-    numeric_val_t  numeric_val;
+    double         ddata;
+    IV             ldata;
 #if MYSQL_VERSION_ID < FIELD_CHARSETNR_VERSION
     unsigned int   flags;
 #endif
@@ -278,8 +260,6 @@ typedef struct imp_sth_fbind_st {
  */
 struct imp_sth_st {
     dbih_stc_t com;       /* MUST be first element in structure     */
-    char *statement;
-    STRLEN statement_len;
 
 #if (MYSQL_VERSION_ID >= SERVER_PREPARE_VERSION)
     MYSQL_STMT       *stmt;
@@ -308,7 +288,9 @@ struct imp_sth_st {
                           /* mysql_use_result rather than           */
                           /* mysql_store_result */
 
+#if MYSQL_ASYNC
     bool is_async;
+#endif
 };
 
 
@@ -325,7 +307,7 @@ struct imp_sth_st {
 #define dbd_db_destroy		mysql_db_destroy
 #define dbd_db_STORE_attrib	mysql_db_STORE_attrib
 #define dbd_db_FETCH_attrib	mysql_db_FETCH_attrib
-#define dbd_st_prepare_sv	mysql_st_prepare_sv
+#define dbd_st_prepare		mysql_st_prepare
 #define dbd_st_execute		mysql_st_execute
 #define dbd_st_fetch		mysql_st_fetch
 #define dbd_st_more_results     mysql_st_next_results
@@ -355,8 +337,7 @@ SV	*dbd_db_fieldlist (MYSQL_RES* res);
 
 void    dbd_preparse (imp_sth_t *imp_sth, SV *statement);
 my_ulonglong mysql_st_internal_execute(SV *,
-                                       char *,
-                                       STRLEN,
+                                       SV *,
                                        SV *,
                                        int,
                                        imp_sth_ph_t *,
@@ -396,20 +377,7 @@ extern MYSQL* mysql_dr_connect(SV*, MYSQL*, char*, char*, char*, char*, char*,
 
 extern int mysql_db_reconnect(SV*);
 int mysql_st_free_result_sets (SV * sth, imp_sth_t * imp_sth);
+#if MYSQL_ASYNC
 int mysql_db_async_result(SV* h, MYSQL_RES** resp);
 int mysql_db_async_ready(SV* h);
-
-void get_param(pTHX_ SV *param, int field, bool enable_utf8, bool is_binary, char **out_buf, STRLEN *out_len);
-void get_statement(pTHX_ SV *statement, bool enable_utf8, char **out_buf, STRLEN *out_len);
-
-int mysql_socket_ready(my_socket fd);
-
-#if MYSQL_VERSION_ID >= FIELD_CHARSETNR_VERSION
-PERL_STATIC_INLINE bool charsetnr_is_utf8(unsigned int id)
-{
-  /* See mysql source code for all utf8 ids: grep -E '^(CHARSET_INFO|struct charset_info_st).*utf8' -A 2 -r strings | grep number | sed -E 's/^.*-  *([^,]+),.*$/\1/' | sort -n */
-  /* Some utf8 ids (selected at mysql compile time) can be retrieved by: SELECT ID FROM INFORMATION_SCHEMA.COLLATIONS WHERE CHARACTER_SET_NAME LIKE 'utf8%' ORDER BY ID */
-  return (id == 33 || id == 45 || id == 46 || id == 83 || (id >= 192 && id <= 215) || (id >= 223 && id <= 247) || (id >= 254 && id <= 277) || (id >= 576 && id <= 578)
-      || (id >= 608 && id <= 610) || id == 1057 || (id >= 1069 && id <= 1070) || id == 1107 || id == 1216 || id == 1283 || id == 1248 || id == 1270);
-}
 #endif

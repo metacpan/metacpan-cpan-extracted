@@ -1,7 +1,7 @@
 package Bencher::Formatter::DeleteNotesFieldIfEmpty;
 
-our $DATE = '2017-02-20'; # DATE
-our $VERSION = '1.036'; # VERSION
+our $DATE = '2017-07-02'; # DATE
+our $VERSION = '1.039'; # VERSION
 
 use 5.010001;
 use strict;
@@ -42,7 +42,7 @@ Bencher::Formatter::DeleteNotesFieldIfEmpty - Delete notes field if there are no
 
 =head1 VERSION
 
-This document describes version 1.036 of Bencher::Formatter::DeleteNotesFieldIfEmpty (from Perl distribution Bencher-Backend), released on 2017-02-20.
+This document describes version 1.039 of Bencher::Formatter::DeleteNotesFieldIfEmpty (from Perl distribution Bencher-Backend), released on 2017-07-02.
 
 =for Pod::Coverage .*
 

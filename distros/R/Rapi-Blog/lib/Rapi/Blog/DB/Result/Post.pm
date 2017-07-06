@@ -126,8 +126,9 @@ sub public_url_path {
   my $self = shift;
   return undef unless $self->Access->default_view_path;
   $self->{_public_url_path} //= do {
-    my $app = $self->parent_app_class;
-    my $path = join('',$app->mount_url,'/',$self->Access->default_view_path);
+    my $pfx = '';
+    if(my $c = RapidApp->active_request_context) { $pfx = $c->mount_url || ''; }
+    my $path = join('',$pfx,'/',$self->Access->default_view_path);
     $path =~ s/\/?$/\//; # make sure there is a trailing '/';
     $path
   }
@@ -143,8 +144,9 @@ sub preview_url_path {
   my $self = shift;
   return undef unless $self->Access->preview_path;
   $self->{_preview_url_path} //= do {
-    my $app = $self->parent_app_class;
-    my $path = join('',$app->mount_url,'/',$self->Access->preview_path);
+    my $pfx = '';
+    if(my $c = RapidApp->active_request_context) { $pfx = $c->mount_url || ''; }
+    my $path = join('',$pfx,'/',$self->Access->preview_path);
     $path =~ s/\/?$/\//; # make sure there is a trailing '/';
     $path
   }
@@ -160,15 +162,17 @@ sub open_url_path {
   my $self = shift;
   my $mode = shift;
   my $app = $self->parent_app_class;
+  my $pfx = '';
+  if(my $c = RapidApp->active_request_context) { $pfx = $c->mount_url || ''; }
   if($mode) {
     $mode = lc($mode);
     die "open_url_path(): bad argument '$mode' -- must be undef, 'direct' or 'navable'"
       unless ($mode eq 'direct' or $mode eq 'navable');
-    return join('',$app->mount_url,'/rapidapp/module/',$mode,$self->getRestPath)
+    return join('',$pfx,'/rapidapp/module/',$mode,$self->getRestPath)
   }
   else {
     my $ns = $app->module_root_namespace;
-    return join('',$app->mount_url,'/',$ns,'/#!',$self->getRestPath)
+    return join('',$pfx,'/',$ns,'/#!',$self->getRestPath)
   }
 }
 

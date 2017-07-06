@@ -1,5 +1,17 @@
 Revision history for PMLTQ
 
+1.4.0
+ - Released: 2017-06-26 09:15:20 UTC
+
+ [ENHANCEMENTS]
+ - PML-TQ CLI client works with new API - added webtreebank command for
+   listing treebanks and getting their configuration file with public
+   accessible info - added configuration command for getting current
+   settings
+
+ [STATISTICS]
+ - code churn: 7 files changed, 235 insertions(+), 24 deletions(-)
+
 1.3.2
  - Released: 2017-06-15 08:55:30 UTC
 

@@ -1,3 +1,4 @@
+use lib '.';
 use Mojo::Base -strict;
 use Mojo::File 'path';
 use Test::More;

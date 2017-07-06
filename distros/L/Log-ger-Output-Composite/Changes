@@ -1,3 +1,41 @@
+0.007   2017-07-02 (PERLANCAR)
+
+	- [Bugfix] Fix leak by using per-target variable name.
+
+
+0.006   2017-07-02 (PERLANCAR)
+
+	- [optimize] Convert to returning a multilevel log.
+
+
+0.005   2017-07-01 (PERLANCAR)
+
+        - Get output module's hook in a proper, sane way.
+
+        - Support per-output layout.
+
+
+0.004   2017-06-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Update/fix documentation.
+
+
+0.003   2017-06-25 (PERLANCAR)
+
+        - [Incompatible change] Rename output specification key 'args' to
+          'conf'.
+
+        - Implement configuration 'category_level' & output specification key
+          'category_level'.
+
+
+0.002   2017-06-23 (PERLANCAR)
+
+	- Adjust to Log::ger 0.005.
+
+
 0.001    2017-06-21 (PERLANCAR)
 
          - First, early release.

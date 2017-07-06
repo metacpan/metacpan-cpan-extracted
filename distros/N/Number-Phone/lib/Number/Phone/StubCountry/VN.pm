@@ -22,32 +22,33 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173055;
+our $VERSION = 1.20170702164949;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[17]99',
-                  'pattern' => '([17]99)(\\d{4})'
+                  'pattern' => '([17]99)(\\d{4})',
+                  'leading_digits' => '[17]99'
                 },
                 {
-                  'pattern' => '([48])(\\d{4})(\\d{4})',
                   'leading_digits' => '
             4|
             8(?:
-              [1-57]|
-              [689][0-79]
+              [2-5]|
+              6[236]|
+              7[13]
             )
-          '
+          ',
+                  'pattern' => '([48])(\\d{4})(\\d{4})'
                 },
                 {
+                  'pattern' => '([235-7]\\d)(\\d{4})(\\d{3})',
                   'leading_digits' => '
-            2[025-79]|
-            3[0136-9]|
-            5[2-9]|
+            2[5-7]|
+            3[0136]|
+            5[5-9]|
             6[0-46-8]|
             7[02-79]
-          ',
-                  'pattern' => '([235-7]\\d)(\\d{4})(\\d{3})'
+          '
                 },
                 {
                   'leading_digits' => '80',
@@ -59,9 +60,14 @@ my $formatters = [
                 },
                 {
                   'leading_digits' => '
-            2[1348]|
+            2(?:
+              [0-489]|
+              5[124-9]|
+              6[0-39]|
+              7[0-7]
+            )|
             3[25]|
-            5[01]|
+            50|
             65|
             7[18]
           ',
@@ -70,93 +76,77 @@ my $formatters = [
                 {
                   'pattern' => '([89]\\d)(\\d{3})(\\d{2})(\\d{2})',
                   'leading_digits' => '
-            8[689]8|
+            8(?:
+              8|
+              9[89]
+            )|
             9
           '
                 },
                 {
+                  'pattern' => '(1[2689]\\d)(\\d{3})(\\d{4})',
                   'leading_digits' => '
             1(?:
               [26]|
               8[68]|
               99
             )
-          ',
-                  'pattern' => '(1[2689]\\d)(\\d{3})(\\d{4})'
+          '
                 },
                 {
-                  'pattern' => '(1[89]00)(\\d{4,6})',
-                  'leading_digits' => '1[89]0'
+                  'leading_digits' => '86[89]',
+                  'pattern' => '(86[89])(\\d{3})(\\d{3})'
+                },
+                {
+                  'leading_digits' => '1[89]0',
+                  'pattern' => '(1[89]00)(\\d{4,6})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '
-          (?:
-            2(?:
-              [025-79]|
-              1[0-689]|
-              3\\d|
-              [48][01]
-            )|
-            3(?:
-              [0136-9]|
-              [25][01]
-            )|
-            4\\d|
-            5(?:
-              [01][01]|
-              [2-9]
-            )|
-            6(?:
-              [0-46-8]|
-              5[01]
-            )|
-            7(?:
-              [02-79]|
-              [18][01]
-            )
-          )\\d{7}|
-          8(?:
-            [1-57]\\d|
-            [689][0-79]
-          )\\d{6}
-        ',
-                'voip' => '',
-                'pager' => '',
-                'personal_number' => '',
                 'geographic' => '
           (?:
             2(?:
-              [025-79]|
+              0[3-9]|
               1[0-689]|
-              3\\d|
-              [48][01]
-            )|
+              2[0-25-9]|
+              3[2-9]|
+              [48][02-9]|
+              5[124-9]?|
+              6[0-39]?|
+              7[0-7]?|
+              9[0-4679]
+            )\\d|
             3(?:
-              [0136-9]|
+              [0136]|
               [25][01]
-            )|
-            4\\d|
+            )\\d|
+            4\\d{2}|
             5(?:
-              [01][01]|
-              [2-9]
-            )|
+              0[01]|
+              [5-9]
+            )\\d|
             6(?:
               [0-46-8]|
               5[01]
-            )|
+            )\\d|
             7(?:
               [02-79]|
               [18][01]
-            )
-          )\\d{7}|
+            )\\d
+          )\\d{6}|
           8(?:
-            [1-57]\\d|
-            [689][0-79]
+            [2-5]\\d|
+            6[236]|
+            7[13]
           )\\d{6}
         ',
-                'toll_free' => '1800\\d{4,6}',
+                'specialrate' => '(1900\\d{4,6})|(
+          [17]99\\d{4}|
+          69\\d{5,6}|
+          80\\d{5}
+        )',
+                'personal_number' => '',
                 'mobile' => '
           (?:
             9\\d|
@@ -167,16 +157,61 @@ my $validators = {
               99
             )
           )\\d{7}|
-          8[689]8\\d{6}
+          8(?:
+            6[89]|
+            8\\d|
+            9[89]
+          )\\d{6}
         ',
-                'specialrate' => '(1900\\d{4,6})|(
-          [17]99\\d{4}|
-          69\\d{5,6}|
-          80\\d{5}
-        )'
+                'fixed_line' => '
+          (?:
+            2(?:
+              0[3-9]|
+              1[0-689]|
+              2[0-25-9]|
+              3[2-9]|
+              [48][02-9]|
+              5[124-9]?|
+              6[0-39]?|
+              7[0-7]?|
+              9[0-4679]
+            )\\d|
+            3(?:
+              [0136]|
+              [25][01]
+            )\\d|
+            4\\d{2}|
+            5(?:
+              0[01]|
+              [5-9]
+            )\\d|
+            6(?:
+              [0-46-8]|
+              5[01]
+            )\\d|
+            7(?:
+              [02-79]|
+              [18][01]
+            )\\d
+          )\\d{6}|
+          8(?:
+            [2-5]\\d|
+            6[236]|
+            7[13]
+          )\\d{6}
+        ',
+                'voip' => '',
+                'pager' => '',
+                'toll_free' => '1800\\d{4,6}'
               };
 my %areanames = (
-  8420 => "Lao\ Cai\ province",
+  84203 => "Quang\ Ninh\ province",
+  84204 => "Bac\ Giang\ province",
+  84205 => "Lang\ Son\ province",
+  84206 => "Cao\ Bang\ province",
+  84207 => "Tuyen\ Quang\ province",
+  84208 => "Thai\ Nguyen\ province",
+  84209 => "Bac\ Can\ province",
   84210 => "Phu\ Tho\ province",
   84211 => "Vinh\ Phuc\ province",
   84212 => "Son\ La\ province",
@@ -186,9 +221,14 @@ my %areanames = (
   84216 => "Yen\ Bai\ province",
   84218 => "Hoa\ Binh\ province",
   84219 => "Ha\ Giang\ province",
-  8422 => "Son\ La\ province",
-  84230 => "Dien\ Bien\ province",
-  84231 => "Lai\ Chau\ province",
+  84220 => "Hai\ Duong\ province",
+  84221 => "Hung\ Yen\ province",
+  84222 => "Bac\ Ninh\ province",
+  84225 => "Hai\ Phong\ City",
+  84226 => "Ha\ Nam\ province",
+  84227 => "Thai\ Binh\ province",
+  84228 => "Nam\ Dinh\ province",
+  84229 => "Ninh\ Binh\ province",
   84232 => "Quang\ Binh\ province",
   84233 => "Quang\ Tri\ province",
   84234 => "Thua\ Thien\-Hue\ province",
@@ -197,14 +237,42 @@ my %areanames = (
   84237 => "Thanh\ Hoa\ province",
   84238 => "Nghe\ An\ province",
   84239 => "Ha\ Tinh\ province",
+  8424 => "Ha\ Noi\ City",
   84240 => "Bac\ Giang\ province",
-  84241 => "Bac\ Ninh\ province",
   8425 => "Lang\ Son\ province",
+  84251 => "Dong\ Nai\ province",
+  84252 => "Binh\ Thuan\ province",
+  84254 => "Ba\ Ria\ Vung\ Tau\ province",
+  84255 => "Quang\ Ngai\ province",
+  84256 => "Binh\ Dinh\ province",
+  84257 => "Phu\ Yen\ province",
+  84258 => "Khanh\ Hoa\ province",
+  84259 => "Ninh\ Thuan\ province",
   8426 => "Cao\ Bang\ province",
+  84260 => "Kon\ Tum\ province",
+  84261 => "Dak\ Nong\ province",
+  84262 => "Dak\ Lak\ province",
+  84263 => "Lam\ Dong\ province",
+  84269 => "Gia\ Lai\ province",
   8427 => "Tuyen\ Quang\ province",
+  84270 => "Ving\ Long\ province",
+  84271 => "Binh\ Phuoc\ province",
+  84272 => "Long\ An\ province",
+  84273 => "Tien\ Giang\ province",
+  84274 => "Binh\ Duong\ province",
+  84275 => "Ben\ Tre\ province",
+  84276 => "Tay\ Ninh\ province",
+  84277 => "Dong\ Thap\ province",
+  8428 => "Ho\ Chi\ Minh\ City",
   84280 => "Thai\ Nguyen\ province",
-  84281 => "Bac\ Kan\ province",
-  8429 => "Yen\ Bai\ province",
+  84290 => "Ca\ Mau\ province",
+  84291 => "Bac\ Lieu\ province",
+  84292 => "Can\ Tho\ City",
+  84293 => "Hau\ Giang\ province",
+  84294 => "Tra\ Vinh\ province",
+  84296 => "An\ Giang\ province",
+  84297 => "Kien\ Giang\ province",
+  84299 => "Soc\ Trang\ province",
   8430 => "Ninh\ Binh\ province",
   8431 => "Hai\ Phong",
   84320 => "Hai\ Duong\ province",
@@ -213,17 +281,9 @@ my %areanames = (
   84350 => "Nam\ Dinh\ province",
   84351 => "Ha\ Nam\ province",
   8436 => "Thai\ Binh\ province",
-  8437 => "Thanh\ Hoa\ province",
-  8438 => "Nghe\ An\ province",
-  8439 => "Ha\ Tinh\ province",
   844 => "Hanoi",
   84500 => "Dak\ Lak\ province",
   84501 => "Dak\ Nong\ province",
-  84510 => "Quang\ Nam\ province",
-  84511 => "Da\ Nang",
-  8452 => "Quang\ Binh\ province",
-  8453 => "Quang\ Tri\ province",
-  8454 => "Thua\ Thien\-Hue\ province",
   8455 => "Quang\ Ngai\ province",
   8456 => "Binh\ Dinh\ province",
   8457 => "Phu\ Yen\ province",

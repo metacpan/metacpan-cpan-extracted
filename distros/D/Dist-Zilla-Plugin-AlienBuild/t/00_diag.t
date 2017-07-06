@@ -17,7 +17,7 @@ $modules{$_} = $_ for qw(
   Moose
   Path::Tiny
   Sub::Exporter::ForMethods
-  Test2::Suite
+  Test2::V0
   Test::More
 );
 

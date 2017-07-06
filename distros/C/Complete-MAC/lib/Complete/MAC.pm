@@ -1,12 +1,12 @@
 package Complete::MAC;
 
-our $DATE = '2016-10-18'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Complete::Common qw(:all);
 
@@ -54,13 +54,13 @@ sub complete_known_mac {
         require IPC::System::Options;
         for my $prog ("/sbin/ifconfig") {
             next unless -x $prog;
-            $log->tracef("[compmac] Checking %s output", $prog) if $COMPLETE_MAC_TRACE;
+            log_trace("[compmac] Checking %s output", $prog) if $COMPLETE_MAC_TRACE;
             my @lines = IPC::System::Options::readpipe(
                 {lang=>"C"}, "$prog -a");
             next if $?;
             for my $line (@lines) {
                 if ($line =~ /\bHWaddr\s+(\S+)/) {
-                    $log->tracef("[compmac]   Adding %s", $1) if $COMPLETE_MAC_TRACE;
+                    log_trace("[compmac]   Adding %s", $1) if $COMPLETE_MAC_TRACE;
                     $macs{$1}++;
                 }
             }
@@ -70,7 +70,7 @@ sub complete_known_mac {
 
     # from ARP cache (TODO: alternatively from "ip neigh show")
     {
-        $log->tracef("[compmac] Checking arp -an output") if $COMPLETE_MAC_TRACE;
+        log_trace("[compmac] Checking arp -an output") if $COMPLETE_MAC_TRACE;
         require IPC::System::Options;
       PROG:
         for my $prog ("/usr/sbin/arp") {
@@ -80,7 +80,7 @@ sub complete_known_mac {
             next if $?;
             for my $line (@lines) {
                 if ($line =~ / at (\S+) \[ether\]/) {
-                    $log->tracef("[compmac]   Adding %s", $1) if $COMPLETE_MAC_TRACE;
+                    log_trace("[compmac]   Adding %s", $1) if $COMPLETE_MAC_TRACE;
                     $macs{$1}++;
                 }
             }
@@ -109,14 +109,18 @@ Complete::MAC - Completion routines related to MAC addresses
 
 =head1 VERSION
 
-This document describes version 0.001 of Complete::MAC (from Perl distribution Complete-MAC), released on 2016-10-18.
+This document describes version 0.002 of Complete::MAC (from Perl distribution Complete-MAC), released on 2017-07-03.
 
 =for Pod::Coverage .+
 
 =head1 FUNCTIONS
 
 
-=head2 complete_known_mac(%args) -> array
+=head2 complete_known_mac
+
+Usage:
+
+ complete_known_mac(%args) -> array
 
 Complete a known hostname.
 
@@ -173,7 +177,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

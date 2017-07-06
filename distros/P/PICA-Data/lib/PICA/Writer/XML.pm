@@ -2,7 +2,7 @@ package PICA::Writer::XML;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Scalar::Util qw(reftype);
 
@@ -26,6 +26,15 @@ sub write_record {
 
     my $fh = $self->{fh};
 
+    my $i = 0;
+    my $pica_sort = sub {
+        my $f = shift;
+        my $oc  = ($f->[1] eq '') ? '00' : $f->[1];
+        $oc = ($f->[0] eq '101@') ? ++$i . $oc : $i . $oc;
+        return [$oc.$f->[0], $f];
+    };
+
+    @$record = map $_->[1], sort { $a->[0] cmp $b->[0] } map { $pica_sort->($_) } @$record;
     $fh->print("<record>\n");
     foreach my $field (@$record) {
         # this may break on invalid tag/occurrence values

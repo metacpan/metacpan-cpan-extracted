@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More::UTF8" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -3,7 +3,7 @@ package RPi::BMP180;
 use strict;
 use warnings;
 
-our $VERSION = '2.3603';
+our $VERSION = '2.3604';
 
 use WiringPi::API qw(:all);
 use RPi::WiringPi::Constant qw(:all);

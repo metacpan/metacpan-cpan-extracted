@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Author-Plicease
 
+2.16      2017-06-22 12:57:51 -0400
+  - Fix some test version upgrades
+
 2.15      2017-06-11 21:38:01 -0400
   - Tweaks for 5.26
 

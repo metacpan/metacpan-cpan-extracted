@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002000';
+our $VERSION = '0.002002';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -150,6 +150,12 @@ sub _translate_parameters {
 
         push @params, \%param;
 
+    }
+
+    # Make an implicit invocant explicit...
+    if (!@params && $kind eq 'method') {
+        "$invocant:" =~ m{\A \s*+ $PARAMETER_SYNTAX }x;
+        push @params, {%+};
     }
 
     # Extract trailing return type specification...
@@ -1245,7 +1251,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002000
+This document describes Dios version 0.002002
 
 
 =head1 SYNOPSIS

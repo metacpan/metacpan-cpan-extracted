@@ -1,4 +1,6 @@
 package Cassandra::Client::Metadata;
+our $AUTHORITY = 'cpan:TVDW';
+$Cassandra::Client::Metadata::VERSION = '0.13';
 use 5.010;
 use strict;
 use warnings;
@@ -16,11 +18,10 @@ sub prepare_cache {
 }
 
 sub add_prepared {
-    my ($self, $query, $id, $input_metadata, $result_metadata, $decoder, $encoder)= @_;
+    my ($self, $query, $id, $input_metadata, $decoder, $encoder)= @_;
     $self->{prepare_cache}{$query}= {
         id => $id,
         input_metadata => $input_metadata,
-        result_metadata => $result_metadata,
         decoder => $decoder,
         encoder => $encoder
     };
@@ -41,3 +42,28 @@ sub is_prepared {
 }
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Cassandra::Client::Metadata
+
+=head1 VERSION
+
+version 0.13
+
+=head1 AUTHOR
+
+Tom van der Woerdt <tvdw@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

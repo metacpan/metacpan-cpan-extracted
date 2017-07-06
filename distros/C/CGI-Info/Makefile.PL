@@ -5,9 +5,8 @@ use File::Spec;
 
 my $tmpdir = File::Spec->tmpdir();
 if(!-w $tmpdir) {
-	# This will set the CPAN-Testers status to Unknown
-	# TODO: Work out how to set the status to NA
-	die "Your temporary directory '$tmpdir' isn't writable, fix your configuration and try again";
+	print STDERR "NA: Your temporary directory '$tmpdir' isn't writable, fix your configuration and try again";
+	exit(0);
 }
 
 WriteMakefile(
@@ -45,6 +44,7 @@ WriteMakefile(
 	'JSON::Parse' => 0,
 	# 'String::EscapeCage' => 0.02,
 	'Class::Autouse' => 0,
+	'namespace::clean' => 0,
     },
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'CGI-Info-*' },
@@ -56,6 +56,10 @@ WriteMakefile(
 			url => 'git://github.com/nigelhorne/CGI-Info.git',
 			web => 'https://github.com/nigelhorne/CGI-Info',
     		},
+		bugtracker => {
+			web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=CGI-Info',
+			mailto => 'bug-CGI-Info@rt.cpan.org'
+		}
 	},
     },
     MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this

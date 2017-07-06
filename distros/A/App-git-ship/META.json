@@ -55,6 +55,6 @@
          "url" : "https://github.com/jhthorsen/app-git-ship.git"
       }
    },
-   "version" : "0.23",
+   "version" : "0.24",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -1,5 +1,6 @@
 .perltidyrc
 .ship.conf
+.travis.yml
 Changes
 cpanfile
 example/fatpack.sh
@@ -14,10 +15,13 @@ t/alias.t
 t/autoload.t
 t/constant.t
 t/example-test1.t
+t/export.t
 t/extends.t
+t/file-dir.t
 t/help.t
 t/Helper.pm
 t/moose.t
+t/n_of.t
 t/options.t
 t/version.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

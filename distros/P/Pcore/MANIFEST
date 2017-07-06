@@ -129,7 +129,9 @@ lib/Pcore/HTTP/Server.pm
 lib/Pcore/HTTP/Server/Request.pm
 lib/Pcore/HTTP/Util.pm
 lib/Pcore/Handle.pm
-lib/Pcore/Handle/Wrapper.pm
+lib/Pcore/Handle/DBI.pm
+lib/Pcore/Handle/DBI/Const.pm
+lib/Pcore/Handle/DBI/STH.pm
 lib/Pcore/RPC.pm
 lib/Pcore/RPC/Proc.pm
 lib/Pcore/RPC/Server.pm

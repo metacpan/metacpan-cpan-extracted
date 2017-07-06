@@ -1,4 +1,14 @@
 Revision history for Rapi::Blog
 
+1.0003 2017-06-28
+    - Better handling for when the app is mounted on a sub-url (VANSTYN)
+    - Misc POD fixes
+
+1.0002 2017-06-28
+    - Documentation improvements (no code changes) (VANSTYN)
+
+1.0001 2017-06-27
+    - Fix first login deep recursion bug (#1) (VANSTYN)
+
 1.0000 2017-06-20
     - First public release for TPC 2017! (VANSTYN)

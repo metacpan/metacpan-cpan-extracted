@@ -1,0 +1,79 @@
+{
+   "abstract" : "templates which compile into coderefs",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.142690",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Template-Compiled",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Eval::TypeTiny" : "0",
+            "Exporter::Tiny" : "0",
+            "HTML::Entities" : "0",
+            "Moo" : "2.000000",
+            "Type::Params" : "1.002000",
+            "Types::Standard" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Template::Compiled" : {
+         "file" : "lib/Template/Compiled.pm",
+         "version" : "0.002"
+      },
+      "Template::Compiled::Utils" : {
+         "file" : "lib/Template/Compiled/Utils.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Template-Compiled"
+      },
+      "homepage" : "https://metacpan.org/release/Template-Compiled",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Template-Compiled/project"
+   },
+   "version" : "0.002"
+}

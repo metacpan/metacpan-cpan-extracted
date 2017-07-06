@@ -65,7 +65,7 @@ sub encrypted_string {
         Crypt::Rijndael::MODE_ECB() # :-(
     );
     $payload = _null_padding($payload,32,'e');
-    encode_base64($crypt->encrypt($payload));
+    $crypt->encrypt($payload);
 }
 
 sub submit {
@@ -73,7 +73,7 @@ sub submit {
     my $payload = $self->has_key
         ? $self->encrypted_string
         : $self->to_string;
-    $self->gearman->dispatch_background($self->queue, $payload)
+    $self->gearman->dispatch_background($self->queue, encode_base64($payload))
         or croak("submitting job failed");
 }
 

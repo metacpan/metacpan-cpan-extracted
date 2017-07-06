@@ -6,7 +6,7 @@ DESCRIPTION
 
     Default implementation of Redis handle is Redis::Fast; otherwise Redis.
 
-    May be overriden through "redis" or "builder" param.
+    May be overriden through "redis" param.
 
     Default implementation of serializer handle is JSON::XS; otherwise
     Mojo::JSON or JSON.
@@ -47,10 +47,6 @@ METHODS
 
       A simple accessor for the Redis handle.
 
-    builder
-
-      A simple builder for the Redis handle if "redis" not set.
-
     inflate
 
       A simple serializer, requires "deflate" param.
@@ -69,9 +65,9 @@ METHODS
       A prefix for Redis session ids. 'Plack::Session::Store::RedisFast:'
       by default.
 
-    expire
+    expires
 
-      An expire for Redis sessions. "ONE_MONTH" in Time::Seconds by
+      An expires for Redis sessions. "ONE_MONTH" in Time::Seconds by
       default.
 
  each_session

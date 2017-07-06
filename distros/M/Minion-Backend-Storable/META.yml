@@ -19,8 +19,9 @@ no_index:
     - inc
     - test
 requires:
-  Minion: '6.05'
-  Mojolicious: '6.3'
+  Minion: '6'
+  Mojolicious: '6'
+  Sereal: '3'
   perl: '5.010001'
 resources:
   IRC: irc://irc.perl.org/#mojo
@@ -28,5 +29,5 @@ resources:
   homepage: https://niczero.github.io
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/niczero/minion-backend-storable.git
-version: 6.051
+version: 7.012
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

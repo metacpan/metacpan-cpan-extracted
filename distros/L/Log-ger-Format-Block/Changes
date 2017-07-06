@@ -1,3 +1,20 @@
+0.004   2017-06-30 (PERLANCAR)
+
+	- Adjust to Log::ger 0.011.
+
+
+0.003   2017-06-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix example in Synopsis.
+
+
+0.002   2017-06-23 (PERLANCAR)
+
+	- Adjust to Log::ger 0.005.
+
+
 0.001    2017-06-21 (PERLANCAR)
 
          - First release.

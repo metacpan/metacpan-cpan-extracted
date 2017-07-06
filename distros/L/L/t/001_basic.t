@@ -10,7 +10,8 @@ $module_path =~ s!::!/!g;
 $module_path .= '.pm';
 
 ok !$INC{$module_path}; # not loaded.
-Data::Dumper->Dump([qw/hoge/]);
+my $out = Data::Dumper->Dump([qw/hoge/]);
+is $out, q[$VAR1 = 'hoge';]."\n";
 ok $INC{$module_path};
 
 local $@;
@@ -23,6 +24,6 @@ eval {
     no warnings;
     hoge();
 };
-like $@, qr/Undefined subroutine &main::hoge called/;
+like $@, qr/(?:Undefined subroutine &main::hoge called|Use of inherited AUTOLOAD for non-method main::hoge\(\) is no longer allowed)/;
 
 done_testing;

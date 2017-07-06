@@ -7,6 +7,29 @@ Home page:    <https://metacpan.org/pod/App::Licensecheck>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=licensecheck>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+v3.0.30	2017-07-05
+
+ [ Bug Fixes ]
+ - Fix detect BSD licenses as bare name.
+   Axel Beckert++
+ - Fix license pattern ms_pl to detect MS Public License (not non-free MS
+   Permissive License).
+
+ [ Test Suite ]
+ - Add OSI test (including only currently succeeding OSI licenses for now).
+
+ [ Other ]
+ - Added: Add license pattern artistic_2.
+ - Improve license pattern agpl to skip english (not only french)
+   cecill_2_1.
+ - Improve license pattern epl to detect some forms of "or newer".
+ - Improve license pattern epl.
+ - clean_comments(): Relax to match varying amount of horizontal whitespace
+   (not exactly one character) followed by any non-whitespace (not only a
+   word character).
+ - clean_comments(): Tighten to match and strip only horizontal whitespace
+   (not newlines).
+
 v3.0.29	2017-01-24
 
  [ REGRESSIONS ]

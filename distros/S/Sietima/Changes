@@ -1,3 +1,8 @@
+1.0.3     2017-06-22 18:26:22+01:00 Europe/London
+ - fixed test failures under future Email::MIME
+ - mark App::Spec 0.004_001 as not suitable (it fails when calling
+   ->print_output)
+
 1.0.2     2017-06-21 22:53:06+01:00 Europe/London
  - bump all dependencies to latest
 

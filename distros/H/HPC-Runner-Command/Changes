@@ -1,5 +1,11 @@
 Revision history for HPC-Runner-Command
 
+3.2.6  2017-07-05 11:46:45 GST
+	- Enhancements to the logging interface
+	- New JSON logging interface
+	- hpcrunner.pl stats command - works from tar archive and is meant to be a starting point for additional loggers
+	- Fixed file paths so tests should run platform independent
+
 3.2.5  2017-06-11 15:53:59 GST
 	- Minor cleanup to config files - reload to get any options that may be in plugins
 

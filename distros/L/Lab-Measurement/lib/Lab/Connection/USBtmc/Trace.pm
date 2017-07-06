@@ -1,5 +1,5 @@
 package Lab::Connection::USBtmc::Trace;
-$Lab::Connection::USBtmc::Trace::VERSION = '3.550';
+$Lab::Connection::USBtmc::Trace::VERSION = '3.552';
 use 5.010;
 use warnings;
 use strict;

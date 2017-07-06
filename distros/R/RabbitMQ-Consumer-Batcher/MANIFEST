@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/RabbitMQ/Consumer/Batcher.pm
+lib/RabbitMQ/Consumer/Batcher/Item.pm
+lib/RabbitMQ/Consumer/Batcher/Message.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/02_default.t
+META.yml
+MANIFEST

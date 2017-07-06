@@ -3,7 +3,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+use version 0.77; our $VERSION = version->declare("v1.0.0");
 
 use Carp ();
 use Module::Load ();
@@ -41,7 +41,7 @@ L - Perl extention to load module automatically in one liner.
 
 =head1 VERSION
 
-This document describes L version 0.01.
+This document describes L version v1.0.0.
 
 =head1 SYNOPSIS
 

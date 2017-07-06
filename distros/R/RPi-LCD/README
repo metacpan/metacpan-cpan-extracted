@@ -1,85 +1,208 @@
-RPi-LCD
+NAME
 
-The README is used to introduce the module and provide instructions on
-how to install the module, any machine dependencies it may have (for
-example C compilers and installed libraries) and any other information
-that should be provided before the module is installed.
+    RPi::LCD - Perl interface to Raspberry Pi LCD displays via the GPIO
+    pins
 
-A README file is required for CPAN modules since CPAN extracts the README
-file from a module distribution so that people browsing the archive
-can use it to get an idea of the module's uses. It is usually a good idea
-to provide version information here so that people can decide whether
-fixes for the module are worth downloading.
+SYNOPSIS
 
+        use RPi::LCD;
+    
+        my $lcd = RPi::LCD->new;
+    
+        my %lcd_args = (
+            rows  => 2,     # number of display rows, 2 or 4
+            cols  => 16,    # number of display columns 16 or 20
+            bits  => 4,     # data width in bits, 4 or 8
+            rs    => 1,     # GPIO pin for the LCD RS pin
+            strb  => 2,     # GPIO pin for the LCD strobe (E) pin
+            d0    => 3,     #
+            ...             # d0-d3 GPIO pinout numbers
+            d3    => 6,     #
+            d4    => 7,     # set d4-d7 to all 0 (zero) if in 4-bit mode
+            ...             # otherwise, set them to their respective
+            d7    => 11,    # GPIO pins
+        );
+    
+        # initialize the LCD screen
+    
+        $lcd->init(%lcd_args);
+    
+        my $perl_ver = '5.24.0';
+        my $name = 'stevieb';
+    
+        $lcd->home; # row 0, col 0
+    
+        $lcd->print("${name}'s RPi, on");
+    
+        $lcd->position(0, 1); # row 2
+    
+        $lcd->print("Perl $perl_ver...");
 
-INSTALLATION
+DESCRIPTION
 
-To install this module, run the following commands:
+    This module acts as an interface to typical 2 or 4 row, 16 or 20 column
+    LCD screens when connected to a Raspberry Pi.
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+    It is standalone code, but if you access an instance of this class
+    through the RPi::WiringPi library, we'll ensure safe exit upon a crash.
 
-SUPPORT AND DOCUMENTATION
+METHODS
 
-After installing, you can find documentation for this module with the
-perldoc command.
+ new()
 
-    perldoc RPi::LCD
+    Returns a new RPi::LCD object. We check if any RPi::WiringPi setup
+    routines have been run, and if not, we set up in GPIO pin mode.
 
-You can also look for information at:
+ init(%args)
 
-    RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=RPi-LCD
+    Initializes the LCD library, and returns an integer representing the
+    handle (file descriptor) of the device. The return is supposed to be
+    constant, so DON'T change it.
 
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/RPi-LCD
+    Parameters:
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/RPi-LCD
+        %args = (
+            rows => $num,       # number of rows. eg: 2 or 4
+            cols => $num,       # number of columns. eg: 16 or 20
+            bits => 4|8,        # width of the interface (4 or 8)
+            rs => $pin_num,     # pin number of the LCD's RS pin
+            strb => $pin_num,   # pin number of the LCD's strobe (E) pin
+            d0 => $pin_num,     # pin number for LCD data pin 1
+            ...
+            d7 => $pin_num,     # pin number for LCD data pin 8
+        );
 
-    Search CPAN
-        http://search.cpan.org/dist/RPi-LCD/
+    Mandatory: All entries must have a value. If you're only using four (4)
+    bit width, d4 through d7 must be set to 0.
 
+    NOTE: In 4-bit mode, connect to pins d4 - d7 on the LCD. These pins act
+    as d0 - d3 when not in 8-bit mode.
 
-LICENSE AND COPYRIGHT
+ home()
 
-Copyright (C) 2017 Steve Bertrand
+    Moves the LCD cursor to the home position (top row, leftmost column).
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+ clear()
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+    Clears the LCD display of all data, and return the cursor to the home
+    position.
 
-Any use, modification, and distribution of the Standard or Modified
-Versions is governed by this Artistic License. By using, modifying or
-distributing the Package, you accept this license. Do not use, modify,
-or distribute the Package, if you do not accept this license.
+ display($state)
 
-If your Modified Version has been derived from a Modified Version made
-by someone other than you, you are nevertheless required to ensure that
-your Modified Version complies with the requirements of this license.
+    Turns the LCD display on and off.
 
-This license does not grant you the right to use any trademark, service
-mark, tradename, or logo of the Copyright Holder.
+    Parameters:
 
-This license includes the non-exclusive, worldwide, free-of-charge
-patent license to make, have made, use, offer to sell, sell, import and
-otherwise transfer the Package with respect to any patent claims
-licensable by the Copyright Holder that are necessarily infringed by the
-Package. If you institute patent litigation (including a cross-claim or
-counterclaim) against any party alleging that the Package constitutes
-direct or contributory patent infringement, then this Artistic License
-to you shall terminate on the date that such litigation is filed.
+        $state
 
-Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    Mandatory: 0 to turn the display off, and 1 for on.
+
+ cursor($state)
+
+    Turns the LCD cursor on and off.
+
+    Parameters:
+
+        $state
+
+    Mandatory: 0 to turn the cursor off, 1 for on.
+
+ cursor_blink($state)
+
+    Parameters:
+
+        $state
+
+    Mandatory: 0 to stop blinking, 1 to enable.
+
+ send_cmd($command)
+
+    Sends any arbitrary command to the LCD. (I've never tested this!).
+
+    Parameters:
+
+        $command
+
+    Mandatory: A command to submit to the LCD.
+
+ position($x, $y)
+
+    Moves the cursor to the specified position on the LCD display.
+
+    Parameters:
+
+        $x
+
+    Mandatory: Column position. 0 is the left-most edge.
+
+        $y
+
+    Mandatory: Row position. 0 is the top row.
+
+ char_def($index, $data)
+
+    This allows you to re-define one of the 8 user-definable characters in
+    the display. The data array is 8 bytes which represent the character
+    from the top line to the bottom line. Note that the characters are
+    actually 5 × 8, so only the lower 5 bits are used. The index is from 0
+    to 7 and you can subsequently print the character defined using the
+    lcdPutchar() call.
+
+    Parameters:
+
+        $index
+
+    Mandatory: Index of the display character. Values are 0-7.
+
+        $data
+
+    Mandatory: See above description.
+
+ put_char($char)
+
+    Writes a single ASCII character to the LCD display, at the current
+    cursor position.
+
+    Parameters:
+
+        $char
+
+    Mandatory: A single ASCII character.
+
+ print_char($char)
+
+    Alias of put_char().
+
+ puts($string)
+
+    Parameters:
+
+        $string
+
+    Mandatory: A string to display.
+
+ print($string)
+
+    Alias of puts().
+
+AUTHOR
+
+    Steve Bertrand, <steveb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 by Steve Bertrand
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.18.2 or, at
+    your option, any later version of Perl 5 you may have available.
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 146:
+
+      Non-ASCII character seen before =encoding in '×'. Assuming UTF-8
 

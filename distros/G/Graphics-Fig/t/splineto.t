@@ -1,32 +1,11 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More;
-use t::FigCmp;
-
-#
-# Skip tests if required modules are not available.
-#
-if (!eval { require File::Temp; 1 }) {
-    plan skip_all => "File::Temp moduled required";
-}
-if (!eval { require Math::Trig; 1 }) {
-    plan skip_all => "Math::Trig moduled required";
-}
-if (!eval { require Regexp::Common; 1 }) {
-    plan skip_all => "Regexp::Common moduled required";
-}
-if (!eval { require Image::Info; 1 }) {
-    plan skip_all => "Image::Info moduled required";
-}
-plan tests => 1;
-
-#
-# Load modules.
-#
-use Graphics::Fig;
+use Test::More tests => 1;
 use File::Temp qw/ tempdir /;
+use Graphics::Fig;
 use Math::Trig;
+use t::FigCmp;
 
 #
 # Create temp directory.

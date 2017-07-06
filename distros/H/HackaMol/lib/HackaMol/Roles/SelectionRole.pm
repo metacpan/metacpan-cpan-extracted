@@ -1,5 +1,5 @@
 package HackaMol::Roles::SelectionRole;
-$HackaMol::Roles::SelectionRole::VERSION = '0.040';
+$HackaMol::Roles::SelectionRole::VERSION = '0.043';
 #ABSTRACT: Atom selections in molecules
 use Moose::Role;
 use HackaMol::AtomGroup;
@@ -92,7 +92,7 @@ HackaMol::Roles::SelectionRole - Atom selections in molecules
 
 =head1 VERSION
 
-version 0.040
+version 0.043
 
 =head1 DESCRIPTION
 

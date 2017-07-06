@@ -24,6 +24,7 @@ sub run {
     'P|pid-file=s' => sub { $prefork->pid_file($_[1]) },
     'p|proxy'      => sub { $prefork->reverse_proxy(1) },
     'r|requests=i' => sub { $prefork->max_requests($_[1]) },
+    's|spare=i'    => sub { $prefork->spare($_[1]) },
     'w|workers=i'  => sub { $prefork->workers($_[1]) };
 
   $prefork->listen(\@listen) if @listen;
@@ -46,7 +47,7 @@ Mojolicious::Command::prefork - Pre-fork command
     ./myapp.pl prefork -m production -l http://*:8080
     ./myapp.pl prefork -l http://127.0.0.1:8080 -l https://[::]:8081
     ./myapp.pl prefork -l 'https://*:443?cert=./server.crt&key=./server.key'
-    ./myapp.pl prefork -l http+unix://%2Ftmp%2Fmyapp.sock
+    ./myapp.pl prefork -l http+unix://%2Ftmp%2Fmyapp.sock -w 12
 
   Options:
     -a, --accepts <number>               Number of connections for workers to
@@ -55,9 +56,9 @@ Mojolicious::Command::prefork - Pre-fork command
                                          SOMAXCONN
     -c, --clients <number>               Maximum number of concurrent
                                          connections, defaults to 1000
-    -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 20.
+    -G, --graceful-timeout <seconds>     Graceful timeout, defaults to 60.
     -I, --heartbeat-interval <seconds>   Heartbeat interval, defaults to 5
-    -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 20
+    -H, --heartbeat-timeout <seconds>    Heartbeat timeout, defaults to 30
     -h, --help                           Show this summary of available options
         --home <path>                    Path to home directory of your
                                          application, defaults to the value of
@@ -77,6 +78,8 @@ Mojolicious::Command::prefork - Pre-fork command
                                          MOJO_REVERSE_PROXY
     -r, --requests <number>              Maximum number of requests per
                                          keep-alive connection, defaults to 100
+    -s, --spare <number>                 Temporarily spawn up to this number of
+                                         additional workers, defaults to 2
     -w, --workers <number>               Number of workers, defaults to 4
 
 =head1 DESCRIPTION

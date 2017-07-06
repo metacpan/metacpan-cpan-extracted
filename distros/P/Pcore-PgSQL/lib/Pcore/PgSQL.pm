@@ -1,4 +1,4 @@
-package Pcore::PgSQL v0.8.0;
+package Pcore::PgSQL v0.9.0;
 
 use Pcore -dist, -class;
 
@@ -52,8 +52,8 @@ sub run ( $self, $cb ) {
     }
 
     # create and prepare unix socket dir
-    P->file->mkdir('/tmp/pgsql.sock') if !-d '/tmp/pgsql.sock';
-    chown $uid, $uid, '/tmp/pgsql.sock' or die;
+    P->file->mkdir('/tmp/pgsql.sock/') if !-d '/tmp/pgsql.sock';
+    chown $uid, $uid, '/tmp/pgsql.sock/' or die;
 
     # run server
     P->pm->run_proc(

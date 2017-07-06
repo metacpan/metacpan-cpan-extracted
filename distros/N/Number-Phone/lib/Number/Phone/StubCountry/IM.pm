@@ -22,28 +22,27 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
                   'leading_digits' => '
             7(?:
-              [1-5789]|
-              6242
+              [1-57-9]|
+              624
             )
           ',
                   'pattern' => '(7\\d{3})(\\d{6})'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})',
                   'leading_digits' => '
             2|
             5[56]|
             7[06]
-          '
+          ',
+                  'pattern' => '(\\d{2})(\\d{4})(\\d{4})'
                 },
                 {
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})',
                   'leading_digits' => '
             1(?:
               1|
@@ -51,7 +50,8 @@ my $formatters = [
             )|
             3|
             9[018]
-          '
+          ',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 },
                 {
                   'leading_digits' => '
@@ -69,8 +69,8 @@ my $formatters = [
                   'pattern' => '(\\d{5})(\\d{4,5})'
                 },
                 {
-                  'leading_digits' => '1',
-                  'pattern' => '(1\\d{3})(\\d{5,6})'
+                  'pattern' => '(1\\d{3})(\\d{5,6})',
+                  'leading_digits' => '1'
                 },
                 {
                   'pattern' => '(800)(\\d{4})',
@@ -90,28 +90,18 @@ my $formatters = [
           '
                 },
                 {
-                  'leading_digits' => '80',
-                  'pattern' => '(80\\d)(\\d{3})(\\d{4})'
+                  'pattern' => '(80\\d)(\\d{3})(\\d{4})',
+                  'leading_digits' => '80'
                 },
                 {
-                  'leading_digits' => '[58]00',
-                  'pattern' => '([58]00)(\\d{6})'
+                  'pattern' => '([58]00)(\\d{6})',
+                  'leading_digits' => '[58]00'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '1624\\d{6}',
-                'voip' => '56\\d{8}',
-                'pager' => '76242\\d{5}',
-                'toll_free' => '808162\\d{4}',
                 'personal_number' => '70\\d{8}',
-                'geographic' => '1624\\d{6}',
-                'mobile' => '
-          7(?:
-            4576|
-            [59]24\\d
-          )\\d{5}
-        ',
+                'geographic' => '1624[5-8]\\d{5}',
                 'specialrate' => '(
           8(?:
             4(?:
@@ -139,7 +129,17 @@ my $validators = {
             )
           )\\d{3}|
           55\\d{8}
-        )'
+        )',
+                'toll_free' => '808162\\d{4}',
+                'pager' => '7624[0-4689]\\d{5}',
+                'voip' => '56\\d{8}',
+                'fixed_line' => '1624[5-8]\\d{5}',
+                'mobile' => '
+          7(?:
+            4576|
+            [59]24\\d
+          )\\d{5}
+        '
               };
 my %areanames = (
   44113 => "Leeds",

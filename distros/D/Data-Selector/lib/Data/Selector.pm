@@ -10,11 +10,11 @@ Data::Selector - data selection dsl parser and applicator
 
 =head1 VERSION
 
-1.01
+1.02
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 SYNOPSIS
 
@@ -427,7 +427,7 @@ sub apply_tree {
         my @data_tree_keys =
           $data_tree_type eq 'HASH'
           ? keys %{$data_tree}
-          : 0 .. $#{$data_tree};
+          : eval { 0 .. $#{$data_tree} };
 
         # Take a copy of the selector tree keys and do any data tree based
         # compilation.

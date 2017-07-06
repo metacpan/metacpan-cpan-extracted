@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 
+use lib 't/';
+
+use RPiTest qw(check_pin_status);
 use RPi::WiringPi;
 use RPi::WiringPi::Constant qw(:all);
 use Test::More;
@@ -13,18 +16,32 @@ if (! $ENV{PI_BOARD}){
     plan skip_all => "not on a pi board\n";
 }
 
-{
-    my $pi = RPi::WiringPi->new(setup => 'none');
+my $pi = RPi::WiringPi->new(setup => 'none');
 
-    is $pi->pin_scheme, -1, "pin_scheme() returns NULL if not set";
-    is $pi->pin_scheme('BCM'), 'BCM', "pin_scheme() returns BCM if setup() is sys";
-    is $pi->pin_scheme('GPIO'), 'GPIO', "pin_scheme() returns GPIO if setup() is gpio";
-    is $pi->pin_scheme('PHYS_GPIO'), 'PHYS_GPIO', "pin_scheme() returns BCM if setup() is phys";
-    is (
-        $pi->pin_scheme('WPI'),
-        'WPI', 
-        "pin_scheme() returns 'wiringPi' if setup() is wiringPi"
-    );
-}
+is $pi->pin_scheme, -1, "pin_scheme() returns NULL if not set";
+
+is
+    $pi->pin_scheme('BCM'),
+    'BCM',
+    "pin_scheme() returns BCM if setup() is sys";
+
+is
+    $pi->pin_scheme('GPIO'),
+    'GPIO',
+    "pin_scheme() returns GPIO if setup() is gpio";
+
+is
+    $pi->pin_scheme('PHYS_GPIO'),
+    'PHYS_GPIO',
+    "pin_scheme() returns BCM if setup() is phys";
+
+is
+    $pi->pin_scheme('WPI'),
+    'WPI', 
+    "pin_scheme() returns 'wiringPi' if setup() is wiringPi";
+
+$pi->cleanup;
+
+check_pin_status();
 
 done_testing();

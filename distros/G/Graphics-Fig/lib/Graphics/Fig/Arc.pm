@@ -15,19 +15,23 @@
 # program.  If not, see <http://www.perlfoundation.org/artistic_license_2_0>.
 #
 package Graphics::Fig::Arc;
-our $VERSION = 'v1.0.2';
+our $VERSION = 'v1.0.3';
 
 use strict;
 use warnings;
 use utf8;
 use Carp;
 use Math::Trig;
-use Regexp::Common qw /number/;
 use Graphics::Fig::Color;
 use Graphics::Fig::Ellipse;
 use Graphics::Fig::Matrix;
 use Graphics::Fig::Parameters;
 use Graphics::Fig::Arc;
+
+#
+# RE_INT: regular expression matching an integer
+#
+my $RE_INT = '(?:(?:[-+]?)(?:[0123456789]+))';
 
 #
 # Graphics::Fig::Arc::convertSubtype
@@ -51,7 +55,7 @@ sub convertSubtype {
     if ($value eq "pie" || $value eq "pie-wedge" || $value eq "closed") {
 	return 2;
     }
-    if (!($value =~ s/^\s*($RE{num}{int})//)) {
+    if (!($value =~ s/^\s*($RE_INT)//)) {
 	croak("${prefix}: ${value}: error: expected open or pie");
     }
     if ($value != 1 && $value != 2) {
@@ -82,7 +86,7 @@ sub convertDirection {
     if ($value eq "counterclockwise" || $value eq "ccw") {
 	return 1;
     }
-    if (!($value =~ s/^\s*($RE{num}{int})//)) {
+    if (!($value =~ s/^\s*($RE_INT)//)) {
 	croak("${prefix}: ${value}: error: expected clockwise or " .
 			                   "counterclockwise");
     }

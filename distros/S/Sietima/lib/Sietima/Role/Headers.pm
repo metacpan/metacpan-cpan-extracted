@@ -8,7 +8,7 @@ use Types::Standard qw(Str);
 use Sietima::Types qw(HeaderUriFromThings);
 use namespace::clean;
 
-our $VERSION = '1.0.2'; # VERSION
+our $VERSION = '1.0.3'; # VERSION
 # ABSTRACT: adds standard list-related headers to messages
 
 
@@ -89,7 +89,7 @@ Sietima::Role::Headers - adds standard list-related headers to messages
 
 =head1 VERSION
 
-version 1.0.2
+version 1.0.3
 
 =head1 SYNOPSIS
 

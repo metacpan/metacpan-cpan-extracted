@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Systemd
 #
-# This software is Copyright (c) 2015-2016 by Dominique Dumont.
+# This software is Copyright (c) 2015-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -424,6 +424,10 @@ prefixed with C<BlockIO> or C<StartupBlockIO>.',
       },
       'DeviceAllow',
       {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
         'description' => 'Control access to specific device nodes by the
 executed processes. Takes two space-separated strings: a
 device node specifier followed by a combination of
@@ -454,8 +458,7 @@ C<char-alsa> are specifiers for all pseudo
 TTYs and all ALSA sound devices,
 respectively. C<char-cpu/*> is a specifier
 matching all CPU related device groups.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
+        'type' => 'list'
       },
       'DevicePolicy',
       {

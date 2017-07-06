@@ -17,13 +17,13 @@ name: Crypt-LE
 provides:
   Crypt::LE:
     file: lib/Crypt/LE.pm
-    version: '0.23'
+    version: '0.24'
   Crypt::LE::Challenge::Simple:
     file: lib/Crypt/LE/Challenge/Simple.pm
-    version: '0.23'
+    version: '0.24'
   Crypt::LE::Complete::Simple:
     file: lib/Crypt/LE/Complete/Simple.pm
-    version: '0.23'
+    version: '0.24'
 requires:
   Convert::ASN1: '0.2'
   Crypt::Format: '0.02'
@@ -40,9 +40,10 @@ requires:
   Net::SSLeay: '1.49'
   Scalar::Util: '0'
   Time::Piece: '1.27'
+  Time::Seconds: '0'
   perl: '5.006'
 resources:
   homepage: https://do-know.com
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/do-know
-version: '0.23'
+version: '0.24'

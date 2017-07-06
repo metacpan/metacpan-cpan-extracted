@@ -1,5 +1,12 @@
 Revision history for Perl extension AWS-CLI-Config
 
+0.05      2017-06-30 10:52:09+01:00 Europe/London
+
+    - Simplified AWS::CLI::Config::Profile removing
+      Object::Tiny from dependencies
+    - Generate list of contributors from git
+    - Simplified line parsing code
+
 0.04 2017-05-20T06:41:39Z
 
     - [Trivial] Drop Config::Tiny from dependencies
@@ -15,4 +22,3 @@ Revision history for Perl extension AWS-CLI-Config
 0.01 2014-12-23T02:28:46Z
 
     - original version
-

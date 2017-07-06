@@ -10,8 +10,6 @@ debian/watch
 devel/graphics-magick.pl
 devel/magick.pl
 devel/txt.pl
-inc/my_pod2html
-inc/MyMakeMakerExtras.pm
 lib/Image/Base/Magick.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -40,4 +38,5 @@ xtools/my-diff-prev.sh
 xtools/my-manifest.sh
 xtools/my-pc.sh
 xtools/my-tags.sh
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

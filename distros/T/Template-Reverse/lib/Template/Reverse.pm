@@ -4,11 +4,14 @@ package Template::Reverse;
 use Moo;
 use utf8;
 use Template::Reverse::Util;
-use Template::Reverse::Part;
 use constant::Atom qw(WILDCARD BOF EOF);
 use Algorithm::Diff qw(sdiff);
-use Scalar::Util qw(blessed);
-our $VERSION = '0.150'; # VERSION
+use List::Util qw(max min);
+require Exporter;
+our @ISA = 'Exporter';
+our @EXPORT = qw(WILDCARD BOF EOF);
+
+our $VERSION = '0.202'; # VERSION
 
 
 has 'sidelen' => (
@@ -17,80 +20,48 @@ has 'sidelen' => (
 );
 
 
-
 sub detect{
-    my ($self,@strs) = @_;
-    my $diff = _diff($strs[0],$strs[1]);
-    my $pattern = _detect($diff,$self->sidelen());
+    my ($self,$arr1,$arr2,$sidelen) = @_;
+    $sidelen ||= $self->sidelen();
+    $arr1 = [BOF, @{$arr1}, EOF];
+    $arr2 = [BOF, @{$arr2}, EOF];
+    my $diff = _diff($arr1,$arr2);
+    my $pattern = _detect($diff, $sidelen);
     return $pattern;
 }
 
-
 ### internal functions
+
 sub _detect{
-    my $diff = shift;
-    my $sidelen = shift;
-    $sidelen = 0 unless $sidelen;
-    my @d = @{$diff};
-    my $lastStar = 0;
+    my ($diff, $sidelen) = @_;
+    my @parts = partition_by(sub{$_[0]==WILDCARD}, @{$diff});
+    my @each_parts = partition(3, 2, @parts);
+
     my @res;
-    for(my $i=0; $i<@d; $i++)
-    {
-        if( WILDCARD == $d[$i] )
-        {
-            my $from = $lastStar;
-            my $to = $i-1;
-            if( $sidelen ){
-                $from = $to-$sidelen+1 if $to-$from+1 > $sidelen;
-            }
-            my @pre = @d[$from..$to];
-            
-            my $j = @d;
-            if( $i+1 < @d ){
-                for( $j=$i+1; $j<@d; $j++)
-                {
-                    if( WILDCARD == $d[$j] ){
-                        last;
-                    }
-                }
-            }
-            $from = $i+1;
-            $to = $j-1;
-            if( $sidelen ){
-                $to = $from + $sidelen-1 if $to-$from+1 > $sidelen;
-            }
-            my @post = @d[$from..$to];
-            my $part = Template::Reverse::Part->new(pre=>\@pre, post=>\@post);
-            push(@res,$part);
-            $lastStar = $i+1;
-        }
+    foreach my $part (@each_parts){
+        my($pre, $wc, $post) = @{$part};
+        my @pre = @{$pre};
+        my @post = @{$post};
+        @pre = splice(@pre, max(0-@pre,-$sidelen));
+        @post = splice(@post, 0, min(0+@post,$sidelen));
+        push(@res, {pre=>\@pre, post=>\@post});
     }
     return \@res;
 }
 
-
 sub _diff{
     my ($a,$b) = @_;
-    my ($org_a,$org_b) = @_;
-
-    $a = [map{blessed($_)?$_->as_string:$_}@{$a}];
-    $b = [map{blessed($_)?$_->as_string:$_}@{$b}];
-    
     my @d = sdiff($a,$b);
     my @rr;
-    my $before='';
     my $idx = 0;
     for my $r (@d){
         if( $r->[0] eq 'u' ){
-            push(@rr,$org_a->[$idx]);
-            $before = '';
+            push(@rr,$a->[$idx]);
         }
         else{
-            push(@rr,WILDCARD) unless WILDCARD == $before;
-            $before = WILDCARD; 
+            push(@rr,WILDCARD) unless WILDCARD == $rr[-1];
         }
         $idx++ if $r->[0] ne '+';
-        
     }
     return \@rr;
 }
@@ -111,7 +82,7 @@ Template::Reverse - A template generator getting different parts between pair of
 
 =head1 VERSION
 
-version 0.150
+version 0.202
 
 =head1 SYNOPSIS
 
@@ -192,6 +163,12 @@ If you set it as 3, you get max 3 length pre-text and post-text array each part.
 
 This is needed for more faster performance.
 
+=head3 BOF, EOF
+
+Template::Reverse exports BOF(Begin of file) and EOF(End of file).
+These are needed for more explicit implementation.
+And you can see them return parts
+
 =head3 detect($arr_ref1, $arr_ref2)
 
 Get an array-ref of L<Template::Reverse::Part> from two array-refs which contains text or object implements as_string() method.
@@ -200,52 +177,63 @@ A L<Template::Reverse::Part> class means an one changable token.
 It returns like below.
 
     $rev->detect([qw(A b C)], [qw(A d C)]);
+    # List is converted as below
+    #
+    # qw(A b C) -> (BOF, qw(A b C), EOF)
     # 
-    # [ { ['A'],['C'] } ] <- Please focus at data, not expression.
-    #   : :...: :...: :     
-    #   :  pre  post  :
-    #   :.............:  
-    #       Part #1
+    # [ { [BOF, 'A'],['C', EOF] } ] <- Please focus at data, not expression.
+    #   : :........: :..,,,,,.: :     
+    #   :     pre       post    :
+    #   :.......................:  
+    #           Part #1
     #
 
     $rev->detect([qw(A b C d E)],[qw(A f C g E)]);
     #
-    # [ { ['A'], ['C'] }, { ['C'], ['E'] } ]
-    #   : :...:  :...: :  : :...:  :...: :
-    #   :  pre   post  :  :  pre   post  :
-    #   :..............:  :..............:
-    #        Part #1          Part #2
+    # [ { [BOF, 'A'], ['C'] }, { ['C'], ['E', EOF] } ]
+    #   : :........:  :...: :  : :...:  :........: :
+    #   :  pre        post  :  :  pre      post    :
+    #   :...................:  :...................:
+    #          Part #1                Part #2
     #
 
     $rev->detect([qw(A1 A2 B C1 C2 D E1 E2)],[qw(A1 A2 D C1 C2 F E1 E2)]);
     #
-    # [ { ['A1','A2'],['C2','C2'] }, { ['C1','C2'], ['E2','E2'] } ]
+    # [ { [BOF,'A1','A2'],['C2','C2'] }, { ['C1','C2'], ['E2','E2',EOF] } ]
     #
 
     my $str1 = [qw"I am perl and smart"];
     my $str2 = [qw"I am KHS and a perlmania"];
     my $parts = $rev->detect($str1, $str2);
     #
-    # [ { ['I','am'], ['and'] } , { ['and'],[] } ]
-    #   : :........:  :.....: :   :            :
-    #   :    pre       post   :   :            :
-    #   :.....................:   :............:
-    #           Part #1               Part #2
+    # [ { [BOF,'I','am'], ['and'] } , { ['and'],[EOF] } ]
+    #   : :............:  :.....: :   :               :
+    #   :      pre         post   :   :               :
+    #   :.........................:   :...............:
+    #              Part #1                  Part #2
     #
 
     # You can get same result for object arrays.
     my $objs1 = [$obj1, $obj2, $obj3];
     my $objs2 = [$obj1, $obj3];
     #
-    # [ { [ $obj1 ], [ $obj3 ] } ]
-    #   : :.......:  :.......: :
-    #   :    pre       post    :
-    #   :......................:
-    #           Part #1
+    # [ { [ BOF,$obj1 ], [ $obj3, EOF ] } ]
+    #   : :...........:  :............: :
+    #   :      pre            post      :
+    #   :...............................:
+    #                Part #1
 
-Returned arrayRef is list of changable parts.
+Returned arrayRef is list of detected changing parts.
 
-You can get a changed token if you find just 'pre' and 'post' sequences on any other token array.
+Actually, the returned value is like below.
+
+    [ 
+        {pre=>[BOF, ...], post=>[...]},
+        ...
+        {pre=>[...], post=>[..., EOF]},
+    ]
+
+You can get a changed token if you find just 'pre' and 'post' parts on splited target.
 
 =head1 SEE ALSO
 

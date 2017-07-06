@@ -1,14 +1,6 @@
-NAME
-    Dist::Zilla::Plugin::PodnameFromFilename - Fill out # PODNAME from
-    filename
-
-VERSION
-    This document describes version 0.01 of
-    Dist::Zilla::Plugin::PodnameFromFilename (from Perl distribution
-    Dist-Zilla-Plugin-PodnameFromFilename), released on 2014-12-14.
-
 SYNOPSIS
-    In "dist.ini":
+
+    In dist.ini:
 
      [PodnameFromFilename]
 
@@ -16,44 +8,20 @@ SYNOPSIS
 
      # PODNAME:
 
-    During build, PODNAME will be filled from filename. If Abstract is
+    During build, PODNAME will be filled from filename. If PODNAME is
     already filled, will leave it alone.
 
 DESCRIPTION
+
     It's yet another DRY plugin. It's annoying that in scripts like
-    "bin/some-progname" you have to specify:
+    bin/some-progname you have to specify:
 
      # PODNAME: some-progname
 
     With this plugin, the value of PODNAME directive will be filled from
-    filename.
+    filename (unless it has been set explicitly).
 
 SEE ALSO
-    Rinci
 
-HOMEPAGE
-    Please visit the project's homepage at
-    <https://metacpan.org/release/Dist-Zilla-Plugin-PodnameFromFilename>.
-
-SOURCE
-    Source repository is at
-    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-PodnameFromFilename
-    >.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Pod
-    nameFromFilename>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
+    https://github.com/rjbs/Pod-Weaver/issues/29
 

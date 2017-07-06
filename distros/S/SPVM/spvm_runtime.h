@@ -11,6 +11,15 @@ struct SPVM_runtime {
 
   // Call stack
   SPVM_VALUE* call_stack;
+
+  // Env
+  SPVM_API* api;
+  
+  // Bytecodes
+  uint8_t* bytecodes;
+  
+  // Constant pool
+  int32_t* constant_pool;
   
   // Call stack capacity
   int32_t call_stack_capacity;
@@ -21,20 +30,26 @@ struct SPVM_runtime {
   // Operand stack top
   int32_t operand_stack_top;
   
-  // Env
-  SPVM_ENV* env;
-  
-  // Bytecodes
-  uint8_t* bytecodes;
+  // Packages length
+  int32_t packages_length;
+
+  // Indexes of package
+  int32_t package_indexes_constant_pool_index;
+
+  // Subroutines length
+  int32_t subs_length;
+
+  // Indexes of package
+  int32_t sub_indexes_constant_pool_index;
   
   // Exception
   _Bool abort;
 };
 
 SPVM_RUNTIME* SPVM_RUNTIME_new();
-void SPVM_RUNTIME_init(SPVM_RUNTIME* runtime);
 void SPVM_RUNTIME_free(SPVM_RUNTIME* runtime);
+SPVM_API* SPVM_RUNTIME_new_api(SPVM_RUNTIME* runtime);
 
-void SPVM_RUNTIME_call_sub(SPVM_RUNTIME* runtime, int32_t sub_constant_pool_index);
+void SPVM_RUNTIME_call_sub(SPVM_API* api, int32_t sub_constant_pool_index);
 
 #endif

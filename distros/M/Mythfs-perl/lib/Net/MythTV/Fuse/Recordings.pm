@@ -32,7 +32,6 @@ backend.
 
 =cut
 
-
 use strict;
 use POSIX 'strftime';
 use LWP::UserAgent;
@@ -43,6 +42,7 @@ use threads;
 use threads::shared;
 use Thread::Semaphore;
 use Config;
+use File::Basename ();
 use Carp 'croak';
 
 use constant CACHETIME => 60*5;  # 5 minutes
@@ -59,8 +59,9 @@ use constant Templates => {
     C  => '{Category}',
     ST => '{SubTitle}?{SubTitle}:{Title}',   # prefer %S?%S:%T
     TC => '{SubTitle}?{Title}:{Category}',   # prefer %S?%T:%C
-    se => '{Season}',
-    e  => '{Episode}',
+    se =>  'sprintf("%02d",$recording->{Season})',
+    e   => 'sprintf("%02d",$recording->{Episode})',
+    see => '$recording->{Season} && $recording->{Episode} ? sprintf("s%02de%02d",$recording->{Season},$recording->{Episode}):""',
     PI => '{ProgramId}',
     SI => '{SeriesId}',
     st => '{Stars}',
@@ -150,7 +151,71 @@ use constant Templates => {
     oB   => '%B{Airdate}',
 
     '%'  => '%',
+
+    # special format for Plex server
+    PLX => <<'END',
+    do {
+       my $r = '';
+       my $ct = $recording->{CatType};
+       if ($ct eq 'series' || $ct eq 'tvshow' || $recording->{Season}) {
+          $r .= 'TV Shows/';
+          $r .= "$recording->{Title}/";
+          if ($recording->{Season}) {
+             $r .= "Season $recording->{Season}/";
+             $r .= sprintf("%s - s%02de%02d - %s",$recording->{Title},$recording->{Season},$recording->{Episode},$recording->{Airdate});
+             $r .= " - $recording->{SubTitle}" if defined $recording->{SubTitle};
+          } else {
+             my ($heuristic_season) = $recording->{SubTitle} =~ /(?:Season|Series)\s+(\d+)/;
+             ($heuristic_season)    = $recording->{Airdate} =~ /^(\d+)/ unless $heuristic_season; # year instead of season
+             $heuristic_season    ||= '00';
+             $r .= "Season $heuristic_season/$recording->{Title} - $recording->{Airdate}";
+             $r .= " - $recording->{SubTitle}" if $recording->{SubTitle};
+          }
+       } else {
+          $r .= 'Movies/';
+          my ($yr) = $recording->{Airdate} =~ /^(\d+)/;
+          $r .= "$recording->{Title}";
+          $r .= " ($yr)" if $yr;
+          $r .= "/";
+          $r .= "$recording->{Title}";
+          $r .= ", $recording->{SubTitle}" if $recording->{SubTitle};
+          $r .= " ($yr)" if $yr;
+       }
+       return $r;
+    } 
+END
+
     };
+
+use constant REC_CODES => {
+    -13  => "Other recording",
+    -12  => "Other tuning",
+    -11  => "Backend not running",
+    -10  => "The showing is being tuned",
+    -9   => "The recorder failed to record",
+    -8   => "The tuner card was busy",
+    -7   => "Low disk space",
+    -6   => "Manual cancel",
+    -5   => "Missed recording",
+    -4   => "Aborted",
+    -3   => "Recorded",
+    -2   => "Now recording",
+    -1   => "Will record",
+    0    => "Unknown status code",
+    1    => "Don't record",
+    2    => "Previously recorded",
+    3    => 'Currently recorded',
+    4    => "Earlier showing",
+    5    => "Max recordings",
+    6    => "Not listed",
+    7    => 'Conflict',
+    8    => 'Later showing',
+    9    => 'Repeat',
+    10   => 'Rule inactive',
+    11   => 'Never record',
+    12   => 'Recorder off-line',
+    13   => 'Other showing',
+};
 
 my $Package = __PACKAGE__;
 foreach (qw(debug backend port dummy_data cache cachetime maxgets threaded
@@ -243,6 +308,8 @@ sub start_update_thread {
     $self->_refresh_recorded 
 	or croak "Could not contact backend at ",$self->backend,':',$self->port;
     return unless $self->threaded;
+
+    # this updates the recordings
     my $thr = threads->create(
 	sub {
 	    while (1) {
@@ -251,6 +318,17 @@ sub start_update_thread {
 	    }
 	}
 	);
+
+    $thr->detach();
+
+    # this updates upcoming recordings at a less frequent interval
+    $thr = threads->create(
+	sub {
+	    while (1) {
+		$self->_refresh_upcoming;
+		sleep(60*60); # 1 hour, hard coded
+	    }
+	});
     $thr->detach();
 }
 
@@ -346,10 +424,11 @@ sub get_recorded {
     return $cache if $cache && $nocache;
 
     $self->_refresh_recorded if !$self->threaded && (time() - $Cache{mtime} >= $self->cachetime);
+
+    lock %Cache;
     return $cache            if $cache && $self->mtime >= $Cache{mtime};
 
     warn scalar localtime()," refreshing thread-level cache, mtime = $Cache{mtime}\n" if $self->debug;
-    lock %Cache;
     $self->mtime($Cache{mtime});
     return $self->cache(decode_json($Cache{recorded}||''));
 }
@@ -511,13 +590,92 @@ sub download_recorded_file {
     my $sg       = $e->{storage};
     my $byterange= $offset.'-'.($offset+$size-1);
 
-    $self->{ua} ||= LWP::UserAgent->new(keep_alive=>20);
+    $self->{ua} ||= LWP::UserAgent->new(keep_alive=>undef);
     $self->semaphore->down();
     my $response = $self->{ua}->get("http://$host:$port/Content/GetFile?StorageGroup=$sg&FileName=$basename",
 				    'Range'       => $byterange);
     $self->semaphore->up();
     $response->is_success or return 'connection failed';
     return ('ok',$response->decoded_content);
+}
+
+=head2 $status = $r->delete_recording($path)
+
+Call on a path to delete the indicated recording. Returns "ok" if
+successful. Otherwise may return "not found" for an invalid path, or
+"delete failed: " plus some explanatory text describing an error on
+the backend.
+
+=cut
+
+sub delete_recording {
+    my $self = shift;
+    my $path = shift;
+
+    # deal with Cache directly, otherwise we get race conditions
+    lock %Cache;
+    my $r    = decode_json($Cache{recorded});
+    my $e    = $r->{paths}{$path} or return 'not found';
+
+    my $host     = $e->{host} || $self->backend;  
+    my $port     = $self->port;
+    my $chanid   = $e->{chanid};
+    my $starttime= $e->{starttime};
+    $starttime   =~ s/Z$//;
+
+    my $url      = "http://$host:$port/Dvr/RemoveRecorded?ChanId=$chanid&StartTime=$starttime";
+    my $ua       = $self->{ua} ||= LWP::UserAgent->new(keep_alive=>undef);
+    warn "DELETE: POST $url";
+
+    my $response = $ua->post("http://$host:$port/Dvr/RemoveRecorded?ChanId=$chanid&StartTime=$starttime");
+    $response->is_success or return "delete failed: ".$response->status_line;
+    my $success = $response->decoded_content =~ m!<bool>true</bool>!;
+
+    warn "DELETE: ",$response->decoded_content;
+
+    if ($success) {
+	my $file = File::Basename::basename($path);
+	my $dir  = File::Basename::dirname($path);
+	delete $r->{paths}{$path};
+	delete $r->{directories}{$dir}{$file};
+	$Cache{recorded} = encode_json($r);
+	$Cache{mtime}    = $self->mtime+1;  # force a cache invalidation
+	return 'ok';
+    } else {
+	return 'delete failed: '.$response->decoded_content;
+    }
+
+}
+
+=head2 $status = $r->delete_directory($path)
+
+Call on a path to delete the indicated directory. The directory must
+be empty. The returned status string will be "ok", or one of "not
+found", "not a directory" or "directory not empty".
+
+=cut
+
+sub delete_directory {
+    my $self = shift;
+    my $path = shift;
+
+    warn "delete_directory($path)";
+
+    # deal with Cache directly, otherwise we get race conditions
+    lock %Cache;
+    my $r    = decode_json($Cache{recorded});
+    my $e    = $r->{paths}{$path}    || return 'not found';
+    $e->{type} eq 'directory'        || return 'not a directory';
+    keys %{$r->{directories}{$path}} && return 'directory not empty';
+
+    my $parent = File::Basename::dirname($path) || '.';
+    my $base   = File::Basename::basename($path);
+    delete $r->{directories}{$path};
+    delete $r->{directories}{$parent}{$base};
+    delete $r->{paths}{$path};
+    $Cache{recorded} = encode_json($r);
+    $Cache{mtime}    = $self->mtime+1;  # force a cache invalidation
+    return 'ok';
 }
 
 =head2 $path = $r->apply_pattern($entry)
@@ -540,6 +698,57 @@ sub apply_pattern {
     return $template;
 }
 
+sub _refresh_upcoming {
+    my $self = shift;
+    my $host     = $self->backend;  
+    my $port     = $self->port;
+    my $ua = $self->{ua} ||= LWP::UserAgent->new(keep_alive=>undef);
+    my $response = $ua->get("http://$host:$port/Dvr/GetUpcomingList?ShowAll=true");
+    $response->is_success or return;
+
+    lock %Cache;
+    my $upcoming = XML::Simple->new(SuppressEmpty=>1)->XMLin($response->decoded_content);
+    $Cache{Upcoming} = encode_json($upcoming);
+}
+
+=head2 $upcoming = $r->get_upcoming_list
+
+Get a list of upcoming recordings. This is an array reference of hashes parsed from the XML 
+shown at http://www.mythtv.org/wiki/DVR_Service#GetUpcomingList.
+
+=cut
+
+sub get_upcoming_list {
+    my $self = shift;
+    lock %Cache;
+    $Cache{Upcoming} or return "No upcoming list. Threads must be enabled to activate this feature.\n";
+    my $response = '';
+    eval {
+	my $upcoming = decode_json($Cache{Upcoming});
+	my $programs = $upcoming->{Programs}{Program};
+	for my $p (@$programs) {
+
+	    my ($start,$end) = map {strftime('%H:%M',localtime(str2time($_)))} @{$p}{'StartTime','EndTime'};
+	    my $date         = strftime('%a %e-%b',localtime(str2time($p->{StartTime})));
+	    my $code         = REC_CODES->{$p->{Recording}{Status}};
+	    $code           .= " (Tuner $p->{Recording}{EncoderId})" if $p->{Recording}{Status} == -1;
+	    my $title        = join (' - ',$p->{Title},$p->{SubTitle});
+	    $title           =~ s/ - $//;
+	    
+	    $response .= sprintf("%-50.50s %4s %7s %10s %5s-%5s %12s\n",
+				 $title,
+				 $p->{Channel}{ChanNum},
+				 $p->{Channel}{ChannelName},
+				 $date,
+				 $start,
+				 $end,
+				 $code);
+	}
+    };
+    return $@ if $@;
+    return $response;
+}
+
 sub _compile_pattern_sub {
     my $self = shift;
     return $self->{pattern_sub} if $self->{pattern_sub};
@@ -549,40 +758,48 @@ sub _compile_pattern_sub {
 
     my $sub = "sub {\n";
     $sub   .= "my (\$recording,\$code) = \@_;\n";
+    $sub   .= "my \$val='';\n";
+    $sub   .= "BLOCK: {\n";
 
-    while ($template =~ /%([a-zA-Z%]{1,3})/g) {
-	my $code = $1;
-	my $field = $Templates->{$code} or next;
+    for my $code (sort {length($b)<=>length($a)} keys %$Templates) {
+	next unless $template =~ /%$code/;
+	my $field = $Templates->{$code};
+
+	$sub .= "if (\$code eq '$code') {\n";
+
 	if ($field eq '%') {
-	    $sub .= "return '%' if \$code eq '$code';\n";
-	    next;
+	    $sub .= "\$val = '%';\n";
 	}
-	if ($field =~ /(%\w+)(\{\w+\})/) { #datetime specifier
-	    $sub .= "return strftime('$1',localtime(str2time(\$recording->$2)||0)) if \$code eq '$code';\n";
-	    next;
+	
+	elsif ($field =~ /(%\w+)(\{\w+\})/) { #datetime specifier
+	    $sub .= "\$val = strftime('$1',localtime(str2time(\$recording->$2)||0));\n";
 	}
-	if ($field =~ /(.+)\?(.+)\:(.+)/) {  # something like '{SubTitle}?{SubTitle}:{Title}'
-	    $sub .= <<END;
-	    if (\$code eq '$code') {
-		my \$val = \$recording->$1?\$recording->$2:\$recording->$3;
-		\$val  ||= '';
-		\$val =~ tr!a-zA-Z0-9_.,&\@:* ^\\![]{}(),?#\$=+%-!_!c;
-		return \$val;
-	    }
-END
-    next;
+	
+	elsif ($field =~ /(.+)\?(.+)\:(.+)/) {  # something like '{SubTitle}?{SubTitle}:{Title}'
+	    $sub .= "\$val = \$recording->$1?\$recording->$2:\$recording->$3;\n";
 	}
 
-	$sub .= <<END;
-	if (\$code eq '$code') {
-	    my \$val = \$recording->$field || '';
-	    \$val =~ tr!a-zA-Z0-9_.,&\@:* ^\\![]{}(),?#\$=+%-!_!c;
-	    return \$val;
+	elsif ($field =~ /^{/) {
+	    $sub .= "\$val = \$recording->$field || '';\n";
 	}
-END
-    ;
+
+	else {  # something else - has to be a perl expression
+	    $sub .= "\$val = $field;\n";
+	}
+	
+	$sub .= "last BLOCK;\n";
+	$sub .= "}\n";
     }
+
+    $sub .= <<END;
+    }
+    \$val ||= '';
+    \$val =~ tr!/!_!;
+    return \$val;
+END
+
     $sub .= "}\n";
+
     my $s = eval $sub;
     die $@ if $@;
     return $self->{pattern_sub} = $s;
@@ -632,7 +849,7 @@ sub _fetch_recorded_data {
     my $host = $self->backend;
     my $port = $self->port;
 
-    $self->{ua} ||= LWP::UserAgent->new(keep_alive=>20);
+    $self->{ua} ||= LWP::UserAgent->new(keep_alive=>undef);
     my $response = $self->{ua}->get("http://$host:$port/Dvr/GetRecordedList");
 
     my $status;
@@ -705,6 +922,10 @@ sub _build_directory_map {
 	$map->{paths}{$path}{storage}  = $meta->{Recording}{StorageGroup};
 	$map->{paths}{$path}{ctime}    = $ctime;
 	$map->{paths}{$path}{mtime}    = $mtime;
+
+	# for recording removal
+	$map->{paths}{$path}{chanid}    = $meta->{Channel}{ChanId};
+	$map->{paths}{$path}{starttime} = $meta->{StartTime};  # slightly redundant information
 	
 	# take care of the directories
 	my $dir = '';

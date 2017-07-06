@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 BEGIN { use_ok('Apache::Session::MongoDB') }
 
 #########################
@@ -20,7 +20,7 @@ BEGIN { use_ok('Apache::Session::MongoDB') }
 SKIP: {
 
     unless ( defined $ENV{MONGODB_SERVER} ) {
-        skip 'MONGODB_SERVER is not set', 8;
+        skip 'MONGODB_SERVER is not set', 10;
     }
     my %h;
     my $args = { host => $ENV{MONGODB_SERVER} };
@@ -29,8 +29,10 @@ SKIP: {
 
     my $id;
     ok( $id = $h{_session_id}, '_session_id is defined' );
-    $h{some} = 'data';
-    $h{utf8} = 'éàèœ';
+    $h{some}         = 'data';
+    $h{utf8}         = 'éàèœ';
+    $h{'dotted.key'} = 'test';
+    $h{'dollar$key'} = 'test';
 
     untie %h;
 
@@ -43,8 +45,10 @@ SKIP: {
         'Access to previous session'
     );
 
-    ok( $h2{some} eq 'data',     'Find data' );
-    ok( $h2{utf8} eq 'éàèœ', 'UTF string' );
+    ok( $h2{some} eq 'data',         'Find data' );
+    ok( $h2{utf8} eq 'éàèœ',     'UTF string' );
+    ok( $h2{'dotted.key'} eq 'test', 'Dotted key' );
+    ok( $h2{'dollar$key'} eq 'test', 'Dollar key' );
     Apache::Session::MongoDB->get_key_from_all_sessions($args);
 
     #binmode(STDERR, ":utf8");

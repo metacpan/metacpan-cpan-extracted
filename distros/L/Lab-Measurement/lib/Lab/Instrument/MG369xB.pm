@@ -1,5 +1,5 @@
 package Lab::Instrument::MG369xB;
-$Lab::Instrument::MG369xB::VERSION = '3.550';
+$Lab::Instrument::MG369xB::VERSION = '3.552';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);

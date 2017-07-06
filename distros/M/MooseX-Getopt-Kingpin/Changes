@@ -1,0 +1,13 @@
+Revision history for Perl extension MooseX-Getopt-Kingpin
+
+0.1.2 2017-06-26T07:42:25Z
+    - remove package BLOCK in test (works in perl 5.10, 5.12)
+    - add to travis
+
+0.1.1 2017-06-23T12:43:22Z
+    - fix documentation
+
+0.1.0 2017-06-23T12:40:12Z
+
+    - original version
+

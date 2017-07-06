@@ -1,0 +1,6 @@
+0.002 2015-03-02
+ - Recognise more edge-cases with for-loops and anonymous subroutines.
+ - Recognise when we're using Try::Tiny
+ - Fix some POD mistakes, more metadata, more tests
+0.001 2014-12-04
+ - Initial release

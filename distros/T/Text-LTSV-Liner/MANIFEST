@@ -3,9 +3,9 @@ Changes
 LICENSE
 META.json
 README.md
-bin/ltsvl.pl
 cpanfile
 lib/Text/LTSV/Liner.pm
+script/ltsvl.pl
 t/00_compile.t
 t/01_parse.t
 META.yml

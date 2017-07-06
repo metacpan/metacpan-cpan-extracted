@@ -8,11 +8,8 @@ SYNOPSIS
 
         use Finance::Bank::ID::Mandiri;
     
-        # FBI::Mandiri uses Log::Any. to show logs, use something like:
-        use Log::Log4perl qw(:easy);
-        use Log::Any::Adapter;
-        Log::Log4perl->easy_init($DEBUG);
-        Log::Any::Adapter->set('Log4perl');
+        # FBI::Mandiri uses Log::ger. to show logs, use something like:
+        use Log::ger::Output 'Screen';
     
         my $ibank = Finance::Bank::ID::Mandiri->new(
             username => '....', # optional if you're only using parse_statement()

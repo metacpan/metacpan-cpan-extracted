@@ -22,46 +22,56 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
-                  'leading_digits' => '2',
-                  'pattern' => '(2\\d)(\\d{3})(\\d{3})'
+                  'pattern' => '(2\\d)(\\d{3})(\\d{3})',
+                  'leading_digits' => '2'
                 },
                 {
-                  'leading_digits' => '[45]',
-                  'pattern' => '([4-5])(\\d{3})(\\d{3})'
+                  'pattern' => '([4-5])(\\d{3})(\\d{3})',
+                  'leading_digits' => '[45]'
                 },
                 {
-                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})',
-                  'leading_digits' => '[23578]'
+                  'leading_digits' => '[23578]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
 my $validators = {
-                'fixed_line' => '2\\d{7}',
-                'pager' => '',
-                'voip' => '
-          332(?:
-            02|
-            [25]\\d
+                'mobile' => '
+          (?:
+            20\\d{2}|
+            330\\d|
+            4[67]|
+            5(?:55)?\\d|
+            77\\d{2}|
+            88\\d{2}
+          )\\d{5}
+        ',
+                'fixed_line' => '
+          (?:
+            2\\d{3}|
+            33333
           )\\d{4}
         ',
                 'toll_free' => '',
-                'geographic' => '2\\d{7}',
+                'pager' => '',
+                'voip' => '',
                 'personal_number' => '',
-                'specialrate' => '',
-                'mobile' => '
+                'geographic' => '
           (?:
-            20\\d{3}|
-            330\\d{2}|
-            4[67]\\d|
-            5(?:55)?\\d{2}|
-            77\\d{3}|
-            88\\d{3}
+            2\\d{3}|
+            33333
           )\\d{4}
-        '
+        ',
+                'specialrate' => '(
+          332(?:
+            02|
+            [2-5]\\d
+          )\\d{4}
+        )'
               };
 
     sub new {

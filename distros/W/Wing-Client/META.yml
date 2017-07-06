@@ -26,4 +26,4 @@ requires:
 resources:
   bugtracker: http://github.com/plainblack/Wing-Client/issues
   repository: git://github.com/plainblack/Wing-Client.git
-version: '1.0000'
+version: '1.1000'

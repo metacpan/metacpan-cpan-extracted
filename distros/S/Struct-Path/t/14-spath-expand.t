@@ -3,14 +3,14 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 10;
 
 use Struct::Path qw(spath);
 
 use Storable qw(dclone);
 
 use lib "t";
-use _common qw($s_mixed);
+use _common qw($s_mixed t_dump);
 
 my (@r, $tmp);
 
@@ -55,6 +55,22 @@ is_deeply(
     },
     "create {a}[3][1]"
 );
+
+$tmp = undef;
+@r = spath(\$tmp, [ [1,8],[3,16] ], expand => 'append');
+is_deeply(
+    $tmp,
+    [[undef,undef],[undef,undef]],
+    "expand-append [1,8],[3,16] for undef"
+) or diag t_dump $tmp;
+
+$tmp = [0, 1, 2, 3];
+@r = spath(\$tmp, [ [8,1],[16,3] ], expand => 'append');
+is_deeply(
+    $tmp,
+    [0,[undef,undef],2,3,[undef,undef]],
+    "expand-append [8,1],[16,3] for [0, 1, 2, 3]"
+) or diag t_dump $tmp;
 
 ### HASHES ###
 

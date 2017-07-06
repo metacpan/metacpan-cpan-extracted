@@ -1,5 +1,10 @@
 Revision history for Perl module Chatbot::Eliza
 
+1.08 2017-06-28 GRANTG
+    - Apply https://rt.cpan.org/Public/Bug/Display.html?id=122147 patch
+      to POD
+    - Fix surrounding EOL whitespace
+
 1.07 2017-04-08 GRANTG
     - Implemented RT https://rt.cpan.org/Ticket/Display.html?id=120590 to
       return reasmbs in order

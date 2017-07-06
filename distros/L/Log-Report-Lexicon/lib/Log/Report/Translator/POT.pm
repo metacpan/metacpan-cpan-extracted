@@ -1,4 +1,4 @@
-# Copyrights 2007-2016 by [Mark Overmeer].
+# Copyrights 2007-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Translator::POT;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 use base 'Log::Report::Translator';
 
@@ -17,8 +17,10 @@ use Log::Report::Lexicon::Index;
 use Log::Report::Lexicon::POTcompact;
 
 use POSIX qw/:locale_h/;
+use File::Spec ();
 
-my %indices;
+my %lexicons;
+sub _fn_to_lexdir($);
 
 # Work-around for missing LC_MESSAGES on old Perls and Windows
 { no warnings;
@@ -26,6 +28,49 @@ my %indices;
   *LC_MESSAGES = sub(){5} if $@;
 }
 
+
+sub new(@)
+{   my $class = shift;
+    # Caller cannot wait until init()
+    $class->SUPER::new(callerfn => (caller)[1], @_);
+}
+
+sub init($)
+{   my ($self, $args) = @_;
+    $self->SUPER::init($args);
+
+    my $lex = delete $args->{lexicons} || delete $args->{lexicon}
+     || (ref $self eq __PACKAGE__ ? [] : _fn_to_lexdir $args->{callerfn});
+
+    error __x"You have to upgrade Log::Report::Lexicon to at least 1.00"
+        if +($Log::Report::Lexicon::Index::VERSION || 999) < 1.00;
+
+    my @lex;
+    foreach my $dir (ref $lex eq 'ARRAY' ? @$lex : $lex)
+    {   # lexicon indexes are shared
+        my $l = $lexicons{$dir} ||= Log::Report::Lexicon::Index->new($dir);
+        $l->index;   # index the files now
+        push @lex, $l;
+    }
+    $self->{lexicons} = \@lex;
+    $self->{charset}  = $args->{charset} || 'utf-8';
+    $self;
+}
+
+sub _fn_to_lexdir($)
+{   my $fn = shift;
+    $fn =~ s/\.pm$//;
+    File::Spec->catdir($fn, 'messages');
+}
+
+#------------
+
+sub lexicons() { @{shift->{lexicons}} }
+
+
+sub charset() {shift->{charset}}
+
+#------------
 
 sub translate($;$$)
 {   my ($self, $msg, $lang, $ctxt) = @_;

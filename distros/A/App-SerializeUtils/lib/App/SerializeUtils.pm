@@ -4,7 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 1;
 # ABSTRACT: Utilities for serialization tasks
@@ -21,7 +21,7 @@ App::SerializeUtils - Utilities for serialization tasks
 
 =head1 VERSION
 
-This document describes version 0.14 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2017-06-01.
+This document describes version 0.15 of App::SerializeUtils (from Perl distribution App-SerializeUtils), released on 2017-06-26.
 
 =head1 SYNOPSIS
 
@@ -128,7 +128,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Serial
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-SerializeUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-SerializeUtils>.
 
 =head1 BUGS
 

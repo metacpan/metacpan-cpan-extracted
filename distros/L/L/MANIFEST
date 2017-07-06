@@ -1,18 +1,12 @@
-.dimconfig
-.shipit
 Build.PL
 Changes
-lib/L.pm
 LICENSE
-Makefile.PL
-MANIFEST			This list of files
-MANIFEST.SKIP
 META.json
-META.yml
-README
+README.md
+cpanfile
+lib/L.pm
+minil.toml
 t/000_load.t
 t/001_basic.t
-xt/perlcritic.t
-xt/pod.t
-xt/podcoverage.t
-xt/podspell.t
+META.yml
+MANIFEST

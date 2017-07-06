@@ -75,7 +75,7 @@ sub run_test {
     my %opts    = %{ $settings->{options} || {} };
 
     for my $n ( 1..@results ) {
-        my $file   = "t/data/$n.txt";
+        my $file   = "./t/data/$n.txt";
         my $result = $results[$n-1];
 
         # File handle initializer

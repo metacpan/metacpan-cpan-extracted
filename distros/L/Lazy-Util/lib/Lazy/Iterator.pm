@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Lazy::Iterator;
-$Lazy::Iterator::VERSION = '0.003';
+$Lazy::Iterator::VERSION = '0.004';
 #ABSTRACT: Objects encapsulating a set of lazy evaluation functions.
 
 
@@ -31,7 +31,7 @@ sub new {
 sub exhausted {
   my $self = shift;
 
-  $self->{get} = $self->get();
+  unshift @{ $self->{get} }, $self->get();
 
   return $self->{exhausted};
 }
@@ -40,7 +40,7 @@ sub exhausted {
 sub get {
   my $self = shift;
 
-  return delete $self->{get} if exists $self->{get};
+  return shift @{ $self->{get} } if @{ $self->{get} || [] };
 
   return undef if $self->{exhausted};
 
@@ -60,6 +60,18 @@ sub get_all {
   return @res;
 }
 
+
+sub unget {
+  my $self = shift;
+  my $value = shift;
+
+  croak "Can't unget an undefined value." if not defined $value;
+
+  unshift @{ $self->{get} }, $value;
+
+  return $self;
+}
+
 1;
 
 __END__
@@ -74,7 +86,7 @@ Lazy::Iterator - Objects encapsulating a set of lazy evaluation functions.
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -87,12 +99,12 @@ version 0.003
 =head1 DESCRIPTION
 
 Objects encapsulating a set of lazy evaluation functions, meaning you can
-combine them using the L<C<l_*>|Lazy::Util/"C<l_*> functions"> functions from
+combine them using the L<C<l_*>|Lazy::Util/"l_* functions"> functions from
 L<C<Lazy::Util>>.
 
-=head1 METHODS
+=head1 CONSTRUCTORS
 
-=head2 C<< Lazy::Iterator->new($source) >>
+=head2 new
 
   my $lazy = Lazy::Iterator->new(sub { $i++ });
 
@@ -103,7 +115,9 @@ that source.
 The C<$source> needs to be either a C<CODE> reference, or a C<Scalar::Defer>
 variable of type C<0>, provided you have C<Scalar::Defer> available.
 
-=head2 C<< $lazy->exhausted() >>
+=head1 METHODS
+
+=head2 exhausted
 
   my $exhausted = $lazy->exhausted();
 
@@ -114,20 +128,28 @@ if there are values left, and 1 if the source is exhausted.
 An exhausted C<Lazy::Iterator> object will always return C<undef> from a
 C<< $lazy->get() >> call.
 
-=head2 C<< $lazy->get() >>
+=head2 get
 
   my $next = $lazy->get();
 
 C<< $lazy->get >> returns the next value from the source it encapsulates. When
 there are no more values it returns C<undef>.
 
-=head2 C<< $lazy->get_all() >>
+=head2 get_all
 
   my @crazy = $lazy->get_all();
 
 C<< $lazy->get_all >> returns all the values from the source, if it can. B<This
 has the potential to never return as well as running out of memory> if given a
 source of infinite values.
+
+=head2 unget
+
+  $lazy = $lazy->unget($value);
+
+C<< $lazy->unget >> stashes C<$value> as the next thing to be returned by
+C<< $last->get() >>. Can be used multiple times to stash further values. The
+latest stashed value will be returned first.
 
 =head1 NOTES
 

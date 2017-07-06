@@ -1,4 +1,4 @@
-# Copyright 2010, 2011, 2012 Kevin Ryde
+# Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 
 # This file is part of Image-Base-Magick.
 #
@@ -30,7 +30,7 @@ use vars '$VERSION', '@ISA';
 use Image::Base;
 @ISA = ('Image::Base');
 
-$VERSION = 4;
+$VERSION = 5;
 
 # uncomment this to run the ### lines
 #use Smart::Comments '###';
@@ -758,7 +758,7 @@ http://user42.tuxfamily.org/image-base-magick/index.html
 
 =head1 LICENSE
 
-Image-Base-Magick is Copyright 2010, 2011, 2012 Kevin Ryde
+Image-Base-Magick is Copyright 2010, 2011, 2012, 2017 Kevin Ryde
 
 Image-Base-Magick is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free

@@ -13,13 +13,54 @@ BEGIN {
     }
 }
 use warnings;
-our $VERSION = '0.000004';
+our $VERSION = '0.000008';
 use utf8;
+
+# Class for $PPR::X::ERROR objects...
+{ package PPR::X::ERROR;
+
+  use overload q{""} => 'source', q{0+} => 'line', fallback => 1;
+
+  sub new {
+      my ($class, %obj) = @_;
+      return bless \%obj, $class;
+  }
+
+  sub prefix { return shift->{prefix} }
+
+  sub source { return shift->{source} }
+
+  sub line   { my $self = shift;
+               my $offset = $self->{line} // shift // 1;
+               return $offset + $self->{prefix} =~ tr/\n//;
+              }
+
+  sub origin { my $self = shift;
+               my $line = shift // 0;
+               my $file = shift // "";
+               return bless { %{$self}, line => $line, file => $file }, ref($self);
+             }
+
+  sub diagnostic { my $self = shift;
+                   my $line = defined $self->{line}
+                                    ? $self->{line} + $self->{prefix} =~ tr/\n//
+                                    : 0;
+                   my $file = $self->{file} // q{};
+                   return q{} if eval "no strict;\n"
+                                    . "#line $line $file\n"
+                                    . "sub{ $self->{source} }";
+                   my $diagnostic = $@;
+                   $diagnostic =~ s{ \s*+ \bat \s++ \( eval \s++ \d++ \) \s++ line \s++ 0,
+                                   | \s*+ \( eval \s++ \d++ \)
+                                   | \s++ \Z
+                                   }{}gx;
+                   return $diagnostic;
+                 }
+}
 
 # Define the grammar...
 our $GRAMMAR = qr{
 (?(DEFINE)
-
     (?<PerlDocument>   (?<PerlStdDocument>
             (?>(?&PerlOWS))
         (?: (?>(?&PerlStatement)) (?&PerlOWS) )*+
@@ -91,6 +132,16 @@ our $GRAMMAR = qr{
 
         | # Just an empty statement...
             (?>(?&PerlOWS)) ;
+
+        | # An error (report it, if it's the first)...
+            (?(?{ !defined $PPR::X::ERROR })
+                (?> (?&PerlOWS) )
+                (?! (?: \} | \z ) )
+                (?{ pos() })
+                ( (?&PerlExpression) (?&PerlOWS) [^\n]++ | [^;\}]++ )
+                (?{ $PPR::X::ERROR //= PPR::X::ERROR->new(source => $^N, prefix => substr($_, 0, $^R) ) })
+                (?!)
+            )
         )
     )) # End of rule
 
@@ -516,7 +567,11 @@ our $GRAMMAR = qr{
     )) # End of rule
 
     (?<PerlDiamondOperator>   (?<PerlStdDiamondOperator>
-        <  (?>(?&PPR_X_balanced_angles))  >
+        <<>>    # Perl 5.22 "double diamond"
+      |
+        < (?! < )
+            (?>(?&PPR_X_balanced_angles))
+        >
         (?=
             (?>(?&PerlOWS))
             (?> \z | [,;\}\])?] | => | : (?! :)        # (
@@ -789,9 +844,6 @@ our $GRAMMAR = qr{
     )) # End of rule
 
     (?<PerlHeredoc>   (?<PerlStdHeredoc>
-        (?{ %PPR::X::_heredoc_skip = () if !$PPR::X::_heredoc_setup;
-            local $PPR::X::_heredoc_setup = 1;
-        })
         <<
         (?<_heredoc_indented> [~]?+ )
         (?>
@@ -809,20 +861,35 @@ our $GRAMMAR = qr{
                    (?<_heredoc_terminator>                                  )
         )?+
 
-        # Lookahead to detect and remember trailing contents of heredoc
-        (?=
-            [^\n]*+ \n                                          # Go to end of line
-            (?: (??{ $PPR::X::_heredoc_skip{+pos()} // q{} }) )++  # Skip earlier heredoc contents
-            (?{ +pos() })                                       # Remember the start location
-            (?<_heredoc_contents>                               # The heredoc contents consist of...
-                (?: [^\n]*+ \n )*?                              #     A minimal number of lines
-                (?(?{ $+{_heredoc_indented} }) \h*+ )           #     An indent (if it was a <<~)
-                \g{_heredoc_terminator}                         #     The specified terminator
-                (?: \n | \z )                                   #     Followed by EOL
-            )
+        # Do we need to reset heredoc cache???
+        (?{
+            if ( ($PPR::X::_heredoc_origin//q{}) ne $_ ) {
+                %PPR::X::_heredoc_skip      = ();
+                %PPR::X::_heredoc_parsed_to = ();
+                $PPR::X::_heredoc_origin    = $_;
+            }
+        })
 
-            # Then memoize the skip for when it's subsequently needed by PerlOWS or PerlNWS...
-            (?{ $PPR::X::_heredoc_skip{$^R} = "(?s:.\{" . length($+{_heredoc_contents}) . "\})"; })
+        # Do we need to cache content lookahead for this heredoc???
+        (?(?{ my $look = !$PPR::X::_heredoc_parsed_to{+pos()}; $PPR::X::_heredoc_parsed_to{+pos()} = 1; $look; })
+
+            # Lookahead to detect and remember trailing contents of heredoc
+            (?=
+                [^\n]*+ \n                                           # Go to the end of the current line
+                (?{ +pos() })                                        # Remember the start of the contents
+                (??{ $PPR::X::_heredoc_skip{+pos()} // q{} })           # Skip earlier heredoc contents
+                (?:                                                  # The heredoc contents consist of...
+                    (?: [^\n]*+ \n )*?                               #     A minimal number of lines
+                    (?(?{ $+{_heredoc_indented} }) \h*+ )            #     An indent (if it was a <<~)
+                    \g{_heredoc_terminator}                          #     The specified terminator
+                    (?: \n | \z )                                    #     Followed by EOL
+                )
+
+                # Then memoize the skip for when it's subsequently needed by PerlOWS or PerlNWS...
+                (?{
+                    $PPR::X::_heredoc_skip{$^R} = "(?s:.\{" . (pos() - $^R) . "\})";
+                })
+            )
         )
 
     )) # End of rule
@@ -969,6 +1036,7 @@ our $GRAMMAR = qr{
 
     (?<PerlBuiltinFunction>   (?<PerlStdBuiltinFunction>
         # Optimized to match any Perl builtin name, without backtracking...
+        (?=[^\W\d]) # Skip if possible
         (?>
              s(?>e(?>t(?>(?>(?>(?>hos|ne)t|gr)en|s(?>erven|ockop))t|p(?>r(?>iority|otoent)|went|grp))|m(?>ctl|get|op)|ek(?>dir)?|lect|nd)|y(?>s(?>write|call|open|read|seek|tem)|mlink)|h(?>m(?>write|read|ctl|get)|utdown|ift)|o(?>cket(?>pair)?|rt)|p(?>li(?>ce|t)|rintf)|(?>cala|ubst)r|t(?>ate?|udy)|leep|rand|qrt|ay|in)
             | g(?>et(?>p(?>r(?>oto(?>byn(?>umber|ame)|ent)|iority)|w(?>ent|nam|uid)|eername|grp|pid)|s(?>erv(?>by(?>name|port)|ent)|ock(?>name|opt))|host(?>by(?>addr|name)|ent)|net(?>by(?>addr|name)|ent)|gr(?>ent|gid|nam)|login|c)|mtime|lob|oto|rep)
@@ -1000,6 +1068,7 @@ our $GRAMMAR = qr{
 
     (?<PerlNullaryBuiltinFunction>   (?<PerlStdNullaryBuiltinFunction>
         # Optimized to match any Perl builtin name, without backtracking...
+        (?= [^\W\d] )  # Skip if possible
         (?>
               get(?:(?:(?:hos|ne)t|serv|gr)ent|p(?:(?:roto|w)ent|pid)|login)
             | end(?:(?:hos|ne)t|p(?:roto|w)|serv|gr)ent
@@ -1183,14 +1252,71 @@ our $GRAMMAR = qr{
         \S   # (Note: Don't have to test that this matches; the preceding subrule already did that)
     )
 
-    (?<PPR_X_balanced_parens>  [^)(\\]*+   (?: (?> \\. | \( (?>(?&PPR_X_balanced_parens))  \) ) [^)(\\]*+   )*+ )
-    (?<PPR_X_balanced_curlies> [^\}\{\\]*+ (?: (?> \\. | \{ (?>(?&PPR_X_balanced_curlies)) \} ) [^\}\{\\]*+ )*+ )
-    (?<PPR_X_balanced_squares> [^][\\]*+   (?: (?> \\. | \[ (?>(?&PPR_X_balanced_squares)) \] ) [^][\\]*+   )*+ )
-    (?<PPR_X_balanced_angles>  [^><\\]*+   (?: (?> \\. |  < (?>(?&PPR_X_balanced_angles))   > ) [^><\\]*+   )*+ )
+    (?<PPR_X_balanced_parens>
+        [^)(\\\n]*+
+        (?:
+            (?>
+                \\.
+            |
+                \(  (?>(?&PPR_X_balanced_parens))  \)
+            |
+                \n  (??{ $PPR::X::_heredoc_skip{+pos()} // q{} })
+            )
+            [^)(\\\n]*+
+        )*+
+    )
+
+    (?<PPR_X_balanced_curlies>
+        [^\}\{\\\n]*+
+        (?:
+            (?>
+                \\.
+            |
+                \{  (?>(?&PPR_X_balanced_curlies))  \}
+            |
+                \n  (??{ $PPR::X::_heredoc_skip{+pos()} // q{} })
+            )
+            [^\}\{\\\n]*+
+        )*+
+    )
+
+    (?<PPR_X_balanced_squares>
+        [^][\\\n]*+
+        (?:
+            (?>
+                \\.
+            |
+                \[  (?>(?&PPR_X_balanced_squares))  \]
+            |
+                \n  (??{ $PPR::X::_heredoc_skip{+pos()} // q{} })
+            )
+            [^][\\\n]*+
+        )*+
+    )
+
+    (?<PPR_X_balanced_angles>
+        [^><\\\n]*+
+        (?:
+            (?>
+                \\.
+            |
+                <  (?>(?&PPR_X_balanced_angles))  >
+            |
+                \n  (??{ $PPR::X::_heredoc_skip{+pos()} // q{} })
+            )
+            [^><\\\n]*+
+        )*+
+    )
 
     (?<PPR_X_quotelike_body_unclosed>
         (?>
-               [#]  [^#\\]*+  (?: \\. [^#\\]*+ )*+   (?= [#] )
+               [#]
+               [^#\\\n]*+
+               (?:
+                   (?: \\. | \n  (??{ $PPR::X::_heredoc_skip{+pos()} // q{} }) )
+                   [^#\\\n]*+
+               )*+
+               (?= [#] )
         |
             (?>(?&PerlOWS))
             (?>
@@ -1202,12 +1328,30 @@ our $GRAMMAR = qr{
             |
                  <  (?>(?&PPR_X_balanced_angles))     (?=  > )
             |
-                \\  [^\\]*+                         (?= \\ )
+                \\
+                    [^\\\n]*+
+                    (
+                        \n  (??{ $PPR::X::_heredoc_skip{+pos()} // q{} })
+                        [^\\\n]*+
+                    )*+
+                (?= \\ )
             |
-                 /  [^\\/]*+ (?: \\. [^\\/]*+ )*+   (?=  / )
+                 /
+                     [^\\/\n]*+
+                 (?:
+                     (?: \\. | \n  (??{ $PPR::X::_heredoc_skip{+pos()} // q{} }) )
+                     [^\\/\n]*+
+                 )*+
+                 (?=  / )
             |
                 (?<PPR_X_qldel> \S )
-                    (?: \\. | (?! \g{PPR_X_qldel} ) . )*+
+                    (?:
+                        \\.
+                    |
+                        \n (??{ $PPR::X::_heredoc_skip{+pos()} // q{} })
+                    |
+                        (?! \g{PPR_X_qldel} ) .
+                    )*+
                 (?= \g{PPR_X_qldel} )
             )
         )
@@ -1233,7 +1377,7 @@ PPR::X - Pattern-based Perl Recognizer
 
 =head1 VERSION
 
-This document describes PPR::X version 0.000004
+This document describes PPR::X version 0.000008
 
 
 =head1 SYNOPSIS
@@ -1325,17 +1469,17 @@ package variable, C<$PPR::X::GRAMMAR>, which can be
 interpolated into regexes to add rules that permit
 Perl constructs to be parsed:
 
-    $source_code =~ m{ \A (?&PerlDocument) \Z  $PPR::X::GRAMMAR }
+    $source_code =~ m{ \A (?&PerlDocument) \Z  $PPR::X::GRAMMAR }x;
 
-Note that all the examples to date add this "grammar variable"
-at the end of the regular expression. In most cases, this is
-not necessary. Each of the following works identically:
+Note that all the examples shown so far have interpolated this "grammar
+variable" at the end of the regular expression. This placement is
+desirable, but not necessary. Each of the following works identically:
 
-    $source_code =~ m{ \A (?&PerlDocument) \Z  $PPR::X::GRAMMAR }
+    $source_code =~ m{ \A (?&PerlDocument) \Z  $PPR::X::GRAMMAR }x;
 
-    $source_code =~ m{ $PPR::X::GRAMMAR  \A (?&PerlDocument) \Z }
+    $source_code =~ m{ $PPR::X::GRAMMAR  \A (?&PerlDocument) \Z }x;
 
-    $source_code =~ m{ \A $PPR::X::GRAMMAR (?&PerlDocument) \Z  }
+    $source_code =~ m{ \A $PPR::X::GRAMMAR (?&PerlDocument) \Z  }x;
 
 However, if the grammar is to be L<extended|"Extending the Perl syntax with keywords">,
 then the extensions must be specified B<I<before>> the base grammar
@@ -1344,6 +1488,92 @@ variable at the end of a regex ensures that will be the case, and has
 the added advantage of "front-loading" the regex with the most important
 information: what is actually going to be matched.
 
+Note too that, because the PPR::X grammar internally uses capture groups,
+placing C<$PPR::X::GRAMMAR> anywhere other than the very end of your regex
+may change the numbering of any explicit capture groups in your regex.
+For complete safety, regexes that use the PPR::X grammar should probably
+use named captures, instead of numbered captures.
+
+
+=head2 Error reporting
+
+Regex-based parsing is all-or-nothing: either your regex matches
+(and returns any captures you requested), or it fails to match
+(and returns nothing).
+
+This can make it difficult to detect I<why> a PPR::X-based match failed;
+to work out what the "bad source code" was that prevented your regex
+from matching.
+
+So the module provides a special variable that attempts to detect the
+source code that prevented any call to the C<(?&PerlStatement)> subpattern
+from matching. That variable is: C<$PPR::X::ERROR>
+
+C<$PPR::X::ERROR> is only set if it is undefined at the point where an
+error is detected, and will only be set to the first such error that
+is encountered during parsing.
+
+If it is set, C<$PPR::X::ERROR> will contain an object of type PPR::X::ERROR,
+with the following methods:
+
+=over
+
+=item C<< $PPR::X::ERROR->origin($line, $file) >>
+
+Returns a clone of the PPR::X::ERROR object that now believes that the
+source code parsing failure it is reporting occurred in a code fragment
+starting at the specified fline and file. If the second argument is
+omitted, the file name is not reported in any diagnostic.
+
+=item C<< $PPR::X::ERROR->source() >>
+
+Returns a string containing the specific source code that could not be
+parsed as a Perl statement.
+
+=item C<< $PPR::X::ERROR->prefix() >>
+
+Returns a string containing all the source code preceding the
+code that could not be parsed. That is: the valid code that is
+the preceding context of the unparsable code.
+
+=item C<< $PPR::X::ERROR->line( $opt_offset ) >>
+
+Returns an integer which is the line number at which the unparsable
+code was encountered. If the optional "offset" argument is provided,
+it will be added to the line number returned. Note that the offset
+is ignored if the PPR::X::ERROR object originates from a prior call to
+C<< $PPR::X::ERROR->origin >> (because in that case you will have already
+specified the correct offset).
+
+=item C<< $PPR::X::ERROR->diagnostic() >>
+
+Returns a string containing the diagnostic that would be returned
+by C<perl -c> if the source code were compiled.
+
+B<I<Warning:>> The diagnostic is obtained by partially eval'ing
+the source code. This means that run-time code will not be executed,
+but C<BEGIN> and C<CHECK> blocks will run. Do B<I<not>> call this method
+if the source code that created this error might also have non-trivial
+compile-time side-effects.
+
+=back
+
+A typical use might therefore be:
+
+    # Make sure it's undefined, and will only be locally modified...
+    local $PPR::X::ERROR;
+
+    # Process the matched block...
+    if ($source_code =~ m{ (?<Block> (?&PerlBlock) )  $PPR::X::GRAMMAR }x) {
+        process( $+{Block} );
+    }
+
+    # Or report the offending code that stopped it being a valid block...
+    else {
+        die "Invalid Perl block: " . $PPR::X::ERROR->source . "\n",
+            $PPR::X::ERROR->origin($linenum, $filename)->diagnostic . "\n";
+    }
+
 
 =head2 Examples
 
@@ -1351,7 +1581,7 @@ I<Note:> In each of the following examples, the subroutine C<slurp()> is
 used to acquire the source code from a file whose name is passed as its
 argument. The C<slurp()> subroutine is just:
 
-    sub slurp { local (@ARGV, $/) = shift; readline; }
+    sub slurp { local (*ARGV, $/); @ARGV = shift; readline; }
 
 or, for the less twisty-minded:
 
@@ -1368,7 +1598,7 @@ or, for the less twisty-minded:
   # "Valid" if source code matches a Perl document under the Perl grammar
   printf(
       "$filename %s a valid Perl file\n",
-      slurp($filename) =~ m{\A (?&PerlDocument) \Z  $PPR::X::GRAMMAR }x
+      slurp($filename) =~ m{ \A (?&PerlDocument) \Z  $PPR::X::GRAMMAR }x
           ? "is"
           : "is not"
   );
@@ -1376,15 +1606,16 @@ or, for the less twisty-minded:
 
 =head3 Counting statements
 
-  printf(                                      # Output
-      "$filename contains %d statements\n",    # a report of
-      scalar                                   # the count of
-          grep {defined}                       # defined matches
-              slurp($filename)                 # from the source code,
-                  =~ m{ \G (?&PerlOWS)         # skipping whitespace
-                          ((?&PerlStatement))  # the keeping statements,
-                          $PPR::X::GRAMMAR        # using the Perl grammar
-                      }gcx;                    # incrementally
+  printf(                                        # Output
+      "$filename contains %d statements\n",      # a report of
+      scalar                                     # the count of
+          grep {defined}                         # defined matches
+              slurp($filename)                   # from the source code,
+                  =~ m{
+                        \G (?&PerlOWS)           # to skip whitespace
+                           ((?&PerlStatement))   # and keep statements,
+                        $PPR::X::GRAMMAR            # using the Perl grammar
+                      }gcx;                      # incrementally
   );
 
 
@@ -1398,7 +1629,7 @@ or, for the less twisty-minded:
 =head3 Stripping comments and POD from source code (in Perl v5.14 or later)
 
   # Print  the source code,  having compacted whitespace...
-    print  slurp($filename)  =~ s{ (?&PerlNWS) $PPR::X::GRAMMAR }{ }gxr;
+    print  slurp($filename)  =~ s{ (?&PerlNWS)  $PPR::X::GRAMMAR }{ }gxr;
 
 
 =head3 Stripping everything C<except> comments and POD from source code
@@ -1408,7 +1639,7 @@ or, for the less twisty-minded:
           slurp($filename)                    # from the source code,
               =~ m{ \G ((?&PerlOWS))          # keeping whitespace,
                        (?&PerlStatement)?     # skipping statements,
-                       $PPR::X::GRAMMAR          # using the Perl grammar
+                    $PPR::X::GRAMMAR             # using the Perl grammar
                   }gcx;                       # incrementally
 
 
@@ -1462,7 +1693,7 @@ precedence of comma (C<,> or C<< => >>).
 
 Matches a conditional expression that uses the C<?>...C<:> ternary operator.
 That is, a single valid Perl expression involving operators above the
-precedence of assignment. 
+precedence of assignment.
 
 The alterative name comes from the fact that anything matching is what
 most people think of as a single element of a comma-separated list.
@@ -1767,7 +1998,7 @@ the terminator.
 So, for example, to correctly match a heredoc plus its contents
 you could use something like:
 
-    m/ (?&PerlHeredoc) (?&PerlOWS)   $PPR::X::GRAMMAR /x
+    m/ (?&PerlHeredoc) (?&PerlOWS)  $PPR::X::GRAMMAR /x
 
 or, if there may be trailing items on the same line as the heredoc
 specifier:

@@ -1,0 +1,161 @@
+
+History for the Lab-Measurement Perl distribution
+
+This document is work in progress (in the sense of adding
+historical information).
+
+3.552 2017-07-02
+
+  * Test release after converting a few files to PodWeaver
+
+3.551 2017-06-29
+
+  * Add some help on hacking Lab::Measurement (HACKING)
+  * Re-add RPM building functionality, now via Dist::Zilla
+
+3.550 2017-06-21
+
+  * Port build system to Dist::Zilla
+  * Fix lab-measurement/issues/4 (pgnuplot.exe became gnuplot.exe)
+
+3.544 2017-06-12
+
+  * Do not load of Lab::Moose instruments in XPRESS::hub
+  * Lakeshore 340: Only use 6 digits for setpoint
+  * XPRESS Datafile: Replace '#COLUMNS#' with '#' in file header
+  * TRMC2: Enable XPRESS step/list temperature sweep
+  * Add docs for DataFile::Gnuplot precision attribute
+  * Moose Gnuplot Datafile: Use default precision of 10 digits
+  * Add initial support for Zurich Instruments devices
+  * Moose SR830: Fix and test 'calculate_settling_time'
+  * Moose SR830: Add 'calculate_saturation_time' method
+
+3.543 2017-05-19
+
+  * Remove obsolete Lab::Data utility scripts
+  * Add subclass example for IPS magnet control: IPSWeissDillFridge
+  * Enable XPRESS sweeps (step or list) with Lakeshore340
+  * Skip test Analysis/DataAnalysis.t if perl uses long doubles
+  * Remove remaining Lab::Data and XPRESS::Xpression.pl legacy code, 
+    fixes lab-measurement/issues/6
+
+3.542 2017-05-01
+
+  * Clean up module descriptions
+  * Add explicit license texts
+  * Move Lab::VISA, homepage, and poster files to separate git repositories
+  * Fix VNA sweep example script
+
+3.541 2017-04-10
+
+  * Add VNA sweep example script
+  * DataFile::Gnuplot::2D: Fix log_block: Do not replot for each added line
+  * Moose/Connection/Socket: Do proper timeout handling with IO::Socket::Timeout
+  * Fix t/Analysis/DataAnalysis.t on Windows
+  * Early implementation of LeCroy WaveRunner 640 digital oscilloscope 
+    Instrument code
+  * Add TCP socket connection with support for binary transmissions
+  * Fix DataFile/Read.pm
+  * Fix frequency setter/getter of RS_SMB
+  * Make read_2d_gnuplot_format a function
+  * Add more docs for set_get_test and scpi_set_get_test
+  * RS_FSV: Add getter and setter for resolution bandwidth
+  * Add basic driver for Rohde & Schwarz SMB RF source
+  * Moose::Developer: Add docs for automated testing
+  * Add common setter/getter/cache test t/Lab/Test.pm and use it in RS_ZVA and 
+    SR_830 tests
+  * Add experimental support for Lakeshore 340 temperature controller
+  * Fix tests with latest gnuplot 5.0.5
+  * OI_ITC503: Allow manual setting of PID parameters
+  * Time Sweep: Add missing return statement and fix status messages
+  * Time Sweep: Add config option for get_value() arguments
+  
+3.540 2017-02-01
+
+  * Fix tests on windows
+  * Document several SCPI roles
+  * Add help option in Moose MockTest
+  * DataFile::Gnuplot::2D: Add hard-copy of plot in data folder
+  * RS_ZVA: Add power and IF-bandwidth settings
+  * Get started with pod file Lab::Moose::Developer
+  * Delete Lab::Moose::BlockData and replace with PDL
+  * Add DataFile::Gnuplot::2D
+  * Moose: put plot_options into HashRef
+  * Moose: Add driver for SR830 LIA
+  * Add Lab::Moose::Plot: Moose based thin wrapper to PDL::Graphics::Gnuplot
+  * fix bug in TDS2024 envelope waveform handling
+  * scpi_parse_sequence bugfixes
+  * Add docs for Lab::Moose::DataFile::Gnuplot
+  * Add Lab::Moose
+  * Skip Yokogawa7651 test, if the system printf is not C99 compatible
+  * Yokogawa7651: Add more tests for set_level
+  * Yokogawa7651: use %g instead of %e in set_level
+  * DataFolder: Use getlogin instead of getpwuid for portability
+  * Fix UTF-8 bug in POD
+  * Do not use taint mode for t/Lab/Test/test.t
+  * New Datafolder and Datafile modules
+  * Add code for controlling a Tektronix TDS2024B digital oscilloscope over a 
+    USBtmc interface
+  * Do not require Term::ANSIScreen, allow Term::ReadKey >= 2.32
+  * Remove GenericIO subsystem
+
+3.531 2016-11-04
+
+  * Use one package per source file
+  * Clean up xt directory
+  * Do not put code before 'use strict'
+
+3.530 2016-11-04   [ _ needs condensing ]
+
+  * XPRESS voltage sweep: Do not call active method for mode 'step' (speed gain)
+  * Add minimal test for XPRESS voltage sweep with YokogawaGS200
+  * Add Charles Lane to dist_author
+  * Sweep/Voltage.pm: Do not check instrument activity for step/list sweeps
+  * Fix Term::ReadKey version requirements
+  * Minor edits to scpi parsing, to eliminate newlines
+  * Clean up USBtmc code, add timeout handling
+  * Fix LinuxGPIB and update tests
+  * Fix Example5_VNA_gate_and_frequency
+  * Remove Test::Files dependency, as it breaks the tests on windows
+  * Use Instrument function for VNA examples
+  * Enable Lab::Moose::Instrument drivers in XPRESS::hub::Instrument
+  * Remove all read_length stuff from Lab::Moose
+  * Clarify meaning of tolerance and std_dev in temp sweep examples
+  * Add examples to address both temperature sweep and VNA in XPRESS
+  * Apply various workarounds for temperature sweep with one sensor and Socket 
+    connection
+  * Add examples to set Triton temperature and do temperature sweep
+  * Make OI_Triton able to do XPRESS temperature sweeps
+  * Perltidy
+  * Fix docs in Moose/Instrument.pm
+  * Fix 'XPRESS with VNA' example
+  * Add Moose version of LinuxGPIB connection
+  * Fix scpi value parsing to handle 'blank string' cases without failures
+  * Update MakeRPM to allow an (optional) parameter for setting the "release 
+    number"
+  * Add docs for the Lab::Moose::Instrument::SCPIBlock role
+  * Add docs for Lab::Moose::Instrument::Common
+  * Use delegation to get connection methods in Lab::Moose::Instrument
+  * Add examples script of VNA in XPRESS voltage sweep
+  * Add RS_FSV: driver for Rohde & Schwartz FSV Signal and Spectrum Analyzer
+  * Improve docs of RS_ZVA and RS_ZVM
+  * Add docs for Lab::Moose::BlockData
+  * Add files for automatically building rpm distribution packages from the 
+    Lab::Measurement code
+  * Add some more Perl::Critic policies from "Perl Best Practices"
+  * Add a $self->{config}->{default_read_mode} to be applied to 
+    get_{cache parameter} when read_mode is not otherwise specified
+  * Add 'average' option to sparam_sweep
+  * Fix command ordering in VNASweep
+  * Improve on RS_ZVM test
+  * Moose tests: Add commandline options for mock tests
+  * Fix bug in scpi_canon: was ignoring 'shorter' form inputs, so not properly 
+    shortening subsequent keywords
+  * Start documenting and testing the VNAs
+  * Add connection logging and mock connection
+  * Turn off recursion warnings, because deep recursion is normal for SCPI parsing
+  * Remove prototypes from SCPI.pm routines
+  * Get started with Moose version of RS_ZVM.
+  * Add RS_ZVM driver. Factor out common code of RS_ZVA and RS_ZVM.
+  * Start documenting the SCPI roles.
+  * Fix path creation in XPRESS datafile

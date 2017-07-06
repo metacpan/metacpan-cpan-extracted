@@ -22,28 +22,28 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
-                  'leading_digits' => '[1-467]',
-                  'pattern' => '([1-467])(\\d{3})(\\d{4})'
+                  'pattern' => '([1-467])(\\d{3})(\\d{4})',
+                  'leading_digits' => '[1-467]'
                 },
                 {
                   'pattern' => '(1\\d)(\\d{3})(\\d{4})',
                   'leading_digits' => '1[1-467]'
                 },
                 {
-                  'pattern' => '(5\\d)(\\d{3})(\\d{4})',
-                  'leading_digits' => '5'
+                  'leading_digits' => '5',
+                  'pattern' => '(5\\d)(\\d{3})(\\d{4})'
                 },
                 {
                   'pattern' => '(92\\d{2})(\\d{5})',
                   'leading_digits' => '92'
                 },
                 {
-                  'leading_digits' => '80',
-                  'pattern' => '(800)(\\d{3})(\\d{4})'
+                  'pattern' => '(800)(\\d{3})(\\d{4})',
+                  'leading_digits' => '80'
                 },
                 {
                   'pattern' => '(811)(\\d{3})(\\d{3,4})',
@@ -62,9 +62,18 @@ my $validators = {
             7[235-7]
           )\\d{6}
         ',
-                'pager' => '',
+                'mobile' => '
+          (?:
+            5(?:
+              [013-689]\\d|
+              7[0-26-8]
+            )|
+            811\\d
+          )\\d{6}
+        ',
                 'voip' => '',
                 'toll_free' => '800\\d{7}',
+                'pager' => '',
                 'geographic' => '
           11\\d{7}|
           1?(?:
@@ -75,17 +84,8 @@ my $validators = {
             7[235-7]
           )\\d{6}
         ',
-                'personal_number' => '',
-                'mobile' => '
-          (?:
-            5(?:
-              [013-689]\\d|
-              7[0-26-8]
-            )|
-            811\\d
-          )\\d{6}
-        ',
-                'specialrate' => '(92[05]\\d{6})'
+                'specialrate' => '(92[05]\\d{6})',
+                'personal_number' => ''
               };
 my %areanames = (
   96611 => "Riyadh\/Kharj",

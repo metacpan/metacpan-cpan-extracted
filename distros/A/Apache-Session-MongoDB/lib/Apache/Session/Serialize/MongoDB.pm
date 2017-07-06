@@ -7,10 +7,46 @@ our $VERSION = '0.16';
 
 sub serialize {
     my $session = shift;
+    &replaceSpecialCharacters( $session->{data} );
 }
 
 sub unserialize {
     my $session = shift;
+    &restoreSpecialCharacters( $session->{data} );
+}
+
+sub replaceSpecialCharacters {
+    my $data = shift;
+
+    foreach my $key ( keys %$data ) {
+        if ( $key =~ /(\.|\$)/ ) {
+            my $oldkey = $key;
+            $key =~ s:\$:\\u0024:g;
+            $key =~ s:\.:\\u002e:g;
+            $data->{$key} = $data->{$oldkey};
+            delete $data->{$oldkey};
+        }
+        if ( ref( $data->{$key} ) eq 'HASH' ) {
+            &replaceSpecialCharacters( $data->{$key} );
+        }
+    }
+}
+
+sub restoreSpecialCharacters {
+    my $data = shift;
+
+    foreach my $key ( keys %$data ) {
+        if ( $key =~ /(\\u0024|\\u002e)/ ) {
+            my $oldkey = $key;
+            $key =~ s:\\u0024:\$:g;
+            $key =~ s:\\u002e:.:g;
+            $data->{$key} = $data->{$oldkey};
+            delete $data->{$oldkey};
+        }
+        if ( ref( $data->{$key} ) eq 'HASH' ) {
+            &restoreSpecialCharacters( $data->{$key} );
+        }
+    }
 }
 
 1;

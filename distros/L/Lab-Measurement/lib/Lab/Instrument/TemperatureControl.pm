@@ -1,6 +1,6 @@
 
 package Lab::Instrument::TemperatureControl;
-$Lab::Instrument::TemperatureControl::VERSION = '3.550';
+$Lab::Instrument::TemperatureControl::VERSION = '3.552';
 use strict;
 
 our @ISA = ('Lab::Instrument');

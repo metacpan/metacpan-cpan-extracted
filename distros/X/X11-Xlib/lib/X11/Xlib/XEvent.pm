@@ -1,4 +1,6 @@
 package X11::Xlib::XEvent;
+use strict;
+use warnings;
 use X11::Xlib; # need constants loaded
 use parent 'X11::Xlib::Struct';
 
@@ -65,6 +67,11 @@ applying the rest of the supplied fields.
 Unpack the fields of an XEvent into a hashref.  The Display field gets
 inflated to an X11::Xlib object.
 
+=head2 summarize
+
+Return a human-readable string describing the Event.  The format is intended
+to be readable by humans, and is subject to change.
+
 =head1 COMMON ATTRIBUTES
 
 All XEvent subclasses have the following attributes:
@@ -108,6 +115,35 @@ sub pack {
         }
     }
     $self->SUPER::pack(@_);
+}
+
+sub summarize {
+    my $self= shift;
+    my $fields= $self->unpack;
+    my $str= (split '::', ref($self))[-1];
+    my $dpy= delete $fields->{display};
+    $str .= ' display:conn'.$dpy->ConnectionNumber if $dpy;
+    join(' ', $str, map { "$_:$fields->{$_}" } sort keys %$fields);
+}
+
+sub X11::Xlib::XErrorEvent::summarize {
+    my $self= shift;
+    if (my $dpy= $self->display) {
+        my $err= $self->error_code;
+        my $major= $self->request_code;
+        my $minor= $self->minor_code;
+        my $res= $self->resourceid;
+        return sprintf("XErrorEvent display:conn%d error:%d (%s) request:%d.%d (%s) resource:0x%X (%d) serial:%d",
+            $dpy->ConnectionNumber, $err,
+            $dpy->XGetErrorDatabaseText("XProtoError", $err, $err),
+            $major, $minor,
+            ($major < 128? $dpy->XGetErrorDatabaseText("XRequest", $major)
+                : $dpy->XGetErrorDatabaseText("XRequest", $dpy->_extension_for_opcode($major).'.'.$minor)
+                || $dpy->_extension_for_opcode($major).' method '.$minor
+            ),
+            $res, $res, $self->serial);
+    }
+    $self->SUPER::summarize();
 }
 
 # ----------------------------------------------------------------------------
@@ -212,6 +248,13 @@ sub pack {
 @X11::Xlib::XDestroyWindowEvent::ISA= ( __PACKAGE__ );
 *X11::Xlib::XDestroyWindowEvent::event= *_event;
 *X11::Xlib::XDestroyWindowEvent::window= *_window;
+
+
+@X11::Xlib::XErrorEvent::ISA= ( __PACKAGE__ );
+*X11::Xlib::XErrorEvent::error_code= *_error_code;
+*X11::Xlib::XErrorEvent::minor_code= *_minor_code;
+*X11::Xlib::XErrorEvent::request_code= *_request_code;
+*X11::Xlib::XErrorEvent::resourceid= *_resourceid;
 
 
 @X11::Xlib::XExposeEvent::ISA= ( __PACKAGE__ );
@@ -482,6 +525,15 @@ Used for event type: DestroyNotify
 
   event             - Window
   window            - Window
+
+=head2 XErrorEvent
+
+Used for event type: 0
+
+  error_code        - unsigned char
+  minor_code        - unsigned char
+  request_code      - unsigned char
+  resourceid        - XID
 
 =head2 XExposeEvent
 

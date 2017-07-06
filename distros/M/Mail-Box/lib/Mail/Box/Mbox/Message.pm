@@ -6,7 +6,7 @@
 use strict;
 package Mail::Box::Mbox::Message;
 use vars '$VERSION';
-$VERSION = '3.002';
+$VERSION = '3.003';
 
 use base 'Mail::Box::File::Message';
 

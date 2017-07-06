@@ -1,0 +1,29 @@
+
+[![Build Status](https://travis-ci.org/Corion/anyevent-impl-prima.svg?branch=master)](https://github.com/Corion/anyevent-impl-prima)
+
+# NAME
+
+AnyEvent::Impl::Prima - Prima event loop adapter for AnyEvent
+
+# SYNOPSIS
+
+    use Prima;
+    use AnyEvent::Impl::Prima;
+    
+    my $mw = Prima::MainWindow->new();
+    
+    my $timer = AnyEvent->timer(
+        after => 10,
+        cb => sub { $mw->close; },
+    );
+
+    Prima->run;
+    
+
+# AUTHORS
+
+Zsban Ambrus
+
+Max Maischein
+
+Dmitry Karasik

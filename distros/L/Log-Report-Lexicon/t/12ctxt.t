@@ -109,7 +109,7 @@ is $b8, 'Dear Lady,';
 
 # Context values also available to insert
 
-my $c1 = __x"{name} is a {gender}", name => 'Piet'
+my $c1 = __x"{name} is a {_context.gender}", name => 'Piet'
    , _context => {gender => 'male'};
 is $c1, 'Piet is a male';
 

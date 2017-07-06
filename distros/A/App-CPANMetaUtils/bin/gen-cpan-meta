@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-03-04'; # DATE
-our $VERSION = '0.008'; # VERSION
+our $DATE = '2017-06-26'; # DATE
+our $VERSION = '0.009'; # VERSION
 
 use 5.010001;
 use strict;
@@ -200,7 +200,7 @@ gen-cpan-meta - Generate CPAN META for a distribution
 
 =head1 VERSION
 
-This document describes version 0.008 of gen-cpan-meta (from Perl distribution App-CPANMetaUtils), released on 2017-03-04.
+This document describes version 0.009 of gen-cpan-meta (from Perl distribution App-CPANMetaUtils), released on 2017-06-26.
 
 =head1 SYNOPSIS
 

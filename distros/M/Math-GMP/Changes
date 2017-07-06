@@ -1,5 +1,10 @@
 Revision history for Perl extension Math::GMP.
 
+2.15  2017-06-25 Shlomif
+    - Bump required perl version to 5.10.x.
+        - There were test failures with 5.8.x and even 5.10.x is old enough.
+        - http://www.cpantesters.org/cpan/report/256184b2-58bf-11e7-a074-e1beba07c9dd
+
 2.14  2017-02-01 Shlomif
     - Hopefully fix the GPG signature.
         - https://rt.cpan.org/Ticket/Display.html?id=120062

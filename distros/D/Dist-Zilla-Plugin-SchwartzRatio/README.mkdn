@@ -4,13 +4,15 @@ Dist::Zilla::Plugin::SchwartzRatio - display the Schwartz ratio of the distribut
 
 # VERSION
 
-version 0.2.0
+version 0.3.2
 
 # SYNOPSIS
 
 In dist.ini:
 
-    [SchwartzRatio]
+```
+[SchwartzRatio]
+```
 
 # DESCRIPTION
 
@@ -20,13 +22,19 @@ a single distribution, it boils down to the less exciting
 number of previous releases still on CPAN. 
 
 After a successful release, the plugin displays
-the releases of the distribution still kickign around on CPAN,
+the releases of the distribution still kicking around on CPAN,
 just to give an idea to the author that maybe it's time
 to do some cleanup.
 
+# SEE ALSO
+
+- [App-PAUSE-cleanup](https://metacpan.org/release/App-PAUSE-cleanup) 
+
+    CLI utility to list and help you delete easily your distributions on CPAN.
+
 # AUTHOR
 
-Yanick Champoux <yanick@babyl.dyndns.org>
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
 
 # COPYRIGHT AND LICENSE
 

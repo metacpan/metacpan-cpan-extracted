@@ -26,10 +26,10 @@ requires:
   Data::Sah::Compiler::perl::TH::str: '0'
   File::Find: '0'
   Filename::Backup: '0'
-  Log::Any: '0'
+  Log::ger: '0.011'
   Module::CoreList: '0'
   Perinci::CmdLine::Any: '0'
-  Perinci::CmdLine::Base: '1.72'
+  Perinci::CmdLine::Base: '1.75'
   Perl::PrereqScanner: '0'
   Sah::Schema::pathname: '0'
   perl: '5.010001'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ScanPrereqs
   homepage: https://metacpan.org/release/App-ScanPrereqs
   repository: git://github.com/perlancar/perl-App-ScanPrereqs.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -309,7 +309,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.23'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

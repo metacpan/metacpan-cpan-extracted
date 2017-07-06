@@ -30,7 +30,7 @@ sub is_finished {
   return 1;
 }
 
-sub stop { kill 'KILL', shift->{pid} }
+sub note { $_[0]->minion->backend->note($_[0]->id, @_[1, 2]) }
 
 sub perform {
   my $self = shift;
@@ -65,6 +65,8 @@ sub start {
   } or $self->fail($@);
   POSIX::_exit(0);
 }
+
+sub stop { kill 'KILL', shift->{pid} }
 
 1;
 
@@ -230,6 +232,9 @@ Get job information.
   # Check job state
   my $state = $job->info->{state};
 
+  # Get job metadata
+  my $progress = $job->info->{notes}{progress};
+
   # Get job result
   my $result = $job->info->{result};
 
@@ -272,6 +277,12 @@ Epoch time job was delayed to.
   finished => 784111777
 
 Epoch time job was finished.
+
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job.
 
 =item parents
 
@@ -340,6 +351,21 @@ Id of worker that is processing the job.
   my $bool = $job->is_finished;
 
 Check if job performed with L</"start"> is finished.
+
+=head2 note
+
+  my $bool = $job->note(foo => 'bar');
+
+Change a metadata field for this job. The new value will get serialized by
+L<Minion/"backend"> (often with L<Mojo::JSON>), so you shouldn't send objects
+and be careful with binary data, nested data structures with hash and array
+references are fine though.
+
+  # Share progress information
+  $job->note(progress => 95);
+
+  # Share stats
+  $job->note(stats => {utime => '0.012628', stime => '0.002429'});
 
 =head2 perform
 

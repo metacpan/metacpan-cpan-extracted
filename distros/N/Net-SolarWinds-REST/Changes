@@ -75,3 +75,15 @@ Revision history for Perl extension SolarWinds.
 
 1.18 
   - Pod Clean ups
+
+1.19
+  - Added GetAlertSettings and SWQL_GetAlertSettings
+  - SWQL_getVolumeMap added Uri to the colums
+  - SWQL_getInterfacesOnNode added Uri to the columns
+  - Added Batch interface GetAlertSettingsMap
+  - Podchecker cleanups
+1.20
+  - bug fix, corrected getNodesByIp query
+  - batch added SWQL_bulk_ip_lookup
+1.21
+  - make dist didn't like 1.2.. so we are on version 1.21

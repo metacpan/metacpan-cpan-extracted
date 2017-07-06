@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Keyword-Declare",
    "no_index" : {
@@ -37,11 +37,11 @@
          "requires" : {
             "Keyword::Simple" : "0",
             "List::Util" : "1.45",
-            "PPR" : "0",
-            "perl" : "5.014"
+            "PPR" : "0.000005",
+            "perl" : "5.012"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.001000"
+   "version" : "0.001004"
 }

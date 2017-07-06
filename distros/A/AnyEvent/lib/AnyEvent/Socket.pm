@@ -1102,12 +1102,16 @@ mode) as first, and the peer host and port as second and third arguments
 
 Croaks on any errors it can detect before the listen.
 
-If called in non-void context, then this function returns a guard object
-whose lifetime it tied to the TCP server: If the object gets destroyed,
-the server will be stopped (but existing accepted connections will
-not be affected).
+In non-void context, this function returns a guard object whose lifetime
+it tied to the TCP server: If the object gets destroyed, the server will
+be stopped and the listening socket will be cleaned up/unlinked (already
+accepted connections will not be affected).
 
-Regardless, when the function returns to the caller, the socket is bound
+When called in void-context, AnyEvent will keep the listening socket alive
+internally. In this case, there is no guarantee that the listening socket
+will be cleaned up or unlinked.
+
+In all cases, when the function returns to the caller, the socket is bound
 and in listening state.
 
 If you need more control over the listening socket, you can provide a
@@ -1153,8 +1157,9 @@ to do the C<accept>'ing yourself, for example, in another process.
 In case of an error, C<tcp_bind> either croaks, or passes C<undef> to the
 C<$done_cb>.
 
-The guard only protects the set-up phase, it isn't used after C<$done_cb>
-has been invoked.
+In non-void context, a guard will be returned. It will clean up/unlink the
+listening socket when destroyed. In void context, no automatic clean up
+might be performed.
 
 =cut
 
@@ -1166,63 +1171,64 @@ sub _tcp_bind($$$;$) {
       unless defined $host;
 
    my $ipn = parse_address $host
-      or Carp::croak "AnyEvent::Socket::tcp_server: cannot parse '$host' as host address";
+      or Carp::croak "tcp_bind: cannot parse '$host' as host address";
 
    my $af = address_family $ipn;
 
    my %state;
 
    # win32 perl is too stupid to get this right :/
-   Carp::croak "tcp_server/socket: address family not supported"
+   Carp::croak "tcp_bind: AF_UNIX address family not supported on win32"
       if AnyEvent::WIN32 && $af == AF_UNIX;
 
-   socket $state{fh}, $af, SOCK_STREAM, 0
-      or Carp::croak "tcp_server/socket: $!";
+   socket my $fh, $af, SOCK_STREAM, 0
+      or Carp::croak "tcp_bind: $!";
+
+   $state{fh} = $fh;
 
    if ($af == AF_INET || $af == AF_INET6) {
-      setsockopt $state{fh}, SOL_SOCKET, SO_REUSEADDR, 1
-         or Carp::croak "tcp_server/so_reuseaddr: $!"
+      setsockopt $fh, SOL_SOCKET, SO_REUSEADDR, 1
+         or Carp::croak "tcp_bind: so_reuseaddr: $!"
             unless AnyEvent::WIN32; # work around windows bug
 
       unless ($service =~ /^\d*$/) {
          $service = (getservbyname $service, "tcp")[2]
-                    or Carp::croak "$service: service unknown"
+                    or Carp::croak "tcp_bind: unknown service '$service'"
       }
    } elsif ($af == AF_UNIX) {
       unlink $service;
    }
 
-   bind $state{fh}, pack_sockaddr $service, $ipn
-      or Carp::croak "bind: $!";
+   bind $fh, pack_sockaddr $service, $ipn
+      or Carp::croak "tcp_bind: $!";
 
-   if ($af == AF_UNIX) {
-      my $fh  = $state{fh};
-      my $ino = (stat $fh)[1];
+   if ($af == AF_UNIX and defined wantarray) {
+      # this is racy, but is not designed to be foolproof, just best-effort
+      my $ino = (lstat $service)[1];
       $state{unlink} = guard {
-         # this is racy, but is not designed to be foolproof, just best-effort
          unlink $service
-            if $ino == (stat $fh)[1];
+            if (lstat $service)[1] == $ino;
       };
    }
 
-   AnyEvent::fh_unblock $state{fh};
+   AnyEvent::fh_unblock $fh;
 
    my $len;
 
    if ($prepare) {
-      my ($service, $host) = unpack_sockaddr getsockname $state{fh};
-      $len = $prepare && $prepare->($state{fh}, format_address $host, $service);
+      my ($service, $host) = unpack_sockaddr getsockname $fh;
+      $len = $prepare && $prepare->($fh, format_address $host, $service);
    }
    
    $len ||= 128;
 
-   listen $state{fh}, $len
-      or Carp::croak "listen: $!";
+   listen $fh, $len
+      or Carp::croak "tcp_bind: $!";
 
    $done->(\%state);
 
    defined wantarray
-      ? guard { %state = () } # clear fh and watcher, which breaks the circular dependency
+      ? guard { %state = () } # clear fh, unlink
       : ()
 }
 

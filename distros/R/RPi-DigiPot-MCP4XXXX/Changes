@@ -1,5 +1,9 @@
 Revision history for RPi-DigiPot-MCP4XXXX
 
+2.3604 2017-06-28
+        - bump prereq ver of WiringPi::API to 2.3612
+        - bump prereq ver of RPi::WiringPi::Constant to 1.00
+
 2.3603  2017-03-13
         - changed version scheme from 2.36.x to 2.360x
 

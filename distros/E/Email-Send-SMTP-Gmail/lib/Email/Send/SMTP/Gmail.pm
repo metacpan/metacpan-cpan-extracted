@@ -4,8 +4,7 @@ use strict;
 use warnings;
 use vars qw($VERSION);
 
-$VERSION='1.06';
-require Net::SMTPS;
+$VERSION='1.21';
 require Net::SMTP;
 use MIME::Base64;
 use File::Spec;
@@ -43,8 +42,6 @@ sub new{
   my $connect=$self->_initsmtp($smtp,$port,$properties{'-login'},$properties{'-pass'},$layer,$auth,$properties{'-debug'},$ssl_verify_mode,$ssl_version,$properties{'-ssl_verify_path'},$properties{'-$ssl_verify_ca'},$timeout);
 
   return -1,$self->{error} if(defined $self->{error});
-#  return $connect if($connect==-1);
-#
   return $self;
 }
 
@@ -83,30 +80,24 @@ sub _initsmtp{
       $self->{error}=$error_string;
       print "Could not connect to SMTP server ($smtp $port)\n" if $debug;
       return $self;
-      #return -1;
     }
   }
   else{
     my $sec=undef;
-    if($layer eq 'tls'){$sec='starttls';}
-    elsif($layer eq 'ssl'){$sec='ssl';}
-    if (not $self->{sender} = Net::SMTPS->new($smtp, Port =>$port, doSSL=>$sec, Debug=>$debug, SSL_verify_mode=>$ssl_mode, SSL_version=>$ssl_version,SSL_ca_file=>$ssl_ca,SSL_ca_path=>$ssl_path, Timeout=>$timeout)){
-      #my $error_string=$self->{sender}->message();
-      #chomp $error_string;
-      # $self->{error}=$error_string;
+    my $ssl=($layer eq 'ssl')?1:0;
+    if (not $self->{sender} = Net::SMTP->new($smtp, Port=>$port, Debug=>$debug, SSL=>$ssl, SSL_verify_mode=>$ssl_mode, SSL_version=>$ssl_version,SSL_ca_file=>$ssl_ca,SSL_ca_path=>$ssl_path, Timeout=>$timeout)){
       $self->{error}=$@;
       print "Could not connect to SMTP server\n" if $debug;
       return $self;
-      #return -1;
     }
   }
   if($auth ne 'none'){
-     unless($self->{sender}->auth($login,$pass,$auth)){
+     $self->{sender}->starttls  if($layer eq 'tls');
+     unless($self->{sender}->auth($login,$pass)){
          my $error_string=$self->{sender}->message();
          chomp $error_string;
          $self->{error}=$error_string;
-         print "Authentication (SMTP) failed\n" if $debug;
-         #return -1;
+         print "Authentication (SMTP) failed: $error_string\n" if $debug;
      }
   }
   return $self;
@@ -207,6 +198,7 @@ sub send
   # Load all the email param
   my $mail;
 
+  print "HOLA\n";
   
   $mail->{to}=$properties{'-to'} if defined $properties{'-to'};
 
@@ -241,19 +233,16 @@ sub send
 
   $mail->{attachmentlist}=$properties{'-attachmentlist'} if defined $properties{'-attachmentlist'};
 
-#  if(($mail->{attachments} ne '')and($self->_checkfiles($mail->{attachments})))
   if($mail->{attachments} ne '')
   {
       $mail->{attachments}=_checkfiles($mail->{attachments},$verbose);
       print "Attachments separated by comma successfully verified\n" if $verbose;
   }
-#  if((defined $mail->{attachmentlist})and($self->_checkfilelist($mail->{attachmentlist}))){
   if(defined $mail->{attachmentlist}){
       $mail->{attachmentlist}=_checkfilelist($mail->{attachmentlist},$verbose);
       print "Attachments \@list successfully verified\n" if $verbose;
   }
 
-  # eval{
       my $boundary=_createboundary();
 
       $self->{sender}->mail($mail->{from} . "\n");

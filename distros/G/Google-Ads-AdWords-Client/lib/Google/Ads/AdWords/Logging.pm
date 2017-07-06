@@ -15,6 +15,7 @@
 package Google::Ads::AdWords::Logging;
 
 use strict;
+use warnings;
 use version;
 
 # The following needs to be on one line because CPAN uses a particularly hacky

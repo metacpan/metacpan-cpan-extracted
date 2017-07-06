@@ -22,7 +22,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 package Game::Asset::Null;
-$Game::Asset::Null::VERSION = '0.5';
+$Game::Asset::Null::VERSION = '0.6';
 use strict;
 use warnings;
 use Moose;

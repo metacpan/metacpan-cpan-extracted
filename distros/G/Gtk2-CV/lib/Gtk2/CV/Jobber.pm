@@ -21,6 +21,7 @@ use Scalar::Util ();
 use IO::AIO;
 use Fcntl ();
 use Guard ();
+use AnyEvent::Fork;
 
 use Gtk2::CV::Progress;
 
@@ -32,15 +33,18 @@ Global variable containing all jobs, indexed by full path.
 
 our %jobs;
 our @jobs; # global job order
+our %busy; # exists if this path is executing a job
 our %hide; # which paths to hide
 
 our %type;
 our @type; # type order
 
+our $TEMPLATE; # the AnyEvent::Fork object
+
 my %type_hide;
 my $disabled;
 
-my $MAXFORK = int 1 + 1.5 * do {
+my $MAXFORK = int 1 + do {
    local $/;
    open my $fh, "<", "/proc/cpuinfo"
       or return 1;
@@ -65,6 +69,8 @@ job:
 
       my $path = $jobs[-$idx];
 
+      next if exists $busy{$path};
+
       my $types = $jobs{$path};
       my @types = keys %$types;
 
@@ -81,6 +87,8 @@ job:
 
                $job->{path} = $path;
                $job->{type} = $type;
+
+               undef $busy{$path};
 
                $job->run;
             }
@@ -104,9 +112,8 @@ job:
 #   (pop @idle_slave)->destroy while @idle_slave;
 }
 
-sub start_slaves {
-   push @idle_slave, new Gtk2::CV::Jobber::Slave
-      while @idle_slave < $MAXFORK;
+sub set_template {
+   $TEMPLATE = shift;
 }
 
 =item Gtk2::CV::Jobber::define $type, [option => $value, ...], $cb
@@ -116,8 +123,8 @@ with ($cont, $path, $type), and has to call &$cont once it has finished
 processing.
 
  pri     => number
- read    => wether reading the file contents ahead of time is useful
- stat    => wether stating the object ahead of time is useful
+ read    => whether reading the file contents ahead of time is useful
+ stat    => whether stating the object ahead of time is useful
  fork    => (lots of restrictions)
  class   =>
  maxread =>
@@ -284,6 +291,22 @@ sub Gtk2::CV::Jobber::Job::run {
    }
 }
 
+our (@EVENT_BATCH, $EVENT_TIMER);
+
+sub client_update {
+   push @EVENT_BATCH, @_;
+
+   $EVENT_TIMER ||= AE::timer 0.1, 0, sub {
+      for my $client (grep $_, values %Gtk2::CV::Jobber::client) {
+         my $update = $client->can ("jobber_update");
+         $update->($client, $_) for @EVENT_BATCH;
+      }
+
+      @EVENT_BATCH = ();
+      undef $EVENT_TIMER;
+   };
+}
+
 sub Gtk2::CV::Jobber::Job::event {
    my ($job, $type, $path, $data, %arg) = @_;
 
@@ -294,8 +317,7 @@ sub Gtk2::CV::Jobber::Job::event {
    if (my $slave = $job->{slave}) {
       $slave->event (\%arg);
    } else {
-      $_->jobber_update (\%arg)
-         for grep $_, values %Gtk2::CV::Jobber::client;
+      client_update \%arg;
    }
 }
 
@@ -309,12 +331,12 @@ sub Gtk2::CV::Jobber::Job::finish {
          my $type = $type{$job->{type}};
          ++$class_limit{$type->{class}};
          delete $hide{$job->{path}} if $type->{hide};
+         delete $busy{$job->{path}};
 
          scheduler;
       }
 
-      $_->jobber_update ($_[0])
-         for grep $_, values %Gtk2::CV::Jobber::client;
+      client_update $_[0];
    }
 }
 
@@ -361,58 +383,58 @@ sub new {
    my $class = shift;
    my $self = bless { @_ }, $class;
 
-   socketpair $self->{m}, $self->{s}, &Socket::AF_UNIX, &Socket::SOCK_STREAM, &Socket::PF_UNSPEC
-      or die "FATAL: socketpair failed\n";
+   $TEMPLATE ||= AnyEvent::Fork->new;
 
-   $self->{pid} = fork;
+   my $rlen;
+   my $rbuf;
 
-   if ($self->{pid}) {
-      close delete $self->{s};
+   $TEMPLATE->fork->run ("Gtk2::CV::Jobber::Slave::run", sub {
+      my ($fh) = @_;
+      $self->{fh} = $fh;
+      delete $self->{ww};
+      $self->send;
 
-      $self->{w} = add_watch Glib::IO fileno $self->{m},
-                         in => sub { $self->reply; 1 },
-                         undef,
-                         &Glib::G_PRIORITY_HIGH;
+      $self->{rw} = add_watch Glib::IO fileno $fh,
+         in => sub {
+            if (4 > length $rlen) {
+               0 ne sysread $fh, $rlen, 4 - length $rlen, length $rlen
+                  or die "FATAL: eof when reading from slave\n";
+            }
 
-   } else {
-      {
-         $SIG{PIPE} = $SIG{TERM} = $SIG{QUIT} = 'DEFAULT';
-         my $sigs = new POSIX::SigSet;
-         $sigs->fillset;
-         $sigs->delset (&POSIX::SIGPIPE);
-         $sigs->delset (&POSIX::SIGTERM);
-         $sigs->delset (&POSIX::SIGQUIT);
-         POSIX::sigprocmask &POSIX::SIG_SETMASK, $sigs;
-      }
+            if (4 == length $rlen) {
+               my $len = unpack "N", $rlen;
 
-      delete $SIG{USR1};
+               0 ne sysread $fh, $rbuf, $len - length $rbuf, length $rbuf
+                  or die "FATAL: eof when reading from slave\n";
 
-      close delete $self->{m};
+               if ($len == length $rbuf) {
+                  my $job = bless { unpack "(w/a*)*", $rbuf }, Gtk2::CV::Jobber::Job::;
 
-      eval { $self->slave };
-      warn "slave process died unexpectedly: $@" if $@;
+                  $job->{stat} = [ split /\0/, $job->{stat} ];
 
-      POSIX::_exit (0);
-   }
+                  undef $rlen;
+                  undef $rbuf;
+
+                  push @idle_slave, $self
+                     unless $job->{event};
+
+                  $job->finish;
+               }
+            }
+
+            1
+         },
+         undef,
+         &Glib::G_PRIORITY_HIGH;
+   });
+
+   $self->{ww} = 1;
 
    $self
 }
 
-sub _send {
-   my ($self, $fh, $job) = @_;
-
-   delete $job->{fh};
-   $job->{stat} = join "\0", @{ $job->{stat} };
-
-   $job = join "\x{fcc0}", %$job;
-   utf8::encode $job;
-
-   syswrite $fh, pack "Na*", (length $job), $job
-      or die "FATAL: unable to send job to subprocess";
-}
-
-sub _recv {
-   my ($self, $fh) = @_;
+sub _recv_s {
+   my ($fh) = @_;
 
    my $len;
    do {
@@ -429,53 +451,88 @@ sub _recv {
          or return;
    } while length $job < $len;
 
-   utf8::decode $job;
-   my $job = bless { split /\x{fcc0}/, $job }, Gtk2::CV::Jobber::Job::;
+   my $job = bless { unpack "(w/a*)*", $job }, Gtk2::CV::Jobber::Job::;
 
    $job->{stat} = [ split /\0/, $job->{stat} ];
 
    $job
 }
 
-sub slave {
-   my ($self) = @_;
+sub run {
+   my ($fh) = @_;
 
-   for (;;) {
-      my $job = $self->_recv ($self->{s})
-         or last;
-
-      $job->{slave} = $self;
-
-      my $type = $type{$job->{type}}
-         or die "unknown job type requested ($job->{type})";
-
-      eval {
-         $type->{cb}->($job);
-      };
-
-      if ($@) {
-         $job->{exception} = $@;
-         $job->finish;
-      }
+   {
+      $SIG{PIPE} = $SIG{TERM} = $SIG{QUIT} = 'DEFAULT';
+      my $sigs = new POSIX::SigSet;
+      $sigs->fillset;
+      $sigs->delset (&POSIX::SIGPIPE);
+      $sigs->delset (&POSIX::SIGTERM);
+      $sigs->delset (&POSIX::SIGQUIT);
+      POSIX::sigprocmask &POSIX::SIG_SETMASK, $sigs;
    }
-}
 
-sub reply {
-   my ($self) = @_;
+   delete $SIG{USR1};
 
-   my $job = $self->_recv ($self->{m})
-      or return;
+   my $self = bless \$fh, __PACKAGE__;
 
-   push @idle_slave, $self
-      unless $job->{event};
+   eval {
+      for (;;) {
+         my $job = _recv_s $fh
+            or last;
 
-   $job->finish;
+         $job->{slave} = $self;
+
+         my $type = $type{$job->{type}}
+            or die "unknown job type requested ($job->{type})";
+
+         eval {
+            $type->{cb}->($job);
+         };
+
+         if ($@) {
+            $job->{exception} = $@;
+            $job->finish;
+         }
+      }
+   };
+   warn "FATAL: slave process died unexpectedly: $@" if $@;
 }
 
 sub send {
    my ($self, $job) = @_;
 
-   $self->_send ($self->{m}, $job);
+   if ($job) {
+      delete $job->{fh};
+      delete $job->{contents}; # nobody uses this, apparently
+
+      $job->{stat} = join "\0", @{ $job->{stat} };
+
+      push @{ $self->{q} }, pack "N/a*", pack "(w/a*)*", %$job;
+   }
+
+   $self->{ww} ||= add_watch Glib::IO fileno $self->{fh}, out => sub {
+      my $len = syswrite $self->{fh}, $self->{q}[0]
+         or die "FATAL: unable to send job to slave: $!";
+
+      substr $self->{q}[0], 0, $len, "";
+      unless (length $self->{q}[0]) {
+         shift @{ $self->{q} };
+         remove Glib::Source delete $self->{ww}
+            unless @{ $self->{q} };
+      }
+
+      1
+   };
+}
+
+sub _send_s {
+   my ($self, $job) = @_;
+
+   delete $job->{stat};
+   delete $job->{contents};
+
+   syswrite $$self, pack "N/a*", pack "(w/a*)*", %$job
+      or die "FATAL: unable to send job to master";
 }
 
 sub event {
@@ -483,25 +540,20 @@ sub event {
 
    $event->{event} = 1;
 
-   $self->_send ($self->{s}, $event);
+   $self->_send_s ($event);
 }
 
 sub finish {
    my ($self, $job) = @_;
 
-   $self->_send ($self->{s}, $job);
+   $self->_send_s ($job);
 }
 
 sub destroy {
    my ($self) = @_;
 
-   remove Glib::Source delete $self->{w} if $self->{w};
-
-   syswrite $self->{m}, pack "N", 0 if $self->{m};
-   close delete $self->{s} if $self->{s};
-   close delete $self->{m} if $self->{m};
-
-   waitpid delete $self->{pid}, 0 if $self->{pid};
+   remove Glib::Source delete $self->{rw} if $self->{rw};
+   remove Glib::Source delete $self->{ww} if $self->{ww};
 }
 
 =back

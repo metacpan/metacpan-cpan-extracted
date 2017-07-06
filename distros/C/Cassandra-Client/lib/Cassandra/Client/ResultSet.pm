@@ -1,84 +1,87 @@
 package Cassandra::Client::ResultSet;
+our $AUTHORITY = 'cpan:TVDW';
+$Cassandra::Client::ResultSet::VERSION = '0.13';
 use 5.010;
 use strict;
 use warnings;
 
-=pod
-
-=head1 NAME
-
-Cassandra::Client::ResultSet - container for rows returned from a query
-
-=head1 METHODS
-
-=over
-
-=cut
 
 sub new {
-    my ($class, $rows, $headers, $next_page)= @_;
+    my ($class, $raw_data, $decoder, $next_page)= @_;
 
     return bless {
-        rows => $rows,
-        headers => $headers,
+        raw_data => $raw_data,
+        decoder => $decoder,
         next_page => $next_page,
     }, $class;
 }
 
-=item $result->rows()
-
-Returns an arrayref of all rows in the ResultSet. Each row will be represented as an arrayref with cells. To find column names, see C<column_names>.
-
-=cut
 
 sub rows {
-    $_[0]{rows}
+    return $_[0]{rows} ||= $_[0]{decoder}->decode(${$_[0]{raw_data}}, 0);
 }
 
-=item $result->row_hashes()
-
-Returns an arrayref of all rows in the ResultSet. Each row will be represented as a hashref with cells.
-
-=cut
 
 sub row_hashes {
-    my $self= shift;
-    my $rows= $self->rows;
-    my @names= @{$self->column_names};
-
-    my @result;
-
-    for my $row (@$rows) {
-        my $newrow= {};
-        @{$newrow}{@names}= @$row;
-        push @result, $newrow;
-    }
-
-    return \@result;
+    return $_[0]{row_hashes} ||= $_[0]{decoder}->decode(${$_[0]{raw_data}}, 1);
 }
 
-=item $result->column_names()
-
-Returns an arrayref with the names of the columns in the result set, to be used with rows returned from C<rows()>.
-
-=cut
 
 sub column_names {
-    $_[0]{headers}
+    $_[0]{decoder}->column_names
 }
 
-=item $result->next_page()
-
-Returns a string pointing to the next Cassandra result page, if any. Used internally by C<< $client->each_page() >>, but can be used to implement custom pagination logic.
-
-=cut
 
 sub next_page {
     $_[0]{next_page}
 }
 
-=back
-
-=cut
 
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Cassandra::Client::ResultSet
+
+=head1 VERSION
+
+version 0.13
+
+=head1 METHODS
+
+=over
+
+=item $result->rows()
+
+Returns an arrayref of all rows in the ResultSet. Each row will be represented as an arrayref with cells. To find column names, see C<column_names>.
+
+=item $result->row_hashes()
+
+Returns an arrayref of all rows in the ResultSet. Each row will be represented as a hashref with cells.
+
+=item $result->column_names()
+
+Returns an arrayref with the names of the columns in the result set, to be used with rows returned from C<rows()>.
+
+=item $result->next_page()
+
+Returns a string pointing to the next Cassandra result page, if any. Used internally by C<< $client->each_page() >>, but can be used to implement custom pagination logic.
+
+=back
+
+=head1 AUTHOR
+
+Tom van der Woerdt <tvdw@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom van der Woerdt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

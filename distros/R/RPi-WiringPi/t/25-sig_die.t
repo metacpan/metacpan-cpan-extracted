@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 
+use lib 't/';
+
+use RPiTest qw(check_pin_status);
 use RPi::WiringPi;
 use RPi::WiringPi::Constant qw(:all);
 use Test::More;
@@ -14,12 +17,18 @@ if (! $ENV{PI_BOARD}){
 }
 
 my $pi = $mod->new(fatal_exit => 0);
-my $pin = $pi->pin(5);
+my $pin = $pi->pin(21);
+
 $pin->mode(OUTPUT);
-is $pi->registered_pins, '5', "pin registered ok";
+
+is ${ $pi->registered_pins }[0], '21', "pin registered ok";
 
 eval { die "intentional die()"; };
 
-is $pin->mode, 0, "pin reset to INPUT after die()";
+is $pin->mode, INPUT, "pin reset to INPUT after die()";
+
+$pi->cleanup;
+
+check_pin_status();
 
 done_testing();

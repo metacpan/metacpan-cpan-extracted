@@ -1,5 +1,19 @@
 Revision history for Perl extension HTML::Scrubber.
 
+0.17      2017-06-27 14:03:47+01:00 Europe/London
+
+0.16      2017-06-25 20:30:15+01:00 Europe/London (TRIAL RELEASE)
+    - Add missing testing prereqs  (github pr#9 paultcochrane)
+    - Extend list of Perls in Travis config   (github pr#10 paultcochrane)
+    - Avoid pod-spell test failure from ABSTRACT text  (github pr#11 paultcochrane)
+    - Minor documentation fixes   (github pr#12 paultcochrane)
+    - Purge trailing whitespace in Travis config    (github pr#13 paultcochrane)
+    - Fix perlcritic issues   (github pr#14 paultcochrane)
+    - Fix stale URLs   (github pr#15 paultcochrane)
+    - Remove invalid end tags for empty elements (RT120384)
+      (github pr#16 paultcochrane)
+    - Rework Dist::Zilla config to be more portable
+
 0.15      2015-10-10 15:01:31+01:00 Europe/London
     - Minor spelling check avoidance tweaks
     - Enforce comments to be well formed, to resolve potential security issue

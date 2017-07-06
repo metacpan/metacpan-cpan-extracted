@@ -254,7 +254,7 @@ my %WriteMakefileArgs = (
     "open" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.0.13",
+  "VERSION" => "2.0.14",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -293,7 +293,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.032
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.033
 use Config;
 if (! $Config{usethreads}) {
   foreach (qw/PREREQ_PM BUILD_REQUIRES TEST_REQUIRES/) {

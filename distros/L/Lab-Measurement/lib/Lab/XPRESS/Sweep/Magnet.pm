@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::Magnet;
-$Lab::XPRESS::Sweep::Magnet::VERSION = '3.550';
+$Lab::XPRESS::Sweep::Magnet::VERSION = '3.552';
 
 use Lab::XPRESS::Sweep::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;

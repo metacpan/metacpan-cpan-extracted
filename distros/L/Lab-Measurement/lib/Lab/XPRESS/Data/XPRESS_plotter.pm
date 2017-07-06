@@ -1,5 +1,5 @@
 package Lab::XPRESS::Data::XPRESS_plotter;
-$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.550';
+$Lab::XPRESS::Data::XPRESS_plotter::VERSION = '3.552';
 
 use strict;
 use Time::HiRes qw/gettimeofday tv_interval/;

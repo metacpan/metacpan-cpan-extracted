@@ -27,7 +27,7 @@ no_index:
 provides:
   Variable::Expand::AnyLevel:
     file: lib/Variable/Expand/AnyLevel.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   PadWalker: '0'
   parent: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/tsucchi/p5-Variable-Expand-AnyLevel/issues
   homepage: https://github.com/tsucchi/p5-Variable-Expand-AnyLevel
   repository: git://github.com/tsucchi/p5-Variable-Expand-AnyLevel.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:TSUCCHI
 x_contributors:
   - 'tsucchi <takuya.tsuchida at gmail.com>'

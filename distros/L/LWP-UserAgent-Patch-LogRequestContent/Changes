@@ -1,4 +1,7 @@
-Revision history for LWP-UserAgent-Patch-LogRequestContent
+0.04    2017-06-26 (PERLANCAR)
+
+	- Switch from Log::Any to Log::ger.
+
 
 0.03    2016-10-08 (PERLANCAR)
 

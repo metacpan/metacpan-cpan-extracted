@@ -1,10 +1,53 @@
 ==================================================
-Changes from 2016-06-22 00:00:00 +0000 to present.
+Changes from 2016-06-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.150 at 2017-06-22 10:25:35 +0000
+version 0.202 at 2017-06-23 08:11:42 +0000
 ------------------------------------------
+
+  Change: 5bbe939b169818ea32b5e4ff8216162eaf287779
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-23 17:11:17 +0000
+
+    Removed unused modules 
+
+  Change: bcbb7e50211785930e64bf12160832ebe9862bef
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-23 14:56:28 +0000
+
+    Merge branch 'master' of https://github.com/sng2c/Template-Reverse 
+
+  Change: 85bb8608d3c7c26096ca42a35c7c8aed5d805db3
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-23 14:56:16 +0000
+
+    fix more code. 
+
+  Change: 75385e9acdb63710f806d43b224490aa75416c90
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-23 14:55:32 +0000
+
+    fix more code. 
+
+  Change: 7a369be32721ef7ff054d0d372a652f811a3f132
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-23 14:53:08 +0000
+
+    fix some code.
+
+    fix some doc. 
+
+  Change: a61fe0178c5ddabb2f4ddc01d07ef653e836a2fb
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2017-06-23 14:23:22 +0000
+
+    Ported from clj-template-reverse.
+
+    - Simpler implementation by adding BOF, EOF. - Added BOF, EOF on
+    return value of detect(). - Changed return value of detect() from
+    array_ref[Part] to array_ref[hashref]. - No compatibility version
+    0.1.x. 
 
   Change: a805ada3b2e4d07a3f3799108b90aca35f31ca70
   Author: sng2c <sng2nara@gmail.com>
@@ -244,5 +287,5 @@ version 0.150 at 2017-06-22 10:25:35 +0000
     for https://metacpan.org/author/AMORETTE 
 
 ================================================
-Plus 8 releases after 2016-06-22 00:00:00 +0000.
+Plus 8 releases after 2016-06-23 00:00:00 +0000.
 ================================================

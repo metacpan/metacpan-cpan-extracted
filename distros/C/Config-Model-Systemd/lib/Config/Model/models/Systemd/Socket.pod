@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::Systemd::Socket
 # ABSTRACT:  Configuration class Systemd::Socket
+
 =encoding utf8
 
 =head1 NAME
@@ -16,19 +17,29 @@ Configuration classes used by L<Config::Model>
 
 When true, cme will disable a configuration file supplied by the vendor by placing place a symlink to
 /dev/null with the same filename as the vendor configuration file.
-See L<systemd-system.conf> for details. I<< Optional. Type boolean. upstream_default: '0'.  >> 
+See L<systemd-system.conf> for details. I< Optional. Type boolean.  > 
+
+=over 4
+
+=item upstream_default value :
+
+0
+
+=back
+
+
 
 =head2 Unit
 
-I<< Optional. Type warped_node of class L<Systemd::Section::Unit|Config::Model::models::Systemd::Section::Unit> .  >> 
+I< Optional. Type warped_node of class L<Systemd::Section::Unit|Config::Model::models::Systemd::Section::Unit> .  > 
 
 =head2 Install
 
-I<< Optional. Type warped_node of class L<Systemd::Section::Install|Config::Model::models::Systemd::Section::Install> .  >> 
+I< Optional. Type warped_node of class L<Systemd::Section::Install|Config::Model::models::Systemd::Section::Install> .  > 
 
 =head2 Socket
 
-I<< Optional. Type warped_node of class L<Systemd::Section::Socket|Config::Model::models::Systemd::Section::Socket> .  >> 
+I< Optional. Type warped_node of class L<Systemd::Section::Socket|Config::Model::models::Systemd::Section::Socket> .  > 
 
 =head1 SEE ALSO
 

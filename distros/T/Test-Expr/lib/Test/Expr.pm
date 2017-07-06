@@ -1,7 +1,7 @@
 package Test::Expr;
-our $VERSION = '0.000003';
+our $VERSION = '0.000005';
 
-use 5.014; use warnings;
+use 5.012; use warnings;
 use Keyword::Declare;
 use Data::Dump;
 use List::Util 'max';
@@ -62,7 +62,7 @@ Test::Expr - Test an expression with better error messages
 
 =head1 VERSION
 
-This document describes Test::Expr version 0.000003
+This document describes Test::Expr version 0.000005
 
 
 =head1 SYNOPSIS
@@ -132,8 +132,7 @@ following functions from Test::More:
 
     ok $got eq $expected;            is        $got, $expected;
     ok $got ne $unexpected;          isnt      $got, $unexpected;
-    ok $got == $expected;            is_deeply $got, $expected;
-    ok $got ~~ $expected;            unlike    $got, $pattern;
+    ok $got ~~ $expected;            is_deeply $got, $expected;
     ok $got =~ $pattern;             like      $got, $pattern;
     ok $got !~ $pattern;             unlike    $got, $pattern;
     ok $obj->isa($classname);        is_ok     $got, $classname;

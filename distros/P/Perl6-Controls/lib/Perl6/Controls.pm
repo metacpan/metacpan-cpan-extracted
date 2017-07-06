@@ -1,8 +1,8 @@
 package Perl6::Controls;
 
-use 5.014; use warnings;
+use 5.012; use warnings;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000006';
 
 
 use Keyword::Declare;
@@ -13,7 +13,7 @@ sub import {
 
     keyword for {{{ foreach }}}
 
-    keytype OptIter is /my\s*\$\w+/;
+    keytype OptIter is /(?:my|our|state)\s*\$\w+/;
 
     keyword for (OptIter $iter = '', '(', '^', Int $max, ')') {{{ for <{$iter}> (0..<{$max-1}>) }}}
 
@@ -22,7 +22,7 @@ sub import {
     {{{
         {
             state $__acc__ = [];
-            foreach my $__nary__  <{ $list =~ s{\)\Z}{,\\\$__acc__)}r }>
+            foreach my $__nary__  <{ $list =~ s{\)\Z}{,\\\$__acc__)}; $list }>
             {
                 if (!ref($__nary__) || $__nary__ != \$__acc__) {
                     push @{$__acc__}, $__nary__;
@@ -131,7 +131,7 @@ Perl6::Controls - Add Perl 6 control structures as Perl 5 keywords
 
 =head1 VERSION
 
-This document describes Perl6::Controls version 0.000003
+This document describes Perl6::Controls version 0.000006
 
 
 =head1 SYNOPSIS

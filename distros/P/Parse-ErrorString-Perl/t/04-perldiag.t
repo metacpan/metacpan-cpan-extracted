@@ -11,7 +11,7 @@ use Test::Differences;
 # use strict;
 # use warnings;
 #
-# $hell;
+# $kaboom;
 
 my $msg_compile;
 

@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -46,6 +46,6 @@
          "web" : "https://github.com/davorg/template-provider-markdown-pandoc"
       }
    },
-   "version" : "v0.0.2",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v999.999.999",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

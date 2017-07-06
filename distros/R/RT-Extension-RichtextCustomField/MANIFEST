@@ -17,9 +17,7 @@ inc/Module/Install/Substitute.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/YAML/Tiny.pm
-lib/RT/Extension/.RichtextCustomField.pm.swp
 lib/RT/Extension/RichtextCustomField.pm
-lib/RT/Extension/RichtextCustomField/Test.pm
 lib/RT/Extension/RichtextCustomField/Test.pm.in
 LICENSE
 Makefile.PL
@@ -28,4 +26,11 @@ META.yml
 README
 README.md
 xt/00-load.t
+xt/admin_cfs.t
+xt/article.t
+xt/asset.t
+xt/group.t
+xt/queue.t
+xt/ticket.t
+xt/user.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

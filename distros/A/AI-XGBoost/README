@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution AI-XGBoost,
-version 0.004:
+version 0.005:
 
   Perl wrapper for XGBoost library L<https://github.com/dmlc/xgboost>
 

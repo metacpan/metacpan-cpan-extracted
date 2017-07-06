@@ -1,0 +1,50 @@
+---
+abstract: 'Find Or Download/Build/Install libpcre2 In PCRE2'
+author:
+  - 'Will Braswell <wbraswell@cpan.org>'
+build_requires:
+  Alien::Build::MM: '0.25'
+  Alien::gmake: '0.11'
+  Archive::Tar: '0'
+  Config: '0'
+  HTML::LinkExtor: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Net::SSLeay: '1.49'
+  Sort::Versions: '0'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '0.52'
+  Alien::Build::MM: '0.25'
+  IO::Socket::SSL: '2.043'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - alien
+  - pcre
+  - pcre2
+  - regex
+  - regularexpression
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-PCRE2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Build: '0.25'
+resources:
+  IRC: irc://irc.perl.org/#native
+  X_mailinglist: https://lists.exim.org/lurker/list/pcre-dev.html
+  X_wiki: https://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Alien-PCRE2
+  homepage: http://www.pcre.org
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/wbraswell/alien-pcre2.git
+version: '0.006000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

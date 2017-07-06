@@ -1,5 +1,20 @@
 Revision history for Perl extension UV-Util
 
+0.007     2017-06-29
+    - Bump the requirement of Alien::libuv to v0.004 to ensure libuv v1+
+
+0.006     2017-06-27
+    - Add Exporter to prereqs.
+
+0.005     2017-06-27
+    - Make all functions and constants exportable
+
+0.004     2017-06-27
+    - Bump requirement for Alien::libuv to 0.003, ensuring clean installs on
+      more platforms
+    - Add PROTOTYPES: DISABLE
+    - Add XSLoader to the prereqs list
+
 0.003     2017-06-16
     - Using DZil now
     - Make use of Alien::libuv

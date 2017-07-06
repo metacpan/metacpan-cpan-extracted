@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Module::CheckDep::Version qw(check_deps);
+
+_help() if ! @ARGV || $ARGV[0] eq '-h' || $ARGV[0] eq '--help';
+
+my $mc = MetaCPAN::Client->new;
+
+my $pause_id;
+
+my $author_ok = eval {
+    my $author_obj = $mc->author(shift @ARGV);
+    $pause_id = $author_obj->pauseid;
+    1;
+};
+
+if (! $author_ok){
+    _invalid_author();
+    _help() if ! $author_ok;
+}
+
+my %opts;
+my $help;
+
+GetOptions (
+    "all|a"         => \$opts{all},
+    "module|m=s"    => \$opts{module},
+    "zero|z"        => \$opts{ignore_any},
+    "help|h"        => \$help
+);
+
+_help() if $help;
+
+$opts{ignore_any} = 0 if $opts{ignore_any};
+
+check_deps($pause_id, %opts);
+
+sub _help {
+    print <DATA>;
+    exit;
+}
+sub _invalid_author {
+    print "\nYou've supplied an invalid author ID\n";
+}
+
+=pod
+
+=head1 NAME
+
+checkdep - Check an author's distributions for prerequisites that are lagging
+behind newer versions
+
+=head1 DESCRIPTION
+
+This is simply a script that uses the L<Module::CheckDep::Version> module as a
+convenience.
+
+=head1 USAGE
+
+    checkdep PAUSEID [options]
+
+Where C<[options]> are:
+
+    -a|--all        Work on all dependencies, not just the author's
+    -m|--module     String; Work only on a specific distribution. (eg: Mock::Sub)
+    -z|--zero       Include dependencies listed with a version of zero
+    -h|--help       Display this help screen
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+=cut
+
+__DATA__
+
+Usage: checkdep PAUSEID [options]
+
+-a|--all        Work on all dependencies, not just the author's
+-m|--module     String; Work only on a specific distribution. (eg: Mock::Sub)
+-z|--zero       Include dependencies listed with a version of zero
+-h|--help       Display this help screen
+

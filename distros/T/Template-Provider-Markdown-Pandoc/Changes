@@ -1,5 +1,11 @@
 # Change Log
 
+## [999.999.999] - 2017-06-27
+
+### Removed
+
+- Deprecated in favour of Template::Provider::Pandoc
+
 ## [0.0.2] - 2017-04-01
 
 ### Fixed

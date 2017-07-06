@@ -16,11 +16,11 @@ my $worker = $minion->repair->worker;
 isa_ok $worker->minion->app, 'Mojolicious', 'has default application';
 
 # Migrate up and down
-is $minion->backend->sqlite->migrations->active, 7, 'active version is 7';
+is $minion->backend->sqlite->migrations->active, 8, 'active version is 8';
 is $minion->backend->sqlite->migrations->migrate(0)->active, 0,
   'active version is 0';
-is $minion->backend->sqlite->migrations->migrate->active, 7,
-  'active version is 7';
+is $minion->backend->sqlite->migrations->migrate->active, 8,
+  'active version is 8';
 
 # Register and unregister
 $worker->register;
@@ -120,10 +120,42 @@ ok !$batch->[1], 'no more results';
 $worker->unregister;
 $worker2->unregister;
 
+# Exclusive lock
+ok $minion->lock('foo', 3600), 'locked';
+ok !$minion->lock('foo', 3600), 'not locked again';
+ok $minion->unlock('foo'), 'unlocked';
+ok !$minion->unlock('foo'), 'not unlocked again';
+ok $minion->lock('foo', -3600), 'locked';
+ok $minion->lock('foo', 3600),  'locked again';
+ok !$minion->lock('foo', -3600), 'not locked again';
+ok !$minion->lock('foo', 3600),  'not locked again';
+ok $minion->unlock('foo'), 'unlocked';
+ok !$minion->unlock('foo'), 'not unlocked again';
+ok $minion->lock('yada', 3600, {limit => 1}), 'locked';
+ok !$minion->lock('yada', 3600, {limit => 1}), 'not locked again';
+
+# Shared lock
+ok $minion->lock('bar', 3600,  {limit => 3}), 'locked';
+ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
+ok $minion->lock('bar', -3600, {limit => 3}), 'locked again';
+ok $minion->lock('bar', 3600,  {limit => 3}), 'locked again';
+ok !$minion->lock('bar', 3600, {limit => 2}), 'not locked again';
+ok $minion->lock('baz', 3600, {limit => 3}), 'locked';
+ok $minion->unlock('bar'), 'unlocked';
+ok $minion->lock('bar', 3600, {limit => 3}), 'locked again';
+ok $minion->unlock('bar'), 'unlocked again';
+ok $minion->unlock('bar'), 'unlocked again';
+ok $minion->unlock('bar'), 'unlocked again';
+ok !$minion->unlock('bar'), 'not unlocked again';
+ok $minion->unlock('baz'), 'unlocked';
+ok !$minion->unlock('baz'), 'not unlocked again';
+
 # Reset
 $minion->reset->repair;
 ok !$minion->backend->sqlite->db->query(
   'select count(id) as count from minion_jobs')->hash->{count}, 'no jobs';
+ok !$minion->backend->sqlite->db->query(
+  'select count(id) as count from minion_locks')->hash->{count}, 'no locks';
 ok !$minion->backend->sqlite->db->query(
   'select count(id) as count from minion_workers')->hash->{count}, 'no workers';
 
@@ -198,6 +230,7 @@ is $batch->[0]{retries},   0, 'job has not been retried';
 like $batch->[0]{created}, qr/^[\d.]+$/, 'has created timestamp';
 is $batch->[1]{task},      'fail', 'right task';
 is_deeply $batch->[1]{args}, [], 'right arguments';
+is_deeply $batch->[1]{notes}, {}, 'right metadata';
 is_deeply $batch->[1]{result}, ['works'], 'right result';
 is $batch->[1]{state},    'finished', 'right state';
 is $batch->[1]{priority}, 0,          'right priority';
@@ -459,13 +492,28 @@ $worker->unregister;
 $minion->add_task(
   nested => sub {
     my ($job, $hash, $array) = @_;
+    $job->note(bar => {baz => [1, 2, 3]});
+    $job->note(baz => 'yada');
     $job->finish([{23 => $hash->{first}[0]{second} x $array->[0][0]}]);
   }
 );
-$minion->enqueue(nested => [{first => [{second => 'test'}]}, [[3]]]);
+$minion->enqueue(
+  'nested',
+  [{first => [{second => 'test'}]}, [[3]]],
+  {notes => {foo => [4, 5, 6]}}
+);
 $job = $worker->register->dequeue(0);
 $job->perform;
 is $job->info->{state}, 'finished', 'right state';
+ok $job->note(yada => ['works']), 'added metadata';
+ok !$minion->backend->note(-1, yada => ['failed']), 'not added metadata';
+my $notes = {
+  foo => [4, 5, 6],
+  bar  => {baz => [1, 2, 3]},
+  baz  => 'yada',
+  yada => ['works']
+};
+is_deeply $job->info->{notes}, $notes, 'right metadata';
 is_deeply $job->info->{result}, [{23 => 'testtesttest'}], 'right structure';
 $worker->unregister;
 
@@ -645,12 +693,9 @@ ok $job->finish, 'job finished';
 is $minion->stats->{finished_jobs}, 3, 'three finished jobs';
 is $minion->repair->stats->{finished_jobs}, 0, 'no finished jobs';
 $id = $minion->enqueue(test => [] => {parents => [-1]});
-ok !$worker->dequeue(0), 'job with missing parent will never be ready';
-$minion->repair;
-like $minion->job($id)->info->{finished}, qr/^[\d.]+$/,
-  'has finished timestamp';
-is $minion->job($id)->info->{state},  'failed',           'right state';
-is $minion->job($id)->info->{result}, 'Parent went away', 'right result';
+$job = $worker->dequeue(0);
+is $job->id, $id, 'right id';
+ok $job->finish, 'job finished';
 $worker->unregister;
 
 SKIP: {

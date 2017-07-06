@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Zhinst;
-$Lab::Moose::Instrument::Zhinst::VERSION = '3.550';
+$Lab::Moose::Instrument::Zhinst::VERSION = '3.552';
 use 5.010;
 use Moose;
 use MooseX::Params::Validate qw/validated_list validated_hash/;

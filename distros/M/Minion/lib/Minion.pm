@@ -16,7 +16,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '7.0';
+our $VERSION = '7.02';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -128,10 +128,10 @@ Minion - Job queue
 
 L<Minion> is a job queue for the L<Mojolicious|http://mojolicious.org> real-time
 web framework, with support for multiple named queues, priorities, delayed jobs,
-job dependencies, job results, retries with backoff, rate limiting, unique jobs,
-statistics, istributed workers, parallel processing, autoscaling,
-remote control, resource leak protection and multiple backends (such as
-L<PostgreSQL|http://www.postgresql.org>).
+job dependencies, job progress, job results, retries with backoff, rate
+limiting, unique jobs, statistics, distributed workers, parallel processing,
+autoscaling, remote control, resource leak protection and multiple backends
+(such as L<PostgreSQL|http://www.postgresql.org>).
 
 Job queues allow you to process time and/or computationally intensive tasks in
 background processes, outside of the request/response lifecycle. Among those
@@ -364,6 +364,15 @@ L</"backoff"> after the first attempt, defaults to C<1>.
 
 Delay job for this many seconds (from now), defaults to C<0>.
 
+=item notes
+
+  notes => {foo => 'bar', baz => [1, 2, 3]}
+
+Hash reference with arbitrary metadata for this job that gets serialized by the
+L</"backend"> (often with L<Mojo::JSON>), so you shouldn't send objects and be
+careful with binary data, nested data structures with hash and array references
+are fine though.
+
 =item parents
 
   parents => [$id1, $id2, $id3]
@@ -394,6 +403,9 @@ return C<undef> if job does not exist.
 
   # Check job state
   my $state = $minion->job($id)->info->{state};
+
+  # Get job metadata
+  my $progress = $minion->$job($id)->info->{notes}{progress};
 
   # Get job result
   my $result = $minion->job($id)->info->{result};
@@ -608,6 +620,8 @@ In alphabetical order:
 Andrey Khozov
 
 Brian Medley
+
+Hubert "depesz" Lubaczewski
 
 Joel Berger
 

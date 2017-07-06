@@ -761,23 +761,6 @@ sub oobinline {
    };
 }
 
-=item $handle->keepalive ($boolean)
-
-Enables or disables the C<keepalive> setting (see constructor argument of
-the same name for details).
-
-=cut
-
-sub keepalive {
-   $_[0]{keepalive} = $_[1];
-
-   eval {
-      local $SIG{__DIE__};
-      setsockopt $_[0]{fh}, Socket::SOL_SOCKET (), Socket::SO_KEEPALIVE (), int $_[1]
-         if $_[0]{fh};
-   };
-}
-
 =item $handle->on_starttls ($cb)
 
 Replace the current C<on_starttls> callback (see the C<on_starttls> constructor argument).
@@ -2212,19 +2195,19 @@ sub starttls {
    # basically, this is deep magic (because SSL_read should have the same issues)
    # but the openssl maintainers basically said: "trust us, it just works".
    # (unfortunately, we have to hardcode constants because the abysmally misdesigned
-   # and mismaintained ssleay-module doesn't even offer them).
+   # and mismaintained ssleay-module didn't offer them for a decade or so).
    # http://www.mail-archive.com/openssl-dev@openssl.org/msg22420.html
    #
    # in short: this is a mess.
-   # 
+   #
    # note that we do not try to keep the length constant between writes as we are required to do.
    # we assume that most (but not all) of this insanity only applies to non-blocking cases,
    # and we drive openssl fully in blocking mode here. Or maybe we don't - openssl seems to
    # have identity issues in that area.
-#   Net::SSLeay::CTX_set_mode ($ssl,
+#   Net::SSLeay::set_mode ($ssl,
 #      (eval { local $SIG{__DIE__}; Net::SSLeay::MODE_ENABLE_PARTIAL_WRITE () } || 1)
 #      | (eval { local $SIG{__DIE__}; Net::SSLeay::MODE_ACCEPT_MOVING_WRITE_BUFFER () } || 2));
-   Net::SSLeay::CTX_set_mode ($tls, 1|2);
+   Net::SSLeay::set_mode ($tls, 1|2);
 
    $self->{_rbio} = Net::SSLeay::BIO_new (Net::SSLeay::BIO_s_mem ());
    $self->{_wbio} = Net::SSLeay::BIO_new (Net::SSLeay::BIO_s_mem ());

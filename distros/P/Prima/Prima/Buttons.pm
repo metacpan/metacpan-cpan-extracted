@@ -463,12 +463,11 @@ sub on_paint
 		( 0, 0, $size[0] - 1, $size[1] - 1);
 	if ( !$self-> {flat} || $self-> {hilite}) {
 		$self-> rect_bevel( $canvas, @fbar, 
-			gradient => {
-				color    => $clr[1], 
+			gradient => $self-> new_gradient(
 				palette  => [ $self-> dark3DColor, $clr[1], $self-> light3DColor ],  
 				spline   => [0,0.5,1,0.5],
 				vertical => 0,
-			},
+			),
 			fill     => $self-> transparent ? undef : $clr[1],
 			width    => $self-> {borderWidth},
 			concave  => ( $_[0]-> { pressed} || $_[0]-> { checked}),
@@ -550,12 +549,11 @@ sub on_paint
 				$c->{cache}->ui_scale( zoom => $is );
 				$c->{zoom} = $is;
 				$c->{obj}  = "$image";
-
-				$image = $c->{cache};
-				$imgNo = 0;
-				($pw,$ph) = $image->size;
-				($sw,$sh) = $image->size;
 			}
+			$image = $c->{cache};
+			$imgNo = 0;
+			($pw,$ph) = $image->size;
+			($sw,$sh) = $image->size;
 		}
 		$canvas-> put_image_indirect(
 			$image,

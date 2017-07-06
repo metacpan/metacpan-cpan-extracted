@@ -1,6 +1,6 @@
 package PMLTQ::Command;
 our $AUTHORITY = 'cpan:MATY';
-$PMLTQ::Command::VERSION = '1.3.2';
+$PMLTQ::Command::VERSION = '1.4.0';
 # ABSTRACT: Command base class
 
 use PMLTQ::Base -base;
@@ -168,10 +168,11 @@ sub ua {
 }
 
 sub login {
-  my ($self,$ua) = @_;
-  my $url = URI::WithBase->new('/',$self->config->{web_api}->{url});
+  my ($self,$ua,$auth) = @_;
+  my $url = URI::WithBase->new('/',$auth->{baseurl}||$self->config->{web_api}->{url});
   $url->path_segments('api','auth');
-  my $res = $self->request($ua,'POST',$url->abs->as_string,{auth => {password => $self->config->{web_api}->{password}, username => $self->config->{web_api}->{user}}});
+
+  my $res = $self->request($ua,'POST',$url->abs->as_string,{auth => {password => $auth->{password} || $self->config->{web_api}->{password}, username => $auth->{username} || $self->config->{web_api}->{user}}});
   my $cookie_jar = HTTP::Cookies->new();
   $cookie_jar->extract_cookies($res);
   $ua->cookie_jar($cookie_jar);
@@ -206,13 +207,18 @@ sub request {
   return $res;
 }
 
-sub get_treebank {
-  my ($self,$ua) = @_;
+sub get_all_treebanks {
+  my ($self,$ua, $apiurl) = @_;
   my $data;
-  my $url = URI::WithBase->new('/',$self->config->{web_api}->{url});
+  my $url = URI::WithBase->new('/',$apiurl || $self->config->{web_api}->{url});
   $url->path_segments('api','admin', 'treebanks');
   (undef,$data) = $self->request($ua,'GET',$url->abs->as_string);
-  my ($treebank) = grep {$_->{name} eq $self->config->{treebank_id}} @{ $data // []};
+  return $data // [];
+}
+
+sub get_treebank {
+  my ($self,$ua) = @_;
+  my ($treebank) = grep {$_->{name} eq $self->config->{treebank_id}} @{ $self->get_all_treebanks($ua)};
   return $treebank;
 }
 
@@ -326,6 +332,34 @@ sub evaluate_query {
   }
   return $result;
 }
+
+sub user2admin_format { # converts getted treebank json to treebank configuration format
+  my ($self, $treebank) = @_;
+  return {
+    id => $treebank->{name},
+    tags => [map  {$_->{name}} @{$treebank->{tags}}],
+    language => $treebank->{languages}->[0]->{code}, 
+    map {$_ => $treebank->{$_}} qw/title isFree isAllLogged isFeatured isPublic homepage description documentation dataSources manuals/
+  }
+}
+
+
+sub get_nodetypes {
+  my ($self, $treebank) = @_;
+  my $url = URI::WithBase->new('/',$self->config->{web_api}->{url});
+  $url->path_segments('api', 'treebanks', $treebank->{name}, 'node-types');
+  my $data;
+  (undef,$data) = $self->request($self->{ua}, 'GET', $url->abs->as_string);
+  return $data->{types}
+}
+
+sub get_test_queries {
+  my ($self, $treebank) = @_;
+  # get node types
+  my ($type) = @{$self->get_nodetypes($treebank)};
+  return [{filename=>"$type.svg", query => "$type [];"}, {filename=>"${type}_count.txt", query => "$type []; >> count()"}]
+}
+
 1;
 
 __END__
@@ -340,7 +374,7 @@ PMLTQ::Command - Command base class
 
 =head1 VERSION
 
-version 1.3.2
+version 1.4.0
 
 =head1 AUTHORS
 

@@ -7,3 +7,4 @@ Revision history for Async-Simple-Pool
 0.05    26/03/17 Win32 Support disabled. May be temporary.
 0.06    09/04/17 Improve tests stability.
 0.07    Dependence on Module::Metadata has been removed. Some test fixes.
+0.08    Task test slowdown. Perl version lower than 5.14.0 disabled from now.

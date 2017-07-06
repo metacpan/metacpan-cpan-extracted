@@ -1,0 +1,31 @@
+requires "CPAN" => "0";
+requires "CPAN::Mini" => "1.111016";
+requires "DBI" => "1.636";
+requires "Exporter" => "0";
+requires "File::Spec" => "0";
+requires "Getopt::Long" => "0";
+requires "Pod::Usage" => "1.69";
+requires "Set::Tiny" => "0.04";
+requires "Term::ProgressBar" => "2.18";
+requires "Test::Reporter" => "1.62";
+requires "Test::Reporter::Transport::Socket" => "0.32";
+requires "YAML::XS" => "0.63";
+requires "perl" => "5.012";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+  requires "Test::Warnings" => "0.026";
+  requires "perl" => "5.012";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.012";
+};
+
+on 'develop' => sub {
+  requires "Test::Kwalitee" => "1.21";
+  requires "Test::More" => "0.88";
+};

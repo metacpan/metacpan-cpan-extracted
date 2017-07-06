@@ -1,0 +1,28 @@
+Revision history for Alien::PCRE2.
+
+0.006000 2017-07-02
+
+    - Build Process, Disable Shared Libs
+    - Test Suite, Enable `pcre2grep` Tests
+
+0.005000 2017-07-02
+
+    - Test Suite, Disable `pcre2grep` Tests, Do Not Force `make install`
+
+0.004000 2017-07-02
+
+    - Test Suite, Force `make install` Before `pcre2grep`
+
+0.003000 2017-07-01
+
+    - Test Suite Update
+    - MS Windows Support
+
+0.002000 2017-06-30
+
+    - Test Suite
+
+0.001000 2017-06-30
+
+    - Initial Release!
+    - Linux Support

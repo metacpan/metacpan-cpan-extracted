@@ -1,37 +1,37 @@
 {
    "abstract" : "PICA record processing",
    "author" : [
-      "Jakob Voß"
+      "Jakob Vo\u00df"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PICA-Data",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "eg",
+         "examples",
          "inc",
          "share",
-         "eg",
-         "examples"
+         "t",
+         "xt"
       ]
    },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.039"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.8",
+            "Dist::Milla" : "v1.0.17",
             "Test::Pod" : "1.41"
          }
       },
@@ -54,13 +54,15 @@
          "web" : "https://github.com/gbv/PICA-Data"
       }
    },
-   "version" : "0.31",
+   "version" : "0.32",
    "x_contributors" : [
+      "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
+      "Carsten Klee <cKlee@users.noreply.github.com>",
       "Jakob Voss <jakob@nichtich.de>",
       "Jakob Voss <voss@gbv.de>",
-      "Jakob Voß <jakob@nichtich.de>",
       "Johann Rolschewski <jorol@cpan.org>",
       "Johann Rolschewski <rolschewski@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
 }
 

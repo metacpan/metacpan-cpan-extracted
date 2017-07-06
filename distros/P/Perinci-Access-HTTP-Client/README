@@ -89,8 +89,8 @@ METHODS
       * log_callback => CODE
 
       Pass log messages from the server to this subroutine. If not
-      specified, log messages will be "rethrown" into Log::Any logging
-      methods (e.g. $log->warn(), $log->debug(), etc).
+      specified, log messages will be "rethrown" into Log::ger loggers
+      (e.g. log_warn(), log_debug(), etc).
 
  $pa->request($action => $server_url[, \%extra_keys[, \%client_opts]]) =>
  $res

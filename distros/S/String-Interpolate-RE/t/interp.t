@@ -7,17 +7,17 @@ use String::Interpolate::RE qw( strinterp );
 my %vars = ( a => '1', b => '2' );
 
 for my $test ( [ var => \%vars ],
-	       [ function => sub { $vars{ $_[0] } } ]
-	     ) {
+               [ function => sub { $vars{ $_[0] } } ]
+             ) {
 
     my ( $label, $vars ) = @$test;
 
     subtest $label => sub {
 
-	local %ENV;
+        local %ENV;
 
-	$ENV{a} = '11';
-	$ENV{b} = '22';
+        $ENV{a} = '11';
+        $ENV{b} = '22';
 
 
         is( strinterp( '$a', $vars ), '1', 'defined in %vars' );

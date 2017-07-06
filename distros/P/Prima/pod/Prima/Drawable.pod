@@ -205,55 +205,6 @@ export its palette to an output device, because images usually are not
 subject to automatic dithering algorithms. Prima::ImageViewer module
 employs this scheme.
 
-=head2 Gradients
-
-Prima offers primitive gradient services to draw gradually changing colors.
-A gradient is requested by setting of at least two colors and optionally
-a set of quadratic spline points that, when, projected, generate the transition curve
-between the colors.
-
-The example below fills a rectangle with a gradient calculated between a
-background color and its pre-lighted variant.
-
-    $canvas-> gradient_bar( $left, $bottom, $right, $top, {
-  	palette  => [ $self->prelight_color($back_color), $back_color ],
-    });
-
-Here are keys understood in the gradient request:
-
-=over
-
-=item palette @COLORS
-
-Each color is a C<cl::> value. The gradient is calculated as polyline where
-each its vertex corresponds to a certain blend between two neighbouring colors
-in the palette. F.ex. the simplest palette going from C<cl::White> to
-C<cl::Black> over a polyline C<0..1> (default), produces pure white color at
-the start and pure black color at the end, filling all available shades of gray
-in between, and changing monotonically.
-
-=item poly @VERTICES
-
-Set of 2-integer polyline vertexes where the first integer is a coordinate (x,
-y, or whatever required by the drawing primitive) between 0 and 1, and the
-second is the color blend value between 0 and 1.
-
-Default: ((0,0),(1,1))
-
-=item spline \@VERTICES, %OPTIONS
-
-Serving same purpose as C<poly> but vertexes are projected first to a B-spline
-curve using L<render_spline> and C<%OPTIONS>. The resulting polyline is treated
-as C<poly>.
-
-=item vertical BOOLEAN
-
-Only used in L<gradient_bar>, to set gradient direction.
-
-=back
-
-See also: L<gradient_bar>, L<gradient_realize3d> .
-
 =head2 Monochrome bitmaps
 
 A special case of C<put_image> is taken where the object to be drawn is a
@@ -810,6 +761,10 @@ An example below shows encoding of fp::Parquet pattern:
 
 On a get-call always returns an array, never a C<fp::> constant.
 
+=item fillPatternOffset X, Y
+
+Origin coordinates for the C<fillPattern>, from 0 to 7.
+
 =item font \%FONT
 
 Manages font context. FONT hash acceptable values are
@@ -1031,14 +986,14 @@ Context used: color, backColor, lineEnd, linePattern, lineWidth, rop, rop2
 
 Draws a filled rectangle within (X1,Y1) - (X2,Y2) extents.
 
-Context used: color, backColor, fillPattern, rop, rop2
+Context used: color, backColor, fillPattern, fillPatternOffset, rop, rop2
 
 =item bars @RECTS
 
 Draws a set of filled rectangles.
 RECTS is an array of integer quartets in format (X1,Y1,X2,Y2).
 
-Context used: color, backColor, fillPattern, rop, rop2
+Context used: color, backColor, fillPattern, fillPatternOffset, rop, rop2
 
 =item chord X, Y, DIAMETER_X, DIAMETER_Y, START_ANGLE, END_ANGLE 
 
@@ -1107,13 +1062,13 @@ Context used: color, backColor, linePattern, lineWidth, rop, rop2
 Fills a chord outline with center in X, Y and DIAMETER_X and DIAMETER_Y axis
 from START_ANGLE to END_ANGLE (see chord()).
 
-Context used: color, backColor, fillPattern, rop, rop2
+Context used: color, backColor, fillPattern, fillPatternOffset, rop, rop2
 
 =item fill_ellipse X, Y, DIAMETER_X, DIAMETER_Y
 
 Fills an elliptical outline with center in X, Y and DIAMETER_X and DIAMETER_Y axis.
 
-Context used: color, backColor, fillPattern, rop, rop2
+Context used: color, backColor, fillPattern, fillPatternOffset, rop, rop2
 
 =item fillpoly \@POLYGON
 
@@ -1123,7 +1078,7 @@ Example:
 
    $d-> fillpoly([ 0, 0, 15, 20, 30, 0]); # triangle
 
-Context used: color, backColor, fillPattern, rop, rop2, fillWinding
+Context used: color, backColor, fillPattern, fillPatternOffset, rop, rop2, fillWinding
 
 Returns success flag; if failed, C<$@> contains the error.
 
@@ -1134,7 +1089,7 @@ See also: polyline().
 Fills a sector outline with center in X, Y and DIAMETER_X and DIAMETER_Y axis
 from START_ANGLE to END_ANGLE (see sector()).
 
-Context used: color, backColor, fillPattern, rop, rop2
+Context used: color, backColor, fillPattern, fillPatternOffset, rop, rop2
 
 =item fill_spline \@VERTICES, %OPTIONS
 
@@ -1144,7 +1099,7 @@ based on set of VERTICES. VERTICES must present an array of integer pair in
 
    $d-> fill_spline([ 0, 0, 15, 20, 30, 0]);
 
-Context used: color, backColor, fillPattern, rop, rop2 
+Context used: color, backColor, fillPattern, fillPatternOffset, rop, rop2 
 
 Returns success flag; if failed, C<$@> contains the error.
 
@@ -1165,34 +1120,7 @@ Filling continues outward in all directions as long as the color
 is encountered. This style is useful for filling areas with 
 multicolored boundaries.
 
-Context used: color, backColor, fillPattern, rop, rop2
-
-=item gradient_bar X1, Y1, X2, Y2, GRADIENT
-
-Draws a filled rectangle within (X1,Y1) - (X2,Y2) extents using a gradient (see L<Gradients>).
-
-Context used: fillPattern, rop, rop2
-
-=item gradient_ellipse X, Y, DIAM_X, DIAM_Y, GRADIENT
-
-Draws a filled ellipse with center in (X,Y) and diameters (DIAM_X,DIAM_Y) using a gradient (see L<Gradients>).
-
-Context used: , fillPattern, rop, rop2
-
-=item gradient_sector X, Y, DIAM_X, DIAM_Y, START_ANGLE, END_ANGLE, GRADIENT
-
-Draws a filled sector with center in (X,Y) and diameters (DIAM_X,DIAM_Y) from START_ANGLE to END_ANGLE (see sector())
-using a gradient (see L<Gradients>).
-
-Context used: fillPattern, rop, rop2
-
-=item gradient_realize3d BREADTH, GRADIENT
-
-Returns an array consisting of integer pairs, where the first one is
-a color value, and the second is the breadth of the color strip.
-L<gradient_bar> uses this information to draw a gradient fill, where
-each color strip is drawn with its own color. Can be used for implementing
-other gradient-aware primitives (see F<examples/f_fill.pl> )
+Context used: color, backColor, fillPattern, fillPatternOffset, rop, rop2
 
 =item line X1, Y1, X2, Y2
 
@@ -1208,6 +1136,10 @@ lines() plots a straight line per quartet.
 Context used: color, backColor, linePattern, lineWidth, rop, rop2
 
 Returns success flag; if failed, C<$@> contains the error.
+
+=item new_gradient
+
+Returns a new gradient object. See L<Prima::Drawable::Gradient> for usage and details.
 
 =item new_path
 

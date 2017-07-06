@@ -18,6 +18,8 @@
 
 #include <assert.h>
 
+#include "perlmulticore.h"
+
 #define IW 80 /* MUST match Schnauzer.pm! */
 #define IH 60 /* MUST match Schnauzer.pm! */
 
@@ -38,12 +40,18 @@ struct jpg_err_mgr
 static void
 cv_error_exit (j_common_ptr cinfo)
 {
+  cinfo->err->output_message (cinfo);
   longjmp (((struct jpg_err_mgr *)cinfo->err)->setjmp_buffer, 99);
 }
 
 static void
 cv_error_output (j_common_ptr cinfo)
 {
+  char msg[JMSG_LENGTH_MAX];
+
+  cinfo->err->format_message (cinfo, msg);
+
+  fprintf (stderr, "JPEG decoding error: %s\n", msg);
   return;
 }
 
@@ -150,9 +158,9 @@ a85_push (PerlIO *fp, guchar c)
       a85_cnt = 4;
       if (a85_val)
         {
-          a85_ptr[4] = (a85_val % 85) + 33; a85_val /= 85; 
-          a85_ptr[3] = (a85_val % 85) + 33; a85_val /= 85; 
-          a85_ptr[2] = (a85_val % 85) + 33; a85_val /= 85; 
+          a85_ptr[4] = (a85_val % 85) + 33; a85_val /= 85;
+          a85_ptr[3] = (a85_val % 85) + 33; a85_val /= 85;
+          a85_ptr[2] = (a85_val % 85) + 33; a85_val /= 85;
           a85_ptr[1] = (a85_val % 85) + 33; a85_val /= 85;
           a85_ptr[0] = (a85_val     ) + 33;
 
@@ -215,7 +223,7 @@ magic (octet_string path)
 
         if (!cookie)
           {
-            cookie = magic_open (MAGIC_NONE);
+            cookie = magic_open (MAGIC_SYMLINK);
 
             if (cookie)
               magic_load (cookie, 0);
@@ -236,7 +244,7 @@ magic_mime (octet_string path)
 
         if (!cookie)
           {
-            cookie = magic_open (MAGIC_MIME);
+            cookie = magic_open (MAGIC_MIME | MAGIC_SYMLINK);
 
             if (cookie)
               magic_load (cookie, 0);
@@ -244,7 +252,9 @@ magic_mime (octet_string path)
               XSRETURN_UNDEF;
           }
 
+        perlinterp_release ();
         RETVAL = magic_file (cookie, path);
+        perlinterp_acquire ();
 }
 	OUTPUT:
         RETVAL
@@ -270,6 +280,7 @@ gdk_net_wm_supports (GdkAtom property)
 GdkPixbuf_noinc *
 dealpha_expose (GdkPixbuf *pb)
 	CODE:
+        perlinterp_release ();
 {
 	int w = gdk_pixbuf_get_width (pb);
         int h = gdk_pixbuf_get_height (pb);
@@ -288,22 +299,27 @@ dealpha_expose (GdkPixbuf *pb)
             for (i = 0; i < 3; i++)
               dst[x * 3 + y * dstr + i] = src[x * bpp + y * sstr + i];
 }
+        perlinterp_acquire ();
 	OUTPUT:
         RETVAL
 
 GdkPixbuf_noinc *
 rotate (GdkPixbuf *pb, int angle)
 	CODE:
+        perlinterp_release ();
+        if (angle < 0)
+          angle += 360;
         RETVAL = gdk_pixbuf_rotate_simple (pb, angle ==   0 ? GDK_PIXBUF_ROTATE_NONE
                                              : angle ==  90 ? GDK_PIXBUF_ROTATE_COUNTERCLOCKWISE
                                              : angle == 180 ? GDK_PIXBUF_ROTATE_UPSIDEDOWN
                                              : angle == 270 ? GDK_PIXBUF_ROTATE_CLOCKWISE
                                              : angle);
+        perlinterp_acquire ();
 	OUTPUT:
         RETVAL
 
 GdkPixbuf_noinc *
-load_jpeg (SV *path, int thumbnail=0)
+load_jpeg (SV *path, int thumbnail = 0, int iw = 0, int ih = 0)
 	CODE:
 {
         struct jpeg_decompress_struct cinfo;
@@ -320,6 +336,8 @@ load_jpeg (SV *path, int thumbnail=0)
         if (!fp)
           XSRETURN_UNDEF;
 
+        perlinterp_release ();
+
         cinfo.err = jpeg_std_error (&jerr.err);
 
         jerr.err.error_exit     = cv_error_exit;
@@ -333,6 +351,7 @@ load_jpeg (SV *path, int thumbnail=0)
             if (pb)
               g_object_unref ((gpointer)pb);
 
+            perlinterp_acquire ();
             XSRETURN_UNDEF;
           }
 
@@ -358,23 +377,29 @@ load_jpeg (SV *path, int thumbnail=0)
             cinfo.do_fancy_upsampling = FALSE;
 
             while (cinfo.scale_denom < 8
-                   && cinfo.output_width  >= IW*4
-                   && cinfo.output_height >= IH*4)
+                   && cinfo.output_width  >= iw*4
+                   && cinfo.output_height >= ih*4)
               {
                 cinfo.scale_denom <<= 1;
                 jpeg_calc_output_dimensions (&cinfo);
               }
           }
 
-	pb = RETVAL = gdk_pixbuf_new (GDK_COLORSPACE_RGB, 0, 8,  cinfo.output_width, cinfo.output_height);
+        if (cinfo.output_components != 3)
+          longjmp (jerr.setjmp_buffer, 3);
+
+        if (cinfo.jpeg_color_space == JCS_YCCK || cinfo.jpeg_color_space == JCS_CMYK)
+          {
+            cinfo.out_color_space = JCS_CMYK;
+            cinfo.output_components = 4;
+          }
+
+	pb = RETVAL = gdk_pixbuf_new (GDK_COLORSPACE_RGB, cinfo.output_components == 4, 8,  cinfo.output_width, cinfo.output_height);
         if (!RETVAL)
           longjmp (jerr.setjmp_buffer, 2);
 
         data = gdk_pixbuf_get_pixels (RETVAL);
         rs = gdk_pixbuf_get_rowstride (RETVAL);
-
-        if (cinfo.output_components != 3)
-          longjmp (jerr.setjmp_buffer, 3);
 
         jpeg_start_decompress (&cinfo);
 
@@ -391,9 +416,39 @@ load_jpeg (SV *path, int thumbnail=0)
             jpeg_read_scanlines (&cinfo, rp, remaining < 4 ? remaining : 4);
           }
 
+        if (cinfo.out_color_space == JCS_CMYK)
+          {
+            guchar *end = data + cinfo.output_height * rs;
+
+            while (data < end)
+              {
+                U32 c = data [0];
+                U32 m = data [1];
+                U32 y = data [2];
+                U32 k = data [3];
+
+                if (0)
+                if (cinfo.Adobe_transform == 2)
+                  {
+                    c ^= 0xff;
+                    m ^= 0xff;
+                    y ^= 0xff;
+                    k ^= 0xff;
+                  }
+
+                data [0] = (c * k + 0x80) / 0xff;
+                data [1] = (m * k + 0x80) / 0xff;
+                data [2] = (y * k + 0x80) / 0xff;
+                data [3] = 0xff;
+
+                data += 4;
+              }
+          }
+
         jpeg_finish_decompress (&cinfo);
         fclose (fp);
         jpeg_destroy_decompress (&cinfo);
+        perlinterp_acquire ();
 }
 	OUTPUT:
         RETVAL
@@ -401,6 +456,7 @@ load_jpeg (SV *path, int thumbnail=0)
 void
 compare (GdkPixbuf *a, GdkPixbuf *b)
 	PPCODE:
+        perlinterp_release ();
 {
 	int w  = gdk_pixbuf_get_width  (a);
 	int h  = gdk_pixbuf_get_height (a);
@@ -437,6 +493,8 @@ compare (GdkPixbuf *a, GdkPixbuf *b)
                   d = ((int)*pa_++) - ((int)*pb_++); diff += d*d; peak = MAX (peak, abs (d));
                 }
             }
+
+        perlinterp_acquire ();
 
         EXTEND (SP, 2);
         PUSHs (sv_2mortal (newSVnv (sqrt (diff / (w * h * 3. * 255. * 255.)))));

@@ -1,4 +1,9 @@
-Revision history for Perinci-Access-Simple-Client
+0.23    2017-07-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::ger.
+
 
 0.22    2016-10-07 (PERLANCAR)
 

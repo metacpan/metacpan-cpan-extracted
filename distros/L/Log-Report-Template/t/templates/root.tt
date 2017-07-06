@@ -1,0 +1,16 @@
+<html>
+<head>
+  <title>[% title %]</title>
+</head>
+<body>
+
+<p>[% loc("Dear visitor,") %]<br>
+
+[% "<test filters>" | html %]<br>
+
+[% loc("This is the {count TH} test", count => 1) %]<br>
+[% | loc(count => 2) %]This is the {count TH} test[% END %]<br>
+[% S("second table") %]
+
+</body>
+</html>

@@ -3,9 +3,9 @@ package Catmandu::Fix::Bind::marc_each;
 use Moo;
 use Catmandu::Util;
 
-our $VERSION = '1.13';
+our $VERSION = '1.16';
 
-with 'Catmandu::Fix::Bind';
+with 'Catmandu::Fix::Bind', 'Catmandu::Fix::Bind::Group';
 
 has done => (is => 'ro');
 
@@ -13,12 +13,12 @@ sub unit {
     my ($self,$data) = @_;
 
     $self->{done} = 0;
-    
+
     $data;
 }
 
 sub bind {
-    my ($self,$mvar,$func,$name,$fixer) = @_;
+    my ($self,$mvar,$code) = @_;
 
     return $mvar if $self->done;
 
@@ -30,7 +30,7 @@ sub bind {
 
         $mvar->{record} = [$row];
 
-        my $fixed = $fixer->fix($mvar);
+        my $fixed = $code->($mvar);
 
         push @new , @{$fixed->{record}} if defined $fixed && exists $fixed->{record} && defined $fixed->{record};
     }
@@ -66,7 +66,7 @@ Catmandu::Fix::Bind::marc_each - a binder that loops over MARC fields
 
 =head1 DESCRIPTION
 
-The marc_each binder will iterate over each individual MARC field and execute the fixes only 
+The marc_each binder will iterate over each individual MARC field and execute the fixes only
 in context over each individual field.
 
 If a MARC record contains:

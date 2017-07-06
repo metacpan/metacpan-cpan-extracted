@@ -8,7 +8,7 @@ use Test::More tests => 18;
 
 BEGIN {
 	use_ok('Debug::Client');
-	use_ok('t::lib::Debugger');
+	require_ok('./t/lib/Debugger.pm');
 
 	use_ok( 'Carp',           '1.20' );
 	use_ok( 'IO::Socket::IP', '0.21' );

@@ -23,11 +23,11 @@ Artifactory::Client - Perl client for Artifactory REST API
 
 =head1 VERSION
 
-Version 1.4.1
+Version 1.5.0
 
 =cut
 
-our $VERSION = 'v1.4.1';
+our $VERSION = 'v1.5.0';
 
 =head1 SYNOPSIS
 
@@ -1824,6 +1824,92 @@ Sets the pass phrase required signing Debian packages using the private key
 sub set_gpg_pass_phrase {
     my ( $self, $pass ) = @_;
     return $self->_handle_gpg_key( 'passphrase', 'put', 'X-GPG-PASSPHRASE' => $pass );
+}
+
+=head2 create_token( username => 'johnq', scope => 'member-of-groups:readers' )
+
+Creates an access token
+
+=cut
+
+sub create_token {
+    my ( $self, %data ) = @_;
+    my $url = $self->_api_url() . "/security/token";
+    return $self->post( $url, content => \%data );
+}
+
+=head2 refresh_token( grant_type => 'refresh_token', refresh_token => 'fgsg53t3g' )
+
+Refresh an access token to extend its validity. If only the access token and the refresh token are provided (and no
+other parameters), this pair is used for authentication. If username or any other parameter is provided, then the
+request must be authenticated by a token that grants admin permissions.
+
+=cut
+
+sub refresh_token {
+    my ( $self, %data ) = @_;
+    return $self->create_token(%data);
+}
+
+=head2 revoke_token( token => 'fgsg53t3g' )
+
+Revoke an access token
+
+=cut
+
+sub revoke_token {
+    my ( $self, %data ) = @_;
+    my $url = $self->_api_url() . "/security/token/revoke";
+    return $self->post( $url, content => \%data );
+}
+
+=head2 get_service_id
+
+Provides the service ID of an Artifactory instance or cluster
+
+=cut
+
+sub get_service_id {
+    my $self = shift;
+    my $url  = $self->_api_url() . "/system/service_id";
+    return $self->get($url);
+}
+
+=head2 get_certificates
+
+Returns a list of installed SSL certificates.
+
+=cut
+
+sub get_certificates {
+    my $self = shift;
+    my $url  = $self->_api_url() . "/system/security/certificates";
+    return $self->get($url);
+}
+
+=head2 add_certificate( $alias, $file_path )
+
+Adds an SSL certificate.
+
+=cut
+
+sub add_certificate {
+    my ( $self, $alias, $file ) = @_;
+    my $url  = $self->_api_url() . "/system/security/certificates/$alias";
+    my $data = Path::Tiny::path($file)->slurp();
+    return $self->post( $url, 'Content-Type' => 'application/text', content => $data );
+}
+
+=head2 delete_certificate( $alias )
+
+Deletes an SSL certificate.
+
+=cut
+
+sub delete_certificate {
+    my ( $self, $alias ) = @_;
+    my $url = $self->_api_url() . "/system/security/certificates/$alias";
+    return $self->delete($url);
 }
 
 =head1 REPOSITORIES

@@ -1,5 +1,25 @@
 Revision history for Dist-Zilla-Plugin-CheckChangeLog
 
+0.04    2017-07-05
+        - hidden from PAUSE
+
+0.03    2016-07-06
+        - Become an AfterBuild plugin instead of a InstallTool plugin
+        - Don't use Moose::Autobox in an effort to keep lean
+        - Remove default value of empty string for filename attr
+        - Rename check_file_for_version to has_version
+        - Only search within the root of the dist and only look for files
+          named change, changes, or changelog (case insenstive)
+        - Added test suites and corpus for test suites
+        - Log messages vs printing to STDOUT
+        - Better error messages
+        - Revise description
+        - Add documentation about file name conventions
+        - Tidy up
+        - Add .travis.yml CI with github
+
+        @starbelly
+
 0.02    2014-12-16
         fix Prereqs with Moose::Autobox
 

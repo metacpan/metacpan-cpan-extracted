@@ -9,7 +9,6 @@ dist.ini
 lib/Template/Reverse.pm
 lib/Template/Reverse/Converter/Regexp.pm
 lib/Template/Reverse/Converter/TT2.pm
-lib/Template/Reverse/Part.pm
 lib/Template/Reverse/Util.pm
 sample/king.pl
 sample/king_regexp.pl
@@ -21,7 +20,6 @@ t/04-reverse-default.t
 t/07-convert-tt2.t
 t/08-reverse-convert-tt2.t
 t/09-cowork-extract.t
-t/10-using_class_input.t
 t/11-cowork-regexp.t
 t/sample1.txt
 t/sample2.txt

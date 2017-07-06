@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -23,6 +23,8 @@ use PDF::API2::Resource::Pattern;
 use PDF::API2::Resource::Shading;
 
 use PDF::API2::NamedDestination;
+
+use Scalar::Util qw(weaken);
 
 our @FontDirs = ( (map { "$_/PDF/API2/fonts" } @INC),
                   qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
@@ -104,6 +106,7 @@ sub new {
     $self->{'pages'}->{'Resources'} ||= PDFDict();
     $self->{'pdf'}->new_obj($self->{'pages'}->{'Resources'}) unless $self->{'pages'}->{'Resources'}->is_obj($self->{'pdf'});
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
+    weaken $self->{'catalog'};
     $self->{'fonts'} = {};
     $self->{'pagestack'} = [];
     $self->{'forcecompress'} = 1;
@@ -200,10 +203,13 @@ sub open_scalar {
     $self->{'pdf'} = PDF::API2::Basic::PDF::File->open($fh, 1);
     $self->{'pdf'}->{'Root'}->realise();
     $self->{'pages'} = $self->{'pdf'}->{'Root'}->{'Pages'}->realise();
+    weaken $self->{'pages'};
     $self->{'pdf'}->{' version'} ||= 3;
     my @pages = proc_pages($self->{'pdf'}, $self->{'pages'});
     $self->{'pagestack'} = [sort { $a->{' pnum'} <=> $b->{' pnum'} } @pages];
+    weaken $self->{'pagestack'}->[$_] for (0 .. scalar @{$self->{'pagestack'}});
     $self->{'catalog'} = $self->{'pdf'}->{'Root'};
+    weaken $self->{'catalog'};
     $self->{'reopened'} = 1;
     $self->{'forcecompress'} = 1;
     $self->{'fonts'} = {};
@@ -1095,16 +1101,21 @@ sub page {
     }
     $page->{' apipdf'} = $self->{'pdf'};
     $page->{' api'} = $self;
+    weaken $page->{' apipdf'};
+    weaken $page->{' api'};
     $self->{'pdf'}->out_obj($page);
     $self->{'pdf'}->out_obj($self->{'pages'});
     if ($index == 0) {
         push @{$self->{'pagestack'}}, $page;
+        weaken $self->{'pagestack'}->[0];
     }
     elsif ($index < 0) {
         splice @{$self->{'pagestack'}}, $index, 0, $page;
+        weaken $self->{'pagestack'}->[$index];
     }
     else {
         splice @{$self->{'pagestack'}}, $index - 1, 0, $page;
+        weaken $self->{'pagestack'}->[$index - 1];
     }
     # $page->{'Resources'} = $self->{'pages'}->{'Resources'};
     return $page;
@@ -1147,6 +1158,8 @@ sub openpage {
         bless $page, 'PDF::API2::Page';
         $page->{' apipdf'} = $self->{'pdf'};
         $page->{' api'} = $self;
+        weaken $page->{' apipdf'};
+        weaken $page->{' api'};
         $self->{'pdf'}->out_obj($page);
         if (($rotate = $page->find_prop('Rotate')) and (not defined($page->{' fixed'}) or $page->{' fixed'} < 1)) {
             $rotate = ($rotate->val() + 360) % 360;
@@ -1219,6 +1232,8 @@ sub openpage {
     $self->{'pdf'}->out_obj($self->{'pages'});
     $page->{' apipdf'} = $self->{'pdf'};
     $page->{' api'} = $self;
+    weaken $page->{' apipdf'};
+    weaken $page->{' api'};
     $page->{' reopened'} = 1;
     return $page;
 }
@@ -1883,13 +1898,19 @@ See Also: L<PDF::API2::Resource::Font::SynFont>
 =cut
 
 sub synfont {
-    my ($self, %opts) = @_;
+    my ($self, $font, %opts) = @_;
+
+    # PDF::API2 doesn't set BaseEncoding for TrueType fonts, so text
+    # isn't searchable unless a ToUnicode CMap is included.  Include
+    # the ToUnicode CMap by default, but allow it to be disabled (for
+    # performance and file size reasons) by setting -unicodemap to 0.
+    $opts{-unicodemap} = 1 unless exists $opts{-unicodemap};
 
     require PDF::API2::Resource::Font::SynFont;
-    my $obj = PDF::API2::Resource::Font::SynFont->new($self->{'pdf'}, %opts);
+    my $obj = PDF::API2::Resource::Font::SynFont->new($self->{'pdf'}, $font, %opts);
 
     $self->{'pdf'}->out_obj($self->{'pages'});
-    $obj->tounicodemap() if $opts{-unicodemap} == 1;
+    $obj->tounicodemap() if $opts{-unicodemap};
 
     return $obj;
 }

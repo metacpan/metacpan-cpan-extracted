@@ -1,0 +1,7 @@
+Revision history for String-Interpolate-Shell
+
+0.02      2017-06-23 14:47:15-04:00 America/New_York
+
+ [BUILD]
+
+   * switch to Dist::Zilla

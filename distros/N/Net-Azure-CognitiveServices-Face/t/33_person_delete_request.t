@@ -11,7 +11,7 @@ can_ok $person, qw/_delete_request/;
 my $req = $person->_delete_request("machida_pm", 'ytnobody');
 
 isa_ok $req, 'HTTP::Request';
-is $req->uri, "https://api.projectoxford.ai/face/v1.0/persongroups/machida_pm/persons/ytnobody";
+is $req->uri, "https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups/machida_pm/persons/ytnobody";
 is $req->method, 'DELETE';
 is $req->header('Content-Type'), 'application/json';
 is $req->header('Ocp-Apim-Subscription-Key'), 'MYSECRET';

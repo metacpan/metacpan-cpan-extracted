@@ -1,0 +1,63 @@
+{
+   "abstract" : "Perl distribution for HIDAPI",
+   "author" : [
+      "Ahmad Fatoum <athreef@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-HIDAPI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IO::Socket::SSL" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Autotools" : "0.000_006",
+            "Alien::Base::ModuleBuild" : "0",
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Socket::SSL" : "0"
+         },
+         "requires" : {
+            "Alien::Base" : "0.030",
+            "File::ShareDir" : "1.00",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test2" : "1.302015",
+            "Test2::Suite" : "0.000030",
+            "Test::Alien" : "0.05",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::HIDAPI" : {
+         "file" : "lib/Alien/HIDAPI.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

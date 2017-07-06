@@ -17,3 +17,11 @@ v1.05	2017-06-22
 
 	- Hopefully fix warnings about ambiguous use of shift without parenthesis in Perl 5.8.
 
+v1.06	2017-06-23
+
+	- Replace // operator that only exists since Perl 5.10.
+
+v1.07	2017-06-24
+
+	- Increased MIN_PERL_VERSION in Makefile.PL to 5.10 because builds were failing on 5.8
+	- Replace require_ok() with plain 'use' in test scripts.

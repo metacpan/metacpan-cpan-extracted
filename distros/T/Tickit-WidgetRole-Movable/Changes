@@ -1,10 +1,18 @@
 Revision history for Tickit-WidgetRole-Movable
 
-0.002     2014-08-16 17:36:22+01:00 Europe/London
-	No new features
+0.002     2017-06-25 02:41:06+08:00 Asia/Kuala_Lumpur
+    No new features
 
-	Bug fixes:
-	* Use $ev methods rather than deprecated multi-arg on_mouse handler
+    Bugs fixed:
+    * Recent (0.62+) versions of Tickit using the C window implementation
+    did not support the ->{steal_input} internal flag, this is now using
+    the official ->set_steal_input method instead.
+
+0.002     2014-08-16 17:36:22+01:00 Europe/London
+    No new features
+
+    Bug fixes:
+    * Use $ev methods rather than deprecated multi-arg on_mouse handler
 
 0.001     2014-08-16 06:26:05+01:00 Europe/London
-	Initial CPAN release
+    Initial CPAN release

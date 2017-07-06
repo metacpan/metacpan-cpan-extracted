@@ -14,7 +14,7 @@
     <ul>
       [% FOREACH user IN users %]
         <li>
-          <a href="../list?username=[% user.username %]">[% user.username %]</a> 
+          <a href="[%- mount_url -%]/list?username=[% user.username %]">[% user.username %]</a> 
         </li>
       [% END %]
     </ul>

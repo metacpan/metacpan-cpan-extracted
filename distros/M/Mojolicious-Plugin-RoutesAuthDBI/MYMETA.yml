@@ -25,5 +25,5 @@ requires:
   Mojolicious::Plugin::Authentication: '1.29'
   Mojolicious::Plugin::OAuth2::Che: '1.539'
   perl: '5.014'
-version: '0.830'
+version: '0.840'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

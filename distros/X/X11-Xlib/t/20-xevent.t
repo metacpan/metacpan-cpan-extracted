@@ -7,14 +7,14 @@ use_ok('X11::Xlib::XEvent') or die;
 sub err(&) { my $code= shift; my $ret; { local $@= ''; eval { $code->() }; $ret= $@; } $ret }
 
 subtest blank_event => sub {
-    # Create a new XEvent
+    # Create a new XEvent (defaults to XErrorEvent)
     my $blank_event= new_ok( 'X11::Xlib::XEvent', [], 'blank event' );
     ok( defined $blank_event->buffer, 'buffer is defined' );
     ok( length($blank_event->buffer) > 0, 'and has non-zero length' );
     is( $blank_event->type,    0,     'type=0' );
     is( $blank_event->display, undef, 'display=undef' );
     is( $blank_event->serial,  0,     'serial=0' );
-    is( $blank_event->send_event, 0,  'send_event=0' );
+    like( $blank_event->summarize, qr/XEvent/ );
 
     # Any method from other subtypes should not exist
     like( err{ $blank_event->x }, qr/locate object method "x"/, 'subtype methods don\'t exist on root event class' );
@@ -87,6 +87,7 @@ subtest event_types => sub {
 
     is( $clone->x, 50, 'x value preserved' );
     is( $clone->y, -7, 'y value preserved' );
+    like( $clone->summarize, qr/x:50/, 'attrs mentioned in summarize()' );
     
     done_testing;
 };

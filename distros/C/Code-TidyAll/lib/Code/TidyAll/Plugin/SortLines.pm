@@ -7,7 +7,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 sub transform_source {
     my ( $self, $source ) = @_;
@@ -31,7 +31,7 @@ Code::TidyAll::Plugin::SortLines - Sort the lines in a file
 
 =head1 VERSION
 
-version 0.59
+version 0.60
 
 =head1 SYNOPSIS
 

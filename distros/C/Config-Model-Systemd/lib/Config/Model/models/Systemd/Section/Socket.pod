@@ -1,5 +1,6 @@
 # PODNAME: Config::Model::models::Systemd::Section::Socket
 # ABSTRACT:  Configuration class Systemd::Section::Socket
+
 =encoding utf8
 
 =head1 NAME
@@ -154,7 +155,7 @@ listen on it before the interface it is configured on is up
 and running, and even regardless of whether it will be up and
 running at any point. To deal with this, it is recommended to
 set the C<FreeBind> option described
-below. I<< Optional. Type list of uniline.  >> 
+below. I< Optional. Type list of uniline.  > 
 
 =head2 ListenDatagram
 
@@ -220,7 +221,7 @@ listen on it before the interface it is configured on is up
 and running, and even regardless of whether it will be up and
 running at any point. To deal with this, it is recommended to
 set the C<FreeBind> option described
-below. I<< Optional. Type list of uniline.  >> 
+below. I< Optional. Type list of uniline.  > 
 
 =head2 ListenSequentialPacket
 
@@ -286,7 +287,7 @@ listen on it before the interface it is configured on is up
 and running, and even regardless of whether it will be up and
 running at any point. To deal with this, it is recommended to
 set the C<FreeBind> option described
-below. I<< Optional. Type list of uniline.  >> 
+below. I< Optional. Type list of uniline.  > 
 
 =head2 ListenFIFO
 
@@ -294,7 +295,7 @@ Specifies a file system FIFO to listen on.
 This expects an absolute file system path as argument.
 Behavior otherwise is very similar to the
 C<ListenDatagram> directive
-above. I<< Optional. Type uniline.  >> 
+above. I< Optional. Type list of uniline.  > 
 
 =head2 ListenSpecial
 
@@ -304,7 +305,7 @@ argument. Behavior otherwise is very similar to the
 C<ListenFIFO> directive above. Use this to
 open character device nodes as well as special files in
 /proc and
-/sys. I<< Optional. Type uniline.  >> 
+/sys. I< Optional. Type list of uniline.  > 
 
 =head2 ListenNetlink
 
@@ -315,7 +316,7 @@ C<audit> or C<kobject-uevent>)
 as argument, optionally suffixed by a whitespace followed by a
 multicast group integer. Behavior otherwise is very similar to
 the C<ListenDatagram> directive
-above. I<< Optional. Type uniline.  >> 
+above. I< Optional. Type list of uniline.  > 
 
 =head2 ListenMessageQueue
 
@@ -324,7 +325,7 @@ on. This expects a valid message queue name (i.e. beginning
 with /). Behavior otherwise is very similar to the
 C<ListenFIFO> directive above. On Linux
 message queue descriptors are actually file descriptors and
-can be inherited between processes. I<< Optional. Type uniline.  >> 
+can be inherited between processes. I< Optional. Type list of uniline.  > 
 
 =head2 ListenUSBFunction
 
@@ -338,14 +339,14 @@ ep0. When using this option, the
 activated service has to have the
 C<USBFunctionDescriptors> and
 C<USBFunctionStrings> options set.
-I<< Optional. Type uniline.  >> 
+I< Optional. Type list of uniline.  > 
 
 =head2 SocketProtocol
 
 Takes a one of C<udplite>
 or C<sctp>. Specifies a socket protocol
 (C<IPPROTO_UDPLITE>) UDP-Lite
-(C<IPPROTO_SCTP>) SCTP socket respectively. I<< Optional. Type uniline.  >> 
+(C<IPPROTO_SCTP>) SCTP socket respectively. I< Optional. Type uniline.  > 
 
 =head2 BindIPv6Only
 
@@ -361,7 +362,7 @@ surprise!), the system wide default setting is used, as
 controlled by
 /proc/sys/net/ipv6/bindv6only, which in
 turn defaults to the equivalent of
-C<both>. I<< Optional. Type uniline.  >> 
+C<both>. I< Optional. Type uniline.  > 
 
 =head2 Backlog
 
@@ -370,7 +371,7 @@ the number of connections to queue that have not been accepted
 yet. This setting matters only for stream and sequential
 packet sockets. See
 L<listen(2)>
-for details. Defaults to SOMAXCONN (128). I<< Optional. Type uniline.  >> 
+for details. Defaults to SOMAXCONN (128). I< Optional. Type uniline.  > 
 
 =head2 BindToDevice
 
@@ -383,7 +384,7 @@ from this socket unit on the network interface device unit
 (L<systemd.device(5)>
 is created. Note that setting this parameter might result in
 additional dependencies to be added to the unit (see
-above). I<< Optional. Type uniline.  >> 
+above). I< Optional. Type uniline.  > 
 
 =head2 SocketUser
 
@@ -393,7 +394,7 @@ owned by the specified user and group. If unset (the default),
 the nodes are owned by the root user/group (if run in system
 context) or the invoking user/group (if run in user context).
 If only a user is specified but no group, then the group is
-derived from the user's default group. I<< Optional. Type uniline.  >> 
+derived from the user's default group. I< Optional. Type uniline.  > 
 
 =head2 SocketGroup
 
@@ -403,14 +404,14 @@ owned by the specified user and group. If unset (the default),
 the nodes are owned by the root user/group (if run in system
 context) or the invoking user/group (if run in user context).
 If only a user is specified but no group, then the group is
-derived from the user's default group. I<< Optional. Type uniline.  >> 
+derived from the user's default group. I< Optional. Type uniline.  > 
 
 =head2 SocketMode
 
 If listening on a file system socket or FIFO,
 this option specifies the file system access mode used when
 creating the file node. Takes an access mode in octal
-notation. Defaults to 0666. I<< Optional. Type uniline.  >> 
+notation. Defaults to 0666. I< Optional. Type uniline.  > 
 
 =head2 DirectoryMode
 
@@ -418,7 +419,7 @@ If listening on a file system socket or FIFO,
 the parent directories are automatically created if needed.
 This option specifies the file system access mode used when
 creating these directories. Takes an access mode in octal
-notation. Defaults to 0755. I<< Optional. Type uniline.  >> 
+notation. Defaults to 0755. I< Optional. Type uniline.  > 
 
 =head2 Accept
 
@@ -451,14 +452,14 @@ activation.
 For IPv4 and IPv6 connections, the C<REMOTE_ADDR>
 environment variable will contain the remote IP address, and C<REMOTE_PORT>
 will contain the remote port. This is the same as the format used by CGI.
-For SOCK_RAW, the port is the IP protocol. I<< Optional. Type boolean.  >> 
+For SOCK_RAW, the port is the IP protocol. I< Optional. Type boolean.  > 
 
 =head2 Writable
 
 Takes a boolean argument. May only be used in
 conjunction with C<ListenSpecial>. If true,
 the specified special file is opened in read-write mode, if
-false, in read-only mode. Defaults to false. I<< Optional. Type boolean.  >> 
+false, in read-only mode. Defaults to false. I< Optional. Type boolean.  > 
 
 =head2 MaxConnections
 
@@ -469,13 +470,13 @@ connections are coming in, they will be refused until at least
 one existing connection is terminated. This setting has no
 effect on sockets configured with
 C<Accept=false> or datagram sockets. Defaults to
-64. I<< Optional. Type uniline.  >> 
+64. I< Optional. Type uniline.  > 
 
 =head2 MaxConnectionsPerSource
 
 The maximum number of connections for a service per source IP address.
 This is very similar to the C<MaxConnections> directive
-above. Disabled by default. I<< Optional. Type uniline.  >> 
+above. Disabled by default. I< Optional. Type uniline.  > 
 
 =head2 KeepAlive
 
@@ -488,7 +489,7 @@ SO_KEEPALIVE socket option (see
 L<socket(7)>
 and the TCP
 Keepalive HOWTO for details.) Defaults to
-C<false>. I<< Optional. Type boolean.  >> 
+C<false>. I< Optional. Type boolean.  > 
 
 =head2 KeepAliveTimeSec
 
@@ -498,7 +499,7 @@ socket option (see
 L<socket(7)>
 and the TCP
 Keepalive HOWTO for details.)
-Defaults value is 7200 seconds (2 hours). I<< Optional. Type integer.  >> 
+Defaults value is 7200 seconds (2 hours). I< Optional. Type integer.  > 
 
 =head2 KeepAliveIntervalSec
 
@@ -509,7 +510,7 @@ the TCP_KEEPINTVL socket option (see
 L<socket(7)>
 and the TCP
 Keepalive HOWTO for details.) Defaults value is 75
-seconds. I<< Optional. Type integer.  >> 
+seconds. I< Optional. Type integer.  > 
 
 =head2 KeepAliveProbes
 
@@ -520,7 +521,7 @@ controls the TCP_KEEPCNT socket option (see
 L<socket(7)>
 and the TCP
 Keepalive HOWTO for details.) Defaults value is
-9. I<< Optional. Type integer.  >> 
+9. I< Optional. Type integer.  > 
 
 =head2 NoDelay
 
@@ -529,7 +530,7 @@ algorithm works by combining a number of small outgoing
 messages, and sending them all at once. This controls the
 TCP_NODELAY socket option (see
 L<tcp(7)>
-Defaults to C<false>. I<< Optional. Type boolean.  >> 
+Defaults to C<false>. I< Optional. Type boolean.  > 
 
 =head2 Priority
 
@@ -537,7 +538,7 @@ Takes an integer argument controlling the
 priority for all traffic sent from this socket. This controls
 the SO_PRIORITY socket option (see
 L<socket(7)>
-for details.). I<< Optional. Type integer.  >> 
+for details.). I< Optional. Type integer.  > 
 
 =head2 DeferAcceptSec
 
@@ -563,7 +564,7 @@ the initial connection may be reduced, because the kernel will
 send data in the final packet establishing the connection (the
 third packet in the "three-way handshake").
 
-Disabled by default. I<< Optional. Type integer.  >> 
+Disabled by default. I< Optional. Type integer.  > 
 
 =head2 ReceiveBuffer
 
@@ -572,7 +573,7 @@ receive or send buffer sizes of this socket, respectively.
 This controls the SO_RCVBUF and SO_SNDBUF socket options (see
 L<socket(7)>
 for details.). The usual suffixes K, M, G are supported and
-are understood to the base of 1024. I<< Optional. Type uniline.  >> 
+are understood to the base of 1024. I< Optional. Type uniline.  > 
 
 =head2 SendBuffer
 
@@ -581,7 +582,7 @@ receive or send buffer sizes of this socket, respectively.
 This controls the SO_RCVBUF and SO_SNDBUF socket options (see
 L<socket(7)>
 for details.). The usual suffixes K, M, G are supported and
-are understood to the base of 1024. I<< Optional. Type uniline.  >> 
+are understood to the base of 1024. I< Optional. Type uniline.  > 
 
 =head2 IPTOS
 
@@ -592,7 +593,7 @@ L<ip(7)>
 for details.). Either a numeric string or one of
 C<low-delay>, C<throughput>,
 C<reliability> or C<low-cost> may
-be specified. I<< Optional. Type integer.  >> 
+be specified. I< Optional. Type integer.  > 
 
 =head2 IPTTL
 
@@ -603,7 +604,7 @@ options (see
 L<ip(7)>
 and
 L<ipv6(7)>
-for details.) I<< Optional. Type integer.  >> 
+for details.) I< Optional. Type integer.  > 
 
 =head2 Mark
 
@@ -612,7 +613,7 @@ mark of packets generated by this socket. This can be used in
 the firewall logic to filter packets from this socket. This
 sets the SO_MARK socket option. See
 L<iptables(8)>
-for details. I<< Optional. Type integer.  >> 
+for details. I< Optional. Type integer.  > 
 
 =head2 ReusePort
 
@@ -622,7 +623,7 @@ L<bind(2)>s
 to this TCP or UDP port. This controls the SO_REUSEPORT socket
 option. See
 L<socket(7)>
-for details. I<< Optional. Type boolean.  >> 
+for details. I< Optional. Type boolean.  > 
 
 =head2 SmackLabel
 
@@ -633,7 +634,7 @@ C<security.SMACK64IPOUT>, respectively, i.e.
 the security label of the FIFO, or the security label for the
 incoming or outgoing connections of the socket, respectively.
 See Smack.txt
-for details. I<< Optional. Type uniline.  >> 
+for details. I< Optional. Type uniline.  > 
 
 =head2 SmackLabelIPIn
 
@@ -644,7 +645,7 @@ C<security.SMACK64IPOUT>, respectively, i.e.
 the security label of the FIFO, or the security label for the
 incoming or outgoing connections of the socket, respectively.
 See Smack.txt
-for details. I<< Optional. Type uniline.  >> 
+for details. I< Optional. Type uniline.  > 
 
 =head2 SmackLabelIPOut
 
@@ -655,7 +656,7 @@ C<security.SMACK64IPOUT>, respectively, i.e.
 the security label of the FIFO, or the security label for the
 incoming or outgoing connections of the socket, respectively.
 See Smack.txt
-for details. I<< Optional. Type uniline.  >> 
+for details. I< Optional. Type uniline.  > 
 
 =head2 SELinuxContextFromNet
 
@@ -671,7 +672,7 @@ This configuration option only affects sockets with
 C<Accept> mode set to
 C<true>. Also note that this option is useful
 only when MLS/MCS SELinux policy is deployed. Defaults to
-C<false>. I<< Optional. Type boolean.  >> 
+C<false>. I< Optional. Type boolean.  > 
 
 =head2 PipeSize
 
@@ -679,7 +680,7 @@ Takes a size in bytes. Controls the pipe
 buffer size of FIFOs configured in this socket unit. See
 L<fcntl(2)>
 for details. The usual suffixes K, M, G are supported and are
-understood to the base of 1024. I<< Optional. Type uniline.  >> 
+understood to the base of 1024. I< Optional. Type uniline.  > 
 
 =head2 MessageQueueMaxMessages
 
@@ -688,7 +689,7 @@ control the mq_maxmsg field or the mq_msgsize field,
 respectively, when creating the message queue. Note that
 either none or both of these variables need to be set. See
 L<mq_setattr(3)>
-for details. I<< Optional. Type uniline.  >> 
+for details. I< Optional. Type uniline.  > 
 
 =head2 FreeBind
 
@@ -699,20 +700,20 @@ those IP addresses are successfully configured on a network
 interface. This sets the IP_FREEBIND socket option. For
 robustness reasons it is recommended to use this option
 whenever you bind a socket to a specific IP address. Defaults
-to C<false>. I<< Optional. Type boolean.  >> 
+to C<false>. I< Optional. Type boolean.  > 
 
 =head2 Transparent
 
 Takes a boolean value. Controls the
 IP_TRANSPARENT socket option. Defaults to
-C<false>. I<< Optional. Type boolean.  >> 
+C<false>. I< Optional. Type boolean.  > 
 
 =head2 Broadcast
 
 Takes a boolean value. This controls the
 SO_BROADCAST socket option, which allows broadcast datagrams
 to be sent from this socket. Defaults to
-C<false>. I<< Optional. Type boolean.  >> 
+C<false>. I< Optional. Type boolean.  > 
 
 =head2 PassCredentials
 
@@ -720,7 +721,7 @@ Takes a boolean value. This controls the
 SO_PASSCRED socket option, which allows
 C<AF_UNIX> sockets to receive the
 credentials of the sending process in an ancillary message.
-Defaults to C<false>. I<< Optional. Type boolean.  >> 
+Defaults to C<false>. I< Optional. Type boolean.  > 
 
 =head2 PassSecurity
 
@@ -728,7 +729,7 @@ Takes a boolean value. This controls the
 SO_PASSSEC socket option, which allows
 C<AF_UNIX> sockets to receive the security
 context of the sending process in an ancillary message.
-Defaults to C<false>. I<< Optional. Type boolean.  >> 
+Defaults to C<false>. I< Optional. Type boolean.  > 
 
 =head2 TCPCongestion
 
@@ -736,7 +737,7 @@ Takes a string value. Controls the TCP
 congestion algorithm used by this socket. Should be one of
 "westwood", "veno", "cubic", "lp" or any other available
 algorithm supported by the IP stack. This setting applies only
-to stream sockets. I<< Optional. Type uniline.  >> 
+to stream sockets. I< Optional. Type uniline.  > 
 
 =head2 ExecStartPre
 
@@ -747,7 +748,7 @@ command line must be an absolute filename, then followed by
 arguments for the process. Multiple command lines may be
 specified following the same scheme as used for
 C<ExecStartPre> of service unit
-files. I<< Optional. Type list of uniline.  >> 
+files. I< Optional. Type list of uniline.  > 
 
 =head2 ExecStartPost
 
@@ -758,7 +759,7 @@ command line must be an absolute filename, then followed by
 arguments for the process. Multiple command lines may be
 specified following the same scheme as used for
 C<ExecStartPre> of service unit
-files. I<< Optional. Type list of uniline.  >> 
+files. I< Optional. Type list of uniline.  > 
 
 =head2 ExecStopPre
 
@@ -767,7 +768,7 @@ or after the listening sockets/FIFOs are closed and removed,
 respectively. Multiple command lines may be specified
 following the same scheme as used for
 C<ExecStartPre> of service unit
-files. I<< Optional. Type list of uniline.  >> 
+files. I< Optional. Type list of uniline.  > 
 
 =head2 ExecStopPost
 
@@ -776,7 +777,7 @@ or after the listening sockets/FIFOs are closed and removed,
 respectively. Multiple command lines may be specified
 following the same scheme as used for
 C<ExecStartPre> of service unit
-files. I<< Optional. Type list of uniline.  >> 
+files. I< Optional. Type list of uniline.  > 
 
 =head2 TimeoutSec
 
@@ -798,7 +799,7 @@ timeout logic. Defaults to
 C<DefaultTimeoutStartSec> from the manager
 configuration file (see
 L<systemd-system.conf(5)>).
-I<< Optional. Type uniline.  >> 
+I< Optional. Type uniline.  > 
 
 =head2 Service
 
@@ -809,7 +810,7 @@ that bears the same name as the socket (with the suffix
 replaced). In most cases, it should not be necessary to use
 this option. Note that setting this parameter might result in
 additional dependencies to be added to the unit (see
-above). I<< Optional. Type uniline.  >> 
+above). I< Optional. Type uniline.  > 
 
 =head2 RemoveOnStop
 
@@ -822,7 +823,7 @@ should not be necessary to use this option, and is not
 recommended as services might continue to run after the socket
 unit has been terminated and it should still be possible to
 communicate with them via their file system node. Defaults to
-off. I<< Optional. Type boolean.  >> 
+off. I< Optional. Type boolean.  > 
 
 =head2 Symlinks
 
@@ -833,7 +834,7 @@ is used, only one AF_UNIX socket in the file system or one
 FIFO may be configured for the socket unit. Use this option to
 manage one or more symlinked alias names for a socket, binding
 their lifecycle together. Defaults to the empty
-list. I<< Optional. Type uniline.  >> 
+list. I< Optional. Type uniline.  > 
 
 =head2 FileDescriptorName
 
@@ -848,7 +849,7 @@ exclude control characters and C<:>, and must
 be at most 255 characters in length. If this setting is not
 used, the file descriptor name defaults to the name of the
 socket unit, including its .socket
-suffix. I<< Optional. Type uniline.  >> 
+suffix. I< Optional. Type uniline.  > 
 
 =head2 TriggerLimitIntervalSec
 
@@ -862,7 +863,7 @@ value and specifies the number of permitted activations per time interval, and d
 C<Accept=yes> sockets (thus by default permitting 200 activations per 2s), and 20 otherwise (20
 activations per 2s). Set either to 0 to disable any form of trigger rate limiting. If the limit is hit, the
 socket unit is placed into a failure mode, and will not be connectible anymore until restarted. Note that this
-limit is enforced before the service activation is enqueued. I<< Optional. Type uniline.  >> 
+limit is enforced before the service activation is enqueued. I< Optional. Type uniline.  > 
 
 =head2 TriggerLimitBurst
 
@@ -876,7 +877,7 @@ value and specifies the number of permitted activations per time interval, and d
 C<Accept=yes> sockets (thus by default permitting 200 activations per 2s), and 20 otherwise (20
 activations per 2s). Set either to 0 to disable any form of trigger rate limiting. If the limit is hit, the
 socket unit is placed into a failure mode, and will not be connectible anymore until restarted. Note that this
-limit is enforced before the service activation is enqueued. I<< Optional. Type uniline.  >> 
+limit is enforced before the service activation is enqueued. I< Optional. Type uniline.  > 
 
 =head1 SEE ALSO
 

@@ -2,7 +2,6 @@
 
 use Test::More;
 use Data::Dumper;
-use DateTime;
 use Test::MockTime;
 
 
@@ -12,7 +11,7 @@ Test::MockTime::set_fixed_time("2016-12-01T00:00:00Z");
 
 use Parse::Syslog::Line qw/:with_timezones/;
 
-set_syslog_timezone("UTC");
+set_syslog_timezone('UTC');
 
 my %msgs = (
     'Snort Message Parse'    => q|<11>Jan  1 00:00:00 mainfw snort[32640]: [1:1893:4] SNMP missing community string attempt [Classification: Misc Attack] [Priority: 2]: {UDP} 1.2.3.4:23210 -> 5.6.7.8:161|,
@@ -55,7 +54,7 @@ my %resps = (
           'message_raw' => '<11>Jan  1 00:00:00 mainfw snort[32640]: [1:1893:4] SNMP missing community string attempt [Classification: Misc Attack] [Priority: 2]: {UDP} 1.2.3.4:23210 -> 5.6.7.8:161',
           'priority_int' => 3,
           'preamble' => '11',
-          'datetime_str' => qq{$year-01-01 00:00:00},
+          'datetime_str' => qq{$year-01-01T00:00:00Z},
           'program_pid' => '32640',
           'facility_int' => 8,
           'program_name' => 'snort',
@@ -77,7 +76,7 @@ my %resps = (
           'message_raw' => '<11>Jan  1 00:00:00 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3',
           'priority_int' => 3,
           'preamble' => '11',
-          'datetime_str' => qq{$year-01-01 00:00:00},
+          'datetime_str' => qq{$year-01-01T00:00:00Z},
           'program_pid' => undef,
           'facility_int' => 8,
           'program_name' => 'dhcpd',
@@ -99,7 +98,7 @@ my %resps = (
           'message_raw' => 'Jan  1 00:00:00 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3',
           'priority_int' => undef,
           'preamble' => undef,
-          'datetime_str' => qq{$year-01-01 00:00:00},
+          'datetime_str' => qq{$year-01-01T00:00:00Z},
           'program_pid' => undef,
           'facility_int' => undef,
           'program_name' => 'dhcpd',
@@ -121,7 +120,7 @@ my %resps = (
           'message_raw' => '<11>Jan  1 00:00:00 dev.example.com dhcpd: DHCPINFORM from 172.16.2.137 via vlan3',
           'priority_int' => 3,
           'preamble' => '11',
-          'datetime_str' => qq{$year-01-01 00:00:00},
+          'datetime_str' => qq{$year-01-01T00:00:00Z},
           'program_pid' => undef,
           'facility_int' => 8,
           'program_name' => 'dhcpd',
@@ -143,7 +142,7 @@ my %resps = (
           'message_raw' => 'Jan  1 00:00:00 example syslogd 1.2.3: restart (remote reception).',
           'priority_int' => undef,
           'preamble' => undef,
-          'datetime_str' => qq{$year-01-01 00:00:00},
+          'datetime_str' => qq{$year-01-01T00:00:00Z},
           'program_pid' => undef,
           'facility_int' => undef,
           'program_name' => 'syslogd',
@@ -165,7 +164,7 @@ my %resps = (
           'message_raw' => '<78>Jan  1 08:15:00 /usr/sbin/cron[73991]: (root) CMD (/usr/libexec/atrun)',
           'priority_int' => 6,
           'preamble' => 78,
-          'datetime_str' => qq{$year-01-01 08:15:00},
+          'datetime_str' => qq{$year-01-01T08:15:00Z},
           'program_pid' => '73991',
           'facility_int' => 72,
           'program_name' => '/usr/sbin/cron',
@@ -186,7 +185,7 @@ my %resps = (
            'message_raw' => '<163>Jan 1 18:39:00 hostname.domain.tld %ASA-3-313001: Denied ICMP type=5, code=1 from 1.2.3.4 on interface inside',
            'priority_int' => 3,
            'preamble' => '163',
-           'datetime_str' => qq{$year-01-01 18:39:00},
+           'datetime_str' => qq{$year-01-01T18:39:00Z},
            'program_pid' => undef,
            'program_name' => '%ASA-3-313001',
            'facility_int' => 160,
@@ -208,7 +207,7 @@ my %resps = (
            'message_raw' => '<161>Jan 1 18:39:00 hostname : %ASA-3-313001: Denied ICMP type=5, code=1 from 1.2.3.4 on interface inside',
            'priority_int' => 1,
            'preamble' => '161',
-           'datetime_str' => qq{$year-01-01 18:39:00},
+           'datetime_str' => qq{$year-01-01T18:39:00Z},
            'program_pid' => undef,
            'program_name' => '%ASA-3-313001',
            'facility_int' => 160,
@@ -220,7 +219,7 @@ my %resps = (
            'ntp' => 'ok',
             message_raw => qq|$year-01-01T11:09:36+02:00 hostname.company.tld : $year Jan  1 11:09:36.290 CET: %ETHPORT-5-IF_DOWN_CFG_CHANGE: Interface Ethernet121/1/1 is down(Config change)|,
            'priority' => undef,
-           'time' => '11:09:36',
+           'time' => '09:09:36',
            'date' => qq{$year-01-01},
            'content' => 'Interface Ethernet121/1/1 is down(Config change)',
            'facility' => undef,
@@ -230,7 +229,7 @@ my %resps = (
            'program_raw' => '%ETHPORT-5-IF_DOWN_CFG_CHANGE',
            'date_raw' => qq{$year-01-01T11:09:36+02:00},
            'datetime_raw' => qq{$year-01-01T11:09:36+02:00},
-           'datetime_str' => qq{$year-01-01 11:09:36},
+           'datetime_str' => qq{$year-01-01T09:09:36Z},
            'priority_int' => undef,
            'preamble' => undef,
            'program_pid' => undef,
@@ -256,7 +255,7 @@ my %resps = (
            'program_raw' => '%C4K_EBM-4-HOSTFLAPPING',
            'date_raw' => 'Jan 1 00:10:02',
            'datetime_raw' => 'Jan 1 00:10:02',
-           'datetime_str' => qq{$year-01-01 00:10:02},
+           'datetime_str' => qq{$year-01-01T00:10:02Z},
            'preamble' => 188,
            'program_pid' => undef,
            'program_name' => '%C4K_EBM-4-HOSTFLAPPING',
@@ -279,7 +278,7 @@ my %resps = (
            'message_raw' => '<189>Jan 1 12:22:26 1.2.3.4 5971: *Jan 1 02:54:25: %SYS-5-CONFIG_I: Configured from console by vty0 (10.100.0.68)',
            'priority_int' => 5,
            'preamble' => '189',
-           'datetime_str' => qq{$year-01-01 12:22:26},
+           'datetime_str' => qq{$year-01-01T12:22:26Z},
            'program_pid' => undef,
            'facility_int' => 184,
            'program_name' => '%SYS-5-CONFIG_I',
@@ -299,7 +298,7 @@ my %resps = (
            'program_raw' => '%LINK-3-UPDOWN',
            'datetime_raw' => 'Jan 1 14:58:58',
            'ntp' => 'out of sync',
-           'datetime_str' => qq{$year-01-01 14:58:58},
+           'datetime_str' => qq{$year-01-01T14:58:58Z},
            'message_raw' => '<187>Jan 1 14:58:58 fqdn.tld 6951: .Jan 1 14:58:57: %LINK-3-UPDOWN: Interface BRI0:1, changed state to down',
            'priority_int' => 3,
            'preamble' => '187',
@@ -326,7 +325,7 @@ my %resps = (
            'message_raw' => '<189>Jan 1 19:12:19 router.company.tld 11815005: Jan 1 2014 19:12:18.454 CET: %CRYPTO-5-IPSEC_SETUP_FAILURE: IPSEC SETUP FAILED for local:1.2.3.4 local_id:1.2.3.4 remote:4.5.6.7 remote_id:4.5.6.7 IKE profile:foo fvrf:None fail_reason:IPSec Proposal failure fail_class_cnt:14',
            'priority_int' => 5,
            'preamble' => 189,
-           'datetime_str' => qq{$year-01-01 19:12:19},
+           'datetime_str' => qq{$year-01-01T19:12:19Z},
            'program_pid' => undef,
            'program_name' => '%CRYPTO-5-IPSEC_SETUP_FAILURE',
            'facility_int' => 184,
@@ -349,7 +348,7 @@ my %resps = (
            'content' => 'FCP Target 0c: Target was Reset by the Initiator at Port Id: 0x11000 (WWPN 5001438021e071ec)',
            'date' => qq{$year-01-01},
            'time' => '11:28:13',
-           'datetime_str' => qq{$year-01-01 11:28:13},
+           'datetime_str' => qq{$year-01-01T11:28:13Z},
            'program_sub' => undef,
            'host' => 'filer-201',
            'date_raw' => 'Jan 1 11:28:13',
@@ -357,7 +356,7 @@ my %resps = (
            'message_raw' => '<134>Jan 1 11:28:13 filer-201.example.com [filer-201: scsitarget.ispfct.targetReset:notice]: FCP Target 0c: Target was Reset by the Initiator at Port Id: 0x11000 (WWPN 5001438021e071ec)'
     },
     "NetApp Filer Alt1" => {
-           'datetime_str' => "$year-01-01 11:28:13",
+           'datetime_str' => "$year-01-01T11:28:13Z",
            'host' => 'filer-201',
            'date' => "$year-01-01",
            'time' => '11:28:13',
@@ -386,7 +385,7 @@ my %resps = (
            'domain' => 'example.com',
            'time' => '11:28:13',
            'date_raw' => 'Jan 1 11:28:13',
-           'datetime_str' => "$year-01-01 11:28:13",
+           'datetime_str' => "$year-01-01T11:28:13Z",
            'facility_int' => 128,
            'program_raw' => '[filer-201:scsitarget.ispfct.targetReset:notice]',
            'content' => 'FCP Target 0c: Target was Reset by the Initiator at Port Id: 0x11000 (WWPN 5001438021e071ec)',
@@ -404,7 +403,7 @@ my %resps = (
            'preamble' => 182,
            'program_raw' => 'info logger',
            'datetime_raw' => 'Jan 1 10:55:37',
-           'datetime_str' => "$year-01-01 10:55:37",
+           'datetime_str' => "$year-01-01T10:55:37Z",
            'domain' => 'example.com',
            'host_raw' => 'f5lb-201.example.com',
            'priority_int' => 6,
@@ -437,12 +436,12 @@ my %resps = (
            'domain' => undef,
            'message' => 'my-script.pl: {"lunchTime":1443612366.442}',
            'host_raw' => 'my-host',
-           'time' => '06:26:06',
+           'time' => '11:26:06.779373',
            'priority_int' => undef,
            'host' => 'my-host',
            'program_sub' => undef,
            'preamble' => undef,
-           'datetime_str' => '2015-09-30 06:26:06'
+           'datetime_str' => '2015-09-30T11:26:06.779373Z'
     },
     'Year with old date' => {
            'priority' => undef,
@@ -454,21 +453,21 @@ my %resps = (
            'program_sub' => undef,
            'host_raw' => 'ether',
            'program_raw' => 'rsyslogd-2177',
-           'datetime_raw' => 'Nov 13 13:40:01',
+           'datetime_raw' => 'Nov 13 13:40:01 2015',
            'message_raw' => '2015 Nov 13 13:40:01 ether rsyslogd-2177: imuxsock begins to drop messages from pid 17840 due to rate-limiting',
            'priority_int' => undef,
            'preamble' => undef,
-           'datetime_str' => '2015-11-13 13:40:01',
+           'datetime_str' => '2015-11-13T13:40:01Z',
            'program_pid' => undef,
            'program_name' => 'rsyslogd-2177',
            'facility_int' => undef,
            'message' => 'rsyslogd-2177: imuxsock begins to drop messages from pid 17840 due to rate-limiting',
            'host' => 'ether',
-           'date_raw' => 'Nov 13 13:40:01'
+           'date_raw' => 'Nov 13 13:40:01 2015'
     },
     'High Precision Dates' => {
            'program_pid' => '14400',
-           'datetime_str' => '2016-11-19 20:50:01',
+           'datetime_str' => '2016-11-19T19:50:01.749659Z',
            'content' => '(root) CMD (/usr/lib64/sa/sa1 1 1)',
            'priority_int' => undef,
            'message_raw' => '2016-11-19T20:50:01.749659+01:00 janus CROND[14400]: (root) CMD (/usr/lib64/sa/sa1 1 1)',
@@ -477,7 +476,7 @@ my %resps = (
            'program_name' => 'CROND',
            'program_sub' => undef,
            'preamble' => undef,
-           'time' => '20:50:01',
+           'time' => '19:50:01.749659',
            'facility_int' => undef,
            'host_raw' => 'janus',
            'host' => 'janus',
@@ -491,47 +490,32 @@ my %resps = (
 );
 
 my @test_configs = (
-    { 'Defaults'        => { 'DateTimeCreate' => 1, 'EpochCreate' => 0, 'IgnoreTimeZones' => 0, 'NormalizeToUTC' => 0, }, },
-    { 'IgnoreTimeZones' => { 'DateTimeCreate' => 0, 'EpochCreate' => 0, 'IgnoreTimeZones' => 1, 'NormalizeToUTC' => 0, }, },
+    { 'Defaults'        => { 'EpochCreate' => 0, 'IgnoreTimeZones' => 0, 'NormalizeToUTC' => 0, }, },
 );
 
-foreach my $set (@test_configs) {
+subtest "Basic Functionality Test" => sub {
+    my @_delete = qw(datetime_obj epoch offset);
 
-    my ($set_name, $config) = each %{$set};
+    foreach my $name (sort keys %msgs) {
+        my $msg = parse_syslog_line($msgs{$name});
+        delete $msg->{$_} for @_delete;
+        if ( !exists $resps{$name} ) {
+            diag( Dumper $msg );
+        }
+        is_deeply( $msg, $resps{$name}, "$name ($set_name)" );
+    }
 
-    subtest $set_name => sub {
-        local ( # localized to subtest scope
-            $Parse::Syslog::Line::DateTimeCreate,
-            $Parse::Syslog::Line::EpochCreate,
-            $Parse::Syslog::Line::IgnoreTimeZones,
-            $Parse::Syslog::Line::NormalizeToUTC,
-        );
-
-        _set_test_config( $config );
-
-        my @_delete = qw(datetime_obj epoch);
-
+    # Disable Program extraction
+    do {
+        local $Parse::Syslog::Line::ExtractProgram = 0;
         foreach my $name (sort keys %msgs) {
             my $msg = parse_syslog_line($msgs{$name});
+            my %expected = %{ $resps{$name} };
             delete $msg->{$_} for @_delete;
-            if ( !exists $resps{$name} ) {
-                diag( Dumper $msg );
-            }
-            is_deeply( $msg, $resps{$name}, "$name ($set_name)" );
+            $expected{content} = $expected{program_raw} . ': ' . $expected{content};
+            $expected{$_} = undef for qw(program_raw program_name program_sub program_pid);
+            is_deeply( $msg, \%expected, "$name (no extract program)" );
         }
-
-        # Disable Program extraction
-        do {
-            local $Parse::Syslog::Line::ExtractProgram = 0;
-            foreach my $name (sort keys %msgs) {
-                my $msg = parse_syslog_line($msgs{$name});
-                my %expected = %{ $resps{$name} };
-                delete $msg->{$_} for @_delete;
-                $expected{content} = $expected{program_raw} . ': ' . $expected{content};
-                $expected{$_} = undef for qw(program_raw program_name program_sub program_pid);
-                is_deeply( $msg, \%expected, "$name (no extract program)" );
-            }
-        };
     };
 };
 
@@ -542,14 +526,13 @@ subtest 'Custom parser' => sub {
         $date //= " ";
         my $modified = "[$date]";
 
-        return $modified, undef, undef, undef, undef;
+        return $modified;
     }
 
-    local $Parse::Syslog::Line::DateTimeCreate = 0;
     local $Parse::Syslog::Line::FmtDate = \&parse_func;
 
     foreach my $name (sort keys %msgs) {
-        foreach my $part (@dtfields, qw/datetime_utc/) {
+        foreach my $part (@dtfields) {
             $resps{$name}{$part} = undef;
         }
         $resps{$name}{date} = "[" . $resps{$name}{datetime_raw} . "]";

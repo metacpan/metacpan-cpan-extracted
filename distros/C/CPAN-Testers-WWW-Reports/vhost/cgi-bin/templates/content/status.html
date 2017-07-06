@@ -25,7 +25,7 @@
 	END
 %]</td></tr>
 <tr><th>Most recent report</th><td>[% report.date %] ([% report.id %])</td></tr>
-<tr><th>Time of oldest page request</th><td>[% status.created %]</td></tr>
+<tr><th>Time of oldest page request</th><td>[% status.created %] EDT</td></tr>
 <tr><th>Total page requests</th><td>[% status.total %]</td></tr>
 <tr><th>Total unique page requests</th><td>[% status.count %]</td></tr>
 [% ELSE %]
@@ -37,10 +37,12 @@
 [% END %]
 </table>
 
-<p>The current status is purely a means to gauge current build times. Typically the builder can process around 10,000-15,000 
-unique page requests per day. This can translate into anything between 30,000 and 50,000 actual requests, although
-can occasionally be more. Following the monitoring of how the builder performs, the oldest request waiting to be 
-processed is usually between 3 to 4 days old, with higher profile pages being built within a few minutes.</p>
+<p>The current status is purely a means to gauge current build times. Typically the builder can process around 50,000
+unique page requests per day. This can translate into anything between 100,000 and 500,000 actual requests, although
+can occasionally be more. Following the monitoring of how the builder performs, the oldest request waiting to be
+processed can be a few days old, with higher profile pages being built within a few minutes. However, recent changes
+to the builder code, should see requests processed within a 24 hour period.</p>
+
 <p>Below are the further graphs to help expand on the above metrics, thus helping us to monitor when the builder
 may be under extreme load, has stopped or has nothing to do.</p>
 

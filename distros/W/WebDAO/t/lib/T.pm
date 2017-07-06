@@ -2,9 +2,8 @@
 #
 #  DESCRIPTION:  Test /
 #
-#       AUTHOR:  Aliaksandr P. Zahatski, <zahatski@gmail.com>
+#       AUTHOR:  Aliaksandr P. Zahatski, <zag@cpan.org>
 #===============================================================================
-#$Id$
 
 use strict;
 use warnings;

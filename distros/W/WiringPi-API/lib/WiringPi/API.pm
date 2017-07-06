@@ -3,7 +3,7 @@ package WiringPi::API;
 use strict;
 use warnings;
 
-our $VERSION = '2.3609';
+our $VERSION = '2.3613';
 
 require XSLoader;
 XSLoader::load('WiringPi::API', $VERSION);
@@ -21,14 +21,16 @@ my @wpi_c_functions = qw(
     lcdDisplay          lcdCursor           lcdCursorBlink
     lcdSendCommand      lcdPosition         lcdDefChar
     lcdPutChar          lcdPuts             setInterrupt
-    softPwmCreate       softPwmWrite        softPwmStop
     sr595Setup          bmp180Setup         bmp180Pressure
     bmp180Temp          analogRead          analogWrite
     physPinToWpi        wiringPiVersion     ads1115Setup
     pseudoPinsSetup     wiringPiSPISetup    spiDataRW
     wiringPiI2CSetup    wiringPiI2CSetupInterface
     wiringPiI2CRead     wiringPiI2CReadReg8 wiringPiI2CReadReg16
-    wiringPiI2CWrite    wiringPiI2CWriteReg8    wiringPiI2CWriteReg16
+    wiringPiI2CWrite    wiringPiI2CWriteReg8 wiringPiI2CWriteReg16
+    pinModeAlt          serialOpen          serialFlush
+    serialPutchar       serialPuts          serialDataAvail
+    serialGetchar
 );
 
 my @wpi_perl_functions = qw(
@@ -38,12 +40,14 @@ my @wpi_perl_functions = qw(
     pwm_set_range   lcd_init        lcd_home            lcd_clear
     lcd_display     lcd_cursor      lcd_cursor_blink    lcd_send_cmd
     lcd_position    lcd_char_def    lcd_put_char        lcd_puts
-    set_interrupt   soft_pwm_create soft_pwm_write      soft_pwm_stop
-    shift_reg_setup bmp180_setup    bmp180_pressure     bmp180_temp
-    analog_read     analog_write    pin_mode            phys_to_wpi
+    set_interrupt   bmp180_setup    bmp180_pressure     bmp180_temp
+    shift_reg_setup analog_read     analog_write        pin_mode
     ads1115_setup   spi_setup       spi_data            i2c_setup
     i2c_interface   i2c_read        i2c_read_byte       i2c_read_word
     i2c_write       i2c_write_byte  i2c_write_word      testChar
+    phys_to_wpi     pin_mode_alt    serial_open         serial_flush
+    serial_put_char serial_puts     serial_data_avail   serial_get_char 
+    serial_close    serial_gets
 );
 
 our @EXPORT_OK;
@@ -59,22 +63,52 @@ sub new {
     return bless {}, shift;
 }
 
-# soft PWM functions
+# serial functions
 
-sub soft_pwm_create {
-    shift if @_ == 4;
-    my ($pin, $value, $range) = @_;
-    softPwmCreate($pin, $value, $range);
+sub serial_open {
+    shift if @_ > 2;
+    my ($dev_ptr, $baud) = @_;
+    my $fd = serialOpen($dev_ptr, $baud);
+    die "could not open serial device $dev_ptr\n" if $fd == -1;
+    return $fd;
 }
-sub soft_pwm_write {
-    shift if @_ == 3;
-    my ($pin, $value) = @_;
-    softPwmWrite($pin, $value);
+sub serial_close {
+    shift if @_ > 1;
+    my ($fd) = @_;
+    serialClose($fd);
 }
-sub soft_pwm_stop {
-    shift if @_ == 2;
-    my $pin = shift;
-    softPwmStop($pin);
+sub serial_flush {
+    shift if @_ > 1;
+    my ($fd) = @_;
+    serialFlush($fd);
+}
+sub serial_put_char {
+    shift if @_ > 2;
+    my ($fd, $unsigned_char) = @_;
+    serialPutchar($fd, $unsigned_char);
+}
+sub serial_puts {
+    shift if @_ > 2;
+    my ($fd, $char) = @_;
+    serialPuts($fd, $char);
+}
+sub serial_data_avail {
+    shift if @_ > 1;
+    my ($fd) = @_;
+    serialDataAvail($fd);
+}
+sub serial_get_char {
+    shift if @_ > 1;
+    my ($fd) = @_;
+    serialGetchar($fd);
+}
+sub serial_gets {
+    shift if @_ > 2;
+    my ($fd, $nbytes) = @_;
+    my $buf = "";
+    my $char_ptr = serialGets($fd, $buf, $nbytes);
+    my $unpacked = unpack "A*", $char_ptr;
+    return $unpacked;
 }
 
 # interrupt functions
@@ -109,6 +143,25 @@ sub pin_mode {
         die "pin_mode() requires either 0, 1, 2 or 3 as a param";
     }
     pinMode($pin, $mode);
+}
+sub pin_mode_alt {
+    shift if @_ == 3;
+    my ($pin, $alt) = @_;
+
+    if (! grep {$alt == $_} 0..7){
+        die "pin_mode_alt() requires 0-7 as a param";
+    }
+
+    # 0     INPUT
+    # 1     OUTPUT
+    # 4     ALT0
+    # 5     ALT1
+    # 6     ALT2
+    # 7     ALT3
+    # 3     ALT4
+    # 2     ALT5
+
+    pinModeAlt($pin, $alt);
 }
 sub pull_up_down {
     shift if @_ == 3;
@@ -358,7 +411,7 @@ sub i2c_write_byte {
         die "i2c_write_byte() requires a \$data param\n";
     }
 
-    return wiringPiI2CWriteReg8($fd, $reg);
+    return wiringPiI2CWriteReg8($fd, $reg, $data);
 }
 sub i2c_write_word {
     shift if @_ > 3;
@@ -374,7 +427,7 @@ sub i2c_write_word {
         die "i2c_write_word() requires a \$data param\n";
     }
 
-    return wiringPiI2CWriteReg16($fd, $reg);
+    return wiringPiI2CWriteReg16($fd, $reg, $data);
 }
 
 # SPI functions
@@ -505,10 +558,11 @@ versions, but are still 100% compatible.
     pwm_set_range   lcd_init        lcd_home            lcd_clear
     lcd_display     lcd_cursor      lcd_cursor_blink    lcd_send_cmd
     lcd_position    lcd_char_def    lcd_put_char        lcd_puts
-    set_interrupt   soft_pwm_create soft_pwm_write      soft_pwm_stop
-    shift_reg_setup pin_mode        analog_read         analog_write
-    bmp180_setup    bmp180_pressure bmp180_temp         phys_to_wpi
-    ads1115_setup   spi_setup       spi_data
+    set_interrupt   pin_mode        analog_read         analog_write
+    shift_reg_setup bmp180_setup    bmp180_pressure     bmp180_temp
+    ads1115_setup   spi_setup       spi_data            phys_to_wpi
+    serial_open     serial_flush    serial_put_char     serial_puts
+    serial_get_char serial_close    serial_data_avail
 
 =head1 EXPORT_TAGS
 
@@ -532,10 +586,6 @@ See L</BOARD FUNCTIONS>.
 
 See L</LCD FUNCTIONS>.
 
-=head2 SOFTWARE PWM
-
-See L</SOFT PWM FUNCTIONS>.
-
 =head2 INTERRUPT
 
 See L</INTERRUPT FUNCTIONS>.
@@ -546,7 +596,11 @@ See L</ADC FUNCTIONS>.
 
 =head2 SHIFT REGISTER
 
-See L</SHIFT REGISTER FUNCTIONS>.
+See L</SHIFT REGISTER FUNCTIONS>
+
+=head2 SERIAL
+
+See L</SERIAL FUNCTIONS>
 
 =head2 I2C
 
@@ -611,7 +665,7 @@ Sets the pin numbering scheme to C<GPIO>.
 
 Maps to C<void pinMode(int pin, int mode)>
 
-Puts the pin in either INPUT or OUTPUT mode.
+Puts the pin in either INPUT, OUTPUT, PWM or GPIO_CLOCK mode.
 
 Parameters:
 
@@ -623,6 +677,35 @@ C<setup*()> routine you used.
     $mode
 
 Mandatory: C<0> for INPUT, C<1> OUTPUT, C<2> PWM_OUTPUT and C<3> GPIO_CLOCK.
+
+=head2 pin_mode_alt($pin, $alt)
+
+Maps to the undocumented C<void pinModeAlt(int pin, int mode)>
+
+Allows you to set any pin to any mode. ALT modes allowed:
+
+    value   mode
+    ------------
+    0       INPUT
+    1       OUTPUT
+    4       ALT0
+    5       ALT1
+    6       ALT2
+    7       ALT3
+    3       ALT4
+    2       ALT5
+
+Parameters:
+
+    $pin
+
+Mandatory: The pin number, in the pin numbering scheme dictated by whichever
+C<setup*()> routine you used.
+
+    $alt
+
+Mandatory, Integer: The mode you want to put the pin into. See the list above
+for the relevant values for this parameter.
 
 =head2 read_pin($pin);
 
@@ -833,6 +916,12 @@ Note: When in 4-bit mode, the C<d0> through C<3> parameters actually map to
 pins C<d4> through C<d7> on the LCD board, so you need to connect those pins
 to their respective selected GPIO pins.
 
+NOTE: There is an upper limit of the number of LCDs that can be initialized
+simultaneously. This number is 8 (0-7). Always check the return of this
+function to ensure you're under the maximum file descriptors. If you receive a
+`-1`, you're out of bounds, and any functions called on the LCD will cause a 
+segmentation fault.
+
 =head2 lcd_home($fd)
 
 Maps to C<void lcdHome(int fd)>
@@ -1008,47 +1097,6 @@ Mandatory: The file descriptor integer returned by C<lcd_init()>.
 
 Mandatory: A string to display.
 
-=head1 SOFT PWM FUNCTIONS
-
-Note: The software PWM functionality is experimental, and from what I've
-tested, not very reliable, so I'd stay away from this at this time.
-
-Software Pulse Width Modulation is not the same as hardware PWM. It should not
-be used for critical things as it's frequency isn't 100% stable.
-
-This software PWM allows you to use PWM on ANY GPIO pin, not just the single
-hardware pin available.
-
-=head2 soft_pwm_create($pin, $initial_value, $range)
-
-Creates a new software PWM thread that runs outside of your main application.
-
-Parameters:
-
-    $pin
-
-Mandatory: The pin number, in the pin numbering scheme dictated by whichever
-C<setup*()> routine you used.
-
-    $initial_value
-
-Optional: A value between C<0> and C<$range>.
-
-    $range
-
-Optional: Look at this like a dial. We start at C<0> and the dial has turned
-completely when we hit the C<$range> integer. If not sent in, defaults to
-C<1023>.
-
-=head2 soft_pwm_write($pin, $value)
-
-Sets the C<HIGH> frequency on C<pin> to whatever is in C<$value>. The value must
-be lower than what was set in the C<$range> parameter to C<soft_pwm_create()>.
-
-=head2 soft_pwm_stop($pin)
-
-Turns off software PWM on the C<$pin>.
-
 =head1 INTERRUPT FUNCTIONS
 
 =head2 set_interrupt($pin, $edge, $callback)
@@ -1161,6 +1209,108 @@ Mandatory: Integer, the GPIO pin number connected to the register's C<SHCP> pin
 
 Mandatory: Integer, the GPIO pin number connected to the register's C<STCP> pin
 (12). Can be any GPIO pin capable of output.
+
+=head1 SERIAL FUNCTIONS
+
+These functions provide basic access to read and write to a serial device.
+
+=head2 serial_open($device, $baud)
+
+Maps to C<int serialOpen(const char *device, const int baud)>
+
+Opens a serial device for read/write access.
+
+Parameters:
+
+    $device
+
+Mandatory, String: The name of the serial device, eg: C</dev/ttyACM0>.
+
+    $baud
+
+Mandatory, Integer: The speed of the serial device. (eg: C<9600>).
+
+Return, Integer: The file descriptor of the device.
+
+=head2 serial_close($fd)
+
+Maps to C<void serialClose(const int fd)>
+
+Closes an already open serial device.
+
+Parameters:
+
+    $fd
+
+Mandatory, Integer: The file descriptor returned by your call to C<serial_open()>.
+
+=head2 serial_flush($fd)
+
+Maps to C<serialFlush(const int fd)>
+
+Flushes the serial device's buffer.
+
+Parameters:
+
+    $fd
+
+Mandatory, Integer: The file descriptor returned by your call to C<serial_open()>.
+
+=head2 serial_data_avail($fd)
+
+Maps to C<serialDataAvail(const int fd)>
+
+Check if there is any data available on the serial interface.
+
+Parameters:
+
+    $fd
+
+Mandatory, Integer: The file descriptor returned by your call to C<serial_open()>.
+
+=head2 serial_get_char($fd)
+
+Maps to C<serialGetchar(const int fd)>
+
+Read a single byte from the serial interface.
+
+Parameters:
+
+    $fd
+
+Mandatory, Integer: The file descriptor returned by your call to C<serial_open()>.
+
+=head2 serial_put_char($fd, $char)
+
+Maps to C<serialPutchar(const int fd, const unsigned char c)>
+
+Write a single byte to the interface.
+
+Parameters:
+
+    $fd
+
+Mandatory, Integer: The file descriptor returned by your call to C<serial_open()>.
+
+    $char
+
+Mandatory, Byte: A single byte to write to the serial interface.
+
+=head2 serial_puts($fd, $string)
+
+Maps to C<serialPuts(const int fd, const char* string)>
+
+Write an arbitrary length string to the serial interface.
+
+Parameters:
+
+    $fd
+
+Mandatory, Integer: The file descriptor returned by your call to C<serial_open()>.
+
+    $string
+
+Mandatory, String: The content to write to the device.
 
 =head1 I2C FUNCTIONS
 
@@ -1476,13 +1626,13 @@ Takes no parameters, returns the byte value as an unsigned int.
 
 Same as L</digitalReadByte>, but reads from the second group of eight GPIO pins.
 
-head1 AUTHOR
+=head1 AUTHOR
 
 Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Steve Bertrand
+Copyright (C) 2017 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

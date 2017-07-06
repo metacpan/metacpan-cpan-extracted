@@ -1,0 +1,42 @@
+---
+abstract: 'A Moose role for processing command lines options via Getopt::Kingpin'
+author:
+  - 'Jan Seidl <seidl@avast.com>'
+build_requires:
+  Test::Exit: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MooseX-Getopt-Kingpin
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MooseX::Getopt::Kingpin:
+    file: lib/MooseX/Getopt/Kingpin.pm
+    version: v0.1.2
+requires:
+  Getopt::Kingpin: '0'
+  Moose: '0'
+  Safe::Isa: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/avast/MooseX-Getopt-Kingpin/issues
+  homepage: https://github.com/avast/MooseX-Getopt-Kingpin
+  repository: git://github.com/avast/MooseX-Getopt-Kingpin.git
+version: 0.1.2
+x_authority: cpan:JASEI
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

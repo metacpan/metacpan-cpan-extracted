@@ -52,12 +52,12 @@ use strict;
 use Carp            ();
 use Scalar::Util    qw{refaddr};
 use List::MoreUtils ();
-use Params::Util    qw{_INSTANCE _CLASS _CODELIKE};
+use Params::Util    qw{_INSTANCE _CLASS _CODELIKE _NUMBER};
 use PPI::Element    ();
 
 use vars qw{$VERSION @ISA *_PARENT};
 BEGIN {
-	$VERSION = '1.234';
+	$VERSION = '1.236';
 	@ISA     = 'PPI::Element';
 	*_PARENT = *PPI::Element::_PARENT;
 }
@@ -247,7 +247,10 @@ element at that node.
 =cut
 
 sub child {
-	$_[0]->{children}->[$_[1]];
+	my ( $self, $index ) = @_;
+	PPI::Exception->throw( "method child() needs an index" )
+	  if not defined _NUMBER $index;
+	$self->{children}->[$index];
 }
 
 =pod

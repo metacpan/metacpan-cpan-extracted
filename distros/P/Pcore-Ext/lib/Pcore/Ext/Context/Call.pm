@@ -21,7 +21,7 @@ sub to_js ( $self ) {
     my $js;
 
     if ( my $args = $self->{func_args} ) {
-        $js = "$self->{func_name}(" . join( q[,], map { to_json( $_, readable => 1 )->$* } $args->@* ) . q[)];
+        $js = "$self->{func_name}(" . join( q[,], map { to_json( $_, json => { ascii => 1, latin1 => 0, utf8 => 1, pretty => 0, canonical => 1 } )->$* } $args->@* ) . q[)];
     }
     else {
         $js = "$self->{func_name}()";

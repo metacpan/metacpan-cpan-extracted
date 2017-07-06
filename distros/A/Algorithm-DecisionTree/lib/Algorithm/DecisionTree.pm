@@ -1,7 +1,7 @@
 package Algorithm::DecisionTree;
 
 #--------------------------------------------------------------------------------------
-# Copyright (c) 2016 Avinash Kak. All rights reserved.  This program is free
+# Copyright (c) 2017 Avinash Kak. All rights reserved.  This program is free
 # software.  You may modify and/or distribute it under the same terms as Perl itself.
 # This copyright notice must remain attached to the file.
 #
@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '3.42';
+our $VERSION = '3.43';
 
 ############################################   Constructor  ##############################################
 sub new { 
@@ -1939,11 +1939,12 @@ sub print_nested_array {
 sub cleanup_csv {
     my $line = shift;
     $line =~ tr/\/:?()[]{}'/          /;
-    my @double_quoted = substr($line, index($line,',')) =~ /\"[^\"]+\"/g;
+#    my @double_quoted = substr($line, index($line,',')) =~ /\"[^\"]+\"/g;
+    my @double_quoted = substr($line, index($line,',')) =~ /\"[^\"]*\"/g;
     for (@double_quoted) {
         my $item = $_;
         $item = substr($item, 1, -1);
-        $item =~ s/^s+|,|\s+$//g;
+        $item =~ s/^\s+|,|\s+$//g;
         $item = join '_',  split /\s+/, $item;
         substr($line, index($line, $_), length($_)) = $item;
     }
@@ -3137,6 +3138,8 @@ sub explain_classification_at_one_node {
 
 =pod
 
+=encoding UTF8
+
 =head1 NAME
 
 Algorithm::DecisionTree - A Perl module for decision-tree based classification of
@@ -3217,6 +3220,12 @@ multidimensional data.
 
 
 =head1 CHANGES
+
+B<Version 3.43:> This version fixes a bug in the C<csv_cleanup_needed()> function.
+The source of the bug was a typo in a regex component meant for matching with white
+space.  I have also made one additional change to this function to increase its
+versatility.  With this change, you are now allowed to have empty strings as values
+for features.
 
 B<Version 3.42:> This version reintroduces C<csv_cleanup_needed> as an optional
 parameter in the module constructor.  This was done in response to several requests
@@ -3305,11 +3314,6 @@ IN THE PORTION OF THE FEATURE SPACE ASSIGNED TO THE NODE.  B<(This is an importa
 part of the generalization achieved by probabilistic modeling of the training data.)>
 For additional information related to DT introspection, see the section titled
 "DECISION TREE INTROSPECTION" in this documentation page.
-
-B<Version 2.27> makes the logic of tree construction from the old-style '.dat' training
-files more consistent with how trees are constructed from the data in `.csv' files.
-The inconsistency in the past was with respect to the naming convention for the class
-labels associated with the different data records.
 
 B<Version 2.26> fixes a bug in the part of the module that some folks use for generating
 synthetic data for experimenting with decision tree construction and classification.
@@ -4320,11 +4324,35 @@ bulk classification when you place all your test samples in a single file.
 
 =head1 USING RANDOMIZED DECISION TREES
 
-As mentioned earlier, the new C<RandomizedTreesForBigData> class allows you to solve
-the following two problems: (1) Data classification using the needle-in-a-haystack
-metaphor, that is, when a vast majority of your training samples belong to just one
-class.  And (2) You have access to a very large database of training samples and you
-wish to construct an ensemble of decision trees for classification.
+Consider the following two situations that call for using randomized decision trees,
+meaning multiple decision trees that are trained using data extracted randomly from a
+large database of training samples: 
+
+(1) Consider a two-class problem for which the training database is grossly
+imbalanced in how many majority-class samples it contains vis-a-vis the number of
+minority class samples.  Let's assume for a moment that the ratio of majority class
+samples to minority class samples is 1000 to 1.  Let's also assume that you have a
+test dataset that is drawn randomly from the same population mixture from which the
+training database was created.  Now consider a stupid data classification program
+that classifies everything as belonging to the majority class.  If you measure the
+classification accuracy rate as the ratio of the number of samples correctly
+classified to the total number of test samples selected randomly from the population,
+this classifier would work with an accuracy of 99.99%. 
+
+(2) Let's now consider another situation in which we are faced with a huge training
+database but in which every class is equally well represented.  Feeding all the data
+into a single decision tree would be akin to polling all of the population of the
+United States for measuring the Coke-versus-Pepsi preference in the country.  You are
+likely to get better results if you construct multiple decision trees, each trained
+with a collection of training samples drawn randomly from the training database.
+After you have created all the decision trees, your final classification decision
+could then be based on, say, majority voting by the trees.
+
+In summary, the C<RandomizedTreesForBigData> class allows you to solve the following
+two problems: (1) Data classification using the needle-in-a-haystack metaphor, that
+is, when a vast majority of your training samples belong to just one class.  And (2)
+You have access to a very large database of training samples and you wish to
+construct an ensemble of decision trees for classification.
 
 =over 4
 
@@ -4847,10 +4875,10 @@ the string 'DecisionTree' in the subject line.
 Download the archive from CPAN in any directory of your choice.  Unpack the archive
 with a command that on a Linux machine would look like:
 
-    tar zxvf Algorithm-DecisionTree-3.42.tar.gz
+    tar zxvf Algorithm-DecisionTree-3.43.tar.gz
 
 This will create an installation directory for you whose name will be
-C<Algorithm-DecisionTree-3.42>.  Enter this directory and execute the following
+C<Algorithm-DecisionTree-3.43>.  Enter this directory and execute the following
 commands for a standard install of the module if you have root privileges:
 
     perl Makefile.PL
@@ -4861,7 +4889,7 @@ commands for a standard install of the module if you have root privileges:
 If you do not have root privileges, you can carry out a non-standard install the
 module in any directory of your choice by:
 
-    perl Makefile.PL prefix=/some/other/directory/
+    perl Makefile.PL prefix=/some/other/directory
     make
     make test
     make install
@@ -4877,6 +4905,13 @@ variable by
 If I used bash, I'd need to declare:
 
     export PERL5LIB=/some/other/directory/lib64/perl5/:/some/other/directory/share/perl5/
+
+Another option for a non-standard install would be to place at the top of your own
+scripts the following invocation:
+
+    BEGIN {
+        unshift @INC, "/some/other/directory/blib/lib";
+    }    
 
 
 =head1 THANKS
@@ -4895,6 +4930,8 @@ On the basis of the report posted by Slaven at C<rt.cpan.org> regarding Version 
 I am removing the Perl version restriction altogether from Version 2.30.  Thanks
 Slaven!
 
+Version 3.43 was prompted by a bug report sent by Jan Trukenmüller regarding a
+missing backslash in a regex in the C<csv_cleanup_needed()> function.  Thanks, Jan!
 
 =head1 AUTHOR
 
@@ -4913,7 +4950,7 @@ C<kak@purdue.edu>
 This library is free software; you can redistribute it and/or modify it under the
 same terms as Perl itself.
 
- Copyright 2016 Avinash Kak
+ Copyright 2017 Avinash Kak
 
 =cut
 

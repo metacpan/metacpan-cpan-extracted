@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Dict';
 use strict;
 no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '2.031'; # VERSION
+our $VERSION = '2.032'; # VERSION
 
 use Carp;
 use Compress::Zlib qw();
@@ -1357,6 +1357,12 @@ sub charspace {
 Sets the spacing between words.  This is initially zero (or, in other
 words, just the width of the space).
 
+Word spacing might only affect simple fonts and composite fonts where
+the space character is a single-byte code.  This is a limitation of
+the PDF specification at least as of version 1.7 (see section 9.3.3).
+It's possible that a later version of the specification will support
+word spacing in fonts that use multi-byte codes.
+
 =cut
 
 sub _wordspace {
@@ -1835,6 +1841,7 @@ attributes.  These can optionally be overridden.
 
 sub advancewidth {
     my ($self,$text,@opts) = @_;
+    return 0 unless defined($text) and length($text);
     if(scalar @opts > 1) {
         my %opts=@opts;
         foreach my $k (qw[ font fontsize wordspace charspace hscale]) {
@@ -1844,7 +1851,7 @@ sub advancewidth {
         my $num_space = $text =~ y/\x20/\x20/;
         my $num_char = length($text);
         my $word_spaces = $opts{wordspace}*$num_space;
-        my $char_spaces = $opts{charspace}*$num_char;
+        my $char_spaces = $opts{charspace}*($num_char - 1);
         my $advance = ($glyph_width+$word_spaces+$char_spaces)*$opts{hscale}/100;
         return $advance;
     }
@@ -1853,7 +1860,7 @@ sub advancewidth {
         my $num_space = $text =~ y/\x20/\x20/;
         my $num_char = length($text);
         my $word_spaces = $self->wordspace*$num_space;
-        my $char_spaces = $self->charspace*$num_char;
+        my $char_spaces = $self->charspace*($num_char - 1);
         my $advance = ($glyph_width+$word_spaces+$char_spaces)*$self->hscale()/100;
         return $advance;
     }
@@ -1865,10 +1872,12 @@ sub advancewidth {
 
 sub text_justified {
     my ($self,$text,$width,%opts) = @_;
-    my $hs = $self->hscale();
-    $self->hscale($hs*($width/$self->advancewidth($text)));
+    my $initial_width = $self->advancewidth($text);
+    my $space_count = scalar split /\s/, $text;
+    my $ws = $self->wordspace();
+    $self->wordspace(($width - $initial_width) / $space_count) if $space_count > 0;
     $self->text($text,%opts);
-    $self->hscale($hs);
+    $self->wordspace($ws);
     return $width;
 }
 
@@ -1918,13 +1927,14 @@ sub text_fill_justified {
     my ($self,$text,$width,%opts) = @_;
     my $over=(not(defined($opts{-spillover}) and $opts{-spillover} == 0));
     my ($line,$ret)=$self->_text_fill_line($text,$width,$over);
-    my $hs=$self->hscale();
+    my $ws=$self->wordspace();
     my $w=$self->advancewidth($line);
-    if ($ret||$w>=$width) {
-        $self->hscale($hs*($width/$w));
+    my $space_count = scalar split /\s/, $line;
+    if (($ret||$w>=$width) and $space_count) {
+        $self->wordspace(($width - $w) / $space_count);
     }
     $width=$self->text($line,%opts);
-    $self->hscale($hs);
+    $self->wordspace($ws);
     return($width,$ret);
 }
 

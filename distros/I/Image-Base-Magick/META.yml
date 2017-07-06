@@ -1,36 +1,31 @@
---- #YAML:1.0
-name:               Image-Base-Magick
-version:            4
-abstract:           Image::Base on files using ImageMagick.
+---
+abstract: 'Image::Base on files using ImageMagick.'
 author:
-    - Kevin Ryde <user42@zip.com.au>
-license:            gpl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Image::Base:    0
-    Image::Magick:  0
-    perl:           5.001
-    Test:           0
-resources:
-    homepage:  http://user42.tuxfamily.org/image-base-magick/index.html
-    license:   http://www.gnu.org/licenses/gpl.html
-no_index:
-    directory:
-        - t
-        - inc
-        - devel
-        - xt
-        - devel
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  ExtUtils::MakeMaker: '0'
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
-optional_features:
-    maximum_tests:
-        description:  Have "make test" do as much as possible.
-        requires:
-            Test::Weaken:  2.000
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Image-Base-Magick
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+requires:
+  Image::Base: '0'
+  Image::Magick: '0'
+  perl: '5.001'
+resources:
+  homepage: http://user42.tuxfamily.org/image-base-magick/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '5'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

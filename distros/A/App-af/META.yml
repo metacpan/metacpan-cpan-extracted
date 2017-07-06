@@ -3,7 +3,8 @@ abstract: 'Command line tool for alienfile'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Test2::Suite: '0.000060'
+  Test2::Tools::Basic: '0.000060'
+  Test2::V0: '0.000060'
   Test::Exit: '0.11'
   Test::More: '0.94'
   Test::Script: '0'
@@ -42,5 +43,5 @@ resources:
   bugtracker: https://github.com/plicease/App-af/issues
   homepage: https://metacpan.org/pod/App::af
   repository: git://github.com/plicease/App-af.git
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'YAML::Tiny version 1.70'

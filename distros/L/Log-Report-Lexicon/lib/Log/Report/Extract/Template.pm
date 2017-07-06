@@ -1,4 +1,4 @@
-# Copyrights 2007-2016 by [Mark Overmeer].
+# Copyrights 2007-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@ use strict;
 
 package Log::Report::Extract::Template;
 use vars '$VERSION';
-$VERSION = '1.06';
+$VERSION = '1.08';
 
 use base 'Log::Report::Extract';
 
@@ -65,15 +65,25 @@ sub process($@)
     ();
 }
 
+sub _no_escapes_in($$$$)
+{   my ($msgid, $plural, $fn, $linenr) = @_;
+    return if $msgid !~ /\&\w+\;/
+           && (defined $plural ? $plural !~ /\&\w+\;/ : 1);
+	$msgid .= "|$plural" if defined $plural;
+
+    warning __x"msgid '{msgid}' contains html escapes, don't do that.  File {fn} line {linenr}"
+       , msgid => $msgid, fn => $fn, linenr => $linenr;
+}
+
 sub scanTemplateToolkit($$$$)
 {   my ($self, $version, $function, $fn, $textref) = @_;
 
     # Split the whole file on the pattern in four fragments per match:
     #       (text, leading, needed trailing, text, leading, ...)
     # f.i.  ('', '[% loc("', 'some-msgid', '", params) %]', ' more text')
-    my @frags
-      = $version==1 ? split(/[\[%]%(.*?)%[%\]]/s, $$textref)
-      :               split(/\[%(.*?)%\]/s, $$textref);
+    my @frags = $version==1
+      ? split(/[\[%]%(.*?)%[%\]]/s, $$textref)
+      : split(/\[%(.*?)%\]/s, $$textref);
 
     my $domain     = $self->domain;
     my $linenr     = 1;
@@ -88,13 +98,15 @@ sub scanTemplateToolkit($$$$)
     {   my ($skip_text, $take) = (shift @frags, shift @frags);
         $linenr += $skip_text =~ tr/\n//;
         if($take =~ $pipe_func_block)
-        {   # [%|loc(...)%]$msgid[%END%]
-            if(@frags < 2 || $frags[1] ne 'END')
+        {   # [% | loc(...) %] $msgid [%END%]
+            if(@frags < 2 || $frags[1] !~ /^\s*END\s*$/)
             {   error __x"template syntax error, no END in {fn} line {line}"
                   , fn => $fn, line => $linenr;
             }
             my $msgid  = $frags[0];  # next content
             my $plural = $msgid =~ s/\|(.*)// ? $1 : undef;
+			_no_escapes_in $msgid, $plural, $fn, $linenr;
+
             $self->store($domain, $fn, $linenr, $msgid, $plural);
             $msgs_found++;
 
@@ -103,9 +115,11 @@ sub scanTemplateToolkit($$$$)
         }
 
         if($take =~ $msgid_pipe_func)
-        {   # [%|loc(...)%]$msgid[%END%]
+        {   # [% $msgid | loc(...) %]
             my $msgid  = $2;
             my $plural = $msgid =~ s/\|(.*)// ? $1 : undef;
+			_no_escapes_in $msgid, $plural, $fn, $linenr;
+
             $self->store($domain, $fn, $linenr, $msgid, $plural);
             $msgs_found++;
 
@@ -121,6 +135,8 @@ sub scanTemplateToolkit($$$$)
                       +  ($markup[1] =~ tr/\n//);
             my $msgid  = $markup[3];
             my $plural = $msgid =~ s/\|(.*)// ? $1 : undef;
+			_no_escapes_in $msgid, $plural, $fn, $linenr;
+
             $self->store($domain, $fn, $linenr, $msgid, $plural);
             $msgs_found++;
             splice @markup, 0, 4;

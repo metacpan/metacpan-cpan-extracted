@@ -38,4 +38,4 @@ requires:
   Mail::Transport::Receive: 3
   Scalar::Util: 0
   Test::More: 0
-version: 3.001
+version: 3.002

@@ -5,7 +5,7 @@ use Mojolicious::Plugin::Vparam::Common qw(:all);
 use version;
 use List::MoreUtils qw(firstval natatime mesh);
 
-our $VERSION    = '2.11.1';
+our $VERSION    = '3.00';
 
 # Regext for shortcut parser
 our $SHORTCUT_REGEXP = qr{
@@ -376,7 +376,7 @@ sub register {
                         $out = $attr{default};
 
                         # Default value always supress error
-                        $error = 0 if defined $attr{default};
+                        $error = 0 if exists $attr{default};
                         # Disable error on optional
                         if( $attr{optional} ) {
                             # Only if input param not set
@@ -397,10 +397,17 @@ sub register {
 
                 # Hack for bool values:
                 # HTML forms do not transmit if checkbox off
-                $out = $attr{default}
-                    if      $type
-                        and $type =~ m{^(?:bool|true|checkbox)$}
-                        and not defined $in;
+                if( $type and not defined $in ) {
+                    if( $type eq 'bool' ) {
+                        $out = exists $attr{default}
+                            ? $attr{default}
+                            : 0
+                        ;
+                    }
+                    if( $type eq 'logic' ) {
+                        $out = $attr{default};
+                    }
+                }
 
                 # Apply post filter
                 $out = $attr{post}->( $self, $out, \%attr )  if $attr{post};
@@ -463,7 +470,7 @@ sub register {
                         : undef
                     ;
                 } else {
-                    $result{ $as } = @output;
+                    $result{ $as } = \@output;
                 }
             } else {
                 $result{ $as } = $output[0]
@@ -1055,6 +1062,22 @@ Empty string is I<FALSE>
 =back
 
 Other values get error.
+
+Example:
+
+    <input type="checkbox" name="bool1" value="yes">
+    <input type="checkbox" name="bool2" value="1">
+    <input type="checkbox" name="bool3" value="ok">
+
+=head2 logic
+
+Three-valued logic. Same as I<bool> but undef state if empty string. Example:
+
+    <select name="logic1">
+        <option value=""></option>
+        <option value="1">True</option>
+        <option value="0">False</option>
+    </select>
 
 =head2 email
 

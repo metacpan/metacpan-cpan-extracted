@@ -27,7 +27,6 @@ lib/Class/Usul/Log.pm
 lib/Class/Usul/Options.pm
 lib/Class/Usul/Programs.pm
 lib/Class/Usul/Response/IPC.pm
-lib/Class/Usul/Response/Table.pm
 lib/Class/Usul/Schema.pm
 lib/Class/Usul/Time.pm
 lib/Class/Usul/TraitFor/ConnectInfo.pm

@@ -492,34 +492,186 @@ use Scalar::Util 'refaddr';
   is @{$dom->find('#list dd')}, 2;
 }
 
-done_testing;
+{ # Forms
+  my $dom = Template::Lace::DOM->new(q[
+    <html>
+      <form id='login'>
+        <textarea name='details'>info</textarea>
+        <input type='text' name='user' />
+        <input type='hidden' name='uid' />
+        <input type='password' name='passwd' />
+        <input type='checkbox' name='toggle'/> <!-- value is bool 'checked' -->
+        <input type='radio' name='choose' />  <!-- fill type value is 'checked' -->
+        <select name='cars'> <!-- fill type -->
+          <option value='honda'>Honda</option>   <!-- 'selected' -->
+        </select>
+        <select name='jobs'>
+          <optgroup label='Example'>
+            <option>Example</option>
+          </optgroup>
+        </select>
+      </form>
+    </html>
+    ]);
 
-__END__
+  { # select API
+    my $localdom = $dom->clone;
+    $localdom->select('cars', [
+      +{ value=>'honda', content=>'Honda' },
+      +{ value=>'ford', content=>'Ford', selected=>1 },
+      +{ value=>'gm', content=>'General Motors' },
+    ]);
+    
+    $localdom->select('jobs', [
+      +{
+        label=>'Easy',
+        options => [
+          +{ value=>'slacker', content=>'Slacker' },
+          +{ value=>'couch_potato', content=>'Couch Potato' },
+        ],
+      },
+      +{
+        label=>'Hard',
+        options => [
+          +{ value=>'digger', content=>'Digger' },
+          +{ value=>'brain', content=>'Brain Surgeon' },
+        ],
+      },
+    ]);
 
+    is $localdom->at('option[value="honda"]')->content, 'Honda';
+    is $localdom->at('option[value="ford"]')->content, 'Ford';
+    is $localdom->at('option[value="ford"]')->attr('selected'), 'on';
+    is $localdom->at('option[value="gm"]')->content, 'General Motors';
+
+    is $localdom->at('option[value="slacker"]')->content, 'Slacker';
+    is $localdom->at('option[value="couch_potato"]')->content, 'Couch Potato';
+    is $localdom->at('option[value="digger"]')->content, 'Digger';
+    is $localdom->at('option[value="brain"]')->content, 'Brain Surgeon';
+  }
+
+  { # 'radio' API
+    my $localdom = $dom->clone;
+
+    $localdom->radio('choose',[
+      +{id=>'id1', value=>1},
+      +{id=>'id2', value=>2},
+      ]);
+
+    is $localdom->at('#id1')->attr('value'), 1;
+    is $localdom->at('#id2')->attr('value'), 2;
+  }
+
+  {
+    my $localdom = $dom->clone;
+    $localdom->at('html')->fill(+{
+        login => +{
+          user => 'Hi User',
+          uid => 111,
+          passwd => 'nopass',
+          toggle => 'on',
+          choose => [
+            +{id=>'id1', value=>1},
+            +{id=>'id2', value=>2, selected=>1},
+          ],
+          cars => [
+            +{ value=>'honda', content=>'Honda' },
+            +{ value=>'ford', content=>'Ford', selected=>1 },
+            +{ value=>'gm', content=>'General Motors' },
+          ],
+          jobs => [
+            +{
+              label=>'Easy',
+              options => [
+                +{ value=>'slacker', content=>'Slacker' },
+                +{ value=>'couch_potato', content=>'Couch Potato' },
+              ],
+            },
+            +{
+              label=>'Hard',
+              options => [
+                +{ value=>'digger', content=>'Digger' },
+                +{ value=>'brain', content=>'Brain Surgeon' },
+              ],
+            },
+          ],
+        },
+      });
+
+    is $localdom->at('#id1')->attr('value'), 1;
+    is $localdom->at('#id2')->attr('value'), 2;
+    is $localdom->at('#id2')->attr('selected'), 'on';
+
+    is $localdom->at('option[value="honda"]')->content, 'Honda';
+    is $localdom->at('option[value="ford"]')->content, 'Ford';
+    is $localdom->at('option[value="ford"]')->attr('selected'), 'on';
+    is $localdom->at('option[value="gm"]')->content, 'General Motors';
+    is $localdom->at('option[value="slacker"]')->content, 'Slacker';
+    is $localdom->at('option[value="couch_potato"]')->content, 'Couch Potato';
+    is $localdom->at('option[value="digger"]')->content, 'Digger';
+    is $localdom->at('option[value="brain"]')->content, 'Brain Surgeon';
+  }
+}
+
+# do bugs
+{
   my $dom = Template::Lace::DOM->new(q[
     <section>
-      <h2 data-page='title'>title</h2>
-      <ul>
-        <li data-page='todos'
-          data-todo='title'>TODOS</li>
-      </ul>
-      <ul>
-        <li data-page='status'>
-          <a data-status='infolink'
-            data-status='description'>Links</a>
-          and Info:<span data-status='details'>Details</span>
-        </li>
-      </ul>
-
-      <ol id='ordered'>
-        <li></li>
+      <ol id="list">
+        <li>example</li>
       </ol>
-      <dl id='list'>
-        <dt>Name</dt>
-        <dd id='name'></dd>
-        <dt>Age</dt>
-        <dd id='age'></dd>
-      </dl>
-    </section>
+      <form id='login'>
+        <input type='checkbox' name='toggle'/>
+        <ol id='toggle_errors'>
+          <li>ERR</li>
+        </ol>
+        <select name='tags'>
+          <option>example</option>
+        </select>
+      </form>
+    </section>]);
+
+  $dom->do(
+    'input[name="toggle"]@checked' => 1,
+    'select[name="tags"]' => [1,2,3],
+    '#list' => [1,2,3],
+    '#toggle_errors' => undef,
+  );
+
+  is $dom->at('input[name="toggle"]')->attr('checked'), 'on';
+  is $dom->at('select[name="tags"]')->find('option')->[0]->content, 1;
+  ok !$dom->at('#toggle_errors');
+}
+
+# wrap_with
+{
+  my $master = Template::Lace::DOM->new(qq[
+    <html>
+      <head>
+        <title></title>
+      </head>
+      <body id="content">
+      </body>
+    </html>
   ]);
 
+  my $inner = Template::Lace::DOM->new(qq[
+    <h1>Hi</h1>
+    <p>This is a test of the emergency broadcasting networl</p>
+  ]);
+
+  $inner->wrap_with($master)
+    ->title('Wrapped');
+
+  $inner->append_js_src_uniquely('/js/common1.js');
+  $inner->append_js_src_uniquely('/js/common2.js');
+  $inner->append_js_src_uniquely('/js/common2.js');
+
+  is $inner->at('title')->content, 'Wrapped';
+  is $inner->at('h1')->content, 'Hi';
+  ok $inner->at('script[src="/js/common1.js"]');
+  ok $inner->at('script[src="/js/common2.js"]');
+  is scalar(@{$inner->find('script[src="/js/common2.js"]')}), 1;
+}
+
+done_testing;

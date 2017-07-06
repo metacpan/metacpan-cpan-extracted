@@ -1,0 +1,160 @@
+package Log::ger::Manual::FAQ;
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: FAQ on Log::ger
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Log::ger::Manual::FAQ - FAQ on Log::ger
+
+=head1 VERSION
+
+version 0.012
+
+=head1 OUTPUT
+
+=head2 How to create multiple loggers?
+
+For example, in L<Log::Any>:
+
+ my $log = Log::Any->get_logger;
+ my $log_dump = Log::Any->get_logger(category => "dump"); # to dump contents
+
+ $log->debugf("Headers is: %s", $http_res->{headers});
+ $log_dump->debug($http_res->{content});
+
+in Log::ger:
+
+ # instead of installing to package, we setup objects (or hashes) for the
+ # secondary loggers
+ my $log_dump = Log::ger->get_logger(category => "dump");
+
+ log_debug("Headers is: %s", $http_res->{headers});
+ $log_dump->debug($http_res->{content});
+
+=head2 How to send logs to several outputs?
+
+Use L<Log::ger::Output::Composite>, which can log to multiple outputs as well as
+multiple output of the same type (e.g. two or more
+L<File|Log::ger::Output::File>'s).
+
+=head2 How to send trace/debug messages to screen, but warnings/errors to file?
+
+Using L<Log::ger::Output::Composite>'s per-output level:
+
+ Log::ger::Output Composite => (
+     Screen => {
+         level => ['trace', 'debug'],
+     },
+     File => {
+         conf => { path=>'/path/to/file.log' },
+         level => ['warn', 'error'],
+     },
+ );
+
+=head2 How to send trace/debug messages to a file, but warnings/errors to another file?
+
+Using L<Log::ger::Output::Composite>'s per-output level:
+
+ Log::ger::Output Composite => (
+     File => [
+         {
+             conf => { path=>'file1.log' },
+             level => ['trace', 'debug'],
+         },
+         {
+             conf => { path=>'file2.log' },
+             level => ['warn', 'error'],
+         },
+     ],
+ );
+
+=head2 How to filter by category?
+
+Using L<Log::ger::Output::Composite>.
+
+TODO example.
+
+=head2 How to log warnings/die messages?
+
+TODO
+
+=head1 LEVEL
+
+=head2 How to use custom levels?
+
+One way:
+
+ use Log::ger ();
+ BEGIN {
+     our %Log::ger::Levels = (
+         critical => 1,
+         error    => 2,
+         warning  => 3,
+         info     => 4,
+         extra    => 5,
+     );
+     our %Log::ger::Level_Aliases = (
+         warn     => 3,
+         verbose  => 4,
+     );
+
+Do this before initializing any package with C<use Log::ger>. The above example
+will create these logging routines: C<log_critical>, C<log_error>,
+C<log_warning>, C<log_info>, C<log_extra>. The aliases won't get the logging
+routines but C<Log::ger::Util::numeric_level> will recognize them.
+
+=head1 FORMAT & LAYOUT
+
+=head2 How to do custom formatting?
+
+For example, a la L<Log::Contextual>:
+
+ log_warn { 'The number of stuffs is: ' . $obj->stuffs_count };
+
+See L<Log::ger::Format::Block> for an example.
+
+=head2 How to add timestamps?
+
+Use a layouter, e.g. L<Log::ger::Layout::Pattern>.
+
+=head1 TARGETS
+
+=head2 How to customize format/layout, output, plugin on a per-target basis?
+
+To use a plugin only for the current package:
+
+ package MyPackage;
+
+ use Log::ger::Plugin;
+ Log::ger::Plugin->set_for_current_package(
+     'PluginName',
+     conf1 => ..., ...);
+ use Log::ger;
+
+Do the same thing for format (using L<Log::ger::Format>), layout (using
+L<Log::ger::Layout>), or output (using L<Log::ger::Output>).
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

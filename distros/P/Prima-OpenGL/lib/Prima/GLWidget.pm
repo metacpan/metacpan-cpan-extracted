@@ -6,7 +6,7 @@ use Prima;
 use OpenGL;
 use Prima::OpenGL;
 
-use vars qw(@ISA);
+use vars qw(@ISA @paint_hooks);
 @ISA = qw(Prima::Widget);
 
 sub profile_default
@@ -38,15 +38,16 @@ sub init
 sub notify
 {
 	my ( $self, $command, @params ) = @_;
-		
+
 	return $self-> SUPER::notify( $command, @params )
-		unless $command eq 'Paint';
+		if $command ne 'Paint';
 
 	unless ( Prima::OpenGL::context_push()) {
 		warn Prima::OpenGL::last_error();
 		return;
 	}
 	$self-> gl_select;
+	$_->($self) for @paint_hooks;
 	my $ret = $self-> SUPER::notify( $command, @params );
 	$self-> gl_flush;
 	Prima::OpenGL::context_pop();
@@ -69,6 +70,13 @@ sub on_size
 	my ( $self, $ox, $oy, $x, $y) = @_;
 	$self-> gl_select;
 	glViewport(0,0,$x,$y);	
+}
+
+sub on_syshandle
+{
+	my $self = shift;
+	$self-> gl_destroy;
+	$self-> gl_create( %{$self-> gl_config} );
 }
 
 sub on_destroy { shift-> gl_destroy }

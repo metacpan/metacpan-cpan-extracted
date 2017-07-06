@@ -6,6 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Log::ger::Output::Screen: '0.004'
   Perinci::Examples: '0.79'
   Test::More: '0.98'
   Test::Perinci::CmdLine: '1.47'
@@ -27,10 +28,12 @@ requires:
   Data::Clean::JSON: '0.38'
   Data::Dmp: '0.21'
   Data::Sah: '0.84'
+  Data::Sah::Coerce::perl::obj::str_url: '0'
   Data::Sah::Compiler::perl::TH::any: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::hash: '0'
+  Data::Sah::Compiler::perl::TH::obj: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Data::Sah::Normalize: '0'
   Data::Sah::Util::Type: '0.45'
@@ -38,15 +41,14 @@ requires:
   Getopt::Long::EvenLess: '0.10'
   Getopt::Long::Subcommand: '0.09'
   JSON::MaybeXS: '0'
-  Log::Any: '0'
-  Log::Any::IfLOG: '0.07'
+  Log::ger: '0.011'
   Module::CoreList: '0'
   Module::CoreList::More: '0'
   Module::DataPack: '0.09'
-  Module::Path::More: '0'
-  Perinci::CmdLine::Base: '1.72'
+  Module::Path::More: '0.32'
+  Perinci::CmdLine::Base: '1.75'
   Perinci::CmdLine::Help: '0'
-  Perinci::CmdLine::Lite: '1.72'
+  Perinci::CmdLine::Lite: '1.75'
   Perinci::CmdLine::POD: '0.003'
   Perinci::CmdLine::Util::Config: '1.71'
   Perinci::Result::Format::Lite: '0.22'
@@ -55,7 +57,7 @@ requires:
   Perinci::Sub::ArgEntity::riap_url: '0'
   Perinci::Sub::GetArgs::Argv: '0.80'
   Perinci::Sub::Normalize: '0.19'
-  Perinci::Sub::Util: '0.45'
+  Perinci::Sub::Util: '0.46'
   Perl::Stripper: '0'
   Regexp::Stringify: '0'
   Sah::Schema::riap::url: '0'
@@ -68,7 +70,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Inline
   homepage: https://metacpan.org/release/Perinci-CmdLine-Inline
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-Inline.git
-version: '0.50'
+version: '0.53'
 x_Dist_Zilla:
   perl:
     version: '5.024000'
@@ -148,7 +150,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.54'
+      version: '0.55'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -156,7 +158,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodnameFromFilename
       name: '@Author::PERLANCAR/PodnameFromFilename'
-      version: '0.01'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
       name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
@@ -173,6 +175,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::CheckMetaResources
       name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
@@ -300,7 +306,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.75'
+              version: '0.76'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -316,7 +322,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.05'
+              version: '0.06'
       name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
@@ -338,7 +344,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
       name: '@Author::PERLANCAR/Rinci::Validate'
-      version: '0.23'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'
@@ -379,11 +385,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.01'
+      version: '0.02'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.003'
+      version: '0.004'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

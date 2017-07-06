@@ -8,7 +8,7 @@ use warnings;
 use autodie;
 
 use Template::Mustache;
-use YAML::Syck;
+use YAML::XS qw/ Load /;
 
 my ($self, $args) = @_;
 my @args = $args ? @$args : @ARGV;
@@ -44,7 +44,7 @@ mustache.pl
 
 =head1 VERSION
 
-version 0.5.6
+version 1.0.2
 
 =head1 NAME
 

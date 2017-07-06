@@ -1,0 +1,8 @@
+0.002   2017-07-03 (PERLANCAR)
+
+	- Create create_logml_routine hook instead of create_log_routine.
+
+
+0.001   2017-07-03 (PERLANCAR)
+
+        - First version.

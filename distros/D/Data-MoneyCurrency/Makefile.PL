@@ -25,7 +25,7 @@ install_share dist => File::Spec->catfile("ruby-money", "config");
 
 WriteMakefile(
     NAME             => 'Data::MoneyCurrency',
-    AUTHOR           => q{David D Lowe <daviddlowe.flimm@gmail.com>},
+    AUTHOR           => q{Ed Freyfogle <edf@opencagedata.com>},
     VERSION_FROM     => 'lib/Data/MoneyCurrency.pm',
     ABSTRACT_FROM    => 'lib/Data/MoneyCurrency.pm',
     LICENSE          => 'mit',

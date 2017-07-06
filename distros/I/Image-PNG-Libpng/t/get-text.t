@@ -11,7 +11,7 @@ if (! libpng_supports ('iTXt') ||
 }
 
 use utf8;
-use FindBin;
+use FindBin '$Bin';
 use Scalar::Util 'looks_like_number';
 binmode STDOUT, ":utf8";
 my $builder = Test::More->builder;
@@ -462,7 +462,7 @@ key => 'Disclaimer',
 # it seems like there must be a faulty libpng.
 
 for my $test (@stuff) {
-    my $png = read_png_file ("$FindBin::Bin/libpng/$test->{file}.png");
+    my $png = read_png_file ("$Bin/libpng/$test->{file}.png");
     my $texts = $png->get_text ();
     if ($texts) {
 	for my $text (@$texts) {
@@ -482,7 +482,7 @@ for my $test (@stuff) {
 }
 
 for my $test (@stuff) {
-    my $png = read_png_file ("$FindBin::Bin/libpng/$test->{file}.png");
+    my $png = read_png_file ("$Bin/libpng/$test->{file}.png");
     my $texts = $png->get_text ();
     if ($test->{empty}) {
 	ok (! $texts, "no text chunks for empty");

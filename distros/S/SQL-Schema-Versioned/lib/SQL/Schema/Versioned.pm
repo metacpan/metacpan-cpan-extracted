@@ -1,12 +1,12 @@
 package SQL::Schema::Versioned;
 
-our $DATE = '2017-06-15'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $DATE = '2017-06-24'; # DATE
+our $VERSION = '0.22'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -141,7 +141,7 @@ _
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub create_or_update_db_schema {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::int;require Scalar::Util::Numeric;my $arg_err; if (exists($args{'create_from_version'})) { ((defined($args{'create_from_version'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'create_from_version'})) ? 1 : (($arg_err //= "Not of type integer"),0)); if ($arg_err) { return [400, "Invalid argument value for create_from_version: $arg_err"] } }no warnings ('void');require Data::Sah::Compiler::perl::TH::obj;require Scalar::Util;if (exists($args{'dbh'})) { ((defined($args{'dbh'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($args{'dbh'})) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { return [400, "Invalid argument value for dbh: $arg_err"] } }if (!exists($args{'dbh'})) { return [400, "Missing argument: dbh"] } no warnings ('void');require Data::Sah::Compiler::perl::TH::hash;if (exists($args{'spec'})) { ((defined($args{'spec'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($args{'spec'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for spec: $arg_err"] } }if (!exists($args{'spec'})) { return [400, "Missing argument: spec"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');require Scalar::Util::Numeric;my $arg_err; if (exists($args{'create_from_version'})) { ((defined($args{'create_from_version'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'create_from_version'})) ? 1 : (($arg_err //= "Not of type integer"),0)); if ($arg_err) { return [400, "Invalid argument value for create_from_version: $arg_err"] } }no warnings ('void');require Scalar::Util;if (exists($args{'dbh'})) { ((defined($args{'dbh'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($args{'dbh'})) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { return [400, "Invalid argument value for dbh: $arg_err"] } }if (!exists($args{'dbh'})) { return [400, "Missing argument: dbh"] } no warnings ('void');if (exists($args{'spec'})) { ((defined($args{'spec'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($args{'spec'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for spec: $arg_err"] } }if (!exists($args{'spec'})) { return [400, "Missing argument: spec"] } # VALIDATE_ARGS
 
     my $spec   = $args{spec};
     my $dbh    = $args{dbh};
@@ -203,7 +203,7 @@ sub create_or_update_db_schema {
             if ($from_v) {
                 # install from a specific version
                 if ($spec->{"install_v$from_v"}) {
-                    $log->debug("Creating version $from_v of database schema ...");
+                    log_debug("Creating version $from_v of database schema ...");
                     for my $step (@{ $spec->{"install_v$from_v"} }) {
                         if (ref($step) eq 'CODE') {
                             eval { $step->($dbh) }; if ($@) { $err = $@; last STEP }
@@ -223,7 +223,7 @@ sub create_or_update_db_schema {
             } else {
                 # install directly the latest version
                 if ($spec->{install}) {
-                    $log->debug("Creating latest version of database schema ...");
+                    log_debug("Creating latest version of database schema ...");
                     for my $step (@{ $spec->{install} }) {
                         if (ref($step) eq 'CODE') {
                             eval { $step->($dbh) }; if ($@) { $err = $@; last STEP }
@@ -248,7 +248,7 @@ sub create_or_update_db_schema {
 
       UPGRADE:
         my $next_v = $current_v + 1;
-        $log->debug("Updating database schema from version $current_v to $next_v ...");
+        log_debug("Updating database schema from version $current_v to $next_v ...");
         $spec->{"upgrade_to_v$next_v"}
             or do { $err = "Error in spec: upgrade_to_v$next_v not specified"; last STEP };
         for my $step (@{ $spec->{"upgrade_to_v$next_v"} }) {
@@ -264,7 +264,7 @@ sub create_or_update_db_schema {
         $current_v = $next_v;
     }
     if ($err) {
-        $log->error("Can't upgrade schema (from version $orig_v): $err");
+        log_error("Can't upgrade schema (from version $orig_v): $err");
         $dbh->rollback;
         return [500, "Can't upgrade schema (from version $orig_v): $err"];
     } else {
@@ -287,7 +287,7 @@ SQL::Schema::Versioned - Routine and convention to create/update your applicatio
 
 =head1 VERSION
 
-This document describes version 0.21 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2017-06-15.
+This document describes version 0.22 of SQL::Schema::Versioned (from Perl distribution SQL-Schema-Versioned), released on 2017-06-24.
 
 =head1 DESCRIPTION
 
@@ -466,7 +466,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/SQL-Schema
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-SQL-Schema-Versioned>.
+Source repository is at L<https://github.com/perlancar/perl-SHARYANTO-SQL-Schema>.
 
 =head1 BUGS
 

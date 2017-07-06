@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,39 +14,44 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 0376428d7b287f63d54add2568b731de62227e38 Changes
+SHA1 7d6a3efc9f3aa4727c3b462bdc177e57ad34c2dc Changes
 SHA1 0a3224be32be8a39834f4c2d84648064fadeb559 LICENSE
-SHA1 cc38358d20b6c02e6a2d9b12a8a9847a3b6658e3 MANIFEST
-SHA1 f633abf6e5a98e0499414bd39fc8fba5ab536414 META.yml
+SHA1 16ec41d7a749f649c5bed3bcc3420aa5fcac1f02 MANIFEST
+SHA1 a9c2bc299f0cde2267cc99634b183331217de952 META.yml
 SHA1 7243105b1d25eefa0f0b0f8cc4c555e03c0dcc35 Makefile.PL
 SHA1 95c97c23ede15cbddfdacc17de851ed8a267359a README
 SHA1 e8e62160dd2d61f6de3230f23920f03edc236bda README.md
 SHA1 9c2b6081f4f9b96996ee7abdc231dfe8b3581168 html/Elements/EditCustomFieldRichtext
 SHA1 61ee39aba0028dc9b9b24e12050b2a8342d28adf html/Elements/ShowCustomFieldRichtext
-SHA1 10f1ba97180b54e94ab30d9efe4aaa0a70aa1e26 inc/Module/AutoInstall.pm
-SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
-SHA1 b084961275ae4b66a9a0766372b0a08803aa63d1 inc/Module/Install/AutoInstall.pm
-SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
-SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
-SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
-SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
-SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
-SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 707278f4ee3fa8eb21b9a2d40fe26447113244a3 inc/Module/AutoInstall.pm
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
+SHA1 da26ed869803dd04c51b15609437d00ffebed3f9 inc/Module/Install/AutoInstall.pm
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 51f01eba57f9f58f7a3480115d2660126f48b35c inc/Module/Install/Include.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
 SHA1 93e864def60207b13ab80f6e390c6667a4ff904b inc/Module/Install/RTx.pm
 SHA1 3fdf4c0cffdb1a2e23e5cd26bf95be553f1f9590 inc/Module/Install/RTx/Runtime.pm
 SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
 SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
-SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
-SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
-SHA1 7173d20065379a781d0218b7e747ca7a9b11f7a0 inc/YAML/Tiny.pm
-SHA1 260b8d6174a4d46eef8b44fd584c532181780595 lib/RT/Extension/RichtextCustomField.pm
-SHA1 f3a927662a3e5120f2aeed75a5c97aa8ee815e5c lib/RT/Extension/RichtextCustomField/Test.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
+SHA1 1bb8b3e76788e691f83dacdee5a2c02aacf1222a inc/YAML/Tiny.pm
+SHA1 7c3b736ae8f2e5107caac27abe3bfcd205ffee31 lib/RT/Extension/RichtextCustomField.pm
 SHA1 2bd0118b13a2a2807e3e25a6e5ccec599084d556 lib/RT/Extension/RichtextCustomField/Test.pm.in
 SHA1 54ea0a3cc9f20469a4b9df304dd5108f450b5966 xt/00-load.t
+SHA1 91282266dd19c678bf971470bef0d4c3bf7e0403 xt/admin_cfs.t
+SHA1 d7e466d127afb45d37adf09096585622e08ddb23 xt/article.t
+SHA1 0589b092bfab357e9bec66775800fbe991d01414 xt/asset.t
+SHA1 6387b217c9418b6e022083be617d29e93f86274d xt/group.t
+SHA1 7bc2d30612360e86064b901a15482f7aacb912b4 xt/queue.t
+SHA1 f423381a5e40362f3a28919676e23c75cbe65906 xt/ticket.t
+SHA1 0ea26cdc320fb8b4084526e754c342d5c380ecc2 xt/user.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAllD0sUACgkQ8914Z7pT+T++PwCfQDpNWw2Vc9noBejjeDuwrvW9
-8qkAn1v9PnQ85tJjRDloBbgvaA82nL6s
-=XimO
+iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCWUvefAAKCRDz3XhnulP5
+P2wQAJ9LlDvTVQIhwdEGWpQNl5ITqgL1/QCfZ0HJkarUIaW6BMKYjvLW1sF4HzM=
+=A6yf
 -----END PGP SIGNATURE-----

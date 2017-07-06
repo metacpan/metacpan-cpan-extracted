@@ -1,6 +1,6 @@
 package Bencher::ScenarioR::CBlocks::Startup;
 
-our $VERSION = 0.002; # VERSION
+our $VERSION = 0.003; # VERSION
 
 our $results = [
   [
@@ -8,28 +8,28 @@ our $results = [
     "OK",
     [
       {
-        errors => 0.00011,
+        errors => 4.8e-05,
         participant => "load_cblocks_perlapi_types",
-        rate => 25,
-        samples => 21,
-        time => 40,
+        rate => 28,
+        samples => 20,
+        time => 36,
         vs_slowest => 1,
       },
       {
-        errors => 0.0001,
+        errors => 7.4e-05,
         participant => "load_cblocks",
-        rate => 43,
+        rate => 47,
         samples => 21,
-        time => 23,
+        time => 21,
         vs_slowest => 1.7,
       },
       {
-        errors => 3.9e-05,
+        errors => 1.8e-05,
         participant => "perl",
-        rate => 120,
+        rate => 140,
         samples => 20,
-        time => 8.2,
-        vs_slowest => 4.9,
+        time => 7,
+        vs_slowest => 5.1,
       },
     ],
     {
@@ -152,7 +152,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 0,
-                                              speed                        => 2699.593,
+                                              speed                        => "2889.960",
                                               stepping                     => 4,
                                             },
                                             {
@@ -267,7 +267,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 1,
-                                              speed                        => 2600.828,
+                                              speed                        => 2617.398,
                                               stepping                     => 4,
                                             },
                                             {
@@ -382,7 +382,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 2,
-                                              speed                        => 2797.429,
+                                              speed                        => 2603.835,
                                               stepping                     => 4,
                                             },
                                             {
@@ -497,14 +497,14 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 3,
-                                              speed                        => 2599.953,
+                                              speed                        => 2745.257,
                                               stepping                     => 4,
                                             },
                                           ],
-      "func.elapsed_time"              => 1.83470487594604,
+      "func.elapsed_time"              => 1.47882914543152,
       "func.module_startup"            => undef,
       "func.module_versions"           => {
-                                            "__PACKAGE__" => 1.034,
+                                            "__PACKAGE__" => 1.039,
                                             "Bencher::Scenario::CBlocks::Startup" => undef,
                                             "Benchmark::Dumb" => "0.10",
                                             "Devel::Platform::Info" => 0.16,
@@ -542,9 +542,9 @@ our $results = [
       "func.scenario_module_mtime"     => 1481375051,
       "func.scenario_module_sha1sum"   => "4ddd3ad150a977624306173490d0a20a47946fa2",
       "func.scenario_module_sha256sum" => "5253225120c198266f6765637d46e3d156f8602cae337bf7bd8de78ccb205ed0",
-      "func.time_end"                  => 1485327062.38151,
+      "func.time_end"                  => 1499087548.44864,
       "func.time_factor"               => 1000,
-      "func.time_start"                => 1485327060.54681,
+      "func.time_start"                => 1499087546.96981,
       "table.field_aligns"             => ["left", "left", "number", "number", "number", "number", "number"],
       "table.field_units"              => [undef, undef, "/s", "ms"],
       "table.fields"                   => [

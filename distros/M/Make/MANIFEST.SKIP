@@ -1,8 +1,11 @@
 %$
-\.(bak|old|gz)$
+\.(bak|old|gz|tar)$
 \b(pm_to_blib|Makefile)$
-\.tar\.
 \bblib\b
 \bcleanup\b
 \.git/
 MANIFEST.bak
+MYMETA.yml
+MYMETA.json
+.tidyall.d/
+

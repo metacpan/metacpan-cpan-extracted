@@ -1,3 +1,23 @@
+0.0208 2017-07-06
+  - add die logic when 32 bit Perl
+  - add several SPVM internal functions
+0.0207 2017-06-30
+  - Fix amd64 segfault bug.
+0.0206 2017-06-20
+  - Argument and return value become normal SV which have IV or NV.
+    # Example
+    my $total = SPVM::MyModule2::foo(3, 5);
+    print $total . "\n";
+
+0.0205 2017-06-29
+  - Only support 64 bit Perl.
+    In 32 bit Perl, 64 bit integer is not supported. This means that Perl can not express 64 bit integers on source code.
+0.0204 2017-06-28
+  - add env interface. This is similar as JAVA JNI
+0.0203 2017-06-26
+  - build SPVM using same CCFLAG as Perl itself
+0.0202 2017-06-25
+  - use same CCFLAG in Makefile.PL
 0.0201 2017-06-20
   - fix memset 0 bug
 0.02 2017-06-20

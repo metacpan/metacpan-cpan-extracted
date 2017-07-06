@@ -17,6 +17,7 @@
 package Google::Ads::Common::Constants;
 
 use strict;
+use warnings;
 use version;
 
 # Main version number that the rest of the modules on this package pick up

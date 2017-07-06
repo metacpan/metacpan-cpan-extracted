@@ -23,7 +23,8 @@ on test => sub {
     requires 'IO::Handle';
     requires 'IPC::Open3';
     requires 'Test::CheckDeps', '0.010';
-    requires 'Test::More', '0.94';
+    requires 'Test::More', '>= 0.98';
+    requires 'Test::Most', 0;
     requires 'Test::MockTime', '>= 0.15';
     requires 'Test::NoWarnings', 0;
     requires 'Test::Exception', 0;

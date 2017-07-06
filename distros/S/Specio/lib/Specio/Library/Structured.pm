@@ -3,7 +3,7 @@ package Specio::Library::Structured;
 use strict;
 use warnings;
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 use parent 'Specio::Exporter';
 
@@ -85,7 +85,7 @@ Specio::Library::Structured - Structured types for Specio (Dict, Map, Tuple)
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 

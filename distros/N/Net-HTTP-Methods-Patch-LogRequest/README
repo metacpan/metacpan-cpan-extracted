@@ -6,7 +6,7 @@ SYNOPSIS
 
     Sample script and output:
 
-     % LOG_SHOW_CATEGORY=1 TRACE=1 perl -MLog::Any::App \
+     % LOG_SHOW_CATEGORY=1 TRACE=1 perl -MLog::ger::Output=Screen \
        -MNet::HTTP::Methods::Patch::LogRequest -MWWW::Mechanize \
        -e'$mech=WWW::Mechanize->new; $mech->get("http://www.google.com/")'
      [cat Net.HTTP.Methods.Patch.LogRequest][23] HTTP request (142 bytes):
@@ -28,7 +28,7 @@ SYNOPSIS
 DESCRIPTION
 
     This module patches Net::HTTP::Methods so that raw LWP HTTP request is
-    logged using Log::Any. If you look into LWP::Protocol::http's source
+    logged using Log::ger. If you look into LWP::Protocol::http's source
     code, you'll see that it is already doing that (albeit commented):
 
       my $req_buf = $socket->format_request($method, $fullpath, @h);

@@ -46,7 +46,23 @@ chomp $cpanm_path;
 my $perlbrew_bin = File::Spec->catdir($ENV{'PERLBREW_ROOT'}, 'perls',
     $brew, 'bin');
 
+my $perlbrew_path = $ENV{'PATH'};
+if(my $local_lib_root = $ENV{'PERL_LOCAL_LIB_ROOT'}) {
+    my @path = File::Spec->path;
+
+    while(@path && $path[0] =~ /^$local_lib_root/) {
+        shift @path;
+    }
+
+    if($^O eq 'MSWin32') {
+        $perlbrew_path = join(';', @path);
+    } else {
+        $perlbrew_path = join(':', @path);
+    }
+}
+
 my ( $env, $status ) = do {
+    local $ENV{'PATH'} = $perlbrew_path;
     local $ENV{'SHELL'} = '/bin/bash'; # fool perlbrew
     ( scalar(qx(perlbrew env $brew)), $? )
 };
@@ -71,7 +87,10 @@ foreach my $line (@lines) {
     }
 }
 
-my $pristine_path = qx(perlbrew display-pristine-path);
+my $pristine_path = do {
+    local $ENV{'PATH'} = $perlbrew_path;
+    qx(perlbrew display-pristine-path);
+};
 chomp $pristine_path;
 $ENV{'PATH'} = join(':', $ENV{'PERLBREW_PATH'}, $pristine_path);
 
@@ -88,9 +107,9 @@ if(!defined $pid) {
     waitpid $pid, 0;
     ok !$?, "cpanm should successfully install your dist with no issues" or copy_log_file($tmphome->dirname);
 } else {
-    close STDIN;
-    close STDOUT;
-    close STDERR;
+    open STDIN, '<', File::Spec->devnull;
+    open STDOUT, '>', File::Spec->devnull;
+    open STDERR, '>', File::Spec->devnull;
 
     my @path = File::Spec->splitdir($FindBin::Bin);
 
@@ -105,8 +124,10 @@ if(!defined $pid) {
     # override where cpanm puts its log file
     $ENV{'HOME'} = $tmphome->dirname;
 
-    
 
+
+    # We use system here instead of exec so that $tmpdir gets cleaned up
+    # after cpanm finishes
     system 'perl', $cpanm_path, '-L', $tmpdir->dirname, '.';
     exit($? >> 8);
 }

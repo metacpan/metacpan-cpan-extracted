@@ -55,9 +55,11 @@
             "Getopt::Long" : "0",
             "JSON" : "0",
             "List::Util" : "0",
-            "Log::Any::Adapter" : "0",
-            "Log::Any::Adapter::Screen" : "0",
-            "Log::Any::IfLOG" : "0.07",
+            "Log::ger" : "0.010",
+            "Log::ger::LevelFromEnv" : "0",
+            "Log::ger::Output" : "0.005",
+            "Log::ger::Output::Screen" : "0",
+            "Log::ger::Util" : "0.008",
             "MIME::Base64" : "0",
             "Mo" : "0",
             "Perinci::Access::Lite" : "0.09",
@@ -101,7 +103,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Lite"
       }
    },
-   "version" : "1.74",
+   "version" : "1.75",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024000"
@@ -111,11 +113,6 @@
             "class" : "Dist::Zilla::Plugin::RenderTemplate",
             "name" : "RenderTemplate",
             "version" : "0.01"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::EnsureDepakable",
-            "name" : "EnsureDepakable",
-            "version" : "0.003"
          },
          {
             "class" : "Dist::Zilla::Plugin::GatherDir",
@@ -446,7 +443,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Rinci::Validate",
             "name" : "@Author::PERLANCAR/Rinci::Validate",
-            "version" : "0.23"
+            "version" : "0.24"
          },
          {
             "class" : "Dist::Zilla::Plugin::SetScriptShebang",

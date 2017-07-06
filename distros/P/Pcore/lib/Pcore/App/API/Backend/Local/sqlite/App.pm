@@ -1,6 +1,6 @@
 package Pcore::App::API::Backend::Local::sqlite::App;
 
-use Pcore -role, -promise, -result;
+use Pcore -role, -result;
 use Pcore::Util::UUID qw[uuid_str];
 
 sub get_app ( $self, $app_id, $cb ) {

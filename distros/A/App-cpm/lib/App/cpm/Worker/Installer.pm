@@ -2,12 +2,16 @@ package App::cpm::Worker::Installer;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '0.350';
+our $VERSION = '0.901';
 
 use App::cpm::Logger::File;
 use App::cpm::Worker::Installer::Menlo;
+use App::cpm::version;
 use CPAN::DistnameInfo;
 use CPAN::Meta;
+use Config;
+use ExtUtils::Install ();
+use ExtUtils::InstallPaths ();
 use File::Basename 'basename';
 use File::Copy ();
 use File::Copy::Recursive ();
@@ -15,10 +19,11 @@ use File::Path qw(mkpath rmtree);
 use File::Spec;
 use File::Temp ();
 use File::pushd 'pushd';
+use JSON::PP ();
 
-use constant NEED_INJECT_TOOLCHAIN_REQS => $] < 5.016;
+use constant NEED_INJECT_TOOLCHAIN_REQUIREMENTS => $] < 5.016;
 
-my $CACHED_MIRROR = sub {
+my $TRUSTED_MIRROR = sub {
     my $uri = shift;
     !!( $uri =~ m{^https?://(?:www.cpan.org|backpan.perl.org|cpan.metacpan.org)} );
 };
@@ -28,40 +33,36 @@ sub work {
     my $type = $job->{type} || "(undef)";
     local $self->{logger}{context} = $job->distvname;
     if ($type eq "fetch") {
-        my ($directory, $meta, $configure_requirements, $provides, $using_cache)
-            = $self->fetch($job);
-        if ($configure_requirements) {
+        if (my $result = $self->fetch($job)) {
             return +{
                 ok => 1,
-                directory => $directory,
-                meta => $meta,
-                configure_requirements => $configure_requirements,
-                provides => $provides,
-                using_cache => $using_cache,
+                directory => $result->{directory},
+                meta => $result->{meta},
+                configure_requirements => $result->{configure_requirements},
+                provides => $result->{provides},
+                using_cache => $result->{using_cache},
+                prebuilt => $result->{prebuilt},
+                requirements => $result->{requirements},
             };
         } else {
             $self->{logger}->log("Failed to fetch/configure distribution");
         }
     } elsif ($type eq "configure") {
-        my ($distdata, $requirements, $static_builder)
-            = $self->configure($job); # $job->{directory}, $job->{distfile}, $job->{meta});
-        if ($requirements) {
+        # $job->{directory}, $job->{distfile}, $job->{meta});
+        if (my $result = $self->configure($job)) {
             return +{
                 ok => 1,
-                distdata => $distdata,
-                requirements => $requirements,
-                static_builder => $static_builder,
+                distdata => $result->{distdata},
+                requirements => $result->{requirements},
+                static_builder => $result->{static_builder},
             };
         } else {
             $self->{logger}->log("Failed to configure distribution");
         }
     } elsif ($type eq "install") {
         my $ok = $self->install($job);
-        if ($ok) {
-            $self->{logger}->log("Successfully installed distribution");
-        } else {
-            $self->{logger}->log("Failed to install distribution");
-        }
+        my $message = $ok ? "Successfully installed distribution" : "Failed to install distribution";
+        $self->{logger}->log($message);
         return { ok => $ok, directory => $job->{directory} };
     } else {
         die "Unknown type: $type\n";
@@ -75,6 +76,7 @@ sub new {
     $option{base}   ||= "$ENV{HOME}/.perl-cpm/work/" . time . ".$$";
     $option{cache}  ||= "$ENV{HOME}/.perl-cpm/cache";
     mkpath $_ for grep !-d, $option{base}, $option{cache};
+    $option{logger}->log("Work directory is $option{base}");
 
     my $menlo = App::cpm::Worker::Installer::Menlo->new(
         base => $option{base},
@@ -88,10 +90,13 @@ sub new {
         build_timeout => $option{build_timeout},
         test_timeout => $option{test_timeout},
     );
-    if (my $local_lib = delete $option{local_lib}) {
+    if ($option{local_lib}) {
+        my $local_lib = $option{local_lib} = $menlo->maybe_abs($option{local_lib});
         $menlo->{self_contained} = 1;
-        $menlo->setup_local_lib($menlo->maybe_abs($local_lib));
+        $menlo->log("Setup local::lib $local_lib");
+        $menlo->setup_local_lib($local_lib);
     }
+    $menlo->log("--", `$^X -V`, "--");
     bless { %option, menlo => $menlo }, $class;
 }
 
@@ -119,6 +124,11 @@ sub _fetch_git {
     ($dir, $rev);
 }
 
+sub enable_prebuilt {
+    my ($self, $uri) = @_;
+    $self->{prebuilt} && $TRUSTED_MIRROR->(ref $uri ? $uri->[0] : $uri);
+}
+
 sub fetch {
     my ($self, $job) = @_;
     my $guard = pushd;
@@ -126,6 +136,13 @@ sub fetch {
     my $source   = $job->{source};
     my $distfile = $job->{distfile};
     my @uri      = ref $job->{uri} ? @{$job->{uri}} : ($job->{uri});
+
+    if ($self->enable_prebuilt($uri[0])) {
+        if (my $result = $self->find_prebuilt($uri[0])) {
+            $self->{logger}->log("Using prebuilt $result->{directory}");
+            return $result;
+        }
+    }
 
     my ($dir, $rev, $using_cache);
     if ($source eq "git") {
@@ -167,7 +184,7 @@ sub fetch {
                 last FETCH;
             } else {
                 local $self->menlo->{save_dists};
-                if ($distfile and $CACHED_MIRROR->($uri)) {
+                if ($distfile and $TRUSTED_MIRROR->($uri)) {
                     my $cache = File::Spec->catfile($self->{cache}, "authors/id/$distfile");
                     if (-f $cache) {
                         $self->{logger}->log("Using cache $cache");
@@ -193,83 +210,135 @@ sub fetch {
     return unless $dir;
 
     chdir $dir or die;
-    my ($meta, $configure_requirements, $provides)
-        = $self->_get_configure_requirements($distfile);
-    return ($dir, $meta, $configure_requirements, $provides, $using_cache);
+
+    my $meta = $self->_load_metafile($distfile, 'META.json', 'META.yml');
+    my $p = $meta->{provides} || $self->menlo->extract_packages($meta, ".");
+    my $provides = [ map +{ package => $_, version => $p->{$_}{version} }, sort keys %$p ];
+
+    my $configure_requirements = [];
+    if ($self->menlo->opts_in_static_install($meta)) {
+        $self->{logger}->log("Distribution opts in x_static_install: $meta->{x_static_install}");
+    } else {
+        $configure_requirements = $self->_extract_configure_requirements($meta, $distfile);
+    }
+
+    return +{
+        directory => $dir,
+        meta => $meta,
+        configure_requirements => $configure_requirements,
+        provides => $provides,
+        using_cache => $using_cache,
+    };
 }
 
-sub _inject_toolchain_reqs {
+sub find_prebuilt {
+    my ($self, $uri) = @_;
+    my $info = CPAN::DistnameInfo->new($uri);
+    my $dir = File::Spec->catdir($self->{prebuilt_base}, $info->cpanid, $info->distvname);
+    return unless -d $dir;
+
+    my $guard = pushd $dir;
+
+    my $meta   = $self->_load_metafile($uri, 'META.json', 'META.yml');
+    my $mymeta = $self->_load_metafile($uri, 'blib/meta/MYMETA.json');
+    my $phase  = $self->{notest} ? [qw(build runtime)] : [qw(build test runtime)];
+    my @req;
+    if (!$self->menlo->opts_in_static_install($meta)) {
+        # XXX Actually we don't need configure requirements for prebuilt.
+        # But requires them for consistency for now.
+        push @req, @{ $self->_extract_configure_requirements($meta, $uri) };
+    }
+    push @req, @{ $self->_extract_requirements($mymeta, $phase) };
+
+    my $provides = do {
+        open my $fh, "<", 'blib/meta/install.json' or die;
+        my $json = JSON::PP::decode_json(do { local $/; <$fh> });
+        my $provides = $json->{provides};
+        [ map +{ package => $_, version => $provides->{$_}{version} || undef }, keys %$provides ];
+    };
+    return +{
+        directory => $dir,
+        meta => $meta->as_struct,
+        provides => $provides,
+        prebuilt => 1,
+        requirements => \@req,
+    };
+}
+
+sub save_prebuilt {
+    my ($self, $job) = @_;
+    my $dir = File::Spec->catdir($self->{prebuilt_base}, $job->cpanid, $job->distvname);
+    return if -d $dir;
+
+    my $parent = File::Basename::dirname($dir);
+    for (1..3) {
+        last if -d $parent;
+        eval { File::Path::mkpath($parent) };
+    }
+    return unless -d $parent;
+    $self->{logger}->log("Saving the build $job->{directory} in $dir");
+    File::Copy::Recursive::dircopy($job->{directory}, $dir) or warn $!;
+}
+
+sub _inject_toolchain_requirements {
     my ($self, $distfile, $reqs) = @_;
     $distfile ||= "";
 
     my %deps = map { $_->{package} => $_ } @$reqs;
-
     if (    -f "Makefile.PL"
         and !$deps{'ExtUtils::MakeMaker'}
         and !-f "Build.PL"
         and $distfile !~ m{/ExtUtils-MakeMaker-[0-9v]}
     ) {
-        $deps{'ExtUtils::MakeMaker'} = {package => "ExtUtils::MakeMaker", version_range => '6.58'};
+        $deps{'ExtUtils::MakeMaker'} ||= { package => "ExtUtils::MakeMaker", version_range => 0 };
+    }
+    if ($deps{'Module::Build'}) {
+        $deps{'ExtUtils::Install'} ||= { package => 'ExtUtils::Install', version_range => 0 };
     }
 
-    # copy from Menlo/cpanminus
-    my $toolchain = CPAN::Meta::Requirements->from_string_hash({
+    my %inject = (
         'Module::Build' => '0.38',
         'ExtUtils::MakeMaker' => '6.58',
         'ExtUtils::Install' => '1.46',
-    });
-    my $merge = sub {
-        my $dep = shift;
-        $toolchain->add_string_requirement($dep->{package}, $dep->{version_range} || 0); # may die
-        $toolchain->requirements_for_module($dep->{package});
-    };
+    );
 
-    my $dep;
-    if ($dep = $deps{"ExtUtils::MakeMaker"}) {
-        $dep->{version_range} = $merge->($dep);
+    for my $package (sort keys %inject) {
+        my $inject = $inject{$package};
+        my $dep = $deps{$package} or next;
+        $dep->{version_range} = App::cpm::version::range_merge($dep->{version_range}, $inject);
     }
-    if ($dep = $deps{"Module::Build"}) {
-        $dep->{version_range} = $merge->($dep);
-        $dep = $deps{"ExtUtils::Install"} ||= {package => 'ExtUtils::Install', version_range => 0};
-        $dep->{version_range} = $merge->($dep);
-    }
+
     @$reqs = values %deps;
 }
 
-sub _get_configure_requirements {
-    my ($self, $distfile) = @_;
+sub _load_metafile {
+    my ($self, $distfile, @file) = @_;
     my $meta;
-    if (my ($file) = grep -f, qw(META.json META.yml)) {
+    if (my ($file) = grep -f, @file) {
         $meta = eval { CPAN::Meta->load_file($file) };
+        $self->{logger}->log("Invalid $file: $@") if $@;
     }
 
-    unless ($meta) {
+    if (!$meta and $distfile) {
         my $d = CPAN::DistnameInfo->new($distfile);
         $meta = CPAN::Meta->new({name => $d->dist, version => $d->version});
     }
-
-    my $p = $meta->{provides} || $self->menlo->extract_packages($meta, ".");
-    my $provides = [map +{
-        package => $_,
-        version => $p->{$_}{version} || undef,
-    }, sort keys %$p];
-
-    my $requirements = [];
-    if ($self->menlo->opts_in_static_install($meta)) {
-        $self->{logger}->log("Distribution opts in x_static_install: $meta->{x_static_install}");
-    } else {
-        $requirements = $self->_extract_requirements($meta, [qw(configure)]);
-        if (!@$requirements and -f "Build.PL" and ($distfile || "") !~ m{/Module-Build-[0-9v]}) {
-            push @$requirements, {package => "Module::Build", version_range => "0.38"};
-        }
-
-        if (NEED_INJECT_TOOLCHAIN_REQS) {
-            $self->_inject_toolchain_reqs($distfile, $requirements);
-        }
-    }
-    return ($meta ? $meta->as_struct : +{}, $requirements, $provides);
+    $meta;
 }
 
+# XXX Assume current directory is distribution directory
+# because the test "-f Build.PL" or similar is present
+sub _extract_configure_requirements {
+    my ($self, $meta, $distfile) = @_;
+    my $requirements = $self->_extract_requirements($meta, [qw(configure)]);
+    if (!@$requirements and -f "Build.PL" and ($distfile || "") !~ m{/Module-Build-[0-9v]}) {
+        push @$requirements, { package => "Module::Build", version_range => "0.38" };
+    }
+    if (NEED_INJECT_TOOLCHAIN_REQUIREMENTS) {
+        $self->_inject_toolchain_requirements($distfile, $requirements);
+    }
+    return $requirements;
+}
 
 sub _extract_requirements {
     my ($self, $meta, $phases) = @_;
@@ -326,13 +395,14 @@ sub configure {
     return unless $configure_ok;
 
     my $distdata = $self->_build_distdata($source, $distfile, $meta);
-    my $requirements = [];
     my $phase = $self->{notest} ? [qw(build runtime)] : [qw(build test runtime)];
-    if (my ($file) = grep -f, qw(MYMETA.json MYMETA.yml)) {
-        my $mymeta = CPAN::Meta->load_file($file);
-        $requirements = $self->_extract_requirements($mymeta, $phase);
-    }
-    return ($distdata, $requirements, $static_builder);
+    my $mymeta = $self->_load_metafile($distfile, 'MYMETA.json', 'MYMETA.yml');
+    my $requirements = $self->_extract_requirements($mymeta, $phase);
+    return +{
+        distdata => $distdata,
+        requirements => $requirements,
+        static_builder => $static_builder,
+    };
 }
 
 sub _build_distdata {
@@ -360,6 +430,8 @@ sub _build_distdata {
 
 sub install {
     my ($self, $job) = @_;
+    return $self->install_prebuilt($job) if $job->{prebuilt};
+
     my ($dir, $distdata, $static_builder) = @{$job}{qw(directory distdata static_builder)};
     my $guard = pushd $dir;
     my $menlo = $self->menlo;
@@ -389,8 +461,45 @@ sub install {
             $distdata,
             $distdata->{module_name},
         );
+        $self->save_prebuilt($job) if $self->enable_prebuilt($job->{uri});
     }
     return $installed;
+}
+
+sub install_prebuilt {
+    my ($self, $job) = @_;
+
+    my $install_base = $self->{local_lib};
+    if (!$install_base && ($ENV{PERL_MM_OPT} || '') =~ /INSTALL_BASE=(\S+)/) {
+        $install_base = $1;
+    }
+
+    $self->{logger}->log("Copying prebuilt $job->{directory}/blib");
+    my $guard = pushd $job->{directory};
+    my $paths = ExtUtils::InstallPaths->new(
+        dist_name => $job->distname, # this enables the installation of packlist
+        $install_base ? (install_base => $install_base) : (),
+    );
+    my $install_base_meta = $install_base ? "$install_base/lib/perl5" : $Config{sitelibexp};
+    my $distvname = $job->distvname;
+    open my $fh, ">", \my $stdout;
+    {
+        local *STDOUT = $fh;
+        ExtUtils::Install::install([
+            from_to => $paths->install_map,
+            verbose => 0,
+            dry_run => 0,
+            uninstall_shadows => 0,
+            skip => undef,
+            always_copy => 1,
+            result => \my %result,
+        ]);
+        ExtUtils::Install::install({
+            'blib/meta' => "$install_base_meta/$Config{archname}/.meta/$distvname",
+        });
+    }
+    $self->{logger}->log($stdout);
+    return 1;
 }
 
 1;

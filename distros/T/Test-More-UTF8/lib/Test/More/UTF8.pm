@@ -11,7 +11,7 @@ Test::More::UTF8 - Enhancing Test::More for UTF8-based projects
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 

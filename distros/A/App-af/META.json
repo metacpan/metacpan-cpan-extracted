@@ -62,7 +62,8 @@
       },
       "test" : {
          "requires" : {
-            "Test2::Suite" : "0.000060",
+            "Test2::Tools::Basic" : "0.000060",
+            "Test2::V0" : "0.000060",
             "Test::Exit" : "0.11",
             "Test::More" : "0.94",
             "Test::Script" : "0",
@@ -83,7 +84,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

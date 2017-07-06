@@ -7,7 +7,8 @@ use File::Path qw(remove_tree make_path);
 use File::Copy;
 use File::Spec::Functions qw(catfile catdir);
 use Test::More;
-use lib '.';
+use FindBin;
+use lib $FindBin::Bin;
 use t::Util;
 use Test::Mock::Net::FTP;
 

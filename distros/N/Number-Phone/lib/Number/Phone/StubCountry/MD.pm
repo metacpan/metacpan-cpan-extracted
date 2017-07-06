@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20170314173054;
+our $VERSION = 1.20170702164948;
 
 my $formatters = [
                 {
@@ -33,32 +33,22 @@ my $formatters = [
           '
                 },
                 {
-                  'pattern' => '([25-7]\\d{2})(\\d{2})(\\d{3})',
                   'leading_digits' => '
             2[13-9]|
             [5-7]
-          '
+          ',
+                  'pattern' => '([25-7]\\d{2})(\\d{2})(\\d{3})'
                 },
                 {
-                  'pattern' => '([89]\\d{2})(\\d{5})',
-                  'leading_digits' => '[89]'
+                  'leading_digits' => '[89]',
+                  'pattern' => '([89]\\d{2})(\\d{5})'
                 }
               ];
 
 my $validators = {
+                'voip' => '3[08]\\d{6}',
                 'toll_free' => '800\\d{5}',
-                'personal_number' => '',
-                'geographic' => '
-          (?:
-            2[1-9]\\d|
-            3[1-79]\\d|
-            5(?:
-              33|
-              5[257]
-            )
-          )\\d{5}
-        ',
-                'specialrate' => '(808\\d{5})|(90[056]\\d{5})|(803\\d{5})',
+                'pager' => '',
                 'mobile' => '
           (?:
             562|
@@ -80,8 +70,18 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'voip' => '3[08]\\d{6}',
-                'pager' => ''
+                'geographic' => '
+          (?:
+            2[1-9]\\d|
+            3[1-79]\\d|
+            5(?:
+              33|
+              5[257]
+            )
+          )\\d{5}
+        ',
+                'specialrate' => '(808\\d{5})|(90[056]\\d{5})|(803\\d{5})',
+                'personal_number' => ''
               };
 my %areanames = (
   373210 => "Grigoriopol",

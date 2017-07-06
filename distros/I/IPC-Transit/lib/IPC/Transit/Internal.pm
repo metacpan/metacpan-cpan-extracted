@@ -1,5 +1,5 @@
 package IPC::Transit::Internal;
-$IPC::Transit::Internal::VERSION = '1.162230';
+$IPC::Transit::Internal::VERSION = '1.171860';
 use strict;use warnings;
 use IPC::SysV;
 use IPC::Msg;

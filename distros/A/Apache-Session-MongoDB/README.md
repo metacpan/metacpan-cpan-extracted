@@ -1,5 +1,7 @@
 # Apache::Session::MongoDB
 
+[![Build Status](https://travis-ci.org/LemonLDAPNG/apache-session-mongodb.svg?branch=master)](https://travis-ci.org/LemonLDAPNG/apache-session-mongodb)
+
 ## NAME
 
 Apache::Session::MongoDB - An implementation of Apache::Session
@@ -27,7 +29,7 @@ Apache::Session::Store::MongoDB for more details.
 
 Xavier Guimard, <x.guimard@free.fr>
 
-##COPYRIGHT AND LICENSE
+## COPYRIGHT AND LICENSE
 
 Copyright &copy;2015-2016 by Xavier Guimard, <x.guimard@free.fr>
 

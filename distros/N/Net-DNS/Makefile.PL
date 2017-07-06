@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1538 2017-02-17 22:21:55Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1573 2017-06-12 11:03:59Z willem $	-*-perl-*-
 #
 
 
@@ -68,6 +68,7 @@ my %optional = (
 
 
 my @debris = qw(
+		.resolv.conf
 		t/IPv6.enabled
 		t/online.enabled t/online.nonfatal
 		zone[0-9].txt zone[0-9][0-9].txt
@@ -233,11 +234,11 @@ sub install {
 	my %noinstall;
 
 	foreach (@installed) {
-		my $path = lc($1) if m/^(.+)$nameregex/i;
+		my $path = $1 if m/^(.+)$nameregex/i;
 		my %seen;
 		foreach (@INC) {
 			$seen{$_}++;				# find $path in @INC
-			last if $path eq lc($_);
+			last if $_ eq $path;
 		}
 		foreach ( grep !$seen{$_}, @INC ) {
 			$noinstall{$_}++;			# mark hidden libraries
@@ -252,8 +253,8 @@ sub install {
 ##	from the existing version $Net::DNS::VERSION in your perl library.
 ##	@installed
 ##
-##	The installation will be rendered ineffective because old
-##	Net::DNS will be found on the library search path before
+##	The installation will be rendered ineffective because the
+##	library search finds the existing version before reaching
 ##	$install_site
 ##
 ##	Makefile has been generated to support build and test only.

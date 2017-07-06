@@ -12,7 +12,7 @@ use AnyEvent::WebSocket::Client;
 use AnyEvent::Future qw(as_future_cb);
 
 use vars qw<$VERSION $magic @CARP_NOT>;
-$VERSION = '0.01';
+$VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,9 @@ sub connect( $self, $handler, $got_endpoint, $logger ) {
 
         my $res = as_future_cb( sub( $done_cb, $fail_cb ) {
             $logger->('debug',"Connecting to $endpoint");
-            $client = AnyEvent::WebSocket::Client->new;
+            $client = AnyEvent::WebSocket::Client->new(
+                max_payload_size => 0, # allow unlimited size for messages
+            );
             $client->connect( $endpoint )->cb( $done_cb );
         });
         $res
@@ -56,12 +58,16 @@ sub connect( $self, $handler, $got_endpoint, $logger ) {
     })->then( sub( $c ) {
         $logger->( 'trace', sprintf "Connected" );
         my $connection = $c->recv;
+
         $self->{connection} = $connection;
         undef $self;
 
         # Kick off the continous polling
         $connection->on( each_message => sub( $connection,$message) {
             $handler->on_response( $connection, $message->body )
+        });
+        $connection->on( parse_error => sub( $connection, $error) {
+            $logger->('error', $error);
         });
 
         my $res = Future->done( $self );
@@ -82,6 +88,21 @@ sub close( $self ) {
 
 sub future {
     AnyEvent::Future->new
+}
+
+=head2 C<< $transport->sleep( $seconds ) >>
+
+    $transport->sleep( 10 )->get; # wait for 10 seconds
+
+Returns a Future that will be resolved in the number of seconds given.
+
+=cut
+
+sub sleep( $self, $seconds ) {
+
+    my $res = as_future_cb( sub( $done_cb, $fail_cb ) {
+        AnyEvent->timer( after => $seconds, cb => $done_cb )
+    });
 }
 
 1;

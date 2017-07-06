@@ -2,15 +2,16 @@ use ExtUtils::MakeMaker;
 
 use 5.008;
 
-my $version = '3.21';
+my $version = '3.22';
 
 my $prereq =
-   { XML::Compile         => '1.51'
+   { XML::Compile         => '1.58'
    , XML::Compile::Tester => '0.90'
    , XML::Compile::Cache  => '1.03'
    , Log::Report          => '1.05'
 
    , LWP               => 6.08
+   , Net::HTTP         => 6.16  # older versions contain nasty bugs
    , Time::HiRes       => 0
    , File::Slurp::Tiny => 0
 
@@ -66,12 +67,11 @@ EXTENDS		= ../XMLCompile:../XMLDaemon:../XMLTester:../XMLCache:../XMLWSDL:../XML
 # for DIST
 RAWDIR          = ../public_html/xml-compile-soap/raw
 DISTDIR         = ../public_html/xml-compile-soap/source
-LICENSE         = artistic
-SKIP_LINKS	= XML::LibXML
+SKIP_LINKS      = XML::LibXML
 
 # for POD
 FIRST_YEAR      = 2007
 EMAIL           = perl@overmeer.net
 WEBSITE         = http://perl.overmeer.net/xml-compile/
-PODTAIL		= ../XML-shared-podtail
+PODTAIL	        = ../XML-shared-podtail
 __POSTAMBLE

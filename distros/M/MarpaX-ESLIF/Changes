@@ -1,6 +1,35 @@
 Changelog for MarpaX-ESLIF
 
-2.0.13 2017-05-31T19:29:35
+2.0.14 2017-06-27T05:55:32
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Version 2.0.14 [ci skip]
+ - BNF/README.pod: some words on regular expression pitfalls [ci skip]
+ - Fixed MARPAESLIF_INTERNAL_GET_SYMBOL_FROM_STACK() and
+   MARPAESLIF_INTERNAL_GET_RULE_FROM_STACK() macros v.s. MARPAESLIF_NTRACE
+   [ci skip]
+ - Set utf validated input earlier to do pcre2_jit_match as soon as
+   possible [ci skip]
+ - BNF/README.pod: more about exception [ci skip]
+ - BNF/README.pod: more about exception constraints [ci skip]
+ - Exception: do not retry to match what was tried before dev+ [ci skip]
+ - Fixed a warning detected by gcc [ci skip]
+ - Exception new implementation dev+ [ci skip]
+ - Exception dev+ [ci skip]
+ - Another exception implementation [ci skip]
+ - Preprare for exception handling in _marpaESLIFRecognizer_resume_oneb()
+   dev+ [ci skip]
+ - src/marpaESLIF.c: In _marpaESLIFGrammar_validateb(), commented out a
+   block that I think is redundant about checking syntactic exception
+   nature [ci skip]
+ - src/marpaESLIF.c: Moved MARPAESLIF_MATCH_AGAIN processing from
+   _marpaESLIFRecognizer_resume_oneb() into
+   _marpaESLIFRecognizer_symbol_matcherb()
+ - src/marpaESLIF.c: Fixed warnings seen with clang [ci skip]
+ - perl/ESLIF.xs: Removed unused method marpaESLIF_call_actionv() [ci skip]
+ - Fixed a warning about typecast from one enum to another [ci skip]
+ - Fixed a warning about /* within a comment [ci skip]
+
+2.0.13 2017-05-31T19:29:35Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Version 2.0.13 [ci skip]
  - perl/ESLIF.xs: removed unused method and prefer av_len over av_top_index

@@ -3,7 +3,7 @@
 # Crypt::HashCash - HashCash Digital Cash
 # Copyright (c) 2001-2017 Ashish Gulhati <crypt-hashcash at hash.neo.tc>
 #
-# $Id: lib/Crypt/HashCash.pm v1.124 Mon Jun 19 15:51:59 PDT 2017 $
+# $Id: lib/Crypt/HashCash.pm v1.126 Sat Jun 24 02:15:17 PDT 2017 $
 
 package Crypt::HashCash;
 
@@ -17,7 +17,7 @@ use vars qw($VERSION @ISA @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(breakamt changecoin _hex _dec _squish _unsquish _dectob85 _b85todec);
 
-our ( $VERSION ) = '$Revision: 1.124 $' =~ /\s+([\d\.]+)/;
+our ( $VERSION ) = '$Revision: 1.126 $' =~ /\s+([\d\.]+)/;
 
 sub breakamt {          # Return denominations of lowest number of coins to make an amount
   my $amt = shift; my %d;
@@ -140,8 +140,8 @@ Crypt::HashCash - HashCash Digital Cash
 
 =head1 VERSION
 
- $Revision: 1.124 $
- $Date: Mon Jun 19 15:51:59 PDT 2017 $
+ $Revision: 1.126 $
+ $Date: Sat Jun 24 02:15:17 PDT 2017 $
 
 =head1 SYNOPSIS
 
@@ -213,7 +213,7 @@ L<Business::HashCash> module.
 It's also quite straightforward, from a technical standpoint, to start
 a HashCash vault, which could be quite a profitable automated business
 requiring minimal ongoing time investment. For more details on this
-visit the website: L<http://www.hashcash.com/>.
+visit the website: L<http://www.hashcash.com>.
 
 =head1 FUNCTIONS
 
@@ -239,7 +239,7 @@ hash, as described above, followed by the total number of coins.
 
 =head1 SEE ALSO
 
-=head2 L<www.hashcash.com>
+=head2 L<http://www.hashcash.com>
 
 =head2 L<Crypt::HashCash::Mint>
 

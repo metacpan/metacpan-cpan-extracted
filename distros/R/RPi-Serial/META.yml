@@ -1,0 +1,27 @@
+---
+abstract: 'Basic read/write interface to a serial port'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: RPi-Serial
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  WiringPi::API: '2.3613'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/stevieb9/rpi-serial/issues
+  repository: https://github.com/stevieb9/rpi-serial.git
+version: '2.3602'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

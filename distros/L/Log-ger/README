@@ -5,15 +5,16 @@ SYNOPSIS
      package Foo;
      use Log::ger; # will import some logging methods e.g. log_warn, log_error
     
-     # produce some logs
      sub foo {
          ...
-         log_warn "an error occurred";
+         # produce some logs
          log_error "an error occurred: %03d - %s", $errcode, $errmsg;
+         ...
+         log_debug "http response: %s", $http; # automatic dumping of data
      }
      1;
 
-    In your application:
+    In your application (consumer/listener):
 
      use Foo;
      use Log::ger::Output 'Screen';
@@ -22,102 +23,69 @@ SYNOPSIS
 
 DESCRIPTION
 
-    EARLY RELEASE, EXPERIMENTAL.
+    Log::ger is yet another logging framework with the following features:
 
-    This is yet another logging framework. Like Log::Any, it separates
-    producers and consumers. Unlike Log::Any (and like Log::Contextual), it
-    uses plain functions (non-OO). Some features:
+      * Separation of producers and consumers/listeners
 
-      * Low startup overhead;
+      Like Log::Any, this offers a very easy way for modules to produce
+      some logs without having to configure anything. Configuring output,
+      level, etc can be done in the application as log consumers/listeners.
+      To read more about this, see the documentation of Log::Any or
+      Log::ger::Manual (but nevertheless see Log::ger::Manual on why you
+      might prefer Log::ger to Log::Any).
 
-      * Low overhead;
+      * Lightweight and fast
 
-      * Customizable levels;
+      Slim distribution. No non-core dependencies, extra functionalities
+      are provided in separate distributions to be pulled as needed.
 
-      * Changing levels and outputs during run-time;
+      Low startup overhead. Only around 1-1.5ms or less, comparable with
+      Log::Any 0.15, less than Log::Any 1.0x at around 4-10ms, and
+      certainly less than Log::Log4perl at 20-30ms. This is measured on a
+      2014-2015 PC and before doing any output configuration. For more
+      benchmarks, see Bencher::Scenarios::LogGer.
 
-      For example, you can debug your running server application to turn on
-      trace logs temporarily when you need to investigate something.
+      Conditional compilation. There is a plugin to optimize away unneeded
+      logging statements, like assertion/conditional compilation, so they
+      have zero runtime performance cost. See Log::ger::Plugin::OptAway.
 
-      * Option to optimize away the logging statements when unnecessary;
+      Being lightweight means the module can be used more universally, from
+      CLI to long-running daemons to inside routines with tight loops.
 
-      See Log::ger::OptAway.
+      * Flexible
 
-      * Interoperability with other logging frameworks;
+      Customizable levels and routine/method names. Can be used in a
+      procedural or OO style. Log::ger can mimic the interface of Log::Any,
+      Log::Contextual, Log::Log4perl, or some other popular logging
+      frameworks, to ease migration or adjust with your personal style.
 
-      See Log::ger::Output::LogAny to interop with Log::Any.
+      Per-package settings. Each importer package can use its own
+      format/layout, output. For example, some modules that are migrated
+      from Log::Any uses Log::Any-style logging, while another uses native
+      Log::ger style, and yet some other uses block formatting like
+      Log::Contextual. This eases code migration and teamwork. Each module
+      author can preserve her own logging style, if wanted, and all the
+      modules still use the same framework.
 
-FAQ
+      Dynamic. Outputs and levels can be changed anytime during run-time
+      and logging routines will be updated automatically. This is useful in
+      situation like a long-running server application: you can turn on
+      tracing logs temporarily to debug problems, then turn them off again,
+      without restarting your server.
 
- How do I create multiple loggers?
+      Interoperability. There are modules to interop with Log::Any, either
+      consume Log::Any logs (see Log::Any::Adapter::LogGer) or produce logs
+      to be consumed by Log::Any (see Log::ger::Output::LogAny).
 
-    For example, in Log::Any:
+      Many output modules and plugins. See Log::ger::Output::*,
+      Log::ger::Format::*, Log::ger::Layout::*, Log::ger::Plugin::*.
+      Writing an output module in Log::ger is easier than writing a
+      Log::Any::Adapter::*.
 
-     my $log = Log::Any->get_logger;
-     my $log_dump = Log::Any->get_logger(category => "dump"); # to dump contents
-    
-     $log->debugf("Headers is: %s", $http_res->{headers});
-     $log_dump->debug($http_res->{content});
-
-    in Log::ger:
-
-     # instead of installing to package, we setup objects/hashes for the secondary
-     # loggers
-     my $log_dump = Log::ger::setup_object(category => "dump");
-     # or, for hash: my $log_dump = Log::ger::setup_hash(category => "dump");
-    
-     log_debug("Headers is: %s", $http_res->{headers});
-     $log_dump->log_debug($http_res->{content});
-     # or, for hash: $log_dump->{log_debug}->($http_res->{content});
-
- How do I do custom formatting
-
-    For example, a la Log::Contextual:
-
-     log_warn { 'The number of stuffs is: ' . $obj->stuffs_count };
-
-    See Log::ger::Format::Block for an example.
-
-INTERNALS
-
- Plugins
-
-    Plugins are how Log::ger provides its flexibility. Plugins are run at
-    various phases. Plugin routine is passed a hash argument and is
-    expected to return an array:
-
-     [$result, $flow_control]
-
-    Some phases will stop after the first plugin that returns non-undef
-    $result. $flow_control can be set to 1 to stop immediately after this
-    hook.
-
-    Aguments received by plugin: target (str, can be package if installing
-    to a package, or hash or object), target_arg (str, when target is
-    package, will be the package name; when target is hash will be the
-    hash; when target is object will be the object's package), setup_args
-    (hash, arguments passed to Log::ger when importing). These arguments
-    are received by plugins for create_log_routine and
-    create_log_is_routine which are run for every level: level (numeric
-    level), str_level.
-
-    Available phases:
-
-      * create_filter_routine
-
-      * create_formatter_routine
-
-      * create_log_routine phase
-
-      Used to create "log_level" routines. Run for each level.
-
-      * create_log_is_routine phase
-
-      Used to create "log_level" routines. Run for each level.
-
-      * after_install_log_routine phase
+    For more documentation, start with Log::ger::Manual.
 
 SEE ALSO
 
-    Some other recommended logging frameworks: Log::Any, Log::Contextual.
+    Some other popular logging frameworks: Log::Any, Log::Contextual,
+    Log::Log4perl, Log::Dispatch, Log::Dispatchouli.
 

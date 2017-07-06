@@ -8,14 +8,15 @@ use Net::SFTP::Util qw( fx2txt );
 use Net::SFTP::Attributes;
 use Net::SFTP::Buffer;
 use Net::SSH::Perl::Constants qw( :msg2 );
-use Net::SSH::Perl 1.24;
+use Net::SSH::Perl 2.12;
+use Math::Int64 qw( :native_if_available uint64 );
 
 use Carp qw( carp croak );
 
 use vars qw( $VERSION );
-$VERSION = '0.10';
+$VERSION = '0.12';
 
-use constant COPY_SIZE => 8192;
+use constant COPY_SIZE => 65536;
 
 sub new {
     my $class = shift;
@@ -254,7 +255,7 @@ sub do_read {
     $size ||= COPY_SIZE;
     my($msg, $expected_id) = $sftp->new_msg_w_id(SSH2_FXP_READ);
     $msg->put_str($handle);
-    $msg->put_int64(int $offset);
+    $msg->put_int64($offset);
     $msg->put_int32($size);
     $sftp->send_msg($msg);
     $sftp->debug("Sent message SSH2_FXP_READ I:$expected_id O:$offset");
@@ -266,7 +267,7 @@ sub do_read {
     if ($type == SSH2_FXP_STATUS) {
         my $status = $msg->get_int32;
         if ($status != SSH2_FX_EOF) {
-      $sftp->warn("Couldn't read from remote file",$status);
+            $sftp->warn("Couldn't read from remote file",$status);
             $sftp->do_close($handle);
         }
         return(undef, $status);
@@ -284,7 +285,7 @@ sub do_write {
     my($handle, $offset, $data) = @_;
     my($msg, $id) = $sftp->new_msg_w_id(SSH2_FXP_WRITE);
     $msg->put_str($handle);
-    $msg->put_int64(int $offset);
+    $msg->put_int64($offset);
     $msg->put_str($data);
     $sftp->send_msg($msg);
     $sftp->debug("Sent message SSH2_FXP_WRITE I:$id O:$offset");
@@ -393,7 +394,7 @@ sub get {
          $sftp->do_close($handle), croak "Can't binmode FH: $!";
     }
 
-    my $offset = 0;
+    my $offset = uint64(0);
     my $ret = '';
     while (1) {
         my($data, $status) = $sftp->do_read($handle, $offset, COPY_SIZE);
@@ -451,10 +452,10 @@ sub put {
      SSH2_FXF_TRUNC, $a);  # check status for info
     return unless defined $handle;
 
-    my $offset = 0;
+    my $offset = uint64(0);
     while (1) {
         my($len, $data, $msg, $id);
-        $len = read FH, $data, COPY_SIZE;
+        $len = read FH, $data, 8192;
         last unless $len;
         $cb->($sftp, $data, $offset, $size) if defined $cb;
         my $status = $sftp->do_write($handle, $offset, $data);
@@ -668,7 +669,8 @@ underlying the I<Net::SFTP> connection.
 
 For example, you could use this to set up your authentication
 identity files, to set a specific cipher for encryption, etc.,
-e.g. C<ssh_args =E<gt> [ cipher =E<gt> 'arcfour' ]>.
+e.g. C<ssh_args =E<gt> [ cipher =E<gt> 'aes256-cbc', options =<gt> 
+[ "MACs +hmac-sha1", "HashKnownHosts yes" ] ]>.
 
 See the I<new> method in I<Net::SSH::Perl> for more details.
 

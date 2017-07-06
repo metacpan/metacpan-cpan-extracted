@@ -10,8 +10,7 @@ use strict;
 use warnings;
 
 BEGIN {
-  $REST::Neo4p::Agent::Mojo::UserAgent::VERSION = 0.3012;
-  $REST::Neo4p::Agent::Mojo::UserAgent::VERSION = 0.3012;
+  $REST::Neo4p::Agent::Mojo::UserAgent::VERSION = 0.3020;
 }
 
 our @default_headers;
@@ -66,11 +65,11 @@ sub http_response {
   my ($tx) = @_;
   # kludge : if 400 error, pull the tmp file content back into response
   # body 
-  if ($tx->res->is_status_class(400) && $tx->res->content->asset->is_file ) {
-    $tx->res->body($tx->res->content->asset->slurp);
-  }
-  unless (defined $tx->res->code) {
+  if (!defined $tx->res->code) {
       $tx->res->code(598) if $tx->res->error;
+  }
+  elsif (($tx->res->code =~ /^4[0-9][0-9]/) && $tx->res->content->asset->is_file ) {
+    $tx->res->body($tx->res->content->asset->slurp);
   }
   my $resp = HTTP::Response->new(
     $tx->res->code,

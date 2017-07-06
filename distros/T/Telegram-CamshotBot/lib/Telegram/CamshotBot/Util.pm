@@ -1,5 +1,5 @@
 package Telegram::CamshotBot::Util;
-$Telegram::CamshotBot::Util::VERSION = '0.01';
+$Telegram::CamshotBot::Util::VERSION = '0.03';
 # ABSTRACT: Reusable functions
 
 # use Mojo::Base -strict;
@@ -85,7 +85,7 @@ Telegram::CamshotBot::Util - Reusable functions
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 METHODS
 

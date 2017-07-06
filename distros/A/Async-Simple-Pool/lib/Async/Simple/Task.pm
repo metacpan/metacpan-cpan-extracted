@@ -97,12 +97,11 @@ ANTONC <antonc@cpan.org>
 =cut
 
 
-use v5.10.0;
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 =head1 Attributes

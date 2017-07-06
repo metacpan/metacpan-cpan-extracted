@@ -1,5 +1,13 @@
 Revision history for Class-Unload
 
+0.11      2017-06-22 17:41:44+01:00 Europe/London
+
+        - No changes since 0.10-TRIAL
+
+0.10      2017-06-08 13:12:04+01:00 Europe/London (TRIAL RELEASE)
+
+        - Remove Moose metaclasses (RT#122048)
+
 0.09      2015-07-03 11:11:32+01:00 Europe/London
 
         - Add META.json and resources metadata (RT#105634)
@@ -27,7 +35,7 @@ Revision history for Class-Unload
 
 0.02 Tue Apr 15, 2008
         - Fix deleting of parent symbol table entry for
-          multi-level class names.  
+          multi-level class names.
         - Clear @ISA before clearing the symbol table to
           make perl 5.10 invalidate its inheritance cache.
 

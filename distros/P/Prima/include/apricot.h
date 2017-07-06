@@ -6,7 +6,7 @@
 #define POLLUTE_NAME_SPACE 1
 #endif
 
-#define PRIMA_CORE_VERSION 2017030901
+#define PRIMA_CORE_VERSION 2017050901
 
 #define PRIMA_VERSION_BOOTCHECK \
 	if(apc_get_core_version()!=PRIMA_CORE_VERSION) \
@@ -1221,6 +1221,9 @@ extern Handle
 gimme_the_mate( SV *perlObject);
 
 extern Handle
+gimme_the_real_mate( SV *perlObject);
+
+extern Handle
 create_mate( SV *perlObject);
 
 extern SV*
@@ -1261,7 +1264,7 @@ extern void
 unprotect_object( Handle obj);
 
 extern void
-kill_zombies( void);
+prima_kill_zombies( void);
 
 /*
 exception_* functions are solely needed as a workaround of a Win64 bug when running 32-bit programs.
@@ -2074,6 +2077,9 @@ extern Bool
 apc_widget_end_paint_info( Handle self);
 
 extern Bool
+apc_widget_get_clip_by_children( Handle self);
+
+extern Bool
 apc_widget_get_clip_owner( Handle self);
 
 extern Color
@@ -2170,6 +2176,9 @@ apc_widget_set_capture( Handle self, Bool capture, Handle confineTo);
 
 extern Bool
 apc_widget_set_color( Handle self, Color color, int index);
+
+extern Bool
+apc_widget_set_clip_by_children( Handle self, Bool clip_by_children);
 
 extern Bool
 apc_widget_set_enabled( Handle self, Bool enable);
@@ -3373,6 +3382,9 @@ apc_gp_get_fill_winding( Handle self);
 extern FillPattern *
 apc_gp_get_fill_pattern( Handle self);
 
+extern Point
+apc_gp_get_fill_pattern_offset( Handle self);
+
 extern ApiHandle
 apc_gp_get_handle( Handle self);
 
@@ -3435,6 +3447,9 @@ apc_gp_set_fill_winding( Handle self, Bool fillWinding);
 
 extern Bool
 apc_gp_set_fill_pattern( Handle self, FillPattern pattern);
+
+extern Bool
+apc_gp_set_fill_pattern_offset( Handle self, Point offset);
 
 extern Bool
 apc_gp_set_font( Handle self, PFont font);

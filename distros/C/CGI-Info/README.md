@@ -9,7 +9,7 @@ Information about the CGI environment
 
 # VERSION
 
-Version 0.61
+Version 0.63
 
 # SYNOPSIS
 
@@ -43,6 +43,9 @@ Takes optional parameter logger, an object which is used for warnings
 Takes optional parameter cache, an object which is used to cache IP lookups.
 This cache object is an object that understands get() and set() messages,
 such as a [CHI](https://metacpan.org/pod/CHI) object.
+
+Takes optional parameter max\_upload, which is the maximum file size you can upload
+(-1 for no limit), the default is 512MB.
 
 ## script\_name
 
@@ -207,7 +210,7 @@ CGI::Info will put the request into the params element 'XML', thus:
         use CGI::Info;
         ...
         my $info = CGI::Info->new();
-        my $paramsref = $info->params();
+        my $paramsref = $info->params();        # See BUGS below
         my $xml = $$paramsref{'XML'};
         # ... parse and process the XML request in $xml
 
@@ -309,8 +312,7 @@ Is the visitor a search engine?
 
     use CGI::Info;
 
-    my $info = CGI::Info->new();
-    if($info->is_search_engine()) {
+    if(CGI::Info->new()->is_search_engine()) {
         # display generic information about yourself
     } else {
         # allow the user to pick and choose something to display
@@ -347,9 +349,11 @@ Deprecated - use cookie() instead.
 
         use CGI::Info;
 
-        my $info = CGI::Info->new();
-        my $name = $info->get_cookie(cookie_name => 'name');
+        my $i = CGI::Info->new();
+        my $name = $i->get_cookie(cookie_name => 'name');
         print "Your name is $name\n";
+        my $address = $i->get_cookie('address');
+        print "Your address is $address\n";
 
 ## cookie
 
@@ -359,8 +363,7 @@ API is the same as "param", it will replace the "get\_cookie" method in the futu
 
         use CGI::Info;
 
-        my $info = CGI::Info->new();
-        my $name = $info->get_cookie(cookie_name => 'name');
+        my $name = CGI::Info->new()->get_cookie(name);
         print "Your name is $name\n";
 
 ## status
@@ -386,6 +389,11 @@ or through the web interface at
 [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Info).
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
+
+params() returns a ref which means that calling routines can change the hash
+for other routines.
+Take a local copy before making amendments to the table if you don't want unexpected
+things to happen.
 
 # SEE ALSO
 
@@ -417,6 +425,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2010-2016 Nigel Horne.
+Copyright 2010-2017 Nigel Horne.
 
 This program is released under the following licence: GPL

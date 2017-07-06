@@ -1,7 +1,1 @@
 *   hooks to SYNOPSIS and docs
-*   support delete and expand opts for hooks
-*   support expand for {} and []
-
-76 schema or when structure itself doesn't yet exists (see L</expand> for example).
-=> ### NOT TESTED! ::
-76 schema or when structure itself doesn't yet exists (see L</spath/Available options/expand> for example).

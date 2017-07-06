@@ -1,10 +1,29 @@
 ==================================================
-Changes from 2016-06-06 00:00:00 +0000 to present.
+Changes from 2016-06-25 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 0.4 at 2017-06-06 05:27:36 +0000
+version 0.6 at 2017-06-25 22:14:14 +0000
 ----------------------------------------
+
+  Change: 203d6c4607b153b5ee3fe01944610109b72ccb21
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-06-25 19:12:21 +0000
+
+    Output as UTF-8
+
+    Using UTF-8 as I/O layer for STDOUT, although not sure how Spamcop
+    website deals with it (Encoding of webpages are always Western as far
+    as I checked) 
+
+  Change: 6da92f29ba1755217c8907330e4d110a37979cd0
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-06-20 20:14:40 +0000
+
+    Converting HTML entities
+
+    When debug is activated, HTML entities are not being converted, so
+    they don't look nice in the terminal. :-) Removed <strong> tags too. 
 
   Change: 1b7a986ba2dc6d76b85a3cdd066c95f6d353b494
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

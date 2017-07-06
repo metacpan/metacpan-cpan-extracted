@@ -2,13 +2,15 @@ on 'runtime' => sub {
     requires 'perl' => '5.008001';
     requires 'strict';
     requires 'warnings';
-    requires 'Alien::libuv';
+    requires 'Alien::libuv' => '0.004';
+    requires 'Exporter' => '5.57';
+    requires 'XSLoader' => '0.14';
 };
 
 on 'build' => sub {
-    requires 'Alien::libuv';
+    requires 'Alien::libuv' => '0.004';
     requires 'Config';
-    requires 'ExtUtils::MakeMaker' => 7.12;
+    requires 'ExtUtils::MakeMaker' => '7.12';
 };
 
 on 'configure' => sub {

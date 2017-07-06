@@ -2,6 +2,7 @@ package Alien::make::Module::Build;
 
 use strict;
 use warnings;
+use 5.010;  # //
 
 use base qw( Module::Build );
 

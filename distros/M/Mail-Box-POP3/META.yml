@@ -32,4 +32,4 @@ requires:
   Mail::Transport::Receive: 3
   Socket: 0
   Test::More: 0
-version: 3.001
+version: 3.002

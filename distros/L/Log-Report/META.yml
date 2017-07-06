@@ -20,9 +20,9 @@ no_index:
 requires:
   Devel::GlobalDestruction: 0.09
   Encode: 2.00
-  Log::Report::Optional: 1.02
+  Log::Report::Optional: 1.03
   Scalar::Util: 0
-  String::Print: 0.13
+  String::Print: 0.91
   Sys::Syslog: 0.27
   Test::More: 0.86
-version: 1.19
+version: 1.21

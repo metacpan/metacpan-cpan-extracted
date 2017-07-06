@@ -5,13 +5,14 @@ on 'test', sub {
   requires 'Test::More', '1.001003';
   requires 'Test::Deep', '0';
   requires 'Test::Warnings', '0';
+  requires 'Test::Warn', '0';
   requires 'XML::XPath', '1.13';
   requires 'Pod::Simple::HTML', '>=3.23';
   requires 'Test::Pod' , '0';
 };
 
 requires 'Carp', '0';
-requires 'Catmandu', '>=1.0201';
+requires 'Catmandu', '>=1.0601';
 requires 'JSON::XS', '2.3';
 requires 'YAML::XS', '0.34';
 requires 'List::Util', '0';

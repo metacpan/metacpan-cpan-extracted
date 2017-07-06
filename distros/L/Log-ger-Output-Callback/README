@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     use Log::ger::Output Callback => (
+         logging_cb   => sub { my ($ctx, $numlevel, $msg) = @_; ... }, # optional
+         detection_cb => sub { my ($numlevel) = @_; ... },             # optional
+     );
+
+DESCRIPTION
+
+CONFIGURATION
+
+logging_cb => code
+
+detection_cb => code
+
+SEE ALSO
+
+    Log::ger
+
+    Modelled after Log::Any::Adapter::Callback
+

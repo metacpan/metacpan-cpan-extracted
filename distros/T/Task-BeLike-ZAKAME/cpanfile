@@ -29,7 +29,7 @@ requires 'Web::Query';
 
 recommends 'App::rainbarf';
 recommends 'App::scan_prereqs_cpanfile';
-recommends 'Git::Deploy';
+recommends 'Devel::Cover';
 recommends 'LWP::Protocol::rsync';
 recommends 'Paws';
 recommends 'Perl::Critic';

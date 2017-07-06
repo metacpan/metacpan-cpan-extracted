@@ -15,6 +15,7 @@
 package Google::Ads::Common::CaptchaRequiredError;
 
 use strict;
+use warnings;
 use version;
 use base qw(Google::Ads::Common::AuthError);
 

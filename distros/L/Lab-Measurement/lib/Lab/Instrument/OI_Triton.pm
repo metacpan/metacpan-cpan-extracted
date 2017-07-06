@@ -1,5 +1,5 @@
 package Lab::Instrument::OI_Triton;
-$Lab::Instrument::OI_Triton::VERSION = '3.550';
+$Lab::Instrument::OI_Triton::VERSION = '3.552';
 use strict;
 use Lab::Instrument;
 use Carp;

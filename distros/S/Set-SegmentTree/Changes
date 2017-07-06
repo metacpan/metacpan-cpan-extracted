@@ -1,0 +1,6 @@
+Revision history for Perl extension Set::SegmentTree.
+
+0.01  Sat Jun 17 22:09:20 2017
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Set::SegmentTree
+

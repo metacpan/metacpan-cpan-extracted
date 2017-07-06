@@ -1,5 +1,12 @@
 Revision history for VMware-vCloudDirector
 
+0.006     2017-06-30 11:57:33+01:00 Europe/London
+    - Require at least version 0.04 of Syntax::Keyword::Try
+      Versions 0.02 & 0.03 caused errors in loading the module.
+
+0.005     2017-06-27 13:58:12+01:00 Europe/London
+    - More informative exception messages
+
 0.004     2017-05-04 15:24:39+01:00 Europe/London
     - Better checking in object expansion (used to error)
     - Bare minimum documentation before initial prototype release to CPAN

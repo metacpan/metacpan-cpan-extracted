@@ -7,10 +7,10 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use Carp qw(confess cluck);
-use Encode qw(encode decode);
+use Encode qw(encode);
 use Travel::Status::DE::EFA::Line;
 use Travel::Status::DE::EFA::Result;
 use Travel::Status::DE::EFA::Stop;
@@ -91,11 +91,11 @@ sub new {
 			mode                   => 'direct',
 			nameInfo_dm            => 'invalid',
 			nameState_dm           => 'empty',
-			name_dm                => encode( 'ISO-8859-15', $opt{name} ),
+			name_dm                => encode( 'UTF-8', $opt{name} ),
 			outputFormat           => 'XML',
 			placeInfo_dm           => 'invalid',
 			placeState_dm          => 'empty',
-			place_dm               => encode( 'ISO-8859-15', $opt{place} ),
+			place_dm               => encode( 'UTF-8', $opt{place} ),
 			ptOptionsActive        => '1',
 			requestID              => '0',
 			reset                  => 'neue Anfrage',
@@ -241,14 +241,14 @@ sub check_for_ambiguous {
 	my $s_name  = $e_name->getAttribute('state');
 
 	if ( $s_place eq 'list' ) {
-		$self->{place_candidates} = [ map { decode( 'UTF-8', $_->textContent ) }
+		$self->{place_candidates} = [ map { $_->textContent }
 			  @{ $e_place->findnodes($xp_place_elem) } ];
 		$self->{errstr} = 'ambiguous place parameter';
 		return;
 	}
 	if ( $s_name eq 'list' ) {
-		$self->{name_candidates} = [ map { decode( 'UTF-8', $_->textContent ) }
-			  @{ $e_name->findnodes($xp_name_elem) } ];
+		$self->{name_candidates}
+		  = [ map { $_->textContent } @{ $e_name->findnodes($xp_name_elem) } ];
 
 		$self->{errstr} = 'ambiguous name parameter';
 		return;
@@ -331,12 +331,12 @@ sub lines {
 			@lines,
 			Travel::Status::DE::EFA::Line->new(
 				name       => $line,
-				direction  => decode( 'UTF-8', $direction ),
+				direction  => $direction,
 				valid      => $valid,
-				type       => decode( 'UTF-8', $type ),
+				type       => $type,
 				mot        => $mot,
-				route      => decode( 'UTF-8', $route ),
-				operator   => decode( 'UTF-8', $operator ),
+				route      => $route,
+				operator   => $operator,
 				identifier => $identifier,
 			)
 		);
@@ -371,8 +371,8 @@ sub parse_route {
 				arr_time => sprintf_time( $times[0] ),
 				dep_date => sprintf_date( $dates[-1] ),
 				dep_time => sprintf_time( $times[-1] ),
-				name     => decode( 'UTF-8', $e->getAttribute('name') ),
-				name_suf => decode( 'UTF-8', $e->getAttribute('nameWO') ),
+				name     => $e->getAttribute('name'),
+				name_suf => $e->getAttribute('nameWO'),
 				platform => $e->getAttribute('platformName'),
 			)
 		);
@@ -492,9 +492,9 @@ sub results {
 				key           => $key,
 				lineref       => $line_obj[0] // undef,
 				line          => $line,
-				destination   => decode( 'UTF-8', $dest ),
+				destination   => $dest,
 				countdown     => $countdown,
-				info          => decode( 'UTF-8', $info ),
+				info          => $info,
 				delay         => $delay,
 				sched_date    => $date,
 				sched_time    => $time,
@@ -615,6 +615,11 @@ sub get_efa_urls {
 			name      => 'Verkehrsbetriebe Luzern',
 			shortname => 'VBL',
 		},
+		{
+			url       => 'http://bsvg.efa.de/bsvagstd/XML_DM_REQUEST',
+			name      => 'Braunschweiger Verkehrs-GmbH',
+			shortname => 'BSVG',
+		},
 
 	);
 }
@@ -645,7 +650,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 1.14
+version 1.15
 
 =head1 DESCRIPTION
 

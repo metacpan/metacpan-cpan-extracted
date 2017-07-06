@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.10
+    version 0.11
 
 SYNOPSIS
 
@@ -129,6 +129,14 @@ METHODS
 
       tells which files to munge, see Dist::Zilla::Role::FileMunger
 
+    finder
+
+      Override the default FileFinder for finding files to check and
+      update. The default value is :InstallModules and :PerlExecFiles (when
+      available; otherwise :ExecFiles) -- see also
+      Dist::Zilla::Plugin::ExecDir, to make sure the script files are
+      properly marked as executables for the installer.
+
 BUGS
 
     Please report any bugs or feature requests on the bugtracker website
@@ -155,6 +163,8 @@ CONTRIBUTORS
 
       * Ian Sealy <git@iansealy.com>
 
+      * Stephan Loyd <stephanloyd9@gmail.com>
+
 AUTHORS
 
       * Caleb Cushing <xenoterracide@gmail.com>
@@ -163,7 +173,7 @@ AUTHORS
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2016 by Caleb Cushing.
+    This software is Copyright (c) 2017 by Caleb Cushing.
 
     This is free software, licensed under:
 

@@ -3,6 +3,12 @@ package Text::NumericData::Calc;
 use Math::Trig;
 require Exporter;
 
+# This is just a placeholder because of a past build system bug.
+# The one and only version for Text::NumericData is kept in
+# the Text::NumericData module itself.
+our $VERSION = '1';
+$VERSION = eval $VERSION;
+
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(linear_value parsed_formula formula_function expression_function);
 
@@ -57,10 +63,21 @@ sub linear_value
 #A -> pararray1
 #C -> pararray2
 #[a,b] -> data[a][b]
+#parsed_formula(text, dataarrayname, arraynamedef)
+#arraynamedef: { A=>'A->', B=>'B->', X=>'xarr->', Z=>'zulu->' }
 
 sub parsed_formula
 {
 	my ($form, $data, $par1, $par2) = @_;
+	my $ardef;
+	if(ref $par1 eq 'HASH')
+	{
+		$ardef = $par1;
+	}
+	else
+	{
+		$ardef = {A=>$par1, C=>$par2};
+	}
 	my @formlines = split("\n", $form);
 	my $nnf = '';
 
@@ -112,13 +129,15 @@ sub parsed_formula
 				}
 			}
 			else{ $num2 = "($num2)-1"; }
-			$nf .= '$'.$data."[$num1][$num2]";		
+			$nf .= '$'.$data."[$num1][$num2]";
 			#print STDERR "nf:      $nf\n";
 		}
 
 		$nf .= $formula;
-		$nf =~ s/(^|[^\$a-zA-Z])A(\d+)/$1\$$par1\[$2\]/g;	
-		$nf =~ s/(^|[^\$a-zA-Z])C(\d+)/$1\$$par2\[$2\]/g;
+		for(keys %{$ardef})
+		{
+			$nf =~ s/(^|[^\$a-zA-Z])$_(\d+)/$1\$$ardef->{$_}\[$2\]/g;
+		}
 		if($nnf ne ''){ $nnf .= "\n"; }
 		$nnf .= $nf;
 	}
@@ -128,19 +147,22 @@ sub parsed_formula
 #(formula [, config])
 sub formula_function
 {
-	my ($formula,$cfg) = @_;
+	my ($formula,$cfg) = (shift, shift);
+	my @ar = qw(A C);
+	push(@ar, @_); # additional names arrays to insert
+	my %ardef = map { $_ => $_.'->' } @ar;
 	my $config = defined $cfg
 		? $cfg
 		: {verbose=>0, plainperl=>0};
 	my $pf = $config->{plainperl}
 		? $formula
-		: parsed_formula($formula, 'fd->', 'A->', 'C->');
+		: parsed_formula($formula, 'fd->', \%ardef);
 	unless(defined $pf)
 	{
 		$@ = "Text::NumericData::Calc: Error parsing the formula!";
 		return undef;
 	}
-	my $ffc = 'sub { my ($fd, $A, $C) = @_; '.$pf.' ; return 0; }';
+	my $ffc = 'sub { my ($fd, '.join(', ', map {'$'.$_} @ar).') = @_; '.$pf.' ; return 0; }';
 	if(defined $config->{verbose})
 	{
 		print STDERR "Formula code: ".$pf."\n"
@@ -154,15 +176,19 @@ sub formula_function
 # same as above, code differs in that it returns the expression indicated by formula
 sub expression_function
 {
-	my ($formula,$verb) = @_;
-	my $pf = parsed_formula($formula, 'fd->', 'A->', 'C->');
+	my $formula = shift;
+	my $verb = shift;
+	my @ar = qw(A C);
+	push(@ar, @_); # additional names arrays to insert
+	my %ardef = map { $_ => $_.'->' } @ar;
+	my $pf = parsed_formula($formula,  'fd->', \%ardef);
 	unless(defined $pf)
 	{
 		$@ = "Text::NumericData::Calc: Error parsing the formula!";
 		return undef;
 	}
 	print STDERR "Formula code: ",$pf,"\n" if $verb;
-	return eval 'sub { my ($fd, $A, $C) = @_; return '.$pf.' ; }';
+	return eval 'sub { my ($fd, '.join(', ', map {'$'.$_} @ar).') = @_; return ('.$pf.'); }';
 }
 
 1;

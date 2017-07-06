@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.014;
 
-package App::af 0.10 {
+package App::af 0.11 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -79,7 +79,7 @@ package App::af 0.10 {
   requires 'main';  
 }
 
-package App::af::default 0.10 {
+package App::af::default 0.11 {
 
   use Moose;
   with 'App::af';
@@ -94,7 +94,7 @@ package App::af::default 0.10 {
   __PACKAGE__->meta->make_immutable;
 }
 
-package App::af::role::alienfile 0.10 {
+package App::af::role::alienfile 0.11 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -177,7 +177,7 @@ package App::af::role::alienfile 0.10 {
   }  
 }
 
-package App::af::role::phase 0.10 {
+package App::af::role::phase 0.11 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -204,7 +204,56 @@ package App::af::role::phase 0.10 {
   
 }
 
-package App::af::opt 0.10 {
+package App::af::role::libandblib 0.11 {
+
+  use Moose::Role;
+  use namespace::autoclean;
+  use Path::Tiny qw( path );
+
+  has I => (
+    is       => 'ro',
+    isa      => 'ArrayRef[Str]',
+    traits   => ['App::af::opt'],
+    opt_type => 's',
+    is_array => 1,
+  );
+  
+  has blib => (
+    is       => 'ro',
+    isa      => 'Int',
+    traits   => ['App::af::opt'],
+  );
+  
+  around main => sub {
+    my $orig = shift;
+    my $self = shift;
+    my @args = @_;
+
+    local @INC = @INC;
+
+    foreach my $inc (reverse @{ $self->I })
+    {
+      require lib;
+      lib->import($inc);
+    }
+    
+    if($self->blib)
+    {
+      require blib;
+      blib->import;
+    }
+
+    # make sure @INC entries are absolute, since $build
+    # may do a lot of directory changes
+    @INC = map { ref $_ ? $_ : path($_)->absolute->stringify } @INC;
+    
+    $orig->($self, @args);
+    
+  };
+
+}
+
+package App::af::opt 0.11 {
 
   use Moose::Role;
   use namespace::autoclean;
@@ -247,7 +296,7 @@ App::af - Command line tool for alienfile
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

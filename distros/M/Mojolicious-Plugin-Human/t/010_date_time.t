@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests => 135;
+use Test::More tests => 145;
 use Encode qw(decode encode);
 
 
@@ -44,6 +44,9 @@ note 'basic';
 
     $t->app->routes->get("/test/human")->to( cb => sub {
         my ($self) = @_;
+
+        is $self->str2time( $dt ),                  $dt->epoch,
+            'str2time from DateTime';
 
         is $self->str2time( $str_tz ),              $dt->epoch,
             'str2time from ISO';
@@ -113,6 +116,8 @@ note 'default timezone';
 
         $self->app->plugin('Human', tz => $tz_dest->name);
 
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
+
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 
         is $self->strftime('%F %T %z', $str),   $to->strftime('%F %T %z'),
@@ -167,6 +172,8 @@ note 'set timezone';
 
         $self->app->plugin('Human', tz => $tz_dest->name);
 
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
+
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 
         is $self->strftime('%F %T %z', $str),   $to->strftime('%F %T %z'),
@@ -220,6 +227,8 @@ note 'cookie timezone numeric';
         my ($self) = @_;
 
        $self->app->plugin('Human', tz => $tz_default->name);
+
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
 
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 
@@ -281,6 +290,8 @@ note 'cookie timezone numeric escaped';
 
        $self->app->plugin('Human', tz => $tz_default->name);
 
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
+
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 
         is $self->strftime('%F %T %z', $str),   $to->strftime('%F %T %z'),
@@ -341,6 +352,8 @@ note 'cookie timezone alpha';
 
         $self->app->plugin('Human', tz => $tz_default->name);
 
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
+
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 
         is $self->strftime('%F %T %z', $str),   $to->strftime('%F %T %z'),
@@ -400,6 +413,8 @@ note 'cookie timezone error';
 
         $self->app->plugin('Human', tz => $tz_default->name);
 
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
+
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 
         is $self->strftime('%F %T %z', $str),   $to->strftime('%F %T %z'),
@@ -458,6 +473,8 @@ note 'cookie timezone like something right';
         my ($self) = @_;
 
         $self->app->plugin('Human', tz => $tz_default->name);
+
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
 
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 
@@ -521,6 +538,8 @@ note 'local force timezone';
         $self->app->plugin('Human', tz => $tz_default->name);
 
         $self->stash('-human-force-tz' => $tz_force->name);
+
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
 
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 
@@ -588,6 +607,8 @@ note 'global force timezone';
         );
 
         $self->stash('-human-force-tz' => $tz_local->name);
+
+        is $self->str2time( $to ),              $to->epoch, 'str2time';
 
         is $self->str2time( $str ),             $to->epoch, 'str2time';
 

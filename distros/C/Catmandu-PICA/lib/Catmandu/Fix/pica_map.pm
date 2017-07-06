@@ -1,6 +1,6 @@
 package Catmandu::Fix::pica_map;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Catmandu::Sane;
 use Moo;
@@ -78,7 +78,7 @@ sub emit {
                         # Treat the subfield_regex as regex that needs to match the subfields
                         return 
                         "for (my ${i} = ${start}; ${i} < \@{${var}}; ${i} += 2) {".
-                            "if (${var}->[${i}] =~ /${subfield_regex}/) {".
+                            "if (${var}->[${i}] =~ ${subfield_regex_var}) {".
                                 "push(\@{${v}}, ${var}->[${i} + 1]);".
                             "}".
                         "}";
@@ -129,7 +129,7 @@ __END__
 
 =head1 NAME
 
-Catmandu::Fix::pica_map - copy mab values of one field to a new field
+Catmandu::Fix::pica_map - copy pica values of one field to a new field
 
 =head1 SYNOPSIS
 
@@ -145,8 +145,8 @@ Catmandu::Fix::pica_map - copy mab values of one field to a new field
     # Copy from field 028A subfields a and d to dc.creator hash joining them by ' '
     pica_map('028Aad','dcterms.creator', -join => ' ');
 
-    # Copy from field 028A with ocurrance subfields a and d to dc.contributor hash joining them by ' '
-    pica_map('028B[01]ad','dcterms.ccontributor', -join => ' ');
+    # Copy from field 028A with occurrence subfields a and d to dc.contributor hash joining them by ' '
+    pica_map('028B[01]ad','dcterms.contributor', -join => ' ');
 
 =head1 SEE ALSO
 

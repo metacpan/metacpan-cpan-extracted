@@ -11,7 +11,7 @@ can_ok $pg, qw/_list_request/;
 my $req = $pg->_list_request(start => 10, top => 5);
 
 isa_ok $req, 'HTTP::Request';
-like $req->uri, qr|^https://api.projectoxford.ai/face/v1.0/persongroups|;
+like $req->uri, qr|^https://westus.api.cognitive.microsoft.com/face/v1.0/persongroups|;
 like $req->uri, qr|start=10|;
 like $req->uri, qr|top=5|;
 is $req->method, 'GET';

@@ -1,6 +1,10 @@
-Revision history for Business-BankCard
+0.02    2017-07-04 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to use Makefile.PL instead of Build.PL.
+
 
 0.01    2012-07-06 (SHARYANTO)
 
-        First version, still empty.
-
+        - First version, still empty.

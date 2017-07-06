@@ -1,3 +1,7 @@
+0.004     2017-07-01 19:50:40+02:00 Europe/Stockholm
+  - Pod fixups
+  - Add unget method to Lazy::Iterator
+
 0.003     2017-06-13 22:49:00+02:00 Europe/Stockholm
   - Expand l_map documentation
   - Rename Lazy::Util::OO to Lazy::Iterator

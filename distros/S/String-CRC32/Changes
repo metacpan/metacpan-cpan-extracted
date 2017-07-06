@@ -1,0 +1,11 @@
+Revision history for String::CRC32
+
+1.600     2017-06-23
+        - New maintainer: LEEJO
+        - Add Changes file
+        - Add link to github repo
+        - Add strict and warnings
+        - Add LICENSE to POD + LICENSE file
+        - Add META.* files through make dist
+        - Add .travis.yml for CI
+

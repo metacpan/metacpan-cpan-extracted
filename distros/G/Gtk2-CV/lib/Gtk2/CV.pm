@@ -9,10 +9,14 @@ use IO::AIO;
 BEGIN {
    use XSLoader;
 
-   our $VERSION = '1.56';
+   our $VERSION = '1.61';
 
    XSLoader::load "Gtk2::CV", $VERSION;
 }
+
+our $FAST_TMP = -w "/run/shm" ? "/run/shm"
+              : -w "/dev/shm" ? "/dev/shm"
+              :                 "/tmp";
 
 my $aio_source;
 
@@ -25,8 +29,7 @@ sub enable_aio {
    $aio_source ||=
       add_watch Glib::IO IO::AIO::poll_fileno,
          in => sub {
-            eval { IO::AIO::poll_cb };
-            warn $@ if $@;#d#
+            IO::AIO::poll_cb;
             1
          },
          undef,

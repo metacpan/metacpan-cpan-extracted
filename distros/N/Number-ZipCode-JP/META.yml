@@ -26,4 +26,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/nipotan/p5-Number-ZipCode-JP
-version: '0.20170531'
+version: '0.20170630'

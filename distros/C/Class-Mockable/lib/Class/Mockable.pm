@@ -4,7 +4,7 @@ use strict;
 use warnings;
 no strict 'refs';
 
-our $VERSION = '1.11';
+our $VERSION = '1.2000';
 
 our %mocks;
 
@@ -192,6 +192,13 @@ For example:
 
 It will also work for inserting a shim into a subclass to wrap around a method
 inherited from a superclass.
+
+=head1 CAVEATS
+
+If you use L<namespace::autoclean> in the same module as this it may
+"helpfully" delete mocked methods that you create. You may need to
+explicitly exclude those from namespace::autoclean's list of things to
+clean.
 
 =head1 AUTHOR
 

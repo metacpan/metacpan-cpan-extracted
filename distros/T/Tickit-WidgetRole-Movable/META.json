@@ -1,22 +1,22 @@
 {
    "abstract" : "resizable/movable panel mixin for Tickit widgets",
    "author" : [
-      "Tom Molesworth <cpan@perlsite.co.uk>"
+      "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Tickit-WidgetRole-Movable",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "perl" : "5.010001"
+            "perl" : "5.014000"
          }
       },
       "configure" : {
@@ -26,9 +26,12 @@
       },
       "develop" : {
          "requires" : {
+            "Test::Mojibake" : "0",
+            "Test::More" : "0",
             "Test::Pod" : "1.41",
+            "Test::Pod::LinkCheck" : "0",
             "Test::Synopsis" : "0",
-            "version" : "0.9901"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -39,7 +42,11 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -56,6 +63,7 @@
       },
       "homepage" : "http://search.cpan.org/dist/Tickit-WidgetRole-Movable/"
    },
-   "version" : "0.002"
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

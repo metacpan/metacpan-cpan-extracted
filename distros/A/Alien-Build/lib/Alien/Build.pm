@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.52'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -30,6 +30,7 @@ sub new
     },
     bin_dir => [],
     pkg_config_path => [],
+    aclocal_path => [],
   }, $class;
   
   $self->meta->filename(
@@ -257,6 +258,17 @@ sub load_requires
       {
         push @{ $self->{pkg_config_path} }, $path->stringify;
       }
+      $path = _path($mod->dist_dir)->child('share/aclocal');
+      if(-d $path)
+      {
+        $path = "$path";
+        if($^O eq 'MSWin32')
+        {
+          # convert to MSYS path
+          $path =~ s{^([a-z]):}{/$1/}i;
+        }
+        push @{ $self->{aclocal_path} }, $path;
+      }
     }
   }
   1;
@@ -271,6 +283,15 @@ sub _call_hook
   
   local $ENV{PKG_CONFIG_PATH} = $ENV{PKG_CONFIG_PATH};
   unshift @PKG_CONFIG_PATH, @{ $self->{pkg_config_path} };
+  
+  local $ENV{ACLOCAL_PATH} = $ENV{ACLOCAL_PATH};
+  # autoconf uses MSYS paths, even for the ACLOCAL_PATH environment variable, so we can't use Env for this.
+  {
+    my @path;
+    @path = split ':', $ENV{ACLOCAL_PATH} if defined $ENV{ACLOCAL_PATH};
+    unshift @path, @{ $self->{aclocal_path} };
+    $ENV{ACLOCAL_PATH} = join ':', @path;
+  }
   
   my $config = ref($_[0]) eq 'HASH' ? shift : {};
   my($name, @args) = @_;
@@ -884,7 +905,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 0.45
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -1016,6 +1037,10 @@ into the stage directory.  If not defined, then all files will be copied.
 
 Same as C<destdir_filter> except applies to C<build_ffi> instead of C<build>.
 
+=item env
+
+Environment variables to override during the build stage.
+
 =item platform
 
 Hash reference.  Contains information about the platform beyond just C<$^O>.
@@ -1065,6 +1090,10 @@ Where MSYS is used and paths like C<C:/foo> are  represented as C</C/foo>
 which are understood by the MSYS tools, but not by Perl.  You should
 only use this if you are using L<Alien::Build::Plugin::Autoconf> in
 your L<alienfile>.
+
+=item env
+
+Environment variables to override during the build stage.
 
 =item old
 
@@ -1390,7 +1419,6 @@ meta object should be made before the C<probe>, C<download> or C<build> steps.
 =head2 prop
 
  my $href = $build->meta->prop;
- my $href = Alien::Build->meta->prop;
 
 Meta properties.  This is the same as calling C<meta_prop> on
 the class or L<Alien::Build> instance.
@@ -1526,6 +1554,8 @@ Contributors:
 Diab Jerius (DJERIUS)
 
 Roy Storey
+
+Ilya Pavlov
 
 =head1 COPYRIGHT AND LICENSE
 

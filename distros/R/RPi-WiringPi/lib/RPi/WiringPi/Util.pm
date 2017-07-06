@@ -4,10 +4,10 @@ use strict;
 use warnings;
 
 use parent 'WiringPi::API';
-
+use JSON;
 use RPi::WiringPi::Constant qw(:all);
 
-our $VERSION = '2.3614';
+our $VERSION = '2.3619';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;
@@ -76,7 +76,7 @@ sub pin_scheme {
 sub pwm_range {
     my ($self, $range) = @_;
     if (defined $range){
-       $self->{pwm_range} = $range;
+        $self->{pwm_range} = $range;
         $self->pwm_set_range($range);
     }
     return defined $self->{pwm_range} ? $self->{pwm_range} : 1023;
@@ -90,49 +90,68 @@ sub unexport_pin {
     system "sudo", "gpio", "unexport", $self->pin_to_gpio($pin);
 }
 sub registered_pins {
-    my ($self, $env) = @_;
-    return $ENV{RPI_PINS};
+    return $_[0]->_pin_registration;
 }
 sub register_pin {
     my ($self, $pin) = @_;
-
-    my $gpio_num = $self->pin_to_gpio($pin->num);
-
-    if (defined $ENV{RPI_PINS} && grep {$gpio_num == $_} split /,/, $ENV{RPI_PINS}){
-        die "\npin $pin is already in use... can't re-register it\n";
-    }
-
-    $ENV{RPI_PINS} = ! defined $ENV{RPI_PINS}
-        ? $gpio_num
-        : "$ENV{RPI_PINS},$gpio_num";
+    $self->_pin_registration($pin, $pin->mode_alt, $pin->read);
 }
 sub unregister_pin {
     my ($self, $pin) = @_;
-
-    my @pin_nums = split /,/, $self->registered_pins;
-
-    my @updated_list;
-
-    for my $pin_num (@pin_nums){
-        if ($pin->num == $pin_num){
-            $pin->mode(INPUT);
-        }
-        else {
-            push @updated_list, $pin_num;
-        }
-    }
-
-    $ENV{RPI_PINS} = join ",", @updated_list;
+    $self->_pin_registration($pin);
 }
 sub cleanup{
-    my $pins = $ENV{RPI_PINS};
     return if ! $ENV{RPI_PINS};
 
-    for (split /,/, $pins){
-        `gpio -g mode $_ in`;
-        `gpio -g mode $_ tri`;
-        delete $ENV{RPI_PINS};
+    my $pins = decode_json $ENV{RPI_PINS};
+
+    for my $pin (keys %{ $pins }){
+        WiringPi::API::pin_mode_alt($pin, $pins->{$pin}{alt});
+        WiringPi::API::write_pin($pin, $pins->{$pin}{state});
     }
+    delete $ENV{RPI_PINS};
+}
+sub _pin_registration {
+    # manages the registration duties for pins
+
+    my ($self, $pin, $alt, $state) = @_;
+
+    my $json = $ENV{RPI_PINS};
+    my $perl = defined $json ? decode_json $json : {};
+
+    if (! defined $pin){
+        my @registered_pins = keys %{ $perl };
+        return \@registered_pins;
+    }
+
+    if (! defined $alt){
+        if (defined $perl->{$self->pin_to_gpio($pin->num)}){
+            $pin->mode_alt($perl->{$pin->num}{alt});
+            $pin->write($perl->{$pin->num}{state});
+            delete $perl->{$self->pin_to_gpio($pin->num)};
+            $ENV{RPI_PINS} = encode_json $perl;
+            return;
+        }
+    }
+
+    die "_pin_data() requires both \$alt and \$state params\n"
+      if ! defined $state;
+
+    if (exists $perl->{$self->pin_to_gpio($pin->num)}){
+        my $gpio_pin_num = $self->pin_to_gpio($pin->num);
+        die "pin $gpio_pin_num is already in use, can't continue...\n";
+    }
+
+    $perl->{$self->pin_to_gpio($pin->num)}{alt} = $alt;
+    $perl->{$self->pin_to_gpio($pin->num)}{state} = $state;
+
+    my @registered_pins = keys %{ $perl };
+
+    $json = encode_json $perl;
+    
+    $ENV{RPI_PINS} = $json;
+
+    return \@registered_pins;
 }
 sub _vim{1;};
 1;
@@ -156,7 +175,7 @@ used independently.
 
 Returns the GPIO layout which indicates the board revision number.
 
-=head2 pin_scheme()
+=head2 pin_scheme([$scheme])
 
 Returns the current pin mapping in use. Returns C<0> for C<wiringPi> scheme,
 C<1> for GPIO, C<2> for System GPIO, C<3> for physical board and C<-1> if a
@@ -206,7 +225,7 @@ For C<'GPIO'> scheme:
         ...
     };
 
-=head2 pin_to_gpio($pin, $scheme)
+=head2 pin_to_gpio($pin, [$scheme])
 
 Dynamically converts the specified pin from the specified scheme
 (C<RPI_MODE_WPI> (wiringPi), or C<RPI_MODE_PHYS> (physical board numbering
@@ -271,8 +290,8 @@ Pin number must be the C<GPIO> pin number representation.
 
 =head2 registered_pins()
 
-Returns a list of comma-separated pin numbers in GPIO scheme that have been used
-in your program run.
+Returns an array reference where each element is the GPIO pin number of each
+currently registerd pin.
 
 =head2 register_pin($pin_obj)
 
@@ -299,8 +318,8 @@ Mandatory: An object instance of L<RPi::WiringPi::Pin> class.
 
 =head2 cleanup()
 
-Resets all registered pins back to default settings (off). It's important that
-this method be called in each application.
+Resets all registered pins back to default settings as they were before your
+program started. It's important that this method be called in each application.
 
 =head1 ENVIRONMENT VARIABLES
 

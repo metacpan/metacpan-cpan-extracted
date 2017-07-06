@@ -1,5 +1,5 @@
 package Lab::Bus::USBtmc;
-$Lab::Bus::USBtmc::VERSION = '3.550';
+$Lab::Bus::USBtmc::VERSION = '3.552';
 # "sys/ioctl.ph" throws a warning about FORTIFY_SOURCE, but
 # this alternate is (perhaps?) not present on all systems,
 # so do a workaround

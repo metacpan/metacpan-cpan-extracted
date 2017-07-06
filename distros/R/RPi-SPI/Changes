@@ -1,5 +1,8 @@
 Revision history for RPi-SPI
 
+2.3607 2017-06-28
+        - bump prereq ver of WiringPi::API to 2.3612
+
 2.3606  2017-03-13
         - changed version scheme from 2.36.x to to 2.360x in module and prereqs
 

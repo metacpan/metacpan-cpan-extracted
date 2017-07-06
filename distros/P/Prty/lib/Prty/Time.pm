@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.108;
+our $VERSION = 1.113;
 
 use POSIX ();
 use Time::Local ();
@@ -373,6 +373,10 @@ sub year {
 =head4 Synopsis
 
     $month = $ti->month;
+
+=head4 Description
+
+Liefere die Nummer des Monats. Wertebereich: 1-12.
 
 =cut
 
@@ -1352,9 +1356,77 @@ sub diff {
 
 # -----------------------------------------------------------------------------
 
+=head2 Konvertierung (Klassenmethoden)
+
+=head3 monthAbbrToNum() - Liefere Monatsnummer zu Monats-Abkürzung
+
+=head4 Synopsis
+
+    $n = $class->monthAbbrToNum($abbr);
+    $n = $class->monthAbbrToNum($abbr,$lang);
+
+=head4 Description
+
+Liefere Monatsnummer (1, ..., 12) zur Monatsabkürzung der
+Sprache $lang. Default für $lang ist 'en'.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+our $MonthAbbr = {
+    de => {
+        Jan => 1,
+        Feb => 2,
+        Mär => 3,
+        Apr => 4,
+        Mai => 5,
+        Jun => 6,
+        Jul => 7,
+        Aug => 8,
+        Sep => 9,
+        Okt => 10,
+        Nov => 11,
+        Dez => 12,
+    },
+    en => {
+        Jan => 1,
+        Feb => 2,
+        Mar => 3,
+        Apr => 4,
+        May => 5,
+        Jun => 6,
+        Jul => 7,
+        Aug => 8,
+        Sep => 9,
+        Oct => 10,
+        Nov => 11,
+        Dec => 12,
+    },
+};
+
+sub monthAbbrToNum {
+    my $self = shift;
+    my $abbr = shift;
+    my $lang = shift || 'en';
+
+    my $n = $MonthAbbr->{$lang}->{$abbr};
+    if (!$n) {
+        $self->throw(
+            q{TIME-00099: Unknown month abbreviation},
+            Abbreviation => $abbr,
+            Language => $lang,
+        );
+    }
+
+    return $n;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.108
+1.113
 
 =head1 AUTHOR
 

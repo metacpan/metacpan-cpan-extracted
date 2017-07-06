@@ -2,11 +2,13 @@ Changes
 const-c.inc
 const-xs.inc
 examples/color-type-name.pl
+examples/copy-png.pl
 examples/get-www-png.pl
 examples/png-cgi.pl
 examples/set-unknown-chunk.pl
 examples/supports.pl
 examples/synopsis.pl
+inc/CheckForLibPng.pm
 inc/Devel/CheckLib.pm
 lib/Image/PNG/Const.pm
 lib/Image/PNG/Libpng.pm

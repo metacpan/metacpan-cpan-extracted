@@ -4,16 +4,26 @@
 #include <DeviceBitmap.h>
 #include <Widget.h>
 #include <Image.h>
+#include <Icon.h>
 #include <Application.h>
 #include <Printer.h>
+#include <GL/gl.h>
 #include "prima_gl.h"
 
 PWidget_vmt CWidget;
 PDeviceBitmap_vmt CDeviceBitmap;
 PImage_vmt CImage;
+PIcon_vmt CIcon;
 PApplication_vmt CApplication;
 PPrinter_vmt CPrinter;
 #define var (( PWidget) widget)
+
+#ifndef GL_BGR
+#define GL_BGR 0x80e0
+#endif
+#ifndef GL_BGRA
+#define GL_BGRA 0x80e1
+#endif
 
 static void
 parse_tristate_char( int * target, SV * item, char * key, char * state_for_1, char * state_for_2)
@@ -93,6 +103,7 @@ BOOT:
 	CWidget = (PWidget_vmt)gimme_the_vmt( "Prima::Widget");
 	CDeviceBitmap = (PDeviceBitmap_vmt)gimme_the_vmt( "Prima::DeviceBitmap");
 	CImage = (PImage_vmt)gimme_the_vmt( "Prima::Image");
+	CIcon = (PIcon_vmt)gimme_the_vmt( "Prima::Icon");
 	CApplication = (PApplication_vmt)gimme_the_vmt( "Prima::Application");
 	CPrinter = (PPrinter_vmt)gimme_the_vmt( "Prima::Printer");
 }
@@ -134,7 +145,7 @@ CODE:
 	else
 		croak("bad object");
 
-	if ( need_paint_state && !PObject(object)-> options. optInDraw )
+	if ( need_paint_state && !( PObject(object)-> options. optInDraw || PObject(object)-> options. optInDrawInfo))
 		croak("object not in paint state");
 	context = gl_context_create(object, &request);
 
@@ -190,3 +201,28 @@ CODE:
 OUTPUT:
 	RETVAL
 
+IV
+gl_image_ptr(sv_obj,mask)
+	SV * sv_obj
+	int mask
+PREINIT:
+	Handle object;
+	PIcon i;
+CODE:
+	if ( !(object = gimme_the_mate(sv_obj)) || !kind_of(object, CImage))
+		croak("not an image");
+	
+	i = PIcon(object);
+	RETVAL = PTR2IV(
+		((kind_of(object, CIcon) && mask) ?
+		i->mask : i->data));
+OUTPUT:
+	RETVAL
+
+int
+is_direct(context)
+	void *context
+CODE:
+	RETVAL = context ? gl_is_direct((Handle) context) : 0;
+OUTPUT:
+	RETVAL

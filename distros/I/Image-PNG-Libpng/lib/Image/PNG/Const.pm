@@ -1,5 +1,5 @@
 package Image::PNG::Const;
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -114,7 +114,6 @@ PNG_BACKGROUND_GAMMA_UNKNOWN
 PNG_BACKGROUND_GAMMA_SCREEN
 PNG_BACKGROUND_GAMMA_FILE
 PNG_BACKGROUND_GAMMA_UNIQUE
-PNG_READ_16_TO_8
 PNG_GAMMA_THRESHOLD
 PNG_CRC_DEFAULT
 PNG_CRC_ERROR_QUIT
@@ -128,6 +127,7 @@ PNG_FILTER_SUB
 PNG_FILTER_UP
 PNG_FILTER_AVG
 PNG_FILTER_PAETH
+PNG_FAST_FILTERS
 PNG_ALL_FILTERS
 PNG_FILTER_VALUE_NONE
 PNG_FILTER_VALUE_SUB
@@ -199,6 +199,9 @@ PNG_IMAGE_FLAG_16BIT_sRGB
 PNG_ARM_NEON
 PNG_MAXIMUM_INFLATE_WINDOW
 PNG_SKIP_sRGB_CHECK_PROFILE
+PNG_MIPS_MSA
+PNG_IGNORE_ADLER32
+PNG_POWERPC_VSX
 PNG_OPTION_NEXT
 PNG_OPTION_UNSET
 PNG_OPTION_INVALID
@@ -327,7 +330,6 @@ use constant {
     PNG_BACKGROUND_GAMMA_SCREEN => 1,
     PNG_BACKGROUND_GAMMA_FILE => 2,
     PNG_BACKGROUND_GAMMA_UNIQUE => 3,
-    PNG_READ_16_TO_8 => SUPPORTED,
     PNG_GAMMA_THRESHOLD => (PNG_GAMMA_THRESHOLD_FIXED*.00001),
     PNG_CRC_DEFAULT => 0,
     PNG_CRC_ERROR_QUIT => 1,
@@ -341,7 +343,8 @@ use constant {
     PNG_FILTER_UP => 0x20,
     PNG_FILTER_AVG => 0x40,
     PNG_FILTER_PAETH => 0x80,
-    PNG_ALL_FILTERS => (0x08 | 0x10 | 0x20 | 0x40 | 0x80),
+    PNG_FAST_FILTERS => (0x08 | 0x10 | 0x20),
+    PNG_ALL_FILTERS => ((0x08 | 0x10 | 0x20) | 0x40 | 0x80),
     PNG_FILTER_VALUE_NONE => 0,
     PNG_FILTER_VALUE_SUB => 1,
     PNG_FILTER_VALUE_UP => 2,
@@ -412,7 +415,10 @@ use constant {
     PNG_ARM_NEON => 0,
     PNG_MAXIMUM_INFLATE_WINDOW => 2,
     PNG_SKIP_sRGB_CHECK_PROFILE => 4,
-    PNG_OPTION_NEXT => 6,
+    PNG_MIPS_MSA => 6,
+    PNG_IGNORE_ADLER32 => 8,
+    PNG_POWERPC_VSX => 10,
+    PNG_OPTION_NEXT => 12,
     PNG_OPTION_UNSET => 0,
     PNG_OPTION_INVALID => 1,
     PNG_OPTION_OFF => 2,
@@ -881,10 +887,6 @@ PNG_BACKGROUND_GAMMA_FILE has value 2.
 
 PNG_BACKGROUND_GAMMA_UNIQUE has value 3.
 
-=item PNG_READ_16_TO_8
-
-PNG_READ_16_TO_8 has value SUPPORTED.
-
 =item PNG_GAMMA_THRESHOLD
 
 PNG_GAMMA_THRESHOLD has value (PNG_GAMMA_THRESHOLD_FIXED*.00001).
@@ -937,9 +939,13 @@ PNG_FILTER_AVG has value 0x40.
 
 PNG_FILTER_PAETH has value 0x80.
 
+=item PNG_FAST_FILTERS
+
+PNG_FAST_FILTERS has value (0x08 | 0x10 | 0x20).
+
 =item PNG_ALL_FILTERS
 
-PNG_ALL_FILTERS has value (0x08 | 0x10 | 0x20 | 0x40 | 0x80).
+PNG_ALL_FILTERS has value ((0x08 | 0x10 | 0x20) | 0x40 | 0x80).
 
 =item PNG_FILTER_VALUE_NONE
 
@@ -1221,9 +1227,21 @@ PNG_MAXIMUM_INFLATE_WINDOW has value 2.
 
 PNG_SKIP_sRGB_CHECK_PROFILE has value 4.
 
+=item PNG_MIPS_MSA
+
+PNG_MIPS_MSA has value 6.
+
+=item PNG_IGNORE_ADLER32
+
+PNG_IGNORE_ADLER32 has value 8.
+
+=item PNG_POWERPC_VSX
+
+PNG_POWERPC_VSX has value 10.
+
 =item PNG_OPTION_NEXT
 
-PNG_OPTION_NEXT has value 6.
+PNG_OPTION_NEXT has value 12.
 
 =item PNG_OPTION_UNSET
 
@@ -1260,18 +1278,10 @@ This Perl module was generated from C<png.h>.
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
--2016
+-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated
@@ -1280,8 +1290,6 @@ Licence.
 
 
 
-
-=cut
 
 # Local variables:
 # mode: perl

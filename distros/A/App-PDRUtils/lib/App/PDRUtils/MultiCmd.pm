@@ -1,12 +1,12 @@
 package App::PDRUtils::MultiCmd;
 
-our $DATE = '2016-12-28'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-03'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use App::PDRUtils::Cmd;
 use App::PDRUtils::DistIniCmd;
@@ -112,11 +112,11 @@ sub _for_each_repo {
     my $envres = envresmulti();
   REPO:
     for my $repo (@{ $pargs->{repos} }) {
-        $log->tracef("Processing repo %s ...", $repo);
+        log_trace("Processing repo %s ...", $repo);
 
         eval { $CWD = $repo };
         if ($@) {
-            $log->warnf("Can't cd to repo %s, skipped", $repo);
+            log_warn("Can't cd to repo %s, skipped", $repo);
             $envres->add_result(500, "Can't cd to repo", {item_id=>$repo});
             next REPO;
         }
@@ -135,7 +135,7 @@ sub _for_each_repo {
 
         if ($requires_dist_ini) {
             unless (-f "dist.ini") {
-                $log->warnf("No dist.ini in repo %s, skipped", $repo);
+                log_warn("No dist.ini in repo %s, skipped", $repo);
                 $envres->add_result(412, "No dist.ini in repo", {item_id=>$repo});
                 next REPO;
             }
@@ -145,7 +145,7 @@ sub _for_each_repo {
         if ($requires_parsed_dist_ini) {
             eval { $parsed_dist_ini = _ciod->read_string($dist_ini) };
             if ($@) {
-                $log->warnf("Can't parse dist.ini in repo %s, skipped", $repo);
+                log_warn("Can't parse dist.ini in repo %s, skipped", $repo);
                 $envres->add_result(412, "Can't parse dist.ini: $@");
                 next REPO;
             }
@@ -159,7 +159,7 @@ sub _for_each_repo {
             {
                 last unless $pargs->{include_dists} && @{ $pargs->{include_dists} };
                 unless (defined $dist_name) {
-                    $log->warnf("Dist name undefined in repo %s, skipped", $repo);
+                    log_warn("Dist name undefined in repo %s, skipped", $repo);
                     $excluded++;
                     last FILTER;
                 }
@@ -168,7 +168,7 @@ sub _for_each_repo {
                         last INCLUDE_DISTS;
                     }
                 }
-                $log->tracef("Skipping repo (not in include_dists)");
+                log_trace("Skipping repo (not in include_dists)");
                 $excluded++;
                 last FILTER;
             }
@@ -176,13 +176,13 @@ sub _for_each_repo {
             {
                 last unless $pargs->{exclude_dists} && @{ $pargs->{exclude_dists} };
                 unless (defined $dist_name) {
-                    $log->warnf("Dist name undefined in repo %s, skipped", $repo);
+                    log_warn("Dist name undefined in repo %s, skipped", $repo);
                     $excluded++;
                     last FILTER;
                 }
                 for my $d (@{ $pargs->{exclude_dists} }) {
                     if ($dist_name eq $d) {
-                        $log->tracef("Skipping repo (in exclude_dists)");
+                        log_trace("Skipping repo (in exclude_dists)");
                         $excluded++;
                         last FILTER;
                     }
@@ -192,7 +192,7 @@ sub _for_each_repo {
             {
                 last unless $pargs->{include_dist_patterns} && @{ $pargs->{include_dist_patterns} };
                 unless (defined $dist_name) {
-                    $log->warnf("Dist name undefined in repo %s, skipped", $repo);
+                    log_warn("Dist name undefined in repo %s, skipped", $repo);
                     $excluded++;
                     last FILTER;
                 }
@@ -201,7 +201,7 @@ sub _for_each_repo {
                         last INCLUDE_DIST_PATTERNS;
                     }
                 }
-                $log->tracef("Skipping repo (doesn't match include_dist_patterns)");
+                log_trace("Skipping repo (doesn't match include_dist_patterns)");
                 $excluded++;
                 last FILTER;
             }
@@ -209,13 +209,13 @@ sub _for_each_repo {
             {
                 last unless $pargs->{exclude_dist_patterns} && @{ $pargs->{exclude_dist_patterns} };
                 unless (defined $dist_name) {
-                    $log->warnf("Dist name undefined in repo %s, skipped", $repo);
+                    log_warn("Dist name undefined in repo %s, skipped", $repo);
                     $excluded++;
                     last FILTER;
                 }
                 for my $d (@{ $pargs->{exclude_dist_patterns} }) {
                     if ($dist_name =~ /$d/) {
-                        $log->tracef("Skipping repo (match exclude_dist_patterns)");
+                        log_trace("Skipping repo (match exclude_dist_patterns)");
                         $excluded++;
                         last FILTER;
                     }
@@ -230,7 +230,7 @@ sub _for_each_repo {
                         last DEPENDS;
                     }
                 }
-                $log->tracef("Skipping repo %s (doesn't depend on ".join("/", @$mods).")", $repo);
+                log_trace("Skipping repo %s (doesn't depend on ".join("/", @$mods).")", $repo);
                 $excluded++;
                 last FILTER;
             }
@@ -240,7 +240,7 @@ sub _for_each_repo {
                 last unless $mods && @$mods;
                 for my $mod (@$mods) {
                     if (App::PDRUtils::Cmd::_has_prereq($parsed_dist_ini, $mod)) {
-                        $log->tracef("Skipping repo %s (depends on $mod)", $repo);
+                        log_trace("Skipping repo %s (depends on $mod)", $repo);
                         $excluded++;
                         last FILTER;
                     }
@@ -254,7 +254,7 @@ sub _for_each_repo {
                         last HAS_TAGS;
                     }
                 }
-                $log->tracef("Skipping repo (doesn't have any tag in has_tags)");
+                log_trace("Skipping repo (doesn't have any tag in has_tags)");
                 $excluded++;
                 last FILTER;
             }
@@ -263,7 +263,7 @@ sub _for_each_repo {
                 last unless $pargs->{lacks_tags} && @{ $pargs->{lacks_tags} };
                 for my $t (@{ $pargs->{lacks_tags} }) {
                     if (-f ".tag-$t") {
-                        $log->tracef("Skipping repo (has tag '$t' in lacks_tags)");
+                        log_trace("Skipping repo (has tag '$t' in lacks_tags)");
                         $excluded++;
                         last FILTER;
                     }
@@ -279,9 +279,9 @@ sub _for_each_repo {
             (dist_ini => $dist_ini) x !!defined($dist_ini),
             (parsed_dist_ini => $parsed_dist_ini) x !!defined($parsed_dist_ini),
         );
-        $log->tracef("Result for repo '%s': %s", $repo, $res);
+        log_trace("Result for repo '%s': %s", $repo, $res);
         if ($res->[0] != 200 && $res->[0] != 304) {
-            $log->warnf("Processing repo %s failed: %s", $repo, $res);
+            log_warn("Processing repo %s failed: %s", $repo, $res);
         }
         $envres->add_result(@$res, {item_id=>$repo});
     }
@@ -335,7 +335,7 @@ sub create_cmd_from_dist_ini_cmd {
                 my $res = $handle_cmd->(%diargs);
 
                 if ($res->[0] == 200) {
-                    $log->infof("%s[dist %s] %s",
+                    log_info("%s[dist %s] %s",
                                 $fargs{-dry_run} ? "[DRY-RUN] " : "",
                                 $dist,
                                 $res->[1]);
@@ -347,7 +347,7 @@ sub create_cmd_from_dist_ini_cmd {
                     }
                     undef $res->[2];
                 } else {
-                    $log->tracef("%d - %s", $res->[0], $res->[1]);
+                    log_trace("%d - %s", $res->[0], $res->[1]);
                 }
                 $res;
             }, # callback
@@ -370,7 +370,7 @@ App::PDRUtils::MultiCmd - Common stuffs for App::PDRUtils::MultiCmd::*
 
 =head1 VERSION
 
-This document describes version 0.09 of App::PDRUtils::MultiCmd (from Perl distribution App-PDRUtils), released on 2016-12-28.
+This document describes version 0.10 of App::PDRUtils::MultiCmd (from Perl distribution App-PDRUtils), released on 2017-07-03.
 
 =head1 DESCRIPTION
 
@@ -405,7 +405,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

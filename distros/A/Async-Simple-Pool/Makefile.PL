@@ -1,4 +1,4 @@
-use 5.10.0;
+use 5.14.0;
 
 use Modern::Perl;
 use ExtUtils::MakeMaker;
@@ -14,7 +14,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Async/Simple/Pool.pm',
     LICENSE          => 'artistic_2',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.10.0,
+    MIN_PERL_VERSION => 5.14.0,
     CONFIGURE_REQUIRES => {
         'Modern::Perl'        => 0,
         'ExtUtils::MakeMaker' => 0,
@@ -45,16 +45,16 @@ WriteMakefile(
     META_ADD => {
         provides => {
             'Async::Simple::Pool' => {
-                'version' => '0.07',
+                'version' => '0.08',
                 'file'    => 'lib/Async/Simple/Pool.pm'
             },
             'Async::Simple::Task::Fork' => {
                 'file'    => 'lib/Async/Simple/Task/Fork.pm',
-                'version' => '0.07'
+                'version' => '0.08'
             },
             'Async::Simple::Task' => {
                 'file'    => 'lib/Async/Simple/Task.pm',
-                'version' => '0.07'
+                'version' => '0.08'
             }
         }
     },

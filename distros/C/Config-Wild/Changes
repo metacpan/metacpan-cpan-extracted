@@ -1,4 +1,11 @@
-Revision history for Perl extension Config::Wild.
+Revision history for Config-Wild
+
+2.02      2017-06-28 16:04:05-04:00 America/New_York
+
+  [BUILD]
+
+     * switch build infrastructure to Dist::Zilla
+     * compliant with Perl 5.26's no '.' in @INC
 
 2.01	2016-02-18T09:45:04-0500
 

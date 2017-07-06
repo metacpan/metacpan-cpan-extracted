@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+use warnings;
+use RL;
+use Data::Dumper;
+use Getopt::Long;
+
+$SIG{"__WARN__"} = \&warner;
+
+GetOptions(
+    "h|help" => \my $help,
+);
+
+if ($help) {
+    usage();
+}
+
+RL::read_history("$ENV{HOME}/.pl_history");
+
+while (1) {
+    my $line = RL::readline("");
+    if (!defined $line) {
+        print "\n";
+        last;
+    }
+    if ($line =~ /^(q|quit|e|exit)$/) {
+        last;
+    }
+    if (!length($line)) {
+        next;
+    }
+    RL::add_history($line);
+    my $output = eval $line;
+    if ($@) {
+        my $error = $@;
+        $error =~ s/ at \(eval \d+\) line \d+(,|\.$)//gm;
+        print STDERR "$error";
+    }
+    elsif (ref $output) {
+        print dumper($output);
+    }
+    elsif (defined $output) {
+        print "$output\n";
+    }
+}
+
+RL::write_history("$ENV{HOME}/.pl_history");
+
+sub dumper {
+    $Data::Dumper::Sortkeys = 1;
+    $Data::Dumper::Indent = 1;
+    $Data::Dumper::Useqq = 1;
+    $Data::Dumper::Quotekeys = 0;
+    my $output = "";
+    for my $item (@_) {
+        my $dd = Data::Dumper->new([$item]);
+        $dd->{"xpad"} = "    ";
+        my $output2 = $dd->Dump();
+        $output2 =~ s/^\$VAR1 = |;$//g;
+        $output .= $output2;
+    }
+    return $output;
+}
+
+sub warner {
+    my ($warning) = @_;
+    $warning =~ s/ at \(eval \d+\) line \d+(,|\.$)//gm;
+    print STDERR "$warning";
+}
+
+sub usage {
+    my $usage = <<EOUSAGE;
+Usage: pl [-h]
+
+Options:
+-h, -help   help text
+
+Special Commands:
+q           quit program
+EOUSAGE
+    print $usage;
+    exit;
+}
+
+__END__
+
+=head1 NAME
+
+pl - A Perl repl for running Perl commands interactively on the command line
+
+=head1 SYNOPSIS
+
+    pl
+
+=head1 OPTIONS
+
+=over
+
+=item -h
+
+Help text.
+
+=back
+
+=head1 DESCRIPTION
+
+This is a command for running Perl statements interactively. You
+type a command and then the program prints the results. If the
+result is a reference (array, hash, blessed hash, etc.) it will
+print it out using Data::Dumper. It uses the RL module (readline)
+for typed user input.
+
+It saves history in the file ~/.pl_history.
+
+=head1 SPECIAL COMMANDS
+
+=over
+
+=item q
+
+Quits program.
+
+=back
+
+=cut
+

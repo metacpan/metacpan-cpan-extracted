@@ -11,7 +11,8 @@ use Test::Deep;
 sub startup : Test(4) {
 	my $self = shift;
 
-	use_ok( 't::lib::Debugger');
+	require_ok('./t/lib/Debugger.pm');
+	t::lib::Debugger->import;
 	ok( start_script('t/eg/14-y_zero.pl'), 'start script' );
 	ok( $self->{debugger} = start_debugger(), 'start debugger' );
 	ok( $self->{debugger}->get, 'get debugger' );

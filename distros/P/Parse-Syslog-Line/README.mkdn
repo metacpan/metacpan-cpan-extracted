@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 3.6
+version 3.7
 
 # SYNOPSIS
 
@@ -27,9 +27,8 @@ parsed out.
     #       date            => 'YYYY-MM-DD',
     #       time            => 'HH::MM:SS',
     #       epoch           => 1361095933,
-    #       datetime_str    => 'YYYY-MM-DD HH:MM:SS',
-    #       datetime_obj    => new C<DateTime()> or C<Time::Moment> object, depending on the NormalizeToUTC switch
-    #       datetime_utc    => ISO 8601 UTC datetime # If $NormalizeToUTC or returned by FmtDate formatter
+    #       datetime_str    => ISO 8601 datetime, $NormalizeToUTC = 1 then UTC, else local
+    #       datetime_obj    => undef,       # If $DateTimeCreate = 1, else undef
     #       datetime_raw    => 'Feb 17 11:12:13'
     #       date_raw        => 'Feb 17 11:12:13'
     #       host_raw        => 'hostname',  # Hostname as it appeared in the message
@@ -104,60 +103,40 @@ Usage:
 
 ## EpochCreate
 
-If this variable is set to 1, the number of seconds from UNIX epoch
-will be returned in the $m->{epoch} field.  If DateTimeCreate is
-not set, the parser will use `HTTP::Date` to perform the parsing.
-This is faster but assumes **local** timezone if its not present in parsed string.
-In other words it ignores the timezone you set for syslog with set\_syslog\_timezone.
-
-Usage:
-
-    $Parse::Syslog::Line::EpochCreate = 1;
+If this variable is set to 1, the default, the number of seconds from UNIX
+epoch will be returned in the $m->{epoch} field.  Setting this to false will
+only delete the epoch before returning the hash reference.
 
 ## NormalizeToUTC
 
-Coerces dates to ISO8601 format, using `Time::Moment`. There are two possible modes of operation:
+When set, the datetime\_str will be ISO8601 UTC.
 
-### If your syslog does not have UTC ISO 8601 timestamps
+## OutputTimeZones
 
-Using costly `DateTime` math we calculate the UTC version of the incomplete date for a given timezone
-and then parse the resulting `DateTime` object using `Time::Moment`.
-
-Usage:
-  $Parse::Syslog::Line::DateTimeCreate  = 1; # default
-  $Parse::Syslog::Line::NormalizeToUTC  = 1;
-
-See also: set\_syslog\_timezone.
-
-### If your syslog timestamps are ISO 8601 compliant
-
-This allows us to skip costly datetime DST calculations, and is very fast.
-You get the same amount of date information as with the defaults.
-
-Usage:
-  $Parse::Syslog::Line::DateTimeCreate  = 0;
-  $Parse::Syslog::Line::EpochCreate     = 0;
-  $Parse::Syslog::Line::IgnoreTimeZones = 0;
-  $Parse::Syslog::Line::NormalizeToUTC  = 1;
-
-    # or
-
-    use Parse::Syslog::Line qw/:with_timezones/;
-    use_utc_syslog(); # sets syslog_timezone to 'UTC' and above variables
-
-See also: set\_syslog\_timezone()
-
-## IgnoreTimeZones
-
-Similarly to EpochCreate, parser will use `HTTP::Date` to perform the parsing, but this time using "parse\_date"
-function. We then discard the timezone part from created dates. Even if the timezone is present in the message
-it will not be used to construct the date string and components (date, time, datetime\_str).
+Default is false, but is enabled if you call set\_syslog\_timezone() or
+use\_utc\_syslog().  If enabled, this will append the timezone offset to the
+datetime\_str.
 
 ## FmtDate
 
-You can pass your own formatter/parser here. Given a raw datetime string it should output a list
-containing date, time, epoch, datetime\_str, datetime\_utc in your wanted format.
-NOTE: No further date processing will be done, you're on your own here.
+You can pass your own formatter/parser here. Given a raw datetime string it
+should output a list containing date, time, epoch, datetime\_str,
+in your wanted format.
+
+    use Parse::Syslog::Line;
+
+    local $Parse::Syslog::Line::FmtDate = sub {
+        my ($raw_datestr) = @_;
+        my @elements = (
+            #date
+            #time
+            #epoch
+            #datetime_str
+        );
+        return @elements;
+    };
+
+**NOTE**: No further date processing will be done, you're on your own here.
 
 ## PruneRaw
 
@@ -189,17 +168,19 @@ Usage:
 
 Returns a hash reference of syslog message parsed data.
 
+**NOTE**: Date/time parsing is hard.  This module has been optimized to balance
+common sense and processing speed. Care is taken to ensure that any data input
+into the system isn't lost, but with the varieties of vendor and admin crafted
+date formats, we don't always get it right.  Feel free to override date
+processing using by setting the $FmtDate variable or completely disable it with
+$DateParsing set to 0.
+
 ## set\_syslog\_timezone($timezone\_name)
 
-Sets a timezone $timezone\_name for parsed messages. This timezone will be used to calculate offset from UTC
-if a timezone designation is not present in the message being parsed. Returns the `DateTime::TimeZone`.
-object for given timezone. If called without parameters, assumes local timezone.
-
-NOTE: this works in conjunction with $NormalizeToUTC and automagically sets:
-    $NormalizeToUTC=1
-    $DateTimeCreate=1
-
-See also $NormalizeToUTC
+Sets a timezone $timezone\_name for parsed messages. This timezone will be used
+to calculate offset from UTC if a timezone designation is not present in the
+message being parsed.  This timezone will also serve as the source timezone for
+the datetime\_str field.
 
 ## get\_syslog\_timezone
 
@@ -207,9 +188,9 @@ Returns the name of the timezone currently set by set\_syslog\_timezone.
 
 ## use\_utc\_syslog
 
-A convenient function which sets the syslog timezone to UTC and sets the config variables accordingly.
-NOTE: by using this you promise the parser that it will get ISO8601 compliant dates. If a date is
-unparsable the parser will emit a warning and set all date fields to undef.
+A convenient function which sets the syslog timezone to UTC and sets the config
+variables accordingly.  Automatically sets $NormaizeToUTC and datetime\_str will
+be set to the UTC equivalent.
 
 ## preamble\_priority
 
@@ -237,7 +218,8 @@ a hash reference as such:
 
 This module is developed with Dist::Zilla.  To build from the repository, use Dist::Zilla:
 
-    dzil authordeps |cpanm
+    dzil authordeps --missing |cpanm
+    dzil listdeps --missing |cpanm
     dzil build
     dzil test
 

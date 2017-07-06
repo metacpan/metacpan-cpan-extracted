@@ -1,12 +1,12 @@
 {
-   "abstract" : "Generate and compare checksums of database schematas",
+   "abstract" : "Manage your datebase schema via checksums",
    "author" : [
       "Thomas Klausner <domm@cpan.org>",
       "Maroš Kollár <maros@cpan.org>",
       "Klaus Ita <koki@worstofall.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -33,9 +33,11 @@
             "Data::Dumper" : "0",
             "Digest::SHA1" : "0",
             "File::Find::Rule" : "0",
+            "File::HomeDir" : "0",
             "IO::Prompt::Tiny" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
             "MooseX::App" : "1.21",
             "MooseX::App::Command" : "0",
             "Path::Class" : "0",
@@ -65,9 +67,9 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://code.validad.net/validad/dbix-schemachecksum"
+         "url" : "git://git.ips.validad.net/opensource/DBIx-SchemaChecksum"
       }
    },
-   "version" : "1.006"
+   "version" : "1.101"
 }
 

@@ -1,18 +1,8 @@
-################################################################################
-#
-# File      : HL7.pm
-# Author    : D.A.Dokter
-# Created   : 30 Jan 2004
-# Version   : $Id: HL7.pm,v 1.11 2015/01/29 15:30:10 wyldebeast Exp $
-# Copyright : Wyldebeast & Wunderliebe
-#
-################################################################################
-
 package Net::HL7;
 
 use strict;
 
-our $VERSION = "0.81";
+our $VERSION = "0.82";
 
 =pod
 

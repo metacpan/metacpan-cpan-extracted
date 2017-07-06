@@ -23,7 +23,7 @@ WriteMakefile(
         'Data::Alias'       => 0,
     ) : () ),
         'Variable::Magic'   => 0.59,
-        'Keyword::Declare'  => 0,
+        'Keyword::Declare'  => '0.001000',
         'Sub::Uplevel'      => 0.24,
     },
     dist                 => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -5,7 +5,7 @@ package VMware::vCloudDirector::Link;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 our $AUTHORITY = 'cpan:NIGELM'; # AUTHORITY
 
 use Moose;
@@ -83,7 +83,7 @@ VMware::vCloudDirector::Link - Link within the vCloud
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head3 DELETE
 

@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC3;
 
 #
-# $Id: NSEC3.pm 1561 2017-04-19 13:08:13Z willem $
+# $Id: NSEC3.pm 1567 2017-05-19 09:52:52Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1561 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
 
 
 use strict;
@@ -37,19 +37,17 @@ my %digest = (
 		'SHA-1' => 1,					# RFC3658
 		);
 
-	my @digestbyalias = ( 'SHA' => 1 );
+	my @digestalias = ( 'SHA' => 1 );
 
 	my %digestbyval = reverse @digestbyname;
 
-	my @digestbynum = map { ( $_, 0 + $_ ) } keys %digestbyval;    # accept algorithm number
-
-	my %digestbyname = map { s /[^A-Za-z0-9]//g; $_ } @digestbyalias, @digestbyname, @digestbynum;
-
+	my @digestrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @digestbyname, @digestalias;
+	my %digestbyname = @digestrehash;			# work around broken cperl
 
 	sub _digestbyname {
 		my $name = shift;
 		my $key	 = uc $name;				# synthetic key
-		$key =~ s /[^A-Z0-9]//g;			# strip non-alphanumerics
+		$key =~ s /[\W_]//g;				# strip non-alphanumerics
 		$digestbyname{$key} || croak "unknown digest type $name";
 	}
 

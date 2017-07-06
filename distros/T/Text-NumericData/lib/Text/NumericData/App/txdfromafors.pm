@@ -4,6 +4,12 @@ use Text::NumericData::App;
 
 use strict;
 
+# This is just a placeholder because of a past build system bug.
+# The one and only version for Text::NumericData is kept in
+# the Text::NumericData module itself.
+our $VERSION = '1';
+$VERSION = eval $VERSION;
+
 my $infostring = 'Hacky tool to convert AFORS-HET (photovoltaic cell simulation) output to usual columns of textual data. Filters STDIN to STDOUT. Due to AFORS-HET appending data to the end, the whole input is buffered, but that should not be an issue for the moderate size of the 1D data.';
 
 our @ISA = ('Text::NumericData::App');

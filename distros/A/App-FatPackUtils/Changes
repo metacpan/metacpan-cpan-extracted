@@ -1,4 +1,23 @@
-Revision history for App-FatPackUtils
+0.11    2017-07-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix dzil plugin ordering.
+
+
+0.10    2017-07-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Abstract.
+
+
+0.09    2017-07-04 (PERLANCAR)
+
+	- Add script: fatpack-extract.
+
+	- Replace Log::Any with Log::ger.
+
 
 0.08    2016-12-29 (PERLANCAR)
 
