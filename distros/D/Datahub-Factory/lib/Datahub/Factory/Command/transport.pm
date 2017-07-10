@@ -12,7 +12,7 @@ use namespace::clean;
 use Datahub::Factory::PipelineConfig;
 use Datahub::Factory::Fixer::Condition;
 
-#use Data::Dumper qw(Dumper);
+use Data::Dumper qw(Dumper);
 
 sub abstract { "Transport data from a data source to a datahub instance" }
 
@@ -89,38 +89,68 @@ sub execute {
   };
 
   # Perform import/fix/export
+  #try {
+      my $condition = Datahub::Factory::Fixer::Condition->new('options' => $opt);
+      $condition->fixers;
+  #} catch {
+      # todo
+      #   Implement me.
+  #}
+
 
   # Catmandu::Fix treats all warnings as fatal errors (this is good)
   # so we can catch them with try-catch
   # Not that errors here are _not_ fatal => continue running
   # till all records have been processed
   my $counter = 0;
- 
+
   # $import_module->importer might also generate to-catch errors
   $import_module->each(sub {
       my $item = shift;
+      my $fix_module;
+
+      my $item_id = data_at($opt->{'id_path'}, $item);
+
       $counter++;
+
       my $f = try {
-          try {
-                my $cond = Datahub::Factory::Fixer::Condition->new(
-                    'options' => $opt,
-                    'item'    => $item
-                );
-                # Load the correct fixer here, we have the data here
-                $fix_module = $cond->fix_module;
+          ##
+          # Normally, failures in loading the fixer (which happens here)
+          # *should* be fatal. However. Perl/Catmandu does not really allow
+          # us to distinguish between errors:
+          # - Failure to load a module should be fatal and end the program.
+          # - Failure to find the correct fix because the $condition does not appear
+          #   *should not* be fatal and continue the run.
+          # The second failure will happen more, and will cause more issues
+          # so, we don't die and simply log the error, and continue to the next
+          # $item. This will have the effect of errorring out on every $item if
+          # the first failure occurs. Nihil ad facere. (This is not good Latin)
+          ##
+          my $c = try {
+            $fix_module = $condition->fix_module($item);
           } catch {
-                my $error_msg;
-                if ($_->can('message')) {
-                    $error_msg = $_->message;
-                } else {
-                    $error_msg = $_;
-                }
-                $logger->fatal($error_msg);
-                exit 1;
+              if ($_->meta->name eq 'Catmandu::BadVal') {
+                  # Non-fatal
+                  $logger->error('Item %d (counted): could not execute fix: %s', $counter, $_->message);
+                  return 1;
+              } else {
+                  my $error_msg;
+                  if ($_->can('message')) {
+                      $error_msg = $_->message;
+                  } else {
+                      $error_msg = $_;
+                  }
+                  $logger->fatal($error_msg);
+                  exit 1;
+              }
           };
 
-          # Execute the fix
-          $fix_module->fixer->fix($item);
+          if (defined($c) && $c == 1) {
+              return 1;
+          } else {
+             # Execute the fix
+             $fix_module->fixer->fix($item);
+          }
       } catch {
           my $error_msg;
           if ($_->can('message')) {
@@ -136,11 +166,11 @@ sub execute {
           return;
       }
 
-      my $item_id = data_at($opt->{'id_path'}, $item);
       my $e = try {
           $export_module->add($item);
       } catch {
           my $error_msg;
+
           # $item_id can be undefined if it isn't set in the source, but this
           # is only discovered when exporting (and not during fixing)
           my $id_type = 'id';
@@ -161,7 +191,7 @@ sub execute {
           # End the processing of this record, go to the next one.
           return;
       }
-      $logger->info(sprintf('Item %s (id): exported.', $item_id));
+      $logger->info(sprintf('Item #%s : %s (id): exported.', $counter, $item_id));
   });
 
 }

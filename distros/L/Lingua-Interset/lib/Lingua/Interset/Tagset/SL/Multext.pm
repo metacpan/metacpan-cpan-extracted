@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::SL::Multext;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -82,14 +82,14 @@ sub _create_atoms
             'g' => [],
             # possessive adjective
             # examples: kalcijev, ogljikov, papežev
-            's' => ['poss' => 'poss'],
+            's' => ['poss' => 'yes'],
             # participial adjective
             # examples: prepričan, pripravljen, namenjen
             'p' => ['verbform' => 'part']
         },
         'encode_map' =>
 
-            { 'poss' => { 'poss' => 's',
+            { 'poss' => { 'yes' => 's',
                            '@'   => { 'verbform' => { 'part' => 'p',
                                                       '@'    => 'g' }}}}
     );
@@ -1346,7 +1346,7 @@ Lingua::Interset::Tagset::SL::Multext - Driver for the Slovene tagset of the Mul
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

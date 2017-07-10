@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::CS::Pmk;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -391,7 +391,7 @@ sub _create_atoms
             # slovesné: postavení, bití, chování
             '5' => ['other' => {'nountype' => 'verb'}],
             # slovesné zvratné: věnování se; note: the tag is assigned to "věnování" while "se" has an empty tag
-            '6' => ['other' => {'nountype' => 'verb'}, 'reflex' => 'reflex'],
+            '6' => ['other' => {'nountype' => 'verb'}, 'reflex' => 'yes'],
             # zkratkové slovo: ó dé eska; note: the tag is assigned to "ó" while "dé" and "eska" have empty tags
             # This is not the same as an abbreviated noun.
             '7' => ['other' => {'nountype' => 'abbr'}],
@@ -400,7 +400,7 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'reflex' => { 'reflex' => '6',
+            { 'reflex' => { 'yes' => '6',
                             '@'      => { 'other/nountype' => { 'adj'    => '2',
                                                                 'pron'   => '3',
                                                                 'num'    => '4',
@@ -421,11 +421,11 @@ sub _create_atoms
             # slovesné: ovlivněný, skličující, vyspělý
             '2' => ['other' => {'adjtype' => 'verb'}],
             # přivlastňovací: Martinův, tátový, Klárčiny
-            '3' => ['poss' => 'poss']
+            '3' => ['poss' => 'yes']
         },
         'encode_map' =>
 
-            { 'poss' => { 'poss' => '3',
+            { 'poss' => { 'yes' => '3',
                           '@'    => { 'other/adjtype' => { 'verb' => '2',
                                                            '@'    => '1' }}}}
     );
@@ -439,23 +439,23 @@ sub _create_atoms
             # departicipiální prosté: přeloženej, shořelej, naloženej
             '1' => ['verbform' => 'part'],
             # zvratné: blížícím se, se živícim, drolící se
-            '2' => ['reflex' => 'reflex'],
+            '2' => ['reflex' => 'yes'],
             # jmenná forma sg neutra: (chybná anotace???) prioritní, vytížený, obligátní
             '3' => ['variant' => 'short', 'gender' => 'neut', 'number' => 'sing'],
             # jmenná forma jiná: schopni, ochotni, unaven
             '4' => ['variant' => 'short'],
             # zvratná jmenná forma: si vědom
-            '5' => ['variant' => 'short', 'reflex' => 'reflex'],
+            '5' => ['variant' => 'short', 'reflex' => 'yes'],
             # ostatní: chybnejch, normální, hovorový
             '0' => []
         },
         'encode_map' =>
 
-            { 'variant' => { 'short' => { 'reflex' => { 'reflex' => '5',
+            { 'variant' => { 'short' => { 'reflex' => { 'yes' => '5',
                                                         '@' => { 'gender' => { 'neut' => { 'number' => { 'sing' => '3',
                                                                                                          '@'    => '4' }},
                                                                                '@'    => '4' }}}},
-                             '@'     => { 'reflex' => { 'reflex' => '2',
+                             '@'     => { 'reflex' => { 'yes' => '2',
                                                         '@'      => { 'verbform' => { 'part' => '1',
                                                                                       '@'    => '0' }}}}}}
     );
@@ -471,7 +471,7 @@ sub _create_atoms
             # neurčité: všem, všechno, nějakou, ňáká, něco, některé, každý
             '2' => ['prontype' => 'ind'],
             # osobní zvratné: sebe, sobě, se, si, sebou
-            '3' => ['prontype' => 'prs', 'reflex' => 'reflex'],
+            '3' => ['prontype' => 'prs', 'reflex' => 'yes'],
             # ukazovací: to, takový, tu, ten, tamto, té, tech
             '4' => ['prontype' => 'dem'],
             # tázací: co, jaký, kdo, čim, komu, která
@@ -481,9 +481,9 @@ sub _create_atoms
             # záporné: žádná, nic, žádný, žádnej, nikdo, nikomu
             '7' => ['prontype' => 'neg'],
             # přivlastňovací: můj, tvůj, jeho, její, náš, váš, jejich
-            '8' => ['prontype' => 'prs', 'poss' => 'poss'],
+            '8' => ['prontype' => 'prs', 'poss' => 'yes'],
             # přivlastňovací zvratné: své, svýmu, svými, svoje
-            '9' => ['prontype' => 'prs', 'poss' => 'poss', 'reflex' => 'reflex'],
+            '9' => ['prontype' => 'prs', 'poss' => 'yes', 'reflex' => 'yes'],
             # víceslovné: nějaký takový, takový ňáký, nějaký ty, takovym tim
             '0' => ['prontype' => 'ind', 'other' => {'prontype' => 'víceslovné'}],
             # víceslovné vztažné: to co, "to, co", něco co, "ten, kdo"
@@ -491,9 +491,9 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'prontype' => { 'prs' => { 'poss' => { 'poss' => { 'reflex' => { 'reflex' => '9',
+            { 'prontype' => { 'prs' => { 'poss' => { 'yes' => { 'reflex' => { 'yes' => '9',
                                                                                '@'      => '8' }},
-                                                     '@'    => { 'reflex' => { 'reflex' => '3',
+                                                     '@'    => { 'reflex' => { 'yes' => '3',
                                                                                '@'      => '1' }}}},
                               'ind' => { 'other/prontype' => { 'víceslovné' => '0',
                                                                '@'          => '2' }},
@@ -742,16 +742,16 @@ sub _create_atoms
         'decode_map' =>
         {
             # citátové výrazy cizojazyčné, zvláště víceslovné: go, skinheads, non plus ultra, madame, cleaner polish
-            'C' => ['foreign' => 'foreign'],
+            'C' => ['foreign' => 'yes'],
             # zkratky neslovní: ý, í, x, ČKD, EEG
-            'Z' => ['abbr' => 'abbr'],
+            'Z' => ['abbr' => 'yes'],
             # propria: Kunratickou, Hrádek, Mirek, Roháčích, Vinnetou
             'P' => ['pos' => 'noun', 'nountype' => 'prop']
         },
         'encode_map' =>
 
-            { 'foreign' => { 'foreign' => 'C',
-                             '@'       => { 'abbr' => { 'abbr' => 'Z',
+            { 'foreign' => { 'yes' => 'C',
+                             '@'       => { 'abbr' => { 'yes' => 'Z',
                                                         '@'    => { 'nountype' => { 'prop' => 'P' }}}}}}
     );
     # PROPER NOUN TYPE ####################
@@ -1568,9 +1568,9 @@ sub _create_atoms
             '2' => ['other' => {'compverb' => 'comp'}],
             # zvratné nesložené: myslim (si myslim); ptej (se ptej); neboj (se neboj)
             # The feature of reflexiveness could accommodate this particular value.
-            '3' => ['other' => {'compverb' => 'rflx'}, 'reflex' => 'reflex'],
+            '3' => ['other' => {'compverb' => 'rflx'}, 'reflex' => 'yes'],
             # zvratné složené: atestovat (se bude atestovat); stávalo (by se stávalo); měla (by se měla)
-            '4' => ['other' => {'compverb' => 'rflx-comp'}, 'reflex' => 'reflex'],
+            '4' => ['other' => {'compverb' => 'rflx-comp'}, 'reflex' => 'yes'],
             # rezultativ prézens: placeno (máme placeno); maji (maji tam napsáno); votevřeno (maji votevřeno)
             '5' => ['other' => {'compverb' => 'res-pres'}],
             # rezultativ minulý: feminizováno (sem měl pracoviště silně feminizováno); napsáno (měli napsáno); nařízíno (měl nařízíno)
@@ -14510,7 +14510,7 @@ Lingua::Interset::Tagset::CS::Pmk - Driver for the Czech tagset of the Prague Sp
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

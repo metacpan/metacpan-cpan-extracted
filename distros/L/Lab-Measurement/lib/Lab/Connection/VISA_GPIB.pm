@@ -1,16 +1,7 @@
-#!/usr/bin/perl -w
-
-#
-# GPIB Connection class for Lab::Bus::VISA
-# This one implements a GPIB-Standard connection on top of VISA (translates
-# GPIB parameters to VISA resource names, mostly, to be exchangeable with other GPIB
-# connections.
-#
-
-# TODO: Access to GPIB VISA attributes, device clear, ...
-
 package Lab::Connection::VISA_GPIB;
-$Lab::Connection::VISA_GPIB::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: GPIB-type connection class which uses NI VISA (L<Lab::VISA>) as backend
+$Lab::Connection::VISA_GPIB::VERSION = '3.553';
 use strict;
 use Lab::VISA;
 use Lab::Bus::VISA;
@@ -166,6 +157,11 @@ sub SetTermChar {    # the character as string
     return $result;
 }
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -174,7 +170,15 @@ sub SetTermChar {    # the character as string
 
 Lab::Connection::VISA_GPIB - GPIB-type connection class which uses NI VISA (L<Lab::VISA>) as backend
 
+=head1 VERSION
+
+version 3.553
+
 =head1 SYNOPSIS
+
+This GPIB Connection class for Lab::Bus::VISA implements a GPIB-Standard 
+connection on top of VISA (translates GPIB parameters to VISA resource names, 
+mostly, to be exchangeable with other GPIB connections.
 
 This class is not called directly. To make a GPIB suppporting instrument use 
 Lab::Connection::VISA_GPIB, set the connection_type parameter accordingly:
@@ -208,11 +212,9 @@ into a valid NI VISA resource name (see L<Lab::Connection::VISA> for more detail
     gpib_saddress => $secondary_address
  }
 
-
 =head1 METHODS
 
 This just falls back on the methods inherited from L<Lab::Connection>.
-
 
 =head2 config
 
@@ -225,7 +227,11 @@ Without arguments, returns a reference to the complete $self->Config aka @_ of t
 
  $Config = $connection->Config();
  $GPIB_Address = $connection->Config()->{'gpib_address'};
- 
+
+=head1 TO DO
+
+Access to GPIB VISA attributes, device clear, ...
+
 =head1 CAVEATS/BUGS
 
 Probably few. Mostly because there's not a lot to be done here. Please report.
@@ -242,14 +248,18 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Florian Olbrich
-           2012      Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, David Kalok, Florian Olbrich
+            2012       Florian Olbrich, Stefan Geissler
+            2013       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

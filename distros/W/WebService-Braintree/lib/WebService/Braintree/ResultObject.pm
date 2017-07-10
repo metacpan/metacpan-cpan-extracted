@@ -1,5 +1,5 @@
 package WebService::Braintree::ResultObject;
-$WebService::Braintree::ResultObject::VERSION = '0.9';
+$WebService::Braintree::ResultObject::VERSION = '0.91';
 use WebService::Braintree::Util qw(is_arrayref is_hashref);
 use Moose;
 

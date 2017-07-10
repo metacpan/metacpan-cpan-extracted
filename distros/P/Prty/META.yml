@@ -3,7 +3,7 @@ abstract: 'Class library in Perl'
 author:
   - 'Frank Seitz <fs@fseitz.de>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.48'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -20,18 +20,21 @@ no_index:
 requires:
   DBD::SQLite: '0'
   DBI: '0'
+  DB_File: '0'
   Data::Printer: '0'
   File::Rsync: '0'
   HTTP::Request: '0'
   Image::Size: '0'
   JSON: '0'
   LWP::UserAgent: '0'
+  Mojolicious::Plugin: '0'
   Pod::WSDL: '0'
   SOAP::Transport::HTTP: '0'
   WWW::Mechanize: '0'
   XML::LibXML: '0'
   XML::Twig: '0'
+  perl: '5.010001'
 resources:
   repository: https://github.com/s31tz/Prty.git
-version: 1.113
+version: 1.117
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

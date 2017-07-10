@@ -1,3 +1,8 @@
+0.2.38 2017-07-07
+
+- Don't print set cwd
+- Resolve_os: Fix ubuntu/alpine bug
+
 0.2.37  2017-06-29
 
 * `strun` - support new parameter `--cwd` to set working directory during run ( mostly to use in Sparky )

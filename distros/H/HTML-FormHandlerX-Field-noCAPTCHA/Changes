@@ -1,6 +1,35 @@
 Revision History for HTML-FormHandlerX-Field-noCAPTCHA
 ======================================================
 
+v0.12 2017-07-06
+----------------
+
+commit 2a22cbc5266e89889a377c8ef1b8ee182282d9ff
+Author: Chuck Larson <clarson@cpan.org>
+
+    README.md update
+
+commit 770674322d7175ce4f1ea7217fc324d2e4a96949
+Author: Chuck Larson <clarson@cpan.org>
+
+    fixed docs and removed bad link to httpuptime.com
+
+v0.11 2017-07-06
+----------------
+
+commit e20504bd68d51498df19db9d3372d3c415a741c8
+Author: Chuck Larson <clarson@cpan.org>
+
+    fixed issue where render field only via form would not render field.
+
+v0.10 2017-01-05
+----------------
+
+commit 83cff6269804ddc5a896c0641d5b8ef55f123187
+Author: Chuck Larson <clarson@cpan.org>
+
+    v0.10
+
 v0.09 2016-12-27
 ----------------
 
@@ -8,48 +37,6 @@ commit 14e4e24eeb50ae34c6e6486eb95178a15ed27c5c
 Author: Chuck Larson <clarson@cpan.org>
 
     added Manifest and MetaYAML
-
-v0.08 2016-04-08
-----------------
-
-commit fc417b60d89049955ab5293c9fbdda87466c86df
-Author: Chuck Larson <clarson@cpan.org>
-
-    set min version for  Captcha::noCAPTCHA
-
-v0.07 2016-02-25
-----------------
-
-commit 0fc3f9544122e80495a778d4c8a1c2ff2d2cd3ff
-Author: Chuck Larson <clarson@cpan.org>
-
-    added noscript option to README.md
-
-commit 1c76c26b22bc7abea3896bc6bfc631e88745c0c6
-Merge: 4ea80f7 b503b01
-Author: Chuck Larson <chuck-github@chlarson.com>
-
-    Merge pull request #2 from adamherzog/add-noscript-option
-
-commit b503b01e3e191bf08242120248cdeaabb9eefc02
-Author: Adam Herzog <adam@adamherzog.com>
-
-    Add noscript rendering option.
-
-commit 37b2752554f99107347f88b04870c9501b27191f
-Author: Adam Herzog <adam@adamherzog.com>
-
-    Fix incorrect cmp_ok() test; replace with is().
-
-commit 5dbf1131f9778a15af49c5fd13e373cde3679b26
-Author: Chuck Larson <clarson@cpan.org>
-
-    added Captcha::NoCAPTCHA to SEE ALSO
-
-commit be6931ee2fb38baaef98daab2ad1660844c9512f
-Author: Chuck Larson <clarson@cpan.org>
-
-    ensure dzil do not include old releases in current release
 
 ===================================
 End of changes in the last 365 days

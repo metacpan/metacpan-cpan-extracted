@@ -1,8 +1,16 @@
 Revision history for Dancer-Plugin-Chain
 
+0.1.1 2017-07-07
+  - tidy up the code, no feature modification.
+
+  [ DOCUMENTATION ]
+    - 'prefix' plays along with the plugin, after all.
+
+  [ STATISTICS ]
+    - code churn: 9 files changed, 167 insertions(+), 53 deletions(-)
+
 0.1.0 2014-02-21
- - First version, unleashed on an unsuspecting world.
+  - First version, unleashed on an unsuspecting world.
 
- [STATISTICS]
- - code churn: 2 files changed, 18 insertions(+), 1 deletion(-)
-
+  [ STATISTICS ]
+    - code churn: 2 files changed, 18 insertions(+), 1 deletion(-)

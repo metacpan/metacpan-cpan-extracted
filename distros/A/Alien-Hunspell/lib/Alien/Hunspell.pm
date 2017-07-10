@@ -5,23 +5,10 @@ use warnings;
 use parent 'Alien::Base';
 
 # ABSTRACT: Install hunspell
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
-sub dynamic_libs
-{
-  my($self) = @_;
-  $self->install_type ne 'system'
-    ? $self->SUPER::dynamic_libs
-    : do {
-      require FFI::CheckLib;
-      FFI::CheckLib::find_lib(
-        lib => '*',
-        verify => sub { $_[0] =~ /hunspell/ },
-        symbol => 'Hunspell_create',
-      );
-    };
-}
+
 
 1;
 
@@ -37,43 +24,51 @@ Alien::Hunspell - Install hunspell
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
-Build.PL:
+In your Build.PL:
 
- use Alien::Hunspell;
  use Module::Build;
- 
- Module::Build->new(
+ use Alien::Hunspell;
+ my $builder = Module::Build->new(
    ...
+   configure_requires => {
+     'Alien::Hunspell' => '0',
+     ...
+   },
    extra_compiler_flags => Alien::Hunspell->cflags,
-   extra_linker_flags   => Alien::HunSpell->libs,
+   extra_linker_flags   => Alien::Hunspell->libs,
    ...
- )->create_build_script;
+ );
+ 
+ $build->create_build_script;
 
-Makefile.PL:
+In your Makefile.PL:
 
- use Alien:Hunspell;
  use ExtUtils::MakeMaker;
+ use Config;
+ use Alien::Hunspell;
  
  WriteMakefile(
    ...
-   CCFLAGS => $alien->cflags,
-   LIBS    => $alien->libs,
+   CONFIGURE_REQUIRES => {
+     'Alien::Hunspell' => '0',
+   },
+   CCFLAGS => Alien::Hunspell->cflags . " $Config{ccflags}",
+   LIBS    => [ Alien::Hunspell->libs ],
    ...
  );
 
-FFI::Platypus:
+In your L<FFI::Platypus> script or module:
 
- use Alien::Hunspell;
  use FFI::Platypus;
+ use Alien::Hunspell;
  
  my $ffi = FFI::Platypus->new(
-   lib => [Alien::Hunspell->new->dynamic_libs],
+   lib => [ Alien::Hunspell->dynamic_libs ],
  );
- ...
 
 =head1 DESCRIPTION
 

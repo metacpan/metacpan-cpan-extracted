@@ -3,7 +3,7 @@ Generate.PL
 Set-SegmentTree-*.*/
 Set-SegmentTree-*.*.tar.gz
 Makefile.old
-Makefile
+Makefile$
 MANIFEST.bak
 MANIFEST.SKP
 smalltemp.fastbuf

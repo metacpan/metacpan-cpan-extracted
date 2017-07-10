@@ -1,5 +1,8 @@
 Revision history for Alien-libtool
 
+0.04      2017-07-07 03:03:34 -0400
+  - Fixes for OpenBSD.
+
 0.03      2017-07-05 12:50:20 -0400
   - Add dependency on Alien::m4
 

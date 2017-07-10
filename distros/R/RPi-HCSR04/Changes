@@ -1,5 +1,25 @@
 Revision history for RPi-HCSR04
 
+2.3602  2017-07-07
+        - revert out the loop in XS. Forgot about the warning
+        - modified XS so that _cm() and _inch() each do their own business;
+          _cm() doesn't call _inch() anymore
+
+2.3601  2017-07-07
+        - added github info to Makefile.PL (closes #3)
+        - corrected pin numbers in voltage divider section in POD (closes #4)
+        - removed 'sudo' requirement from POD (closes #6)
+        - renamed all C functions to private, and removed POD that outlined them
+        - added '-lrt' to Makefile.PL LIBS to avoid undefined 'shm_open' symbol
+        - changed version numbering scheme to be in line with what other of the
+          RPi dists use that require the wiringPi library (closes #7)
+        - put warning in place that the end-user needs to do timing in loops
+        - loop in C until we get a value that is within range (0cm-400cm)
+          (closes #1)
+
+0.02    2017-01-13
+        - POD updates
+
 0.01    2017-01-13
         First version, released on an unsuspecting world.
 

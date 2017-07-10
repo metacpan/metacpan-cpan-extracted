@@ -1,5 +1,5 @@
 package Lab::Instrument::OI_ILM210;
-$Lab::Instrument::OI_ILM210::VERSION = '3.552';
+$Lab::Instrument::OI_ILM210::VERSION = '3.553';
 use strict;
 use Lab::Instrument;
 

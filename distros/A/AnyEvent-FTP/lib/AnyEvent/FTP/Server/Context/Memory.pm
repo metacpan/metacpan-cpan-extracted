@@ -11,7 +11,7 @@ use List::MoreUtils qw( first_index );
 extends 'AnyEvent::FTP::Server::Context';
 
 # ABSTRACT: FTP Server client context class with full read/write access
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::Auth';
@@ -46,13 +46,13 @@ sub find
   $path = Path::Class::Dir->new_foreign('Unix', $path) unless ref $path;
   $path = Path::Class::Dir->new_foreign('Unix', $self->cwd, $path)
     unless $path->is_absolute;
-  
+
   my $store = $self->store;
 
   return $store if $path eq '/';
-  
+
   my @list = $path->components;
-  
+
   while(1)
   {
     my $i = first_index { $_ eq '..' } @list;
@@ -66,10 +66,10 @@ sub find
       splice @list, $i, 1;
     }
   }
-  
+
   shift @list; # shift off the root
   my $top = pop @list;
-  
+
   foreach my $part (@list)
   {
     if(exists($store->{$part}) && ref($store->{$part}) eq 'HASH')
@@ -81,7 +81,7 @@ sub find
       return;
     }
   }
-  
+
   if(exists $store->{$top})
   { return $store->{$top} }
   else
@@ -102,7 +102,7 @@ sub help_cwd { 'CWD <sp> pathname' }
 sub cmd_cwd
 {
   my($self, $con, $req) = @_;
-  
+
   my $dir = Path::Class::Dir->new_foreign('Unix', $req->args)->cleanup;
   $dir = $dir->absolute($self->cwd) unless $dir->is_absolute;
 
@@ -122,9 +122,9 @@ sub cmd_cwd
     }
   }
 
-  
+
   $dir = Path::Class::Dir->new_foreign('Unix', @list);
-  
+
   if(ref($self->find($dir)) eq 'HASH')
   {
     $self->cwd($dir);
@@ -156,7 +156,7 @@ sub cmd_cdup
   {
     $con->send_response(550 => 'CDUP error');
   }
-  
+
   $self->done;
 }
 
@@ -166,7 +166,7 @@ sub help_pwd { 'PWD' }
 sub cmd_pwd
 {
   my($self, $con, $req) = @_;
-  
+
   my $cwd = $self->cwd;
   $con->send_response(257 => "\"$cwd\" is the current directory");
   $self->done;
@@ -178,9 +178,9 @@ sub help_size { 'SIZE <sp> pathname' }
 sub cmd_size
 {
   my($self, $con, $req) = @_;
-  
+
   my $file = $self->find(Path::Class::File->new_foreign('Unix', $req->args));
-  
+
   if(defined($file) && !ref($file))
   {
     $con->send_response(213 => length $file);
@@ -193,7 +193,7 @@ sub cmd_size
   {
     $con->send_response(550 => $req->args . ": No such file or directory");
   }
-  
+
   $self->done;
 }
 
@@ -203,7 +203,7 @@ sub help_mkd { 'MKD <sp> pathname' }
 sub cmd_mkd
 {
   my($self, $con, $req) = @_;
-  
+
   my $path = Path::Class::Dir->new_foreign('Unix', $req->args);
   my $file = $self->find($path->parent);
   if($path->basename ne '' && defined($file) && ref($file) eq 'HASH')
@@ -231,7 +231,7 @@ sub help_rmd { 'RMD <sp> pathname' }
 sub cmd_rmd
 {
   my($self, $con, $req) = @_;
-  
+
   # TODO: be more picky about rmd and file or dele a directory
   my $path = Path::Class::Dir->new_foreign('Unix', $req->args);
   my $file = $self->find($path->parent);
@@ -261,7 +261,7 @@ sub help_dele { 'DELE <sp> pathname' }
 sub cmd_dele
 {
   my($self, $con, $req) = @_;
-  
+
   my $path = Path::Class::File->new_foreign('Unix', $req->args);
   my $file = $self->find($path->parent);
   if(defined($file) && ref($file) eq 'HASH')
@@ -289,7 +289,7 @@ sub help_rnfr { 'RNFR <sp> pathname' }
 sub cmd_rnfr
 {
   my($self, $con, $req) = @_;
-  
+
   my $path = Path::Class::File->new_foreign('Unix', $req->args);
   my $dir = $self->find($path->parent);
   if(ref($dir) eq 'HASH')
@@ -308,7 +308,7 @@ sub cmd_rnfr
   {
     $con->send_response(550 => 'No such file or directory');
   }
-  
+
   $self->done;
 }
 
@@ -318,7 +318,7 @@ sub help_rnto { 'RNTO <sp> pathname' }
 sub cmd_rnto
 {
   my($self, $con, $req) = @_;
-  
+
   my $from = $self->rename_from;
 
   unless(defined $from)
@@ -327,7 +327,7 @@ sub cmd_rnto
     $self->done;
     return;
   }
-  
+
   my $path = Path::Class::File->new_foreign('Unix', $req->args);
   my $dir = $self->find($path->parent);
 
@@ -358,7 +358,7 @@ sub cmd_stat
   my($self, $con, $req) = @_;
 
   my $file = $self->find($req->args);
-  
+
   if(defined $file)
   {
     if(ref($file) eq 'HASH')
@@ -383,15 +383,15 @@ sub help_nlst { 'NLST [<sp> (pathname)]' }
 sub cmd_nlst
 {
   my($self, $con, $req) = @_;
-  
+
   my $dir = $req->args;
-  
+
   unless(defined $self->data)
   {
     $con->send_response(425 => 'Unable to build data connection');
     return;
   }
-  
+
   eval {
     $con->send_response(150 => "Opening ASCII mode data connection for file list");
     my @list;
@@ -452,19 +452,19 @@ AnyEvent::FTP::Server::Context::Memory - FTP Server client context class with fu
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
  use AnyEvent::FTP::Server;
- 
+
  my $server = AnyEvent::FTP::Server->new(
    default_context => 'AnyEvent::FTP::Server::Context::Memory',
  );
 
 =head1 DESCRIPTION
 
-This class provides a context for L<AnyEvent::FTP::Server> which uses 
+This class provides a context for L<AnyEvent::FTP::Server> which uses
 memory to provide storage.  Once the server process terminates, all
 data stored is lost.
 
@@ -554,6 +554,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

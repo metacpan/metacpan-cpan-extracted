@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "RapidApp" => "1.3001",
     "YAML::XS" => "0.65"
   },
-  "VERSION" => "1.0003",
+  "VERSION" => "1.0004",
   "test" => {
     "TESTS" => "t/*.t"
   }

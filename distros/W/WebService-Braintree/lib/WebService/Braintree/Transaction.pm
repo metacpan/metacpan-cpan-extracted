@@ -1,5 +1,5 @@
 package WebService::Braintree::Transaction;
-$WebService::Braintree::Transaction::VERSION = '0.9';
+$WebService::Braintree::Transaction::VERSION = '0.91';
 use WebService::Braintree::Transaction::CreatedUsing;
 use WebService::Braintree::Transaction::EscrowStatus;
 use WebService::Braintree::Transaction::Source;

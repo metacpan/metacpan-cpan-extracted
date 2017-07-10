@@ -1,12 +1,95 @@
-SYNOPSIS
+NAME
+    App::AcmeCpanauthors - Unofficial CLI for Acme::CPANAuthors
 
+VERSION
+    This document describes version 0.003 of App::AcmeCpanauthors (from Perl
+    distribution App-AcmeCpanauthors), released on 2017-07-07.
+
+SYNOPSIS
     See the included script acme-cpanauthors.
 
-ENVIRONMENT
+FUNCTIONS
+  acme_cpanauthors
+    Usage:
 
- DEBUG => bool
+     acme_cpanauthors(%args) -> [status, msg, result, meta]
+
+    Unofficial CLI for Acme::CPANAuthors.
+
+    Examples:
+
+    *   List installed Acme::CPANAuthors::* modules:
+
+         acme_cpanauthors( action => "list_installed");
+
+    *   List available Acme::CPANAuthors::* modules on CPAN:
+
+         acme_cpanauthors( action => "list_cpan");
+
+    *   Like previous example, but use local CPAN mirror first:
+
+         acme_cpanauthors( action => "list_cpan", lcpan => 1);
+
+    *   List PAUSE ID's of Indonesian authors:
+
+         acme_cpanauthors( module => "Indonesian", action => "list_ids");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action* => *str*
+
+    *   detail => *bool*
+
+        Display more information when listing modules/result.
+
+    *   lcpan => *bool*
+
+        Use local CPAN mirror first when available (for -L).
+
+    *   module => *str*
+
+        Acme::CPANAuthors::* module name, without Acme::CPANAuthors::
+        prefix.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  DEBUG => bool
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-AcmeCpanauthors>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-AcmeCpanauthors>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-AcmeCpanauthors>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Acme::CPANAuthors and "Acme::CPANAuthors::*" modules.
 
-    Acme::CPANAuthors and Acme::CPANAuthors::* modules.
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

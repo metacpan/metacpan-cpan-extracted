@@ -1,4 +1,10 @@
-Revision history for Pod-Weaver-Role-SectionText-SelfCompletion
+0.05    2017-07-07 (PERLANCAR)
+
+	- Replace recommendation that mentions DZP:GenShellCompletion with
+	  cpanm-shcompgen.
+
+	- [dist] Enable static install.
+
 
 0.04    2015-08-26 (PERLANCAR)
 

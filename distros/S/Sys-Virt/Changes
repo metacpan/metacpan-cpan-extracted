@@ -1,5 +1,9 @@
 Revision history for perl module Sys::Virt
 
+3.5.0 2017-07-06
+
+ - Add VIR_DOMAIN_BLOCK_COPY_TRANSIENT_JOB constant
+
 3.4.0 2017-06-05
 
  - Add LIST_CAP_MDEV & LIST_CAP_MDEV_TYPES constants

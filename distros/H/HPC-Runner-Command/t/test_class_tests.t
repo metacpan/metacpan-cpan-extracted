@@ -19,7 +19,7 @@ if ( $ENV{'TRAVIS'} || $ENV{'DEV'} ) {
             # 'TestsFor::HPC::Runner::Command::Test011',
             # 'TestsFor::HPC::Runner::Command::Test012',
             # 'TestsFor::HPC::Runner::Command::Test013',
-            # 'TestsFor::HPC::Runner::Command::Test014',
+            'TestsFor::HPC::Runner::Command::Test014',
             # 'TestsFor::HPC::Runner::Command::Test015',
             # 'TestsFor::HPC::Runner::Command::Test016',
         ],

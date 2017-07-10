@@ -1,7 +1,7 @@
 package App::DuckPAN::TemplateSet;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Set of templates an Instant Answer
-$App::DuckPAN::TemplateSet::VERSION = '1018';
+$App::DuckPAN::TemplateSet::VERSION = '1019';
 # A group of templates is a template set. Conceptually this represents a
 # sub-type of an instant answer type. For example, a Goodie can be a standard
 # Goodie or a Cheat Sheet goodie, each of which corresponds to a template set.
@@ -148,7 +148,7 @@ App::DuckPAN::TemplateSet - Set of templates an Instant Answer
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

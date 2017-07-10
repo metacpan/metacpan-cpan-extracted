@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Inlineable';
 
-our $VERSION = '1.16';
+our $VERSION = '1.161';
 
 has marc_path      => (fix_arg => 1);
 has regex          => (fix_arg => 1);
@@ -35,6 +35,9 @@ Catmandu::Fix::marc_replace_all - regex replace (sub)field values in a MARC file
 
     # Replace all 'Joe'-s in 100a to the value in field x.y.z
     marc_replace_all('100a','\bJoe\b',$.x.y.z)
+
+    # Replace all the content of 100a with everything in curly brackets
+    marc_replace_all('100a','^(.*)$','{$1}')
 
 =head1 DESCRIPTION
 

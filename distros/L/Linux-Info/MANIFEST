@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 changelog
+cpanfile
 dist.ini
 examples/diskusage.pl
 examples/loadavg.pl
@@ -31,6 +32,7 @@ lib/Linux/Info/ProcStats.pm
 lib/Linux/Info/Processes.pm
 lib/Linux/Info/SockStats.pm
 lib/Linux/Info/SysInfo.pm
+t/00-compilation.t
 t/010-sysinfo.t
 t/020-cpustats.t
 t/030-procstats.t
@@ -46,6 +48,7 @@ t/120-processes.t
 t/130-search.t
 t/140-psfind.t
 t/150-pstop.t
+t/160-linuxinfo.t
 t/samples/cpuinfo0
 t/samples/cpuinfo1
 t/samples/cpuinfo2

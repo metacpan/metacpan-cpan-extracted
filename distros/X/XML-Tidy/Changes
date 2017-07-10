@@ -1,6 +1,30 @@
 CHANGES
     Revision history for Perl extension XML::Tidy:
 
+    - 1.20 H79M9hU8 Sun Jul 9 09:43:30:08 -0500 2017
+      * removed broken Build.PL to resolve
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122406>. (Thank you,
+      Slaven.)
+
+    - 1.18 H78M5qm1 Sat Jul 8 05:52:48:01 -0500 2017
+      * fixed new() to check file or xml to detect standalone in
+      declaration, from <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122389>
+      (Thanks Alex!)
+
+      * traced tidy() memory leak from
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=120296> (Thanks Jozef!)
+      which seems to come from every XPath->findnodes() call
+
+      * aligned synopsis comments
+
+      * updated write() to use output encoding UTF-8 since that's what
+      almost all XML should rely on (with thanks to RJBS for teaching me
+      much from his great talk at <HTTPS://YouTube.Com/watch?v=TmTeXcEixEg>)
+
+      * collapsed trailing curly braces on code blocks
+
+      * added croak for any failed file open attempt
+
     - 1.16 G6LM4EST Tue Jun 21 04:14:28:29 -0500 2016
       * stopped using my old fragile package generation and manually updated
       all distribution files (though Dist::Zilla should let me generate much
@@ -9,20 +33,20 @@ CHANGES
       * updated license to GPLv3+
 
       * fixed 00pod.t and 01podc.t to eval the Test modules from issue and
-      patch: HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592 (Thanks
+      patch: <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592> (Thanks
       again MichielB.)
 
       * replaced all old '&&' with 'and' in POD
 
     - 1.14 G6JMERCY Sun Jun 19 14:27:12:34 -0500 2016
       * separated old PT from VERSION to fix non-numeric issue:
-      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=56073 (Thanks to
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=56073> (Thanks to
       Slaven.)
 
       * removed Unicode from POD but added encoding utf8 anyway to pass
       tests and resolve issues:
-      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=92434 and
-      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592 (Thanks to
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=92434> and
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592> (Thanks to
       Sudhanshu and MichielB.)
 
     - 1.12.B55J2qn Thu May 5 19:02:52:49 2011
@@ -38,11 +62,11 @@ CHANGES
       * aligned .t code
 
       * added test for newline before -r to try to resolve:
-      HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65471 (Thanks, Leandro.)
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65471> (Thanks, Leandro.)
 
       * fixed off-by-one error when new gets a readable (non-newline)
       filename (that's not "filename" without a pre-'filename' param) to
-      resolve: HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65151 (Thanks,
+      resolve: <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65151> (Thanks,
       Simone.)
 
     - 1.6.A7RJKwl Tue Jul 27 19:20:58:47 2010

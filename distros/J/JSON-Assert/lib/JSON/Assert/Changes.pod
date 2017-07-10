@@ -1,5 +1,15 @@
 =head1 CHANGELOG FOR JSON::Assert
 
+=head2 VERSION 0.08,  7 JULY 2017
+
+=over
+
+=item *
+
+Fix missing dep for MooX::Types::MooseLike::Base
+
+=back
+
 =head2 VERSION 0.07, 27 JUNE 2017
 
 =over

@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
-
 package Lab::Connection::DEBUG;
-$Lab::Connection::DEBUG::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Connection to the DEBUG bus
+$Lab::Connection::DEBUG::VERSION = '3.553';
 use strict;
 use Time::HiRes qw (usleep sleep);
 use Lab::Connection;
@@ -35,26 +35,31 @@ sub new {
 
 1;
 
+__END__
+
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Lab::Connection::DEBUG - Debug connection
+Lab::Connection::DEBUG - Connection to the DEBUG bus
+
+=head1 VERSION
+
+version 3.553
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Florian Olbrich
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
 
 
-=head1 DESCRIPTION
-
-Connection to the DEBUG bus.
-
-=head1 AUTHOR/COPYRIGHT
-
- Copyright 2011      Florian Olbrich
-
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

@@ -13,8 +13,8 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/create-self-signed-ssl-cert',
-    'bin/create-ssl-csr'
+    'script/create-self-signed-ssl-cert',
+    'script/create-ssl-csr'
 );
 
 # no fake home requested

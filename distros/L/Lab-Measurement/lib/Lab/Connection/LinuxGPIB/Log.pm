@@ -1,5 +1,5 @@
 package Lab::Connection::LinuxGPIB::Log;
-$Lab::Connection::LinuxGPIB::Log::VERSION = '3.552';
+$Lab::Connection::LinuxGPIB::Log::VERSION = '3.553';
 use 5.010;
 use warnings;
 use strict;

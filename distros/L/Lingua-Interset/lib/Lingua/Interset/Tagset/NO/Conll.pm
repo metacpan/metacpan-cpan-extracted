@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::NO::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -101,7 +101,7 @@ sub _create_atoms
         'surfeature' => 'prontype',
         'decode_map' =>
         {
-            'refl'   => ['reflex'      => 'reflex'],
+            'refl'   => ['reflex'      => 'yes'],
             'hum'    => ['animateness' => 'anim'], # not strictly animate
             'pers'   => ['prontype'    => 'prs'],
             'høflig' => ['politeness'  => 'pol'],
@@ -110,7 +110,7 @@ sub _create_atoms
         },
         'encode_map' =>
         {
-            'reflex' => { 'reflex' => 'refl',
+            'reflex' => { 'yes' => 'refl',
                           '@'      => { 'animateness' => { 'anim' => 'hum',
                                                            '@'    => { 'politeness' => { 'pol' => 'høflig',
                                                                                          '@'   => { 'prs' => 'pers',
@@ -124,7 +124,7 @@ sub _create_atoms
         'intfeature' => 'poss',
         'simple_decode_map' =>
         {
-            'poss' => 'poss'
+            'poss' => 'yes'
         }
     );
     # SPECIAL TYPE ####################
@@ -133,13 +133,13 @@ sub _create_atoms
         'surfeature' => 'spectype',
         'decode_map' =>
         {
-            'unorm' => ['typo' => 'typo'],
-            'fork'  => ['abbr' => 'abbr']
+            'unorm' => ['typo' => 'yes'],
+            'fork'  => ['abbr' => 'yes']
         },
         'encode_map' =>
         {
-            'typo' => { 'typo' => 'unorm',
-                        '@'    => { 'abbr' => { 'abbr' => 'fork' }}}
+            'typo' => { 'yes' => 'unorm',
+                        '@'    => { 'abbr' => { 'yes' => 'fork' }}}
         }
     );
     # PUNCTUATION TYPE ####################
@@ -436,7 +436,7 @@ Lingua::Interset::Tagset::NO::Conll - Driver for a Norwegian tagset.
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

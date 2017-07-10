@@ -9,7 +9,7 @@ use Carp qw( croak );
 use Socket qw( unpack_sockaddr_in inet_ntoa );
 
 # ABSTRACT: Simple asynchronous ftp client
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 with 'AnyEvent::FTP::Role::Event';
@@ -56,11 +56,11 @@ sub BUILD
     $self->_connected(0);
     delete $self->{handle};
   });
-  
+
   require ($self->passive
     ? 'AnyEvent/FTP/Client/Transfer/Passive.pm'
     : 'AnyEvent/FTP/Client/Transfer/Active.pm');
-  
+
   return;
 }
 
@@ -68,15 +68,15 @@ sub BUILD
 sub connect
 {
   my($self, $host, $port) = @_;
-  
+
   if($host =~ /^ftp:/)
   {
     require URI;
     $host = URI->new($host);
   }
-  
+
   my $uri;
-  
+
   if(ref($host) && eval { $host->isa('URI') })
   {
     $uri = $host;
@@ -87,12 +87,12 @@ sub connect
   {
     $port //= 21;
   }
-  
+
   croak "Tried to reconnect while connected" if $self->_connected;
-  
+
   my $cv = AnyEvent->condvar;
   $self->_connected(1);
-  
+
   tcp_connect $host, $port, sub {
     my($fh) = @_;
     unless($fh)
@@ -102,14 +102,14 @@ sub connect
       $self->clear_command;
       return;
     }
-    
+
     # Get the IP address we are sending from for when
     # we use the PORT command (passive=0).
     $self->{my_ip} = do {
       my($port, $addr) = unpack_sockaddr_in getsockname $fh;
       inet_ntoa $addr;
     };
-    
+
     $self->{handle} = AnyEvent::Handle->new(
       fh       => $fh,
       on_error => sub {
@@ -123,7 +123,7 @@ sub connect
         $self->emit('close');
       },
     );
-    
+
     $self->on_next_response(sub {
       my $res = shift;
       return $cv->croak($res) unless $res->is_success;
@@ -143,18 +143,18 @@ sub connect
         $self->pop_command;
       }
     });
-    
+
     $self->{handle}->on_read(sub {
       $self->{handle}->push_read( line => sub {
         my($handle, $line) = @_;
         $self->process_message_line($line);
       });
     });
-    
-  }, sub { 
+
+  }, sub {
     $self->timeout;
   };
-  
+
   return $cv;
 }
 
@@ -257,7 +257,7 @@ sub rename
   );
 }
 
-  
+
 sub pwd
 {
   my($self) = @_;
@@ -265,7 +265,7 @@ sub pwd
   $self->push_command(['PWD'])->cb(sub {
     my $res = eval { shift->recv } // $@;
     my $dir = $res->get_dir;
-    if($dir) { $cv->send($dir) } 
+    if($dir) { $cv->send($dir) }
     else { $cv->croak($res) }
   });
   $cv;
@@ -287,21 +287,21 @@ sub size
 }
 
 
-(eval sprintf('sub %s { shift->push_command([ %s => @_])};1', lc $_, $_)) // die $@ 
+(eval sprintf('sub %s { shift->push_command([ %s => @_])};1', lc $_, $_)) // die $@
   for qw( CWD CDUP NOOP ALLO SYST TYPE STRU MODE REST MKD RMD STAT HELP DELE RNFR RNTO USER PASS ACCT MDTM );
-  
+
 
 sub quit
 {
   my($self) = @_;
   my $cv = AnyEvent->condvar;
-  
+
   my $res;
-  
+
   $self->push_command(['QUIT'])->cb(sub {
     $res = eval { shift->recv } // $@;
   });
-  
+
   my $save = $self->{event}->{close};
   $self->{event}->{close} = [ sub {
     if(defined $res && $res->is_success)
@@ -313,7 +313,7 @@ sub quit
     $_->() for @$save;
     $self->{event}->{close} = $save;
   } ];
-  
+
   return $cv;
 }
 
@@ -338,7 +338,7 @@ AnyEvent::FTP::Client - Simple asynchronous ftp client
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -501,7 +501,7 @@ is 30.
 
 =head2 passive
 
-If set to true (the default) then data will be transferred using the 
+If set to true (the default) then data will be transferred using the
 passive (PASV) command, meaning the server will open a port for the
 client to connect to.  If set to false then data will be transferred
 using data port (PORT) command, meaning the client will open a port
@@ -509,10 +509,10 @@ for the server to send to.
 
 =head1 METHODS
 
-Unless otherwise specified, these methods will return an AnyEvent condition variable 
-(AnyEvent->condvar) or an object that implements its interface (methods C<recv>, C<cb>).  
-On success the C<send> will be used on the condition variable, on failure C<croak> will be 
-used instead.  Unless otherwise specified the object sent (for both success and failure) 
+Unless otherwise specified, these methods will return an AnyEvent condition variable
+(AnyEvent->condvar) or an object that implements its interface (methods C<recv>, C<cb>).
+On success the C<send> will be used on the condition variable, on failure C<croak> will be
+used instead.  Unless otherwise specified the object sent (for both success and failure)
 will be an instance of L<AnyEvent::FTP::Client::Response>.
 
 As an example, here is a fairly thorough handling of a response to the standard FTP C<HELP>
@@ -563,7 +563,7 @@ The URI of the remote FTP server.  C<$uri> must be either an instance of L<URI> 
 scheme, or a string with an FTP URL.
 
 If you use this method to connect to the FTP server, connect will also attempt to login with
-the username and password specified in the URL (or anonymous FTP if no credentials are 
+the username and password specified in the URL (or anonymous FTP if no credentials are
 specified).
 
 If there is a path included in the URL, then connect will also do a C<CWD> so that you start
@@ -624,7 +624,7 @@ The contents of the file will be passed to the callback as they are received.
 
 =back
 
-In order to resume a transfer, you need to include the C<restart> option after the 
+In order to resume a transfer, you need to include the C<restart> option after the
 C<$local> argument.  Here is an example:
 
  # assumes foo.txt (partial download) exists in the current
@@ -851,8 +851,8 @@ to some servers, but is seldom used today in practice.  See RFC959 for details.
 
 =head2 $client-E<gt>size( $path )
 
-Get the size of the remote file specified by C<$path>.  This is an extension to the FTP 
-standard specified in RFC3659, and may not be implemented by older (or even newer) 
+Get the size of the remote file specified by C<$path>.  This is an extension to the FTP
+standard specified in RFC3659, and may not be implemented by older (or even newer)
 servers.
 
 Send the size of the file on success, instead of the response object.
@@ -871,7 +871,7 @@ Send the FTP C<QUIT> command and close the connection to the remote server.
 The C<site> method provides an interface to site specific FTP commands.  Many
 FTP servers will support an extended set of commands using the standard FTP
 C<SITE> command.  This command will not check to see if the site commands are
-supported by the remote server, so it is up to you to determine if you can 
+supported by the remote server, so it is up to you to determine if you can
 really use these interfaces yourself.
 
 =over 4
@@ -1266,6 +1266,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

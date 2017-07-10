@@ -1,5 +1,5 @@
 package WebService::Braintree::WebhookNotificationGateway;
-$WebService::Braintree::WebhookNotificationGateway::VERSION = '0.9';
+$WebService::Braintree::WebhookNotificationGateway::VERSION = '0.91';
 
 use MIME::Base64;
 use WebService::Braintree::Digest qw(hexdigest);

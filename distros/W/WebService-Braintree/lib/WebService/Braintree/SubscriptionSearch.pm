@@ -1,5 +1,5 @@
 package WebService::Braintree::SubscriptionSearch;
-$WebService::Braintree::SubscriptionSearch::VERSION = '0.9';
+$WebService::Braintree::SubscriptionSearch::VERSION = '0.91';
 use Moose;
 use WebService::Braintree::AdvancedSearch;
 

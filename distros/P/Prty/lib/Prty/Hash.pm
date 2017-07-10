@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -861,15 +861,11 @@ sub delete {
 
 =head4 Description
 
-Leere Hash, d.h. entferne alle Schlüssel/Wert-Paare. An der Menge der
-zulässigen Schlüssel ändert sich dadurch nichts!
+Leere Hash, d.h. entferne alle Schlüssel/Wert-Paare.
 
 Alternative Formulierung:
 
     %$h = ();
-
-Anmerkung: Die interne Größe des Hash (Anzahl der allozierten Buckets)
-wird durch das Leeren nicht verändert.
 
 =cut
 
@@ -1175,43 +1171,22 @@ sub weaken {
 
 =head2 Interna
 
-=head3 buckets() - Ermittele/Vergrößere Bucketanzahl
+=head3 buckets() - Ermittele Bucket-Anzahl
 
 =head4 Synopsis
 
     $n = $h->buckets;
-    $n = $h->buckets($m);
 
 =head4 Description
 
-Vergrößere die Bucketanzahl des Hash auf (mindestens) $m.
-Die Methode liefert die Anzahl der Buckets zurück. Ist kein
-Parameter angegeben, wird nur die Anzahl der Buckets geliefert.
-
-Anmerkungen:
-
-=over 2
-
-=item o
-
-$m wird von Perl auf die nächste Zweierpotenz aufgerundet
-
-=item o
-
-Die Bucketanzahl kann nur vergrößert, nicht verkleinert werden
-
-=back
+Liefere die Anzahl der Hash-Buckets.
 
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub buckets {
-    my ($self,$n) = @_;
-
-    if (defined $n) {
-        CORE::keys(%$self) = $n;
-    }
+    my $self = shift;
 
     # scalar(%hash) liefert 0, wenn der Hash leer ist, andernfalls
     # $x/$n, wobei $n die Anzahl der zur Verfügung stehenden Buckets ist
@@ -1219,6 +1194,7 @@ sub buckets {
     # eines leeren Hash zu ermitteln, müssen wir also temporär ein
     # Element hinzufügen.
 
+    my $n;
     unless ($n = scalar %$self) {
         $self->add(this_is_a_pseudo_key=>1);
         $n = scalar %$self;
@@ -1407,7 +1383,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

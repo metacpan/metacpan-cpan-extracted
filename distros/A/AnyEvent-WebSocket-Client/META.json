@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -55,7 +55,7 @@
             "PerlX::Maybe::XS" : "0"
          },
          "requires" : {
-            "AnyEvent" : "0",
+            "AnyEvent" : "7.13",
             "Moo" : "2.0",
             "PerlX::Maybe" : "0.003",
             "Protocol::WebSocket" : "0.20",
@@ -91,7 +91,13 @@
          "web" : "https://github.com/plicease/AnyEvent-WebSocket-Client"
       }
    },
-   "version" : "0.38",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.39",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Toshio Ito",
+      "Jos\u00e9 Joaqu\u00edn Atria",
+      "Kivanc Yazan"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

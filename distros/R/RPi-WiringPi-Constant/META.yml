@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/p5-rpi-wiringpi-constant/issues
   repository: https://github.com/stevieb9/p5-rpi-wiringpi-constant.git
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

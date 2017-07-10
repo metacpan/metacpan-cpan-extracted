@@ -5,10 +5,9 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use App::CISetup::Types qw( Str );
-use List::Gather;
 
 use Moose;
 
@@ -129,14 +128,14 @@ sub _fix_up_yaml {
 sub _cisetup_flags {
     my $self = shift;
 
-    return {
-        gather {
-            take email_address => $self->email_address
-                if $self->has_email_address;
-            take slack_channel => $self->slack_channel
-                if $self->has_slack_channel;
-        }
-    };
+    my %flags;
+    $flags{email_address} = $self->email_address
+        if $self->has_email_address;
+
+    $flags{slack_channel} = $self->slack_channel
+        if $self->has_slack_channel;
+
+    return \%flags;
 }
 ## use critic
 

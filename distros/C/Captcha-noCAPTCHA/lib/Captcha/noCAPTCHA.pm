@@ -5,7 +5,7 @@ use strict;
 use HTTP::Tiny;
 use JSON::PP qw();
 
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 sub new {
 	my ($class,$args) = @_;
@@ -195,8 +195,6 @@ The following modules or resources may be of interest.
 
 L<HTML::FormHandlerX::Field::noCAPTCHA>
 
-See it in action at L<https://www.httpuptime.com>
-
 =head1 AUTHOR
 
 Chuck Larson C<< <clarson@cpan.org> >>
@@ -207,7 +205,7 @@ leejo C<< <leejo@cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2015, Chuck Larson C<< <chuck+github@endcapsoftwware.com> >>
+Copyright 2017, Chuck Larson C<< <chuck+github@endcapsoftwware.com> >>
 
 This projects work sponsered by End Cap Software, LLC.
 L<http://www.endcapsoftware.com>

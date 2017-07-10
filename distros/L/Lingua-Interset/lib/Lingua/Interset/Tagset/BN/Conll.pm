@@ -8,7 +8,7 @@
 package Lingua::Interset::Tagset::BN::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -151,7 +151,7 @@ sub _create_atoms
             # , . - " ? ; : !
             'SYM'  => ['pos' => 'punc'],
             # foreign or unknown words
-            'UNK'  => ['foreign' => 'foreign'],
+            'UNK'  => ['foreign' => 'yes'],
             # The 'NULL' tag is used for artificial NULL nodes.
             'NULL' => ['other' => {'pos' => 'null'}]
         },
@@ -915,7 +915,7 @@ Lingua::Interset::Tagset::BN::Conll - Driver for the Bengali tagset of the ICON 
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

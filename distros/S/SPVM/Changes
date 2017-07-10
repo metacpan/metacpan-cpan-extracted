@@ -1,3 +1,17 @@
+0.0213 2017-07-10
+  - Fix MANIFEST
+0.0212 2017-07-10
+  - Fix hex literal bug. 0xFFFFFFFFFFFFFFFFL is OK.
+  - Fix bit shift bugs. <<, >>, >>> work well now.
+0.0211 2017-07-08
+  - Fix if statement condition not working bugs
+  - try {  } catch () { } syntax is replaced with eval { }; if ($@) { ... } syntax.
+0.0210 2017-07-08
+  - Fix reference count bugs
+0.0209 2017-07-07
+  - len $nums is replaced with @$nums
+  - $nums[0] is replaced with $nums->[0]
+  - $obj{x} is replaced with $obj->{x}
 0.0208 2017-07-06
   - add die logic when 32 bit Perl
   - add several SPVM internal functions

@@ -1,5 +1,5 @@
 package WebService::Braintree::Dispute;
-$WebService::Braintree::Dispute::VERSION = '0.9';
+$WebService::Braintree::Dispute::VERSION = '0.91';
 use WebService::Braintree::Dispute::TransactionDetails;
 use WebService::Braintree::Dispute::Status;
 use WebService::Braintree::Dispute::Reason;

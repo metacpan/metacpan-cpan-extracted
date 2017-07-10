@@ -8,6 +8,12 @@ Maintainer:   Kjetil Kjernsmo <kjetilk@cpan.org>
 Maintainer:   Gregory Todd Williams <gwilliams@cpan.org>
 Maintainer:   Chris Prather (PERIGRIN) <chris@prather.org>
 
+1.04	2017-07-08	Append a hash to only to XSD URIs.
+
+ [ Bug Fixes ]
+ - Partly revert fix in 1.02, now only append a hash to the XML Schema URI
+   (closes issue #14).
+
 1.02	2017-06-21	Append a hash to URIs needing it.
 
  [ Bug Fixes ]

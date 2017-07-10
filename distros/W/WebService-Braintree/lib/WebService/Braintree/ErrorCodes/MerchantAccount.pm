@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount;
-$WebService::Braintree::ErrorCodes::MerchantAccount::VERSION = '0.9';
+$WebService::Braintree::ErrorCodes::MerchantAccount::VERSION = '0.91';
 use strict;
 
 use constant IdIsNotAllowed                         => "82605";

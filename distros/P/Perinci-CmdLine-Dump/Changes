@@ -1,3 +1,11 @@
+0.11    2017-07-07 (PERLANCAR)
+
+        - [Bugfix] Forgot to pass -I options from 'libs' argument when
+          self-dumping.
+
+        - [dist] Enable static install.
+
+
 0.10    2017-06-24 (PERLANCAR)
 
 	- Bring back patching method because the self-dump method introduced in

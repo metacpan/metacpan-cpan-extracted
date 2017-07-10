@@ -24,12 +24,12 @@ Alternatively, if your CPAN shell is set up, you should just be able to do:
 As a last resort, you can manually install it. Download the tarball, untar it,
 then build it:
 
-    % perl Build.PL
-    % ./Build && ./Build test
+    % perl Makefile.PL
+    % make && make test
 
 Then install it:
 
-    % ./Build install
+    % make install
 
 If your perl is system-managed, you can create a local::lib in your home
 directory to install modules to. For details, see the local::lib documentation:

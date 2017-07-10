@@ -1,3 +1,10 @@
+BEGIN {
+    return unless $] >= 5.027001;
+    require Test2::API;
+    my $ctx = Test2::API::context();
+    $ctx->plan(0, SKIP => "Not needed on perl 5.27.1+");
+    $ctx->release;
+}
 # Make sure loading it multiple times is not a problem
 use Test2::Plugin::OpenFixPerlIO;
 use Test2::Plugin::OpenFixPerlIO;
@@ -14,6 +21,12 @@ use IO::Handle;
         bless {}, $class;
     }
 
+    sub FLUSH {
+        my $self = shift;
+        my ($handle) = @_;
+        $handle->flush;
+    }
+
     sub WRITE {
         my ($self, $buffer, $handle) = @_;
 
@@ -23,7 +36,7 @@ use IO::Handle;
 }
 
 use File::Temp qw/tempfile/;
-my ($fh, $name) = tempfile("$$-XXXXXXXX");
+my ($fh, $name) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
 binmode($fh, ':via(PerlIO::via::XXX):utf8');
 
 ok(

@@ -1,8 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # chvw.pl - example of binding callbacks to changeView events to update a secondary canvas
-use strict;
-use Tk;
-use Tk::AbstractCanvas;
+use strict;use warnings;
+use        Tk;
+use        Tk::AbstractCanvas;
 my $mwin = Tk::MainWindow->new();
 my $acnv = $mwin->AbstractCanvas()->pack(-expand => 1, -fill => 'both');
 my $acn2 = $mwin->AbstractCanvas()->pack(-expand => 1, -fill => 'both');
@@ -18,8 +18,7 @@ my $wind   = $acnv->createWindow(15, 16, -window => $labl);
 $acnv->configure(-changeView => [\&changeView, $acn2]);
 # viewAll if 2nd AbstractCanvas widget is resized.
 $acn2->CanvasBind('<Configure>' => sub {$acn2->viewAll});
-{
-  my $viewBox;
+{ my $viewBox;
   sub changeView {
     my($canvas2, @coords) = @_;
     $canvas2->delete($viewBox) if $viewBox;

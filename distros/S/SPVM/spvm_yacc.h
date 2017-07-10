@@ -65,8 +65,8 @@
      CASE = 281,
      DEFAULT = 282,
      VOID = 283,
-     TRY = 284,
-     CATCH = 285,
+     EVAL = 284,
+     EXCEPTION_VAR = 285,
      ASSIGN = 286,
      OR = 287,
      AND = 288,
@@ -113,8 +113,8 @@
 #define CASE 281
 #define DEFAULT 282
 #define VOID 283
-#define TRY 284
-#define CATCH 285
+#define EVAL 284
+#define EXCEPTION_VAR 285
 #define ASSIGN 286
 #define OR 287
 #define AND 288

@@ -1,5 +1,5 @@
 package WebService::Braintree::MerchantAccount::AddressDetails;
-$WebService::Braintree::MerchantAccount::AddressDetails::VERSION = '0.9';
+$WebService::Braintree::MerchantAccount::AddressDetails::VERSION = '0.91';
 
 use Moose;
 extends "WebService::Braintree::ResultObject";

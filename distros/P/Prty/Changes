@@ -1,0 +1,29 @@
+1.117 2017-07-09
+
+Datei LICENSE hinzugefügt.
+    
+[Prty::Ipc]
+Testfall für Exitcode != 0 angepasst, so dass auch bei schneller
+Ausführung von false(1) kein SIGPIPE ausgelöst wird.
+
+[Prty::Option]
+Argumente, die undef sind, lösen keine Warning mehr aus.
+
+1.116 2017-07-09
+
+[Prty::Hash]
+Unsinnigen Test auf gleiche Bucket-Größe nach clear() entfernt, da
+unportabel. Die zulässigen Keys in einem Restricted Hash
+bleiben in neueren Perl-Versionen nicht erhalten.
+
+Setzen von Bucket-Größe via buckets() entfernt, da unportabel.
+In neueren Perl-Versionen nicht mehr möglich.
+
+[Prty::Test::Class]
+Methode floatIs() hinzugefügt.
+
+[Prty::Math]
+Rundung bei Vergleich von Float-Werten zum Testcode hinzugefügt.
+
+[Prty::Timeseries::Synchronizer]
+Rundung bei Vergleich von Float-Werten zum Testcode hinzugefügt.

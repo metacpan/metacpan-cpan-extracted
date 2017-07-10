@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::TR::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -53,7 +53,7 @@ sub _create_atoms
             'Noun NPresPart' => ['pos' => 'noun', 'verbform' => 'part', 'tense' => 'pres'],
             'Noun NPastPart' => ['pos' => 'noun', 'verbform' => 'part', 'tense' => 'past'],
             'Pron PersP'     => ['pos' => 'noun', 'prontype' => 'prs'],
-            'Pron ReflexP'   => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'],
+            'Pron ReflexP'   => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'],
             # "Pron Pron" contains a heterogenous group of pronouns. Reciprocal pronouns seem to constitute a large part of it.
             # Example: birbirimizi (each other)
             'Pron Pron'      => ['pos' => 'noun', 'prontype' => 'rcp'],
@@ -92,7 +92,7 @@ sub _create_atoms
                                                    'prop' => 'Noun Prop',
                                                    '@'    => { 'prontype' => { 'dem' => 'Pron DemonsP',
                                                                                'int' => 'Pron QuesP',
-                                                                               'prs' => { 'reflex' => { 'reflex' => 'Pron ReflexP',
+                                                                               'prs' => { 'reflex' => { 'yes' => 'Pron ReflexP',
                                                                                                         '@'      => 'Pron PersP' }},
                                                                                ''    => { 'verbform' => { 'part' => { 'tense' => { 'fut'  => 'Noun NFutPart',
                                                                                                                                    'pres' => 'Noun NPresPart',
@@ -480,7 +480,7 @@ sub _create_atoms
             # Pass|Pos|Past|A3sg examples: belirtildi (was said), söylendi (was told), istendi (was asked), öğrenildi (was learned), kaldırıldı
             'Pass'   => ['voice' => 'pass'],
             # Reflex|Pos|Prog1|A3sg example: hazırlanıyor (is preparing itself)
-            'Reflex' => ['reflex' => 'reflex'],
+            'Reflex' => ['reflex' => 'yes'],
             # Recip|Pos|Past|A3sg example: karıştı (confused each other?)
             'Recip'  => ['voice' => 'rcp'],
             # Caus ... causative
@@ -496,7 +496,7 @@ sub _create_atoms
             'voice' => { 'pass' => 'Pass',
                          'rcp'  => 'Recip',
                          'cau'  => 'Caus',
-                         '@'    => { 'reflex' => { 'reflex' => 'Reflex' }}}
+                         '@'    => { 'reflex' => { 'yes' => 'Reflex' }}}
         }
     );
     # COPULA ####################
@@ -1771,7 +1771,7 @@ Lingua::Interset::Tagset::TR::Conll - Driver for the Turkish tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

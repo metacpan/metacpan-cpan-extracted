@@ -3,7 +3,7 @@ package App::Critique::Command::remove;
 use strict;
 use warnings;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use App::Critique::Session;
@@ -119,7 +119,7 @@ App::Critique::Command::remove - Remove critique session files
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

@@ -33,8 +33,6 @@ our @nodelist;
 # $tree->read(file => $fh);
 # Query your tree for a particular data
 # (ID, ID, ID, ID) = $tree->find(QUERYVALUE);
-use Data::UUID;
-
 use Set::SegmentTree;
 my $rawtree = Set::SegmentTree::Builder->new(['A',1,5],['B',2,3],['C',3,8],['D',10,12]);
 my $tree = $rawtree->build;

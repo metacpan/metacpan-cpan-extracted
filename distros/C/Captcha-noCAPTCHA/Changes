@@ -1,6 +1,22 @@
 Revision History for Captcha-noCAPTCHA
 ======================================
 
+v0.16 2017-07-06
+----------------
+
+commit e8ab51680867d546e51cb6e8d9f2551264a5c0a2
+Author: Chuck Larson <chuck@chlarson.com>
+
+    removed example site and updated copyright year
+
+v0.15 2017-01-05
+----------------
+
+commit e52282fb925fe43b0720caf9c1f25978844b9b21
+Author: Chuck Larson <chuck@chlarson.com>
+
+    v0.15
+
 v0.14 2016-12-27
 ----------------
 
@@ -26,30 +42,6 @@ commit c74d94cc779ecfe2a16bc4aa0bcb7b756fe3643a
 Author: Michael Schout <mschout@gkg.net>
 
     add response() accessor that returns most recent response
-
-v0.12 2016-02-25
-----------------
-
-commit e811739b884708481f5b1753a0d4f2eac54ffa8b
-Author: Chuck Larson <chuck@chlarson.com>
-
-    Added noscript option to README.md
-
-commit 5f9b552407777b1966297b3affadae556200fecc
-Merge: be007ac 4b25001
-Author: Chuck Larson <chuck-github@chlarson.com>
-
-    Merge pull request #4 from adamherzog/add-noscript-option
-
-commit 4b25001576e6bb8fc7832307a447b1ae966d8f4f
-Author: Adam Herzog <adam@adamherzog.com>
-
-    Add noscript option and rendering.
-
-commit b8cce68b184c61c85c7b6b714cd29f14c723ad52
-Author: Adam Herzog <adam@adamherzog.com>
-
-    Fix incorrect cmp_ok() test; replace with is().
 
 ===================================
 End of changes in the last 365 days

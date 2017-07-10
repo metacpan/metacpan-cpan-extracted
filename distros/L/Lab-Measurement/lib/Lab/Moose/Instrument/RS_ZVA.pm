@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVA;
-$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.552';
+$Lab::Moose::Instrument::RS_ZVA::VERSION = '3.553';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints;

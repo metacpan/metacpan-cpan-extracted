@@ -1,0 +1,40 @@
+NAME
+    App::cpanm::shcompgen - Install modules from CPAN (and activate shell
+    completion)
+
+VERSION
+    This document describes version 0.001 of App::cpanm::shcompgen (from
+    Perl distribution App-cpanm-shcompgen), released on 2017-07-08.
+
+DESCRIPTION
+    See the included cpanm-shcompgen script.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-cpanm-shcompgen>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-cpanm-shcompgen>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanm-shcompgen>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::cpanminus
+
+    App::shcompgen
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,4 +1,5 @@
 #line 2 "edit-distance.c.tmpl"
+#include <stdio.h>
 /* For INT_MAX/INT_MIN */
 #include <limits.h>
 /* For malloc. */
@@ -7,7 +8,7 @@
 #include "config.h"
 #include "text-fuzzy.h"
 #include "edit-distance-char-trans.h"
-#line 12 "edit-distance.c.tmpl"
+#line 13 "edit-distance.c.tmpl"
 
 
 /* Our unsorted dictionary linked list.       */
@@ -93,12 +94,12 @@ int distance_char_trans (
                     text_fuzzy_t * tf)
 
 {
-#line 97 "edit-distance.c.tmpl"
+#line 98 "edit-distance.c.tmpl"
 
 
 
 
-#line 108 "edit-distance.c.tmpl"
+#line 109 "edit-distance.c.tmpl"
     const unsigned char * word1 = (const unsigned char *) tf->b.text;
     int len1 = tf->b.length;
     const unsigned char * word2 = (const unsigned char *) tf->text.text;
@@ -195,6 +196,6 @@ int distance_char_trans (
 
 #endif
 
-#line 370 "edit-distance.c.tmpl"
+#line 371 "edit-distance.c.tmpl"
 }
 

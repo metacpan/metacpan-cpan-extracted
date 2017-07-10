@@ -1,5 +1,5 @@
 package Lab::Moose::Connection;
-$Lab::Moose::Connection::VERSION = '3.552';
+$Lab::Moose::Connection::VERSION = '3.553';
 use 5.010;
 use warnings;
 use strict;

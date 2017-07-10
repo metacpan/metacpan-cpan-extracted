@@ -3,7 +3,7 @@ package App::Critique::Command::status;
 use strict;
 use warnings;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Term::ANSIColor ':constants';
@@ -38,21 +38,25 @@ sub execute {
         info(HR_DARK);
         info('CONFIG:');
         info(HR_LIGHT);
-        info('  perl_critic_profile : %s', $session->perl_critic_profile // 'auto');
-        info('  perl_critic_theme   : %s', $session->perl_critic_theme   // 'auto');
-        info('  perl_critic_policy  : %s', $session->perl_critic_policy  // 'auto');
-        info('  git_work_tree       : %s', $session->git_work_tree       // 'auto');
-        info('  git_branch          : %s', $session->git_branch          // 'auto');
+        info('  perl_critic_profile = %s', $session->perl_critic_profile // '[...]');
+        info('  perl_critic_theme   = %s', $session->perl_critic_theme   // '[...]');
+        info('  perl_critic_policy  = %s', $session->perl_critic_policy  // '[...]');
+        info(HR_LIGHT);
+        info('  git_work_tree       = %s', $session->git_work_tree      );
+        info('  git_work_tree_root  = %s', $session->git_work_tree_root );
+        info('  git_branch          = %s', $session->git_branch         );
+        info('  git_head_sha        = %s', $session->git_head_sha       );
+        
         info(HR_DARK);
         info('FILE CRITERIA:');
         info(HR_LIGHT);
-        info('  filter       : %s', $session->file_criteria->{'filter'}       // '-');
-        info('  match        : %s', $session->file_criteria->{'match'}        // '-');
-        info('  no-violation : %s', $session->file_criteria->{'no_violation'} // '-');
+        info('  filter       = %s', $session->file_criteria->{'filter'}       // '[...]');
+        info('  match        = %s', $session->file_criteria->{'match'}        // '[...]');
+        info('  no-violation = %s', $session->file_criteria->{'no_violation'} // '[...]');
     }
 
     info(HR_DARK);
-    info('FILES: <legend: [v|r|e|c] path>');
+    info('FILES: <legend: [v|r|e|c]:(idx) path>');
     if ( $opt->verbose ) {
         info(HR_LIGHT);
         info('CURRENT FILE INDEX: (%d)', $curr_file_idx);
@@ -61,17 +65,18 @@ sub execute {
     if ( $num_files ) {
         foreach my $i ( 0 .. $#tracked_files ) {
             my $file = $tracked_files[$i];
-            info('%s [%s|%s|%s|%s] %s',
+            info('%s [%s|%s|%s|%s]:(%d) %s',
                 ($i == $curr_file_idx ? '>' : ' '),
                 $file->recall('violations') // '-',
                 $file->recall('reviewed')   // '-',
                 $file->recall('edited')     // '-',
                 $file->recall('commited')   // '-',
-                $file->relative_path( $session->git_work_tree ),
+                $i,                
+                $file->relative_path( $session->git_work_tree_root ),
             );
             if ( $opt->verbose ) {
                 foreach my $sha ( @{ $file->recall('shas') || [] } ) {
-                    info('          : %s', $git->show($sha, { format => '%h - %s', s => 1 }));
+                    info('           | %s', $git->show($sha, { format => '%h - %s', s => 1 }));
                 }
             }
         }
@@ -80,11 +85,11 @@ sub execute {
         info(ITALIC('... no files added.'));
     }
     info(HR_DARK);
-    info('TOTAL: %s file(s)', format_number($num_files) );
-    info('  (v)iolations : %s', format_number($violations));
-    info('  (r)eviwed    : %s', format_number($reviewed)  );
-    info('  (e)dited     : %s', format_number($edited)    );
-    info('  (c)ommited   : %s', format_number($commited)  );
+    info('TOTAL: %s file(s)',   format_number($num_files) );
+    info('  (v)iolations = %s', format_number($violations));
+    info('  (r)eviwed    = %s', format_number($reviewed)  );
+    info('  (e)dited     = %s', format_number($edited)    );
+    info('  (c)ommited   = %s', format_number($commited)  );
 
     if ( $opt->verbose ) {
         info(HR_LIGHT);
@@ -104,7 +109,7 @@ App::Critique::Command::status - Display status of the current critique session.
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

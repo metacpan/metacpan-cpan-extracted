@@ -40,7 +40,7 @@ Class::Multimethods::multimethod __agm__ => qw(Math::MPC Math::MPC) => sub {
     my $count = 0;
     {
         Math::MPC::Rmpc_add($a1, $a0, $g0, $ROUND);
-        Math::MPC::Rmpc_div_2exp($a1, $a1, 1, $ROUND);
+        Math::MPC::Rmpc_div_2ui($a1, $a1, 1, $ROUND);
 
         Math::MPC::Rmpc_mul($g1, $a0, $g0, $ROUND);
         Math::MPC::Rmpc_add($t, $a0, $g0, $ROUND);

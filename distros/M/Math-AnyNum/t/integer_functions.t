@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 273;
+plan tests => 325;
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -32,11 +32,14 @@ is(fibonacci(12),          '144');
 is(fibonacci(-3),          'NaN');
 is(fibonacci($o->new(12)), '144');
 
-is(binomial(12,   5),  '792');
-is(binomial(0,    0),  '1');
-is(binomial(-15,  12), '9657700');
-is(binomial(124,  -2), '0');
-is(binomial(-124, -3), '0');
+is(binomial(12,           5),           '792');
+is(binomial(0,            0),           '1');
+is(binomial(-15,          12),          '9657700');
+is(binomial($o->new(-15), $o->new(12)), '9657700');
+is(binomial($o->new(-15), 12),          '9657700');
+is(binomial(-15,          $o->new(12)), '9657700');
+is(binomial(124,          -2),          '0');
+is(binomial(-124,         -3),          '0');
 
 is(binomial($o->new(12),  5),           '792');
 is(binomial(-15,          $o->new(12)), '9657700');
@@ -53,6 +56,35 @@ is(binomial($o->new(42), $o->new(39)), 11480);
 is(fibonacci(12), 144);
 is(lucas(15),     1364);
 
+is(falling_factorial(123,          13),          '764762377697592310465228800');
+is(falling_factorial(123,          $o->new(13)), '764762377697592310465228800');
+is(falling_factorial($o->new(123), 13),          '764762377697592310465228800');
+is(falling_factorial($o->new(123), $o->new(13)), '764762377697592310465228800');
+
+is(rising_factorial(123,          13),          '2724517128835670795827200000');
+is(rising_factorial(123,          $o->new(13)), '2724517128835670795827200000');
+is(rising_factorial($o->new(123), 13),          '2724517128835670795827200000');
+is(rising_factorial($o->new(123), $o->new(13)), '2724517128835670795827200000');
+
+is(falling_factorial(-123,          13),          '-2724517128835670795827200000');
+is(falling_factorial(-123,          $o->new(13)), '-2724517128835670795827200000');
+is(falling_factorial($o->new(-123), 13),          '-2724517128835670795827200000');
+is(falling_factorial($o->new(-123), $o->new(13)), '-2724517128835670795827200000');
+
+is(rising_factorial(-123,          13),          '-764762377697592310465228800');
+is(rising_factorial(-123,          $o->new(13)), '-764762377697592310465228800');
+is(rising_factorial($o->new(-123), 13),          '-764762377697592310465228800');
+is(rising_factorial($o->new(-123), $o->new(13)), '-764762377697592310465228800');
+
+is(falling_factorial(-123, -13), 'NaN');
+is(rising_factorial(-123, -13), 'NaN');
+
+is(falling_factorial(123,          $o->new(-42)), 'NaN');
+is(falling_factorial($o->new(123), $o->new(-42)), 'NaN');
+
+is(rising_factorial(123,          $o->new(-42)), 'NaN');
+is(rising_factorial($o->new(123), $o->new(-42)), 'NaN');
+
 # The following functions require GMP >= 5.1.0.
 #   primorial
 #   dfactorial
@@ -68,6 +100,15 @@ SKIP: {
     is(mfactorial($o->new(10), 2),          '3840');
     is(mfactorial(11,          $o->new(2)), '10395');
     is(mfactorial($o->new(10), $o->new(2)), '3840');
+
+    is(mfactorial(-3, -23), 'NaN');
+    is(mfactorial(-3, 23),  'NaN');
+    is(mfactorial(3,  -23), 'NaN');
+
+    is(mfactorial($o->new(-3), $o->new(-23)), 'NaN');
+    is(mfactorial($o->new(-3), 23),           'NaN');
+    is(mfactorial(3,           $o->new(-23)), 'NaN');
+    is(mfactorial($o->new(3),  -23),          'NaN');
 
     is(dfactorial(10),          '3840');
     is(dfactorial($o->new(11)), '10395');
@@ -102,6 +143,26 @@ is(ipow($o->new(2.5), 10.5),          1024);
 is(ipow($o->new(2),   10.5),          1024);
 is(ipow($o->new(2.5), $o->new(10)),   1024);
 is(ipow($o->new(2.5), 10),            1024);
+
+is(ipow2(0),               1);
+is(ipow2(3),               8);
+is(ipow2(-3),              0);
+is(ipow2(3.5),             8);
+is(ipow2(3.7),             8);
+is(ipow2($o->new('3.7')),  8);
+is(ipow2($o->new('13/2')), 64);
+is(ipow2($o->new(-1)),     0);
+is(ipow2($o->new(5)),      32);
+
+is(ipow10(0),               1);
+is(ipow10(3),               1000);
+is(ipow10(-3),              0);
+is(ipow10(3.7),             1000);
+is(ipow10(3.5),             1000);
+is(ipow10($o->new(-3)),     0);
+is(ipow10($o->new(3)),      1000);
+is(ipow10($o->new('13/2')), 1000000);
+is(ipow10($o->new('3.7')),  1000);
 
 is(lcm(13,          14),          182);
 is(lcm(14,          $o->new(13)), 182);
@@ -140,6 +201,9 @@ is(bernfrac($o->new(30)), '8615841276005/14322');
 is(bernfrac(52),          '-801165718135489957347924991853/1590');
 is(bernfrac(54),          '29149963634884862421418123812691/798');
 is(bernfrac($o->new(54)), '29149963634884862421418123812691/798');
+
+is(bernfrac(90), '1179057279021082799884123351249215083775254949669647116231545215727922535/272118');
+is(bernfrac(92), '-1295585948207537527989427828538576749659341483719435143023316326829946247/1410');
 
 is(harmfrac(-2),          'NaN');
 is(harmfrac(-1),          'NaN');

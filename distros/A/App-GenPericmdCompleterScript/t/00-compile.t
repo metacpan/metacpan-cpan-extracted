@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/gen-pericmd-completer'
+    'script/gen-pericmd-completer'
 );
 
 # no fake home requested

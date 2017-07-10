@@ -4,7 +4,6 @@ requires "Git::Sub" => "0";
 requires "IPC::Run3" => "0";
 requires "IPC::System::Simple" => "0";
 requires "List::AllUtils" => "0";
-requires "List::Gather" => "0";
 requires "Moose" => "0";
 requires "Moose::Role" => "0";
 requires "MooseX::Getopt::Dashes" => "0";

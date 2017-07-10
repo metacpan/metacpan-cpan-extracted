@@ -8,7 +8,7 @@ use Carp qw(carp confess);
 use POE;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.31';
+$VERSION = '0.32';
 sub DOSENDBACK () { 1 }
 
 our $globalinfos;
@@ -263,10 +263,12 @@ sub new {
       my $dhret = Net::SSLeay::PEM_read_bio_DHparams($dhbio);
       Net::SSLeay::BIO_free($dhbio);
       die "Couldn't set DH parameters!"
-         if (Net::SSLeay::set_tmp_dh($self->{ssl}, $dhret) < 0);
+         if (SSL_set_tmp_dh($self->{ssl}, $dhret) < 0);
+      #die "Couldn't set CTX DH parameters!"
+      #   if (SSL_CTX_set_tmp_dh($self->{context}, $dhret) < 0);
       my $rsa = Net::SSLeay::RSA_generate_key(2048, 73);
       die "Couldn't set RSA key!"
-         if (!Net::SSLeay::CTX_set_tmp_rsa($self->{context}, $rsa));
+         if (!SSL_CTX_set_tmp_rsa($self->{context}, $rsa));
       Net::SSLeay::RSA_free($rsa);
    }
 
@@ -567,7 +569,7 @@ POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 =head1 VERSION
 
-Version 0.31
+Version 0.32
 
 =head1 DESCRIPTION
 

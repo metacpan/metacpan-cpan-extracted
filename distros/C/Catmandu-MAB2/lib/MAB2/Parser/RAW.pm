@@ -1,6 +1,6 @@
 package MAB2::Parser::RAW;
 
-our $VERSION = '0.15';
+our $VERSION = '0.19';
 
 use strict;
 use warnings;

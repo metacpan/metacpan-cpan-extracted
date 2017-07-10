@@ -1,5 +1,5 @@
 package WebService::Braintree::Address;
-$WebService::Braintree::Address::VERSION = '0.9';
+$WebService::Braintree::Address::VERSION = '0.91';
 use Moose;
 extends 'WebService::Braintree::ResultObject';
 

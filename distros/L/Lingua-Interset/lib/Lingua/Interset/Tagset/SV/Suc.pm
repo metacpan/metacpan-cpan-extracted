@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::SV::Suc;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -64,7 +64,7 @@ sub _create_atoms
             'HP' => ['pos' => 'noun', 'prontype' => 'int|rel'],
             # interrogative/relative possessive pronoun / frågande/relativt possesivt pronomen
             # example: vars
-            'HS' => ['pos' => 'adj', 'prontype' => 'int|rel', 'poss' => 'poss'],
+            'HS' => ['pos' => 'adj', 'prontype' => 'int|rel', 'poss' => 'yes'],
             # infinitive marker / infinitivmärke
             # example: att
             'IE' => ['pos' => 'part', 'verbform' => 'inf'], ###!!! what is the current standard about infinitive markers?
@@ -107,7 +107,7 @@ sub _create_atoms
             'PP' => ['pos' => 'adp', 'adpostype' => 'prep'],
             # possessive pronoun / possesivt pronomen
             # examples: min, din, sin, vår, er, mitt, ditt, sitt, vårt, ert, mina, dina, sina, våra
-            'PS' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            'PS' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             # cardinal numeral / grundtal
             # examples: en, ett, två, tre, 1, 20, 2
             'RG' => ['pos' => 'num', 'numtype' => 'card'],
@@ -119,7 +119,7 @@ sub _create_atoms
             'SN' => ['pos' => 'conj', 'conjtype' => 'sub'],
             # foreign word / utländskt ord
             # examples: companionship, vice, versa, family, capita
-            'UO' => ['foreign' => 'foreign'],
+            'UO' => ['foreign' => 'yes'],
             # verb / verb
             # examples: vara, få, ha, bli, kunna
             'VB' => ['pos' => 'verb'],
@@ -128,16 +128,16 @@ sub _create_atoms
         {
             'pos' => { 'noun' => { 'prontype' => { ''    => { 'nountype' => { 'prop' => 'PM',
                                                                               '@'    => 'NN' }},
-                                                   'int' => { 'poss' => { 'poss' => 'HS',
+                                                   'int' => { 'poss' => { 'yes' => 'HS',
                                                                           '@'    => 'HP' }},
-                                                   '@'   => { 'poss' => { 'poss' => 'PS',
+                                                   '@'   => { 'poss' => { 'yes' => 'PS',
                                                                           '@'    => 'PN' }}}},
                        'adj'  => { 'prontype' => { ''    => { 'verbform' => { 'part' => 'PC',
                                                                               '@'    => { 'numtype' => { 'ord' => 'RO',
                                                                                                          '@'   => 'JJ' }}}},
-                                                   'int' => { 'poss' => { 'poss' => 'HS',
+                                                   'int' => { 'poss' => { 'yes' => 'HS',
                                                                           '@'    => 'HD' }},
-                                                   '@'   => { 'poss' => { 'poss' => 'PS',
+                                                   '@'   => { 'poss' => { 'yes' => 'PS',
                                                                           '@'    => 'DT' }}}},
                        'num'  => { 'numtype' => { 'ord' => 'RO',
                                                   '@'   => 'RG' }},
@@ -291,14 +291,14 @@ sub _create_atoms
         'decode_map' =>
         {
             # hyphenated prefix / sammansättningsform
-            'SMS' => ['hyph' => 'hyph'],
+            'SMS' => ['hyph' => 'yes'],
             # abbreviation / förkortning
-            'AN' => ['abbr' => 'abbr']
+            'AN' => ['abbr' => 'yes']
         },
         'encode_map' =>
         {
-            'hyph' => { 'hyph' => 'SMS',
-                        '@'    => { 'abbr' => { 'abbr' => 'AN' }}}
+            'hyph' => { 'yes' => 'SMS',
+                        '@'    => { 'abbr' => { 'yes' => 'AN' }}}
         }
     );
     # MERGED ATOM TO DECODE ANY FEATURE VALUE ####################
@@ -598,7 +598,7 @@ Lingua::Interset::Tagset::SV::Suc - Driver for the Swedish tagset of the Stockho
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

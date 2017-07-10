@@ -3,6 +3,8 @@ package Set::SegmentTree::node;
 use strict;
 use warnings;
 
+our $VERSION = '0.06';
+
 sub new {
 	my ($class, %args) = @_;
 	my $self = bless {}, $class;

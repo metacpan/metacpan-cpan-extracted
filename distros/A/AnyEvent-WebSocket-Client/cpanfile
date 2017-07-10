@@ -1,4 +1,4 @@
-requires "AnyEvent" => "0";
+requires "AnyEvent" => "7.13";
 requires "Moo" => "2.0";
 requires "PerlX::Maybe" => "0.003";
 requires "Protocol::WebSocket" => "0.20";

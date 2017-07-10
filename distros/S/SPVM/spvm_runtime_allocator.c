@@ -39,7 +39,7 @@ SPVM_RUNTIME_ALLOCATOR* SPVM_RUNTIME_ALLOCATOR_new(SPVM_RUNTIME* runtime) {
   return allocator;
 }
 
-inline int32_t SPVM_RUNTIME_ALLOCATOR_get_freelist_index(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t size) {
+int32_t SPVM_RUNTIME_ALLOCATOR_get_freelist_index(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t size) {
   (void)api;
   (void)allocator;
   
@@ -74,8 +74,9 @@ inline int32_t SPVM_RUNTIME_ALLOCATOR_get_freelist_index(SPVM_API* api, SPVM_RUN
   return index;
 }
 
-inline void* SPVM_RUNTIME_ALLOCATOR_malloc(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t size) {
-  
+void* SPVM_RUNTIME_ALLOCATOR_malloc(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, int64_t size) {
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->runtime;
+
   assert(size > 0);
   
   void* block;
@@ -87,17 +88,26 @@ inline void* SPVM_RUNTIME_ALLOCATOR_malloc(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR
     
     void* free_address = SPVM_ARRAY_pop(allocator->freelists[index]);
     if (free_address) {
-      return free_address;
+      block = free_address;
     }
     else {
       block = SPVM_MEMORY_POOL_alloc(allocator->memory_pool, size);
     }
   }
+
+#ifdef DEBUG
+  if (block != NULL) {
+    runtime->object_count++;
+  }
+  warn("MALLOC OBJECT COUNT %d", runtime->object_count);
+#endif
   
   return block;
 }
 
-inline void SPVM_RUNTIME_ALLOCATOR_free_base_object(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, SPVM_BASE_OBJECT* base_object) {
+void SPVM_RUNTIME_ALLOCATOR_free_base_object(SPVM_API* api, SPVM_RUNTIME_ALLOCATOR* allocator, SPVM_BASE_OBJECT* base_object) {
+  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->runtime;
+  
   if (base_object == NULL) {
     return;
   }
@@ -106,6 +116,12 @@ inline void SPVM_RUNTIME_ALLOCATOR_free_base_object(SPVM_API* api, SPVM_RUNTIME_
     int64_t byte_size = SPVM_RUNTIME_API_calcurate_base_object_byte_size(api, base_object);
     
     assert(byte_size > 0);
+    
+#ifdef DEBUG
+    runtime->object_count--;
+    warn("FREE OBJECT COUNT %d", runtime->object_count);
+    assert(runtime->object_count >= 0);
+#endif
     
     if (byte_size > allocator->base_object_max_byte_size_use_memory_pool) {
       free(base_object);

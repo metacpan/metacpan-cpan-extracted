@@ -79,7 +79,7 @@ use MARC::File::USMARC;
 use MARC::Lint;
 use Catmandu::Importer::MARC::Decoder;
 
-our $VERSION = '1.16';
+our $VERSION = '1.161';
 
 with 'Catmandu::Importer';
 

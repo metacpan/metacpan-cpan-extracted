@@ -1,0 +1,240 @@
+#!/usr/bin/env perl
+# PODNAME: muter
+#
+# muter - a data transformation tool
+#
+# Copyright © 2017 brian m. carlson
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+
+=encoding UTF-8
+
+=head1 NAME
+
+muter - tool to convert between various formats
+
+=head1 SYNOPSIS
+
+B<muter> [B<-r>] B<-c> I<chain> [I<file>...]
+
+B<muter> [B<--verbose>] B<--help>
+
+=head1 DESCRIPTION
+
+B<muter> is a tool to process data by encoding and decoding it in various
+formats.  The series of transforms being used is described by the chain.
+
+Like most Unix command line tools, B<muter> processes the files specified on the
+command line, or standard input if no files are specified.  It produces output
+to standard output.  Input and output are generally assumed to be a series of
+bytes; where character interpretation is required, UTF-8 is used.
+
+A chain is a series of transforms separated by colons.  A reverse transform
+(decoding) is specified by preceding the transform with a C<-> character.  If a
+transform takes parameters, they are separated by commas and follow the
+transform either surrounded by parentheses or preceded by a comma.
+
+Not all transforms have an reverse transforms.  For example, the I<hash>
+transform, which implements cryptographic hashes, is not practically invertible
+(we hope).  An exception will be thrown if you attmept to use an invalid
+transform.
+
+Generally, a reverse transform will decode any variant of the forward transform.
+To preserve this invariant, related but incompatible transforms such as base64
+and url64 are separate transforms.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-c> I<chain>, B<--chain>=I<chain>
+
+Specify the chain of transforms.  This option is mandatory.
+
+=item B<-r>, B<--reverse>
+
+Reverse the chain of transforms and convert each forward transform to a reverse
+transform, and vice versa.  Assuming all transforms can be inverted, running an
+instance of B<muter> without this flag followed by an instance with this flag
+and with the same chain returns the original data.
+
+It is not valid to specify this flag with transforms that have no inverse.
+
+=item B<--help>
+
+List usage and all known transforms.
+
+=item B<--verbose>
+
+With B<--help>, provide a description for each transform parameter.
+
+=back
+
+=head1 BACKENDS
+
+The following backends are included with muter; additional backends can be used
+by creating modules under the C<App::Muter::Backend> namespace in C<@INC>.
+
+=head2 ascii85
+
+Implements the L<Ascii85 encoding|https://en.wikipedia.org/wiki/Ascii85>.
+
+=head2 base16
+
+Equivalent to the C<hex> backend with the C<upper> argument.  Implements the
+L<RFC 4648|https://tools.ietf.org/html/rfc4648> Base16 encoding.
+
+=head2 base32
+
+Implements the L<RFC 4648|https://tools.ietf.org/html/rfc4648> Base32 encoding.
+
+Accepts one option, C<manual>, which forces the use of the built-in encoder
+instead of L<MIME::Base32>.  This built-in encoder is forced if L<MIME::Base32>
+is missing or too old.
+
+=head2 base32hex
+
+Implements the L<RFC 4648|https://tools.ietf.org/html/rfc4648> Base32 with
+Extended Hex Alphabet encoding, better known as C<base32hex>.
+
+Accept one option, C<manual>, which does the same thing as for C<base32>.
+
+=head2 base64
+
+Implements the L<RFC 4648|https://tools.ietf.org/html/rfc4648> Base64 encoding.
+
+=head2 hash
+
+Implements a cryptographic hash of the input data.  There is no corresponding
+reverse transform.
+
+The following hash algorithms are supported:
+
+=over 4
+
+=item md5
+
+=item sha1
+
+=item sha224
+
+=item sha256
+
+=item sha3-224
+
+=item sha3-256
+
+=item sha3-384
+
+=item sha3-512
+
+=item sha384
+
+=item sha512
+
+=back
+
+=head2 hex
+
+Implements hex encoding.  Takes two options, C<lower> and C<upper>, that control
+which type of letters are used.
+
+=head2 identity
+
+Implements the identity transform.  Passes through the input unmodified.
+
+=head2 quotedprintable
+
+Implements quoted-printable MIME encoding.  With the option C<smtp>, encodes "."
+and "From " if they appear at the beginning of a line (including beginning of
+input).
+
+=head2 uri
+
+Implements URI percent encoding.
+
+Takes three possible options.  C<lower> and C<upper> control the type of hex
+character emitted, and C<form> makes space be encoded as C<+> instead of C<%20>
+(as for use in I<application/x-www-form-urlencoded>.
+
+=head2 url64
+
+Implements the L<RFC 4648|https://tools.ietf.org/html/rfc4648> Base64 Encdoing
+with URL and Filename Safe Alphabet.
+
+=head2 uuencode
+
+Implements UUencoding.  Note that the "begin" and "end" markers are not emitted.
+
+=head2 vis
+
+Implements the L<vis(3)> function found on the BSDs.  The options supported
+correspond directly to the constants that function takes.
+
+=head2 xml
+
+Implements encoding of XML special characters.  Note that the reverse transform
+decodes arbitrary decimal and hexadecimal entities into UTF-8.
+
+Takes one of the following three arguments:
+
+=over 4
+
+=item default
+
+Use XML entity names.
+
+=item hex
+
+Use hexadecimal entity names for all entities.
+
+=item html
+
+Use XML entitiy names, except for the apostrophe, which uses a hexadecimal
+entity.
+
+=head1 EXAMPLES
+
+=over 4
+
+=item B<muter> B<-c> -base64:uri
+
+Decode the standard input as Base64 and output it, encoding it using URI
+percent-encoding.
+
+=item B<muter> B<-r> B<-c> -uri:base64
+
+Exactly the same as the above.
+
+=item B<muter> B<-c> -hex:hash(sha256):base64 I<file>
+
+Read from I<file>, which contains a single hex-encoded string, hash the result
+with SHA-256, and encode the result as base64.  This chain could also be written
+as C-hex:hash,sha256:base64>, which may be easier to type.
+
+=back
+
+=cut
+
+use strict;
+use warnings;
+
+use App::Muter;
+
+exit App::Muter::Main::script(@ARGV) unless caller;

@@ -1,7 +1,11 @@
 Revision history for AnyEvent-WebSocket-Client
 
+0.39      2017-07-07 18:32:02 -0400
+  - Require AnyEvent 7.13 or better to address SSL/TLS error (gh#22)
+  - Updated example to use Mojo::Redis2 and modern Mojolicious (Kivanc Yazan gh#29)
+
 0.38      2017-01-31 13:11:24 -0500
-  - Fix skip in t/mojo_close_codes.t which requires EV to be installed
+  - Fix skip in t/mojo_close_codes.t which requires EV to be installed (José Joaquín Atria gh#28)
 
 0.37      2016-11-04 22:24:11 -0400
   - Added max_payload_size to AnyEvent::WebSocket::Client and 

@@ -11,11 +11,12 @@ requires 'Log::Any::Adapter', '>= 1.045';
 requires 'Syntax::Keyword::Try', '>= 0.04';
 requires 'namespace::clean', '>= 0.27';
 requires 'Variable::Disposition', '>= 0.004';
+requires 'Encode', '>= 1.98';
 
 # Used for transcoding - not essential, but commonly used
-recommends 'Encode', '>= 1.98';
 recommends 'MIME::Base64', 0;
 recommends 'JSON::MaybeXS', 0;
+recommends 'Text::CSV', 0;
 
 # Not so common
 suggests 'JSON::SL', '>= 1.0.6';

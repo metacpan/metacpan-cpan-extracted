@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_MFLI;
-$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.552';
+$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.553';
 use 5.010;
 use Moose;
 use MooseX::Params::Validate;

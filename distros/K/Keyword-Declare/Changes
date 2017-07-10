@@ -58,3 +58,10 @@ Revision history for Keyword-Declare
 0.001004  Thu Jul  6 19:20:00 2017
 
     * Tweaked Makefile.PL and docs to reflect 5.12 as minimal Perl version
+
+
+0.001005  Sun Jul  9 08:15:17 2017
+
+    * Tweaked docs to remove POD errors
+      (Thanks, Mohammad)
+

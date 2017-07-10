@@ -9,13 +9,13 @@ sub __idiv__ {    # takes two Math::GMPz objects
         my $sign = Math::GMPz::Rmpz_sgn($x);
 
         if ($sign == 0) {    # 0/0
-            goto &Math::AnyNum::_nan;
+            goto &_nan;
         }
         elsif ($sign > 0) {    # x/0 where: x > 0
-            goto &Math::AnyNum::_inf;
+            goto &_inf;
         }
         else {                 # x/0 where: x < 0
-            goto &Math::AnyNum::_ninf;
+            goto &_ninf;
         }
     };
 

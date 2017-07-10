@@ -1,3 +1,15 @@
+0.000009  2017-07-07 20:31:55-07:00 America/Los_Angeles
+
+    - Fix for perls 5.27 and 5.8
+    - Depend on more recent versions of deps to stop some failures
+
+0.000008  2017-07-06 21:14:04-07:00 America/Los_Angeles
+
+    - Change IOMuxer to better reflect line-buffered IO
+    - Change IOMuxer to name handles
+    - Change IOMuxer to number writes
+    - Minor test updates
+
 0.000007  2017-05-12 21:08:37-07:00 America/Los_Angeles
 
     - Switch IOMuxer to use JSON instead of bullshit

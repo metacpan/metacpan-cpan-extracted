@@ -1,3 +1,9 @@
+0.005   2017-07-07 (PERLANCAR)
+
+        - Switch from (ab)using InstallTool phase to using AfterBuild phase to
+          do our stuffs, to be compatible with DZP:StaticInstall.
+
+
 0.004   2017-07-04 (PERLANCAR)
 
         - Skip checking if lcpan is not available [thanks José Joaquín Atria].

@@ -1,5 +1,5 @@
 package Lab::Instrument::WR640;
-$Lab::Instrument::WR640::VERSION = '3.552';
+$Lab::Instrument::WR640::VERSION = '3.553';
 use 5.006;
 use strict;
 use warnings;

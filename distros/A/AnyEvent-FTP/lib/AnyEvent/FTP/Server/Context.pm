@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: FTP Server client context class
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 with 'AnyEvent::FTP::Role::Event';
 with 'AnyEvent::FTP::Server::Role::Context';
@@ -26,20 +26,20 @@ has ascii_layer => (
 sub push_request
 {
   my($self, $con, $req) = @_;
-  
+
   push @{ $self->{request_queue} }, [ $con, $req ];
-  
+
   $self->process_queue if $self->ready;
-  
+
   $self;
 }
 
 sub process_queue
 {
   my($self) = @_;
-  
+
   return $self unless @{ $self->{request_queue} } > 0;
-  
+
   $self->ready(0);
 
   my($con, $req) = @{ shift @{ $self->{request_queue} } };
@@ -52,7 +52,7 @@ sub process_queue
   }
 
   my $method = join '_', 'cmd', $command;
-  
+
   if($self->can($method))
   {
     $self->$method($con, $req);
@@ -61,7 +61,7 @@ sub process_queue
   {
     $self->invalid_command($con, $req);
   }
-  
+
   $self;
 }
 
@@ -111,7 +111,7 @@ AnyEvent::FTP::Server::Context - FTP Server client context class
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 METHODS
 
@@ -164,6 +164,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -18,11 +18,11 @@ WWW::Zotero::Write - Perl interface to the Zotero Write API
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
@@ -139,10 +139,7 @@ sub updateCollection {
         $self->_build_url( $groupid, $userid ) . "/collections/$data->{key}";
     my $token = encode_json($data);
     if ( !$data->{version} ) {
-        croak("Can't get Last-Modified-Version")
-            unless ( $self->_get_last_modified_version($groupid) );
-        $self->client->addHeader( 'If-Unmodified-Since-Version',
-            $self->last_modif_ver() );
+        $self->_header_last_modif_ver( $groupid, $userid );
     }
     my $response = $self->client->PATCH( $url, $token );
     return $self->_check_response( $response, "204" );
@@ -181,8 +178,9 @@ sub updateItems {
     croak "updateItems: can't treat more then 50 elements"
         if ( scalar @$data > 50 );
     my ( $groupid, $userid ) = @opt{qw(group user)};
-    my $url      = $self->_build_url( $groupid, $userid ) . "/items";
-    my $token    = encode_json($data);
+    my $url = $self->_build_url( $groupid, $userid ) . "/items";
+    my $token = encode_json($data);
+    $self->_header_last_modif_ver( $groupid, $userid );
     my $response = $self->client->POST( $url, $token );
     $self->last_modif_ver(
         $response->responseHeader('Last-Modified-Version') )
@@ -264,13 +262,7 @@ sub _delete_this {
         . "/$metadata="
         . join( $sep, @$data );
 
-    #ensure to set the last-modified-version with querying
-    #all the top collection
-    confess("Can't get Last-Modified-Version")
-        unless ( $self->_get_last_modified_version( $groupid, $userid ) );
-
-    $self->client->addHeader( 'If-Unmodified-Since-Version',
-        $self->last_modif_ver() );
+    $self->_header_last_modif_ver( $groupid, $userid );
     my $response = $self->client->DELETE($url);
     return $self->_check_response( $response, "204" );
 }
@@ -279,10 +271,9 @@ sub _add_this {
     my ( $self, $groupid, $userid, $data, $metadata ) = @_;
     confess "Can't treat more then 25 elements"
         if ( scalar @$data > 25 );
-
-    my $url = $self->_build_url( $groupid, $userid ) . "/$metadata";
-
-    my $token = encode_json($data);
+    $self->_header_last_modif_ver( $groupid, $userid );
+    my $url      = $self->_build_url( $groupid, $userid ) . "/$metadata";
+    my $token    = encode_json($data);
     my $response = $self->client->POST( $url, $token );
     return $self->_check_response( $response, "200" );
 
@@ -335,6 +326,18 @@ sub _build_url {
     my $type = defined $userid ? 'users' : 'groups';
 
     return $self->baseurl . "/$type/$id";
+
+}
+
+sub _header_last_modif_ver {
+    my ( $self, $groupid, $userid ) = @_;
+
+    #ensure to set the last-modified-version with querying
+    #all the top collection
+    confess("Can't get Last-Modified-Version")
+        unless ( $self->_get_last_modified_version( $groupid, $userid ) );
+    $self->client->addHeader( 'If-Unmodified-Since-Version',
+        $self->last_modif_ver() );
 
 }
 

@@ -1,5 +1,5 @@
 package WebService::Braintree::Configuration;
-$WebService::Braintree::Configuration::VERSION = '0.9';
+$WebService::Braintree::Configuration::VERSION = '0.91';
 
 use WebService::Braintree::Gateway;
 use Moose;

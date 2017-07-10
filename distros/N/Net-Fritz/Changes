@@ -1,5 +1,14 @@
 Revision history for perl distribution Net::Fritz
 
+v0.0.8 2017-07-08
+
+ - Net::Fritz::Box::new() can parse a configuration file where you can
+   store the username and password to log into your FRITZ!Box
+  - new convenience methods that reduce boilerplate code:
+   - Net::Fritz::Box::call()
+   - Net::Fritz::Device::call()
+ - various documentation fixes
+
 v0.0.7 2017-06-14
 
  - next try to fix XML::Simple related bugs during test execution,

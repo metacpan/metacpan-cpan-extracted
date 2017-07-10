@@ -1,42 +1,36 @@
 NAME
-    Tk::AbstractCanvas - Canvas with Abstract center, zoom, && rotate
+    Tk::AbstractCanvas - Canvas with Abstract center, zoom, and rotate
     methods
 
 VERSION
-    This documentation refers to version 1.4.A7QFZHF of Tk::AbstractCanvas,
-    which was released on Mon Jul 26 15:35:17:15 2010.
+    This documentation refers to version 1.8 of Tk::AbstractCanvas, which
+    was released on Sun Jul 9 09:27:50:55 -0500 2017.
 
 SYNOPSIS
-      #!/usr/bin/perl -w
-      use strict;
-      use Tk;
-      use Tk::AbstractCanvas;
+      use        Tk;
+      use        Tk::AbstractCanvas;
       my $mwin = Tk::MainWindow->new();
       my $acnv = $mwin->AbstractCanvas()->pack('-expand' => 1,
-        '-fill'  =>  'both');
+                                                          '-fill'  =>  'both');
       #$acnv->invertY(   1); # uncomment for inverted y-axis
-      $acnv->controlNav(1); # advanced CtrlKey+MouseDrag Navigation
-      $acnv->rectToPoly(1);
-      #$acnv->ovalToPoly(1); # uncomment for oval to rot w/ canvas
-      my $rect   = $acnv->createRectangle( 7,  8, 24, 23,
-        '-fill'  =>   'red');
-      my $oval   = $acnv->createOval(     23, 24, 32, 27,
-        '-fill'  => 'green');
-      my $line   = $acnv->createLine(      0,  1, 31, 32,
-        '-fill'  =>  'blue',
-        '-arrow' =>  'last');
-      my $labl   = $mwin->Label('-text' => 'Hello AbstractCanvas! =)');
-      my $wind   = $acnv->createWindow(15, 16, '-window' => $labl);
+       $acnv->controlNav(1); # advanced CtrlKey+MouseDrag Navigation
+       $acnv->rectToPoly(1);
+      #$acnv->ovalToPoly(1); # uncomment for oval to rot8 with canvas
+      my $rect   = $acnv->createRectangle( 7,  8, 24, 23, '-fill'  =>   'red');
+      my $oval   = $acnv->createOval(     23, 24, 32, 27, '-fill'  => 'green');
+      my $line   = $acnv->createLine(      0,  1, 31, 32, '-fill'  =>  'blue',
+                                                          '-arrow' =>  'last');
+      my $labl   = $mwin->Label('-text'  => 'Hello AbstractCanvas! =)');
+      my $wind   = $acnv->createWindow(15, 16, '-window' => $labl     );
       $acnv->CanvasBind('<Button-1>' => sub { $acnv->zoom(1.04); });
+      $acnv->CanvasBind('<Button-3>' => sub { $acnv->zoom(0.97); });
       $acnv->CanvasBind('<Button-2>' => sub {
         $acnv->rotate($rect,  5);
-        $acnv->rotate($wind,  5); # this rot should do nothing because
-        $acnv->rotate($oval, -5); #      can't rotate about own center
-        $acnv->rotate($line, -5);
-      });
-      $acnv->CanvasBind('<Button-3>' => sub { $acnv->zoom(0.97); });
+        $acnv->rotate($wind,  5); # this rot8 should do nothing because
+        $acnv->rotate($oval, -5); #   window can't go around own center
+        $acnv->rotate($line, -5);                                });
       $acnv->viewAll();
-      MainLoop();
+      MainLoop();                 # ... then click the 3 mouse buttons
 
 DESCRIPTION
     AbstractCanvas provides an alternative to a Tk::Canvas object which
@@ -47,14 +41,8 @@ DESCRIPTION
 
     Tk::AbstractCanvas is derived from the excellent modules Tk::WorldCanvas
     by Joseph Skrovan <Joseph@Skrovan.Com> (which was itself based on a
-    version by Rudy Albachten <Rudy@Albachten.Com>) && Tk::RotCanvas by Ala
+    version by Rudy Albachten <Rudy@Albachten.Com>) and Tk::RotCanvas by Ala
     Qumsieh <AQumsieh@CPAN.Org>.
-
-2DU
-    - add Math::Geometry::Planar && others to polygonize, find_CM, test
-    intersections, etc.
-    - abstract rotations fully away like zoom
-    - What else does AbstractCanvas need?
 
 USAGE
 DESCRIPTION
@@ -69,7 +57,7 @@ DESCRIPTION
     $acnv->viewArea(@box)) before calling MainLoop().
 
     Most of the *AbstractCanvas* methods are the same as regular *Canvas*
-    methods except that they accept && return abstract coordinates instead
+    methods except that they accept and return abstract coordinates instead
     of widget coordinates.
 
     *AbstractCanvas* also adds a new rotate() method to allow rotation of
@@ -157,7 +145,7 @@ NEW METHODS
     *$acnv*->controlNav([new_value])
       Returns the state of whether special Control+MouseButton drag
       navigation bindings are set. When true, Control-Button-1 mouse
-      dragging rotates the whole AbstractCanvas, 2 pans, && 3 zooms. The
+      dragging rotates the whole AbstractCanvas, 2 pans, and 3 zooms. The
       default of this value is 0 but this option is very useful if you don't
       need Control-Button bindings for some other purpose. An optional
       parameter can be supplied to set the value.
@@ -170,24 +158,24 @@ NEW METHODS
     *$acnv*->controlZoomScale([new_value])
       Returns the value of the special controlNav zoom scale (activated by
       Control-Button-3 dragging). The default value is -0.001. The zoom
-      function takes the distance dragged in pixels across the positive x &&
-      y axes scaled by the zoom factor to determine the zoom result. If you
-      make the scale positive, it will invert the directions which zoom in
-      && out. If you make the number larger (e.g., -0.003 or 0.003), zooming
-      will become more twitchy. If you make the number smaller (e.g.,
-      -0.0007 or 0.0007), zooming will happen more smoothly. An optional
-      parameter can be supplied to set the value.
+      function takes the distance dragged in pixels across the positive x
+      and y axes scaled by the zoom factor to determine the zoom result. If
+      you make the scale positive, it will invert the directions which zoom
+      in and out. If you make the number larger (e.g., -0.003 or 0.003),
+      zooming will become more twitchy. If you make the number smaller
+      (e.g., -0.0007 or 0.0007), zooming will happen more smoothly. An
+      optional parameter can be supplied to set the value.
 
     *$acnv*->controlRotScale([new_value])
       Returns the value of the special controlNav rotation scale (activated
       by Control-Button-1 dragging). The default value is -0.3. The rotation
-      function takes the distance dragged in pixels across the positive x &&
-      y axes scaled by the rotation factor to determine the rotation result.
-      If you make the scale positive, it will invert the directions which
-      rotate positive or negative degrees. If you make the number larger
-      (e.g., -0.7 or 0.7), rotations will become more twitchy. If you make
-      the number smaller (e.g., -0.07 or 0.07), rotations will happen more
-      smoothly. An optional parameter can be supplied to set the value.
+      function takes the distance dragged in pixels across the positive x
+      and y axes scaled by the rotation factor to determine the rotation
+      result. If you make the scale positive, it will invert the directions
+      which rotate positive or negative degrees. If you make the number
+      larger (e.g., -0.7 or 0.7), rotations will become more twitchy. If you
+      make the number smaller (e.g., -0.07 or 0.07), rotations will happen
+      more smoothly. An optional parameter can be supplied to set the value.
 
     *$acnv*->controlRotMoCB([\&new_callback])
       Returns the value of the special controlNav rotation motion callback.
@@ -232,7 +220,7 @@ NEW METHODS
     *$acnv*->rubberBand(*{0|1|2}*)
       Creates a rubber banding box that allows the user to graphically
       select a region. rubberBand is called with a step parameter '0', '1',
-      or '2'. '0' to start a new box, '1' to stretch the box, && '2' to
+      or '2'. '0' to start a new box, '1' to stretch the box, and '2' to
       finish the box. When called with '2', the specified box is returned
       (x1, y1, x2, y2)
 
@@ -247,9 +235,9 @@ NEW METHODS
                                             my @box = $acnv->rubberBand(2);
                                             my @ids = $acnv->find('enclosed', @box);
                                    for my $id (@ids) {$acnv->delete($id)} });
-        # Note: '<B3-ButtonRelease>' will be called for any ButtonRelease!  Use '<ButtonRelease-3>' instead.
-
-        # If you want the rubber band to look smooth during panning && zooming, add
+        # Note: '<B3-ButtonRelease>' will be called for any ButtonRelease!
+        #      Use '<ButtonRelease-3>' instead.
+        # If you want the rubber band to look smooth during panning and zooming, add
         #   rubberBand(1) update calls to the appropriate key-bindings:
         $acnv->CanvasBind(   '<Up>' => sub {                   $acnv->rubberBand(1)});
         $acnv->CanvasBind( '<Down>' => sub {                   $acnv->rubberBand(1)});
@@ -290,11 +278,11 @@ NEW METHODS
       Convert widget coordinates to abstract coordinates.
 
 CHANGED METHODS
-    Abstract coordinates are supplied && returned to AbstractCanvas methods
+    Abstract coordinates are supplied and returned to AbstractCanvas methods
     instead of widget coordinates unless otherwise specified. (i.e., These
-    methods take && return abstract coordinates: center, panAbstract,
+    methods take and return abstract coordinates: center, panAbstract,
     viewArea, find, coords, scale, move, bbox, rubberBand, eventLocation,
-    pixelSize, && create*)
+    pixelSize, and create*)
 
     *$acnv*->bbox([-exact => {0 | 1}], *TagOrID*, [*TagOrID*, ...])
       '-exact => 1' is only needed if the TagOrID is not 'all'. It will
@@ -312,10 +300,10 @@ CHANGED METHODS
       automatically.
 
     *$acnv*->scale(*'all', xOrigin, yOrigin, xScale, yScale*)
-      Scale should not be used to 'zoom' the display in && out as it will
+      Scale should not be used to 'zoom' the display in and out as it will
       change the abstract coordinates of the scaled objects. Methods zoom,
-      viewArea, && viewAll should be used to change the scale of the display
-      without affecting the dimensions of the objects.
+      viewArea, and viewAll should be used to change the scale of the
+      display without affecting the dimensions of the objects.
 
 VIEW AREA CHANGE CALLBACK
     *Tk::AbstractCanvas* option '-changeView' can be used to specify a
@@ -344,8 +332,8 @@ SCROLL REGION NOTES
     '1' by default there. With '-confine => 1' the canvas will not allow the
     display to go outside of the scroll region. This causes some methods not
     to work accurately, for example, the 'center' method will not be able to
-    center on coordinates near to the edge of the scroll region && 'zoom
-    out' near the edge will zoom out && pan towards the center.
+    center on coordinates near to the edge of the scroll region and 'zoom
+    out' near the edge will zoom out and pan towards the center.
 
     *Tk::AbstractCanvas* sets '-confine => 0' by default to avoid these
     problems. You can change it back with:
@@ -368,45 +356,76 @@ SCROLL REGION NOTES
       move
       scale
 
-    Instead they will mark the bounding box as invalid, && it will be
+    Instead they will mark the bounding box as invalid, and it will be
     updated at the next zoom or pan operation. The only downside to this is
     that the scrollbars will be incorrect until the update.
 
     If these operations increase the size of the box, changing the box is
-    trivial && the update is immediate.
+    trivial and the update is immediate.
 
 ROTATION LIMITATIONS
     As it stands, the module can only rotate the following object types
     about their centers:
 
     * Lines
+
     * Polygons
+
     * Rectangles (if rectToPoly(1) is called)
+
     * Ovals (if ovalToPoly(1) is called)
 
-    All other object types (bitmap, image, arc, text, && window) can only be
-    rotated about another point. A warning is issued if the user tries to
+    All other object types (bitmap, image, arc, text, and window) can only
+    be rotated about another point. A warning is issued if the user tries to
     rotate one of these object types about their center. Hopefully, more
     types will be able to center-rotate in the future.
 
 ROTATION DETAILS
-    To be able to rotate rectangles && ovals, this module is capable of
-    intercepting any calls to create(), createRectangle(), && createOval()
+    To be able to rotate rectangles and ovals, this module is capable of
+    intercepting any calls to create(), createRectangle(), and createOval()
     to change them to polygons. The user should not be alarmed if type()
     returns *polygon* when a *rectangle* or *oval* was created.
     Additionally, if you call coords() on a polygonized object, expect to
     have to manipulate all the additionally generated coordinates.
 
+TODO
+    - add Math::Geometry::Planar and others to polygonize, find_CM, test
+    intersections, etc.
+    - maybe include Graph::Easy and some file serialization like DiagEMT XML
+    but maybe more like a .Hrc format for the future
+    - maybe make Diag objects which can scale fonts or state-box sizes
+    separately from uniform AC zooms, have EMT side scroll panel, input or
+    output arrow ordering, state-box flags region and menu frameworks,
+    overview with rubberBand of main view region, jointed arrows, arcs,
+    splines, and pal8s
+    - abstract rotations fully away like zoom
+
 CHANGES
     Revision history for Perl extension Tk::AbstractCanvas:
+
+    - 1.8 H79M9Rot Sun Jul 9 09:27:50:55 -0500 2017
+      * added test skipping in 02acnv.t to resolve
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122405>. (Thanks again
+      Slaven!)
+
+      * removed broken Build.PL to resolve
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122404>. (Thank you,
+      Slaven.)
+
+    - 1.6 H78MEDIC Sat Jul 8 14:13:18:12 -0500 2017
+      * cleaned up examples and tested that grid works from
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=46655>. (Thanks Josef!)
+
+      * replaced POD ampersands with 'and' and turned double-spaces after
+      periods to single
 
     - 1.4.A7QFZHF Mon Jul 26 15:35:17:15 2010
       * updated license to GPLv3
 
     - 1.2.75L75Nr Mon May 21 07:05:23:53 2007
-      * added ex/* examples && tidied everything up
+      * added ex/* examples and tidied everything up
 
-      * added Ctrl rot callbacks (mocb, rlcb) && limited Motion && Release
+      * added Ctrl rot callbacks (mocb, rlcb) and limited Motion and Release
       to just Ctrl + one MouseButton events
 
     - 1.0.56BHMOt Sat Jun 11 17:22:24:55 2005
@@ -417,16 +436,49 @@ INSTALL
 
       `perl -MCPAN -e "install Tk::AbstractCanvas"`
 
-    or uncompress the package && run the standard:
+    or uncompress the package and run the standard:
 
       `perl Makefile.PL; make; make test; make install`
 
+BUGS
+    Please report any bugs or feature requests to bug-Tk-AbstractCanvas at
+    RT.CPAN.Org, or through the web interface at
+    <HTTPS://RT.CPAN.Org/NoAuth/ReportBug.html?Queue=Tk-AbstractCanvas>. I
+    will be notified, and then you can be updated of progress on your bug as
+    I address fixes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command
+    (after it is installed).
+
+      `perldoc Tk::AbstractCanvas`
+
+    You can also look for information at:
+
+        RT: CPAN's Request Tracker
+
+      HTTPS://RT.CPAN.Org/NoAuth/Bugs.html?Dist=Tk-AbstractCanvas
+
+        AnnoCPAN: Annotated CPAN documentation
+
+      HTTP://AnnoCPAN.Org/dist/Tk-AbstractCanvas
+
+        CPAN Ratings
+
+      HTTPS://CPANRatings.Perl.Org/d/Tk-AbstractCanvas
+
+        Search CPAN
+
+      HTTP://Search.CPAN.Org/dist/Tk-AbstractCanvas
+
 LICENSE
-    Most source code should be Free! Code I have lawful authority over is &&
-    shall be! Copyright: (c) 2005-2010, Pip Stuart. Copyleft : This software
-    is licensed under the GNU General Public License (version 3). Please
-    consult the Free Software Foundation (HTTP://FSF.Org) for important
-    information about your freedom.
+    Most source code should be Free! Code I have lawful authority over is
+    and shall be! Copyright: (c) 2005-2017, Pip Stuart. Copyleft : This
+    software is licensed under the GNU General Public License (version 3 or
+    later). Please consult <HTTPS://GNU.Org/licenses/gpl-3.0.txt> for
+    important information about your freedom. This is Free Software: you are
+    free to change and redistribute it. There is NO WARRANTY, to the extent
+    permitted by law. See <HTTPS://FSF.Org> for further information.
 
 AUTHORS
     Pip Stuart (*Pip@CPAN.Org*)

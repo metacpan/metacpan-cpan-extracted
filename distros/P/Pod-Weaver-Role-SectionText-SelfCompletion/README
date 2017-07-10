@@ -1,9 +1,17 @@
-DESCRIPTION
+NAME
+    Pod::Weaver::Role::SectionText::SelfCompletion - Provide COMPLETION
+    section text
 
-    This role provides text for "COMPLETION" POD section. The text
-    describes instructions for activating tab completion for script, for
-    several shells. It is meant for script that can complete itself
-    (detecting environment variables like COMP_LINE and COMP_POINT and act
+VERSION
+    This document describes version 0.05 of
+    Pod::Weaver::Role::SectionText::SelfCompletion (from Perl distribution
+    Pod-Weaver-Role-SectionText-SelfCompletion), released on 2017-07-07.
+
+DESCRIPTION
+    This role provides text for "COMPLETION" POD section. The text describes
+    instructions for activating tab completion for script, for several
+    shells. It is meant for script that can complete itself (detecting
+    environment variables like "COMP_LINE" and "COMP_POINT" and act
     accordingly).
 
     This role is currently used by
@@ -11,14 +19,38 @@ DESCRIPTION
     Pod::Weaver::Section::Completion::PerinciCmdLine.
 
 METHODS
-
- $obj->section_text_self_completion(\%vars) => str
-
+  $obj->section_text_self_completion(\%vars) => str
     Variables:
 
-      * command_name => str
+    *   command_name => str
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Role-SectionText-SelfCompletion
+    >.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Role-SectionCompletionSelf
+    >.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Role-Secti
+    onText-SelfCompletion>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Pod::Weaver::Role::SectionText::HasCompletion
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

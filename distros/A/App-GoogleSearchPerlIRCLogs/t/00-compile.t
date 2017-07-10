@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/google-search-perl-irc-logs'
+    'script/google-search-perl-irc-logs'
 );
 
 # no fake home requested

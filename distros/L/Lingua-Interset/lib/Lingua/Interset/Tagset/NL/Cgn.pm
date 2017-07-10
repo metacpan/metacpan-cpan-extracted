@@ -9,7 +9,7 @@
 package Lingua::Interset::Tagset::NL::Cgn;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -122,9 +122,9 @@ sub _create_atoms
             'pers'  => ['prontype' => 'prs'], # persoonlijk (me, ik, ons, we, je, u, jullie, ze, hem, hij, hen)
             ###!!! There are no means in Interset to say that the word may or may not be reflexive
             ###!!! (to distinguish 'pr' from 'pers', which cannot be reflexive, and from 'refl', which is certainly reflexive).
-            'pr'    => ['prontype' => 'prs', 'reflex' => 'reflex'], # persoonlijk of reflexief (mij, me, mijzelf, mezelf, ons, onszelf, je, jezelf, u, uzelf)
-            'refl'  => ['prontype' => 'prs', 'reflex' => 'reflex'], # reflexief (zich, zichzelf)
-            'bez'   => ['prontype' => 'prs', 'poss' => 'poss'], # beztittelijk (mijn, onze, je, jullie, zijner, zijn, hun)
+            'pr'    => ['prontype' => 'prs', 'reflex' => 'yes'], # persoonlijk of reflexief (mij, me, mijzelf, mezelf, ons, onszelf, je, jezelf, u, uzelf)
+            'refl'  => ['prontype' => 'prs', 'reflex' => 'yes'], # reflexief (zich, zichzelf)
+            'bez'   => ['prontype' => 'prs', 'poss' => 'yes'], # beztittelijk (mijn, onze, je, jullie, zijner, zijn, hun)
             'recip' => ['prontype' => 'rcp'], # reciprook (elkaar, elkaars)
             'aanw'  => ['prontype' => 'dem'], # aanwijzend (deze, dit, die, dat)
             'betr'  => ['prontype' => 'rel'], # betrekkelijk (welk, die, dat, wat, wie)
@@ -135,8 +135,8 @@ sub _create_atoms
         },
         'encode_map' =>
         {
-            'prontype' => { 'prs'     => { 'poss' => { 'poss' => 'bez',
-                                                       '@'    => { 'reflex' => { 'reflex' => { 'person' => { '3' => 'refl',
+            'prontype' => { 'prs'     => { 'poss' => { 'yes' => 'bez',
+                                                       '@'    => { 'reflex' => { 'yes' => { 'person' => { '3' => 'refl',
                                                                                                              '@' => 'pr' }},
                                                                                  '@'      => 'pers' }}}},
                             'rcp'     => 'recip',
@@ -597,11 +597,11 @@ sub _create_atoms
         'decode_map' =>
         {
             'symb' => ['pos' => 'sym'],
-            'afk'  => ['abbr' => 'abbr']
+            'afk'  => ['abbr' => 'yes']
         },
         'encode_map' =>
         {
-            'abbr' => { 'abbr' => 'afk',
+            'abbr' => { 'yes' => 'afk',
                         '@'    => { 'pos' => { 'sym' => 'symb' }}}
         }
     );
@@ -1136,7 +1136,7 @@ Lingua::Interset::Tagset::NL::Cgn - Driver for the CGN/Lassy/Alpino Dutch tagset
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

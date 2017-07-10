@@ -18,13 +18,13 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Graham Ollis <plicease\@cpan.org>",
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.49",
-    "Alien::Build::MM" => "0.40",
+    "Alien::Build::MM" => "0.32",
     "Alien::Build::Plugin::Build::Autoconf" => "0.47",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "CONFIGURE_REQUIRES" => {
-    "Alien::Build" => "0.40",
-    "Alien::Build::MM" => "0.40",
+    "Alien::Build" => "0.32",
+    "Alien::Build::MM" => "0.32",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-automake",
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Alien" => 0,
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Alien::Base" => "0.038",
   "Alien::Build" => "0.49",
-  "Alien::Build::MM" => "0.40",
+  "Alien::Build::MM" => "0.32",
   "Alien::Build::Plugin::Build::Autoconf" => "0.47",
   "Alien::autoconf" => 0,
   "Env" => 0,

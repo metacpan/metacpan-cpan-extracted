@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Device;
 # ABSTRACT: represents a TR064 device
-$Net::Fritz::Device::VERSION = 'v0.0.7';
+$Net::Fritz::Device::VERSION = 'v0.0.8';
 
 use Net::Fritz::Data;
 use Net::Fritz::Error;
@@ -176,6 +176,25 @@ sub find_device {
 }
 
 
+has _service_cache => ( is => 'ro', default => sub { return {} } );
+
+sub call {
+    my $self      = shift;
+    my $type      = shift;
+    my $action    = shift;
+    my %call_args = (@_);
+
+    my $service = $self->_service_cache->{$type};
+    if (! defined $service) {
+	$service = $self->find_service($type);
+	$self->_service_cache->{$type} = $service;
+    }
+    return $service if $service->error;
+
+    return $service->call($action, %call_args);
+}
+
+
 sub dump {
     my $self = shift;
 
@@ -223,7 +242,7 @@ Net::Fritz::Device - represents a TR064 device
 
 =head1 VERSION
 
-version v0.0.7
+version v0.0.8
 
 =head1 SYNOPSIS
 
@@ -374,6 +393,21 @@ first.
 
 If no matching device is found, a L<Net::Fritz::Error> is returned.
 
+=head2 call(I<service_name> I<action_name [I<parameter> => I<value>] [...])
+
+Directly calls the L<Net::Fritz::Action> named I<action_name> of the
+L<Net::Fritz::Service> matching the regular expression I<service_name>.
+
+This is a convenience method that internally calls
+L<find_service()|/find_service(regexp)> followed by L<Net::Fritz::Service/call> -
+see those methods for further details.
+
+The intermediate L<Net::Fritz::Service> is cached, so that further
+calls to the same I<service_name> only need to do one instead of two
+SOAP requests.
+
+This method is available since C<v0.0.8>.
+
 =head2 dump(I<indent>)
 
 Returns some preformatted multiline information about the object.
@@ -393,12 +427,13 @@ See L<Net::Fritz::IsNoError/errorcheck>.
 
 B<TODO:> Method names are inconsistent: With services, C<get_*> uses
 exact matching while C<find_*> uses regexp matching.  But with
-devices, L</find_device> uses exact matching.  Change this to match
-the service methods and add the missing variants.
+devices, L<find_device()|/find_device(name)> uses exact matching.
+Change this to match the service methods and add the missing variants.
 
-B<TODO:> Rename L</find_service_names> to something like
-L</find_all_service> as it's basically L</find_service> with multiple
-results.  It does not return service names but services.
+B<TODO:> Rename L<find_service_names()|/find_service_names(regexp)> to
+something like C<find_all_services()> as it's basically
+L<find_service()|/find_service(regexp)> with multiple results.  It
+does not return service names but services.
 
 =head1 SEE ALSO
 

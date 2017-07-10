@@ -1,10 +1,11 @@
 package WebService::Braintree::Result;
-$WebService::Braintree::Result::VERSION = '0.9';
+$WebService::Braintree::Result::VERSION = '0.91';
 use Moose;
 use Hash::Inflator;
 use WebService::Braintree::Util;
 use WebService::Braintree::ValidationErrorCollection;
 use WebService::Braintree::CreditCardVerification;
+use WebService::Braintree::Nonce;
 
 my $meta = __PACKAGE__->meta;
 
@@ -19,6 +20,7 @@ my $response_objects = {
         credit_card => "WebService::Braintree::CreditCard",
         paypal_account => "WebService::Braintree::PayPalAccount"
     },
+    payment_method_nonce => "WebService::Braintree::Nonce",
     settlement_batch_summary => "WebService::Braintree::SettlementBatchSummary",
     subscription => "WebService::Braintree::Subscription",
     transaction => "WebService::Braintree::Transaction",

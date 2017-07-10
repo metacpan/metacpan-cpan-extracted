@@ -12,3 +12,12 @@ Revision history for Alias-Any
 0.000003  Thu Jul  6 19:22:14 2017
 
     Corrected errors and omissions in Makefile.PL
+
+
+0.000004  Sat Jul  8 14:37:12 2017
+
+    * Added missing dependency on Keyword::Declare
+      (Thanks, Father C.)
+
+    * Corrected version selection for refaliasing
+      (Thanks, Father C...for both the report and for refaliasing! :-)

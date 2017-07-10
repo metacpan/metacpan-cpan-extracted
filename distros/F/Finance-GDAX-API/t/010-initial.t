@@ -68,23 +68,25 @@ is($req->key, $key, 'external_secret key read ok');
 is($req->secret, $sec, 'external_secret secret read ok');
 is($req->passphrase, $pas, 'external_secret passphrase read ok');
 
-#my $tmp2 = File::Temp->new(UNLINK => 0);
-#print $tmp2 <<"EOB";
-##!/usr/bin/perl
-#print "key:$key\n";
-#print "secret:$sec\n";
-#print "# This is a comment\n";
-#print "passphrase:$pas\n";
-#EOB
-#$tmp2->flush;
-#chmod 0744, $tmp2->filename;
-#my $tmp2_filename = $tmp2->filename;
-#$tmp2->close;
-#$req->external_secret($tmp2_filename, 1);
-#unlink $tmp2_filename;
-#is($req->key, $key, 'external_secret forked key read ok');
-#is($req->secret, $sec, 'external_secret forked secret read ok');
-#is($req->passphrase, $pas, 'external_secret forked passphrase read ok');
+if (%ENV{AUTHOR_TESTING}) {
+    my $tmp2 = File::Temp->new(UNLINK => 0);
+    print $tmp2 <<"EOB";
+#!/usr/bin/env perl
+print "key:$key\n";
+print "secret:$sec\n";
+print "# This is a comment\n";
+print "passphrase:$pas\n";
+EOB
+    $tmp2->flush;
+    chmod 0744, $tmp2->filename;
+    my $tmp2_filename = $tmp2->filename;
+    $tmp2->close;
+    $req->external_secret($tmp2_filename, 1);
+    unlink $tmp2_filename;
+    is($req->key, $key, 'external_secret forked key read ok');
+    is($req->secret, $sec, 'external_secret forked secret read ok');
+    is($req->passphrase, $pas, 'external_secret forked passphrase read ok');
+}
 
 done_testing();
 

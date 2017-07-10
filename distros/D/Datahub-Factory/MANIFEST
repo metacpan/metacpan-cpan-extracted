@@ -25,6 +25,7 @@ lib/Datahub/Factory/Config.pm
 lib/Datahub/Factory/Env.pm
 lib/Datahub/Factory/Exporter.pm
 lib/Datahub/Factory/Exporter/Datahub.pm
+lib/Datahub/Factory/Exporter/JSON.pm
 lib/Datahub/Factory/Exporter/LIDO.pm
 lib/Datahub/Factory/Exporter/Solr.pm
 lib/Datahub/Factory/Exporter/YAML.pm
@@ -35,6 +36,7 @@ lib/Datahub/Factory/Importer.pm
 lib/Datahub/Factory/Importer/Adlib.pm
 lib/Datahub/Factory/Importer/CollectiveAccess.pm
 lib/Datahub/Factory/Importer/Datahub.pm
+lib/Datahub/Factory/Importer/JSON.pm
 lib/Datahub/Factory/Importer/OAI.pm
 lib/Datahub/Factory/Importer/TMS.pm
 lib/Datahub/Factory/Importer/TMS/Index.pm

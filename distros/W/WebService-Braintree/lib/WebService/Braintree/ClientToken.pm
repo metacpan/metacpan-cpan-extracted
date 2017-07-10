@@ -1,5 +1,5 @@
 package WebService::Braintree::ClientToken;
-$WebService::Braintree::ClientToken::VERSION = '0.9';
+$WebService::Braintree::ClientToken::VERSION = '0.91';
 
 use constant DEFAULT_VERSION => "2";
 

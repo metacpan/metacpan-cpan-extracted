@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Acme::CPANLists::Blacklist;
 
-our $DATE = '2016-02-14'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2017-07-06'; # DATE
+our $VERSION = '0.03'; # VERSION
 
 use 5.010001;
 use strict;
@@ -13,7 +13,7 @@ use namespace::autoclean;
 use Module::Load;
 
 with (
-    'Dist::Zilla::Role::InstallTool',
+    'Dist::Zilla::Role::AfterBuild',
 );
 
 has author_list => (is=>'rw');
@@ -59,9 +59,7 @@ sub _prereq_none {
     $num_any == 0;
 }
 
-# actually we use InstallTool phase just so we are run after all the
-# PrereqSources plugins
-sub setup_installer {
+sub after_build {
     use experimental 'smartmatch';
     no strict 'refs';
 
@@ -188,7 +186,7 @@ Dist::Zilla::Plugin::Acme::CPANLists::Blacklist - Blacklist prereqs using a CPAN
 
 =head1 VERSION
 
-This document describes version 0.02 of Dist::Zilla::Plugin::Acme::CPANLists::Blacklist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2016-02-14.
+This document describes version 0.03 of Dist::Zilla::Plugin::Acme::CPANLists::Blacklist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2017-07-06.
 
 =head1 SYNOPSIS
 
@@ -270,7 +268,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

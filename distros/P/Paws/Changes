@@ -1,4 +1,32 @@
-0.33 
+0.34 07 Jul 2017
+ - New Credential provider: Paws::Credential::ECSContainerProfile (gadgetjunkie)
+ - Added ECSContainerProfile to the default credential provider chain so it
+   will be automatically used if you're running inside an ECS container (gadgetjunkie)
+ - New API: DAX (DynamoDB Accelerator)
+ - API update: XRay
+ - API update: ServiceCatalog
+ - API update: EC2
+ - API update: CloudDirectory
+ - API update: ECS
+ - API update: Lightsail
+ - API update: IoT
+ - API update: SSM
+ - API update: WAF
+ - API update: WAFRegional
+ - API update: Workdocs
+ - API update: CodePipeline
+ - API update: DMS
+ - API update: Route53
+ - API update: CloudWatchEvents
+ - API update: GameLift
+ - API update: S3
+ - API update: CloudWatch
+ - API update: Kinesis
+ - API update: SSM
+ - API update: DS
+ - API update: KMS
+
+0.33 04 Jun 2017
  - New Credential provider: Paws::Credential::Explicit for providing in-code credentials (meis)
  - Bug fixed: ETag not defined when using MojoAsyncCaller (PopeFelix)
  - New parameter for services: "endpoint" that is used to override the URL for sending requests 

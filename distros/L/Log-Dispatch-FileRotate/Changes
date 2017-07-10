@@ -1,5 +1,12 @@
 Revision history for Perl extension Log::Dispatch::FileRotate.
 
+1.27 Thu Jul 06 2017
+    - add "check_both" configuration option which allows the use of both time and
+      size based rotation at the same time.  If either conditions require a
+      rotation, a rotation will happen.  Default is false (previous behaviour).
+      Thanks Emanuele Tomasi.  PR #6.
+    - make signature test an "author" test and make Test::Signature optional
+
 1.26 Tue May 09 2017
     - add SEE ALSO reference to Log::Dispath::File::Stamped (Thanks Karen
       Etheridge)

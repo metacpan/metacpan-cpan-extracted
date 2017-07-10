@@ -11,7 +11,7 @@ use Text::Diff 1.44 qw(diff);
 
 use Moo;
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 # External
 has 'argv'               => ( is => 'ro', default => q{} );
@@ -189,7 +189,7 @@ Code::TidyAll::Plugin - Create plugins for tidying or validating code
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 

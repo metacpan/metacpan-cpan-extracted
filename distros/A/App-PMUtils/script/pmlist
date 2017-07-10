@@ -1,0 +1,445 @@
+#!perl
+
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.70'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use App::PMUtils;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{pmlist} = {
+    v => 1.1,
+    summary => 'List Perl modules (and PODs, and module prefixes)',
+    description => <<'_',
+
+This is basically a CLI interface to <pm:Module::List>, with tab completion.
+
+_
+    args => {
+        query => {
+            schema  => 'str*',
+            default => '',
+            pos     => 0,
+            completion => sub {
+                require Complete::Module;
+                my %args = @_;
+                Complete::Module::complete_module(word=>$args{word});
+            },
+            tags => ['category:filtering'],
+        },
+        pm => {
+            summary => 'List .pm files',
+            schema  => 'bool',
+            default => 1,
+            tags => ['category:filtering'],
+        },
+        pod => {
+            summary => 'List .pod files',
+            schema  => 'bool',
+            default => 0,
+            tags => ['category:filtering'],
+        },
+        prefix => {
+            summary => 'List prefixes (dirs)',
+            schema  => 'bool',
+            default => 0,
+            tags => ['category:filtering'],
+        },
+        xs => {
+            summary => 'Only list XS modules',
+            'summary.alt.bool.not' => 'Only list PP (pure-perl) modules',
+            schema  => 'bool',
+            tags => ['category:filtering'],
+            cmdline_aliases => {
+                pp => {
+                    summary => 'Alias for --no-core',
+                    is_flag => 1,
+                    code => sub { $_[0]{xs} = 0 },
+                },
+            },
+        },
+        core => {
+            summary => 'Only list core modules',
+            'summary.alt.bool.not' => 'Only list non-core modules',
+            schema  => 'bool',
+            tags => ['category:filtering'],
+        },
+        core_dirs => {
+            summary => 'Only search in core directories',
+            'summary.alt.bool.not' => 'Only search in non-core directories',
+            schema => 'bool',
+            tags => ['category:filtering'],
+        },
+        exclude_curdir => {
+            summary => 'Do not include "." in search dir',
+            schema => 'bool',
+            description => <<'_',
+
+By default, Perl usually adds `.` (the current directory) in the search dir.
+This option removes it.
+
+_
+            tags => ['category:filtering'],
+        },
+        recurse => {
+            schema  => 'bool',
+            cmdline_aliases => { R => {} },
+        },
+        detail => {
+            summary => 'Return detailed records instead of just module names',
+            schema  => 'bool',
+            cmdline_aliases => { l=>{} },
+        },
+    },
+};
+sub pmlist {
+    require Module::List;
+    my %args = @_;
+
+    require Module::CoreList::More if defined($args{core}) || $args{detail};
+    require Module::XSOrPP if defined($args{xs}) || $args{detail};
+
+    my $query = $args{query} // "";
+    $query =~ s!/!::!g; # convenience
+
+    # i wonder why Module::List is not more forgiving
+    $query .= "::" unless !length($query) || $query =~ /::\z/;
+
+    local @INC = @INC;
+    @INC = do {
+        no warnings 'once';
+        require Config;
+        @Config::Config{qw(privlibexp archlibexp)};
+    } if $args{core_dirs};
+    @INC = grep { $_ ne '.' } @INC if $args{exclude_curdir};
+
+    my $mods = Module::List::list_modules(
+        $query,
+        {
+            list_prefixes => $args{prefix},
+            list_modules  => $args{pm},
+            list_pod      => $args{pod},
+            recurse       => $args{recurse},
+        });
+    my @res;
+  MOD:
+    for my $mod (sort keys %$mods) {
+        my $is_core;
+        if (defined $args{core}) {
+            $is_core = Module::CoreList::More->is_core($mod);
+            next MOD if $args{core} xor $is_core;
+        }
+        my $is_xs;
+        my $is_xs_calculated;
+        if (defined $args{xs}) {
+            $is_xs = Module::XSOrPP::is_xs($mod);
+            $is_xs_calculated++;
+            next MOD if $args{xs} xor $is_xs;
+        }
+
+        if ($args{detail}) {
+            push @res, {
+                module  => $mod,
+                is_core => $is_core // Module::CoreList::More->is_core($mod),
+                is_xs   => $is_xs_calculated ? $is_xs : Module::XSOrPP::is_xs($mod),
+            };
+        } else {
+            push @res, $mod;
+        }
+    }
+    my $meta = {};
+    if ($args{detail}) {
+        $meta->{'table.fields'} = [qw/module is_core is_xs/];
+    }
+    [200, "OK", \@res, $meta];
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/pmlist',
+)->run;
+
+# ABSTRACT: List Perl modules (and PODs, and module prefixes)
+# PODNAME: pmlist
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pmlist - List Perl modules (and PODs, and module prefixes)
+
+=head1 VERSION
+
+This document describes version 0.70 of pmlist (from Perl distribution App-PMUtils), released on 2017-07-08.
+
+=head1 SYNOPSIS
+
+Basic usage:
+
+ % pmlist Text::
+
+=head1 DESCRIPTION
+
+This is basically a CLI interface to L<Module::List>, with tab completion.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return detailed records instead of just module names.
+
+=item B<--recurse>, B<-R>
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--core>
+
+Only list core modules.
+
+=item B<--core-dirs>
+
+Only search in core directories.
+
+=item B<--exclude-curdir>
+
+Do not include "." in search dir.
+
+By default, Perl usually adds `.` (the current directory) in the search dir.
+This option removes it.
+
+
+=item B<--no-pm>
+
+=item B<--pod>
+
+List .pod files.
+
+=item B<--pp>
+
+Alias for --no-core.
+
+See C<--xs>.
+
+=item B<--prefix>
+
+List prefixes (dirs).
+
+=item B<--query>=I<s>
+
+Default value:
+
+ ""
+
+=item B<--xs>
+
+Only list XS modules.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C pmlist pmlist
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete pmlist 'p/*/`pmlist`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/pmlist.conf>, F<~/pmlist.conf>, or F</etc/pmlist.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ core (see --core)
+ core_dirs (see --core-dirs)
+ detail (see --detail)
+ exclude_curdir (see --exclude-curdir)
+ format (see --format)
+ naked_res (see --naked-res)
+ pm (see --no-pm)
+ pod (see --pod)
+ prefix (see --prefix)
+ query (see --query)
+ recurse (see --recurse)
+ xs (see --xs)
+
+=head1 ENVIRONMENT
+
+=head2 PMLIST_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/pmlist.conf>
+
+F<~/pmlist.conf>
+
+F</etc/pmlist.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PMUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PMUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

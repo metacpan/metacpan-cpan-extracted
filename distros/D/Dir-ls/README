@@ -1,0 +1,128 @@
+NAME
+
+    Dir::ls - List the contents of a directory
+
+SYNOPSIS
+
+      use Dir::ls;
+      
+      print "$_\n" for ls '.';
+      
+      print "$_: ", -s "/foo/bar/$_", "\n" for ls '/foo/bar', {all => 1, sort => 'size'};
+
+DESCRIPTION
+
+    Provides the function "ls", which returns the contents of a directory
+    in a similar manner to the GNU coreutils command ls(1).
+
+FUNCTIONS
+
+ ls
+
+      my @contents = ls $dir, \%options;
+
+    Takes a directory path and optional hashref of options, and returns a
+    list of items in the directory. Home directories represented by ~ will
+    be expanded by "path" in Path::Tiny. Like in ls(1), the returned names
+    are relative to the passed directory path, so if you want to use a
+    filename (such as passing it to open or stat), you must prefix it with
+    the directory path, with ~ expanded if present.
+
+      # Check the size of a file in current user's home directory
+      my @contents = ls '~';
+      say -s glob('~') . "/$contents[0]";
+
+    By default, hidden files and directories (those starting with .) are
+    omitted, and the results are sorted by name according to the current
+    locale (see perllocale for more information).
+
+    Accepts the following options:
+
+    a
+
+    all
+
+      Include hidden files and directories.
+
+    A
+
+    almost-all
+
+      Include hidden files and directories, but not . or ...
+
+    c
+
+      Sort by ctime (change time) in seconds since the epoch.
+
+    f
+
+      Equivalent to passing all and setting sort to none.
+
+    r
+
+    reverse
+
+      Reverse sort order (unless U or sort => 'none' specified).
+
+    sort
+
+      Specify sort algorithm other than the default sort-by-name. Valid
+      values are: none, extension, size, time, or version.
+
+    S
+
+      Sort by file size in bytes (descending). Equivalent to sort =>
+      'size'.
+
+    t
+
+      Sort by mtime (modification time) in seconds since the epoch.
+      Equivalent to sort => 'time'.
+
+    u
+
+      Sort by atime (access time) in seconds since the epoch.
+
+    U
+
+      Return entries in directory order (unsorted). Equivalent to sort =>
+      'none'.
+
+    v
+
+      Sort naturally by version numbers within the name. Uses
+      Sort::filevercmp for sorting. Equivalent to sort => 'version'.
+
+    X
+
+      Sort by (last) file extension, according to the current locale.
+      Equivalent to sort => 'extension'.
+
+CAVEATS
+
+    This is only an approximation of ls(1). It makes an attempt to give the
+    same output under the supported options, but there may be differences
+    in edge cases. Weird things might happen with sorting of non-ASCII
+    filenames, or on non-Unixlike systems. Lots of options aren't supported
+    yet. Patches welcome.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Path::Tiny, ls(1)
+

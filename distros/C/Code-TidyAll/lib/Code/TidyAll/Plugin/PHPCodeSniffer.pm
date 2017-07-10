@@ -9,7 +9,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 sub _build_cmd {'phpcs'}
 
@@ -41,7 +41,7 @@ Code::TidyAll::Plugin::PHPCodeSniffer - Use phpcs with tidyall
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 

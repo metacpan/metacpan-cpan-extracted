@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Pod::Markdown;
+use Getopt::Long;
+
+my $opt = { output => 'README' };
+GetOptions($opt, "output|o=s");
+
+my $p2md = Pod::Markdown->new;
+$p2md->parse_from_file($_) for @ARGV;
+my $md = $p2md->as_markdown;
+$md =~ s/\\_/_/g;
+open MD, '>', $opt->{output} or die $!;
+print MD $md;

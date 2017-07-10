@@ -2,12 +2,14 @@ package Test2::Plugin::OpenFixPerlIO;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 use Carp qw/cluck/;
 use PerlIO;
 
 BEGIN {
+    return if $] >= 5.027001;
+
     my $maker = sub {
         my ($pkg) = @_;
         my ($open, $layers, $binmode);

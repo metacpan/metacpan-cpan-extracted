@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot;
-$Lab::Moose::DataFile::Gnuplot::VERSION = '3.552';
+$Lab::Moose::DataFile::Gnuplot::VERSION = '3.553';
 use 5.010;
 use warnings;
 use strict;

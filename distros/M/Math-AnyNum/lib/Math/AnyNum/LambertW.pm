@@ -12,7 +12,9 @@ Class::Multimethods::multimethod __LambertW__ => qw(Math::MPFR) => sub {
         goto &__LambertW__;
     }
 
-    Math::MPFR::Rmpfr_set_str((my $p = Math::MPFR::Rmpfr_init2($PREC)), '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
+    my $p = Math::MPFR::Rmpfr_init2($PREC);
+    Math::MPFR::Rmpfr_set_str($p, '1e-' . CORE::int($PREC >> 2), 10, $ROUND);
+
     Math::MPFR::Rmpfr_set_ui((my $r = Math::MPFR::Rmpfr_init2($PREC)), 1, $ROUND);
     Math::MPFR::Rmpfr_set_ui((my $y = Math::MPFR::Rmpfr_init2($PREC)), 0, $ROUND);
 
@@ -53,7 +55,7 @@ Class::Multimethods::multimethod __LambertW__ => qw(Math::MPC) => sub {
     my $tmp = Math::MPC::Rmpc_init2($PREC);
     my $abs = Math::MPFR::Rmpfr_init2($PREC);
 
-    my $xount = 0;
+    my $count = 0;
     while (1) {
         Math::MPC::Rmpc_sub($tmp, $r, $y, $ROUND);
 
@@ -67,7 +69,7 @@ Class::Multimethods::multimethod __LambertW__ => qw(Math::MPC) => sub {
 
         Math::MPC::Rmpc_add($r, $r, $x, $ROUND);
         Math::MPC::Rmpc_div($r, $r, $tmp, $ROUND);
-        last if ++$xount > $PREC;
+        last if ++$count > $PREC;
     }
 
     Math::MPC::Rmpc_log($r, $r, $ROUND);

@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: UNIX implementations for AnyEvent::FTP
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub BUILDARGS
@@ -14,7 +14,7 @@ sub BUILDARGS
   my($class, $query) = @_;
   my($name, $pw, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire) = getpwnam $query;
   die "user not found" unless $name;
-  
+
   return {
     name  => $name,
     uid   => $uid,
@@ -60,10 +60,10 @@ sub jail
 sub drop_privileges
 {
   my($self) = @_;
-  
+
   $) = join ' ', $self->gid, $self->gid, @{ $self->groups };
   $> = $self->uid;
-  
+
   $( = $self->gid;
   $< = $self->uid;
 
@@ -84,12 +84,12 @@ AnyEvent::FTP::Server::OS::UNIX - UNIX implementations for AnyEvent::FTP
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
  use AnyEvent::FTP::Server::OS::UNIX;
- 
+
  # interface using user fred
  my $unix = AnyEvent::FTP::Server::OS::UNIX->new('fred');
  $unix->jail;            # chroot
@@ -145,6 +145,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

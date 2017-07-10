@@ -1,24 +1,29 @@
 ---
-abstract: unknown
+abstract: 'Wrapper around Perl tr/../../ operator'
 author:
-  - unknown
+  - 'Laurent Dami <dami@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.143240'
-license: unknown
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.143240'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Text-Transliterator
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Text::Transliterator:
+    file: lib/Text/Transliterator.pm
+    version: '1.03'
+  Text::Transliterator::Unaccent:
+    file: lib/Text/Transliterator/Unaccent.pm
+    version: '1.03'
 requires:
-  Test::More: '0'
   Unicode::Normalize: '0'
   Unicode::UCD: '0'
-version: '1.02'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/damil/Text-Transliterator
+version: '1.03'

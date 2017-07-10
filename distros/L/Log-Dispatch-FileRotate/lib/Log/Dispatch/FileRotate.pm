@@ -1,5 +1,5 @@
 package Log::Dispatch::FileRotate;
-$Log::Dispatch::FileRotate::VERSION = '1.26';
+$Log::Dispatch::FileRotate::VERSION = '1.27';
 # ABSTRACT: Log to Files that Archive/Rotate Themselves
 
 require 5.005;
@@ -88,6 +88,8 @@ sub new
 	{
 		$self->setDatePattern($p{'DatePattern'});
 	}
+
+	$self->{check_both} = ($p{check_both}) ? 1 : 0;
 
 	# Flag this as first creation point
 	$self->{'new'} = 1;
@@ -213,6 +215,7 @@ sub log_message
 		warn "$$ got lock after wait\n" if $self->{debug};
 	}
 
+	my $have_to_rotate = 0;
 	my $size   = (stat($fh))[7];   # Stat the handle to get real size
 	my $inode  = (stat($fh))[1];   # get real inode
 	my $finode = (stat($name))[1]; # Stat the name for comparision
@@ -222,7 +225,6 @@ sub log_message
 
 	# If finode and inode are the same then nobody has done a rename
 	# under us and we can continue. Otherwise just close and reopen.
-	# Time mode overrides Size mode
 	if(!defined($finode) || $inode != $finode)
 	{
 		# Oops someone moved things on us. So just reopen our log
@@ -230,22 +232,24 @@ sub log_message
 		$self->{LDF} =  Log::Dispatch::File->new(%{$self->{params}});  # Our log
 
 		warn localtime()." $$ Someone else rotated: normal log\n" if $self->{debug};
-		$self->logit($p{message});
 	}
-	elsif($in_time_mode && !$time_to_rotate)
+	else
 	{
-		warn localtime()." $$ In time mode: normal log\n" if $self->{debug};
-		$self->logit($p{message});
+		my $check_both = $self->{check_both};
+		my $rotate_by_size = ($size >= $max_size) ? 1 : 0;
+		if(($in_time_mode && $time_to_rotate) ||
+		   (!$in_time_mode && $rotate_by_size) ||
+		   ($rotate_by_size && $check_both))
+		{
+			$have_to_rotate = 1;
+		}
+
+		warn localtime()." $$ in time mode: $in_time_mode; time to rotate: $time_to_rotate;"
+			." rotate by size: $rotate_by_size; check_both: $check_both;"
+			." have to rotate: $have_to_rotate\n" if $self->{debug};
 	}
-	elsif(!$in_time_mode && defined($size) && $size < $max_size )
-	{
-		warn localtime()." $$ In size mode: normal log\n" if $self->{debug};
-		$self->logit($p{message});
-	}
-	# Need to rotate
-	elsif(($in_time_mode && $time_to_rotate) || 
-	      (!$in_time_mode && $size)
-		 )
+
+	if($have_to_rotate)
 	{
 		# Shut down the log
 		delete $self->{LDF};  # Should get rid of current LDF
@@ -275,10 +279,9 @@ sub log_message
 
 		# Write it out
 		warn localtime()." $$ rotated: normal log\n" if $self->{debug};
-		$self->logit($p{message});
 	}
-	#else size is zero :-} just don't do anything!
 
+	$self->logit($p{message});
 	$self->lfhunlock();
 }
 
@@ -677,7 +680,7 @@ Log::Dispatch::FileRotate - Log to Files that Archive/Rotate Themselves
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -720,9 +723,9 @@ number of log files created. The size defaults to 10M and the max number
 of files defaults to 1. If DatePattern is not defined then we default to
 working in size mode. That is, use size values for deciding when to rotate.
 
-Once DatePattern is defined FileRotate will move into time mode. Once
-this happens file rotation ignores size constraints and uses the defined
-date pattern constraints.
+Once DatePattern is defined FileRotate will move into time mode. Once this
+happens file rotation ignores size constraints, unless check_both, and uses
+the defined date pattern constraints.
 
 If you setup a config file using Log::Log4perl::init_and_watch() or the
 like, you can switch between modes just by commenting out the DatePattern
@@ -782,6 +785,10 @@ Date::Manip's concept of timezones and of course your machines timezone.
 =item -- DatePattern ($)
 
 The DatePattern as defined above.
+
+=item -- check_both ($)
+
+1 for checking both constrains, 0 otherwise (the default).
 
 =item -- min_level ($)
 

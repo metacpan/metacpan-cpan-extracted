@@ -1,5 +1,5 @@
 package Lab::Connection::LinuxGPIB::Trace;
-$Lab::Connection::LinuxGPIB::Trace::VERSION = '3.552';
+$Lab::Connection::LinuxGPIB::Trace::VERSION = '3.553';
 use 5.010;
 use warnings;
 use strict;

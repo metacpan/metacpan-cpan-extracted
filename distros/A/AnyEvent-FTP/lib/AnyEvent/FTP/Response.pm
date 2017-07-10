@@ -8,7 +8,7 @@ use overload
   fallback => 1;
 
 # ABSTRACT: Response class for asynchronous ftp client
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub new
@@ -51,7 +51,7 @@ AnyEvent::FTP::Response - Response class for asynchronous ftp client
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ Permanent negative reply
 =back
 
 Generally C<4xx> and C<5xx> messages are errors, where as C<1xx>, C<3xx> are various states of
-(at least so far) successful operations.  C<2xx> indicates a completely successful 
+(at least so far) successful operations.  C<2xx> indicates a completely successful
 operation.
 
 =head2 $res-E<gt>message
@@ -109,7 +109,7 @@ True if the response is a preliminary positive reply (code C<1xx>).
 =head2 $res-E<gt>as_string
 
 Returns a string representation of the response.  This may not be exactly what was
-returned by the server, but will include the code and at least part of the message in 
+returned by the server, but will include the code and at least part of the message in
 a human readable format.
 
 You can also get this string by treating objects of this class as a string (using
@@ -130,6 +130,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

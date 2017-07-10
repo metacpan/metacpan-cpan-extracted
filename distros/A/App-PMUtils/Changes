@@ -1,3 +1,17 @@
+0.70    2017-07-08 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild to fix Changes entry.
+
+
+0.69    2017-07-08 (PERLANCAR)
+
+        - [ux] pmuninst: When --confirm-yes, use 'cpanm uninstall -f'.
+
+	- Replace Log::Any with Log::ger.
+
+
 0.68    2017-06-09 (PERLANCAR)
 
 	- Update to use MetaCPAN v1 API instead of v0 which has been shut

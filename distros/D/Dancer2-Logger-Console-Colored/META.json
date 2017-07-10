@@ -4,13 +4,13 @@
       "BURNERSK <burnersk@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Logger-Console-Colored",
    "no_index" : {
@@ -22,15 +22,27 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.013002"
          }
       },
       "runtime" : {
          "requires" : {
+            "Dancer2" : "0.166001_01",
             "Dancer2::Core::Types" : "0",
             "Dancer2::Logger::Console" : "0",
             "Moo" : "0",
             "Term::ANSIColor" : "0",
+            "perl" : "5.013002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Dancer2" : "0.166001_01",
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
             "perl" : "5.013002"
          }
       }
@@ -52,9 +64,12 @@
          "web" : "https://github.com/burnersk/Dancer2-Logger-Console-Colored"
       }
    },
-   "version" : "0.001",
+   "version" : "0.003",
    "x_contributors" : [
+      "simbabque <simbabque@cpan.org>",
+      "Steve Guo <steve.guo@transfer-to.com>",
       "BURNERSK <burnersk@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
 }
 

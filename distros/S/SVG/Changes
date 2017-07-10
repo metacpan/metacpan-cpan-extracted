@@ -1,5 +1,8 @@
 Revision history for Perl extension SVG.
 
+2.78  2017.07.07 MANWAR
+      - Merged PR #10 (fix entity escaping), thanks @haarg. This also resolved RT #121612.
+
 2.77  2017.05.18 MANWAR
       - Proposed fix to the following test failure:
         http://www.cpantesters.org/cpan/report/ddc7eefc-3429-11e7-8430-9cfb106f656a

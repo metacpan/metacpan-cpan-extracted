@@ -3,7 +3,7 @@ package Exception::Class::Base;
 use strict;
 use warnings;
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 use Class::Data::Inheritable 0.02;
 use Devel::StackTrace 2.00;
@@ -219,7 +219,7 @@ sub as_string {
     return $str;
 }
 
-sub full_message { $_[0]->{message} }
+sub full_message { $_[0]->message }
 
 #
 # The %seen bit protects against circular inheritance.
@@ -268,7 +268,7 @@ Exception::Class::Base - A base class for exception objects
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 SYNOPSIS
 
@@ -563,9 +563,13 @@ overridden. For example:
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<https://github.com/houseabsolute/Exception-Class/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Exception-Class/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Exception-Class can be found at L<https://github.com/houseabsolute/Exception-Class>.
 
 =head1 AUTHOR
 
@@ -577,5 +581,8 @@ This software is copyright (c) 2017 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

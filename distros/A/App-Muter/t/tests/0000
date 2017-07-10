@@ -1,0 +1,7 @@
+Input:
+Chain: hex
+Flags: inverse
+Output:
+Chain: base64
+Flags: inverse
+Output:

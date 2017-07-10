@@ -6,7 +6,7 @@
 
   at
 
-     Wed Dec  7 11:27:14 2016.
+     Mon Jul 10 17:20:46 2017.
 */
 extern const char * text_fuzzy_statuses[];
 #ifndef ERROR_HANDLER_H
@@ -26,8 +26,6 @@ extern error_handler_t text_fuzzy_error_handler;
 #define FAIL_STATUS -1
 #endif /* FAIL_STATUS */
 #ifndef ERROR_HANDLER
-#include <stdio.h>
-#include <stdarg.h>
 
 #ifdef __GNUC__
 
@@ -41,6 +39,8 @@ default_error_handler (const char *,
     __attribute__ ((unused));
 
 #endif /* __GNUC__ */
+
+#include <stdarg.h>
 
 static void default_error_handler (const char * file, int line,
                                    const char * format, ...)
@@ -105,13 +105,12 @@ static int miscount = text_fuzzy_status_miscount;
 #else /* __GNUC__ */
 #define CMAKER_WARN_UNUSED_RESULT
 #endif /* __GNUC__ */
-
 //#define VERBOSE 1
 
 /* Alphabet over unicode characters. */
 
-typedef struct ualphabet {
-
+typedef struct ualphabet
+{
     /* The smallest character in our alphabet. */
     int min;
 
@@ -132,8 +131,8 @@ ualphabet_t;
 
 /* This structure contains one string of whatever type. */
 
-typedef struct text_fuzzy_string {
-
+typedef struct text_fuzzy_string
+{
     /* The text of the string. */
     char * text;
 
@@ -146,6 +145,10 @@ typedef struct text_fuzzy_string {
 
     /* The length of "unicode". */
     int ulength;
+
+    /* Is "text" allocated? */
+
+    unsigned int allocated : 1;
 }
 text_fuzzy_string_t;
 
@@ -163,13 +166,12 @@ struct candidate {
    paraphenalia used in searching for the string, for example the
    alphabet of the string. */
 
-typedef struct text_fuzzy {
-
+typedef struct text_fuzzy
+{
     /* The string we are to match. */
     text_fuzzy_string_t text;
 
     /* The matching string. */
-
     text_fuzzy_string_t b;
 
     /* The maximum edit distance we allow for. */
@@ -261,46 +263,46 @@ text_fuzzy_t;
    unknown. */
 
 #define TEXT_FUZZY_INVALID_UNICODE_LENGTH -1
-#line 193 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 198 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_generate_ualphabet (text_fuzzy_t * tf) CMAKER_WARN_UNUSED_RESULT;
-#line 379 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 383 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_compare_single (text_fuzzy_t * tf) CMAKER_WARN_UNUSED_RESULT;
-#line 556 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 560 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_candidates (text_fuzzy_t * text_fuzzy, int * n_candidates_ptr, int ** candidates_ptr) CMAKER_WARN_UNUSED_RESULT;
-#line 613 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 617 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_free_candidates (text_fuzzy_t * text_fuzzy, int * candidates) CMAKER_WARN_UNUSED_RESULT;
-#line 630 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 633 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_generate_alphabet (text_fuzzy_t * text_fuzzy) CMAKER_WARN_UNUSED_RESULT;
-#line 668 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 671 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_begin_scanning (text_fuzzy_t * text_fuzzy) CMAKER_WARN_UNUSED_RESULT;
-#line 699 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 702 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_end_scanning (text_fuzzy_t * text_fuzzy) CMAKER_WARN_UNUSED_RESULT;
-#line 793 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 797 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_scan_file (text_fuzzy_t * text_fuzzy, char * file_name, char ** nearest_ptr, int * nearest_length_ptr) CMAKER_WARN_UNUSED_RESULT;
-#line 840 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 844 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_scan_file_free (char * nearest) CMAKER_WARN_UNUSED_RESULT;
-#line 846 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 850 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_alphabet_rejections (text_fuzzy_t * text_fuzzy, int * r) CMAKER_WARN_UNUSED_RESULT;
-#line 859 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 863 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_free_memory (text_fuzzy_t * text_fuzzy) CMAKER_WARN_UNUSED_RESULT;
-#line 865 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 869 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_set_max_distance (text_fuzzy_t * text_fuzzy, int max_distance) CMAKER_WARN_UNUSED_RESULT;
-#line 871 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 875 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_max_distance (text_fuzzy_t * text_fuzzy, int * max_distance) CMAKER_WARN_UNUSED_RESULT;
-#line 877 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 881 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_set_transpositions (text_fuzzy_t * text_fuzzy, int transpositions) CMAKER_WARN_UNUSED_RESULT;
-#line 883 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 887 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_transpositions (text_fuzzy_t * text_fuzzy, int * transpositions) CMAKER_WARN_UNUSED_RESULT;
-#line 889 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 893 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_last_distance (text_fuzzy_t * text_fuzzy, int * last_distance) CMAKER_WARN_UNUSED_RESULT;
-#line 899 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 903 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_no_alphabet (text_fuzzy_t * text_fuzzy, int yes_no) CMAKER_WARN_UNUSED_RESULT;
-#line 905 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 909 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_ualphabet_rejections (text_fuzzy_t * text_fuzzy, int * ualphabet_rejections) CMAKER_WARN_UNUSED_RESULT;
-#line 911 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 915 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_set_no_exact (text_fuzzy_t * text_fuzzy, int yes_no) CMAKER_WARN_UNUSED_RESULT;
-#line 917 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 921 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_length_rejections (text_fuzzy_t * text_fuzzy, int * length_rejections) CMAKER_WARN_UNUSED_RESULT;
-#line 928 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+#line 932 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_unicode_length (text_fuzzy_t * text_fuzzy, int * unicode_length) CMAKER_WARN_UNUSED_RESULT;
 #endif /* TEXT_FUZZY_H */

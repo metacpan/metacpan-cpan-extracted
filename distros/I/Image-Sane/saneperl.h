@@ -12,6 +12,6 @@
 /* Include all of sane's headers for internal consistency */
 #include <sane/sane.h>
 /*#include "sane/sanei.h"*/
-#include "sane/saneopts.h"
+#include <sane/saneopts.h>
 
 #endif /* _SANEPERL_H_ */

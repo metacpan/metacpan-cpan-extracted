@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::Socket;
-$Lab::Moose::Connection::Socket::VERSION = '3.552';
+$Lab::Moose::Connection::Socket::VERSION = '3.553';
 use 5.010;
 
 use Moose;

@@ -1,5 +1,5 @@
 package WebService::Braintree::TransparentRedirect::QueryString;
-$WebService::Braintree::TransparentRedirect::QueryString::VERSION = '0.9';
+$WebService::Braintree::TransparentRedirect::QueryString::VERSION = '0.91';
 use URI;
 use WebService::Braintree::Digest qw(hexdigest);
 use Moose;

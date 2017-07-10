@@ -178,7 +178,7 @@ my %WriteMakefileArgs = (
     "inc::Module::Install" => "1.08",
     "utf8" => 0
   },
-  "VERSION" => "1.3001",
+  "VERSION" => "1.3002",
   "test" => {
     "TESTS" => "t/*.t t/author/*.t t/unit/*.t"
   }

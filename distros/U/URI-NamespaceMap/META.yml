@@ -28,16 +28,16 @@ optional_features: {}
 provides:
   Types::Namespace:
     file: lib/Types/Namespace.pm
-    version: '1.02'
+    version: '1.04'
   URI::Namespace:
     file: lib/URI/Namespace.pm
-    version: '1.02'
+    version: '1.04'
   URI::NamespaceMap:
     file: lib/URI/NamespaceMap.pm
-    version: '1.02'
+    version: '1.04'
   URI::NamespaceMap::ReservedLocalParts:
     file: lib/URI/NamespaceMap/ReservedLocalParts.pm
-    version: '1.02'
+    version: '1.04'
 recommends:
   RDF::NS: '20130802'
   RDF::NS::Curated: '0'
@@ -61,7 +61,7 @@ resources:
   homepage: https://metacpan.org/module/URI::NamespaceMap
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kjetilk/URI-NamespaceMap/
-version: '1.02'
+version: '1.04'
 x_contributors:
   - 'Dorian Taylor <dorian@cpan.org>'
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'

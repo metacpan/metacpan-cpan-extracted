@@ -1,0 +1,75 @@
+{
+   "abstract" : "Perl pseudo pragma to enable strict, warnings, features, mro, filehandle methods",
+   "author" : [
+      "Gryphon Shafer <gryphon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "exact",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "v5.16.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "feature" : "0",
+            "mro" : "0",
+            "perl" : "v5.16.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "blib" : "1.01",
+            "perl" : "v5.16.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gryphonshafer/exact/issues"
+      },
+      "homepage" : "https://github.com/gryphonshafer/exact",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gryphonshafer/exact.git",
+         "web" : "https://github.com/gryphonshafer/exact"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

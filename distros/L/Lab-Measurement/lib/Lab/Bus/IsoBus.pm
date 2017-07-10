@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Bus::IsoBus;
-$Lab::Bus::IsoBus::VERSION = '3.552';
+$Lab::Bus::IsoBus::VERSION = '3.553';
 use strict;
 use Lab::Connection;
 use Scalar::Util qw(weaken);

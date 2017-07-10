@@ -21,14 +21,13 @@ sub test_filter : Test(3) {
     my ($out,$err) = Prty::Ipc->filter('/bin/cat','Ein Test');
     $self->is($out,'Ein Test');
 
-    eval { Prty::Ipc->filter('/bin/false','Ein Test') };
-    # warn "$@";
-    $self->like($@,qr/ExitCode:\s+1\s+/,'Kommando schlägt fehl');
+    # Fix: CPAN Testers
+    eval { Prty::Ipc->filter('false') };
+    $self->like($@,qr/ExitCode:\s+1\s+/);
 
     # Dieser Test schlägt unter Perl 5.8.8 fehl, da $? (Exitcode) 0 ist
     eval { Prty::Ipc->filter('/bin/unknown_command','Ein Test') };
-    # warn "$@";
-    $self->like($@,qr/open3:/,'Kommando existiert nicht');
+    $self->like($@,qr/open3:/);
 }
 
 # -----------------------------------------------------------------------------

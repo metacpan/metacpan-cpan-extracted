@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::AuthorsFromGit;
 # ABSTRACT: Add per-file per-year copyright info to each Perl document
-$Dist::Zilla::Plugin::AuthorsFromGit::VERSION = '0.005';
+$Dist::Zilla::Plugin::AuthorsFromGit::VERSION = '0.006';
 use Git::Wrapper;
 use DateTime;
 use List::MoreUtils 0.4 qw(uniq sort_by true);
@@ -27,7 +27,7 @@ sub getblacklist {
 sub gitauthorlist {
   my ($file, $git)= @_;
 
-  my @log_lines = $git->RUN('log', '--follow', '--format=%H %at %aN', '--', $file->name);
+  my @log_lines = $git->RUN('log', '--follow', '-M75%', '--format=%H %at %aN', '--', $file->name);
   my @outputlines;
   push @outputlines, "";
 
@@ -173,7 +173,7 @@ Dist::Zilla::Plugin::AuthorsFromGit - Add per-file per-year copyright info to ea
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

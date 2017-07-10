@@ -1,5 +1,12 @@
 Revision history for git-workflow-tools
 
+1.0.2   2017-07-09
+        Updating for release of version 1.0.2
+        Updated licence date (Ivan Wills)
+        Fixed manifest (Ivan Wills)
+        Adding extra info to make understanding errors easier (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+
 1.0.1   2016-06-26
         Updating for release of version 1.0.1
         Added colouring of found branch matches (Ivan Wills)

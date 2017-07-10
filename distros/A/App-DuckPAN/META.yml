@@ -97,7 +97,7 @@ requires:
 resources:
   homepage: https://github.com/duckduckgo/p5-app-duckpan
   repository: https://github.com/duckduckgo/p5-app-duckpan.git
-version: '1018'
+version: '1019'
 x_Dist_Zilla:
   perl:
     version: '5.016003'
@@ -335,7 +335,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1018'
+          tag: '1019'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -410,7 +410,7 @@ x_Dist_Zilla:
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
+      is_trial: 0
     version: '6.009'
 x_authority: cpan:DDG
 x_serialization_backend: 'YAML::Tiny version 1.57'

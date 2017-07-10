@@ -139,7 +139,7 @@ to overcome this ambiguity";
                 }                
 
                 if ( -f sparrow_root."/plugins/public/$pid/requirements.txt" ){
-                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt");
+                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
                 }            
 
             }else{
@@ -152,7 +152,7 @@ to overcome this ambiguity";
                 }                
 
                 if ( -f sparrow_root."/plugins/public/$pid/requirements.txt" ){
-                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt");
+                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
                 }            
 
             }
@@ -182,7 +182,7 @@ to overcome this ambiguity";
             }                
 
             if ( -f sparrow_root."/plugins/public/$pid/requirements.txt" ){
-              execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt");
+              execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
             }            
 
         }
@@ -443,7 +443,7 @@ sub read_plugin_list {
     my $mode = shift || 'as_array';
 
     # read public plugins list first
-    open F, spi_file() or confess "can't open ".spl_file()." to read - $!";
+    open F, spi_file() or confess "can't open ".spi_file()." to read - $!";
 
     while ( my $i = <F> ){
         chomp $i;

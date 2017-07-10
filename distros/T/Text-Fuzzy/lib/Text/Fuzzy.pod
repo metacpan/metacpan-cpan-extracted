@@ -1,3 +1,5 @@
+
+
 =encoding UTF-8
 
 =head1 NAME
@@ -10,18 +12,25 @@ Text::Fuzzy - Partial string matching using edit distances
     use Text::Fuzzy;
     my $tf = Text::Fuzzy->new ('boboon');
     print "Distance is ", $tf->distance ('babboon'), "\n";
-    # Prints "Distance is 2"
     my @words = qw/the quick brown fox jumped over the lazy dog/;
     my $nearest = $tf->nearestv (\@words);
     print "Nearest array entry is $nearest\n";
-    # Prints "Nearest array entry is brown"
     
+
+
+produces output
+
+    Distance is 2
+    Nearest array entry is brown
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.25 of Text::Fuzzy corresponding
-to git commit L<c5377c01525e8ae5cd2659fb2b752b7e9cb894b7|https://github.com/benkasminbullock/Text-Fuzzy/commit/c5377c01525e8ae5cd2659fb2b752b7e9cb894b7> released on Wed Dec 7 11:26:30 2016 +0900.
+This documents version 0.26 of Text::Fuzzy corresponding
+to git commit L<41c9f86088a4b233672c4782c164226ff99aba9c|https://github.com/benkasminbullock/Text-Fuzzy/commit/41c9f86088a4b233672c4782c164226ff99aba9c> released on Mon Jul 10 17:20:20 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -35,8 +44,15 @@ Unicode), treating each Unicode character as a single entity.
     use utf8;
     my $tf = Text::Fuzzy->new ('あいうえお☺');
     print $tf->distance ('うえお☺'), "\n";
-    # prints "2".
     
+
+
+produces output
+
+    2
+
+
+(This example is included as L<F<unicode.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/unicode.pl> in the distribution.)
 
 
 The default edit distance is the Levenshtein one, which counts each
@@ -129,14 +145,21 @@ word used to create the object in L</new>.
     use Text::Fuzzy;
     my $cat = Text::Fuzzy->new ('cat');
     print $cat->distance ('cut'), "\n";
-    # Prints 1
     print $cat->distance ('cart'), "\n";
-    # Prints 1
     print $cat->distance ('catamaran'), "\n";
-    # Prints 6
     use utf8;
     print $cat->distance ('γάτος'), "\n";
-    # Prints 5
+
+
+produces output
+
+    1
+    1
+    6
+    5
+
+
+(This example is included as L<F<distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/distance.pl> in the distribution.)
 
 
 To know which edits are used to convert the words, use
@@ -157,7 +180,14 @@ of the nearest values.
     my $tf = Text::Fuzzy->new ('whammo');
     my @nearest = $tf->nearestv (\@words);
     print "@nearest\n";
-    # Prints "who what"
+
+
+produces output
+
+    who what
+
+
+(This example is included as L<F<nearestv.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/nearestv.pl> in the distribution.)
 
 
 The behaviour of the match can be controlled with L</no_exact> and
@@ -207,6 +237,14 @@ to check the return value of index using C<defined>.
     
 
 
+produces output
+
+    Not found anywhere.
+
+
+(This example is included as L<F<check-return.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/check-return.pl> in the distribution.)
+
+
 If there is more than one word with the same edit distance in
 C<@words>, this returns the last one found, unless it is an exact
 match, in which case it returns the first one found. To get all
@@ -228,10 +266,14 @@ returns the array offset of it or them, not the value itself.
     print "The nearest words are ";
     print join ", ", (map {$funky_words[$_]} @nearest);
     printf ", distance %d.\n", $tf->last_distance ();
-    
-    # Prints out "The nearest words are nice, rice, lice."
-    
-    
+
+
+produces output
+
+    The nearest words are nice, rice, lice, distance 1.
+
+
+(This example is included as L<F<list-context.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/list-context.pl> in the distribution.)
 
 
 =head2 last_distance
@@ -248,12 +290,19 @@ to the previous match.
     my $tf = Text::Fuzzy->new ('whammo');
     my @nearest = $tf->nearestv (\@words);
     print "@nearest\n";
-    # Prints "who what"
     print $tf->last_distance (), "\n";
     # Prints 3, the number of edits needed to turn "whammo" into "who"
     # (delete a, m, m) or into "what" (replace m with t, delete m, delete
     # o).
-    
+
+
+produces output
+
+    who what
+    3
+
+
+(This example is included as L<F<last-distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/last-distance.pl> in the distribution.)
 
 
 =head2 set_max_distance
@@ -287,6 +336,15 @@ by the user.
     # Prints 11, one more than the maximum distance, because the search
     # stopped when the distance was exceeded.
     print $tf->distance ('abcdefghijklm'), "\n";
+
+
+produces output
+
+    13
+    11
+
+
+(This example is included as L<F<max-dist.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/max-dist.pl> in the distribution.)
 
 
 Setting the maximum distance is a way to make a search more rapid. For
@@ -326,16 +384,16 @@ example,
     for my $word (@words) {
         my $tf = Text::Fuzzy->new ($word);
         $tf->no_exact (0);
-        my $nearest = $tf->nearest (\@words);
-        print "With exact, nearest to $word is $words[$nearest]\n";
+        my $nearest1 = $tf->nearest (\@words);
+        print "With exact, nearest to $word is $words[$nearest1]\n";
         # Make "$word" not match itself.
         $tf->no_exact (1);
-        my $nearest = $tf->nearest (\@words);
-        print "Without exact, nearest to $word is $words[$nearest]\n";
+        my $nearest2 = $tf->nearest (\@words);
+        print "Without exact, nearest to $word is $words[$nearest2]\n";
     }
 
 
-This prints
+produces output
 
     With exact, nearest to bibbity is bibbity
     Without exact, nearest to bibbity is bobbity
@@ -343,6 +401,9 @@ This prints
     Without exact, nearest to bobbity is bibbity
     With exact, nearest to boo is boo
     Without exact, nearest to boo is bobbity
+
+
+(This example is included as L<F<no-exact.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/no-exact.pl> in the distribution.)
 
 
 This is for the case of searching over an array which contains the
@@ -390,6 +451,16 @@ respectively. For example, for "piece" and "peace", C<$edits> contains
     
 
 
+produces output
+
+    who what
+    3
+    kkdddk
+
+
+(This example is included as L<F<distance-edits.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/distance-edits.pl> in the distribution.)
+
+
 This does not handle transpositions. Unlike the rest of the module,
 this is pure Perl rather than XS, and not optimized for speed. The
 edit distance search within L</nearest> is optimized for speed, and
@@ -399,7 +470,7 @@ hence discards its record of edits used to get the result.
 
     my ($offset, $edits, $distance) = fuzzy_index ($needle, $haystack);
 
-Searches for SUBSTR in STR using fuzzy matching.
+Searches for C<$needle> in C<$haystack> using fuzzy matching.
 
 Return value is the offest of the closest match found, the edits
 necessary on C<$needle> to make it into the matching text, and the
@@ -415,9 +486,14 @@ debugging code. Please expect the interface and internals to change.
 
 =head1 EXAMPLES
 
+This section gives extended examples of the use of the module to solve
+practical problems.
+
 =head2 misspelt-web-page.cgi
 
-The file F<examples/misspelt-web-page.cgi> is an example of a CGI
+The file 
+L<F<examples/misspelt-web-page.cgi>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/misspelt-web-page.cgi>
+ is an example of a CGI
 script which does something similar to the Apache mod_speling module,
 offering spelling corrections for mistyped URLs and sending the user
 to a correct page.
@@ -524,7 +600,9 @@ set up F<.htaccess> to use the script.
 
 =head2 spell-check.pl
 
-The file F<examples/spell-check.pl> is a spell checker. It uses a
+The file 
+L<F<examples/spell-check.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/spell-check.pl>
+ is a spell checker. It uses a
 dictionary of words specified by a command-line option "-d":
 
     spell-check.pl -d /usr/dict/words file1.txt file2.txt
@@ -658,17 +736,18 @@ of verbs.
 
 =head2 extract-kana.pl
 
-The file F<examples/extract-kana.pl> extracts the kana entries from
-"edict", a freely-available Japanese to English electronic dictionary,
-and does some fuzzy searches on them. It requires a local copy of the
-file to run. This script demonstrates the use of Unicode searches with
-Text::Fuzzy.
+The file 
+L<F<examples/extract-kana.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.26/examples/extract-kana.pl>
+ extracts the kana entries
+from "edict", a freely-available Japanese to English electronic
+dictionary, and does some fuzzy searches on them. It requires a local
+copy of the file to run. This script demonstrates the use of Unicode
+searches with Text::Fuzzy.
 
     
     use Lingua::JA::Moji ':all';
     use Text::Fuzzy;
     use utf8;
-    binmode STDOUT, ":utf8";
     my $infile = '/home/ben/data/edrdg/edict';
     open my $in, "<:encoding(EUC-JP)", $infile or die $!;
     my @kana;
@@ -710,6 +789,16 @@ Text::Fuzzy.
     
 
 
+=head2 L<Lingua::JA::Gairaigo::Fuzzy>
+
+The module Lingua::JA::Gairaigo::Fuzzy tries to determine whether two
+Japanese loanwords are the same word or not.
+
+=head2 L<CPAN::Nearest>
+
+The module CPAN::Nearest offers a search over the titles of CPAN
+modules using a fuzzy search to get the nearest match.
+
 =head1 SUPPORT
 
 =head2 Reporting a bug
@@ -725,8 +814,8 @@ L<http://code.activestate.com/ppm/Text-Fuzzy/>.
 
 =head1 PRIVATE METHODS
 
-You probably do not need any of these methods. They are for
-benchmarking the module and checking its correctness.
+The following methods are for benchmarking the module and checking its
+correctness.
 
 =head2 no_alphabet
 
@@ -805,23 +894,80 @@ Similar modules on CPAN include the following.
 
 =item L<String::Approx>
 
+Approximate matching (fuzzy matching).
+
+=item L<Text::EditTranscript>
+
+Determine the edit transcript between two strings.
+
 =item L<Text::Fuzzy::PP>
 
 This is Nick Logan's Pure Perl version of this module.
 
 =item L<Text::Levenshtein::Damerau>
 
-This implements the Levenshtein-Damerau edit distance.
+Levenshtein-Damerau edit distance.
 
 =item L<Text::Levenshtein>
 
 =item L<Text::Levenshtein::Flexible>
 
+XS Levenshtein distance calculation with bounds and costs.
+
 =item L<Text::Levenshtein::XS>
 
-This is an XS implementation of the Levenshtein edit distance.
+An XS implementation of the Levenshtein edit distance.
 
 =item L<Text::LevenshteinXS>
+
+An XS implementation of the Levenshtein edit distance
+
+=item L<Text::Levenshtein::Edlib>
+
+A wrapper around the edlib library that computes Levenshtein edit
+distance and optimal alignment path for a pair of strings.
+
+=item L<Tree::BK>
+
+Structure for efficient fuzzy matching.
+
+=item L<Text::Brew>
+
+An implementation of the Brew edit distance.
+
+=item L<Text::WagnerFischer>
+
+Wagner-Fischer edit distance.
+
+=item L<Bencher::Scenario::LevenshteinModules>
+
+Some benchmarks of various modules including this one.
+
+=back
+
+=head1 HISTORY
+
+=over
+
+=item 0.26
+
+=over
+
+=item 
+
+A bug was fixed where an input string may be overwritten in code like
+
+    my $tf = Text::Fuzzy->new ($x);
+    $tf->distance ($y);
+
+if C<$x> is a plain ASCII string and C<$y> is a Unicode string.
+
+=item
+
+Links were added to the examples, and the outputs of the examples were
+added as part of the documentation.
+
+=back
 
 =back
 
@@ -829,7 +975,8 @@ This is an XS implementation of the Levenshtein edit distance.
 
 The edit distance including transpositions was contributed by Nick
 Logan (UGEXE). Some of the tests in F<t/trans.t> are taken from the
-L<Text::Levenshtein::Damerau::XS> module.
+L<Text::Levenshtein::Damerau::XS> module. Nils Boeffel reported a bug
+where strings may be overwritten in version 0.25.
 
 
 =head1 AUTHOR
@@ -839,7 +986,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2016
+2012-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

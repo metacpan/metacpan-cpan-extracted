@@ -1,0 +1,63 @@
+{
+   "abstract" : "Generate Cypher queries in Perl",
+   "author" : [
+      "Mark A. Jensen"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Neo4j-Cypher-Abstract",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Tie::IxHash" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.33",
+            "Scalar::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Neo4j::Cypher::Abstract" : {
+         "file" : "lib/Neo4j/Cypher/Abstract.pm",
+         "version" : "0.1001"
+      },
+      "Neo4j::Cypher::Abstract::Peeler" : {
+         "file" : "lib/Neo4j/Cypher/Abstract/Peeler.pm",
+         "version" : "0.1001"
+      },
+      "Neo4j::Cypher::Pattern" : {
+         "file" : "lib/Neo4j/Cypher/Pattern.pm",
+         "version" : "0.1001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Neo4j-Cypher-Abstract"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/majensen/cypher-abstract.git"
+      }
+   },
+   "version" : "0.1001",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

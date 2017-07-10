@@ -1,13 +1,13 @@
 package App::CreateAcmeCPANListsImportModules;
 
-our $DATE = '2017-01-06'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Perinci::Sub::Util qw(err);
 
 our %SPEC;
@@ -87,7 +87,7 @@ sub create_acme_cpanlists_import_modules {
 
     my %names;
     for my $ac_mod (@$ac_modules) {
-        $log->infof("Processing %s ...", $ac_mod->{name});
+        log_info("Processing %s ...", $ac_mod->{name});
 
         return [409, "Duplicate module name '$ac_mod->{name}'"]
             if $names{$ac_mod->{name}}++;
@@ -106,7 +106,7 @@ sub create_acme_cpanlists_import_modules {
             my @st_cache = stat $cache_path;
             my $content;
             if (!$cache || !@st_cache || $st_cache[9] < $now-30*86400) {
-                $log->infof("Retrieving %s ...", $url);
+                log_info("Retrieving %s ...", $url);
                 my $resp = $ua->get($url, "Cache-Control" => "no-cache");
                 $resp->is_success
                     or return [500, "Can't get $url: ".$resp->status_line];
@@ -114,7 +114,7 @@ sub create_acme_cpanlists_import_modules {
                 File::Slurper::write_text($cache_path, $content);
                 $date //= POSIX::strftime("%Y-%m-%d", localtime $now);
             } else {
-                $log->infof("Using cache file %s", $cache_path);
+                log_info("Using cache file %s", $cache_path);
                 $content = File::Slurper::read_text($cache_path);
                 $date //= POSIX::strftime("%Y-%m-%d", localtime($st_cache[9]));
             }
@@ -122,7 +122,7 @@ sub create_acme_cpanlists_import_modules {
             my $mods0 = HTML::Extract::CPANModules::extract_cpan_modules_from_html(
                 html => $content, %{ $ac_mod->{extract_opts} // {}});
 
-            $log->debugf("Extracted module names: %s", $mods0);
+            log_debug("Extracted module names: %s", $mods0);
             for my $m (@$mods0) {
                 push @$mods, $m unless grep { $m eq $_ } @$mods;
             }
@@ -147,7 +147,7 @@ sub create_acme_cpanlists_import_modules {
             $mods = \@included_mods;
 
             if (@excluded_mods) {
-                $log->debugf("Excluded module names (not indexed on ".
+                log_debug("Excluded module names (not indexed on ".
                                  "local CPAN mirror): %s", \@excluded_mods);
             }
         }
@@ -184,7 +184,7 @@ sub create_acme_cpanlists_import_modules {
             "\n",
         );
 
-        $log->infof("Writing module %s ...", $ac_module_path);
+        log_info("Writing module %s ...", $ac_module_path);
         File::Slurper::write_text($ac_module_path, join("", @pm_content));
     }
 
@@ -206,12 +206,16 @@ App::CreateAcmeCPANListsImportModules - Create Acme::CPANLists::Import::* module
 
 =head1 VERSION
 
-This document describes version 0.06 of App::CreateAcmeCPANListsImportModules (from Perl distribution App-CreateAcmeCPANListsImportModules), released on 2017-01-06.
+This document describes version 0.07 of App::CreateAcmeCPANListsImportModules (from Perl distribution App-CreateAcmeCPANListsImportModules), released on 2017-07-08.
 
 =head1 FUNCTIONS
 
 
-=head2 create_acme_cpanlists_import_modules(%args) -> [status, msg, result, meta]
+=head2 create_acme_cpanlists_import_modules
+
+Usage:
+
+ create_acme_cpanlists_import_modules(%args) -> [status, msg, result, meta]
 
 Create Acme::CPANLists::Import::* modules.
 
@@ -296,7 +300,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

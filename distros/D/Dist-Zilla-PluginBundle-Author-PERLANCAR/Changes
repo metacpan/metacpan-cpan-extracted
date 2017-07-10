@@ -1,3 +1,27 @@
+0.58    2017-07-08 (PERLANCAR)
+
+	- Add some documentation.
+
+	- Add [StaticInstall].
+
+
+0.57    2017-07-07 (PERLANCAR)
+
+        - Add script/ as an exec dir using DZP:ExecDir.
+
+        - [dist] Enable static install.
+
+
+0.56    2017-07-07 (PERLANCAR)
+
+        - Remove GenShellCompletion because it is incompatible with
+          DZP:StaticInstall. Instead of running shcompgen in Makefile let's
+          later hook into the CPAN installer client for this.
+
+        - replace ReadmeFromPod with Pod2Readme that is compatible with
+          DZP:StaticInstall.
+
+
 0.55    2017-02-09 (PERLANCAR)
 
 	- Add plugin: CopyrightYearFromGit.

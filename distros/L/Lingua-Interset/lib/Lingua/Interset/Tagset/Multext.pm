@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::Multext;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -96,7 +96,7 @@ sub _create_atoms
             # abbreviation
             # examples [cs]: atd., apod.
             # examples [ro]: mp, km, etc.
-            'Y' => ['abbr' => 'abbr'],
+            'Y' => ['abbr' => 'yes'],
             # punctuation
             # examples: , .
             'Z' => ['pos' => 'punc'],
@@ -106,7 +106,7 @@ sub _create_atoms
         # Some Multext-East tagsets (e.g. most Slavic languages) lack articles and determiners (the latter exist but are included in pronouns).
         'encode_map' => $self->determiners() ?
         {
-            'abbr' => { 'abbr' => 'Y',
+            'abbr' => { 'yes' => 'Y',
                         '@'    => { 'numtype' => { ''  => { 'pos' => { 'noun' => { 'prontype' => { ''  => 'N',
                                                                                                    '@' => 'P' }},
                                                                        'adj'  => { 'prontype' => { ''    => 'A',
@@ -128,7 +128,7 @@ sub _create_atoms
         }
         :
         {
-            'abbr' => { 'abbr' => 'Y',
+            'abbr' => { 'yes' => 'Y',
                         '@'    => { 'numtype' => { ''  => { 'pos' => { 'noun' => { 'prontype' => { ''  => 'N',
                                                                                                    '@' => 'P' }},
                                                                        'adj'  => { 'prontype' => { ''  => 'A',
@@ -166,11 +166,11 @@ sub _create_atoms
             'f' => [],
             # possessive adjective
             # examples: otcův, matčin
-            's' => ['poss' => 'poss']
+            's' => ['poss' => 'yes']
         },
         'encode_map' =>
 
-            { 'poss' => { 'poss' => 's',
+            { 'poss' => { 'yes' => 's',
                            '@'   => 'f' }}
     );
     # PRONTYPE ####################
@@ -194,7 +194,7 @@ sub _create_atoms
             # possessive pronoun
             # relative possessive pronouns ("jehož") are classified as relatives
             # examples: můj, tvůj, jeho, její, náš, váš, jejich
-            's' => ['prontype' => 'prs', 'poss' => 'poss'],
+            's' => ['prontype' => 'prs', 'poss' => 'yes'],
             # interrogative pronoun
             # examples: kdo, co, jaký, který, čí
             'q' => ['prontype' => 'int'],
@@ -207,7 +207,7 @@ sub _create_atoms
             # reflexive pronoun (both personal and possessive reflexive pronouns fall here)
             # examples of personal reflexive pronouns: se, si, sebe, sobě, sebou
             # examples of possessive reflexive pronouns: svůj
-            'x' => ['prontype' => 'prs', 'reflex' => 'reflex'],
+            'x' => ['prontype' => 'prs', 'reflex' => 'yes'],
             # negative pronoun
             # examples: nikdo, nic, nijaký, ničí, žádný
             'z' => ['prontype' => 'neg'],
@@ -222,8 +222,8 @@ sub _create_atoms
         },
         'encode_map' =>
         {
-            'reflex' => { 'reflex' => 'x',
-                          '@'      => { 'poss' => { 'poss' => 's',
+            'reflex' => { 'yes' => 'x',
+                          '@'      => { 'poss' => { 'yes' => 's',
                                                     '@'    => { 'prontype' => { 'dem' => 'd',
                                                                                 'emp' => 'h',
                                                                                 'ind' => 'i',
@@ -420,7 +420,7 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'poss' => { 'poss' => '-',
+            { 'poss' => { 'yes' => '-',
                           '@'    => { 'variant' => { 'short' => 'n',
                                                      '@'     => 'c' }}}}
     );
@@ -452,7 +452,7 @@ sub _create_atoms
         # We have to be careful here. The "-s" clitic is specific for Czech. We cannot just erase person in any language.
         # Romanian, for example, sets the 3rd person even for demonstrative pronouns.
         { 'verbform' => { 'part' => '-',
-                          '@'    => { 'other/clitic_s' => { 'y' => { 'prontype' => { 'prs' => { 'reflex' => { 'reflex' => '-',
+                          '@'    => { 'other/clitic_s' => { 'y' => { 'prontype' => { 'prs' => { 'reflex' => { 'yes' => '-',
                                                                                                               '@'      => { 'person' => { '1' => '1',
                                                                                                                                           '2' => '2',
                                                                                                                                           '3' => '3',
@@ -517,12 +517,12 @@ sub _create_atoms
         'surfeature' => 'referent_type',
         'decode_map' =>
         {
-            's' => ['reflex' => 'reflex', 'poss' => 'poss'],
-            'p' => ['reflex' => 'reflex']
+            's' => ['reflex' => 'yes', 'poss' => 'yes'],
+            'p' => ['reflex' => 'yes']
         },
         'encode_map' =>
 
-            { 'reflex' => { 'reflex' => { 'poss' => { 'poss' => 's',
+            { 'reflex' => { 'yes' => { 'poss' => { 'yes' => 's',
                                                       '@'    => 'p' }},
                             '@'      => '-' }}
     );
@@ -823,9 +823,9 @@ sub _create_atoms
         {
             # foreign word
             # examples: a1, SETimes, European, bin, international
-            'f' => ['foreign' => 'foreign'],
+            'f' => ['foreign' => 'yes'],
             # typo
-            't' => ['typo' => 'typo'],
+            't' => ['typo' => 'yes'],
             # program
             # DZ: I am not sure what this value is supposed to mean. It is mentioned but not explained in the documentation.
             # It does not occur in the SETimes.HR corpus.
@@ -833,8 +833,8 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'foreign' => { 'foreign' => 'f',
-                             '@'       => { 'typo' => { 'typo' => 't',
+            { 'foreign' => { 'yes' => 'f',
+                             '@'       => { 'typo' => { 'yes' => 't',
                                                         '@'    => '-' }}}}
     );
     return \%atoms;
@@ -946,7 +946,7 @@ Lingua::Interset::Tagset::Multext - Common code for drivers of tagsets of the Mu
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

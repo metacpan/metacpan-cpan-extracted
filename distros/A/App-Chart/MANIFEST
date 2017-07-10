@@ -36,6 +36,7 @@ devel/makefile-from-grep.pl
 devel/makefile-to-debs.pl
 devel/meta-read.pl
 devel/misc.el
+devel/MON.pm
 devel/my-extract-use.pl
 devel/MyExtractUse.pm
 devel/myshare.pl
@@ -59,7 +60,6 @@ devel/run-vacuum-dialog.pl
 devel/run-watchlist.pl
 devel/run-weblink-menu.pl
 devel/scandeps-to-makefile.pl
-devel/t-tradingroom.pl
 devel/VacuumDialog.t
 devel/warnings-unused.pl
 devel/weblinks-samples.pl
@@ -407,7 +407,6 @@ lib/App/Chart/Suffix/MF.pm
 lib/App/Chart/Suffix/MGEX.pm
 lib/App/Chart/Suffix/MI.pm
 lib/App/Chart/Suffix/MLC.pm
-lib/App/Chart/Suffix/MON.pm
 lib/App/Chart/Suffix/MU.pm
 lib/App/Chart/Suffix/MX.pm
 lib/App/Chart/Suffix/NoSuffix.pm
@@ -710,6 +709,7 @@ t/WatchlistModel.t
 t/Yahoo.t
 unused/CommSec.pm
 unused/Float.pm
+unused/t-tradingroom.pl
 unused/TradingRoom.pm
 xt/0-desktop-file-validate.t
 xt/0-exe-shebang.t

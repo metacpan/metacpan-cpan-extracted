@@ -1,0 +1,8 @@
+0.003     2017-07-07 15:03:57 EDT
+  - Fix tests to work correctly in different locales
+
+0.002     2017-07-06 15:55:48 EDT
+  - Split version sorting out to Sort::filevercmp
+
+0.001     2017-07-06 11:33:31 EDT
+  - First release

@@ -20,6 +20,7 @@ requires 'namespace::clean';
 requires 'Sub::Exporter';
 requires 'Catmandu::OAI';
 requires 'Catmandu::Solr';
+requires 'Catmandu::Importer::XML';
 requires 'Hash::Merge';
 requires "Ref::Util";
 requires "DateTime";

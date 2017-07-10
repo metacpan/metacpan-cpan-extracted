@@ -1,0 +1,16 @@
+Revision history for Dancer2-Logger-Console-Colored
+
+0.003     2017-07-07 10:13:50+02:00 Europe/Berlin
+
+0.003     2017-07-07 10:12:15+02:00 Europe/Berlin
+        - Rerelease the previous version because it was broken.
+
+0.002   2017-06-06 16:47:00Z 
+        - GH #4: Fix bug where the line number and file name of the source
+          of the error message is wrong. (Steve Guo)
+        - Add unit tests. (simbabque)
+        - Require at least Dancer2 version 0.166001_01. You probably want
+          at least 0.200. (simbabque)
+
+0.001   2014-08-11 12:16:13Z
+        - Initial release.

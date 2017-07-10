@@ -1,6 +1,7 @@
-
 package Lab::Measurement;
-$Lab::Measurement::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Log, describe and plot data on the fly
+$Lab::Measurement::VERSION = '3.553';
 use strict;
 use warnings;
 use Lab::Generic;
@@ -13,16 +14,21 @@ our @EXPORT = qw(DataFile Sweep Frame Instrument Connection);
 
 __END__
 
-=encoding utf8
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Lab::Measurement - Log, describe and plot data on the fly
 
+=head1 VERSION
+
+version 3.553
+
 =head1 SYNOPSIS
 
   use Lab::Measurement;
-  
 
 =head1 DESCRIPTION
 
@@ -49,12 +55,20 @@ command; further required modules will be imported on demand.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2004-2006 Daniel Schröer (L<http://www.danielschroeer.de>)
- Copyright      2016 Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+  Copyright 2005-2006  Daniel Schroeer
+            2011       Andreas K. Huettel
+            2012       Alois Dirnaichner, Andreas K. Huettel, David Kalok, Hermann Kraus
+            2013       Andreas K. Huettel
+            2014       Christian Butschkow
+            2016       Andreas K. Huettel, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

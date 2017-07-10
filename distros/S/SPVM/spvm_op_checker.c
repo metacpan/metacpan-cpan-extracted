@@ -27,45 +27,6 @@
 #include "spvm_limit.h"
 #include "spvm_constant_pool_package.h"
 
-void SPVM_OP_CHECKER_build_leave_scope(SPVM_COMPILER* compiler, SPVM_OP* op_leave_scope, SPVM_ARRAY* op_my_var_stack, int32_t top, int32_t bottom, SPVM_OP* op_term_keep) {
-  
-  {
-    int32_t i;
-    for (i = top; i >= bottom; i--) {
-      SPVM_OP* op_my_var = SPVM_ARRAY_fetch(op_my_var_stack, i);
-      assert(op_my_var);
-      
-      SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_my_var);
-      
-      // Decrement reference count when leaving scope
-      if (!SPVM_TYPE_is_numeric(compiler, type)) {
-        // If return term is variable, don't decrement reference count
-        _Bool do_dec_ref_count = 0;
-        if (op_term_keep) {
-          if (op_term_keep->code == SPVM_OP_C_CODE_VAR) {
-            if (op_term_keep->uv.var->op_my_var->uv.my_var->index != op_my_var->uv.my_var->index) {
-              do_dec_ref_count = 1;
-            }
-          }
-          else {
-            do_dec_ref_count = 1;
-          }
-        }
-        else {
-          do_dec_ref_count = 1;
-        }
-        
-        if (do_dec_ref_count) {
-          SPVM_OP* op_dec_ref_count = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_DEC_REF_COUNT, op_leave_scope->file, op_leave_scope->line);
-          SPVM_OP* op_var = SPVM_OP_new_op_var_from_op_my_var(compiler, op_my_var);
-          SPVM_OP_sibling_splice(compiler, op_dec_ref_count, NULL, 0, op_var);
-          SPVM_OP_sibling_splice(compiler, op_leave_scope, NULL, 0, op_dec_ref_count);
-        }
-      }
-    }
-  }
-}
-
 void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
   
   SPVM_ARRAY* op_types = compiler->op_types;
@@ -327,7 +288,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_SUB) {
                     SPVM_OP* op_statements = op_cur->first;
                     
-                    if (op_statements->last->code != SPVM_OP_C_CODE_RETURN_PROCESS) {
+                    if (op_statements->last->code != SPVM_OP_C_CODE_RETURN) {
                       
                       SPVM_OP* op_return = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_RETURN, op_cur->file, op_cur->line);
                       if (sub->op_return_type->code != SPVM_OP_C_CODE_VOID) {
@@ -362,13 +323,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         }
                       }
                       
-                      SPVM_OP* op_return_process = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_RETURN_PROCESS, op_return->file, op_return->line);
-                      SPVM_OP* op_leave_scope = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_LEAVE_SCOPE, op_return->file, op_return->line);
-                      
-                      SPVM_OP_sibling_splice(compiler, op_return_process, op_return_process->last, 0, op_leave_scope);
-                      SPVM_OP_sibling_splice(compiler, op_return_process, op_return_process->last, 0, op_return);
-                      
-                      SPVM_OP_sibling_splice(compiler, op_statements, op_statements->last, 0, op_return_process);
+                      SPVM_OP_sibling_splice(compiler, op_statements, op_statements->last, 0, op_return);
                     }
                   }
                   
@@ -380,7 +335,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_LOOP) {
                     SPVM_ARRAY_push(loop_block_my_var_base_stack, block_my_var_base_ptr);
                   }
-                  else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_TRY) {
+                  else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
                     SPVM_ARRAY_push(try_block_my_var_base_stack, block_my_var_base_ptr);
                   }
                   
@@ -392,85 +347,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Right side of "=" is rvalue
                   op_cur->last->rvalue = 1;
-                  break;
-                }
-                case SPVM_OP_C_CODE_MALLOC: {
-                  SPVM_OP* op_type = op_cur->first;
-                  
-                  // If MALLOC is not rvalue, temparary variable is created, and assinged.
-                  if (!op_cur->rvalue) {
-                    assert(my_var_length <= SPVM_LIMIT_C_MY_VARS);
-                    if (my_var_length == SPVM_LIMIT_C_MY_VARS) {
-                      SPVM_yyerror_format(compiler, "too many lexical variables(Temparay variable is created in malloc) at %s line %d\n", op_cur->file, op_cur->line);
-                      compiler->fatal_error = 1;
-                      break;
-                    }
-                    
-                    // Create temporary variable
-                    // my_var
-                    SPVM_MY_VAR* my_var = SPVM_MY_VAR_new(compiler);
-                    
-                    // Temparary variable name
-                    char* name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, strlen("@tmp2147483647"));
-                    sprintf(name, "@tmp%d", my_var_tmp_index++);
-                    SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NAME, op_cur->file, op_cur->line);
-                    op_name->uv.name = name;
-                    my_var->op_name = op_name;
-                    
-                    // Set type to my var
-                    my_var->op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, op_cur->file, op_cur->line);
-                    my_var->op_type->uv.type = op_type->uv.type;
-                    
-                    // Index
-                    my_var->index = my_var_length++;
-                    
-                    // op my_var
-                    SPVM_OP* op_my_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR, op_cur->file, op_cur->line);
-                    op_my_var->uv.my_var = my_var;
-                    
-                    // Add my var
-                    SPVM_ARRAY_push(op_my_vars, op_my_var);
-                    SPVM_ARRAY_push(op_my_var_stack, op_my_var);
-                    
-                    // Convert malloc op to assing op
-                    // Var op
-                    SPVM_OP* op_var = SPVM_OP_new_op_var_from_op_my_var(compiler, op_my_var);
-                    
-                    // Malloc op
-                    SPVM_OP* op_malloc = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MALLOC, op_cur->file, op_cur->line);
-                    
-                    // Type parent is malloc
-                    op_type->moresib = 0;
-                    op_type->sibparent = op_malloc;
-
-                    // Assing op
-                    SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
-                    op_assign->first = op_var;
-                    op_assign->last = op_malloc;
-                    op_assign->moresib = 0;
-                    op_assign->sibparent = op_cur;
-                    
-                    // Convert cur malloc op to var
-                    op_cur->code = SPVM_OP_C_CODE_VAR;
-                    op_cur->uv.var = op_var->uv.var;
-                    op_cur->first = op_assign;
-                    op_cur->last = op_assign;
-                    
-                    // Var op has sibling
-                    op_var->moresib = 1;
-                    op_var->sibparent = op_malloc;
-                    
-                    // Malloc op parent is assign op
-                    op_malloc->first = op_type;
-                    op_malloc->last = op_type;
-                    op_malloc->moresib = 0;
-                    op_malloc->sibparent = op_assign;
-                    
-                    // Set lvalue and rvalue
-                    op_assign->first->lvalue = 1;
-                    op_assign->last->rvalue = 1;
-                    
-                  }
                   break;
                 }
               }
@@ -493,47 +369,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       if (loop_block_my_var_base_stack->length == 0) {
                         SPVM_yyerror_format(compiler, "last statement must be in loop block at %s line %d\n", op_cur->file, op_cur->line);
                       }
-                      break;
-                    }
-                    case SPVM_OP_C_CODE_NEXT_PROCESS: {
-                      SPVM_OP* op_leave_scope = op_cur->first;
-                      
-                      assert(loop_block_my_var_base_stack->length > 0);
-                      int32_t* bottom_ptr = SPVM_ARRAY_fetch(loop_block_my_var_base_stack, loop_block_my_var_base_stack->length - 1);
-                      
-                      // Build op_leave_scope
-                      SPVM_OP_CHECKER_build_leave_scope(compiler, op_leave_scope, op_my_var_stack, op_my_var_stack->length - 1, *bottom_ptr, NULL);
-                      
-                      break;
-                    }
-                    case SPVM_OP_C_CODE_LAST_PROCESS: {
-                      SPVM_OP* op_leave_scope = op_cur->first;
-                      
-                      assert(loop_block_my_var_base_stack->length > 0);
-                      int32_t* bottom_ptr = SPVM_ARRAY_fetch(loop_block_my_var_base_stack, loop_block_my_var_base_stack->length - 1);
-                      
-                      // Build op_leave_scope
-                      SPVM_OP_CHECKER_build_leave_scope(compiler, op_leave_scope, op_my_var_stack, op_my_var_stack->length - 1, *bottom_ptr, NULL);
-                      
-                      break;
-                    }
-                    case SPVM_OP_C_CODE_DIE_PROCESS: {
-                      // Add before return process
-                      SPVM_OP* op_leave_scope = op_cur->first;
-                      SPVM_OP* op_die = op_cur->last;
-                      SPVM_OP* op_term = op_die->first;
-                      
-                      if (try_block_my_var_base_stack->length > 0) {
-                        int32_t* bottom_ptr = SPVM_ARRAY_fetch(try_block_my_var_base_stack, try_block_my_var_base_stack->length - 1);
-                        
-                        // Build op_leave_scope
-                        SPVM_OP_CHECKER_build_leave_scope(compiler, op_leave_scope, op_my_var_stack, op_my_var_stack->length - 1, *bottom_ptr, op_term);
-                      }
-                      else {
-                        // Build op_leave_scope
-                        SPVM_OP_CHECKER_build_leave_scope(compiler, op_leave_scope, op_my_var_stack, op_my_var_stack->length - 1, 0, op_term);
-                      }
-                      
                       break;
                     }
                     case SPVM_OP_C_CODE_CONSTANT: {
@@ -589,6 +424,19 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           const char* value = constant->uv.string_value;
                           
                           constant->constant_pool_index = SPVM_CONSTANT_POOL_push_string(compiler, constant_pool, value);
+                          
+                          SPVM_OP* op_constant = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONSTANT, op_cur->line, op_cur->file);
+                          op_constant->uv.constant = op_cur->uv.constant;
+                          
+                          op_cur->code = SPVM_OP_C_CODE_MALLOC;
+                          op_cur->first = op_constant;
+                          op_cur->last = op_constant;
+                          
+                          op_constant->moresib = 0;
+                          op_constant->sibparent = op_cur;
+                          
+                          op_cur = op_constant;
+                          
                           break;
                         }
                       }
@@ -979,30 +827,116 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       break;
                     }
                     case SPVM_OP_C_CODE_MALLOC: {
-                      SPVM_OP* op_type = op_cur->first;
-                      SPVM_TYPE* type = op_type->uv.type;
+                      SPVM_OP* op_type_or_constant = op_cur->first;
                       
-                      if (SPVM_TYPE_is_array(compiler, type)) {
-                        SPVM_OP* op_index_term = op_type->last;
-                        SPVM_TYPE* index_type = SPVM_OP_get_type(compiler, op_index_term);
+                      if (op_cur->first->code == SPVM_OP_C_CODE_TYPE) {
+                        SPVM_OP* op_type = op_cur->first;
+                        SPVM_TYPE* type = op_type->uv.type;
                         
-                        if (!index_type) {
-                          SPVM_yyerror_format(compiler, "new operator can't create array which don't have length \"%s\" at %s line %d\n", type->name, op_cur->file, op_cur->line);
-                          break;
+                        if (SPVM_TYPE_is_array(compiler, type)) {
+                          SPVM_OP* op_index_term = op_type->last;
+                          SPVM_TYPE* index_type = SPVM_OP_get_type(compiler, op_index_term);
+                          
+                          if (!index_type) {
+                            SPVM_yyerror_format(compiler, "new operator can't create array which don't have length \"%s\" at %s line %d\n", type->name, op_cur->file, op_cur->line);
+                            break;
+                          }
+                          else if (index_type->id != SPVM_TYPE_C_ID_INT) {
+                            SPVM_yyerror_format(compiler, "new operator can't create array which don't have int length \"%s\" at %s line %d\n", type->name, op_cur->file, op_cur->line);
+                            break;
+                          }
                         }
-                        else if (index_type->id != SPVM_TYPE_C_ID_INT) {
-                          SPVM_yyerror_format(compiler, "new operator can't create array which don't have int length \"%s\" at %s line %d\n", type->name, op_cur->file, op_cur->line);
-                          break;
+                        else {
+                          if (SPVM_TYPE_is_numeric(compiler, type)) {
+                            SPVM_yyerror_format(compiler,
+                              "new operator can't receive core type at %s line %d\n", op_cur->file, op_cur->line);
+                            break;
+                          }
                         }
+                      }
+                      else if (op_cur->first->code == SPVM_OP_C_CODE_CONSTANT) {
+                        // Constant string
                       }
                       else {
-                        if (SPVM_TYPE_is_numeric(compiler, type)) {
-                          SPVM_yyerror_format(compiler,
-                            "new operator can't receive core type at %s line %d\n", op_cur->file, op_cur->line);
-                          break;
-                        }
+                        assert(0);
                       }
                       
+                      // If MALLOC is not rvalue, temparary variable is created, and assinged.
+                      if (!op_cur->rvalue) {
+                        assert(my_var_length <= SPVM_LIMIT_C_MY_VARS);
+                        if (my_var_length == SPVM_LIMIT_C_MY_VARS) {
+                          SPVM_yyerror_format(compiler, "too many lexical variables(Temparay variable is created in malloc) at %s line %d\n", op_cur->file, op_cur->line);
+                          compiler->fatal_error = 1;
+                          break;
+                        }
+                        
+                        // Create temporary variable
+                        // my_var
+                        SPVM_MY_VAR* my_var = SPVM_MY_VAR_new(compiler);
+                        
+                        // Temparary variable name
+                        char* name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, strlen("@tmp2147483647"));
+                        sprintf(name, "@tmp%d", my_var_tmp_index++);
+                        SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NAME, op_cur->file, op_cur->line);
+                        op_name->uv.name = name;
+                        my_var->op_name = op_name;
+                        
+                        // Set type to my var
+                        my_var->op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, op_cur->file, op_cur->line);
+                        my_var->op_type->uv.type = SPVM_OP_get_type(compiler, op_cur->first);
+                        
+                        // Index
+                        my_var->index = my_var_length++;
+                        
+                        // op my_var
+                        SPVM_OP* op_my_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR, op_cur->file, op_cur->line);
+                        op_my_var->uv.my_var = my_var;
+                        
+                        // Add my var
+                        SPVM_ARRAY_push(op_my_vars, op_my_var);
+                        SPVM_ARRAY_push(op_my_var_stack, op_my_var);
+                        
+                        // Convert malloc op to assing op
+                        // Var op
+                        SPVM_OP* op_var = SPVM_OP_new_op_var_from_op_my_var(compiler, op_my_var);
+                        
+                        // Malloc op
+                        SPVM_OP* op_malloc = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MALLOC, op_cur->file, op_cur->line);
+                        
+                        // Type parent is malloc
+                        op_type_or_constant->moresib = 0;
+                        op_type_or_constant->sibparent = op_malloc;
+
+                        // Assing op
+                        SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
+                        op_assign->first = op_var;
+                        op_assign->last = op_malloc;
+                        op_assign->moresib = 0;
+                        op_assign->sibparent = op_cur;
+                        
+                        // Convert cur malloc op to var
+                        op_cur->code = SPVM_OP_C_CODE_VAR;
+                        op_cur->uv.var = op_var->uv.var;
+                        op_cur->first = op_assign;
+                        op_cur->last = op_assign;
+                        
+                        // Var op has sibling
+                        op_var->moresib = 1;
+                        op_var->sibparent = op_malloc;
+                        
+                        // Malloc op parent is assign op
+                        op_malloc->first = op_type_or_constant;
+                        op_malloc->last = op_type_or_constant;
+                        op_malloc->moresib = 0;
+                        op_malloc->sibparent = op_assign;
+                        
+                        // Set lvalue and rvalue
+                        op_assign->first->lvalue = 1;
+                        op_assign->last->rvalue = 1;
+                        
+                        op_cur = op_malloc;
+                      }
+
                       break;
                     }
                     case SPVM_OP_C_CODE_BIT_XOR: {
@@ -1080,11 +1014,11 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                       SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                       
-                      // Type assumption
+                      // Type inference
                       if (!first_type) {
                         SPVM_OP* op_var = op_cur->first;
                         SPVM_MY_VAR* my_var = op_var->uv.var->op_my_var->uv.my_var;
-                        first_type = SPVM_OP_get_type(compiler, my_var->op_term_assumption);
+                        first_type = SPVM_OP_get_type(compiler, my_var->op_term_type_inference);
                         
                         if (first_type) {
                           SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, op_cur->file, op_cur->line);
@@ -1167,17 +1101,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                           break;
                         }
                       }
-                      break;
-                    }
-                    case SPVM_OP_C_CODE_RETURN_PROCESS: {
-                      
-                      // Add before return process
-                      SPVM_OP* op_leave_scope = op_cur->first;
-                      SPVM_OP* op_return = op_cur->last;
-                      SPVM_OP* op_term = op_return->first;
-                      
-                      SPVM_OP_CHECKER_build_leave_scope(compiler, op_leave_scope, op_my_var_stack, op_my_var_stack->length - 1, 0, op_term);
-                      
                       break;
                     }
                     case SPVM_OP_C_CODE_NEGATE: {
@@ -1398,33 +1321,13 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         SPVM_ARRAY_pop(loop_block_my_var_base_stack);
                       }
                       // Pop try block my variable base
-                      else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_TRY) {
+                      else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
                         assert(try_block_my_var_base_stack->length > 0);
                         SPVM_ARRAY_pop(try_block_my_var_base_stack);
                       }
                       
                       // Free my variables at end of block
                       SPVM_OP* op_block_end = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BLOCK_END, op_cur->file, op_cur->line);
-                      
-                      int32_t pop_count = op_my_var_stack->length - block_my_var_base;
-                      {
-                        int32_t j;
-                        for (j = 0; j < pop_count; j++) {
-                          SPVM_OP* op_my_var = SPVM_ARRAY_pop(op_my_var_stack);
-                          
-                          SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_my_var);
-                          
-                          // Decrement reference count at end of scope
-                          if (!SPVM_TYPE_is_numeric(compiler, type)) {
-                            SPVM_OP* op_dec_ref_count = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_DEC_REF_COUNT, op_cur->file, op_cur->line);
-                            SPVM_OP* op_var = SPVM_OP_new_op_var_from_op_my_var(compiler, op_my_var);
-                            SPVM_OP_sibling_splice(compiler, op_dec_ref_count, NULL, 0, op_var);
-                            SPVM_OP_sibling_splice(compiler, op_block_end, NULL, 0, op_dec_ref_count);
-                          }
-                          
-                          assert(op_my_var);
-                        }
-                      }
                       
                       if (!(op_cur->flag & SPVM_OP_C_FLAG_BLOCK_SUB)) {
                         SPVM_OP_sibling_splice(compiler, op_list_statement, op_list_statement->last, 0, op_block_end);
@@ -1470,25 +1373,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         compiler->fatal_error = 1;
                         return;
                       }
-                      break;
-                    }
-                    case SPVM_OP_C_CODE_MY_VAR_PROCESS: {
-                      
-                      SPVM_OP* op_my_var = op_cur->first;
-                      SPVM_MY_VAR* my_var = op_my_var->uv.my_var;
-                      
-                      // If argument is object, increment reference count
-                      if (my_var->index < sub->op_args->length) {
-                        SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_my_var);
-                        if (!SPVM_TYPE_is_numeric(compiler, type)) {
-                          SPVM_OP* op_var = SPVM_OP_new_op_var_from_op_my_var(compiler, op_my_var);
-                          
-                          SPVM_OP* op_increfcount = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_INC_REF_COUNT, op_my_var->file, op_my_var->line);
-                          SPVM_OP_sibling_splice(compiler, op_increfcount, NULL, 0, op_var);
-                          SPVM_OP_sibling_splice(compiler, op_cur, op_cur->last, 0, op_increfcount);
-                        }
-                      }
-                      
                       break;
                     }
                     case SPVM_OP_C_CODE_MY_VAR: {
@@ -1560,7 +1444,12 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       // Check sub name
                       SPVM_OP_resolve_sub_name(compiler, op_package, op_cur);
                       
-                      const char* sub_abs_name = op_cur->uv.name_info->resolved_name;
+                      SPVM_OP* op_name_sub = op_cur->first;
+                      SPVM_OP* op_list_args = op_cur->last;
+                      
+                      SPVM_NAME_INFO* name_info = op_cur->uv.name_info;
+                      
+                      const char* sub_abs_name = name_info->resolved_name;
                       
                       SPVM_OP* found_op_sub= SPVM_HASH_search(
                         compiler->op_sub_symtable,
@@ -1577,7 +1466,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       SPVM_SUB* found_sub = found_op_sub->uv.sub;
 
                       int32_t sub_args_count = found_sub->op_args->length;
-                      SPVM_OP* op_list_args = op_cur->last;
                       SPVM_OP* op_term = op_list_args->first;
                       int32_t call_sub_args_count = 0;
                       while ((op_term = SPVM_OP_sibling(compiler, op_term))) {
@@ -1626,6 +1514,84 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         
                         op_cur->first = NULL;
                         op_cur->last = NULL;
+                      }
+                      
+                      SPVM_TYPE* return_type = SPVM_OP_get_type(compiler, found_op_sub->uv.sub->op_return_type);
+                      
+                      // If CALL_SUB is is not rvalue and return type is object, temparary variable is created, and assinged.
+                      if (!op_cur->rvalue && (return_type && !SPVM_TYPE_is_numeric(compiler, return_type))) {
+                        assert(my_var_length <= SPVM_LIMIT_C_MY_VARS);
+                        if (my_var_length == SPVM_LIMIT_C_MY_VARS) {
+                          SPVM_yyerror_format(compiler, "too many lexical variables(Temparay variable is created for return value) at %s line %d\n", op_cur->file, op_cur->line);
+                          compiler->fatal_error = 1;
+                          break;
+                        }
+                        
+                        // Create temporary variable
+                        // my_var
+                        SPVM_MY_VAR* my_var = SPVM_MY_VAR_new(compiler);
+                        
+                        // Temparary variable name
+                        char* name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, strlen("@tmp2147483647"));
+                        sprintf(name, "@tmp%d", my_var_tmp_index++);
+                        SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NAME, op_cur->file, op_cur->line);
+                        op_name->uv.name = name;
+                        my_var->op_name = op_name;
+                        
+                        // Set type to my var
+                        my_var->op_type = found_sub->op_return_type;
+                        
+                        // Index
+                        my_var->index = my_var_length++;
+                        
+                        // op my_var
+                        SPVM_OP* op_my_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR, op_cur->file, op_cur->line);
+                        op_my_var->uv.my_var = my_var;
+                        
+                        // Add my var
+                        SPVM_ARRAY_push(op_my_vars, op_my_var);
+                        SPVM_ARRAY_push(op_my_var_stack, op_my_var);
+                        
+                        // Convert call_sub op to assing op
+                        // Var op
+                        SPVM_OP* op_var = SPVM_OP_new_op_var_from_op_my_var(compiler, op_my_var);
+                        
+                        // Malloc op
+                        SPVM_OP* op_call_sub = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CALL_SUB, op_cur->file, op_cur->line);
+                        
+                        // List args parent is call_sub
+                        op_list_args->moresib = 0;
+                        op_list_args->sibparent = op_call_sub;
+
+                        // Assing op
+                        SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
+                        op_assign->first = op_var;
+                        op_assign->last = op_call_sub;
+                        op_assign->moresib = 0;
+                        op_assign->sibparent = op_cur;
+                        
+                        // Convert cur call_sub op to var
+                        op_cur->code = SPVM_OP_C_CODE_VAR;
+                        op_cur->uv.var = op_var->uv.var;
+                        op_cur->first = op_assign;
+                        op_cur->last = op_assign;
+                        
+                        // Var op has sibling
+                        op_var->moresib = 1;
+                        op_var->sibparent = op_call_sub;
+                        
+                        // Malloc op parent is assign op
+                        op_call_sub->first = op_name_sub;
+                        op_call_sub->last = op_list_args;
+                        op_call_sub->moresib = 0;
+                        op_call_sub->sibparent = op_assign;
+                        op_call_sub->uv.name_info = name_info;
+                        
+                        // Set lvalue and rvalue
+                        op_assign->first->lvalue = 1;
+                        op_assign->last->rvalue = 1;
+                        
+                        op_cur = op_call_sub;
                       }
                       
                       break;

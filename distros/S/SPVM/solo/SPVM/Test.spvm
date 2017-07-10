@@ -19,6 +19,33 @@ SPVM::Test - SPVM test module
 
 package Test {
   sub main($mvar : int) : int {
+    # Exception variable
+    {
+      $@ = "Exception";
+      std::println($@);
+    }
+    
+    # $array->[0]{x}
+    {
+      my $objs = malloc Test::Minimal[3];
+      $objs->[0] = malloc Test::Minimal;
+      $objs->[0]{x} = 111;
+      std::println_int($objs->[0]{x});
+    }
+    
+    # $obj->{x}[0]
+    {
+      my $obj = malloc Test::Simple;
+      $obj->{values1} = malloc int[5];
+      $obj->{values1}[0] = 221;
+      std::println_int($obj->{values1}[0]);
+    }
+    
+    # Call new subroutine without variable
+    {
+      Test::Minimal::new();
+      sum0(1, 3);
+    }
     
     # Subroutine call from native
     {
@@ -30,7 +57,7 @@ package Test {
     {
       malloc Test::Minimal;
       malloc Test::Minimal;
-      (malloc Test::Minimal){x};
+      (malloc Test::Minimal)->{x};
     }
     
     my $obj1 = malloc Test::Minimal;
@@ -79,7 +106,9 @@ package Test {
     # Malloc mutil array
     {
       my $nums : int[][] = malloc int[][3];
-      $nums[0] = malloc int[1];
+      $nums->[0] = malloc int[1];
+      $nums->[0][0] = 178;
+      std::println_int($nums->[0][0]);
     }
     
     # Declare mutil array
@@ -103,25 +132,31 @@ package Test {
 
     {
       my $nums = malloc int[258];
-      my $len = len $nums;
+      my $len = @$nums;
       for (my $i = 0; $i < $len; $i++) {
-        $nums[$i] = $i;
+        $nums->[$i] = $i;
       }
 
-      for (my $i = 0; $i < $len; $i++) {
-        $nums[$i] = $i;
+      for (my $i = 0; $i < @$nums; $i++) {
+        $nums->[$i] = $i;
       }
+    }
+    
+    # length with {}
+    {
+      my $nums = malloc int[2000000];
+      my $len = @{$nums};
     }
     
     {
       my $nums = malloc int[2000000];
-      my $len = len $nums;
+      my $len = @$nums;
       my $i = 0;
       for ($i = 0; $i < $len; $i = $i + 1) {
-        $nums[$i] = $i;
+        $nums->[$i] = $i;
       }
       std::println_int($i);
-      std::println_int($nums[$i - 1]);
+      std::println_int($nums->[$i - 1]);
     }
     
     # Object to get long field is undef
@@ -139,37 +174,37 @@ package Test {
     # Index is out of range
     #{
     #  my $nums = malloc int[3];
-    #  $nums[3] = 1;
+    #  $nums->[3] = 1;
     #}
     
     # Index is out of range
     #{
     #  my $nums = malloc int[3];
-    #  $nums[-1] = 3;
+    #  $nums->[-1] = 3;
     #}
 
     # Array is undef
     #{
     #  my $nums : int[];
-    #  $nums[0] = 1;
+    #  $nums->[0] = 1;
     #}
 
     # Index is out of range
     #{
     #  my $nums = malloc int[3];
-    #  $nums[3];
+    #  $nums->[3];
     #}
     
     # Index is out of range
     #{
     #  my $nums = malloc int[3];
-    #  $nums[-1];
+    #  $nums->[-1];
     #}
     
     # Array is undef
     #{
     #  my $nums : int[];
-    #  $nums[0];
+    #  $nums->[0];
     #}
     
     {
@@ -216,7 +251,7 @@ package Test {
       ++$var;
     }
     
-    try {
+    eval {
       sum0(1, 2);
       
       3;
@@ -226,17 +261,19 @@ package Test {
       die "Catch error";
       
       1;
-    } catch ($error) {
+    };
+    
+    {
       sum0(5, 6);
       2;
-      std::println($error);
+      std::println("Error");
     }
     
     {
       my $nums = malloc int[3];
-      $nums[0] = 1;
-      $nums[1] = 2;
-      $nums[2] = 3;
+      $nums->[0] = 1;
+      $nums->[1] = 2;
+      $nums->[2] = 3;
       
       my $total = std::sum_int($nums);
       std::println_int($total);
@@ -267,11 +304,11 @@ package Test {
     {
       my $m = malloc Test::Minimal;
       
-      $m{x} = 99;
-      $m{y} = 100;
+      $m->{x} = 99;
+      $m->{y} = 100;
       
-      std::println_int($m{x});
-      std::println_int($m{y});
+      std::println_int($m->{x});
+      std::println_int($m->{y});
     }
 
     # Free when assignment
@@ -431,9 +468,9 @@ package Test {
     std::println_int($simple3->get_x());
     $simple3->get_x;
     
-    $simple3{y} = 2;
-    $simple3{x};
-    $simple3{y};
+    $simple3->{y} = 2;
+    $simple3->{x};
+    $simple3->{y};
 
     my $simple2 : Test::Simple = malloc Test::Simple;
     
@@ -523,20 +560,20 @@ package Test {
 
     {
       my $nums = malloc int[3];
-      $nums[0] = 13;
-      $nums[1] = 14;
-      std::println_int($nums[0]);
-      std::println_int($nums[1]);
+      $nums->[0] = 13;
+      $nums->[1] = 14;
+      std::println_int($nums->[0]);
+      std::println_int($nums->[1]);
     }
     
     {
       my $nums : long[] = malloc long[3];
-      $nums[0] = 11L;
-      $nums[1] = 12L;
-      std::println_long($nums[0]);
-      std::println_long($nums[1]);
-      std::println_int(len $nums);
-      my $nums_length : int = len $nums;
+      $nums->[0] = 11L;
+      $nums->[1] = 12L;
+      std::println_long($nums->[0]);
+      std::println_long($nums->[1]);
+      std::println_int(@$nums);
+      my $nums_length : int = @$nums;
     }
     
     my $simple : Test::Simple = malloc Test::Simple;
@@ -754,10 +791,10 @@ package Test {
     }
   }
 
-  sub try_catch() : void {
+  sub eval_block() : void {
     my $obj0 = malloc Test::Minimal;
     
-    try {
+    eval {
       my $obj1 = malloc Test::Minimal;
       
       my $obj2 : Test::Minimal;
@@ -767,12 +804,8 @@ package Test {
       my $obj_error1 = "Error1";
       
       die $obj_error1;
-      
-    }
-    catch ($error) {
-      
-    }
-
+    };
+    
     {
       my $obj4 = malloc Test::Minimal;
       

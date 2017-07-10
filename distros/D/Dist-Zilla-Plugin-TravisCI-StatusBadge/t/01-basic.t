@@ -1,10 +1,11 @@
 #!/usr/bin/env perl
 
+use lib qw( t/lib );
 use Test::Spec;
 use Test::Exception;
 use Test::DZil;
 
-use t::lib::Builder;
+use Builder;
 
 describe "TravisCI::StatusBadge" => sub {
     it "should compile ok" => sub {

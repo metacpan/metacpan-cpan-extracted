@@ -4,13 +4,13 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   File::HomeDir: '0.91'
-  Module::Build: '0.28'
+  Module::Build: '0.3601'
   perl: '5.010001'
 configure_requires:
-  Module::Build: '0.28'
+  Module::Build: '0.3601'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,6 +24,8 @@ recommends:
   EV: '0'
 requires:
   AnyEvent: '0'
+  File::Share: '0'
+  File::Which: '0'
   File::chdir: '0'
   List::MoreUtils: '0'
   Moo: '2.0'
@@ -33,6 +35,12 @@ requires:
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/plicease/AnyEvent-FTP/issues
-  homepage: http://perl.wdlabs.com/AnyEvent-FTP
+  homepage: https://metacpan.org/pod/AnyEvent::FTP
   repository: git://github.com/plicease/AnyEvent-FTP.git
-version: '0.09'
+version: '0.10'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Ryo Okamoto'
+  - 'Shlomi Fish'
+  - 'José Joaquín Atria'
+x_serialization_backend: 'YAML::Tiny version 1.70'

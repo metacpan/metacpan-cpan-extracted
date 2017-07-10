@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'Text::Transliterator',
     license             => 'perl',
-    dist_author         => q{Laurent Dami <lau.....da..@justice.ge.ch>},
+    dist_author         => q{Laurent Dami <dami@cpan.org>},
     dist_version_from   => 'lib/Text/Transliterator.pm',
     requires            => { 'Unicode::UCD'       => 0,
                              'Unicode::Normalize' => 0, },

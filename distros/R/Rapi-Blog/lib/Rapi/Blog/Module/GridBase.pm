@@ -25,6 +25,8 @@ sub BUILD {
         }
       },
     );
+    
+    $self->add_plugin('ra-grid-expand-max-cell-height');
   }
 }
 

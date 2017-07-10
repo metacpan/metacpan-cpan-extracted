@@ -1,5 +1,5 @@
 package WebService::Braintree::Subscription;
-$WebService::Braintree::Subscription::VERSION = '0.9';
+$WebService::Braintree::Subscription::VERSION = '0.91';
 use WebService::Braintree::SubscriptionGateway;
 use WebService::Braintree::Subscription::Status;
 

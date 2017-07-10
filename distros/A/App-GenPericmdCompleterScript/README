@@ -1,0 +1,137 @@
+NAME
+    App::GenPericmdCompleterScript - Generate Perinci::CmdLine completer
+    script
+
+VERSION
+    This document describes version 0.11 of App::GenPericmdCompleterScript
+    (from Perl distribution App-GenPericmdCompleterScript), released on
+    2017-07-08.
+
+FUNCTIONS
+  gen_pericmd_completer_script
+    Usage:
+
+     gen_pericmd_completer_script(%args) -> [status, msg, result, meta]
+
+    Generate Perinci::CmdLine completer script.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   completion => *code*
+
+    *   default_subcommand => *str*
+
+    *   exclude_package_functions_match => *re*
+
+        Exclude package functions matching this pattern.
+
+    *   get_subcommand_from_arg => *int* (default: 1)
+
+    *   include_package_functions_match => *re*
+
+        Only include package functions matching this pattern.
+
+    *   interpreter_path => *str*
+
+        What to put on shebang line.
+
+    *   load_module => *array[str]*
+
+        Load extra modules.
+
+    *   output_file => *str* (default: "-")
+
+        Path to output file.
+
+    *   overwrite => *bool* (default: 0)
+
+        Whether to overwrite output if previously exists.
+
+    *   per_arg_json => *bool*
+
+    *   per_arg_yaml => *bool*
+
+    *   program_name* => *str*
+
+        Program name that is being completed.
+
+    *   read_config => *bool*
+
+    *   read_env => *bool*
+
+    *   skip_format => *bool*
+
+    *   subcommands => *hash*
+
+        Hash of subcommand names and function URLs.
+
+        Optionally, it can be additionally followed by a summary, so:
+
+         URL[:SUMMARY]
+
+        Example (on CLI):
+
+         --subcommand "delete=/My/App/delete_item:Delete an item"
+
+    *   subcommands_from_package_functions => *bool*
+
+        Form subcommands from functions under package's URL.
+
+        This is an alternative to the "subcommand" option. Instead of
+        specifying each subcommand's name and URL, you can also specify that
+        subcommand names are from functions under the package URL in "url".
+        So for example if "url" is "/My/App/", hen all functions under
+        "/My/App" are listed first. If the functions are:
+
+         foo
+         bar
+         baz_qux
+
+        then the subcommands become:
+
+         foo => /My/App/foo
+         bar => /My/App/bar
+         "baz-qux" => /My/App/baz_qux
+
+    *   url* => *riap::url*
+
+        URL to function (or package, if you have subcommands).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-GenPericmdCompleterScript>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-GenPericmdCompleterScript>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GenPericmdComplet
+    erScript>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

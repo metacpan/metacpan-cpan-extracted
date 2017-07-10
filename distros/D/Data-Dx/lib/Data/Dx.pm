@@ -4,7 +4,7 @@ use 5.012;
 use utf8;
 use warnings;
 
-our $VERSION = '0.000004';
+our $VERSION = '0.000005';
 
 use Keyword::Declare;
 
@@ -147,7 +147,7 @@ Data::Dx - Dump data structures with name and point-of-origin
 
 =head1 VERSION
 
-This document describes Data::Dx version 0.000004
+This document describes Data::Dx version 0.000005
 
 
 =head1 SYNOPSIS
@@ -249,7 +249,7 @@ This means that you can leave every C<Dx> in your code
 but disable them all (or just all of them in a given scope)
 by changing the original C<use Data::Dx> to C<no Data::Dx>
 
-=item C<use Data::Dx { colour => 0 };>
+=item C<< use Data::Dx { colour => 0 }; >>
 
 If the module is imported with the C<'colour'> option set false,
 output is dumped without colouring, even if Term::ANSIColor is
@@ -272,9 +272,11 @@ Data::Dx requires no configuration files or environment variables.
 
 Requires the Data::Dump and Keyword::Declare modules.
 
-Only works under Perl 5.14 and later.
-Does not work under Perl 5.20 (due to problems with
-the Keyword::Declare module under that release).
+Only works under Perl 5.12 and later (the release in 
+which pluggable keywords were added to Perl).
+
+Does not work under Perl 5.20 (due to problems with regex compilation
+exposed by the Keyword::Declare module under that release).
 
 
 =head1 INCOMPATIBILITIES

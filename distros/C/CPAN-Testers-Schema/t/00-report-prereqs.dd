@@ -26,7 +26,8 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'CPAN::Meta' => '2.120900',
+                                     'Test::mysqld' => '0'
                                    },
                    'requires' => {
                                    'CPAN::Testers::Fact::LegacyReport' => '0',

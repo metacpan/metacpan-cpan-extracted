@@ -1,5 +1,13 @@
 Revision history for Perl module Dist::Zilla::Plugin::TravisCI::StatusBadge.
 
+0.007   Sun Jul 9 19:16:04 2017 +0000
+
+    [ FEATURES ]
+    - use Path::Tiny API (gh #4) [SKAJI]
+
+    [ FIXES ]
+    - tests on v5.25.10+ (gh #5) [ETHER]
+
 0.006   Sat Dec 27 19:22:41 2014 +0000
 
     [ FEATURES ]

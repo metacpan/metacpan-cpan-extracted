@@ -27,3 +27,5 @@ MYMETA\..*
 # Template
 ^declaration$
 ^timesheet\.txt$
+# Author tests
+^xt/.*$

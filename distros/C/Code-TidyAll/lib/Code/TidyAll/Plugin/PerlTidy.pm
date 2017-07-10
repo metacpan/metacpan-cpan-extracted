@@ -10,7 +10,7 @@ use Moo;
 
 extends 'Code::TidyAll::Plugin';
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 sub transform_source {
     my ( $self, $source ) = @_;
@@ -61,7 +61,7 @@ Code::TidyAll::Plugin::PerlTidy - Use perltidy with tidyall
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 

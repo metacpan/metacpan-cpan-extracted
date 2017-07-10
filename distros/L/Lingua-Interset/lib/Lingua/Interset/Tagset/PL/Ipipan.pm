@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::PL::Ipipan;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -60,7 +60,7 @@ sub _create_atoms
             'adj'     => ['pos' => 'adj'],
             # przymiotnik przyprzym. = adjective hyphen-connected to another adjective (Chrześcijańsko(-Demokratycznym))
             # occurred in version 1 of corpus, does not occur in version 2 ("Chrześcijańsko" has new tag "ign")
-            'adja'    => ['pos' => 'adj', 'hyph' => 'hyph'],
+            'adja'    => ['pos' => 'adj', 'hyph' => 'yes'],
             # przymiotnik poprzyim. = adjective after preposition "po", forming together an adverbial ("po prostu": [prosty:adjp])
             'adjp'    => ['pos' => 'adj', 'prepcase' => 'pre'],
             # przysłówek = adverb (naukowo, szybko, codziennie, ciężko, lepiej)
@@ -70,7 +70,7 @@ sub _create_atoms
             # zaimek trzecioosobowy = 3rd person personal pronoun (nich, ich, ją, nim, ona)
             'ppron3'  => ['pos' => 'noun', 'prontype' => 'prs', 'person' => '3'],
             # zaimek SIEBIE = pronoun SIEBIE (sobie, siebie, sobą)
-            'siebie'  => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'],
+            'siebie'  => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'],
             # forma nieprzeszła = finite verb form (jestem, mówią, mówi, występuje, ma)
             'fin'     => ['pos' => 'verb', 'verbform' => 'fin', 'mood' => 'ind', 'tense' => 'pres'],
             # forma przyszła BYĆ = future form of the verb "to be", BYĆ (będę, będzie, będziesz, będziemy)
@@ -115,11 +115,11 @@ sub _create_atoms
             # abbreviation (r, tys, zł, ul, proc)
             # Most abbreviations in the Polish treebank are nouns but not all.
             # For example, "ok" is the abbreviated preposition "około" ("about, approximately").
-            'brev'    => ['abbr' => 'abbr'],
+            'brev'    => ['abbr' => 'yes'],
             # ciało obce nominalne (no occurrences found)
-            'xxs'     => ['foreign' => 'foreign', 'other' => {'pos' => 'xxs'}],
+            'xxs'     => ['foreign' => 'yes', 'other' => {'pos' => 'xxs'}],
             # ciało obce luźne = foreign word (International, European, investment, Office, Deutsche)
-            'xxx'     => ['foreign' => 'foreign'],
+            'xxx'     => ['foreign' => 'yes'],
             # forma nierozpoznana = unrecognized form (1985, Wandzia, Queens, University, Rodera)
             'ign'     => [],
             # interpunkcja = punctuation (, . : „ !)
@@ -129,11 +129,11 @@ sub _create_atoms
         {
             'pos' => { 'noun' => { 'prontype' => { ''  => { 'other/nountype' => { 'depr' => 'depr',
                                                                                   '@'    => 'subst' }},
-                                                   '@' => { 'reflex' => { 'reflex' => 'siebie',
+                                                   '@' => { 'reflex' => { 'yes' => 'siebie',
                                                                           '@'      => { 'person' => { '3' => 'ppron3',
                                                                                                       '@' => 'ppron12' }}}}}},
                        'adj'  => { 'other/adjtype' => { 'winien' => 'winien',
-                                                        '@'      => { 'aspect' => { ''  => { 'hyph' => { 'hyph' => 'adja',
+                                                        '@'      => { 'aspect' => { ''  => { 'hyph' => { 'yes' => 'adja',
                                                                                                          '@'    => { 'prepcase' => { 'pre' => 'adjp',
                                                                                                                                      '@'   => 'adj' }}}},
                                                                                     '@' => 'winien' }}}},
@@ -159,9 +159,9 @@ sub _create_atoms
                        'part' => 'qub',
                        'punc' => 'interp',
                        'sym'  => 'interp',
-                       '@'    => { 'foreign' => { 'foreign' => { 'other/pos' => { 'xxs' => 'xxs',
+                       '@'    => { 'foreign' => { 'yes' => { 'other/pos' => { 'xxs' => 'xxs',
                                                                                   '@'   => 'xxx' }},
-                                                  '@'       => { 'abbr' => { 'abbr' => 'brev',
+                                                  '@'       => { 'abbr' => { 'yes' => 'brev',
                                                                              '@'    => 'ign' }}}}}
         }
     );
@@ -1783,7 +1783,7 @@ Lingua::Interset::Tagset::PL::Ipipan - Driver for the tagset of the Korpus Języ
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

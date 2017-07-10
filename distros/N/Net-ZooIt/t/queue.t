@@ -35,9 +35,9 @@ $zk->create('/zooitqueue' => $$, acl => ZOO_OPEN_ACL_UNSAFE);
 
 my $queue = Net::ZooIt->new_queue(path => '/zooitqueue', zk => $zk);
 
-# Parent waiting for workers to complete
+# Parent feeding queue and waiting for workers to complete
 if ($$ == $parent) {
-    $queue->put_queue($_) for 1 .. $items;
+    $queue->put_queue($_), sleep rand for 1 .. $items;
     print STDERR "Waiting for children...\n";
     for (1 .. $consumers) {
         my $pid = wait;
@@ -47,7 +47,7 @@ if ($$ == $parent) {
 } else {
 # Children consuming queue
     my $processed = 0;
-    while (my $data = $queue->get_queue(timeout => 5)) {
+    while (my $data = $queue->get_queue(timeout => 1)) {
         $processed++;
         print "$$ $data\n";
     }

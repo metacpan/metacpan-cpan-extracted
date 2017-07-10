@@ -1,3 +1,45 @@
+commit d073ea47384014bb02b0055aa5163eb2b64cfc35
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jul 6 21:30:14 2017 -0700
+
+    Fixed documentation typo in Order
+
+commit 938735a52e9844a8f6e1fd75ad36519eed97d3e4
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jul 6 21:26:50 2017 -0700
+
+    Fixed documentation typo in Order
+
+commit 8db27f76fecba7a2c0e44cc6a6d7fdb689bc40ea
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jul 6 21:25:18 2017 -0700
+
+    Fixed documentation typo
+
+commit 738149cef7ad13c88f392805bc26039311c439c3
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jul 6 21:23:27 2017 -0700
+
+    Removed leftover warn that was in the get method for debuggind
+
+commit 1b954f019e4c29c0ac9a35fffe90a9da85e3c431
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jul 6 21:23:13 2017 -0700
+
+    Removed leftover warn that was in the get method for debuggind
+
+commit 4d9d96bdc37bdd597bac05be6a33d1add475f465
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jul 6 21:18:57 2017 -0700
+
+    Added AUTHOR_TESTING flag for tests to help eliminate cross-platform errors that happen
+
+commit b7be792a81b9630204e6953d9e0a680d8153c58d
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Tue Jul 4 17:16:39 2017 -0700
+
+    New meta and changes generated
+
 commit b0e117953acbb6a853e8c73c082a1fa5efa1bd37
 Author: Mark Rushing <mark@orbislumen.net>
 Date:   Tue Jul 4 17:13:26 2017 -0700

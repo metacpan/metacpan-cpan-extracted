@@ -59,7 +59,9 @@ sub test_epochToDuration : Test(2) {
 
 sub test_timestampToEpoch : Test(3) {
     my $self = shift;
-  
+
+    $ENV{'TZ'} = 'CET'; # Fix: CPAN Testers
+    
     # Alle Angaben
     my $t = Prty::Converter->timestampToEpoch('2014-11-18 14:05:06,690');
     $self->is($t,'1416315906.690');
@@ -77,7 +79,9 @@ sub test_timestampToEpoch : Test(3) {
 
 sub test_epochToTimestamp : Test(3) {
     my $self = shift;
-  
+
+    $ENV{'TZ'} = 'CET'; # Fix: CPAN Testers
+     
     # Alle Angaben
     my $timestamp = Prty::Converter->epochToTimestamp('1416315906.690');
     $self->is($timestamp,'2014-11-18 14:05:06,690');

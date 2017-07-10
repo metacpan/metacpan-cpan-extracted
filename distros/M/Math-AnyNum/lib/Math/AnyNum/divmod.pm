@@ -5,7 +5,7 @@ sub __divmod__ {
     my ($x, $y) = @_;
 
     Math::GMPz::Rmpz_sgn($y)
-      || return (&Math::AnyNum::_nan(), &Math::AnyNum::_nan());
+      || return (_nan(), _nan());
 
     my $r = Math::GMPz::Rmpz_init();
     my $s = Math::GMPz::Rmpz_init();

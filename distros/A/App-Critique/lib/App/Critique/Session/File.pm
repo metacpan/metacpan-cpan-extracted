@@ -3,7 +3,7 @@ package App::Critique::Session::File;
 use strict;
 use warnings;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Scalar::Util ();
@@ -88,7 +88,7 @@ App::Critique::Session::File - Information about file processed by App::Critique
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

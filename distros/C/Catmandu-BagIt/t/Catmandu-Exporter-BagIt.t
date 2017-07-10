@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Role::Tiny;
-use File::Path qw(remove_tree);
+use Path::Tiny;
 use Test::LWP::UserAgent;
 use Catmandu::Importer::BagIt;
 
@@ -81,6 +81,5 @@ END {
 	my $error = [];
 	# Stupid chdir trick to make remove_tree work
 	chdir("lib");
-	remove_tree('../t/my-bag', { error => \$error });
-	print STDERR join("\n",@$error) , "\n" if @$error > 0;;
+	path('../t/my-bag')->remove_tree;
 };

@@ -1,5 +1,9 @@
 Revision history for Data-Section
 
+0.200007  2017-07-07 11:36:04-04:00 America/New_York
+        - rename the test library "Parent.pm" to "Mother.pm" to avoid conflict
+          with core "parent.pm" on case-insensitive systems (thanks, Dan Kogai)
+
 0.200006  2014-03-10 10:14:45-04:00 America/New_York
         - skip tests on Win32 pre-5.14 related to line endings; perl munges the
           data before we're able to get at it (thanks, Christian Walde!)

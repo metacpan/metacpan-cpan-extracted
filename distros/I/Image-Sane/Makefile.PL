@@ -39,6 +39,7 @@ WriteMakefile(
     TEST_REQUIRES => {
         Test::More     => 0,
         Test::Requires => 0,
+        Try::Tiny      => 0,
     },
     clean => { FILES => '$(SOURCE_TIDY)' },
 

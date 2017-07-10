@@ -3,7 +3,7 @@ package RPi::HCSR04;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '2.3602';
 
 require XSLoader;
 XSLoader::load('RPi::HCSR04', $VERSION);
@@ -39,21 +39,21 @@ sub new {
     $self->_trig($t);
     $self->_echo($e);
 
-    setup($t, $e);
+    _setup($t, $e);
 
     return $self;
 }
 sub inch {
     my $self = shift;
-    return inch_c($self->_trig, $self->_echo);
+    return _inch($self->_trig, $self->_echo);
 }
 sub cm {
     my $self = shift;
-    return cm_c($self->_trig, $self->_echo);
+    return _cm($self->_trig, $self->_echo);
 }
 sub raw {
     my $self = shift;
-    return raw_c($self->_trig, $self->_echo);
+    return _raw($self->_trig, $self->_echo);
 }
 sub _vim{};
 
@@ -62,8 +62,8 @@ __END__
 
 =head1 NAME
 
-RPi::HCSR04 - Interface to the HC-SR04 ultrasonic distance measurement sensor
-on the Raspberry Pi
+RPi::HCSR04 - Interface to the HC-SR04 ultrasonic distance measurement sensor on
+the Raspberry Pi
 
 =head1 SYNOPSIS
 
@@ -87,6 +87,15 @@ ultrasonic distance measurement sensor.
 
 Requires L<wiringPi|http://wiringpi.com> to be installed.
 
+=head1 TIMING WITHIN A LOOP
+
+This software does no timing whatsoever; it operates as fast as your device
+will allow it.
+
+This often causes odd results. It's recommended that if you put your checks
+within a loop, to sleep for at least two milliseconds (C<0.02>). You can use
+C<select(undef, undef, undef, 0.02);>, or C<usleep()> from L<Time::HiRes>.
+
 =head1 VOLTAGE DIVIDER
 
 The HC-SR04 sensor requires 5V input, and that is returned back to a Pi GPIO
@@ -97,7 +106,7 @@ be used to ensure you don't damage the Pi.
 L<Here's|https://stevieb9.github.io/rpi-hcsr04/hcsr04.png> a diagram showing
 how to create a voltage divider with a 1k and a 2k Ohm resistor to lower the
 C<ECHO> voltage output down to a safe ~3.29V. In this case, C<TRIG> is
-connected to GPIO 18, and C<ECHO> is connected to GPIO 23.
+connected to GPIO 23, and C<ECHO> is connected to GPIO 24.
 
 =head1 METHODS
 
@@ -132,32 +141,16 @@ no parameters.
 Returns an integer representing the return from the sensor in raw original
 form. Takes no parameters.
 
-=head1 C FUNCTIONS
-
-These are to be only used within the module itself.
-
-=head2 setup
-
-Performs the wiringPi setup routine.
-
-=head2 raw_c
-
-Called by C<raw()>.
-
-=head2 inch_c
-
-Called by C<inch()>.
-
-=head2 cm_c
-
-Called by C<cm()>.
-
 =head1 REQUIREMENTS
 
-* L<wiringPi|http://wiringpi.com> must be installed.
-* At this time, your program will have to be run as root (under C<sudo>).
-* You must regulate the voltage from the C<ECHO> pin down to a safe 3.3V from
-the 5V input. See L</VOLTAGE DIVIDER> for details.
+=over
+
+=item * L<wiringPi|http://wiringpi.com> must be installed.
+
+=item * You must regulate the voltage from the C<ECHO> pin down to a safe 3.3V
+from the 5V input. See L</VOLTAGE DIVIDER> for details.
+
+=back
 
 =head1 AUTHOR
 

@@ -10,11 +10,11 @@ use strict;
 use warnings;
 
 use lib qw(../lib);
-use Math::AnyNum qw(:overload pi bernfrac factorial);
+use experimental qw(signatures);
+use Math::AnyNum qw(tau bernfrac factorial);
 
-sub zeta_2n {
-    my ($n2) = 2 * $_[0];
-    ((-1)**($_[0] + 1) * 2**($n2 - 1) * pi**$n2 * bernfrac($n2)) / factorial($n2);
+sub zeta_2n($n) {
+    (-1)**($n + 1) * bernfrac(2 * $n) / factorial(2 * $n) * tau**(2 * $n) / 2;
 }
 
 for my $i (1 .. 30) {

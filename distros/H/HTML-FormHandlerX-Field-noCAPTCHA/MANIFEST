@@ -16,3 +16,4 @@ t/04-render-light.t
 t/05-render-dark.t
 t/06-render-default.t
 t/07-render-noscript.t
+t/08-render-field-only.t

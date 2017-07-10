@@ -36,6 +36,11 @@ sub add {
     $self->out->add($item);
 }
 
+sub update {
+    my ($self, $id, $item) = @_;
+    $self->out->update($id, $item);
+}
+
 1;
 __END__
 

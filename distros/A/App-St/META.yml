@@ -3,20 +3,20 @@ abstract: 'Simple Statistics'
 author:
   - 'Nelson Ferraz <nferraz@gmail.com>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.132660'
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: App-St
 no_index:
   directory:
     - t
     - inc
 requires:
-  perl: 5.006
-version: v1.1.1
+  perl: '5.006'
+version: v1.1.3

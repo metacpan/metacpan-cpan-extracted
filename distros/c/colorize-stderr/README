@@ -1,0 +1,68 @@
+NAME
+    colorize::stderr - Colorize STDERR
+
+VERSION
+    This document describes version 0.001 of colorize::stderr (from Perl
+    distribution colorize-stderr), released on 2017-07-10.
+
+SYNOPSIS
+     use colorize::stderr;
+     warn "blah!"; # will be printed in yellow
+
+    If you want to customize color:
+
+     use colorize::stderr 'red on_white';
+     warn "blah!";
+
+DESCRIPTION
+    This is a convenience wrapper over colorize::handle for colorizing
+    STDERR.
+
+    Caveat: although this module provides "unimport()", this code does not
+    do what you expect it to do:
+
+     {
+         use colorize::stderr;
+         warn "colored warning!";
+     }
+     warn "back to uncolored";
+
+    Because "no colorize::stderr" will be run at compile-time. You can do
+    this though:
+
+     use colorize::stderr ();
+
+     {
+         colorize::stderr->import;
+         warn "colored warning!";
+         colorize::stderr->unimport;
+     }
+     warn "back to uncolored";
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/colorize-stderr>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-colorize-handle>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=colorize-stderr>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    colorize::handle
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

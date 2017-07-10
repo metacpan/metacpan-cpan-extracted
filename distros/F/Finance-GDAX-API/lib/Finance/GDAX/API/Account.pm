@@ -1,5 +1,5 @@
 package Finance::GDAX::API::Account;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use 5.20.0;
 use warnings;
 use Moose;
@@ -57,8 +57,8 @@ Finance::GDAX::API::Account - Work with GDAX Accounts
 
   # List all accounts
   $accounts = $account->get_all;
-  if ($accounts->error) {
-      die 'There was an error '.$accounts->error;
+  if ($account->error) {
+      die 'There was an error '.$account->error;
   }
   foreach (@$accounts) {
       print $$_{currency}." = ".$$_{balance};

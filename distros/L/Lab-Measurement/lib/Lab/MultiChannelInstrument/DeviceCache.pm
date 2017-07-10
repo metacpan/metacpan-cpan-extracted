@@ -1,5 +1,5 @@
 package Lab::MultiChannelInstrument::DeviceCache;
-$Lab::MultiChannelInstrument::DeviceCache::VERSION = '3.552';
+$Lab::MultiChannelInstrument::DeviceCache::VERSION = '3.553';
 use warnings;
 use strict;
 

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Prty::ClassLoader;
 use Test::Builder ();
@@ -865,6 +865,38 @@ sub isnt {
 
 # -----------------------------------------------------------------------------
 
+=head3 floatIs() - Prüfe, ob Float-Wert dem erwarteten Wert entspricht
+
+=head4 Synopsis
+
+    $bool = $test->floatIs($got,$expected);
+    $bool = $test->floatIs($got,$expected,$text);
+
+=head4 Description
+
+Vergleiche die Float-Werte $got und $expected, nachdem $got auf
+die Anzahl an Nachkommastellen von $expected gerundet wurde.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub floatIs {
+    my ($self,$got,$expected,$text) = @_;
+
+    # Runde auf die Nachkommastellen des erwarteten Werts
+
+    my ($places) = $expected =~ /\.(\d+)/;
+    if ($places) {
+        $got = sprintf '%.*f',length($places),$got;
+    }
+
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    return Test::More::is($got,$expected,$text);    
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 isDeeply() - Prüfe, ob Datenstrukturen identisch sind
 
 =head4 Synopsis
@@ -1046,7 +1078,7 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

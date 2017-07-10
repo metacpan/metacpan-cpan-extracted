@@ -5,7 +5,7 @@ use Carp qw(croak);
 use Set::Tiny 0.01;
 use Filesys::Df 0.92;
 use Hash::Util 'lock_keys';
-our $VERSION = '1.1'; # VERSION
+our $VERSION = '1.3'; # VERSION
 
 =head1 NAME
 

@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address;
-$WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::VERSION = '0.9';
+$WebService::Braintree::ErrorCodes::MerchantAccount::Individual::Address::VERSION = '0.91';
 use strict;
 
 use constant StreetAddressIsRequired => "82657";

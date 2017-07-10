@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::JA::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -586,7 +586,7 @@ Lingua::Interset::Tagset::JA::Conll - Driver for the Japanese tagset of the CoNL
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

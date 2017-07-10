@@ -11,7 +11,7 @@ use strict;
 use warnings;
 
 use lib qw(../lib);
-use Math::AnyNum qw(ipow idiv);
+use Math::AnyNum qw(ipow ipow10 idiv);
 
 sub cumulative_freq {
     my ($freq) = @_;
@@ -59,8 +59,8 @@ sub arithmethic_coding {
 
     my $len = $L->length;
 
-    $L = Math::AnyNum->new("$L / " . ipow(10, $len));
-    $U = Math::AnyNum->new("$U / " . ipow(10, $len));
+    $L = Math::AnyNum->new("$L / " . ipow10($len));
+    $U = Math::AnyNum->new("$U / " . ipow10($len));
 
     my $t = Math::AnyNum->new(1);
     my $n = Math::AnyNum->new(0);
@@ -95,7 +95,7 @@ sub arithmethic_decoding {
         $line += $bin[$i] / ($t <<= 1);
     }
 
-    $enc = $line * ipow(10, $pow);
+    $enc = $line * ipow10($pow);
 
     my $base = Math::AnyNum->new(0);
     $base += $_ for values %{$freq};

@@ -4,7 +4,7 @@
 package Lingua::Interset::FeatureStructure;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -387,10 +387,10 @@ my %matrix = @_matrix =
     'poss' =>
     {
         'priority' => 210,
-        'values' => ['poss', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
+        'values' => ['yes', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
         'replacements' =>
         [
-            ['poss']
+            ['yes']
         ],
         'uname' => 'Poss'
     },
@@ -398,10 +398,10 @@ my %matrix = @_matrix =
     'reflex' =>
     {
         'priority' => 220,
-        'values' => ['reflex', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
+        'values' => ['yes', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
         'replacements' =>
         [
-            ['reflex']
+            ['yes']
         ],
         'uname' => 'Reflex'
     },
@@ -409,10 +409,10 @@ my %matrix = @_matrix =
     'foreign' =>
     {
         'priority' => 400,
-        'values' => ['foreign', ''],
+        'values' => ['yes', ''],
         'replacements' =>
         [
-            ['foreign']
+            ['yes']
         ],
         'uname' => 'Foreign'
     },
@@ -420,10 +420,10 @@ my %matrix = @_matrix =
     'abbr' =>
     {
         'priority' => 20,
-        'values' => ['abbr', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
+        'values' => ['yes', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
         'replacements' =>
         [
-            ['abbr']
+            ['yes']
         ],
         'uname' => 'Abbr'
     },
@@ -433,10 +433,10 @@ my %matrix = @_matrix =
     'hyph' =>
     {
         'priority' => 30,
-        'values' => ['hyph', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
+        'values' => ['yes', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
         'replacements' =>
         [
-            ['hyph']
+            ['yes']
         ],
         'uname' => 'Hyph'
     },
@@ -444,10 +444,10 @@ my %matrix = @_matrix =
     'typo' =>
     {
         'priority' => 430,
-        'values' => ['typo', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
+        'values' => ['yes', ''], ###!!! OR yes-no-empty? But I do not think it would be practical.
         'replacements' =>
         [
-            ['typo']
+            ['yes']
         ],
         'uname' => 'Typo'
     },
@@ -1219,6 +1219,30 @@ sub value_valid
 # unknown and no mapping is available, we return undef. This method does not
 # throw exceptions.
 #------------------------------------------------------------------------------
+my %fvbct =
+(
+    'number'      => { 'plu' => 'plur' }, # renamed in fall 2014
+    'degree'      => { 'comp' => 'cmp' }, # renamed in Interset 2.049, 2015-09-29
+    'aspect'      => { 'pro' => 'prosp' }, # renamed in UD v2, 2016-12-01
+    'verbform'    => { 'trans' => 'conv' }, # renamed in UD v2, 2016-12-01
+    'polite'      => { 'inf' => 'infm', # renamed in UD v2, 2016-12-01
+                       'pol' => 'form' }, # renamed in UD v2, 2016-12-01
+    'abspolite'   => { 'inf' => 'infm', # renamed in UD v2, 2016-12-01
+                       'pol' => 'form' }, # renamed in UD v2, 2016-12-01
+    'datpolite'   => { 'inf' => 'infm', # renamed in UD v2, 2016-12-01
+                       'pol' => 'form' }, # renamed in UD v2, 2016-12-01
+    'ergpolite'   => { 'inf' => 'infm', # renamed in UD v2, 2016-12-01
+                       'pol' => 'form' }, # renamed in UD v2, 2016-12-01
+    'numtype'     => { 'gen' => 'mult' }, # value removed in UD v2, 2016-12-01
+    'foreign'     => { 'foreign' => 'yes', # value renamed in Interset 3.005, 2017-07-08
+                       'fscript' => 'yes', # value removed in UD v2, 2016-12-01
+                       'tscript' => 'yes' }, # value removed in UD v2, 2016-12-01
+    'poss'        => { 'poss' => 'yes' }, # value renamed in Interset 3.005, 2017-07-08
+    'reflex'      => { 'reflex' => 'yes' }, # value renamed in Interset 3.005, 2017-07-08
+    'abbr'        => { 'abbr' => 'yes' }, # value renamed in Interset 3.005, 2017-07-08
+    'hyph'        => { 'hyph' => 'yes' }, # value renamed in Interset 3.005, 2017-07-08
+    'typo'        => { 'typo' => 'yes' }, # value renamed in Interset 3.005, 2017-07-08
+);
 sub _get_compatible_value
 {
     my $self = shift;
@@ -1230,16 +1254,10 @@ sub _get_compatible_value
     }
     else
     {
-        # If the list of renamed values grows longer (hopefully not!) we may want to put this into a separate hash.
-        return 'plur'    if($feature eq 'number' && $value eq 'plu'); # renamed in fall 2014
-        return 'cmp'     if($feature eq 'degree' && $value eq 'comp'); # renamed in Interset 2.049, 2015-09-29
-        return 'prosp'   if($feature eq 'aspect' && $value eq 'pro'); # renamed in UD v2, 2016-12-01
-        return 'conv'    if($feature eq 'verbform' && $value eq 'trans'); # renamed in UD v2, 2016-12-01
-        return 'infm'    if($feature =~ m/^(abs|dat|erg)?polite/ && $value eq 'inf'); # renamed in UD v2, 2016-12-01
-        return 'form'    if($feature =~ m/^(abs|dat|erg)?polite/ && $value eq 'pol'); # renamed in UD v2, 2016-12-01
-        return 'foreign' if($feature eq 'foreign' && $value eq 'fscript'); # value removed in UD v2, 2016-12-01
-        return 'foreign' if($feature eq 'foreign' && $value eq 'tscript'); # value removed in UD v2, 2016-12-01
-        return 'mult'    if($feature eq 'numtype' && $value eq 'gen'); # value removed in UD v2, 2016-12-01
+        if(exists($fvbct{$feature}{$value}))
+        {
+            return $fvbct{$feature}{$value};
+        }
         # If we are here, the feature-value pair is unknown and we do not know where to map it to.
         return;
     }
@@ -1829,8 +1847,6 @@ sub add_ufeatures
             my $feature = $map->{$ufeature};
             next if(!defined($feature));
             my $value = lc($uvalue);
-            # Interset uses for boolean features the value identical to feature name while universal features use "Yes".
-            $value = $feature if($value eq 'yes');
             # Universal Features use comma to join multi-values but we use the vertical bar.
             $value =~ s/,/\|/g;
             # Backward compatibility: if this is an old value that has been renamed, get the new value.
@@ -1869,9 +1885,6 @@ sub get_ufeatures
         @values = sort {lc($a) cmp lc($b)} (map {my $x = $_; $x =~ s/^(.)/\u$1/; $x} (@values));
         # Join values using comma (unlike in get_joined(), with Universal Features we cannot use the vertical bar).
         my $value = join(',', @values);
-        # Interset uses for boolean features the value identical to feature name while universal features use "Yes".
-        # Exception: Foreign used to be boolean, now it has three values but foreign=foreign is still one of them.
-        $value = 'Yes' if($value eq $uname);
         my $pair = "$uname=$value";
         # Some values of some features became obsolete because the distinction was moved to the POS tag level.
         next if($pair =~ m/^(PronType=Prn|ConjType=(Coor|Sub)|NounType=(Com|Prop)|VerbType=Aux|Variant=[0-9])$/);
@@ -2006,7 +2019,7 @@ sub structure_to_string
 sub is_noun {my $self = shift; return $self->contains('pos', 'noun');}
 
 #------------------------------------------------------------------------------
-sub is_abbreviation {my $self = shift; return $self->abbr() eq 'abbr';}
+sub is_abbreviation {my $self = shift; return $self->abbr() eq 'yes';}
 
 #------------------------------------------------------------------------------
 sub is_abessive {my $self = shift; return $self->contains('case', 'abe');}
@@ -2162,7 +2175,7 @@ sub is_finite_verb {my $self = shift; return $self->contains('verbform', 'fin');
 sub is_first_person {my $self = shift; return $self->contains('person', '1');}
 
 #------------------------------------------------------------------------------
-sub is_foreign {my $self = shift; return $self->foreign() eq 'foreign';}
+sub is_foreign {my $self = shift; return $self->foreign() eq 'yes';}
 
 #------------------------------------------------------------------------------
 sub is_formal {my $self = shift; return $self->contains('polite', 'form');}
@@ -2186,7 +2199,7 @@ sub is_human {my $self = shift; return $self->contains('animacy', 'hum');}
 sub is_humbling {my $self = shift; return $self->contains('polite', 'humb');}
 
 #------------------------------------------------------------------------------
-sub is_hyph {my $self = shift; return $self->hyph() eq 'hyph';}
+sub is_hyph {my $self = shift; return $self->hyph() eq 'yes';}
 
 #------------------------------------------------------------------------------
 sub is_illative {my $self = shift; return $self->contains('case', 'ill');}
@@ -2321,7 +2334,7 @@ sub is_polite {my $self = shift; return $self->contains('polite', 'form');}
 sub is_positive {my $self = shift; return $self->contains('degree', 'pos');}
 
 #------------------------------------------------------------------------------
-sub is_possessive {my $self = shift; return $self->poss() eq 'poss';}
+sub is_possessive {my $self = shift; return $self->poss() eq 'yes';}
 
 #------------------------------------------------------------------------------
 sub is_potential {my $self = shift; return $self->contains('mood', 'pot');}
@@ -2360,7 +2373,7 @@ sub is_rare {my $self = shift; return $self->contains('style', 'rare');}
 sub is_reciprocal {my $self = shift; return $self->contains('prontype', 'rcp') || $self->contains('voice', 'rcp');}
 
 #------------------------------------------------------------------------------
-sub is_reflexive {my $self = shift; return $self->reflex() eq 'reflex';}
+sub is_reflexive {my $self = shift; return $self->reflex() eq 'yes';}
 
 #------------------------------------------------------------------------------
 sub is_relative {my $self = shift; $self->contains('prontype', 'rel');}
@@ -2414,7 +2427,7 @@ sub is_transitive {my $self = shift; return $self->contains('subcat', 'tran');}
 sub is_translative {my $self = shift; return $self->contains('case', 'tra');}
 
 #------------------------------------------------------------------------------
-sub is_typo {my $self = shift; return $self->typo() eq 'typo';}
+sub is_typo {my $self = shift; return $self->typo() eq 'yes';}
 
 #------------------------------------------------------------------------------
 sub is_verb {my $self = shift; return $self->contains('pos', 'verb');}
@@ -2826,7 +2839,7 @@ Lingua::Interset::FeatureStructure - Definition of morphosyntactic features and 
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,22 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Mojo/UserAgent/Cached.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+Mojo-UserAgent-Cached-1.05.tar
+Mojo-UserAgent-Cached-1.05.tar.gz
+README.md
+t/data/body+headers.txt
+t/data/incorrect_format_xml.xml
+t/data/invalid_xml.xml
+t/data/malformed_xml.xml
+t/data/newsfeed.xml
+t/mojo_user_agent.t
+t/mojo_useragent_cached.t

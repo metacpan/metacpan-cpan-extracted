@@ -4,7 +4,7 @@ use base qw/Prty::ContentProcessor::BaseType/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 # -----------------------------------------------------------------------------
 
@@ -525,16 +525,16 @@ Eine Entität besitzt einen von drei Test-Status:
 
 =over 4
 
-=item 0
+=item Z<>0
 
 Nichts zu tun. Die Entität braucht nicht getestet werden.
 
-=item 1
+=item Z<>1
 
 Der Code der Entität hat sich geändert. Die Entität und alle
 abhängigen Entitäten müssen getestet werden.
 
-=item 2
+=item Z<>2
 
 Nur die Entität selbst muss getestet werden. Die Entität
 selbst wurde nicht geändert, hängt aber von einer Entität ab,
@@ -601,11 +601,11 @@ Eine Entität besitzt einen von zwei Änderungs-Status:
 
 =over 4
 
-=item 0
+=item Z<>0
 
 Nichts zu tun. Die Entität wurde nicht geändert.
 
-=item 1
+=item Z<>1
 
 Die Entitäts wurde geändert. Die Ausgabe-Dateien der
 Entität müssen neu generiert werden.
@@ -655,7 +655,7 @@ sub needsUpdate {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

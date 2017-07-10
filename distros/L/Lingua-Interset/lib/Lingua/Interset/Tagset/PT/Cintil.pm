@@ -7,7 +7,7 @@
 package Lingua::Interset::Tagset::PT::Cintil;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -78,7 +78,7 @@ sub _create_atoms
             # Electronic address (http://www.di.fc.ul.pt)
             'EADR'   => ['pos' => 'noun', 'other' => {'pos' => 'url'}],
             # End of enumeration (etc.)
-            'EOE'    => ['pos' => 'part', 'abbr' => 'abbr'],
+            'EOE'    => ['pos' => 'part', 'abbr' => 'yes'],
             # Exclamation (que, quanto)
             'EXC'    => ['pos' => 'int'],
             # Gerund (sendo, afirmando, vivendo)
@@ -105,7 +105,7 @@ sub _create_atoms
             # Month (Janeiro, Dezembro)
             'MTH'    => ['pos' => 'noun', 'other' => {'pos' => 'month'}],
             # Noun phrase (idem)
-            'NP'     => ['pos' => 'noun', 'abbr' => 'abbr'],
+            'NP'     => ['pos' => 'noun', 'abbr' => 'yes'],
             # Ordinal numeral (primeiro, centésimo, penúltimo)
             'ORD'    => ['pos' => 'adj', 'numtype' => 'ord'],
             # Part of address (Rua, av., rot.)
@@ -115,7 +115,7 @@ sub _create_atoms
             # Punctuation (., ?, (, ))
             'PNT'    => ['pos' => 'punc'],
             # Possessive pronoun or determiner (meu, teu, seu)
-            'POSS'   => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            'POSS'   => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             # Past participle not in compound tenses (sido, afirmados, vivida)
             'PPA'    => ['pos' => 'adj', 'verbform' => 'part', 'tense' => 'past'],
             ###!!! According to Martin/documentation?, PP should mean "prepositional phrase" (algures = somewhere).
@@ -140,7 +140,7 @@ sub _create_atoms
             # "um" or "uma" (they could be either indefinite articles or cardinal numerals meaning "one")
             'UM'     => ['pos' => 'adj', 'prontype' => 'art', 'definite' => 'ind', 'numtype' => 'card', 'numform' => 'word', 'numvalue' => '1'],
             # Abbreviated measurement unit (Kg, h, seg, Hz, Mbytes)
-            'UNIT'   => ['pos' => 'noun', 'abbr' => 'abbr'],
+            'UNIT'   => ['pos' => 'noun', 'abbr' => 'yes'],
             # Finite form of an auxiliary verb in compound tenses (temos, haveriam)
             'VAUX'   => ['pos' => 'verb', 'verbtype' => 'aux', 'verbform' => 'fin'],
             # Verb (other than PPA, PPT, INF or GER) (falou, falaria)
@@ -160,7 +160,7 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'prontype' => { 'prs' => { 'poss' => { 'poss' => 'POSS',
+            { 'prontype' => { 'prs' => { 'poss' => { 'yes' => 'POSS',
                                                      '@'    => { 'variant' => { 'short' => 'CL',
                                                                                 '@'     => 'PRS' }}}},
                               'art' => { 'definite' => { 'def' => 'DA',
@@ -693,7 +693,7 @@ Lingua::Interset::Tagset::PT::Cintil - Driver for the Portuguese tagset of the C
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

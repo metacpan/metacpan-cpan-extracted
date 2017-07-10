@@ -9,7 +9,7 @@
 package Lingua::Interset::Tagset::MT::Mlss;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -114,7 +114,7 @@ around BUILDARGS => sub
         'NP'    => ['pos' => 'noun', 'nountype' => 'prop'],
         # initial in proper name
         # no occurrence in the corpus
-        #'NPI'   => ['pos' => 'noun', 'nountype' => 'prop', 'abbr' => 'abbr'],
+        #'NPI'   => ['pos' => 'noun', 'nountype' => 'prop', 'abbr' => 'yes'],
         # verbal negator
         # examples: ma, mhux, m', mhix, mhuwiex (not, not, not, not, not)
         'NV'    => ['pos' => 'part', 'polarity' => 'neg'],
@@ -146,7 +146,7 @@ around BUILDARGS => sub
         'PP'    => ['pos' => 'noun', 'prontype' => 'prs'],
         # pronoun, reflexive
         # examples: ruħu, nnifsu, innifsu, ruħhom, nnifisha (himself, herself, itself, themselves, itself)
-        'PR'    => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'],
+        'PR'    => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'],
         # preposition
         # examples: ta', f', fuq, minn, b' (of, ?, ?, from, in)
         'PRP'   => ['pos' => 'adp', 'adpostype' => 'prep'],
@@ -155,7 +155,7 @@ around BUILDARGS => sub
         'PRPC'  => ['pos' => 'adp', 'adpostype' => 'prep', 'prontype' => 'art', 'definiteness' => 'def'],
         # pronoun, possessive
         # examples: tiegħu, tagħhom, tagħha, tagħna, tiegħi (his, their, her, our, my)
-        'PT'    => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+        'PT'    => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
         # punctuation
         # examples: , . ' ( )
         'PUN'   => ['pos' => 'punc'],
@@ -164,10 +164,10 @@ around BUILDARGS => sub
         'PW'    => ['pos' => 'noun|adj', 'prontype' => 'int'],
         # residual, acronym
         # examples: Dr, ICT, Prof., UE, PARC
-        'RA'    => ['pos' => 'noun', 'nountype' => 'prop', 'abbr' => 'abbr'],
+        'RA'    => ['pos' => 'noun', 'nountype' => 'prop', 'abbr' => 'yes'],
         # residual, abbreviation
         # examples: ..., Ltd, Ed, GĦST, ICT
-        'RB'    => ['abbr' => 'abbr'],
+        'RB'    => ['abbr' => 'yes'],
         # residual, date
         # examples: 13, 631, 22, 158, 33
         # this tag is not restricted to dates, it appears e.g. in "artikolu 631" (article 631)
@@ -176,7 +176,7 @@ around BUILDARGS => sub
         'RFR'   => ['pos' => 'sym'],
         # residual, foreign word
         # examples: of, the, for, in, e
-        'RFW'   => ['foreign' => 'foreign'],
+        'RFW'   => ['foreign' => 'yes'],
         # residual, honorific
         # examples: Sur, San, Dun, European, Fr
         'RH'    => ['pos' => 'noun', 'nountype' => 'com', 'other' => {'nountype' => 'title'}],
@@ -218,10 +218,10 @@ around BUILDARGS => sub
                         'neg' => 'PI',
                         'int' => 'PW',
                         'rel' => 'PW',
-                        'prs' => { 'poss' => { 'poss' => 'PT',
-                                               '@'    => { 'reflex' => { 'reflex' => 'PR',
+                        'prs' => { 'poss' => { 'yes' => 'PT',
+                                               '@'    => { 'reflex' => { 'yes' => 'PR',
                                                                          '@'      => 'PP' }}}},
-                        '@'   => { 'pos' => { 'noun' => { 'nountype' => { 'prop' => { 'abbr' => { 'abbr' => 'RA',
+                        '@'   => { 'pos' => { 'noun' => { 'nountype' => { 'prop' => { 'abbr' => { 'yes' => 'RA',
                                                                                                   '@'    => 'NP' }},
                                                                           '@'    => { 'other/nountype' => { 'title' => 'RH',
                                                                                                             '@'     => 'NN' }}}},
@@ -250,8 +250,8 @@ around BUILDARGS => sub
                                               'int'  => 'II',
                                               'sym'  => 'RFR',
                                               'punc' => 'PUN',
-                                              '@'    => { 'abbr' => { 'abbr' => 'RB',
-                                                                      '@'    => { 'foreign' => { 'foreign' => 'RFW',
+                                              '@'    => { 'abbr' => { 'yes' => 'RB',
+                                                                      '@'    => { 'foreign' => { 'yes' => 'RFW',
                                                                                                  '@'       => 'RO' }}}}}}}
     );
     # Now add the references to the attribute hash.
@@ -294,7 +294,7 @@ Lingua::Interset::Tagset::MT::Mlss - Driver for the tagset of the Maltese Langua
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

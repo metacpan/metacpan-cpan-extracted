@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Calculate::Data;
-$Lab::Moose::Instrument::SCPI::Calculate::Data::VERSION = '3.552';
+$Lab::Moose::Instrument::SCPI::Calculate::Data::VERSION = '3.553';
 use 5.010;
 use Moose::Role;
 use MooseX::Params::Validate;

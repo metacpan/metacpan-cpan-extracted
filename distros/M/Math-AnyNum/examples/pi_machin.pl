@@ -24,7 +24,6 @@ sub next_term {
 my $p2  = 5;
 my $pow = 1;
 
-$| = 1;
 for (my $x = 5 ; $x < 5000 ; $x += 4) {
     ($ns, $ds) = ($ns * $d5 + $n5 * $pow * $ds, $ds * $d5);
 
@@ -50,6 +49,7 @@ for (my $x = 5 ; $x < 5000 ; $x += 4) {
         $ns %= $ds;
 
         $out = ("0" x (length($ppow) - length($out) - 1)) . $out;
+        local $| = 1;
         print $out;
     }
 

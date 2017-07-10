@@ -90,12 +90,12 @@ static void allocate_b_unicode (text_fuzzy_t * text_fuzzy, int b_length)
 static void sv_to_int_ptr (SV * text, text_fuzzy_string_t * tfs)
 {
     int i;
-    U8 * utf;
+    const U8 * utf;
     STRLEN curlen;
     STRLEN length;
-    unsigned char * stuff;
+    const unsigned char * stuff;
 
-    stuff = (unsigned char *) SvPV (text, length);
+    stuff = (const unsigned char *) SvPV (text, length);
 
     utf = stuff;
     curlen = length;
@@ -118,7 +118,7 @@ static void
 sv_to_text_fuzzy (SV * text, text_fuzzy_t ** text_fuzzy_ptr)
 {
     STRLEN length;
-    unsigned char * stuff;
+    const unsigned char * stuff;
     text_fuzzy_t * text_fuzzy;
     int i;
     int is_utf8;
@@ -162,59 +162,74 @@ sv_to_text_fuzzy (SV * text, text_fuzzy_t ** text_fuzzy_ptr)
     * text_fuzzy_ptr = text_fuzzy;
 }
 
-/* The following palaver is related to the macros "FAIL" and
-   "FAIL_MSG" in "text-fuzzy.c.in". */
-
-#undef FAIL_STATUS
-#define FAIL_STATUS -1
-
 static void
-sv_to_text_fuzzy_string (SV * word, text_fuzzy_t * tf)
+sv_to_text_fuzzy_string (SV * word, text_fuzzy_t * text_fuzzy)
 {
     STRLEN length;
-    tf->b.text = SvPV (word, length);
-    tf->b.length = length;
-    if (SvUTF8 (word) || tf->unicode) {
+    text_fuzzy->b.text = SvPV (word, length);
+    text_fuzzy->b.allocated = 0;
+    text_fuzzy->b.length = length;
+    if (SvUTF8 (word) || text_fuzzy->unicode) {
 
 	/* Make a Unicode version of b. */
 
-	tf->b.ulength = sv_len_utf8 (word);
-	allocate_b_unicode (tf, tf->b.ulength);
-	sv_to_int_ptr (word, & tf->b);
-	if (! tf->unicode) {
+	text_fuzzy->b.ulength = sv_len_utf8 (word);
+	allocate_b_unicode (text_fuzzy, text_fuzzy->b.ulength);
+	sv_to_int_ptr (word, & text_fuzzy->b);
+	if (! text_fuzzy->unicode) {
 
 	    /* Make a non-Unicode version of b. */
 
 	    int i;
 
-	    tf->b.length = tf->b.ulength;
-	    for (i = 0; i < tf->b.ulength; i++) {
+	    text_fuzzy->b.length = text_fuzzy->b.ulength;
+	    text_fuzzy->b.allocated = 1;
+	    get_memory (text_fuzzy->b.text, text_fuzzy->b.length + 1, char);
+	    for (i = 0; i < text_fuzzy->b.ulength; i++) {
 		int c;
 
-		c = tf->b.unicode[i];
+		c = text_fuzzy->b.unicode[i];
 		if (c <= 0x80) {
-		    tf->b.text[i] = c;
+		    text_fuzzy->b.text[i] = c;
 		}
 		else {
 		    /* Put a non-matching character in there. */
 
-		    tf->b.text[i] = tf->invalid_char;
+		    text_fuzzy->b.text[i] = text_fuzzy->invalid_char;
 		}
 	    }
 	}
     }
 }
 
-static int
-text_fuzzy_sv_distance (text_fuzzy_t * tf, SV * word)
+static void
+free_text (text_fuzzy_t * text_fuzzy)
 {
-    sv_to_text_fuzzy_string (word, tf);
-    TEXT_FUZZY (compare_single (tf));
-    if (tf->found) {
-        return tf->distance;
+    if (text_fuzzy->b.allocated) {
+	Safefree (text_fuzzy->b.text);
+	text_fuzzy->n_mallocs--;
+	text_fuzzy->b.text = 0;
+	text_fuzzy->b.allocated = 0;
+    }
+}
+
+/* The following palaver is related to the macros "FAIL" and
+   "FAIL_MSG" in "text-fuzzy.c.in". */
+
+#undef FAIL_STATUS
+#define FAIL_STATUS -1
+
+static int
+text_fuzzy_sv_distance (text_fuzzy_t * text_fuzzy, SV * word)
+{
+    sv_to_text_fuzzy_string (word, text_fuzzy);
+    TEXT_FUZZY (compare_single (text_fuzzy));
+    free_text (text_fuzzy);
+    if (text_fuzzy->found) {
+        return text_fuzzy->distance;
     }
     else {
-        return tf->max_distance + 1;
+        return text_fuzzy->max_distance + 1;
     }
 }
 
@@ -246,6 +261,7 @@ text_fuzzy_av_distance (text_fuzzy_t * text_fuzzy, AV * words, AV * wantarray)
         sv_to_text_fuzzy_string (word, text_fuzzy);
 	text_fuzzy->offset = i;
         TEXT_FUZZY (compare_single (text_fuzzy));
+	free_text (text_fuzzy);
         if (text_fuzzy->found) {
             nearest = i;
 	    if (! text_fuzzy->wantarray && text_fuzzy->distance == 0) {

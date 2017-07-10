@@ -1,4 +1,66 @@
-SYNOPSIS
+NAME
+    App::GoogleSearchPerlmonksUser - Search Google for user mentions in
+    perlmonks.org
 
+VERSION
+    This document describes version 0.02 of App::GoogleSearchPerlmonksUser
+    (from Perl distribution App-GoogleSearchPerlmonksUser), released on
+    2017-07-08.
+
+SYNOPSIS
     Use the included script google-search-perlmonks-user.
+
+FUNCTIONS
+  google_search_perlmonks_user
+    Usage:
+
+     google_search_perlmonks_user(%args) -> [status, msg, result, meta]
+
+    Search Google for user mentions in perlmonks.org.
+
+    Basically a shortcut for launching Google search for a user
+    (specifically, user mentions in discussion threads) in "perlmonks.org"
+    site, with some unwanted pages excluded.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-GoogleSearchPerlmonksUser>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-GoogleSearchPerlmonksUser>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GoogleSearchPerlm
+    onksUser>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

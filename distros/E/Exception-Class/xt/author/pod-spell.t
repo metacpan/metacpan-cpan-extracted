@@ -10,8 +10,11 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+0x62ash
+Alexander
 Arun
 Base
+Batyrshin
 CPAN
 Class
 DROLSKY

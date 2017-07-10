@@ -1,4 +1,14 @@
-3.004
+3.005
+
+Features:
+* In line with Universal Dependencies, the single-value features' value is no
+  longer identical to the feature name; instead, it is 'yes'. For example,
+  'reflex=reflex' is substituted by 'reflex=yes'. The change involves features:
+  'reflex', 'poss', 'abbr', 'foreign', 'hyph', 'typo'.
+
+
+
+3.004     2017-02-08 15:25:24+01:00 Europe/Prague
 
 Features:
 * In line with Universal Dependencies v2, added value 'vnoun' of feature

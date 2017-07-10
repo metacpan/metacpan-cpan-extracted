@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'WiringPi::API';
 
-our $VERSION = '2.3603';
+our $VERSION = '2.3604';
 
 sub new {
     my ($class, $pin) = @_;
@@ -74,9 +74,7 @@ sub pull {
 sub pwm {
     my ($self, $value) = @_;
 
-    my $gpio = $self->pin_to_gpio($self->num);
-
-    if ($self->mode != 2 && $gpio == 18){
+    if ($self->mode != 2 && $self->num == 18){
         my $num = $self->num;
         die "\npin $num isn't set to mode 2 (PWM). pwm() can't be set\n";
     }

@@ -1,12 +1,12 @@
 package App::CreateSelfSignedSSLCert;
 
-our $DATE = '2016-06-09'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.14'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Expect;
 #use File::chdir;
@@ -94,7 +94,7 @@ sub create_self_signed_ssl_cert {
         $exp->soft_close;
     }
     if ($args{csr_only}) {
-        $log->info("Your CSR has been created at $h.csr");
+        log_info("Your CSR has been created at $h.csr");
         return [200];
     }
 
@@ -119,7 +119,7 @@ sub create_self_signed_ssl_cert {
 
     system("chmod 400 "._sq("$h.pem"));
 
-    $log->info("Your certificate has been created at $h.pem");
+    log_info("Your certificate has been created at $h.pem");
 
     [200];
 }
@@ -170,7 +170,7 @@ App::CreateSelfSignedSSLCert - Create self-signed SSL certificate
 
 =head1 VERSION
 
-This document describes version 0.13 of App::CreateSelfSignedSSLCert (from Perl distribution App-CreateSelfSignedSSLCert), released on 2016-06-09.
+This document describes version 0.14 of App::CreateSelfSignedSSLCert (from Perl distribution App-CreateSelfSignedSSLCert), released on 2017-07-08.
 
 =head1 SYNOPSIS
 
@@ -180,7 +180,11 @@ L<create-self-signed-ssl-cert> and L<create-ssl-csr>.
 =head1 FUNCTIONS
 
 
-=head2 create_self_signed_ssl_cert(%args) -> [status, msg, result, meta]
+=head2 create_self_signed_ssl_cert
+
+Usage:
+
+ create_self_signed_ssl_cert(%args) -> [status, msg, result, meta]
 
 Create self-signed SSL certificate.
 
@@ -228,7 +232,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 create_ssl_csr(%args) -> [status, msg, result, meta]
+=head2 create_ssl_csr
+
+Usage:
+
+ create_ssl_csr(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -281,7 +289,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

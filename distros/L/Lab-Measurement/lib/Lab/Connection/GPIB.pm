@@ -1,5 +1,7 @@
-#!/usr/bin/perl -w
-
+package Lab::Connection::GPIB;
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: GPIB Connection base class
+$Lab::Connection::GPIB::VERSION = '3.553';
 #
 # This is the GPIB Connection base class. It provides the interface definition for all
 # connections implementing the GPIB protocol.
@@ -9,11 +11,10 @@
 # Instruments using a GPIB connection will check the inheritance tree of the provided connection
 # for this class.
 #
-
+#
 # TODO: Access to GPIB attributes, device clear, ...
+#
 
-package Lab::Connection::GPIB;
-$Lab::Connection::GPIB::VERSION = '3.552';
 use Lab::Connection;
 use strict;
 use Lab::Exception;
@@ -102,13 +103,22 @@ sub serial_poll {
 
 1;
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Connection::GPIB - GPIB connection base class
+Lab::Connection::GPIB - GPIB Connection base class
+
+=head1 VERSION
+
+version 3.553
 
 =head1 SYNOPSIS
 
@@ -156,11 +166,9 @@ Takes a config hash, has to at least pass the key 'command' correctly to the und
 
 Takes a config hash, reads back a message from the device.
 
-
 =head3 Clear()
 
 Clears the instrument.
-
 
 =head2 config
 
@@ -173,7 +181,7 @@ Without arguments, returns a reference to the complete $self->Config aka @_ of t
 
  $Config = $connection->Config();
  $GPIB_PAddress = $connection->Config()->{'GPIB_PAddress'};
- 
+
 =head1 CAVEATS/BUGS
 
 Probably few. Mostly because there's not a lot to be done here. Please report.
@@ -190,13 +198,17 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Florian Olbrich, Hermann Kraus, Stefan Geissler
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

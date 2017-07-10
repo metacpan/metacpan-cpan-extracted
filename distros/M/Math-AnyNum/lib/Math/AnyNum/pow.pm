@@ -13,7 +13,7 @@ Class::Multimethods::multimethod __pow__ => qw(Math::GMPq $) => sub {
     Math::GMPq::Rmpq_pow_ui($r, $x, CORE::abs($y));
 
     if ($y < 0) {
-        Math::GMPq::Rmpq_sgn($r) || goto &Math::AnyNum::_inf;
+        Math::GMPq::Rmpq_sgn($r) || goto &_inf;
         Math::GMPq::Rmpq_inv($r, $r);
     }
 
@@ -65,7 +65,7 @@ Class::Multimethods::multimethod __pow__ => qw(Math::GMPz $) => sub {
     Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
 
     if ($y < 0) {
-        Math::GMPz::Rmpz_sgn($r) || goto &Math::AnyNum::_inf;
+        Math::GMPz::Rmpz_sgn($r) || goto &_inf;
 
         my $q = Math::GMPq::Rmpq_init();
         Math::GMPq::Rmpq_set_z($q, $r);

@@ -276,7 +276,6 @@ sub log_job {
             }
         }
         $self->get_cmd_stats($cmdpid);
-        ##TODO Add Variable
         sleep( $self->poll_time );
     }
 

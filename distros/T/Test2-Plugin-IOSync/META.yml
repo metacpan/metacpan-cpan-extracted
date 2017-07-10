@@ -3,7 +3,11 @@ abstract: 'Load IOEvents and IOMuxer so that they work together.'
 author:
   - 'Chad Granum <exodist@cpan.org>'
 build_requires:
-  Test2::Bundle::Extended: '0.000070'
+  File::Temp: '0'
+  IPC::Open3: '0'
+  List::Util: '0'
+  Test2::Bundle::Extended: '0.000072'
+  Test2::Formatter::TAP: '1.302086'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -15,12 +19,13 @@ meta-spec:
 name: Test2-Plugin-IOSync
 requires:
   Carp: '0'
+  IO::Handle: '0'
   PerlIO: '0'
-  Test2::API: '1.302084'
+  Test2::API: '1.302086'
   Time::HiRes: '0'
   perl: '5.008001'
 resources:
   bugtracker: http://github.com/Test-More/Test2-Plugin-IOSync/issues
   repository: http://github.com/Test-More/Test2-Plugin-IOSync/
-version: '0.000007'
+version: '0.000009'
 x_serialization_backend: 'YAML::Tiny version 1.70'

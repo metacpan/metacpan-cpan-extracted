@@ -1,6 +1,6 @@
 package Bundle::DadaMail;
 
-$VERSION = '0.0.6';
+$VERSION = '0.0.7';
 
 1;
 
@@ -67,6 +67,14 @@ Google::reCAPTCHA
 Gravatar::URL
 
 Net::Domain
+
+Net::POP3 - used for POP3 access, for example: Bounce Handler and Bridge
+
+Net::SMTP - used for sending via SMTP
+
+Digest::HMAC
+
+Authen::SASL
 
 JSON - actually required for Dada Mail - Pure Perl version included, but you probably want to use a faster version
 

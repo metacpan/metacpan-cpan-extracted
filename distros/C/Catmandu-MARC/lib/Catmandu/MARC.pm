@@ -15,7 +15,7 @@ memoize('compile_marc_path');
 memoize('parse_marc_spec');
 memoize('_get_index_range');
 
-our $VERSION = '1.16';
+our $VERSION = '1.161';
 
 sub marc_map {
     my $self      = $_[0];
@@ -318,7 +318,8 @@ sub marc_replace_all {
 
         for (my $i = 0; $i < @subfields; $i += 2) {
             if ($subfields[$i] =~ $context->{subfield}) {
-                $field->[$i + 4] =~ s{$regex}{$value}g;
+                # Trick to double eval the right hand side
+                $field->[$i + 4] =~ s{$regex}{"\"$value\""}eeg;
             }
         }
     }

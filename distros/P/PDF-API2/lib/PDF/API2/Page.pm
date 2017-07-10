@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Pages';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.032'; # VERSION
+our $VERSION = '2.033'; # VERSION
 
 use POSIX qw(floor);
 

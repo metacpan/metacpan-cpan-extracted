@@ -1,5 +1,5 @@
 package Lab::Instrument::Lakeshore224;
-$Lab::Instrument::Lakeshore224::VERSION = '3.552';
+$Lab::Instrument::Lakeshore224::VERSION = '3.553';
 use strict;
 
 use Lab::Instrument;

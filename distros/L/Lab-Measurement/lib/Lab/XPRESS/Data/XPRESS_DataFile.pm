@@ -1,5 +1,5 @@
 package Lab::XPRESS::Data::XPRESS_DataFile;
-$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.552';
+$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.553';
 use strict;
 use Time::HiRes qw/usleep/, qw/time/;
 use Storable qw(dclone);

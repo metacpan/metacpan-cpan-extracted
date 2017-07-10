@@ -1,0 +1,22 @@
+Changes
+lib/Type/Simple.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/00-load.t
+t/01-basic.t
+t/02-hashref.t
+t/02-ref.t
+t/03-compound.t
+t/04-maybe.t
+t/05-str.t
+t/06-logical.t
+t/07-regex.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

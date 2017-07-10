@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl wrapper around the Riot Games League of Legends API",
+   "author" : [
+      "Justin Hunter <justin.d.hunter@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-RiotGames-LeagueOfLegends",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Function::Parameters" : "0",
+            "JSON" : "0",
+            "LWP" : "0",
+            "Moo" : "0",
+            "Sub::Name" : "0",
+            "Types::Standard" : "0",
+            "URI" : "0",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/arcanez/www-riotgames-leagueoflegends/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/arcanez/www-riotgames-leagueoflegends"
+      }
+   },
+   "version" : 0.0001,
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

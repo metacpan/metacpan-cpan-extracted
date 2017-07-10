@@ -24,8 +24,7 @@ Class::Multimethods::multimethod __irand__ => qw(Math::GMPz Math::GMPz *) => sub
 Class::Multimethods::multimethod __irand__ => qw(Math::GMPz *) => sub {
     my ($x, $state) = @_;
 
-    my $sgn = Math::GMPz::Rmpz_sgn($x)
-      || return Math::GMPz::Rmpz_init_set_ui(0);
+    my $sgn = Math::GMPz::Rmpz_sgn($x) || return $x;
 
     my $r = Math::GMPz::Rmpz_init_set($x);
 

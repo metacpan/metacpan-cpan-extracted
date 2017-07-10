@@ -26,10 +26,11 @@ meta-spec:
   version: '1.4'
 name: Ryu
 recommends:
-  Encode: '1.98'
   JSON::MaybeXS: '0'
   MIME::Base64: '0'
+  Text::CSV: '0'
 requires:
+  Encode: '1.98'
   Future: '0.35'
   List::UtilsBy: '0.10'
   Log::Any: '1.045'
@@ -46,5 +47,5 @@ requires:
 resources:
   bugtracker: https://github.com/team-at-cpan/Ryu/issues
   repository: git://github.com/team-at-cpan/Ryu.git
-version: '0.021'
+version: '0.022'
 x_serialization_backend: 'YAML::Tiny version 1.70'

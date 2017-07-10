@@ -10,7 +10,3 @@ my @nearest = $tf->nearest (\@funky_words);
 print "The nearest words are ";
 print join ", ", (map {$funky_words[$_]} @nearest);
 printf ", distance %d.\n", $tf->last_distance ();
-
-# Prints out "The nearest words are nice, rice, lice."
-
-

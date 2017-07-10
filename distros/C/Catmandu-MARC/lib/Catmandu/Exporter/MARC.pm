@@ -2,7 +2,7 @@ package Catmandu::Exporter::MARC;
 use Catmandu::Sane;
 use Moo;
 
-our $VERSION = '1.16';
+our $VERSION = '1.161';
 
 has type           => (is => 'ro' , default => sub { 'ISO' });
 has _exporter      => (is => 'ro' , lazy => 1 , builder => '_build_exporter' , handles => 'Catmandu::Exporter');

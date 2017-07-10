@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.48"
          }
       },
       "configure" : {
@@ -34,17 +34,20 @@
          "requires" : {
             "DBD::SQLite" : "0",
             "DBI" : "0",
+            "DB_File" : "0",
             "Data::Printer" : "0",
             "File::Rsync" : "0",
             "HTTP::Request" : "0",
             "Image::Size" : "0",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
+            "Mojolicious::Plugin" : "0",
             "Pod::WSDL" : "0",
             "SOAP::Transport::HTTP" : "0",
             "WWW::Mechanize" : "0",
             "XML::LibXML" : "0",
-            "XML::Twig" : "0"
+            "XML::Twig" : "0",
+            "perl" : "5.010001"
          }
       }
    },
@@ -56,6 +59,6 @@
          "web" : "https://github.com/s31tz/Prty"
       }
    },
-   "version" : 1.113,
+   "version" : 1.117,
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

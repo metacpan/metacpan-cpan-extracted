@@ -1,3 +1,10 @@
+1.43    2017-07-09
+
+- The full_message() method in Exception::Class::Base now calls message()
+  instead of accessing the object's hash key. This makes it easier to override
+  message() in a subclass. Patch by Alexander Batyrshin. PR #11.
+
+
 1.42    2017-01-04
 
 - Generated exception classes are now added to %INC. If you subclass a

@@ -89,8 +89,16 @@ rm -rf $DISTVNAME
 tar xfz $DISTVNAME.tar.gz
 unset DISPLAY; export DISPLAY
 cd $DISTVNAME
+
+if test -d examples; then
+  if ! grep _examples debian/rules; then
+    echo "examples directory not in debian/rules"
+  fi
+fi
+
 dpkg-checkbuilddeps debian/control
 fakeroot debian/rules binary
+
 cd ..
 rm -rf $DISTVNAME
 

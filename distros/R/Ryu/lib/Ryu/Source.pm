@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 =head1 NAME
 
@@ -75,6 +75,14 @@ our %ENCODER = (
             $json->encode($_)
         }
     },
+    csv => sub {
+        require Text::CSV;
+        my $csv = Text::CSV->new(@_);
+        sub {
+            die $csv->error_input unless $csv->combine(@$_);
+            $csv->string
+        }
+    },
     base64 => sub {
         require MIME::Base64;
         sub {
@@ -101,6 +109,14 @@ our %DECODER = (
         my $json = JSON::MaybeXS->new(@_);
         sub {
             $json->decode($_)
+        }
+    },
+    csv => sub {
+        require Text::CSV;
+        my $csv = Text::CSV->new(@_);
+        sub {
+            die $csv->error_input unless $csv->parse($_);
+            [ $csv->fields ]
         }
     },
     base64 => sub {

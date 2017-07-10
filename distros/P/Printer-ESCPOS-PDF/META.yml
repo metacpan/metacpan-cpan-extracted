@@ -15,5 +15,8 @@ name: Printer-ESCPOS-PDF
 requires:
   PDF::API2: '0'
   Printer::ESCPOS::Profiles::Generic: '0'
-version: '0.001'
+resources:
+  bugtracker: https://github.com/sonntagd/Printer-ESCPOS-PDF/issues
+  repository: git://github.com/sonntagd/Printer-ESCPOS-PDF.git
+version: '0.003'
 x_serialization_backend: 'YAML::Tiny version 1.70'

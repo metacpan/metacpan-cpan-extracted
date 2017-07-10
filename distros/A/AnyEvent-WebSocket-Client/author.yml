@@ -10,6 +10,8 @@ pod_spelling_system:
     - Toshio
     - subprotocol
     - subprotocols
+    - Kivanc
+    - Yazan
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

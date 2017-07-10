@@ -16,7 +16,7 @@
 package Lingua::Interset::Tagset::RO::Rdt;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -59,9 +59,9 @@ around BUILDARGS => sub
         # cel (demonstrative article, used only before adjectives "cel bun")
         'art. dem.'          => ['pos' => 'adj', 'prontype' => 'dem', 'definite' => 'def'],
         # lui (definite article, used only in possessive constructions with male gender)
-        'art. hot.'          => ['pos' => 'adj', 'prontype' => 'art', 'definite' => 'def', 'poss' => 'poss', 'gender' => 'masc'],
+        'art. hot.'          => ['pos' => 'adj', 'prontype' => 'art', 'definite' => 'def', 'poss' => 'yes', 'gender' => 'masc'],
         # al, a, ai, ale (genitival/possessive article)
-        'art. poses.'        => ['pos' => 'adj', 'prontype' => 'art', 'poss' => 'poss'],
+        'art. poses.'        => ['pos' => 'adj', 'prontype' => 'art', 'poss' => 'yes'],
         # o, un, niște
         'art. nehot.'        => ['pos' => 'adj', 'prontype' => 'art', 'definite' => 'ind'],
         'conj. aux.'         => ['pos' => 'conj', 'conjtype' => 'sub'],
@@ -69,7 +69,7 @@ around BUILDARGS => sub
         'numeral'            => ['pos' => 'num'],
         'prepozitie'         => ['pos' => 'adp', 'adpostype' => 'prep'],
         # se, ne, mă
-        'pron. reflex.'      => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'],
+        'pron. reflex.'      => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'],
         # care, ce, le, noi, nimic, totul
         'pronume'            => ['pos' => 'noun|adj', 'prontype' => 'prn'],
         'substantiv'         => ['pos' => 'noun'],
@@ -90,13 +90,13 @@ around BUILDARGS => sub
     my %em =
     (
         'pos' => { 'noun' => { 'prontype' => { ''    => 'substantiv',
-                                               '@'   => { 'reflex' => { 'reflex' => 'pron. reflex.',
+                                               '@'   => { 'reflex' => { 'yes' => 'pron. reflex.',
                                                                         '@'      => 'pronume' }}}},
                    'adj'  => { 'prontype' => { ''    => { 'verbform' => { 'part' => 'adj. particip.',
                                                                           '@'    => 'adjectiv' }},
                                                'dem' => { 'definite' => { 'def' => 'art. dem.',
                                                                           '@'   => 'pron. dem.' }},
-                                               'art' => { 'poss' => { 'poss' => { 'definite' => { 'def' => 'art. hot.',
+                                               'art' => { 'poss' => { 'yes' => { 'definite' => { 'def' => 'art. hot.',
                                                                                                   '@'   => 'art. poses.' }},
                                                                       '@'    => 'art. nehot.' }},
                                                '@'   => 'pronume' }},
@@ -153,7 +153,7 @@ Lingua::Interset::Tagset::RO::Rdt - Driver for the tagset of the Romanian Depend
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

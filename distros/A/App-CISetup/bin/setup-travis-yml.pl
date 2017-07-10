@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use App::CISetup::Travis::ConfigUpdater;
 
@@ -25,7 +25,7 @@ setup-travis-yml.pl - Tool for managing .travis.yml files
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

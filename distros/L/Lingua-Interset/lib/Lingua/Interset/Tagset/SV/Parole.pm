@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::SV::Parole;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -60,9 +60,9 @@ sub _create_atoms
             'DI' => ['pos' => 'adj', 'prontype' => 'ind'],
             # pronoun
             'PF' => ['pos' => 'noun', 'prontype' => 'prs'],
-            'PS' => ['pos' => 'adj',  'prontype' => 'prs', 'poss' => 'poss'],
+            'PS' => ['pos' => 'adj',  'prontype' => 'prs', 'poss' => 'yes'],
             'PH' => ['pos' => 'noun', 'prontype' => 'int'],
-            'PE' => ['pos' => 'adj',  'prontype' => 'int', 'poss' => 'poss'],
+            'PE' => ['pos' => 'adj',  'prontype' => 'int', 'poss' => 'yes'],
             'PI' => ['pos' => 'noun', 'prontype' => 'ind'],
             # numeral
             'MC' => ['pos' => 'num', 'numtype' => 'card'],
@@ -92,26 +92,26 @@ sub _create_atoms
             # example: "
             'FI' => ['pos' => 'punc', 'punctype' => 'quot'],
             # foreign word
-            'XF' => ['foreign' => 'foreign'],
+            'XF' => ['foreign' => 'yes'],
         },
         'encode_map' =>
         {
             'pos' => { 'noun' => { 'prontype' => { ''    => { 'nountype' => { 'prop' => 'NP',
                                                                               '@'    => 'NC' }},
-                                                   'int' => { 'poss' => { 'poss' => 'PE',
+                                                   'int' => { 'poss' => { 'yes' => 'PE',
                                                                           '@'    => 'PH' }},
                                                    'ind' => 'PI',
-                                                   '@'   => { 'poss' => { 'poss' => 'PS',
+                                                   '@'   => { 'poss' => { 'yes' => 'PS',
                                                                           '@'    => 'PF' }}}},
                        'adj'  => { 'prontype' => { ''    => { 'verbform' => { 'part' => { 'tense' => { 'pres' => 'AP',
                                                                                                        '@'    => 'AF' }},
                                                                               '@'    => { 'numtype' => { 'ord' => 'MO',
                                                                                                          '@'   => 'AQ' }}}},
-                                                   'int' => { 'poss' => { 'poss' => 'PE',
+                                                   'int' => { 'poss' => { 'yes' => 'PE',
                                                                           '@'    => 'DH' }},
                                                    'dem' => 'DF',
                                                    'ind' => 'DI',
-                                                   '@'   => { 'poss' => { 'poss' => 'PS',
+                                                   '@'   => { 'poss' => { 'yes' => 'PS',
                                                                           '@'    => 'D0' }}}},
                        'num'  => { 'numtype' => { 'ord' => 'MO',
                                                   '@'   => 'MC' }},
@@ -268,14 +268,14 @@ sub _create_atoms
             # full form
             'S' => [],
             # hyphenated prefix
-            'C' => ['hyph' => 'hyph'],
+            'C' => ['hyph' => 'yes'],
             # abbreviation
-            'A' => ['abbr' => 'abbr']
+            'A' => ['abbr' => 'yes']
         },
         'encode_map' =>
         {
-            'hyph' => { 'hyph' => 'C',
-                        '@'    => { 'abbr' => { 'abbr' => 'A',
+            'hyph' => { 'yes' => 'C',
+                        '@'    => { 'abbr' => { 'yes' => 'A',
                                                 '@'    => 'S' }}}
         }
     );
@@ -567,7 +567,7 @@ Lingua::Interset::Tagset::SV::Parole - Driver for the Swedish PAROLE tagset.
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for Catmandu-Store-Datahub
 
+0.06  2017-07-08 13:55:03 CEST
+
+    - fixed: missing ID now fails gracefully.
+
 0.05  2017-06-08 10:57:50 CEST
     - fixed: LWP::Useragent breaks with 'select failed: invalid argument' error after processing multiple records
     - changed: confrom to new Catmandu::Store::Datahub API

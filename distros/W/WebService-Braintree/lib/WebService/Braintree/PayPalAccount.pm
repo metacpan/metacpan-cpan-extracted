@@ -1,5 +1,5 @@
 package WebService::Braintree::PayPalAccount;
-$WebService::Braintree::PayPalAccount::VERSION = '0.9';
+$WebService::Braintree::PayPalAccount::VERSION = '0.91';
 use Moose;
 extends 'WebService::Braintree::PaymentMethod';
 

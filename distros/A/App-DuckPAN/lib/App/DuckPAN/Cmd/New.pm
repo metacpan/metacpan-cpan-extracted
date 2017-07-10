@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::New;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Take a name as input and generates a new, named Goodie or Spice instant answer skeleton
-$App::DuckPAN::Cmd::New::VERSION = '1018';
+$App::DuckPAN::Cmd::New::VERSION = '1019';
 # See the template/templates.yml file in the Goodie or Spice repository for the
 # list of template-sets and files generated for them
 
@@ -364,7 +364,7 @@ App::DuckPAN::Cmd::New - Take a name as input and generates a new, named Goodie 
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

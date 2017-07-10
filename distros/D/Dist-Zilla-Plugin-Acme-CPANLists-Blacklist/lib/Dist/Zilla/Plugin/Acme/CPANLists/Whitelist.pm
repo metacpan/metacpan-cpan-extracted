@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Acme::CPANLists::Whitelist;
 
-our $DATE = '2016-02-14'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $DATE = '2017-07-06'; # DATE
+our $VERSION = '0.03'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,7 @@ use Moose;
 use namespace::autoclean;
 
 with (
-    'Dist::Zilla::Role::InstallTool',
+    'Dist::Zilla::Role::AfterBuild',
 );
 
 has author => (is=>'rw');
@@ -19,7 +19,7 @@ has module => (is=>'rw');
 
 sub mvp_multivalue_args { qw(author module) }
 
-sub setup_installer {}
+sub after_build {}
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -37,7 +37,7 @@ Dist::Zilla::Plugin::Acme::CPANLists::Whitelist - Specify whitelist
 
 =head1 VERSION
 
-This document describes version 0.02 of Dist::Zilla::Plugin::Acme::CPANLists::Whitelist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2016-02-14.
+This document describes version 0.03 of Dist::Zilla::Plugin::Acme::CPANLists::Whitelist (from Perl distribution Dist-Zilla-Plugin-Acme-CPANLists-Blacklist), released on 2017-07-06.
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

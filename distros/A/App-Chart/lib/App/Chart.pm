@@ -32,7 +32,7 @@ use Glib;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 260;
+our $VERSION = 261;
 
 use Locale::Messages 1.16; # version 1.16 for turn_utf_8_on()
 BEGIN {

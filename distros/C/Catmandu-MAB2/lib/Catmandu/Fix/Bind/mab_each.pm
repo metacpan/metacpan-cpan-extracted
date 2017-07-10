@@ -1,6 +1,6 @@
 package Catmandu::Fix::Bind::mab_each;
 
-our $VERSION = '0.15';
+our $VERSION = '0.19';
 
 use Moo;
 use Catmandu::Util;

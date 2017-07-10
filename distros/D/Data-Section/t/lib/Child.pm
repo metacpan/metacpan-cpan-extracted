@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Child;
 use Godfather;
-use base qw(Parent Godfather);
+use base qw(Mother Godfather);
 1;
 __DATA__
 __[b]__

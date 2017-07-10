@@ -1,5 +1,5 @@
 package MultiModuleTest::OtherExternalModule;
-$MultiModuleTest::OtherExternalModule::VERSION = '1.143160';
+$MultiModuleTest::OtherExternalModule::VERSION = '1.171870';
 use strict;use warnings;
 use Data::Dumper;
 use Message::Transform qw(mtransform);

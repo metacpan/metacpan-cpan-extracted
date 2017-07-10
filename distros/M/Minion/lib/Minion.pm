@@ -16,7 +16,7 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '7.02';
+our $VERSION = '7.03';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
 
@@ -460,6 +460,7 @@ defaults to C<1>.
 =head2 new
 
   my $minion = Minion->new(Pg => 'postgresql://postgres@/test');
+  my $minion = Minion->new(Pg => Mojo::Pg->new);
 
 Construct a new L<Minion> object.
 

@@ -27,14 +27,14 @@ no_index:
     - xt
 requires:
   Catmandu: '1.0601'
-  Catmandu::SRU: '0.032'
+  Catmandu::SRU: '0.040'
   Readonly: '0'
-  perl: v5.10.1
+  perl: v5.14.0
 resources:
   bugtracker: https://github.com/jorol/Catmandu-MAB2/issues
   homepage: https://github.com/jorol/Catmandu-MAB2
   repository: https://github.com/jorol/Catmandu-MAB2.git
-version: '0.15'
+version: '0.19'
 x_contributors:
   - 'Johann Rolschewski <rolschewski@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

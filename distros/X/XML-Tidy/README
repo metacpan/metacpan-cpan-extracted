@@ -2,19 +2,21 @@ NAME
     XML::Tidy - tidy indenting of XML documents
 
 VERSION
-    This documentation refers to version 1.16 of XML::Tidy, which was
-    released on Tue Jun 21 04:14:28:29 -0500 2016.
+    This documentation refers to version 1.20 of XML::Tidy, which was
+    released on Sun Jul 9 09:43:30:08 -0500 2017.
 
 SYNOPSIS
-      use XML::Tidy;
+      #!/usr/bin/perl
+      use strict;use  warnings;
+      use   utf8;use XML::Tidy;
 
-      # create new   XML::Tidy object from         MainFile.xml
+      # create new   XML::Tidy object by loading:  MainFile.xml
       my $tidy_obj = XML::Tidy->new('filename' => 'MainFile.xml');
 
-      # Tidy up the indenting
+      #   tidy  up  the  indenting
          $tidy_obj->tidy();
 
-      # Write out changes back to MainFile.xml
+      #             write out changes back     to  MainFile.xml
          $tidy_obj->write();
 
 DESCRIPTION
@@ -24,18 +26,9 @@ DESCRIPTION
     your XML document object (into either a compact XML representation or a
     binary one).
 
-TODO
-    - maybe add to bcompress support for binary char, wide UTF-8, short
-    ints, and single or quad-precision floats
-    - maybe store in compress recurring patterns of node index sets in a new
-    array that can be indexed itself
-    - fix reload() from messing up Unicode escaped &XYZ; components like
-    Copyright &#xA9; and Registered &#xAE;
-    - What else does Tidy need?
-
 USAGE
   new()
-    This is the standard Tidy object constructor. Except for the new
+    This is the standard Tidy object constructor. Except for the added
     'binary' option, it can take the same parameters as an XML::XPath object
     constructor to initialize the XML document object. These can be any one
     of:
@@ -63,8 +56,8 @@ USAGE
     mixed-content (i.e., non-data) text nodes and empties them out. This
     will basically unformat any markup indenting.
 
-    strip() is used by compress() and tidy() but it is exposed because it
-    could be worthwhile by itself.
+    strip() is used by compress() and tidy() but it is exposed because it is
+    also worthwhile by itself.
 
   tidy()
     The tidy() member function can take a single optional parameter as the
@@ -77,7 +70,10 @@ USAGE
          $tidy_obj->tidy('    ');
 
       # Tidy up indenting with         one  (1) tab    per indent level
-         $tidy_obj->tidy("\t");
+         $tidy_obj->tidy('tab' );
+
+      # Tidy up indenting with         two  (2) tabs   per indent level
+         $tidy_obj->tidy("\t\t");
 
     The default behavior is to use two (2) spaces for each indent level. The
     Tidy object gets all mixed-content (i.e., non-data) text nodes
@@ -87,9 +83,15 @@ USAGE
     NOTE: tidy() disturbs some XML escapes in whatever ways XML::XPath does.
     It has been brought to my attention that these modules also strip CDATA
     tags from XML files / data they operate on. Even though CDATA tags don't
-    seem very common, I wish they could work smoothly too. Hopefully the
-    vast majority of files will work fine and support for other types can be
-    added later.
+    seem very common, I would very much like for them to work smoothly too.
+    Hopefully the vast majority of files will work fine and future support
+    for any of the more rare types can be added later.
+
+    Additionally, please take notice that every call to tidy() (as well as
+    reload, strip, and most other XML::Tidy functions) leak some memory due
+    to their usage of XPath's findnodes command. This issue was described
+    helpfully at <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=120296>. Thanks
+    to Jozef!
 
   compress()
     The compress() member function calls strip() on the Tidy object then
@@ -182,7 +184,7 @@ USAGE
         <location> 4.0 -2.0 4.0 </location>
       </enemy>
 
-    The default file extension is .xtb (for XML::Tidy binary).
+    The default file extension is .xtb (for XML::Tidy Binary).
 
   bexpand('BinaryInputFilename.xtb')
     The bexpand() member function reads a binary file which was previously
@@ -221,7 +223,7 @@ USAGE
     that it takes no parameters and simply returns the equivalent XML string
     as a scalar. It is a little weird because normally only XML::XPath::Node
     objects have a toString() member but I figure it makes sense to extend
-    the same syntax to the parent object as well since it is a useful
+    the same syntax to the parent object as well, since it is a useful
     option.
 
 createNode Wrappers
@@ -247,8 +249,9 @@ createNode Wrappers
     wrapper for XML::XPath::Node::Namespace->new()
 
 EXPORTED CONSTANTS
-    XML::Tidy also exports the same node constants as XML::XPath::Node
-    (which correspond to DOM values). These include:
+    Since they are sometimes needed to compare against, XML::Tidy also
+    exports the same node constants as XML::XPath::Node (which correspond to
+    DOM values). These include:
 
   UNKNOWN_NODE
   ELEMENT_NODE
@@ -271,10 +274,43 @@ EXPORTED CONSTANTS
     XML::Tidy also exports:
 
   STANDARD_XML_DECL
-    which returns a reasonable default XML declaration string.
+    which returns a reasonable default XML declaration string (assuming
+    typical "utf-8" encoding).
+
+TODO
+    - fix reload() from messing up Unicode escaped &XYZ; components like
+    Copyright &#xA9; and Registered &#xAE; (probably needs pre and post
+    processing)
+    - write many better UTF-8 tests
+    - support namespaces
+    - handle CDATA
 
 CHANGES
     Revision history for Perl extension XML::Tidy:
+
+    - 1.20 H79M9hU8 Sun Jul 9 09:43:30:08 -0500 2017
+      * removed broken Build.PL to resolve
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122406>. (Thank you,
+      Slaven.)
+
+    - 1.18 H78M5qm1 Sat Jul 8 05:52:48:01 -0500 2017
+      * fixed new() to check file or xml to detect standalone in
+      declaration, from <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122389>
+      (Thanks Alex!)
+
+      * traced tidy() memory leak from
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=120296> (Thanks Jozef!)
+      which seems to come from every XPath->findnodes() call
+
+      * aligned synopsis comments
+
+      * updated write() to use output encoding UTF-8 since that's what
+      almost all XML should rely on (with thanks to RJBS for teaching me
+      much from his great talk at <HTTPS://YouTube.Com/watch?v=TmTeXcEixEg>)
+
+      * collapsed trailing curly braces on code blocks
+
+      * added croak for any failed file open attempt
 
     - 1.16 G6LM4EST Tue Jun 21 04:14:28:29 -0500 2016
       * stopped using my old fragile package generation and manually updated
@@ -284,20 +320,20 @@ CHANGES
       * updated license to GPLv3+
 
       * fixed 00pod.t and 01podc.t to eval the Test modules from issue and
-      patch: HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592 (Thanks
+      patch: <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592> (Thanks
       again MichielB.)
 
       * replaced all old '&&' with 'and' in POD
 
     - 1.14 G6JMERCY Sun Jun 19 14:27:12:34 -0500 2016
       * separated old PT from VERSION to fix non-numeric issue:
-      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=56073 (Thanks to
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=56073> (Thanks to
       Slaven.)
 
       * removed Unicode from POD but added encoding utf8 anyway to pass
       tests and resolve issues:
-      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=92434 and
-      HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592 (Thanks to
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=92434> and
+      <HTTPS://RT.CPAN.Org/Public/Bug/Display.html?id=85592> (Thanks to
       Sudhanshu and MichielB.)
 
     - 1.12.B55J2qn Thu May 5 19:02:52:49 2011
@@ -313,11 +349,11 @@ CHANGES
       * aligned .t code
 
       * added test for newline before -r to try to resolve:
-      HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65471 (Thanks, Leandro.)
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65471> (Thanks, Leandro.)
 
       * fixed off-by-one error when new gets a readable (non-newline)
       filename (that's not "filename" without a pre-'filename' param) to
-      resolve: HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65151 (Thanks,
+      resolve: <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=65151> (Thanks,
       Simone.)
 
     - 1.6.A7RJKwl Tue Jul 27 19:20:58:47 2010
@@ -399,14 +435,45 @@ FILES
 
     Math::BaseCnv to handle base-64 indexing for compress() and expand()
 
+BUGS
+    Please report any bugs or feature requests to bug-XML-Tidy at
+    RT.CPAN.Org, or through the web interface at
+    <HTTPS://RT.CPAN.Org/NoAuth/ReportBug.html?Queue=XML-Tidy>. I will be
+    notified, and then you can be updated of progress on your bug as I
+    address fixes.
+
+SUPPORT
+    You can find documentation for this module (after it is installed) with
+    the perldoc command.
+
+      `perldoc XML::Tidy`
+
+    You can also look for information at:
+
+        RT: CPAN's Request Tracker
+
+      HTTPS://RT.CPAN.Org/NoAuth/Bugs.html?Dist=XML-Tidy
+
+        AnnoCPAN: Annotated CPAN documentation
+
+      HTTP://AnnoCPAN.Org/dist/XML-Tidy
+
+        CPAN Ratings
+
+      HTTPS://CPANRatings.Perl.Org/d/XML-Tidy
+
+        Search CPAN
+
+      HTTP://Search.CPAN.Org/dist/XML-Tidy
+
 LICENSE
     Most source code should be Free! Code I have lawful authority over is
-    and shall be! Copyright: (c) 2004-2016, Pip Stuart. Copyleft : This
+    and shall be! Copyright: (c) 2004-2017, Pip Stuart. Copyleft : This
     software is licensed under the GNU General Public License (version 3 or
-    later). Please consult HTTP://GNU.Org/licenses/gpl-3.0.txt for important
-    information about your freedom. This is Free Software: you are free to
-    change and redistribute it. There is NO WARRANTY, to the extent
-    permitted by law. See HTTP://FSF.Org for further information.
+    later). Please consult <HTTPS://GNU.Org/licenses/gpl-3.0.txt> for
+    important information about your freedom. This is Free Software: you are
+    free to change and redistribute it. There is NO WARRANTY, to the extent
+    permitted by law. See <HTTPS://FSF.Org> for further information.
 
 AUTHOR
     Pip Stuart <Pip@CPAN.Org>

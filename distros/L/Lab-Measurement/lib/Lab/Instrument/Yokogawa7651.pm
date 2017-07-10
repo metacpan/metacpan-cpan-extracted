@@ -1,5 +1,5 @@
 package Lab::Instrument::Yokogawa7651;
-$Lab::Instrument::Yokogawa7651::VERSION = '3.552';
+$Lab::Instrument::Yokogawa7651::VERSION = '3.553';
 use warnings;
 use strict;
 use Time::HiRes qw/usleep/;

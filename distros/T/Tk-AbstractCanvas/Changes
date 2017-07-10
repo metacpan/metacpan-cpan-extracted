@@ -1,0 +1,31 @@
+CHANGES
+    Revision history for Perl extension Tk::AbstractCanvas:
+
+    - 1.8 H79M9Rot Sun Jul 9 09:27:50:55 -0500 2017
+      * added test skipping in 02acnv.t to resolve
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122405>. (Thanks again
+      Slaven!)
+
+      * removed broken Build.PL to resolve
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122404>. (Thank you,
+      Slaven.)
+
+    - 1.6 H78MEDIC Sat Jul 8 14:13:18:12 -0500 2017
+      * cleaned up examples and tested that grid works from
+      <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=46655>. (Thanks Josef!)
+
+      * replaced POD ampersands with 'and' and turned double-spaces after
+      periods to single
+
+    - 1.4.A7QFZHF Mon Jul 26 15:35:17:15 2010
+      * updated license to GPLv3
+
+    - 1.2.75L75Nr Mon May 21 07:05:23:53 2007
+      * added ex/* examples and tidied everything up
+
+      * added Ctrl rot callbacks (mocb, rlcb) and limited Motion and Release
+      to just Ctrl + one MouseButton events
+
+    - 1.0.56BHMOt Sat Jun 11 17:22:24:55 2005
+      * original version
+

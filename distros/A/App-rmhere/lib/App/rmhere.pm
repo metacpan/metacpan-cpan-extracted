@@ -1,13 +1,13 @@
 package App::rmhere;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 #use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::chdir;
 
@@ -137,7 +137,7 @@ sub rmhere {
             }
         }
         if ($dry_run) {
-            $log->info("DRY_RUN: Deleting $e ...");
+            log_info("DRY_RUN: Deleting $e ...");
             next;
         } else {
             unlink($e);
@@ -168,7 +168,7 @@ App::rmhere - Delete files in current directory
 
 =head1 VERSION
 
-This document describes version 0.06 of App::rmhere (from Perl distribution App-rmhere), released on 2015-09-03.
+This document describes version 0.08 of App::rmhere (from Perl distribution App-rmhere), released on 2017-07-07.
 
 =head1 SYNOPSIS
 
@@ -179,9 +179,15 @@ See L<rmhere> script.
 =head1 FUNCTIONS
 
 
-=head2 rmhere(%args) -> [status, msg, result, meta]
+=head2 rmhere
+
+Usage:
+
+ rmhere(%args) -> [status, msg, result, meta]
 
 Delete files in current directory.
+
+This function is not exported.
 
 This function supports dry-run operation.
 
@@ -257,7 +263,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

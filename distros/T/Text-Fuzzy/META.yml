@@ -22,7 +22,7 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/Text-Fuzzy/issues
   repository: https://github.com/benkasminbullock/Text-Fuzzy
-version: '0.25'
+version: '0.26'
 x_contributors:
   - 'Nick Logan <ugexe@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

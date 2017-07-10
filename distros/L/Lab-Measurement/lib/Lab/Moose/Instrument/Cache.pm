@@ -65,7 +65,7 @@ driver:
 =cut
 
 package Lab::Moose::Instrument::Cache;
-$Lab::Moose::Instrument::Cache::VERSION = '3.552';
+$Lab::Moose::Instrument::Cache::VERSION = '3.553';
 use Moose::Role;
 use MooseX::Params::Validate;
 

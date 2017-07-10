@@ -10,8 +10,8 @@ ok($INC{'Test2/Plugin/OpenFixPerlIO.pm'}, "Loaded OpenFixPerlIO");
 subtest mux_handle => sub {
     Test2::Plugin::IOMuxer->import(qw/mux_handle/);
     imported_ok('mux_handle');
-    my ($fh, $name)  = tempfile("$$-XXXXXXXX");
-    my ($mh, $muxed) = tempfile("$$-XXXXXXXX");
+    my ($fh, $name)  = tempfile("$$-XXXXXXXX", TMPDIR => 1);
+    my ($mh, $muxed) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
     close($mh) or die "$!";
 
     mux_handle($fh, $muxed);
@@ -47,13 +47,12 @@ subtest mux_handle => sub {
         [map { JSON->new->decode($_) } <$mh>],
         [
             {buffer => "This is a test\n"},
-            {buffer => "This is a\nmulti-line test\n"},
-            {buffer => "This is a no line-end test 1"},
-            {buffer => "This is a no line-end test 2"},
-            {buffer => "\n"},
+            {buffer => "This is a\n"},
+            {buffer => "multi-line test\n"},
+            {buffer => "This is a no line-end test 1This is a no line-end test 2\n"},
             {buffer => "This is the final test\n"},
         ],
-        "Got all lines as expected, with markers in mux file"
+        "Got all lines as expected"
     );
 
     unlink($name);
@@ -61,9 +60,9 @@ subtest mux_handle => sub {
 };
 
 subtest mux_test_io => sub {
-    my ($out_fh, $out_file) = tempfile("$$-XXXXXXXX");
-    my ($err_fh, $err_file) = tempfile("$$-XXXXXXXX");
-    my ($mux_fh, $mux_file) = tempfile("$$-XXXXXXXX");
+    my ($out_fh, $out_file) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
+    my ($err_fh, $err_file) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
+    my ($mux_fh, $mux_file) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
     close($mux_fh);
 
     {

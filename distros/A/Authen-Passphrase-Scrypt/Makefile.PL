@@ -5,8 +5,6 @@ my @link_with = map { 'scrypt-1.2.1/'.$_ } qw,
 lib/crypto/libscrypt_sse2_a-crypto_scrypt_smix_sse2.o
 lib/crypto/crypto_scrypt.o
 lib/crypto/crypto_scrypt_smix.o
-lib/scryptenc/scryptenc.o
-lib/scryptenc/scryptenc_cpuperf.o
 lib/util/memlimit.o
 libcperciva/alg/sha256.o
 libcperciva/cpusupport/cpusupport_x86_aesni.o

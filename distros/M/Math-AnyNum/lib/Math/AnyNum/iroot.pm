@@ -15,14 +15,14 @@ sub __iroot__ {
             return Math::GMPz::Rmpz_init_set_ui(1);
         }
 
-        goto &Math::AnyNum::_inf;
+        goto &_inf;
     }
     elsif ($y < 0) {
         my $sign = Math::GMPz::Rmpz_sgn($x)
-          || goto &Math::AnyNum::_inf;            # 1 / 0^k = Inf
+          || goto &_inf;                          # 1 / 0^k = Inf
 
         if ($sign < 0) {
-            goto &Math::AnyNum::_nan;
+            goto &_nan;
         }
 
         if (Math::GMPz::Rmpz_cmp_ui($x, 1) == 0) {    # 1 / 1^k = 1
@@ -32,7 +32,7 @@ sub __iroot__ {
         return Math::GMPz::Rmpz_init_set_ui(0);
     }
     elsif ($y % 2 == 0 and Math::GMPz::Rmpz_sgn($x) < 0) {
-        goto &Math::AnyNum::_nan;
+        goto &_nan;
     }
 
     my $r = Math::GMPz::Rmpz_init();

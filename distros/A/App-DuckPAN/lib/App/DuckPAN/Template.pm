@@ -1,7 +1,7 @@
 package App::DuckPAN::Template;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Template to generate one file of an Instant Answer
-$App::DuckPAN::Template::VERSION = '1018';
+$App::DuckPAN::Template::VERSION = '1019';
 # An Instant Answer has multiple templates, each of which can be used
 # to generate one output file.
 
@@ -98,7 +98,7 @@ App::DuckPAN::Template - Template to generate one file of an Instant Answer
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

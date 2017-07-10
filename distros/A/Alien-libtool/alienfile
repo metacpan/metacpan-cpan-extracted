@@ -6,6 +6,12 @@ share {
   requires 'Alien::MSYS' => '0.08' if $^O eq 'MSWin32';
   requires 'Alien::m4' => '0.11';
 
+  if($^O eq 'openbsd')
+  {
+    requires 'Alien::autoconf' => '0.02';
+    requires 'Alien::automake' => '0.03';
+  }
+
   plugin Download => (
     url => 'ftp://ftp.gnu.org/gnu/libtool',
     filter => qr/^libtool-.*\.tar\.gz$/,

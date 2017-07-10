@@ -1,7 +1,9 @@
 Revision history for WebService-Braintree
-0.6     1206-4-14
+0.91    2016-07-09
+        Support for payment nonces thanks Tom Heady
+0.6     2017-4-14
         Issues has wrong link in pod.
-0.4.0   2016-4-12
+0.4.0   2017-4-12
         Fix dist to point to self rather than where forked from.
         Activate github issues for dist
         Minor dzil version issue.

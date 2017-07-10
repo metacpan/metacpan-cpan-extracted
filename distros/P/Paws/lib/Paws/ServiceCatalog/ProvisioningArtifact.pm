@@ -52,7 +52,8 @@ provisioned.
 
 =head2 Id => Str
 
-  The identifier for the artifact.
+  The identifier for the artifact. This is sometimes referred to as the
+product version.
 
 
 =head2 Name => Str

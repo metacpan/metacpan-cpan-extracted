@@ -1,11 +1,12 @@
 package Linux::Info;
 use strict;
 use warnings;
-use Carp qw(croak);
+use Carp qw(confess);
 use POSIX qw(strftime);
 use UNIVERSAL;
 use Linux::Info::Compilation;
-our $VERSION = '1.1'; # VERSION
+
+our $VERSION = '1.3'; # VERSION
 
 =head1 NAME
 
@@ -15,8 +16,8 @@ Linux::Info - API in Perl to recover information about the running Linux OS
 
     use Linux::Info;
 
+    # you can't use sysinfo like that!
     my $lxs = Linux::Info->new(
-        sysinfo   => 1,
         cpustats  => 1,
         procstats => 1,
         memstats  => 1,
@@ -68,13 +69,13 @@ on or off block statistics for devices.
 
 Note that if you try to install or run C<Linux::Info> under virtual machines
 on guest systems that some statistics are not available, such as C<SockStats>, C<PgSwStats>
-and C<DiskStats>. The reason is that not all /proc data are passed to the guests.
+and C<DiskStats>. The reason is that not all F</proc> data are passed to the guests.
 
 If the installation fails then try to force the installation with
 
     cpan> force install Linux::Info
 
-and notice which tests fails, because this statistics maybe not available on the virtual machine - sorry.
+and notice which tests fails, because these statistics maybe not available on the virtual machine - sorry.
 
 =head1 DELTAS
 
@@ -87,13 +88,13 @@ By the call of C<get()> the initial statistics will be updated automatically. Pl
 section L</METHODS> to get more information about the usage of C<new()>, C<set()>, C<init()>
 and C<get()>.
 
-Another exigence is to sleep for a while - at least for one second - before the call of C<get()>
+Another exigence is to C<sleep> for a while - at least for one second - before the call of C<get()>
 if you want to get useful statistics. The statistics for C<SysInfo>, C<MemStats>, C<SockStats>,
 C<DiskUsage>, C<LoadAVG> and C<FileStats> are no deltas. If you need only one of these information
 you don't need to sleep before the call of C<get()>.
 
 The method C<get()> prepares all requested statistics and returns the statistics as a
-L<Linux::Info::Compilation> object. The inital statistics will be updated.
+L<Linux::Info::Compilation> object. The initial statistics will be updated.
 
 =head1 MANUAL PROC(5)
 
@@ -104,12 +105,12 @@ L<http://www.kernel.org/doc/man-pages/online/pages/man5/proc.5.html>
 If you have questions or don't understand the sense of some statistics then take a look
 into this awesome documentation.
 
-=head1 OPTIONS
+=head1 OPTIONS FOR NEW INSTANCES
 
-The options below applies to all classes except L<Linux::Info::SysInfo>.
+During the creation of new instances of L<Linux::Info>, you can pass as parameters to the C<new> method different statistics to
+collect. The statistics available are those listed on L</DELTAS>.
 
-All options are identical with the package names of the distribution in lowercase. To activate
-the gathering of statistics you have to set the options by the call of C<new()> or C<set()>.
+You can use the L</DELTAS> by using their respective package names in lowercase. To activate the gathering of statistics you have to set the options by the call of C<new()> or C<set()>.
 In addition you can deactivate statistics with C<set()>.
 
 The options must be set with one of the following values:
@@ -158,7 +159,6 @@ Option C<initfile> is useful if you want to store initial statistics on the file
 
 Example:
 
-    #!/usr/bin/perl
     use strict;
     use warnings;
     use Linux::Info;
@@ -190,7 +190,6 @@ average load of your system since the last call.
 
 To get more information about the statistics refer the different modules of the distribution.
 
-    sysinfo     -  Collect system information              with Linux::Info::SysInfo.
     cpustats    -  Collect cpu statistics                  with Linux::Info::CpuStats.
     procstats   -  Collect process statistics              with Linux::Info::ProcStats.
     memstats    -  Collect memory statistics               with Linux::Info::MemStats.
@@ -202,6 +201,10 @@ To get more information about the statistics refer the different modules of the 
     loadavg     -  Collect the load average                with Linux::Info::LoadAVG.
     filestats   -  Collect inode statistics                with Linux::Info::FileStats.
     processes   -  Collect process statistics              with Linux::Info::Processes.
+
+The options just described don't apply to L<Linux::Info::SysInfo> since this module doesn't hold statistics from the OS.
+If you try to use it C<Linux::Info> will C<die> with an error message. In order to use L<Linux::Info::SysInfo>, just
+create an instance of it directly. See L<Linux::Info::SysInfo> for information on that.
 
 =head1 METHODS
 
@@ -454,7 +457,6 @@ sub new {
     );
 
     foreach my $opt (@options) {
-
         # backward compatibility
         $self->{opts}->{$opt} = 0;
         $self->{maps}->{$opt} = $opt;
@@ -476,18 +478,21 @@ sub set {
     my $opts  = $self->{opts};
     my $obj   = $self->{obj};
     my $maps  = $self->{maps};
-    my $pids  = ();
 
-    foreach my $opt ( keys %$args ) {
-        if ( !exists $opts->{$opt} ) {
-            croak "$class: invalid option '$opt'";
-        }
+
+    confess 'Linux::Info::SysInfo cannot be instantiated from Linux::Info'
+      if ( exists( $args->{sysinfo} ) );
+
+    foreach my $opt ( keys( %{$args} ) ) {
+
+        confess "invalid delta option '$opt'"
+          unless ( exists( $opts->{$opt} ) );
 
         if ( ref( $args->{$opt} ) ) {
             $opts->{$opt} = delete $args->{$opt}->{init} || 1;
         }
         elsif ( $args->{$opt} !~ qr/^[012]\z/ ) {
-            croak "$class: invalid value for '$opt'";
+            confess "invalid value for '$opt'";
         }
         else {
             $opts->{$opt} = $args->{$opt};
@@ -528,7 +533,6 @@ sub set {
 sub init {
     my $self  = shift;
     my $class = ref $self;
-    my $maps  = $self->{maps};
 
     foreach my $opt ( keys %{ $self->{opts} } ) {
         if ( $self->{opts}->{$opt} > 0

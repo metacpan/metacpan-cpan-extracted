@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::ET::Puudepank;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -90,11 +90,11 @@ sub _create_atoms
             # pron-indef = indefinite pronoun (mõned)
             'pron-indef' => ['pos' => 'noun', 'prontype' => 'ind'],
             # pron-poss = possessive pronoun (ise)
-            'pron-poss' => ['pos' => 'noun', 'prontype' => 'prs', 'poss' => 'poss'],
+            'pron-poss' => ['pos' => 'noun', 'prontype' => 'prs', 'poss' => 'yes'],
             # pron-def = possessive (?) pronoun (keegi, mingi)
-            'pron-def' => ['pos' => 'noun', 'prontype' => 'prs', 'poss' => 'poss'],
+            'pron-def' => ['pos' => 'noun', 'prontype' => 'prs', 'poss' => 'yes'],
             # pron-refl = reflexive pronoun (enda, endasse)
-            'pron-refl' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'],
+            'pron-refl' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'],
             # num = numeral (kaks, neli, viis, seitse, kümme)
             'num' => ['pos' => 'num'],
             # intj = interjection (no, kurat)
@@ -105,7 +105,7 @@ sub _create_atoms
             'punc' => ['pos' => 'punc'],
             # sta = statement ??? ###!!! DOES NOT OCCUR IN THE CORPUS
             # abbr = abbreviation (km/h, cm)
-            'abbr' => ['abbr' => 'abbr'],
+            'abbr' => ['abbr' => 'yes'],
             # x = undefined word class (--, pid, viis-, ta-)
             'x' => [],
             # b = discourse particle (only in sul.xml (spoken language)) (noh, nigu, vä, nagu, ei)
@@ -132,7 +132,7 @@ sub _create_atoms
                                                                                 '@'   => 'b' }},
                                                     'int'  => 'intj',
                                                     'punc' => 'punc',
-                                                    '@'    => { 'abbr' => { 'abbr' => 'abbr',
+                                                    '@'    => { 'abbr' => { 'yes' => 'abbr',
                                                                             '@'    => 'x' }}}},
                               'art' => 'art',
                               # Encoding of pronoun types is inconsistent in the corpus.
@@ -177,11 +177,11 @@ sub _create_atoms
             'pers'  => ['prontype' => 'prs'],
             # possessive: oma (own, their, your, its, his, our, my)
             # Note: The real tag is 'pos' but we change it to 'poss' during preprocessing to make it distinct from the tag for the positive degree of adjectives.
-            'poss'  => ['prontype' => 'prs', 'poss' => 'poss'],
+            'poss'  => ['prontype' => 'prs', 'poss' => 'yes'],
             # reciprocal: üksteisele (each other)
             'rec'   => ['prontype' => 'rcp'],
             # reflexive: ise, enese, end (oneself, self)
-            'refl'  => ['prontype' => 'prs', 'reflex' => 'reflex'],
+            'refl'  => ['prontype' => 'prs', 'reflex' => 'yes'],
             # relative: kes (who), mis (what), milline (which)
             'rel'   => ['prontype' => 'rel']
         },
@@ -192,8 +192,8 @@ sub _create_atoms
                             'ind' => 'indef',
                             'neg' => 'indef',
                             'int' => 'inter',
-                            'prs' => { 'poss' => { 'poss' => 'pos',
-                                                   '@'    => { 'reflex' => { 'reflex' => 'refl',
+                            'prs' => { 'poss' => { 'yes' => 'pos',
+                                                   '@'    => { 'reflex' => { 'yes' => 'refl',
                                                                              '@'      => 'pers' }}}},
                             'rcp' => 'rec',
                             'rel' => 'rel' }
@@ -1291,7 +1291,7 @@ Lingua::Interset::Tagset::ET::Puudepank - Driver for the Estonian tagset from th
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

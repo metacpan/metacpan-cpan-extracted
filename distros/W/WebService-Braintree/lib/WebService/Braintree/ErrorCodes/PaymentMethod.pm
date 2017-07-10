@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::PaymentMethod;
-$WebService::Braintree::ErrorCodes::PaymentMethod::VERSION = '0.9';
+$WebService::Braintree::ErrorCodes::PaymentMethod::VERSION = '0.91';
 use strict;
 
 use constant CustomerIdIsRequired           => "93104";

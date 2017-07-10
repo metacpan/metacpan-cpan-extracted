@@ -2,7 +2,7 @@ package Test2::Plugin::IOEvents::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 use Test2::Plugin::OpenFixPerlIO;
 use IO::Handle;
@@ -16,14 +16,22 @@ sub PUSHED {
     bless {}, $class;
 }
 
+sub FLUSH {
+    my $self = shift;
+    my ($handle) = @_;
+    $handle->flush;
+}
+
 my $LOADED = 0;
 sub WRITE {
     my ($self, $buffer, $handle) = @_;
 
     $LOADED ||= $INC{'Test2/API.pm'} && Test2::API::test2_init_done();
 
+    my $caller = caller;
+
     # Test2::API not loaded (?)
-    if ($self->{no_event} || !$LOADED) {
+    if ($self->{no_event} || !$LOADED || $caller->isa('Test2::Formatter') || $caller->isa('Test2::Plugin::IOMuxer::Layer')) {
         print $handle $buffer;
         return length($buffer);
     }

@@ -144,6 +144,7 @@ t/extgstate.t
 t/filter-ascii85decode.t
 t/filter-asciihexdecode.t
 t/filter-runlengthdecode.t
+t/font-corefont.t
 t/font-synfont.t
 t/font-ttf.t
 t/font-type1.t

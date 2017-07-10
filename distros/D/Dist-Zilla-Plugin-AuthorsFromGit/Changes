@@ -1,5 +1,10 @@
 History for Dist-Zilla-Plugin-AuthorsFromGit
 
+0.006 2017-07-07
+
+  * Tell git to require at least 75% similarity in a file rename.
+    Otherwise all files share history somehow.
+
 0.005 2017-07-04
 
   * Add commit blacklisting

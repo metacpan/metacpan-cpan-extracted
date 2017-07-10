@@ -25,6 +25,7 @@ t/12-out_fields.t
 t/13-accents.t
 t/14-export.t
 t/15-lock.t
+t/16-outhh.t
 t/acct-l1.csv
 t/acct-l2.csv
 t/acct-u.csv
@@ -72,6 +73,8 @@ t/e7.csv
 t/esc01.csv
 t/esc02.csv
 t/ex1.csv
+t/hh1.csv
+t/hh2.csv
 t/in.csv
 t/l01a.csv
 t/l01b.csv
@@ -138,6 +141,8 @@ t/wwe7.csv
 t/wwesc01.csv
 t/wwesc02.csv
 t/wwex1.csv
+t/wwhh1.csv
+t/wwhh2.csv
 t/wwin.csv
 t/wwl01a.csv
 t/wwl01b.csv

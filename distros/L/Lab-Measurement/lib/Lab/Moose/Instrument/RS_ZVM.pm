@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_ZVM;
-$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.552';
+$Lab::Moose::Instrument::RS_ZVM::VERSION = '3.553';
 use 5.010;
 use Moose;
 use Moose::Util::TypeConstraints;

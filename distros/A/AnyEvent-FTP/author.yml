@@ -1,0 +1,109 @@
+---
+pod_spelling_system:
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - AnyEvent
+    - BUILDARGS
+    - IIS
+    - PASV
+    - URI
+    - filename
+    - filenames
+    - login
+    - proftpd
+    - KEA
+    - SKIPJACK
+    - IP
+    - unparsed
+    - fget
+    - fput
+    - fls
+    - aeftpd
+    - CDPATH
+    - CHECKMETHOD
+    - CHECKSUM
+    - cb
+    - callbacks
+    - callback
+    - pl
+    - APPE
+    - CDUP
+    - CWD
+    - DELE
+    - MKD
+    - NLST
+    - PWD
+    - Readonly
+    - RMD
+    - RNFR
+    - RNTO
+    - STAT
+    - STOR
+    - STOU
+    - FTPd
+    - bftpd
+    - ftpd
+    - vsftpd
+    - wu
+    - NcFTPd
+    - syst
+    - SYST
+    - ALLO
+    - standalone
+    - stderr
+    - auth
+    - cred
+    - inet
+    - pam
+    - readonly
+    - RETR
+    - VMS
+    - authenticator
+    - TCP
+    - FSRW
+    - vett
+    - customizations
+    - Okamoto
+    - Ryo
+    - Shlomi
+    # lol
+    - ACFLRSTWacdfgiklmnopqrstux
+    - dev
+    - Joaquín
+    - José
+    - Leighton
+    - RSacdfiklnrstu
+    
+
+pod_coverage:
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private:
+    - .*#new
+    - .*#BUILD
+    - .*#BUILDARGS
+    - AnyEvent::FTP::Client::Role::RequestBuffer
+    - AnyEvent::FTP::Client::Role::ResponseBuffer
+    - AnyEvent::FTP::Client::Transfer#(handle|client|command|local|restart)
+    - AnyEvent::FTP::Client::Transfer::Active
+    - AnyEvent::FTP::Client::Transfer::Passive
+    - AnyEvent::FTP::Client::Role::FetchTransfer
+    - AnyEvent::FTP::Client::Role::ListTransfer
+    - AnyEvent::FTP::Client::Role::StoreTransfer
+    
+    # server context requires coverage of commands,
+    # not methods
+    - AnyEvent::FTP::Server::Context::(FS(|RW|RO)|Memory)#(cmd_|help_).*
+    - AnyEvent::FTP::Server::Role::(TransferPrep|Auth|Help|Old|Type)#(cmd_|help_).*
+    
+    # The ::Site:: module documentation actually cover these methods,
+    # but Test::Pod::Coverage doesn't like the multipe arrow thing that is
+    # going on there, but I think it be more clear
+    - AnyEvent::FTP::Client::Site::Base#client
+    - AnyEvent::FTP::Client::Site::Microsoft#dirstyle
+    - AnyEvent::FTP::Client::Site::NetFtpServer#version
+    - AnyEvent::FTP::Client::Site::Proftpd#(chgrp|chmod|help|quota|ratio|rmdir|symlink|utime|mkdir)
+
+unused_vars:
+  skip: 1

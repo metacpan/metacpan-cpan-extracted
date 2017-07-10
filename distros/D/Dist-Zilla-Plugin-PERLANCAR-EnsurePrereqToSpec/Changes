@@ -1,4 +1,8 @@
-Revision history for Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec
+0.05    2017-07-07 (PERLANCAR)
+
+	- Switch from (ab)using InstallTool phase to using AfterBuild phase
+	  to do our stuffs, to be compatible with DZP:StaticInstall.
+
 
 0.04    2016-12-28 (PERLANCAR)
 

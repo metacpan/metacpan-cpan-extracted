@@ -5,15 +5,18 @@ use warnings;
 
 package Net::Fritz::Box;
 # ABSTRACT: main configuration and entry point for L<Net::Fritz> distribution
-$Net::Fritz::Box::VERSION = 'v0.0.7';
+$Net::Fritz::Box::VERSION = 'v0.0.8';
 
 # We need LWP::UserAgent 6.00 because of ssl_opts.  We could work with
 # an older version as seen in https://github.com/rhuss/jmx4perl/issues/28
 # but SOAP::Lite might then have the same problem...  For now just
 # stick with the versioned dependency.
 use LWP::UserAgent 6.00;
+
 use XML::Simple qw(:strict);
 $XML::Simple::PREFERRED_PARSER = 'XML::Parser';
+
+use AppConfig;
 
 use Net::Fritz::Error;
 use Net::Fritz::Device;
@@ -33,6 +36,48 @@ has username      => ( is => 'ro' );
 
 
 has password      => ( is => 'ro' );
+
+
+has configfile    => ( is => 'ro' );
+
+
+sub BUILDARGS {
+    my ( $class, %args ) = @_;
+
+    if (exists $args{configfile}) {
+
+	# expand empty filename to default ~/.fritzrc
+	if (! $args{configfile}) {
+	    my $default_configfile = "$ENV{HOME}/.fritzrc";
+	    return \%args unless -e $default_configfile; # skip if ~/.fritzrc does not exist
+	    $args{configfile} = $default_configfile;
+	}
+
+	# expand ~ to $HOME
+	$args{configfile} =~ s/^~/$ENV{HOME}/;
+
+	# configure AppConfig
+	my $config = AppConfig->new();
+	$config->define('upnp_url=s');
+	$config->define('trdesc_path=s');
+	$config->define('username=s');
+	$config->define('password=s');
+
+	# read configfile
+	$config->file($args{configfile});
+
+	# get configuration variables
+	my %config_vars = $config->varlist('^');
+
+	# remove all missing configuration variables
+	delete $config_vars{$_} foreach grep {!defined $config_vars{$_}} keys %config_vars;
+
+	# merge both hashes; %args wins for duplicate keys
+	return { %config_vars, %args };
+    }
+
+    return \%args;
+};
 
 # internal XML::Simple instance (lazy)
 has _xs           => ( is => 'lazy', init_arg => undef );
@@ -90,6 +135,25 @@ sub discover {
 }
 
 
+has _device_cache => ( is => 'rw' );
+
+sub call {
+    my $self      = shift;
+    my $service   = shift;
+    my $action    = shift;
+    my %call_args = (@_);
+
+    my $device = $self->_device_cache;
+    if (!defined $device) {
+	$device = $self->discover();
+	return $device if $device->error;
+	$self->_device_cache($device);
+    }
+
+    return $device->call($service, $action, %call_args);
+}
+
+
 sub dump {
     my $self = shift;
     my $indent = shift;
@@ -118,7 +182,7 @@ Net::Fritz::Box - main configuration and entry point for L<Net::Fritz> distribut
 
 =head1 VERSION
 
-version v0.0.7
+version v0.0.8
 
 =head1 SYNOPSIS
 
@@ -178,6 +242,41 @@ Default value: none
 
 Sets the password to use for authentication against a device.
 
+=head2 configfile
+
+Default value: none
+
+Sets a configuration file to read the configuration from.
+
+A C<~> at the beginning of the filename will be expanded to
+C<$ENV{HOME}>.
+
+If the filename expands to C<false> (C<0>, C<''> or the like), the
+default filename of C<~/.fritzrc> will be used if it exists.
+
+The file format is simply C<key = value> (for more details see
+L<AppConfig>) per line with the following keys available:
+
+=over
+
+=item L</upnp_url>
+
+=item L</trdesc_path>
+
+=item L</username>
+
+=item L</password>
+
+=back
+
+If an attribute is both defined by the configuration file and given as
+a parameter to L</new>, the parameter is taken and the value from the
+configuration file is ignored.
+
+This attribute is available since C<v0.0.8>.
+
+=for Pod::Coverage BUILDARGS
+
 =head2 error
 
 See L<Net::Fritz::IsNoError/error>.
@@ -207,6 +306,20 @@ values:
 
 Tries to discover the TR064 device at the current L</upnp_url>.
 Returns a L<Net::Fritz::Device> on success.  Accepts no parameters.
+
+=head2 call(I<service_name> I<action_name [I<parameter> => I<value>] [...])
+
+Directly calls the L<Net::Fritz::Action> named I<action_name> of the
+L<Net::Fritz::Service> matching the regular expression I<service_name>.
+
+This is a convenience method that internally calls L</discover>
+followed by L<Net::Fritz::Device/call> - see those methods for further
+details.
+
+The intermediate L<Net::Fritz::Device> is cached, so that further
+calls can skip that initial SOAP request.
+
+This method is available since C<v0.0.8>.
 
 =head2 dump(I<indent>)
 

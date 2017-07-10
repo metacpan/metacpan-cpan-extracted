@@ -1,5 +1,14 @@
 Revision history for Perl extension Image::Sane.
 
+0.14  Thu, 08 Jul 2017 19:30 +0200
+        - correct escaping in 81_scanimage-perl.t to fix RT 122380.
+        - add Try::Tiny to TEST_REQUIRES fix RT 122382.
+
+0.13  Thu, 06 Jul 2017 19:30 +0200
+        - include <sane/saneopts.h> to fix RT 122333.
+        - update scanimage-perl to also reproduce scanimage 1.0.27.
+          Fixes RT 122334
+
 0.12  Sun, 04 Jun 2017 09:30 +0200
         - skip t/81_scanimage-perl.t if we don't have Perl 5.10
 

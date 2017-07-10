@@ -10,7 +10,7 @@ use Alien::Build::Util qw( _mirror _destdir_prefix );
 use JSON::PP ();
 
 # ABSTRACT: Core gather plugin
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 
 sub init
@@ -109,9 +109,10 @@ sub init
       );
       
       # copy the alienfile, if we managed to keep it around.
-      if($build->meta->filename      && 
-         -r $build->meta->filename   &&
-         $build->meta->filename !~ /\.(pm|pl)$/)
+      if($build->meta->filename                 && 
+         -r $build->meta->filename              &&
+         $build->meta->filename !~ /\.(pm|pl)$/ &&
+         ! -d $build->meta->filename)
       {
         Path::Tiny->new($build->meta->filename)
                   ->copy($stage->child('_alien/alienfile'));
@@ -141,7 +142,7 @@ Alien::Build::Plugin::Core::Gather - Core gather plugin
 
 =head1 VERSION
 
-version 0.52
+version 0.55
 
 =head1 SYNOPSIS
 

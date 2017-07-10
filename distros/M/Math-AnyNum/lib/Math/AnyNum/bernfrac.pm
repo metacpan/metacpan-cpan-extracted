@@ -12,9 +12,7 @@ sub __bernfrac__ {
     # B(n) = (-1)^(n/2 + 1) * zeta(n)*2*n! / (2*pi)^n
 
     if ($n == 0) {
-        my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_ui($r, 1, 1);
-        return $r;
+        goto &_one;
     }
 
     if ($n == 1) {
@@ -24,9 +22,7 @@ sub __bernfrac__ {
     }
 
     if (($n & 1) and ($n > 1)) {    # Bn = 0 for odd n>1
-        my $r = Math::GMPq::Rmpq_init();
-        Math::GMPq::Rmpq_set_ui($r, 0, 1);
-        return $r;
+        goto &_zero;
     }
 
     my $round = Math::MPFR::MPFR_RNDN();
@@ -34,11 +30,7 @@ sub __bernfrac__ {
     my $tau   = 6.28318530717958647692528676655900576839433879875;
     my $log2B = (CORE::log(4 * $tau * $n) / 2 + $n * (CORE::log($n) - CORE::log($tau) - 1)) / CORE::log(2);
 
-    my $prec = (
-                $n <= 90
-                    ? CORE::int($n * CORE::log($n) + 1)
-                    : CORE::int($n + $log2B)
-               );
+    my $prec = CORE::int($n + $log2B) + ($n <= 90 ? 18 : 0);
 
     my $d = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_fac_ui($d, $n);                      # d = n!
@@ -73,19 +65,19 @@ sub __bernfrac__ {
         }
     }
 
-    my $N = Math::MPFR::Rmpfr_init2(64);
+    state $N = Math::MPFR::Rmpfr_init2_nobless(64);
     Math::MPFR::Rmpfr_mul_z($N, $K, $d, $round);            # N = K*d
     Math::MPFR::Rmpfr_root($N, $N, $n - 1, $round);         # N = N^(1/(n-1))
     Math::MPFR::Rmpfr_ceil($N, $N);                         # N = ceil(N)
 
-    $N = Math::MPFR::Rmpfr_get_ui($N, $round);              # N = int(N)
+    my $bound = Math::MPFR::Rmpfr_get_ui($N, $round);       # bound = int(N)
 
     my $z = Math::MPFR::Rmpfr_init2($prec);                 # zeta(n)
     my $u = Math::GMPz::Rmpz_init();                        # p^n
 
     Math::MPFR::Rmpfr_set_ui($z, 1, $round);                # z = 1
 
-    for (my $i = 0 ; $primes[$i] <= $N ; ++$i) {            # primes <= N
+    for (my $i = 0 ; $primes[$i] <= $bound ; ++$i) {        # primes <= bound
         Math::GMPz::Rmpz_ui_pow_ui($u, $primes[$i], $n);    # u = p^n
         Math::GMPz::Rmpz_sub_ui($u, $u, 1);                 # u = u-1
         Math::MPFR::Rmpfr_mul_z($z, $z, $u, $round);        # z = z*u

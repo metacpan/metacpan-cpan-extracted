@@ -18,6 +18,7 @@ extern "C" {
 #include "XSUB.h"
 #include <stdio.h>
 #include "coollex.h"
+#include "multicall.h"
 #ifdef __cplusplus
 }
 #endif
@@ -91,6 +92,7 @@ typedef struct record {
 typedef struct {
     bool is_done;
     SV **items;
+    SV* aryref;
     UV num;
 #ifdef USE_LINKEDLIST
     listrecord *ptr_head, **ptr, **pred;
@@ -214,6 +216,25 @@ void afp_destructor(void *cache)
     free(c);
 }
 
+static
+bool reset_combination(Permute *self, AV *av, UV r) {
+    UV n;
+    if ((n = av_len(av) + 1) == 0) 
+        return 0;
+
+    COMBINATION *c = init_combination(n, r, av);
+    /* PerlIO_stdoutf("passed init_combination()\n"); */
+    if (c == NULL) {
+        warn("Unable to initialize combination");
+        return 0;
+    }
+    self->c = c;
+
+    coollex(self->c);
+    coollex_visit(self->c, self->items + 1); /* base of items is 1 */
+    return 1;
+}
+
 MODULE = Algorithm::Permute     PACKAGE = Algorithm::Permute        
 PROTOTYPES: DISABLE
 
@@ -223,8 +244,8 @@ new(CLASS, av, ...)
     AV *av
     PREINIT:
     UV i, num;
-    COMBINATION *c;
     UV r, n;
+    UV has_combination;
 #ifdef USE_LINKEDLIST
     listrecord *q; /* temporary holder */
 #endif
@@ -241,6 +262,9 @@ new(CLASS, av, ...)
         XSRETURN_UNDEF;
 
     /* init combination if necessary */
+    has_combination = 0;
+    RETVAL->c = NULL;
+    num = n;
     if (items > 2) {
         r = SvUV(ST(2));
         if (r > n) {
@@ -248,23 +272,12 @@ new(CLASS, av, ...)
             XSRETURN_UNDEF;
         }
         if (r < n) {
-            c = init_combination(n, r, av);
-            /* PerlIO_stdoutf("passed init_combination()\n"); */
-            if (c == NULL) {
-                warn("Unable to initialize combination");
-                XSRETURN_UNDEF;
-            }
-            RETVAL->c = c;
+            has_combination = 1;
             num = r;
-        } else {
-            RETVAL->c = NULL;
-            num = n;
-        }
-    } else {
-        RETVAL->c = NULL;
-        num = n;
+        } 
     }
 
+    RETVAL->aryref = newRV_inc((SV*) av);
     RETVAL->num = num;
 
     if ((RETVAL->items = (SV**) safemalloc(sizeof(SV*) * (num + 1))) == NULL)
@@ -291,7 +304,7 @@ new(CLASS, av, ...)
 
     /* initialize items, p, and loc */
     for (i = 1; i <= num; i++) {
-        if (RETVAL->c) {
+        if (has_combination) {
             *(RETVAL->items + i) = &PL_sv_undef;
         } else {
             *(RETVAL->items + i) = av_shift(av);
@@ -314,9 +327,10 @@ new(CLASS, av, ...)
     q->link = NULL; /* the tail of list points to NULL */
 #endif
 
-    if (RETVAL->c) {
-        coollex(RETVAL->c);
-        coollex_visit(RETVAL->c, RETVAL->items + 1); /* base of items is 1 */
+    if (has_combination) {
+        if(!reset_combination(RETVAL, av, r)) {
+            XSRETURN_UNDEF;
+        }
     }
 
     OUTPUT:
@@ -331,27 +345,6 @@ next(self)
     listrecord *q; /* temporary holder */
 #endif
     PPCODE:
-    if (self->is_done && self->c) { /* permutation done */
-        self->is_done = coollex(self->c); /* generate next combination */
-#ifdef USE_LINKEDLIST
-        q = self->ptr_head;
-        for (i = 1; i <= self->num; i++) {
-            q = q->link;
-            q->info = self->num - i + 1;
-            self->pred[i] = self->ptr_head;
-        }
-        /* q->link = NULL; */ 
-        assert(q->link == NULL); /* should point to NULL */
-#else
-        /* reset self->p and self->loc */
-        for (i = 1; i <= self->num; i++) {
-            *(self->p + i) = self->num - i + 1;
-            *(self->loc + i) = 1;
-        }
-#endif
-        /* and update self->items */
-        coollex_visit(self->c, self->items + 1);
-    }
     if (self->is_done) { /* done permutation for all combination */
         if (self->c) {
             free_combination(self->c);
@@ -376,6 +369,28 @@ next(self)
         self->is_done = _next(self->num, self->p, self->loc);
 #endif
     }
+    /* generate next combination if necessary */
+    if (self->is_done && self->c) { /* permutation done */
+        self->is_done = coollex(self->c); /* generate next combination */
+#ifdef USE_LINKEDLIST
+        q = self->ptr_head;
+        for (i = 1; i <= self->num; i++) {
+            q = q->link;
+            q->info = self->num - i + 1;
+            self->pred[i] = self->ptr_head;
+        }
+        /* q->link = NULL; */ 
+        assert(q->link == NULL); /* should point to NULL */
+#else
+        /* reset self->p and self->loc */
+        for (i = 1; i <= self->num; i++) {
+            *(self->p + i) = self->num - i + 1;
+            *(self->loc + i) = 1;
+        }
+#endif
+        /* and update self->items */
+        coollex_visit(self->c, self->items + 1);
+    }
 
 void
 DESTROY(self)
@@ -386,6 +401,7 @@ DESTROY(self)
     listrecord *q;
 #endif
     CODE:
+    SvREFCNT_dec(self->aryref);
 #ifdef USE_LINKEDLIST
     q = self->ptr_head;
     for (i = 1; i <= self->num; i++) {
@@ -436,11 +452,16 @@ reset(self)
     Permute *self
     PREINIT:
     int i;
+    AV* av;
+    COMBINATION *c;
+    UV n;
 #ifdef USE_LINKEDLIST
     listrecord *q;
 #endif
     CODE:
     self->is_done = FALSE;
+
+    reset_combination(self, (AV*)(SvRV(self->aryref)), self->num);
 #ifdef USE_LINKEDLIST
     q = self->ptr_head;
     for (i = 1; i <= self->num; i++) {
@@ -521,28 +542,10 @@ SV* array_sv;
     for (x = c->len; x >= 0; x--)
         c->tmparea[x]  = malloc(c->len * sizeof **(c->tmparea));
     
-    /* Set up the context for the callback */
-    SAVESPTR(CvROOT(callback)->op_ppaddr);
-    CvROOT(callback)->op_ppaddr = PL_ppaddr[OP_NULL];  /* Zap the OP_LEAVESUB */
-#ifdef PAD_SET_CUR
-    PAD_SET_CUR(CvPADLIST(callback),1);
-#else
-    SAVESPTR(PL_curpad);
-    PL_curpad = AvARRAY((AV*)AvARRAY(CvPADLIST(callback))[1]);
-#endif
-    SAVETMPS;
-    SAVESPTR(PL_op);
-
-    PUSHBLOCK(cx, CXt_NULL, SP);  /* make a pseudo block */
-    PUSHSUB(cx);
-
-    old_catch = CATCH_GET;
-    CATCH_SET(TRUE);
-    save_destructor(afp_destructor, c);
-    
+    dMULTICALL;
+    PUSH_MULTICALL(callback);
+    SAVEDESTRUCTOR(afp_destructor, c);
     permute_engine(c->array, AvARRAY(c->array), 0, c->len, 
-        c->tmparea, CvSTART(callback));
-    
-    POPBLOCK(cx,PL_curpm);
-    CATCH_SET(old_catch);
+        c->tmparea, multicall_cop);
+    POP_MULTICALL;
 }

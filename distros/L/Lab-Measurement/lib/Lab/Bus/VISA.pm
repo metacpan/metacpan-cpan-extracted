@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
-
 package Lab::Bus::VISA;
-$Lab::Bus::VISA::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: National Instruments VISA bus
+$Lab::Bus::VISA::VERSION = '3.553';
 use strict;
 use Lab::VISA;
 use Scalar::Util qw(weaken);
@@ -365,6 +365,11 @@ sub _search_twin {
 
 1;
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -372,6 +377,10 @@ sub _search_twin {
 =head1 NAME
 
 Lab::Bus::VISA - National Instruments VISA bus
+
+=head1 VERSION
+
+version 3.553
 
 =head1 SYNOPSIS
 
@@ -389,7 +398,6 @@ or implicit through instrument creation:
 
 soon
 
-
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -401,7 +409,6 @@ Return blessed $self, with @_ accessible through $self->config().
 
 Options:
 none
-
 
 =head1 Thrown Exceptions
 
@@ -432,13 +439,11 @@ to identify and handle the calling instrument:
 
 See C<Lab::Instrument::Read()>.
 
-
 =head2 connection_write
 
   $visa->connection_write( $InstrumentHandle, { command => $command, wait_status => $wait_status } );
 
 Sends $command to the instrument specified by the handle, and waits $wait_status microseconds before evaluating the status.
-
 
 =head2 connection_read
 
@@ -450,15 +455,12 @@ carries the data received up to the timeout event, accessible through $Exception
 
 Setting C<Brutal> to a true value will result in timeouts being ignored, and the gathered data returned without error.
 
-
 =head2 connection_query
 
   $visa->connection_query( $InstrumentHandle, { command => $command, read_length => $read_length, wait_status => $wait_status, wait_query => $wait_query, brutal => 0/1 } );
 
 Performs an connection_write followed by an connection_read, each given the supplied parameters. Waits $wait_query microseconds
 betweeen Write and Read.
-
-
 
 =head1 CAVEATS/BUGS
 
@@ -476,17 +478,18 @@ Few. Not a lot to be done here.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2004-2006 Daniel Schröer <schroeer@cpan.org>, 
-           2009-2010 Daniel Schröer, Andreas K. Hüttel (L<http://www.akhuettel.de/>) and David Kalok,
-           2010      Matthias Völker <mvoelker@cpan.org>
-           2011      Florian Olbrich, Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2010       Andreas K. Huettel
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich, Stefan Geissler
+            2013       Andreas K. Huettel, Christian Butschkow
+            2016       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;
-

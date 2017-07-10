@@ -1,11 +1,12 @@
-use XML::Tidy;
+#!/usr/bin/perl
+use strict;use  warnings;
+use   utf8;use XML::Tidy;
 
-# create new   XML::Tidy object from         MainFile.xml
+# create new   XML::Tidy object by loading:  MainFile.xml
 my $tidy_obj = XML::Tidy->new('filename' => 'MainFile.xml');
 
-# Tidy up the indenting
+#   tidy  up  the  indenting
    $tidy_obj->tidy();
 
-# Write out changes back to MainFile.xml
+#             write out changes back     to  MainFile.xml
    $tidy_obj->write();
-

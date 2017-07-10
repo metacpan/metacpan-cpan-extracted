@@ -55,7 +55,6 @@
             "IPC::Run3" : "0",
             "IPC::System::Simple" : "0",
             "List::AllUtils" : "0",
-            "List::Gather" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
             "MooseX::Getopt::Dashes" : "0",
@@ -94,35 +93,35 @@
    "provides" : {
       "App::CISetup" : {
          "file" : "lib/App/CISetup.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "App::CISetup::AppVeyor::ConfigFile" : {
          "file" : "lib/App/CISetup/AppVeyor/ConfigFile.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "App::CISetup::AppVeyor::ConfigUpdater" : {
          "file" : "lib/App/CISetup/AppVeyor/ConfigUpdater.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "App::CISetup::Role::ConfigFile" : {
          "file" : "lib/App/CISetup/Role/ConfigFile.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "App::CISetup::Role::ConfigUpdater" : {
          "file" : "lib/App/CISetup/Role/ConfigUpdater.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "App::CISetup::Travis::ConfigFile" : {
          "file" : "lib/App/CISetup/Travis/ConfigFile.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "App::CISetup::Travis::ConfigUpdater" : {
          "file" : "lib/App/CISetup/Travis/ConfigUpdater.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "App::CISetup::Types" : {
          "file" : "lib/App/CISetup/Types.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -137,7 +136,7 @@
          "web" : "https://github.com/maxmind/App-CISetup"
       }
    },
-   "version" : 0.04,
+   "version" : 0.05,
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"
@@ -885,7 +884,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.04",
+                  "tag" : "v0.05",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

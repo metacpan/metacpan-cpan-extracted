@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Env::Cmd::Set;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Sets the specified env variable value
-$App::DuckPAN::Cmd::Env::Cmd::Set::VERSION = '1018';
+$App::DuckPAN::Cmd::Env::Cmd::Set::VERSION = '1019';
 use Moo;
 with qw( App::DuckPAN::Cmd::Env::Cmd );
 
@@ -30,7 +30,7 @@ App::DuckPAN::Cmd::Env::Cmd::Set - Sets the specified env variable value
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

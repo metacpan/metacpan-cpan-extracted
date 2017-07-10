@@ -20,10 +20,10 @@ name: HTML-FormHandlerX-Field-noCAPTCHA
 provides:
   HTML::FormHandlerX::Field::noCAPTCHA:
     file: lib/HTML/FormHandlerX/Field/noCAPTCHA.pm
-    version: '0.10'
+    version: '0.12'
   HTML::FormHandlerX::Widget::Field::noCAPTCHA:
     file: lib/HTML/FormHandlerX/Widget/Field/noCAPTCHA.pm
-    version: '0.10'
+    version: '0.12'
 requires:
   Captcha::noCAPTCHA: '0.12'
   HTML::FormHandler::Field: '0'
@@ -35,4 +35,4 @@ resources:
   bugtracker: https://github.com/clarson/html-formhandlerx-field-nocaptcha/issues
   homepage: https://github.com/clarson/html-formhandlerx-field-nocaptcha
   repository: https://github.com/clarson/html-formhandlerx-field-nocaptcha.git
-version: '0.10'
+version: '0.12'

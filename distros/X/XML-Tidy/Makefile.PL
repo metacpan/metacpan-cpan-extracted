@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
   'NAME'           => 'XML::Tidy',
 # 'VERSION_FROM'   => 'lib/XML/Tidy.pm',
-  'VERSION'        => '1.16',
+  'VERSION'        => '1.20',
 # 'ABSTRACT_FROM'  => 'lib/XML/Tidy.pm',
   'ABSTRACT'       => 'tidy indenting of XML documents',
   'LICENSE'        => 'gpl_3',

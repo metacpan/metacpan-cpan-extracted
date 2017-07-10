@@ -3,7 +3,7 @@ package Ryu::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 =head1 NAME
 

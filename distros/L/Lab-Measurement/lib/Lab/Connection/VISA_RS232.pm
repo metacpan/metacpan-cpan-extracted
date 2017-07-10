@@ -1,13 +1,7 @@
-#!/usr/bin/perl -w
-
-#
-# RS232 Connection class for Lab::Bus::VISA
-# This one implements a RS232-Standard connection on top of VISA (translates
-# RS232 settings to VISA attributes, mostly).
-#
-
 package Lab::Connection::VISA_RS232;
-$Lab::Connection::VISA_RS232::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: RS232-type connection which uses NI VISA (L<Lab::VISA>) as backend
+$Lab::Connection::VISA_RS232::VERSION = '3.553';
 use strict;
 use Lab::Bus::VISA;
 use Lab::Connection;
@@ -164,6 +158,11 @@ sub _configurebus {
 # Read,Write,Query are OK in the version from Lab::Connection
 #
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -172,7 +171,14 @@ sub _configurebus {
 
 Lab::Connection::VISA_RS232 - RS232-type connection which uses NI VISA (L<Lab::VISA>) as backend
 
+=head1 VERSION
+
+version 3.553
+
 =head1 SYNOPSIS
+
+This RS232 Connection class for Lab::Bus::VISA implements a RS232-Standard 
+connection on top of VISA (translates RS232 settings to VISA attributes, mostly).
 
 This class is not called directly. To make a RS232 suppporting instrument use 
 Lab::Connection::VISA_RS232, set the connection_type parameter accordingly:
@@ -202,11 +208,9 @@ The main feature is to set upon initialization all the RS232 libe parameters
     baud_rate => 9600,
  )
 
-
 =head1 METHODS
 
 This just falls back on the methods inherited from L<Lab::Connection>.
-
 
 =head2 config
 
@@ -219,7 +223,7 @@ Without arguments, returns a reference to the complete $self->Config aka @_ of t
 
  $Config = $connection->Config();
  $GPIB_Address = $connection->Config()->{'gpib_address'};
- 
+
 =head1 CAVEATS/BUGS
 
 Probably few. Mostly because there's not a lot to be done here. Please report.
@@ -236,14 +240,16 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Florian Olbrich
-           2012      Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2012       Andreas K. Huettel, Stefan Geissler
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

@@ -1,27 +1,58 @@
-DESCRIPTION
+NAME
+    Pod::Weaver::Role::SectionText::HasCompletion - Provide COMPLETION
+    section text
 
-    This role provides text for "COMPLETION" POD section. The text
-    describes instructions for activating tab completion for script, for
-    several shells. It is meant for script that has a separate completer
-    script.
+VERSION
+    This document describes version 0.04 of
+    Pod::Weaver::Role::SectionText::HasCompletion (from Perl distribution
+    Pod-Weaver-Role-SectionText-HasCompletion), released on 2017-07-07.
+
+DESCRIPTION
+    This role provides text for "COMPLETION" POD section. The text describes
+    instructions for activating tab completion for script, for several
+    shells. It is meant for script that has a separate completer script.
 
     This role is currently used by
     Pod::Weaver::Section::Completion::PerinciCmdLine.
 
 METHODS
-
- $obj->section_text_has_completion(\%vars) => str
-
+  $obj->section_text_has_completion(\%vars) => str
     Variables:
 
-      * command_name => str
+    *   command_name => str
 
-      * completer_name => str
+    *   completer_name => str
 
-      Defaults to _command_name (that is, command name with underscore
-      prefix).
+        Defaults to "_"*command_name* (that is, command name with underscore
+        prefix).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Pod-Weaver-Role-SectionText-HasCompletion>
+    .
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Pod-Weaver-Role-SectionText-HasComple
+    tion>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Role-Secti
+    onText-HasCompletion>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Pod::Weaver::Role::SectionText::SelfCompletion
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

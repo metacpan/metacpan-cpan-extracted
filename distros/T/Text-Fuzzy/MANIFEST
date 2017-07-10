@@ -8,24 +8,37 @@ edit-distance-int-trans.c
 edit-distance-int-trans.h
 edit-distance-int.c
 edit-distance-int.h
+examples/check-return-out.txt
 examples/check-return.pl
+examples/distance-edits-out.txt
 examples/distance-edits.pl
+examples/distance-out.txt
 examples/distance.pl
+examples/extract-kana-out.txt
 examples/extract-kana.pl
+examples/kanji-search-out.txt
 examples/kanji-search.pl
+examples/last-distance-out.txt
 examples/last-distance.pl
+examples/list-context-out.txt
 examples/list-context.pl
+examples/max-dist-out.txt
 examples/max-dist.pl
 examples/misspelt-web-page.cgi
+examples/nearestv-out.txt
 examples/nearestv.pl
 examples/no-exact-out.txt
 examples/no-exact.pl
+examples/spell-check-out.txt
 examples/spell-check.pl
+examples/synopsis-out.txt
 examples/synopsis.pl
+examples/unicode-out.txt
 examples/unicode.pl
 Fuzzy.xs
 lib/Text/Fuzzy.pm
 lib/Text/Fuzzy.pod
+make-pod.pl
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -34,6 +47,7 @@ README
 t/compatibility.t
 t/fuzzy-index.t
 t/max-distance.t
+t/overwrite-bug.t
 t/private-functions.t
 t/return-array.t
 t/Text-Fuzzy.t
@@ -46,9 +60,5 @@ text-fuzzy-perl.c
 text-fuzzy.c
 text-fuzzy.h
 typemap
-xt/checkpod.t
-xt/distro.t
-xt/git.t
-xt/usr-words.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,449 @@
+package TestCase {
+  has x : int;
+  has y : int;
+
+  # Bit shift right logical
+  sub bit_shift_right_logical_byte() : int {
+    # 11000001 >>> 2
+    my $value = (byte)0xC1 >>> 2;
+    
+    # 00110000
+    if ($value == (byte)0x30) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_right_logical_short() : int {
+    # 11000000 00000001 >>> 2
+    my $value = (short)0xC001 >>> 2;
+    
+    # 00110000 00000000
+    if ($value == (short)0x3000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_right_logical_int() : int {
+    # 11000000 00000000 00000000 00000001 >>> 2
+    my $value = 0xC0000001 >>> 2;
+    
+    # 00110000 00000000 00000000 00000000
+    if ($value == 0x30000000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_right_logical_long() : int {
+    # 11000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001 >>> 2
+    my $value = 0xC000000000000001L >>> 2;
+    
+    # 00110000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+    if ($value == 0x3000000000000000L) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  # Bit shift right logical
+  sub bit_shift_right_byte() : int {
+    # 11000001 >> 2
+    my $value = (byte)0xC1 >> 2;
+    
+    # 11110000
+    if ($value == (byte)0xF0) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_right_short() : int {
+    # 11000000 00000001 >> 2
+    my $value = (short)0xC001 >> 2;
+    
+    # 11110000 00000000
+    if ($value == (short)0xF000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_right_int() : int {
+    # 11000000 00000000 00000000 00000001 >> 2
+    my $value = 0xC0000001 >> 2;
+    
+    # 11110000 00000000 00000000 00000000
+    if ($value == 0xF0000000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_right_long() : int {
+    # 11000000 00000000 00000000 00000000 00000000 00000000 00000000 00000001 >> 2
+    my $value = 0xC000000000000001L >> 2;
+    
+    # 11110000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+    if ($value == 0xF000000000000000L) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  # Number literal
+  sub number_literal_hex_int() : int {
+    my $value = 0xFF;
+    
+    if ($value == 255) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub number_literal_hex_int_max() : int {
+    # 11111111 11111111 11111111 11111111
+    my $value = 0xFFFFFFFF;
+    
+    if ($value == -1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub number_literal_hex_long() : int {
+    my $value = 0xFFL;
+    
+    if ($value == 255L) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub number_literal_hex_long_max() : int {
+    # 11111111 11111111 11111111 11111111 11111111 11111111 11111111 11111111
+    my $value = 0xFFFFFFFFFFFFFFFFL;
+    
+    if ($value == -1L) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  # Bit shift left
+  sub bit_shift_left_byte() : int {
+    # 00000011 << 2
+    my $value = (byte)0x3 << 2;
+    
+    # 00001100
+    if ($value == (byte)0xC) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_byte_max() : int {
+    
+    # 01000000 << 1
+    my $value = (byte)0x40 << 1;
+    
+    # 10000000
+    if ($value == (byte)0x80) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_byte_overflow() : int {
+    
+    # 10000000 << 1
+    my $value = (byte)0x80 << 1;
+    
+    # 00000000
+    if ($value == (byte)0) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_short() : int {
+    
+    # 00000011 00000000 << 2
+    my $value = (short)0x300 << 2;
+    
+    # 00001100 00000000
+    if ($value == (short)0xC00) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_short_max() : int {
+    
+    # 01000000 00000000 << 1
+    my $value = (short)0x4000 << 1;
+    
+    # 10000000 00000000
+    if ($value == (short)0x8000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_short_overflow() : int {
+    
+    # 10000000 00000000 << 1
+    my $value = (short)0x8000 << 1;
+    
+    # 00000000 00000000
+    if ($value == (short)0) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub bit_shift_left_int() : int {
+    
+    # 00000011 00000000 00000000 00000000 << 2
+    my $value = 0x30000000 << 2;
+    
+    # 00001100 00000000 00000000 00000000
+    if ($value == 0xC0000000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_int_max() : int {
+    
+    # 01000000 00000000 00000000 00000000 << 1
+    my $value = 0x40000000 << 1;
+    
+    # 10000000 00000000 00000000 00000000
+    if ($value == 0x80000000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_int_overflow() : int {
+    
+    # 10000000 00000000 00000000 00000000 << 1
+    my $value = 0x80000000 << 1;
+    
+    # 00000000 00000000 00000000 00000000
+    if ($value == 0) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub bit_shift_left_long() : int {
+    
+    # 00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000 << 2
+    my $value = 0x3000000000000000 << 2;
+    
+    # 00001100 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+    if ($value == 0xC000000000000000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_long_max() : int {
+    
+    # 01000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000  << 1
+    my $value = 0x4000000000000000 << 1;
+    
+    # 10000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+    if ($value == 0x8000000000000000) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub bit_shift_left_long_overflow() : int {
+    
+    # 10000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000  << 1
+    my $value = 0x8000000000000000 << 1;
+    
+    # 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
+    if ($value == 0) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  # Array
+  sub array_malloc_int_array_and_get_length() : int {
+    
+    my $nums = malloc int[3];
+    my $len = @$nums;
+
+    return $len;
+  }
+
+  sub array_set_and_get_array_element_first() : int {
+    
+    my $nums = malloc int[3];
+    $nums->[0] = 345;
+
+    return $nums->[0];
+  }
+
+  sub array_set_and_get_array_element_last() : int {
+    
+    my $nums = malloc int[3];
+    $nums->[2] = 298;
+
+    return $nums->[2];
+  }
+
+  sub array_culcurate_sum_by_for() : int {
+    
+    my $nums = malloc int[3];
+    $nums->[0] = 1;
+    $nums->[1] = 2;
+    $nums->[2] = 3;
+    
+    my $total = 0;
+    for (my $i = 0; $i < @$nums; $i++) {
+      $total = $total + $nums->[$i];
+    }
+
+    return $total;
+  }
+  
+  # Sum
+  sub sum_byte ($a : byte, $b :byte) : byte {
+    
+    my $total = $a + $b;
+    
+    return $total;
+  }
+
+  sub sum_short ($a : short, $b :short) : short {
+    
+    my $total = $a + $b;
+    
+    return $total;
+  }
+
+  sub sum_int ($a : int, $b :int) : int {
+    
+    my $total = $a + $b;
+    
+    return $total;
+  }
+
+  sub sum_long ($a : long, $b :long) : long {
+    
+    my $total = $a + $b;
+    
+    return $total;
+  }
+
+  sub sum_float ($a : float, $b :float) : float {
+    
+    my $total = $a + $b;
+    
+    return $total;
+  }
+
+  sub sum_double ($a : double, $b :double) : double {
+    
+    my $total = $a + $b;
+    
+    return $total;
+  }
+  
+  # For
+  sub for_basic() : int {
+    my $total = 0;
+    for (my $i = 1; $i <= 3; $i++) {
+      $total = $total + $i;
+    }
+    
+    return $total;
+  }
+  
+  # If
+  sub if_gt_int_left_big () : int {
+    
+    if (3 > 1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_gt_int_same () : int {
+    
+    if (3 > 3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_int_right_big () : int {
+    
+    if (3 > 4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+}

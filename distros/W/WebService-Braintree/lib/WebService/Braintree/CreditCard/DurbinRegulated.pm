@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCard::DurbinRegulated;
-$WebService::Braintree::CreditCard::DurbinRegulated::VERSION = '0.9';
+$WebService::Braintree::CreditCard::DurbinRegulated::VERSION = '0.91';
 use strict;
 
 use constant Yes => "Yes";

@@ -4,7 +4,7 @@ requires 'AnyEvent::WebSocket::Client', '0.12';
 requires 'JSON';
 requires 'LWP::UserAgent';
 requires 'Mojo::JSON';
-requires 'Mojo::Redis';
+requires 'Mojo::Redis2';
 requires 'Mojolicious::Lite';
 requires 'Text::Table';
 requires 'URI';

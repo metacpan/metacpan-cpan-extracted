@@ -57,7 +57,7 @@ sub test_brightness : Test(3) {
     # rot
 
     $brightness = Prty::Color->new('ff0000')->brightness;
-    $self->is(sprintf('%.2f',$brightness),139.44);
+    $self->floatIs($brightness,139.44);
 }
 
 # -----------------------------------------------------------------------------

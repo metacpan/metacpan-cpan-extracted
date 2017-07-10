@@ -1,5 +1,5 @@
 package Lab::Instrument::OI_ITC503;
-$Lab::Instrument::OI_ITC503::VERSION = '3.552';
+$Lab::Instrument::OI_ITC503::VERSION = '3.553';
 use strict;
 use feature "switch";
 use Lab::Instrument;

@@ -9,7 +9,7 @@ use parent qw/Exporter Authen::Passphrase Class::Accessor::Fast/;
 
 our @EXPORT = qw/crypto_scrypt/;
 our @EXPORT_OK = @EXPORT;
-our $VERSION = '0.001';
+our $VERSION = '0.001001';
 
 use Data::Entropy::Algorithms qw/rand_bits/;
 use Digest::SHA qw/sha256 hmac_sha256/;

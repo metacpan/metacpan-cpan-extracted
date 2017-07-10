@@ -1,5 +1,11 @@
-DESCRIPTION
+NAME
+    Perinci::CmdLine - Rinci/Riap-based command-line application framework
 
+VERSION
+    This document describes version 1.52 of Perinci::CmdLine (from Perl
+    distribution Perinci-CmdLine), released on 2017-07-07.
+
+DESCRIPTION
     This module is currently empty, because the implementation is currently
     split into Perinci::CmdLine::Lite (the lightweight version) and
     Perinci::CmdLine::Classic (the full but heavier version). There's also
@@ -9,8 +15,22 @@ DESCRIPTION
 
     This module exists solely for convenience of linking purposes.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::CmdLine::Lite
 
     Perinci::CmdLine::Classic
@@ -19,12 +39,12 @@ SEE ALSO
 
     Perinci::CmdLine::Inline
 
-POD ERRORS
+AUTHOR
+    perlancar <perlancar@cpan.org>
 
-    Hey! The above document had some coding errors, which are explained
-    below:
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
-    Around line 6:
-
-      Non-ASCII character seen before =encoding in 'à'. Assuming UTF-8
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::CS::Pdt;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -49,7 +49,7 @@ sub _create_atoms
             # examples: pán hrad žena růže město moře
             'NN' => ['pos' => 'noun'],
             # noun abbreviation
-            'N;' => ['pos' => 'noun', 'abbr' => 'abbr'],
+            'N;' => ['pos' => 'noun', 'abbr' => 'yes'],
             # adjective
             # examples: mladý jarní
             'AA' => ['pos' => 'adj'],
@@ -61,7 +61,7 @@ sub _create_atoms
             'AO' => ['pos' => 'adj', 'other' => 'O'],
             # possessive adjective
             # examples: otcův matčin
-            'AU' => ['pos' => 'adj', 'poss' => 'poss'],
+            'AU' => ['pos' => 'adj', 'poss' => 'yes'],
             # adjective derived from present transgressive of verb
             # examples: dělající
             'AG' => ['pos' => 'adj', 'verbform' => 'part', 'tense' => 'pres', 'voice' => 'act', 'aspect' => 'imp'],
@@ -70,10 +70,10 @@ sub _create_atoms
             'AM' => ['pos' => 'adj', 'verbform' => 'part', 'tense' => 'past', 'voice' => 'act', 'aspect' => 'perf'],
             # first part of hyphenated compound adjective
             # example: česko (in "česko-slovenský")
-            'A2' => ['pos' => 'adj', 'hyph' => 'hyph'],
+            'A2' => ['pos' => 'adj', 'hyph' => 'yes'],
             # adjective abbreviation
             # example: ml.
-            'A.' => ['pos' => 'adj', 'abbr' => 'abbr'],
+            'A.' => ['pos' => 'adj', 'abbr' => 'yes'],
             # personal pronoun
             # examples: já ty tys on ona ono my vy oni ony ona
             'PP' => ['pos' => 'noun', 'prontype' => 'prs'],
@@ -88,16 +88,16 @@ sub _create_atoms
             'P0' => ['pos' => 'noun', 'prontype' => 'prs', 'adpostype' => 'preppron'],
             # reflexive personal pronoun, long form
             # examples: sebe sobě sebou
-            'P6' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'],
+            'P6' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'],
             # reflexive personal pronoun, short form
             # examples: se si ses sis
-            'P7' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex', 'variant' => 'short'],
+            'P7' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes', 'variant' => 'short'],
             # possessive pronoun
             # examples: můj tvůj jeho její náš váš jejich
-            'PS' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            'PS' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             # reflexive possessive pronoun
             # examples: svůj
-            'P8' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss', 'reflex' => 'reflex'],
+            'P8' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes', 'reflex' => 'yes'],
             # demonstrative pronoun
             # examples: ten tento tenhle onen takový týž tentýž sám
             ###!!! Syntactically they are often adjectives but not always ("to auto je moje" vs. "to je moje").
@@ -125,7 +125,7 @@ sub _create_atoms
             'PE' => ['pos' => 'noun', 'prontype' => 'rel'],
             # possessive relative pronoun
             # examples: jehož jejíž
-            'P1' => ['pos' => 'adj', 'prontype' => 'rel', 'poss' => 'poss'],
+            'P1' => ['pos' => 'adj', 'prontype' => 'rel', 'poss' => 'yes'],
             # indefinite pronoun
             # examples: někdo něco nějaký některý něčí ... kdokoli ... kdosi ...
             'PZ' => ['pos' => 'noun|adj', 'prontype' => 'ind'],
@@ -147,7 +147,7 @@ sub _create_atoms
             'C?' => ['pos' => 'num', 'numtype' => 'card', 'prontype' => 'int|rel'],
             # numeral abbreviation
             # examples: tis. mil.
-            'C3' => ['pos' => 'num', 'abbr' => 'abbr'],
+            'C3' => ['pos' => 'num', 'abbr' => 'yes'],
             # indefinite or demonstrative cardinal numeral
             # examples: několik mnoho málo kdovíkolik tolik
             'Ca' => ['pos' => 'num', 'numtype' => 'card', 'prontype' => 'ind|dem'],
@@ -238,7 +238,7 @@ sub _create_atoms
             'Vm' => ['pos' => 'verb', 'verbform' => 'conv', 'tense' => 'past', 'aspect' => 'perf', 'voice' => 'act'],
             # verb abbreviation
             # examples: srov.
-            'V~' => ['pos' => 'verb', 'abbr' => 'abbr'],
+            'V~' => ['pos' => 'verb', 'abbr' => 'yes'],
             # adverb with degree of comparison and polarity
             # examples: málo chytře
             'Dg' => ['pos' => 'adv'],
@@ -246,7 +246,7 @@ sub _create_atoms
             # examples: kde kam kdy jak tady dnes
             'Db' => ['pos' => 'adv'],
             # adverb abbreviation
-            'D!' => ['pos' => 'adv', 'abbr' => 'abbr'],
+            'D!' => ['pos' => 'adv', 'abbr' => 'yes'],
             # preposition
             # examples: v pod k
             'RR' => ['pos' => 'adp', 'adpostype' => 'prep'],
@@ -285,7 +285,7 @@ sub _create_atoms
             # - should never appear as subpos but it does, even in the list in b2800a.o2f
             'X-' => ['other' => '-'],
             # abbreviation of unknown part of speech
-            'Xx' => ['abbr' => 'abbr']
+            'Xx' => ['abbr' => 'yes']
         },
         'encode_map' => {} # Encoding of part of speech must be solved directly in Perl code, it would be too complicated to do it here.
     );
@@ -476,7 +476,7 @@ sub _create_atoms
             '5' => ['variant' => '5', 'style' => 'coll'], # ty
             '6' => ['variant' => '6', 'style' => 'coll'], # druhý, které, kytkový, naší, forda
             '7' => ['variant' => '7', 'style' => 'coll'], # které, naprostým, si
-            '8' => ['variant' => '8', 'abbr' => 'abbr'],  # ČR, LN, ODS, J, r
+            '8' => ['variant' => '8', 'abbr' => 'yes'],  # ČR, LN, ODS, J, r
             '9' => ['variant' => '9']                     # dne, ap, n
         },
         'encode_map' =>
@@ -5379,7 +5379,7 @@ Lingua::Interset::Tagset::CS::Pdt - Driver for the tagset of the Prague Dependen
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

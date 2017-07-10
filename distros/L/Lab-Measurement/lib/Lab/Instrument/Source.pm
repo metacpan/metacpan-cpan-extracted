@@ -1,5 +1,5 @@
 package Lab::Instrument::Source;
-$Lab::Instrument::Source::VERSION = '3.552';
+$Lab::Instrument::Source::VERSION = '3.553';
 use strict;
 use warnings;
 use 5.010;

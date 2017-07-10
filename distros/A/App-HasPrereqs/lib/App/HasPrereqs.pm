@@ -1,12 +1,12 @@
 package App::HasPrereqs;
 
-our $DATE = '2016-01-18'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use Config::IniFiles;
 use Module::Path::More qw(module_path);
@@ -51,7 +51,7 @@ sub has_prereqs {
       MOD:
         for my $mod ($cfg->Parameters($section)) {
             my $v = $cfg->val($section, $mod);
-            $log->infof("Checking prerequisite: %s=%s ...", $mod, $v);
+            log_info("Checking prerequisite: %s=%s ...", $mod, $v);
             if ($v eq '0') {
                 if ($mod eq 'perl') {
                     # do nothing
@@ -114,7 +114,7 @@ App::HasPrereqs - Check whether your Perl installation has prerequisites in dist
 
 =head1 VERSION
 
-This document describes version 0.09 of App::HasPrereqs (from Perl distribution App-HasPrereqs), released on 2016-01-18.
+This document describes version 0.10 of App::HasPrereqs (from Perl distribution App-HasPrereqs), released on 2017-07-08.
 
 =head1 SYNOPSIS
 
@@ -123,7 +123,11 @@ This document describes version 0.09 of App::HasPrereqs (from Perl distribution 
 =head1 FUNCTIONS
 
 
-=head2 has_prereqs(%args) -> [status, msg, result, meta]
+=head2 has_prereqs
+
+Usage:
+
+ has_prereqs(%args) -> [status, msg, result, meta]
 
 Check whether your Perl installation has prerequisites in dist.ini.
 
@@ -156,7 +160,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-HasPre
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-HasPrereqs>.
+Source repository is at L<https://github.com/perlancar/perl-App-HasPrereqs>.
 
 =head1 BUGS
 
@@ -172,7 +176,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

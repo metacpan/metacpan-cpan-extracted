@@ -2,7 +2,7 @@ package Test2::Plugin::IOEvents::STDOUT;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 BEGIN { require Test2::Plugin::IOEvents::Base; our @ISA = ('Test2::Plugin::IOEvents::Base') };
 

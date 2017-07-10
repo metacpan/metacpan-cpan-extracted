@@ -4,7 +4,7 @@ use base qw/Prty::TextFile::Line/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 # -----------------------------------------------------------------------------
 
@@ -263,7 +263,7 @@ sub item {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

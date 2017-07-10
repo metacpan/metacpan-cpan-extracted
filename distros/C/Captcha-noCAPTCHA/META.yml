@@ -16,7 +16,7 @@ name: Captcha-noCAPTCHA
 provides:
   Captcha::noCAPTCHA:
     file: lib/Captcha/noCAPTCHA.pm
-    version: '0.15'
+    version: '0.16'
 requires:
   HTTP::Tiny: '0'
   IO::Socket::SSL: '1.56'
@@ -28,4 +28,4 @@ resources:
   bugtracker: https://github.com/clarson/Captcha-noCAPTCHA/issues
   homepage: https://github.com/clarson/Captcha-noCAPTCHA
   repository: https://github.com/clarson/Captcha-noCAPTCHA.git
-version: '0.15'
+version: '0.16'

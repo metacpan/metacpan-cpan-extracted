@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCard::IssuingBank;
-$WebService::Braintree::CreditCard::IssuingBank::VERSION = '0.9';
+$WebService::Braintree::CreditCard::IssuingBank::VERSION = '0.91';
 use strict;
 
 use constant Yes => "Yes";

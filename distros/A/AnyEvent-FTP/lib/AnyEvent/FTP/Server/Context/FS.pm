@@ -10,7 +10,7 @@ use File::Spec;
 extends 'AnyEvent::FTP::Server::Context';
 
 # ABSTRACT: FTP server context that uses real file system (no transfers)
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::Auth';
@@ -40,7 +40,7 @@ sub help_cwd { 'CWD <sp> pathname' }
 sub cmd_cwd
 {
   my($self, $con, $req) = @_;
-  
+
   my $dir = $req->args;
 
   eval {
@@ -52,7 +52,7 @@ sub cmd_cwd
     $con->send_response(250 => 'CWD command successful');
   };
   $con->send_response(550 => 'CWD error') if $@;
-  
+
   $self->done;
 }
 
@@ -62,7 +62,7 @@ sub help_cdup { 'CDUP' }
 sub cmd_cdup
 {
   my($self, $con, $req) = @_;
-  
+
   eval {
     use autodie;
     local $CWD = $self->cwd;
@@ -71,7 +71,7 @@ sub cmd_cdup
     $con->send_response(250 => 'CDUP command successful');
   };
   $con->send_response(550 => 'CDUP error') if $@;
-  
+
   $self->done;
 }
 
@@ -81,11 +81,11 @@ sub help_pwd { 'PWD' }
 sub cmd_pwd
 {
   my($self, $con, $req) = @_;
-  
+
   my $cwd = $self->cwd;
   if($^O eq 'MSWin32')
   {
-    (undef,$cwd) = File::Spec->splitpath($cwd,1);
+    (undef,$cwd) = File::Spec->splitpath($cwd, 1);
     $cwd =~ s{\\}{/}g;
   }
   $con->send_response(257 => "\"$cwd\" is the current directory");
@@ -98,7 +98,7 @@ sub help_size { 'SIZE <sp> pathname' }
 sub cmd_size
 {
   my($self, $con, $req) = @_;
-  
+
   eval {
     use autodie;
     local $CWD = $self->cwd;
@@ -129,7 +129,7 @@ sub help_mkd { 'MKD <sp> pathname' }
 sub cmd_mkd
 {
   my($self, $con, $req) = @_;
-  
+
   my $dir = $req->args;
   eval {
     use autodie;
@@ -147,7 +147,7 @@ sub help_rmd { 'RMD <sp> pathname' }
 sub cmd_rmd
 {
   my($self, $con, $req) = @_;
-  
+
   my $dir = $req->args;
   eval {
     use autodie;
@@ -165,7 +165,7 @@ sub help_dele { 'DELE <sp> pathname' }
 sub cmd_dele
 {
   my($self, $con, $req) = @_;
-  
+
   my $file = $req->args;
   eval {
     use autodie;
@@ -183,9 +183,9 @@ sub help_rnfr { 'RNFR <sp> pathname' }
 sub cmd_rnfr
 {
   my($self, $con, $req) = @_;
-  
+
   my $path = $req->args;
-  
+
   if($path)
   {
     eval {
@@ -223,9 +223,9 @@ sub help_rnto { 'RNTO <sp> pathname' }
 sub cmd_rnto
 {
   my($self, $con, $req) = @_;
-  
+
   my $path = $req->args;
-  
+
   if(! defined $self->rename_from)
   {
     $con->send_response(503 => 'Bad sequence of commands');
@@ -239,7 +239,7 @@ sub cmd_rnto
     eval {
       local $CWD = $self->cwd;
       if(! -e $path)
-      {        
+      {
         rename $self->rename_from, $path;
         $con->send_response(250 => 'Rename successful');
       }
@@ -263,9 +263,9 @@ sub help_stat { 'STAT [<sp> pathname]' }
 sub cmd_stat
 {
   my($self, $con, $req) = @_;
-  
+
   my $path = $req->args;
-  
+
   if($path)
   {
     do {
@@ -307,12 +307,12 @@ AnyEvent::FTP::Server::Context::FS - FTP server context that uses real file syst
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
  use AnyEvent::FTP::Server;
- 
+
  my $server = AnyEvent::FTP::Server->new(
    default_context => 'AnyEvent::FTP::Server::Context::FS',
  );
@@ -394,6 +394,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

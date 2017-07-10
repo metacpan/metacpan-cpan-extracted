@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::MUL::Uposf;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -109,7 +109,7 @@ Lingua::Interset::Tagset::MUL::Uposf - Driver for the Universal Part-of-Speech T
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

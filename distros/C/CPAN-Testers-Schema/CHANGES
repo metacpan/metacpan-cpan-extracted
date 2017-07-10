@@ -1,5 +1,21 @@
 Changelog for CPAN-Testers-Schema
 
+0.015     2017-07-08 12:07:35-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed test that starts a MySQL server to run JSON pointer tests.
+      JSON support was added in MySQL 5.7, and cannot run on any MySQL
+      prior to that. Now the tests check that the MySQL is the right
+      version before continuing.
+
+0.014     2017-07-06 22:56:21-05:00 America/Chicago
+
+    [Added]
+
+    - Added method to search full test reports for language,
+      distribution, and version
+
 0.013     2017-05-26 22:48:55-05:00 America/Chicago
 
     [Added]

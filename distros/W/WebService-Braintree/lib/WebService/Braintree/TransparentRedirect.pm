@@ -1,5 +1,5 @@
 package WebService::Braintree::TransparentRedirect;
-$WebService::Braintree::TransparentRedirect::VERSION = '0.9';
+$WebService::Braintree::TransparentRedirect::VERSION = '0.91';
 use Moose;
 
 sub confirm {

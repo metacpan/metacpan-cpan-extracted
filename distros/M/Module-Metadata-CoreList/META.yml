@@ -38,5 +38,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/ronsavage/Module-Metadata-CoreList.git
-version: '1.08'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

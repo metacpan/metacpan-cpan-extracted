@@ -1,4 +1,149 @@
-SYNOPSIS
+NAME
+    App::LintPrereqs - Check extraneous/missing/incorrect prerequisites in
+    dist.ini
 
+VERSION
+    This document describes version 0.53 of App::LintPrereqs (from Perl
+    distribution App-LintPrereqs), released on 2017-07-08.
+
+SYNOPSIS
      # Use via lint-prereqs CLI script
+
+FUNCTIONS
+  lint_prereqs
+    Usage:
+
+     lint_prereqs(%args) -> [status, msg, result, meta]
+
+    Check extraneous/missing/incorrect prerequisites in dist.ini.
+
+    lint-prereqs can improve your prereqs specification in "dist.ini" by
+    reporting prereqs that are extraneous (specified but unused), missing
+    (used/required but not specified), or incorrect (mismatching version
+    between what's specified in "dist.ini" vs in source code, incorrect
+    phase like test prereqs specified in runtime, etc).
+
+    Checking actual usage of prereqs is done using Perl::PrereqScanner (or
+    Perl::PrereqScanner::Lite).
+
+    Sections that will be checked for prereqs include "[Prereqs / *]", as
+    well as "OSPrereqs", "Extras/lint-prereqs/Assume-*". Designed to work
+    with prerequisites that are manually written. Does not work if you use
+    AutoPrereqs (using AutoPrereqs basically means that you do not specify
+    prereqs and just use whatever modules are detected by the scanner.)
+
+    Sometimes there are prerequisites that you know are used but can't be
+    detected by the scanner, or you want to include anyway. If this is the
+    case, you can instruct lint_prereqs to assume that the prerequisite is
+    used.
+
+     ;!lint_prereqs assume-used "even though we know it is not currently used"
+     Foo::Bar=0
+ 
+     ;!lint_prereqs assume-used "we are forcing a certain version"
+     Baz=0.12
+
+    Sometimes there are also prerequisites that are detected by
+    scan_prereqs, but are false positives (Perl::PrereqScanner::Lite
+    sometimes does this because its parser is simpler) or you know are
+    already provided by some other modules. So to make lint-prereqs ignore
+    them:
+
+     [Extras / lint-prereqs / assume-provided]
+     Qux::Quux=0
+
+    You can also add a "[versions]" section in your "lint-prereqs.conf"
+    configuration containing minimum versions that you want for certain
+    modules, e.g.:
+
+     [versions]
+     Bencher=0.30
+     Log::Any::IfLOG=0.07
+     ...
+
+    then if there is a prereq specified less than the minimum versions,
+    "lint-prereqs" will also complain.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   core_prereqs => *bool* (default: 1)
+
+        Whether or not prereqs to core modules are allowed.
+
+        If set to 0 (the default), will complain if there are prerequisites
+        to core modules. If set to 1, prerequisites to core modules are
+        required just like other modules.
+
+    *   extra_runtime_dirs => *array[str]*
+
+        Add extra directories to scan for runtime requirements.
+
+    *   extra_test_dirs => *array[str]*
+
+        Add extra directories to scan for test requirements.
+
+    *   fix => *bool*
+
+        Attempt to automatically fix the errors.
+
+        "lint-prereqs" can attempt to automatically fix the errors by
+        adding/removing/moving prereqs in "dist.ini". Not all errors can be
+        automatically fixed. When modifying "dist.ini", a backup in
+        "dist.ini~" will be created.
+
+    *   perl_version => *str*
+
+        Perl version to use (overrides scan_prereqs/dist.ini).
+
+    *   scanner => *str* (default: "regular")
+
+        Which scanner to use.
+
+        "regular" means Perl::PrereqScanner which is PPI-based and is the
+        slowest but has the most complete support for Perl syntax.
+
+        "lite" means Perl::PrereqScanner::Lite has uses an XS-based lexer
+        and is the fastest but might miss some Perl syntax (i.e. miss some
+        prereqs) or crash if given some weird code.
+
+        "nqlite" means Perl::PrereqScanner::NotQuiteLite which is faster
+        than "regular" but not as fast as "lite".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-LintPrereqs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-LintPrereqs>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-LintPrereqs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -12,6 +12,7 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Sub/Uplevel.pm
 inc/Test/Exception.pm
+JSON-Assert-0.07.tar.gz
 lib/JSON/Assert.pm
 lib/JSON/Assert/Changes.pod
 lib/Test/JSON/Assert.pm

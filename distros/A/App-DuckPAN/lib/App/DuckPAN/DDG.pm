@@ -1,7 +1,7 @@
 package App::DuckPAN::DDG;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: DDG related functionality of duckpan
-$App::DuckPAN::DDG::VERSION = '1018';
+$App::DuckPAN::DDG::VERSION = '1019';
 use Moo;
 with 'App::DuckPAN::HasApp';
 
@@ -115,7 +115,7 @@ sub get_blocks_from_current_dir {
 
 		# Check if Perl Package name provided
 		# We don't have Goodie packages with
-		elsif ($arg =~ /^(DDG::(?:Goodie|Spice|Fathead)::)?[A-Z]+[a-z0-9]*?$/) {
+		elsif ($arg =~ /^(DDG::(?:Goodie|Spice|Fathead)::)?[A-Z]+[a-zA-Z0-9]*$/) {
 			push @no_metadata, $arg;
 			$class = $1 ? $arg : "DDG::$type->{name}::$arg";
 		}
@@ -223,7 +223,7 @@ App::DuckPAN::DDG - DDG related functionality of duckpan
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

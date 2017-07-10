@@ -15,7 +15,7 @@
 
 %token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE MALLOC
 %token <opval> LAST NEXT NAME VAR CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF DIE
-%token <opval> SWITCH CASE DEFAULT VOID TRY CATCH
+%token <opval> SWITCH CASE DEFAULT VOID EVAL EXCEPTION_VAR
 
 %type <opval> grammar opt_statements statements statement my field if_statement else_statement
 %type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop
@@ -25,7 +25,7 @@
 %type <opval> for_statement while_statement expression opt_declarations_in_grammar opt_term
 %type <opval> call_field array_elem convert_type enumeration new_object type_name array_length declaration_in_grammar
 %type <opval> switch_statement case_statement default_statement type_array_with_length
-%type <opval> ';' opt_descriptors descriptors type_or_void normal_statement try_catch
+%type <opval> ';' opt_descriptors descriptors type_or_void normal_statement eval_block
 
 
 %right <opval> ASSIGN
@@ -60,7 +60,7 @@ grammar
 opt_declarations_in_grammar
   :	/* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
   |	declarations_in_grammar
     {
@@ -102,7 +102,7 @@ package
 opt_declarations_in_package
   :	/* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
   |	declarations_in_package
     {
@@ -144,7 +144,7 @@ enumeration_block
 opt_enumeration_values
   :	/* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
   |	enumeration_values
     {
@@ -180,7 +180,7 @@ enumeration_value
 opt_statements
   :	/* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
   |	statements
     {
@@ -209,7 +209,7 @@ statement
   | switch_statement
   | case_statement
   | default_statement
-  | try_catch
+  | eval_block
 
 block 
   : '{' opt_statements '}'
@@ -266,7 +266,7 @@ if_statement
 else_statement
   : /* NULL */
     {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, compiler->cur_file, compiler->cur_line);
     };
   | ELSE block
     {
@@ -319,19 +319,17 @@ my
 
 expression
   : LAST
-    {
-      $$ = SPVM_OP_build_last(compiler, $1);
-    }
   | NEXT
-    {
-      $$ = SPVM_OP_build_next(compiler, $1);
-    }
   | RETURN {
       $$ = SPVM_OP_build_return(compiler, $1, NULL);
     }
   | RETURN term
     {
       $$ = SPVM_OP_build_return(compiler, $1, $2);
+    }
+  | DIE
+    {
+      $$ = SPVM_OP_build_die(compiler, $1, NULL);
     }
   | DIE term
     {
@@ -342,7 +340,7 @@ expression
 opt_terms
   :	/* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
   |	terms
     {
@@ -367,16 +365,20 @@ array_length
     {
       $$ = SPVM_OP_build_array_length(compiler, $1, $2);
     }
-
+  | ARRAY_LENGTH '{' term '}'
+    {
+      $$ = SPVM_OP_build_array_length(compiler, $1, $3);
+    }
 opt_term
   : /* NULL */
     {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, compiler->cur_file, compiler->cur_line);
     }
   | term
 
 term
   : VAR
+  | EXCEPTION_VAR
   | CONSTANT
   | UNDEF
   | call_sub
@@ -405,7 +407,15 @@ convert_type
     }
 
 call_field
-  : term '{' field_name '}'
+  : term ARROW '{' field_name '}'
+    {
+      $$ = SPVM_OP_build_call_field(compiler, $1, $4);
+    }
+  | call_field '{' field_name '}'
+    {
+      $$ = SPVM_OP_build_call_field(compiler, $1, $3);
+    }
+  | array_elem '{' field_name '}'
     {
       $$ = SPVM_OP_build_call_field(compiler, $1, $3);
     }
@@ -511,7 +521,15 @@ binop
     }
 
 array_elem
-  : term '[' term ']'
+  : term ARROW '[' term ']'
+    {
+      $$ = SPVM_OP_build_array_elem(compiler, $1, $4);
+    }
+  | array_elem '[' term ']'
+    {
+      $$ = SPVM_OP_build_array_elem(compiler, $1, $3);
+    }
+  | call_field '[' term ']'
     {
       $$ = SPVM_OP_build_array_elem(compiler, $1, $3);
     }
@@ -543,7 +561,7 @@ call_sub
 opt_args
   :	/* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
   |	args
     {
@@ -572,7 +590,7 @@ arg
 opt_descriptors
   :	/* Empty */
     {
-      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_module_path, compiler->cur_line);
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
     }
   |	descriptors
     {
@@ -631,10 +649,10 @@ field_name : NAME
 sub_name : NAME
 package_name : NAME
 
-try_catch
-  : TRY block CATCH '(' VAR ')' block
+eval_block
+  : EVAL block
     {
-      $$ = SPVM_OP_build_try_catch(compiler, $1, $2, $3, $5, $7);
+      $$ = SPVM_OP_build_eval(compiler, $1, $2);
     }
 
 %%

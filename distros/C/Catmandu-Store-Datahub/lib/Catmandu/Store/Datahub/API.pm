@@ -46,6 +46,13 @@ sub generate_token {
 
 sub get {
     my ($self, $id) = @_;
+
+    if (not defined $id) {
+        Catmandu::BadArg->throw(
+            'message' => "Record could not be retrieved. Missing 'id'."
+        );
+    }
+
     my $url = sprintf('%s/api/v1/data/%s', $self->url, $id);
 
     my $response = $self->client->get($url, Authorization => sprintf('Bearer %s', $self->access_token));
@@ -109,6 +116,13 @@ sub add {
 
 sub update {
     my ($self, $id, $data) = @_;
+
+    if (not defined $id) {
+        Catmandu::BadArg->throw(
+            'message' => "Record could not be updated. Missing 'id'."
+        );
+    }
+
     my $url = sprintf('%s/api/v1/data/%s', $self->url, $id);
 
     my $token = $self->access_token;
@@ -141,6 +155,13 @@ sub update {
 
 sub delete {
     my ($self, $id) = @_;
+
+    if (not defined $id) {
+        Catmandu::BadArg->throw(
+            'message' => "Record could not be deleted. Missing 'id'."
+        );
+    }
+
     my $url = sprintf('%s/api/v1/data/%s', $self->url, $id);
 
     my $token = $self->access_token;

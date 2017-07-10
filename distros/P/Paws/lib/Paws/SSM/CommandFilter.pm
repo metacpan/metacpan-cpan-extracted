@@ -39,12 +39,12 @@ Describes a command filter.
 
 =head2 B<REQUIRED> Key => Str
 
-  The name of the filter. For example, requested date and time.
+  The name of the filter.
 
 
 =head2 B<REQUIRED> Value => Str
 
-  The filter value. For example: June 30, 2015.
+  The filter value.
 
 
 

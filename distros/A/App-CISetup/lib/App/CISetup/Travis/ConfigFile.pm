@@ -5,14 +5,13 @@ use warnings;
 use namespace::autoclean;
 use autodie qw( :all );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use App::CISetup::Types qw( Bool File Str );
 use File::pushd;
 use File::Which qw( which );
 use IPC::Run3 qw( run3 );
 use List::AllUtils qw( first_index uniq );
-use List::Gather;
 use Path::Iterator::Rule;
 use Try::Tiny;
 use YAML qw( Dump );
@@ -366,15 +365,16 @@ sub _reorder_addons_block {
 sub _cisetup_flags {
     my $self = shift;
 
-    return {
+    my %flags = (
         force_threaded_perls => $self->force_threaded_perls,
-        gather {
-            take email_address => $self->email_address
-                if $self->has_email_address;
-            take github_user => $self->github_user
-                if $self->has_github_user;
-        }
-    };
+    );
+
+    $flags{email_address} = $self->email_address
+        if $self->has_email_address;
+    $flags{github_user} = $self->github_user
+        if $self->has_github_user;
+
+    return \%flags;
 }
 ## use critic
 

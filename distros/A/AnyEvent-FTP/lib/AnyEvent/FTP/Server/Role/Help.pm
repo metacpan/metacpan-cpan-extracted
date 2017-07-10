@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Help role for FTP server
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 my %cmds;
@@ -16,7 +16,7 @@ sub help_help { 'HELP [<sp> command]' }
 sub cmd_help
 {
   my($self, $con, $req) = @_;
-  
+
   my $topic = $req->args;
   $topic =~ s/^\s+//;
   $topic =~ s/\s+$//;
@@ -28,11 +28,11 @@ sub cmd_help
     unless(defined $cmds{$class})
     {
       no strict 'refs';
-      $cmds{$class} = [ 
+      $cmds{$class} = [
         sort map { s/^cmd_//; uc $_ } grep /^cmd_/, keys %{$class . '::'}
       ];
     }
-  
+
     $con->send_response(214, [
       'The following commands are recognized:',
       join(' ', @{ $cmds{$class} }),
@@ -55,7 +55,7 @@ sub cmd_help
   {
     $con->send_response(502 => 'Unknown command');
   }
-  
+
   $self->done;
 }
 
@@ -73,7 +73,7 @@ AnyEvent::FTP::Server::Role::Help - Help role for FTP server
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -139,6 +139,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

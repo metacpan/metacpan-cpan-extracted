@@ -1,5 +1,5 @@
 package App::MultiModule::Test::StatefulStream;
-$App::MultiModule::Test::StatefulStream::VERSION = '1.143160';
+$App::MultiModule::Test::StatefulStream::VERSION = '1.171870';
 use strict;use warnings;
 use Test::More;
 use IPC::Transit;

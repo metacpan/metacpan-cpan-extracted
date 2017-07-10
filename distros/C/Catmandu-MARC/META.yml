@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-MARC/issues
   homepage: https://github.com/LibreCat/Catmandu-MARC
   repository: https://github.com/LibreCat/Catmandu-MARC.git
-version: '1.16'
+version: '1.161'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'

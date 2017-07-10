@@ -1,0 +1,4 @@
+Bagging-Date: 2017-31-07/09/17 10:31:16
+Bag-Size: 0.006 KB
+Payload-Oxum: 6.1
+Bagging-Update: 2017-07-09 10:31:16

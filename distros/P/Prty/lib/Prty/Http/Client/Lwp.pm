@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Prty::Option;
 use LWP::UserAgent ();
@@ -116,7 +116,7 @@ sub get {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

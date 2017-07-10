@@ -1,5 +1,5 @@
 package WebService::Braintree::Xml;
-$WebService::Braintree::Xml::VERSION = '0.9';
+$WebService::Braintree::Xml::VERSION = '0.91';
 use strict;
 
 use XML::Simple;

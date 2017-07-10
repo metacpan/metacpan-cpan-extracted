@@ -11,10 +11,12 @@ use Test::More;
 use App::Critique::Tester;
 
 BEGIN {
+    $ENV{CRITIQUE_EDITOR} = 'ed %s';
+    
     use_ok('App::Critique');
 }
 
-my $test_repo = App::Critique::Tester::init_test_repo();
+my $test_repo = App::Critique::Tester::init_test_env();
 my $work_tree = $test_repo->dir;
 my $work_base = Path::Tiny::path( $work_tree )->basename;
 

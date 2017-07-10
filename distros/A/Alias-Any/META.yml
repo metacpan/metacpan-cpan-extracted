@@ -19,6 +19,7 @@ no_index:
     - inc
 requires:
   Data::Alias: '0'
+  Keyword::Declare: '0.001004'
   Test::More: '0'
   perl: '5.012'
-version: '0.000003'
+version: '0.000004'

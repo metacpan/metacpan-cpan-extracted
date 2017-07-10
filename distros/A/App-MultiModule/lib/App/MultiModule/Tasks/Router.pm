@@ -1,5 +1,5 @@
 package App::MultiModule::Tasks::Router;
-$App::MultiModule::Tasks::Router::VERSION = '1.143160';
+$App::MultiModule::Tasks::Router::VERSION = '1.171870';
 use strict;use warnings;
 use Data::Dumper;
 use IPC::Transit::Router qw(troute troute_config);

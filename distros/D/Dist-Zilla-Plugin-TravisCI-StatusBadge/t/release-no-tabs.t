@@ -1,8 +1,8 @@
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for release candidate testing');
+    print qq{1..0 # SKIP these tests are for release candidate testing\n};
+    exit
   }
 }
 
@@ -20,13 +20,13 @@ my @files = (
     't/01-basic.t',
     't/02-distmeta.t',
     't/03-anyreadme.t',
+    't/author-pod-coverage.t',
+    't/author-pod-syntax.t',
     't/author-test-eol.t',
     't/lib/Builder.pm',
     't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-no-tabs.t',
-    't/release-pod-coverage.t',
-    't/release-pod-syntax.t',
     't/release-test-version.t'
 );
 

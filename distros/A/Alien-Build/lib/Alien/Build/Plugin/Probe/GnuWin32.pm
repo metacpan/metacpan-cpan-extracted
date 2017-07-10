@@ -10,7 +10,7 @@ use Capture::Tiny qw( capture );
 use List::Util ();
 
 # ABSTRACT: Probe for GnuWin32 packages using the Windows registry
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 has native_only         => 0;
 has registery_key_regex => undef;
@@ -159,7 +159,7 @@ Alien::Build::Plugin::Probe::GnuWin32 - Probe for GnuWin32 packages using the Wi
 
 =head1 VERSION
 
-version 0.52
+version 0.55
 
 =head1 AUTHOR
 

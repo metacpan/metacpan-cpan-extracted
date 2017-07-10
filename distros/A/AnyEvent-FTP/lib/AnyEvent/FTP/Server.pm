@@ -10,7 +10,7 @@ use AnyEvent::FTP::Server::Connection;
 use Socket qw( unpack_sockaddr_in inet_ntoa );
 
 # ABSTRACT: Simple asynchronous ftp server
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 $AnyEvent::FTP::Server::VERSION //= 'dev';
@@ -69,7 +69,7 @@ sub start
 sub _start_inet
 {
   my($self) = @_;
-  
+
   my $con = AnyEvent::FTP::Server::Connection->new(
     context => $self->{default_context}->new,
     ip      => do {
@@ -96,7 +96,7 @@ sub _start_inet
         undef $con;
       },
   );
-  
+
   $self->emit(connect => $con);
 
   STDOUT->autoflush(1);
@@ -106,37 +106,37 @@ sub _start_inet
     my($raw) = @_;
     print STDOUT $raw;
   });
-    
+
   $con->on_close(sub {
     close STDOUT;
     exit;
   });
-    
+
   $con->send_response(@{ $self->welcome });
-    
+
   $handle->on_read(sub {
     $handle->push_read( line => sub {
       my($handle, $line) = @_;
       $con->process_request($line);
     });
   });
-  
+
   $self;
 }
 
 sub _start_standalone
 {
   my($self) = @_;
-  
+
   my $prepare = sub {
     my($fh, $host, $port) = @_;
     $self->bindport($port);
     $self->emit(bind => $port);
   };
-  
+
   my $connect = sub {
     my($fh, $host, $port) = @_;
-    
+
     my $con = AnyEvent::FTP::Server::Connection->new(
       context => $self->{default_context}->new,
       ip => do {
@@ -144,7 +144,7 @@ sub _start_standalone
         inet_ntoa $addr;
       },
     );
-    
+
     my $handle;
     $handle = AnyEvent::Handle->new(
       fh       => $fh,
@@ -162,31 +162,31 @@ sub _start_standalone
         undef $con;
       },
     );
-    
+
     $self->emit(connect => $con);
-    
+
     $con->on_response(sub {
       my($raw) = @_;
       $handle->push_write($raw);
     });
-    
+
     $con->on_close(sub {
       $handle->push_shutdown;
     });
-    
+
     $con->send_response(@{ $self->welcome });
-    
+
     $handle->on_read(sub {
       $handle->push_read( line => sub {
         my($handle, $line) = @_;
         $con->process_request($line);
       });
     });
-  
+
   };
-  
+
   tcp_server $self->hostname, $self->port || undef, $connect, $prepare;
-  
+
   $self;
 }
 
@@ -204,13 +204,13 @@ AnyEvent::FTP::Server - Simple asynchronous ftp server
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
  use AnyEvent;
  use AnyEvent::FTP::Server;
- 
+
  my $server = AnyEvent::FTP::Server->new;
  $server->start;
  AnyEvent->condvar->recv;
@@ -219,7 +219,7 @@ version 0.09
 
 B<CAUTION> L<AnyEvent::FTP::Server> hasn't been audited by anyone, including
 its author, in order to ensure that it is secure.  It is intended to be used
-primarily in testing the companion client L<AnyEvent::FTP::Client>.  It can 
+primarily in testing the companion client L<AnyEvent::FTP::Client>.  It can
 also be used to write your own context or personality (to use the L<Net::FTPServer>
 terminology) that use alternate back ends (say a database or memory store)
 that could theoretically be made to be secure, but you will need to carefully
@@ -230,7 +230,7 @@ This class is used for L<AnyEvent::FTP> server instances.
 Each time a client connects to the server a L<AnyEvent::FTP::Server::Connection>
 instance is created to manage the TCP connection.  Each connection
 also has a L<AnyEvent::FTP::Server::Context> which defines the behavior or
-personality of the server, and each context instance keeps track of the 
+personality of the server, and each context instance keeps track of the
 current directory, user authentication and authorization status of each
 connected client.
 
@@ -285,6 +285,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

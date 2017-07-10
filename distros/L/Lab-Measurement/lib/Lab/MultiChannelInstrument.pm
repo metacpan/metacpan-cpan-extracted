@@ -1,5 +1,7 @@
 package Lab::MultiChannelInstrument;
-$Lab::MultiChannelInstrument::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Multi-channel instrument base class
+$Lab::MultiChannelInstrument::VERSION = '3.553';
 use strict;
 use Lab::Generic;
 use List::MoreUtils qw{ any };
@@ -305,3 +307,32 @@ sub device_cache {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::MultiChannelInstrument - Multi-channel instrument base class
+
+=head1 VERSION
+
+version 3.553
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2013       Christian Butschkow, Stefan Geissler
+            2014       Andreas K. Huettel, Christian Butschkow
+            2015       Andreas K. Huettel
+            2016       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

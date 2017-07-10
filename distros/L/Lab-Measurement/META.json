@@ -27,8 +27,7 @@
          "requires" : {
             "File::Find" : "0",
             "Perl::Tidy" : "0",
-            "Test::More" : "0",
-            "Test::Perl::Critic" : "0"
+            "Test::More" : "0"
          }
       },
       "runtime" : {
@@ -93,7 +92,6 @@
             "perl" : "5.014",
             "sigtrap" : "0",
             "strict" : "0",
-            "threads" : "0",
             "utf8" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -128,7 +126,7 @@
          "web" : "https://github.com/lab-measurement/lab-measurement"
       }
    },
-   "version" : "3.552",
+   "version" : "3.553",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

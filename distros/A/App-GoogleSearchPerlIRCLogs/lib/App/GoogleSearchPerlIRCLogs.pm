@@ -1,12 +1,12 @@
 package App::GoogleSearchPerlIRCLogs;
 
-our $DATE = '2016-02-11'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.02'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 our %SPEC;
 
@@ -89,7 +89,7 @@ App::GoogleSearchPerlIRCLogs - Search Google for stuffs in Perl IRC logs
 
 =head1 VERSION
 
-This document describes version 0.01 of App::GoogleSearchPerlIRCLogs (from Perl distribution App-GoogleSearchPerlIRCLogs), released on 2016-02-11.
+This document describes version 0.02 of App::GoogleSearchPerlIRCLogs (from Perl distribution App-GoogleSearchPerlIRCLogs), released on 2017-07-08.
 
 =head1 SYNOPSIS
 
@@ -98,13 +98,17 @@ Use the included script L<google-search-perl-irc-logs>.
 =head1 FUNCTIONS
 
 
-=head2 google_search_perl_irc_logs(%args) -> [status, msg, result, meta]
+=head2 google_search_perl_irc_logs
+
+Usage:
+
+ google_search_perl_irc_logs(%args) -> [status, msg, result, meta]
 
 Search Google for stuffs in Perl IRC logs.
 
 Currently searching with C<site:irclog.perlgeek.org>.
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -149,7 +153,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

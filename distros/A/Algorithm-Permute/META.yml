@@ -1,10 +1,29 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Algorithm-Permute
-version:      0.12
-version_from: Permute.pm
-installdirs:  site
+---
+abstract: 'Handy and fast permutation with object oriented interface'
+author:
+  - 'Edwin Pratomo <edpratomo@cpan.org>'
+  - 'Stephan Loyd <sloyd@cpan.org>'
+build_requires:
+  Test::LeakTrace: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Permute
+provides:
+  Algorithm::Permute:
+    file: lib/Algorithm/Permute.pm
+    version: '0.14'
 requires:
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  XSLoader: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/stphnlyd/perl5-Algorithm-Permute.git
+version: '0.14'
+x_serialization_backend: 'YAML::Tiny version 1.70'

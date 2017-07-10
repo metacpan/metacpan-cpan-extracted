@@ -1,3 +1,6 @@
+1.171870  2017-07-06 15:39:14-07:00 America/Los_Angeles
+    - Fix #! line of MultiModule and remove useless (and failing) test
+
 1.143160  2014-11-12 05:55:06-08:00 America/Los_Angeles
     - Added tests for static forwards
 

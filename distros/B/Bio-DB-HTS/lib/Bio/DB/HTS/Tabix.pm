@@ -1,7 +1,7 @@
 
 =head1 LICENSE
 
-Copyright [1999-2016] EMBL-European Bioinformatics Institute
+Copyright [2015-2017] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package Bio::DB::HTS::Tabix;
 
 use Bio::DB::HTS;
 use Bio::DB::HTS::Tabix::Iterator;
-$Bio::DB::HTS::Tabix::VERSION = '2.7';
+$Bio::DB::HTS::Tabix::VERSION = '2.8';
 use strict;
 use warnings;
 
@@ -42,7 +42,7 @@ sub new {
   my $tmpdir = File::Spec->tmpdir;
 
   #change to the tmp dir to allow the C library to download remote index files
-  if( Bio::DB::HTS->is_remote($filename) && ( !defined $use_tmp_dir || $use_tmp_dir != 0) )
+  if( Bio::DB::HTSfile->is_remote($filename) && ( !defined $use_tmp_dir || $use_tmp_dir != 0) )
   {
     chdir($tmpdir);
   }

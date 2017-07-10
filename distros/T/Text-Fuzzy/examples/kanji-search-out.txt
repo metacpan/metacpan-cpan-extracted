@@ -1,0 +1,7 @@
+Starting fuzzy searches over 158225 lines.
+The nearest to "幾何学校" is 幾何学的 (distance 1)
+Fuzzy search took 0.03125 seconds.
+The nearest to "阿部総理大臣" is 内閣総理大臣 (distance 2)
+Fuzzy search took 0.0210559 seconds.
+The nearest to "何校" is 將校 (distance 1)
+Fuzzy search took 0.0154021 seconds.

@@ -35,16 +35,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 /* Operation code */
 enum {
   SPVM_OP_C_CODE_IF,
@@ -59,7 +49,7 @@ enum {
   SPVM_OP_C_CODE_NAME,
   SPVM_OP_C_CODE_PACKAGE,
   SPVM_OP_C_CODE_MY_VAR,
-  SPVM_OP_C_CODE_MY_VAR_PROCESS,
+  SPVM_OP_C_CODE_MY_VAR_ASSIGN,
   SPVM_OP_C_CODE_FIELD,
   SPVM_OP_C_CODE_SUB,
   SPVM_OP_C_CODE_ENUM,
@@ -120,18 +110,9 @@ enum {
   SPVM_OP_C_CODE_DEFAULT,
   SPVM_OP_C_CODE_SWITCH_CONDITION,
   SPVM_OP_C_CODE_VOID,
-  SPVM_OP_C_CODE_TRY,
-  SPVM_OP_C_CODE_CATCH,
-  SPVM_OP_C_CODE_DEC_REF_COUNT,
-  SPVM_OP_C_CODE_INC_REF_COUNT,
-  SPVM_OP_C_CODE_FORMAL_ARGS,
+  SPVM_OP_C_CODE_EVAL,
   SPVM_OP_C_CODE_BLOCK_END,
-  SPVM_OP_C_CODE_RETURN_PROCESS,
-  SPVM_OP_C_CODE_LEAVE_SCOPE,
-  SPVM_OP_C_CODE_DIE_PROCESS,
-  SPVM_OP_C_CODE_STORE,
-  SPVM_OP_C_CODE_LAST_PROCESS,
-  SPVM_OP_C_CODE_NEXT_PROCESS,
+  SPVM_OP_C_CODE_EXCEPTION_VAR,
 };
 
 extern const char* const SPVM_OP_C_CODE_NAMES[];
@@ -144,7 +125,7 @@ enum {
   SPVM_OP_C_FLAG_BLOCK_SWITCH = 8,
   SPVM_OP_C_FLAG_BLOCK_HAS_ELSE = 16,
   SPVM_OP_C_FLAG_BLOCK_SUB = 32,
-  SPVM_OP_C_FLAG_BLOCK_TRY = 64,
+  SPVM_OP_C_FLAG_BLOCK_EVAL = 64,
 };
 
 enum {
@@ -156,6 +137,11 @@ enum {
 enum {
   // Case flag
   SPVM_OP_C_FLAG_CONSTANT_CASE = 1,
+};
+
+enum {
+  // Assign flag
+  SPVM_OP_C_FLAG_ASSIGN_TMP_VAR = 1
 };
 
 /* Binary operation */
@@ -201,11 +187,9 @@ void SPVM_OP_resolve_type(SPVM_COMPILER* compiler, SPVM_TYPE* type, int32_t name
 void SPVM_OP_resolve_sub_name(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPVM_OP* op_name);
 void SPVM_OP_resolve_field_name(SPVM_COMPILER* compiler, SPVM_OP* op_name);
 
-SPVM_OP* SPVM_OP_build_last(SPVM_COMPILER* compiler, SPVM_OP* op_last);
-SPVM_OP* SPVM_OP_build_next(SPVM_COMPILER* compiler, SPVM_OP* op_next);
 SPVM_OP* SPVM_OP_build_return(SPVM_COMPILER* compiler, SPVM_OP* op_return, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_die(SPVM_COMPILER* compiler, SPVM_OP* op_die, SPVM_OP* op_term);
-SPVM_OP* SPVM_OP_build_try_catch(SPVM_COMPILER* compiler, SPVM_OP* op_try, SPVM_OP* op_try_block, SPVM_OP* op_catch, SPVM_OP* op_my_var, SPVM_OP* op_catch_block);
+SPVM_OP* SPVM_OP_build_eval(SPVM_COMPILER* compiler, SPVM_OP* op_eval, SPVM_OP* op_block);
 SPVM_OP* SPVM_OP_build_switch_statement(SPVM_COMPILER* compiler, SPVM_OP* op_switch, SPVM_OP* op_term, SPVM_OP* op_block);
 SPVM_OP* SPVM_OP_build_case_statement(SPVM_COMPILER* compiler, SPVM_OP* op_case, SPVM_OP* op_term);
 SPVM_OP* SPVM_OP_build_logical_op(SPVM_COMPILER* compiler, SPVM_OP* op_logical_op, SPVM_OP* op_first, SPVM_OP* op_last);

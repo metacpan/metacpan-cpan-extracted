@@ -3,7 +3,7 @@ package Prty::ApplicationPaths;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Cwd ();
 use Hash::Util ();
@@ -360,7 +360,7 @@ Trennzeichens erlaubt:
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

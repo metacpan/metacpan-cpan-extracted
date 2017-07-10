@@ -1,5 +1,8 @@
 Revision history for PerlIO-http
 
+0.003     2017-07-07 15:49:26+02:00 Europe/Amsterdam
+          Stop using unexported symbols
+
 0.002     2013-04-23 14:04:39 Europe/Amsterdam
           Define ETIMEDOUT for Windows
 

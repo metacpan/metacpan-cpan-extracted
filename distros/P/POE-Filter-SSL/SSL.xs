@@ -15,6 +15,21 @@ static const ASN1_INTEGER *X509_REVOKED_get0_serialNumber(const X509_REVOKED *x)
 
 MODULE = POE::Filter::SSL      PACKAGE = POE::Filter::SSL
 
+long
+SSL_set_tmp_dh(ssl,dh)
+     SSL *	ssl
+     DH *	dh
+
+long
+SSL_CTX_set_tmp_dh(ctx,dh)
+   SSL_CTX *	ctx
+   DH *	dh
+
+long
+SSL_CTX_set_tmp_rsa(ctx,rsa)
+   SSL_CTX *	ctx
+   RSA *	rsa
+
 ASN1_INTEGER *
 X509_get_serialNumber(cert)
    X509 *      cert

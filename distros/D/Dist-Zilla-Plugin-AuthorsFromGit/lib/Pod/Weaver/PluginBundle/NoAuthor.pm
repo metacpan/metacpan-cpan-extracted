@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Pod::Weaver::PluginBundle::NoAuthor;
 # ABSTRACT: the Default plugin bundle, with the Authors section removed
-$Pod::Weaver::PluginBundle::NoAuthor::VERSION = '0.005';
+$Pod::Weaver::PluginBundle::NoAuthor::VERSION = '0.006';
 #pod =head1 OVERVIEW
 #pod
 #pod This is a slight modification of Pod::Weaver::PluginBundle::Default, with the
@@ -53,7 +53,7 @@ Pod::Weaver::PluginBundle::NoAuthor - the Default plugin bundle, with the Author
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

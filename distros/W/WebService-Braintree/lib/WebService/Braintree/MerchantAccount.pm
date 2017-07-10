@@ -1,5 +1,5 @@
 package WebService::Braintree::MerchantAccount;
-$WebService::Braintree::MerchantAccount::VERSION = '0.9';
+$WebService::Braintree::MerchantAccount::VERSION = '0.91';
 use WebService::Braintree::MerchantAccount::IndividualDetails;
 use WebService::Braintree::MerchantAccount::AddressDetails;
 use WebService::Braintree::MerchantAccount::BusinessDetails;
@@ -10,7 +10,7 @@ extends "WebService::Braintree::ResultObject";
 
 {
     package WebService::Braintree::MerchantAccount::Status;
-$WebService::Braintree::MerchantAccount::Status::VERSION = '0.9';
+$WebService::Braintree::MerchantAccount::Status::VERSION = '0.91';
 use constant Active => "active";
     use constant Pending => "pending";
     use constant Suspended => "suspended";
@@ -18,7 +18,7 @@ use constant Active => "active";
 
 {
     package WebService::Braintree::MerchantAccount::FundingDestination;
-$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '0.9';
+$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '0.91';
 use constant Bank => "bank";
     use constant Email => "email";
     use constant MobilePhone => "mobile_phone";

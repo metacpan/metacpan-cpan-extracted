@@ -1,12 +1,11 @@
-Tidy.pm
+lib/XML/Tidy.pm
 LICENSE
 MANIFEST
 MANIFEST.SKIP
-META.yml
 META.json
+META.yml
 README
 Changes
-Build.PL
 Makefile.PL
 t/00pod.t
 t/01podc.t
@@ -14,5 +13,6 @@ t/02small.t
 t/03medium.t
 t/04large.t
 t/05prune.t
+t/06decl.t
 ex/synopsis.pl
 bin/xmltidy

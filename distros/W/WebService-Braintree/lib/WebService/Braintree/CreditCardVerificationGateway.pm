@@ -1,5 +1,5 @@
 package WebService::Braintree::CreditCardVerificationGateway;
-$WebService::Braintree::CreditCardVerificationGateway::VERSION = '0.9';
+$WebService::Braintree::CreditCardVerificationGateway::VERSION = '0.91';
 use Moose;
 use WebService::Braintree::CreditCardVerificationSearch;
 use WebService::Braintree::Util;

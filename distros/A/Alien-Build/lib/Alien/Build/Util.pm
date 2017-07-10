@@ -6,7 +6,7 @@ use base qw( Exporter );
 use Path::Tiny qw( path );
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 
 our @EXPORT_OK = qw( _mirror _dump _destdir_prefix );
@@ -121,7 +121,7 @@ Alien::Build::Util - Private utility functions for Alien::Build
 
 =head1 VERSION
 
-version 0.52
+version 0.55
 
 =head1 DESCRIPTION
 

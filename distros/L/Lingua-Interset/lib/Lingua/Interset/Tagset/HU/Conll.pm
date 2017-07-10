@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::HU::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -54,7 +54,7 @@ sub _create_atoms
             'Nc' => ['pos' => 'noun', 'nountype' => 'com'], # common noun
             'Np' => ['pos' => 'noun', 'nountype' => 'prop'], # proper noun
             'O'  => [], # other tokens (e-mail or web address)
-            'Oh' => ['hyph' => 'hyph'], # words ending in hyphens
+            'Oh' => ['hyph' => 'yes'], # words ending in hyphens
             'Oi' => ['pos' => 'noun', 'other' => {'nountype' => 'identifier'}], # identifier: R99, V-3
             'On' => ['pos' => 'num', 'numform' => 'digit'], # numbers written in digits: 6:2, 4:2-re
             'Pd' => ['pos' => 'adj',  'prontype' => 'dem'], # az = the, ez = this, olyan = such
@@ -63,8 +63,8 @@ sub _create_atoms
             'Pp' => ['pos' => 'noun', 'prontype' => 'prs'], # én = I, mi = we, te = thou, ti = you, ő = he/she/it, ők = they
             'Pq' => ['pos' => 'noun', 'prontype' => 'int'], # mi, milyen = what, ki = who
             'Pr' => ['pos' => 'noun', 'prontype' => 'rel'], # amely, aki, ami, amelyik = which
-            'Ps' => ['pos' => 'adj',  'prontype' => 'prs', 'poss' => 'poss'], # enyém = mine, miénk = ours, övék = theirs, saját, sajátja, önnön = own
-            'Px' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'], # magam = myself, magunk = ourselves, magad = yourself, önmaga = himself/herself, maga = itself, maguk = themselves
+            'Ps' => ['pos' => 'adj',  'prontype' => 'prs', 'poss' => 'yes'], # enyém = mine, miénk = ours, övék = theirs, saját, sajátja, önnön = own
+            'Px' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'], # magam = myself, magunk = ourselves, magad = yourself, önmaga = himself/herself, maga = itself, maguk = themselves
             'Py' => ['pos' => 'noun', 'prontype' => 'rcp'], # egymás = each other
             'Rd' => ['pos' => 'adv', 'prontype' => 'dem'], # akkor = then, úgy = so, így = so, itt = here, ott = there
             'Rg' => ['pos' => 'adv', 'prontype' => 'tot|neg'], # general adverbs: mindig = always, soha = never, mindenképpen = in any case, mind = every, bármikor = whenever
@@ -81,9 +81,9 @@ sub _create_atoms
             'Ti' => ['pos' => 'adj', 'prontype' => 'art', 'definite' => 'ind'], # indefinite article: egy
             'Va' => ['pos' => 'verb', 'verbtype' => 'aux'], # fogok, fog, fogja, fogunk, fognak, fogják, volna
             'Vm' => ['pos' => 'verb'], # main verb: van = there is, kell = must, lehet = may, lesz = become, nincs = is not, áll = stop, kerül = get to, tud = know
-            'X'  => ['foreign' => 'foreign'], # foreign or unknown: homo, ecce, public_relations, szlovák)-Coetzer
-            'Y'  => ['abbr' => 'abbr'], # abbreviation: stb., dr., Mr., T., Dr.
-            'Z'  => ['typo' => 'typo'], # mistyped word
+            'X'  => ['foreign' => 'yes'], # foreign or unknown: homo, ecce, public_relations, szlovák)-Coetzer
+            'Y'  => ['abbr' => 'yes'], # abbreviation: stb., dr., Mr., T., Dr.
+            'Z'  => ['typo' => 'yes'], # mistyped word
             'WPUNCT' => ['pos' => 'punc'], # word punctuation
             'SPUNCT' => ['pos' => 'punc', 'punctype' => 'peri|excl|qest'], # sentence delimiting punctuation (., !, ?)
         },
@@ -92,7 +92,7 @@ sub _create_atoms
             'pos' => { 'noun' => { 'prontype' => { ''    => { 'nountype' => { 'prop' => 'Np',
                                                                               'com'  => 'Nc',
                                                                               '@'    => 'Oi' }},
-                                                   'prs' => { 'reflex' => { 'reflex' => 'Px',
+                                                   'prs' => { 'reflex' => { 'yes' => 'Px',
                                                                             '@'      => 'Pp' }},
                                                    'rcp' => 'Py',
                                                    'int' => 'Pq',
@@ -133,10 +133,10 @@ sub _create_atoms
                                                    'excl' => 'SPUNCT',
                                                    'qest' => 'SPUNCT',
                                                    '@'    => 'WPUNCT' }},
-                       '@'    => { 'hyph' => { 'hyph' => 'Oh',
-                                               '@'    => { 'foreign' => { 'foreign' => 'X',
-                                                                          '@'       => { 'abbr' => { 'abbr' => 'Y',
-                                                                                                     '@'    => { 'typo' => { 'typo' => 'Z',
+                       '@'    => { 'hyph' => { 'yes' => 'Oh',
+                                               '@'    => { 'foreign' => { 'yes' => 'X',
+                                                                          '@'       => { 'abbr' => { 'yes' => 'Y',
+                                                                                                     '@'    => { 'typo' => { 'yes' => 'Z',
                                                                                                                              '@'    => 'O' }}}}}}}}}
         }
     );
@@ -1058,7 +1058,7 @@ Lingua::Interset::Tagset::HU::Conll - Driver for the Hungarian tagset of the CoN
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

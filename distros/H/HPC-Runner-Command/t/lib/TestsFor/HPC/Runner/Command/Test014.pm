@@ -192,4 +192,19 @@ sub test_005 : Tags(use_batches) {
     remove_tree($test_dir);
 }
 
+sub test_006 {
+  my $test  = construct();
+    my $test_dir = getcwd();
+
+    my $basename = $test->data_tar->basename('.tar.gz');
+    my $job_dir = File::Spec->catdir( $basename, 'job', );
+
+    is($test->lock_exists($job_dir), 0, 'Lock does not exist');
+    $test->write_lock($job_dir);
+    is($test->lock_exists($job_dir), 1, 'Lock exists');
+    $test->remove_lock($job_dir);
+    is($test->lock_exists($job_dir), 0, 'Lock does not exist');
+
+}
+
 1;

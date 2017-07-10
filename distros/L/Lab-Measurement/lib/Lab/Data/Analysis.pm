@@ -1,5 +1,5 @@
 package Lab::Data::Analysis;
-$Lab::Data::Analysis::VERSION = '3.552';
+$Lab::Data::Analysis::VERSION = '3.553';
 use 5.006;
 use strict;
 use Clone qw(clone);

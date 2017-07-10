@@ -9,7 +9,7 @@ use AnyEvent::Handle;
 use Carp qw( confess );
 
 # ABSTRACT: Transfer class for asynchronous ftp client
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 # TODO: implement ABOR
@@ -61,7 +61,7 @@ sub recv { shift->{cv}->recv }
 sub handle
 {
   my($self, $fh) = @_;
-  
+
   my $handle;
   $handle = AnyEvent::Handle->new(
     fh => $fh,
@@ -75,13 +75,13 @@ sub handle
       $handle->destroy;
     },
     # this avoids deep recursion exception error (usually
-    # a warning) in example fput.pl when the buffer is 
+    # a warning) in example fput.pl when the buffer is
     # small (1024 on my debian VM)
     autocork  => 1,
   );
-  
+
   $self->emit(open => $handle);
-  
+
   $handle;
 }
 
@@ -100,29 +100,29 @@ AnyEvent::FTP::Client::Transfer - Transfer class for asynchronous ftp client
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
  use AnyEvent::FTP::Client;
  my $client = AnyEvent::FTP::Client;
  $client->connect('ftp://ftp.cpan.org')->cb(sub {
- 
+
    # $upload_transfer and $download_transfer are instances of
    # AnyEvent::FTP::Client::Transfer
    my $upload_transfer = $client->stor('remote_filename.txt', 'content');
-   
+
    my $buffer;
    my $download_transfer = $client->retr('remote_filename.txt', \$buffer);
- 
+
  });
 
 =head1 DESCRIPTION
 
 This class represents a file transfer with a remote server.  Transfers
-may be initiated between a remote file name and a local object.  The 
+may be initiated between a remote file name and a local object.  The
 local object may be a regular scalar, reference to a scalar or a file
-handle, for details, see the C<stor>, C<stou>, C<appe> and C<retr> 
+handle, for details, see the C<stor>, C<stou>, C<appe> and C<retr>
 methods in L<AnyEvent::FTP::Client>.
 
 This documentation covers what you can do with the transfer object once it
@@ -146,7 +146,7 @@ This class provides these events:
 
 =head2 open
 
-Emitted when the data connection is opened, and passes in as its first argument 
+Emitted when the data connection is opened, and passes in as its first argument
 the L<AnyEvent::Handle> instance used to transfer the file.
 
  $xfer->on_open(sub {
@@ -157,7 +157,7 @@ the L<AnyEvent::Handle> instance used to transfer the file.
 =head2 close
 
 Emitted when the transfer is complete, either due to a successful transfer or
-the server returned a failure status.  Passes in the final 
+the server returned a failure status.  Passes in the final
 L<AnyEvent::FTP::Client::Response> message associated with the transfer.
 
  $xfer->on_close(sub {
@@ -177,8 +177,8 @@ Emitted when the data connection closes.
 
 =head2 cb
 
-Register a callback with the transfer to be executed when the transfer 
-successfully completes, or fails. Works exactly like the L<AnyEvent> condition 
+Register a callback with the transfer to be executed when the transfer
+successfully completes, or fails. Works exactly like the L<AnyEvent> condition
 variable C<cb> method.
 
 =head2 ready
@@ -204,6 +204,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

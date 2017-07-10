@@ -9,7 +9,7 @@ use AnyEvent::Socket qw( tcp_server tcp_connect );
 use AnyEvent::Handle;
 
 # ABSTRACT: Interface for PASV, PORT and REST commands
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 has data => (
@@ -35,7 +35,7 @@ sub help_pasv { 'PASV (returns address/port)' }
 sub cmd_pasv
 {
   my($self, $con, $req) = @_;
-  
+
   my $count = 0;
 
   tcp_server undef, undef, sub {
@@ -55,14 +55,14 @@ sub cmd_pasv
       },
       autocork => 1,
     );
-    
+
     $self->data($handle);
     # TODO this should be with the 227 message below.
     # demoting this to a TODO (was a F-I-X-M-E)
     # since I can't remember why I thought it needed
     # doing. plicease 12-05-2014
     $self->done;
-    
+
   }, sub {
     my($fh, $host, $port) = @_;
     my $ip_and_port = join(',', split(/\./, $con->ip), $port >> 8, $port & 0xff);
@@ -72,9 +72,9 @@ sub cmd_pasv
       $con->send_response(227 => "Entering Passive Mode ($ip_and_port)");
       undef $w;
     });
-    
+
   };
-  
+
   return;
 }
 
@@ -84,12 +84,12 @@ sub help_port { 'PORT <sp> h1,h2,h3,h4,p1,p2' }
 sub cmd_port
 {
   my($self, $con, $req) = @_;
-  
+
   if($req->args =~ /(\d+,\d+,\d+,\d+),(\d+),(\d+)/)
   {
     my $ip = join '.', split /,/, $1;
     my $port = $2*256 + $3;
-    
+
     tcp_connect $ip, $port, sub {
       my($fh) = @_;
       unless($fh)
@@ -98,7 +98,7 @@ sub cmd_port
         $self->done;
         return;
       }
-      
+
       my $handle;
       $handle = AnyEvent::Handle->new(
         fh => $fh,
@@ -111,13 +111,13 @@ sub cmd_port
           undef $handle;
         },
       );
-      
+
       $self->data($handle);
       $con->send_response(200 => "Port command successful");
       $self->done;
-      
+
     };
-    
+
   }
   else
   {
@@ -133,7 +133,7 @@ sub help_rest { 'REST <sp> byte-count' }
 sub cmd_rest
 {
   my($self, $con, $req) = @_;
-  
+
   if($req->args =~ /^\s*(\d+)\s*$/)
   {
     my $offset = $1;
@@ -161,12 +161,12 @@ AnyEvent::FTP::Server::Role::TransferPrep - Interface for PASV, PORT and REST co
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
  package AnyEvent::FTP::Server::Context::MyContext;
- 
+
  use Moo;
  extends 'AnyEvent::FTP::Server::Context';
  with 'AnyEvent::FTP::Server::Role::TransferPrep';
@@ -217,6 +217,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

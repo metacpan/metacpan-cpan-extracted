@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Prty::Option;
 use Time::HiRes ();
@@ -550,7 +550,7 @@ Wert von $pi->timePerStep.
 
 =item @args
 
-Argumente für sprintf-Platzhalter.
+Ausgabe-Zeichenketten oder Argumente für sprintf-Platzhalter.
 
 =back
 
@@ -558,7 +558,7 @@ Argumente für sprintf-Platzhalter.
 
 =over 4
 
-=item $msg
+=item $str
 
 Erzeugte Meldung
 
@@ -649,9 +649,85 @@ sub msg {
 
 # -----------------------------------------------------------------------------
 
+=head3 warn() - Erzeuge Warnung
+
+=head4 Synopsis
+
+    $str = $pi->warn(@args);
+    $str = $pi->warn($fmt,@args);
+
+=head4 Arguments
+
+=over 4
+
+=item $fmt
+
+Formatelement für sprintf().
+
+=item @args
+
+Ausgabe-Zeichenketten oder Argumente für sprintf-Platzhalter.
+
+=back
+
+=head4 Returns
+
+=over 4
+
+=item $str
+
+Erzeugte Meldung
+
+=back
+
+=head4 Example
+
+Schreibe Warnung nach STDERR, die oberhalb der Fortschrittsanzeige
+erscheint:
+
+    warn $pro->warn("WARNING: Pfad erfüllt Regex nicht: $file");
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub warn {
+    my $self = shift;
+    # @_: @args -or- $fmt,@args
+
+    # Meldung erzeugen
+
+    my $msg = '';
+    if (!$self->{'show'}) {
+        # Keine Meldung
+    }
+    elsif (@_) {
+        my $fmt = shift;
+        # @_: sprintf-Argumente
+
+        my $l0 = length $self->{'msg'};
+        $msg = sprintf $fmt,@_;
+
+        # Überstehenden Text längerer Zeilen mit Leerzeichen überschreiben
+
+        $msg =~ s/\n+//;
+        my $l = length $msg;
+        if ($l < $l0) {
+            # Meldung mit Leerzeichen auffüllen, wenn vorige Meldung
+            # länger war, damit überzählige Zeichen überschrieben werden.
+            $msg .= ' ' x ($l0-$l+1);
+        }
+        $msg .= "\n";
+    }
+
+    return $msg;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

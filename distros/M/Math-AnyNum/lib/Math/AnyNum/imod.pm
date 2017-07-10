@@ -5,7 +5,7 @@ Class::Multimethods::multimethod __imod__ => qw(Math::GMPz Math::GMPz) => sub {
     my ($x, $y) = @_;
 
     my $sign_y = Math::GMPz::Rmpz_sgn($y)
-      || goto &Math::AnyNum::_nan;
+      || goto &_nan;
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_mod($r, $x, $y);
@@ -24,7 +24,7 @@ Class::Multimethods::multimethod __imod__ => qw(Math::GMPz $) => sub {
     my ($x, $y) = @_;
 
     CORE::int($y)
-      || goto &Math::AnyNum::_nan;
+      || goto &_nan;
 
     my $neg_y = $y < 0;
     $y = -$y if $neg_y;

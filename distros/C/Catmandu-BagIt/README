@@ -108,6 +108,8 @@ CATMANDU MODULES
 
       * Catmandu::Exporter::BagIt
 
+      * Catmandu::Store::File::BagIt
+
 METHODS
 
  new()
@@ -257,7 +259,8 @@ METHODS
 
 SEE ALSO
 
-    Catmandu::Importer::BagIt , Catmandu::Exporter::BagIt
+    Catmandu::Importer::BagIt , Catmandu::Exporter::BagIt ,
+    Catmandu::Store::File::BagIt
 
 AUTHOR
 

@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::HR::Multext;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -78,14 +78,14 @@ sub _create_atoms
             'g' => [],
             # possessive adjective
             # examples: Žuvanićev, Ashdownov, vladin
-            's' => ['poss' => 'poss'],
+            's' => ['poss' => 'yes'],
             # participial adjective
             # examples: žrtvovan, zvan, znan, zloupotrebljavan
             'p' => ['verbform' => 'part']
         },
         'encode_map' =>
 
-            { 'poss' => { 'poss' => 's',
+            { 'poss' => { 'yes' => 's',
                            '@'   => { 'verbform' => { 'part' => 'p',
                                                       '@'    => 'g' }}}}
     );
@@ -1473,7 +1473,7 @@ Lingua::Interset::Tagset::HR::Multext - Driver for the Croatian tagset of the Mu
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

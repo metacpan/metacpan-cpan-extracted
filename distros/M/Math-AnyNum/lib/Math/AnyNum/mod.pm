@@ -10,7 +10,7 @@ Class::Multimethods::multimethod __mod__ => qw(Math::GMPq Math::GMPq) => sub {
     my ($x, $y) = @_;
 
     Math::GMPq::Rmpq_sgn($y)
-      || goto &Math::AnyNum::_nan;
+      || goto &_nan;
 
     my $quo = Math::GMPq::Rmpq_init();
     Math::GMPq::Rmpq_div($quo, $x, $y);
@@ -51,7 +51,7 @@ Class::Multimethods::multimethod __mod__ => qw(Math::GMPz Math::GMPz) => sub {
     my ($x, $y) = @_;
 
     my $sgn_y = Math::GMPz::Rmpz_sgn($y)
-      || goto &Math::AnyNum::_nan;
+      || goto &_nan;
 
     my $r = Math::GMPz::Rmpz_init();
     Math::GMPz::Rmpz_mod($r, $x, $y);

@@ -17,7 +17,7 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 use base 'PDF::API2::Basic::PDF::Dict';
 
-our $VERSION = '2.032'; # VERSION
+our $VERSION = '2.033'; # VERSION
 
 use PDF::API2::Basic::PDF::Array;
 use PDF::API2::Basic::PDF::Dict;

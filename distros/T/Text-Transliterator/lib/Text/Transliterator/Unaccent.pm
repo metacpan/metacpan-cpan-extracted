@@ -3,8 +3,9 @@ package Text::Transliterator::Unaccent;
 use warnings;
 use strict;
 
-use Text::Transliterator; our $VERSION = $Text::Transliterator::VERSION;
+our $VERSION = "1.03";
 
+use Text::Transliterator;
 use Unicode::UCD        qw(charinfo charscript charblock);
 use Unicode::Normalize  qw();
 
@@ -239,7 +240,7 @@ an C<unaccent> tokenizer.
 
 =head1 AUTHOR
 
-Laurent Dami, C<< <lau.....da..@justice.ge.ch> >>
+Laurent Dami, C<< <dami@cpan.org> >>
 
 =head1 BUGS
 
@@ -283,7 +284,7 @@ L<http://search.cpan.org/dist/Text-Transliterator/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010 Laurent Dami.
+Copyright 2010, 2017 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

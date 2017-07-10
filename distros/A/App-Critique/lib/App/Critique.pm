@@ -4,20 +4,22 @@ use strict;
 use warnings;
 
 use File::HomeDir ();
-use JSON::XS      ();
+use JSON::MaybeXS ();
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 # load our CONFIG first, ...
 
 our %CONFIG;
 BEGIN {
-    $CONFIG{'HOME'}    = $ENV{'CRITIQUE_HOME'}    || File::HomeDir->my_home;
-    $CONFIG{'COLOR'}   = $ENV{'CRITIQUE_COLOR'}   // 1;
-    $CONFIG{'DEBUG'}   = $ENV{'CRITIQUE_DEBUG'}   // 0;
-    $CONFIG{'VERBOSE'} = $ENV{'CRITIQUE_VERBOSE'} // 0;
-    $CONFIG{'EDITOR'}  = $ENV{'CRITIQUE_EDITOR'}  || $ENV{'EDITOR'} || $ENV{'VISUAL'};
+    $CONFIG{'HOME'}      = $ENV{'CRITIQUE_HOME'}      || File::HomeDir->my_home;
+    $CONFIG{'DATA_DIR'}  = $ENV{'CRITIQUE_DATA_DIR'}  || '.critique';
+    $CONFIG{'DATA_FILE'} = $ENV{'CRITIQUE_DATA_FILE'} || 'session.json';
+    $CONFIG{'COLOR'}     = $ENV{'CRITIQUE_COLOR'}     // 1;
+    $CONFIG{'DEBUG'}     = $ENV{'CRITIQUE_DEBUG'}     // 0;
+    $CONFIG{'VERBOSE'}   = $ENV{'CRITIQUE_VERBOSE'}   // 0;
+    $CONFIG{'EDITOR'}    = $ENV{'CRITIQUE_EDITOR'}    || $ENV{'EDITOR'} || $ENV{'VISUAL'};
 
     # okay, we give you sensible Perl & Git defaults
     $CONFIG{'IGNORE'} = {
@@ -38,7 +40,7 @@ BEGIN {
 
 # ... then gloablly used stuff, ....
 
-our $JSON = JSON::XS->new->utf8->pretty->canonical;
+our $JSON = JSON::MaybeXS->new->utf8->pretty->canonical;
 
 # ... then load the app and plugins
 
@@ -59,7 +61,7 @@ App::Critique - An incremental refactoring tool for Perl powered by Perl::Critic
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

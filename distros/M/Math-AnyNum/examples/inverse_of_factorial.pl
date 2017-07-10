@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 use lib qw(../lib);
-use Math::AnyNum qw(:overload tau e factorial);
+use Math::AnyNum qw(:overload tau e factorial LambertW lgrt);
 
 use constant S => tau->sqrt->log;
 use constant T => tau->root(-2.0 * e);
@@ -15,12 +15,12 @@ use constant T => tau->root(-2.0 * e);
 sub inv_fac_W {
     my ($n) = @_;
     my $L = log($n) - S;
-    $L / ($L / e)->LambertW - 0.5;
+    $L / LambertW($L / e) - 0.5;
 }
 
 sub inv_fac_lgrt {
     my ($n) = @_;
-    (T * $n**(1 / e))->lgrt * e - 0.5;
+    lgrt(T * $n**(1 / e)) * e - 0.5;
 }
 
 for my $n (1 .. 100) {

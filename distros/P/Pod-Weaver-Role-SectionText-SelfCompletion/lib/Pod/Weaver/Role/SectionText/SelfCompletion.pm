@@ -1,7 +1,7 @@
 package Pod::Weaver::Role::SectionText::SelfCompletion;
 
-our $DATE = '2015-08-26'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use Moose::Role;
@@ -32,12 +32,8 @@ in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is recommended, however, that you install L<shcompgen> which allows you to
-activate completion scripts for several kinds of scripts on multiple shells.
-Some CPAN distributions (those that are built with
-L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using C<shcompgen>) at installation time,
-so you can immadiately have tab completion.
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
 
 $h2 tcsh
 
@@ -75,7 +71,7 @@ Pod::Weaver::Role::SectionText::SelfCompletion - Provide COMPLETION section text
 
 =head1 VERSION
 
-This document describes version 0.04 of Pod::Weaver::Role::SectionText::SelfCompletion (from Perl distribution Pod-Weaver-Role-SectionText-SelfCompletion), released on 2015-08-26.
+This document describes version 0.05 of Pod::Weaver::Role::SectionText::SelfCompletion (from Perl distribution Pod-Weaver-Role-SectionText-SelfCompletion), released on 2017-07-07.
 
 =head1 DESCRIPTION
 
@@ -100,10 +96,6 @@ Variables:
 
 =back
 
-=head1 SEE ALSO
-
-L<Pod::Weaver::Role::SectionText::HasCompletion>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver-Role-SectionText-SelfCompletion>.
@@ -120,13 +112,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Pod::Weaver::Role::SectionText::HasCompletion>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

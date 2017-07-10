@@ -3,7 +3,7 @@ package Set::SegmentTree::Builder;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.06';
 
 use Carp qw/croak confess carp/;
 use IO::File;
@@ -288,7 +288,7 @@ at your option, any later version of Perl 5 you may have available.
 
 =head1 VERSION
 
-0.01
+0.06
 
 =head1 AUTHOR
 

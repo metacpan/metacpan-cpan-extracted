@@ -1,5 +1,5 @@
 package Lab::Connection::LogMethodCall;
-$Lab::Connection::LogMethodCall::VERSION = '3.552';
+$Lab::Connection::LogMethodCall::VERSION = '3.553';
 use warnings;
 use strict;
 use 5.010;

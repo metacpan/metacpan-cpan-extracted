@@ -11,8 +11,9 @@ WriteMakefile(
     LICENSE             => 'artistic2',
     MIN_PERL_VERSION    => 5.012,
     PREREQ_PM => {
-        'Test::More' => 0,
-        ( $^V < 5.020
+        'Test::More'       => 0,
+        'Keyword::Declare' => 0.001004,
+        ( $^V < 5.022
             ? ('Data::Alias' => 0)
             : ()
         )

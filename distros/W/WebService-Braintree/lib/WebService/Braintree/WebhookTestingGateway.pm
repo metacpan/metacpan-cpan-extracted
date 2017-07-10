@@ -1,5 +1,5 @@
 package WebService::Braintree::WebhookTestingGateway;
-$WebService::Braintree::WebhookTestingGateway::VERSION = '0.9';
+$WebService::Braintree::WebhookTestingGateway::VERSION = '0.91';
 
 use MIME::Base64;
 use POSIX qw(strftime);

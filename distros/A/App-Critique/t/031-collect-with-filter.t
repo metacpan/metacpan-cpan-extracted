@@ -14,7 +14,7 @@ BEGIN {
     use_ok('App::Critique');
 }
 
-my $test_repo = App::Critique::Tester::init_test_repo();
+my $test_repo = App::Critique::Tester::init_test_env();
 my $work_tree = $test_repo->dir;
 my $work_base = Path::Tiny::path( $work_tree )->basename;
 
@@ -63,13 +63,15 @@ subtest '... testing collect' => sub {
         ],
         [
             qr/Session file loaded/,
-            qr/Matched\: keeping file \(bin\/my-app\)/,
-            qr/Matched\: keeping file \(lib\/My\/Test\/WithoutViolations\.pm\)/,
-            qr/Matched\: keeping file \(lib\/My\/Test\/WithViolations\.pm\)/,
-            qr/Matched\: keeping file \(share\/debug.pl\)/,
-            qr/Matched\: keeping file \(root\/app\.psgi\)/,
-            qr/Not Matched\: skipping file \(t\/000\-test\-with\-violations\.t\)/,
-            qr/Not Matched\: skipping file \(t\/001\-test\-without-violations\.t\)/,
+            qr/\.\.\. adding file \(bin\/my-app\)/,
+            qr/\.\.\. adding file \(lib\/My\/Test\/WithoutViolations\.pm\)/,
+            qr/\.\.\. adding file \(lib\/My\/Test\/WithViolations\.pm\)/,
+            qr/\.\.\. adding file \(share\/debug.pl\)/,
+            qr/\.\.\. adding file \(root\/app\.psgi\)/,
+            qr/\.\.\. adding file \(t\/000\-test\-with\-violations\.t\)/,
+            qr/\.\.\. adding file \(t\/001\-test\-without-violations\.t\)/,
+            qr/Accumulated 7 files, now processing/,
+            qr/Filtered 2 files, left with 5/,
             qr/Collected 5 perl file\(s\) for critique/,
             qr/Including bin\/my-app/,
             qr/Including lib\/My\/Test\/WithoutViolations\.pm/,
@@ -105,8 +107,8 @@ subtest '... testing status' => sub {
         ],
         [
             qr/Session file loaded/,
-            qr/perl_critic_policy\s+\: Variables\:\:ProhibitUnusedVariables/,
-            qr/git_work_tree\s*\: $work_tree/,
+            qr/perl_critic_policy\s+\= Variables\:\:ProhibitUnusedVariables/,
+            qr/git_work_tree\s*\= $work_tree/,
                 qr/bin\/my-app/,
                 qr/lib\/My\/Test\/WithoutViolations\.pm/,
                 qr/lib\/My\/Test\/WithViolations\.pm/,

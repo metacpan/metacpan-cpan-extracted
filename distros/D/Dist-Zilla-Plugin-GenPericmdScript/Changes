@@ -1,3 +1,9 @@
+0.41    2017-07-07 (PERLANCAR)
+
+	- Produce scripts in script/ instead of bin/, to be compatible with
+	  static install requirement.
+
+
 0.40    2017-01-16 (PERLANCAR)
 
 	- Add configuration: use_cleanser.

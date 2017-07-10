@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 
 # ABSTRACT: Dispatcher for site specific ftp commands
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 sub new
 {
@@ -43,7 +43,7 @@ AnyEvent::FTP::Client::Site - Dispatcher for site specific ftp commands
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 
@@ -54,6 +54,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

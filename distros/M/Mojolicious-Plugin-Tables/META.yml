@@ -3,13 +3,13 @@ abstract: 'Quickstart and grow a Tables-Maintenance Webapp'
 author:
   - 'Frank Carnovale <frankc@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mojolicious-Plugin-Tables
 no_index:
   directory:
@@ -17,14 +17,15 @@ no_index:
     - inc
     - t
 requires:
-  DBIx::Class::Core: 0
-  DBIx::Class::Schema: 0
-  DBIx::Class::Schema::Loader: 0.07045
-  DBIx::Class::Schema::Loader::Dynamic: 1.05
-  Mojolicious: 6.44
-  perl: 5.010001
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  DBIx::Class::Schema::Loader: '0.07045'
+  DBIx::Class::Schema::Loader::Dynamic: '1.05'
+  Mojolicious: '6.44'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/frank-carnovale/Mojolicious-Plugin-Tables/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/frank-carnovale/Mojolicious-Plugin-Tables.git
-version: 0.07
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

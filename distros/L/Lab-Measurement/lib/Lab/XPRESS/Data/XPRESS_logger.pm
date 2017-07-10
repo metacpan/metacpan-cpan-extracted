@@ -1,5 +1,5 @@
 package Lab::XPRESS::Data::XPRESS_logger;
-$Lab::XPRESS::Data::XPRESS_logger::VERSION = '3.552';
+$Lab::XPRESS::Data::XPRESS_logger::VERSION = '3.553';
 
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;

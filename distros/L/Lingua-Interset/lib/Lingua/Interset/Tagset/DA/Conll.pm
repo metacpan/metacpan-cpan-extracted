@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::DA::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -52,7 +52,7 @@ sub _create_atoms
             'AO' => ['pos' => 'adj', 'numtype' => 'ord'],
             # P = pronoun
             'PP' => ['pos' => 'noun', 'prontype' => 'prs'],
-            'PO' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            'PO' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             'PC' => ['pos' => 'noun', 'prontype' => 'rcp'],
             'PD' => ['pos' => 'noun|adj', 'prontype' => 'dem'],
             'PI' => ['pos' => 'noun|adj', 'prontype' => 'ind'],
@@ -83,8 +83,8 @@ sub _create_atoms
             # I = interjection
             'I'  => ['pos' => 'int'],
             # X = residual class
-            'XA' => ['abbr' => 'abbr'],
-            'XF' => ['foreign' => 'foreign'],
+            'XA' => ['abbr' => 'yes'],
+            'XF' => ['foreign' => 'yes'],
             'XP' => ['pos' => 'punc'],
             # symbol, e.g. "+"
             'XS' => ['pos' => 'sym'],
@@ -98,7 +98,7 @@ sub _create_atoms
         {
             'pos' => { 'noun' => { 'prontype' => { ''    => { 'nountype' => { 'prop' => 'NP',
                                                                               '@'    => 'NC' }},
-                                                   'prs' => { 'poss' => { 'poss' => 'PO',
+                                                   'prs' => { 'poss' => { 'yes' => 'PO',
                                                                           '@'    => 'PP' }},
                                                    'rcp' => 'PC',
                                                    'dem' => 'PD',
@@ -108,7 +108,7 @@ sub _create_atoms
                        'adj'  => { 'prontype' => { ''    => { 'numtype' => { 'card' => 'AC',
                                                                              'ord'  => 'AO',
                                                                              '@'    => 'AN' }},
-                                                   'prs' => { 'poss' => { 'poss' => 'PO',
+                                                   'prs' => { 'poss' => { 'yes' => 'PO',
                                                                           '@'    => 'PP' }},
                                                    'rcp' => 'PC',
                                                    'dem' => 'PD',
@@ -127,8 +127,8 @@ sub _create_atoms
                        'int'  => 'I',
                        'punc' => 'XP',
                        'sym'  => 'XS',
-                       '@'    => { 'abbr' => { 'abbr' => 'XA',
-                                               '@'    => { 'foreign' => { 'foreign' => 'XF',
+                       '@'    => { 'abbr' => { 'yes' => 'XA',
+                                               '@'    => { 'foreign' => { 'yes' => 'XF',
                                                                           '@'       => { 'other/pos' => { 'formula' => 'XR',
                                                                                                           '@'       => 'XX' }}}}}}}
         }
@@ -206,14 +206,14 @@ sub _create_atoms
             # Reflexive personal pronoun: sig
             # Reflexive possessive pronouns: sin, sine, sit
             'no'     => ['other' => {'reflex' => 'no'}],
-            'yes'    => ['reflex' => 'reflex'],
+            'yes'    => ['reflex' => 'yes'],
             'yes/no' => ['other' => {'reflex' => 'maybe'}]
         },
         'encode_map' =>
         {
-            'reflex' => { 'reflex' => 'yes',
+            'reflex' => { 'yes' => 'yes',
                           '@'      => { 'other/reflex' => { 'no' => 'no',
-                                                            '@'  => { 'poss' => { 'poss' => 'no',
+                                                            '@'  => { 'poss' => { 'yes' => 'no',
                                                                                   '@'    => { 'case' => { 'nom' => 'no',
                                                                                                           '@'   => 'yes/no' }}}}}}}
         }
@@ -632,7 +632,7 @@ Lingua::Interset::Tagset::DA::Conll - Driver for the Danish tagset of the CoNLL 
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

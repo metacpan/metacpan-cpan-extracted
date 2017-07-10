@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::PT::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -95,7 +95,7 @@ sub _create_atoms
             # in = interjection # example: adeus, ai, alô
             'in'        => ['pos' => 'int'],
             # ec = partial word # example: anti-, ex-, pós, pré-
-            'ec'        => ['pos' => 'part', 'hyph' => 'hyph'],
+            'ec'        => ['pos' => 'part', 'hyph' => 'yes'],
             # punc = punctuation # example: --, -, ,, ;, :, !, ?:?...
             'punc'      => ['pos' => 'punc'],
             # ? = unknown # 2 occurrences in CoNLL 2006 data
@@ -216,18 +216,18 @@ sub _create_atoms
         'decode_map' =>
         {
             # meu, meus, minha, minhas
-            '<poss1S>'   => ['prontype' => 'prs', 'poss' => 'poss', 'person' => '1', 'possnumber' => 'sing'],
+            '<poss1S>'   => ['prontype' => 'prs', 'poss' => 'yes', 'person' => '1', 'possnumber' => 'sing'],
             # teu, teus, tua, tuas
-            '<poss2S>'   => ['prontype' => 'prs', 'poss' => 'poss', 'person' => '2', 'possnumber' => 'sing'],
+            '<poss2S>'   => ['prontype' => 'prs', 'poss' => 'yes', 'person' => '2', 'possnumber' => 'sing'],
             # seu, seus, sua, suas
-            '<poss3S>'   => ['prontype' => 'prs', 'poss' => 'poss', 'person' => '3', 'possnumber' => 'sing'],
-            '<poss3S/P>' => ['prontype' => 'prs', 'poss' => 'poss', 'person' => '3'],
+            '<poss3S>'   => ['prontype' => 'prs', 'poss' => 'yes', 'person' => '3', 'possnumber' => 'sing'],
+            '<poss3S/P>' => ['prontype' => 'prs', 'poss' => 'yes', 'person' => '3'],
             # nosso, nossos, nossa, nossas
-            '<poss1P>'   => ['prontype' => 'prs', 'poss' => 'poss', 'person' => '1', 'possnumber' => 'plur'],
+            '<poss1P>'   => ['prontype' => 'prs', 'poss' => 'yes', 'person' => '1', 'possnumber' => 'plur'],
             # vosso, vossos, vossa, vossas
-            '<poss2P>'   => ['prontype' => 'prs', 'poss' => 'poss', 'person' => '2', 'possnumber' => 'plur'],
+            '<poss2P>'   => ['prontype' => 'prs', 'poss' => 'yes', 'person' => '2', 'possnumber' => 'plur'],
             # seu, seus, sua, suas
-            '<poss3P>'   => ['prontype' => 'prs', 'poss' => 'poss', 'person' => '3', 'possnumber' => 'plur'],
+            '<poss3P>'   => ['prontype' => 'prs', 'poss' => 'yes', 'person' => '3', 'possnumber' => 'plur'],
         },
         'encode_map' =>
         {
@@ -237,7 +237,7 @@ sub _create_atoms
                               'plur' => { 'person' => { '1'   => '<poss1P>',
                                                         '2'   => '<poss2P>',
                                                         '@'   => '<poss3P>' }},
-                              '@'    => { 'poss' => { 'poss' => '<poss3S/P>' }}}
+                              '@'    => { 'poss' => { 'yes' => '<poss3S/P>' }}}
         }
     );
     # MOOD ####################
@@ -326,7 +326,7 @@ sub _create_atoms
             # Collective reflexive pronoun ("se" in "reunir-se", "associar-se").
             # This feature is relatively rare. It should always co-occur with the <reflex> feature
             # but sometimes it does not so we make sure to set reflex here as well.
-            '<coll>'   => ['reflex' => 'reflex', 'other' => {'coll' => '1'}],
+            '<coll>'   => ['reflex' => 'yes', 'other' => {'coll' => '1'}],
             # Demonstrative pronoun or adverb.
             # adv <dem>|<quant>: tão
             # For adverbs, <dem> almost always comes together with <quant>. There was one occurrence of <dem> without <quant> (an error?)
@@ -363,9 +363,9 @@ sub _create_atoms
             # Reciprocal reflexive (amar-se).
             '<reci>'  => ['prontype' => 'rcp'],
             # Reflexive pronoun.
-            '<refl>'  => ['prontype' => 'prs', 'reflex' => 'reflex'],
+            '<refl>'  => ['prontype' => 'prs', 'reflex' => 'yes'],
             # Reflexive usage of 3rd person possessive (seu, seus, sua, suas).
-            '<si>'    => ['prontype' => 'prs', 'poss' => 'poss', 'person' => '3', 'reflex' => 'reflex'],
+            '<si>'    => ['prontype' => 'prs', 'poss' => 'yes', 'person' => '3', 'reflex' => 'yes'],
             # Differentiator (mesmo, outro, semelhante, tal).
             '<diff>'  => ['other' => {'prontype' => 'diff'}],
             # Identifier pronoun (mesmo, próprio).
@@ -385,7 +385,7 @@ sub _create_atoms
                                                                                           'ind' => { 'numtype' => { 'card' => '<quant>' }},
                                                                                           'neg' => { 'numtype' => { 'card' => '<quant>' }},
                                                                                           'tot' => { 'numtype' => { 'card' => '<quant>' }},
-                                                                                          'prs' => { 'reflex' => { 'reflex' => { 'poss' => { 'poss' => '<si>',
+                                                                                          'prs' => { 'reflex' => { 'yes' => { 'poss' => { 'yes' => '<si>',
                                                                                                                                              '@'    => '<refl>' }}}}}}}}}
         }
     );
@@ -428,7 +428,7 @@ sub _create_atoms
         'intfeature' => 'typo',
         'simple_decode_map' =>
         {
-            '<ALT>' => 'typo'
+            '<ALT>' => 'yes'
         }
     );
     # CONTRACTIONS ####################
@@ -548,11 +548,11 @@ sub _create_atoms
             # adv <foc>: que, é_que, foi, é, era
             '<foc>'   => ['other' => {'foc' => '1'}],
             # Hyphenated prefix, usually of reflexive verbs.
-            '<hyfen>' => ['hyph' => 'hyph'],
+            '<hyfen>' => ['hyph' => 'yes'],
         },
         'encode_map' =>
         {
-            'hyph' => { 'hyph' => '<hyfen>',
+            'hyph' => { 'yes' => '<hyfen>',
                         '@'    => { 'other/derp' => { '1' => '<DERP>',
                                                       '@' => { 'other/ders' => { '1' => '<DERS>',
                                                                                  '@' => { 'other/foc' => { '1' => '<foc>' }}}}}}}
@@ -1275,7 +1275,7 @@ Lingua::Interset::Tagset::PT::Conll - Driver for the Portuguese tagset of the Co
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

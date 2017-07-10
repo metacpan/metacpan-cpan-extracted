@@ -1,5 +1,8 @@
 TYPEMAP
-SSL *		     T_IV
-BIO *         T_IV
-BIO_METHOD *  T_IV
-X509 *		  T_IV
+SSL_CTX *	  T_PTR
+SSL *		     T_PTR
+BIO *         T_PTR
+BIO_METHOD *  T_PTR
+RSA *		     T_PTR
+X509 *		  T_PTR
+DH *          T_PTR

@@ -1,5 +1,5 @@
 package WebService::Braintree::Subscription::Status;
-$WebService::Braintree::Subscription::Status::VERSION = '0.9';
+$WebService::Braintree::Subscription::Status::VERSION = '0.91';
 use strict;
 
 use constant Active => 'Active';

@@ -14,7 +14,7 @@ BEGIN {
     use_ok('App::Critique');
 }
 
-my $test_repo = App::Critique::Tester::init_test_repo();
+my $test_repo = App::Critique::Tester::init_test_env();
 my $work_tree = $test_repo->dir;
 my $work_base = Path::Tiny::path( $work_tree )->basename;
 
@@ -62,8 +62,8 @@ subtest '... testing status' => sub {
         ],
         [
             qr/Session file loaded/,
-            qr/perl_critic_policy\s+\: Variables\:\:ProhibitUnusedVariables/,
-            qr/git_work_tree\s*\: $work_tree/,
+            qr/perl_critic_policy\s+\= Variables\:\:ProhibitUnusedVariables/,
+            qr/git_work_tree\s*\= $work_tree/,
             qr/TOTAL\: 0 file\(s\)/,
             qr/\.critique\/$work_base\/master\/session\.json/,
         ],
@@ -158,8 +158,8 @@ subtest '... testing status' => sub {
         ],
         [
             qr/Session file loaded/,
-            qr/perl_critic_policy\s+\: Variables\:\:ProhibitReusedNames/,
-            qr/git_work_tree\s*\: $work_tree/,
+            qr/perl_critic_policy\s+\= Variables\:\:ProhibitReusedNames/,
+            qr/git_work_tree\s*\= $work_tree/,
             qr/TOTAL\: 0 file\(s\)/,
             qr/\.critique\/$work_base\/master\/session\.json/,
         ],

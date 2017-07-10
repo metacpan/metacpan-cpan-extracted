@@ -1,8 +1,8 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 # band.pl - example of binding callbacks to make a rubberBand to delete fully enclosed contents
-use strict;
-use Tk;
-use Tk::AbstractCanvas;
+use strict;use warnings;
+use        Tk;
+use        Tk::AbstractCanvas;
 my $mwin = Tk::MainWindow->new();
 my $acnv = $mwin->AbstractCanvas()->pack(-expand => 1, -fill  => 'both');
 $acnv->controlNav(1); # advanced CtrlKey+MouseDrag Navigation

@@ -1,5 +1,11 @@
 Revision history for perl module Text::Fuzzy
 
+0.26 2017-07-09
+
+* Don't overwrite strings in Unicode/non-Unicode matches
+* Links to example source code within documentation
+* Example output added to documentation
+
 0.25 2016-12-07
 
 * Documentation changes only

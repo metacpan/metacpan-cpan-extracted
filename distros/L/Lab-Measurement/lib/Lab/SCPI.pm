@@ -1,5 +1,7 @@
 package Lab::SCPI;
-$Lab::SCPI::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and parameters against keywords
+$Lab::SCPI::VERSION = '3.553';
 use 5.010;
 use warnings;
 no warnings 'recursion';
@@ -15,46 +17,6 @@ our @EXPORT = qw( scpi_match scpi_parse scpi_canon
 
 our $WS = qr/[\x00-\x09\x0b-\x20]/;    # whitespace std488-2 7.4.1.2
 
-=head1 NAME
-
-Lab::SCPI - Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and
-parameters against keywords. 
-
-This module exports a single function:
-
-=head2 scpi_match($header, $keyword)
-
-Return true, if C<$header> matches the SCPI keyword expression C<$keyword>.
-
-=head3 Examples
-
-The calls
-
- scpi_match($header, 'voltage[:APERture]')
- scpi_match($header, 'voltage|CURRENT|resistance')
- scpi_match($header, '[:abcdef]:ghi[:jkl]')
-
-are convenient replacements for
-
- $header =~ /^(voltage:aperture|voltage:aper|voltage|volt:aperture|volt:aper|volt)$/i
- $header =~ /^(voltage|volt|current|curr|resistance|res)$/i
- $header =~ /^(:abcdef:ghi:jkl|:abcdef:ghi|:abcd:ghi:jkl|:abcd:ghi|:ghi:jkl|:ghi)$/i
-
-respectively.
-
-Leading and trailing whitespace is removed from the first argument, before
- matching against the keyword.
-
-=head3 Keyword Structure
-
-See Sec. 6 "Program Headers" in the SCPI spec. Always give the long form of a
-keyword; the short form will be derived automatically. The colon is optional
-for the first mnemonic. There must be at least one non-optional mnemonic in the
-keyword.
-
-C<scpi_match> will throw, if it is given an invalid keyword.
-
-=cut
 
 sub scpi_match {
     my $header   = shift;
@@ -99,32 +61,6 @@ sub parse_keyword {
     );
 }
 
-=head2 scpi_shortform($keyword)
-
-returns the "short form" of the input keyword, according to the 
-SCPI spec. Note that the keyword can have an appended number,
-that needs to be preserved: sweep1 -> SWE1. Any trailing '?' is
-also preserved, which is useful for general SCPI parsing purposes.
-
-BEWARE: some instruments have ambivalant 'shortform' when
-constructed using normal rules:
-(Tektronix DPO4104  ACQUIRE:NUMENV  and ACQUIRE:NUMAVG)
-you have to be aware of the mnemonic heirarchy for this,
-so "scpi_canon" has a way to deal with such special cases. 
-
-"Common" keywords (that start with '*') are returned unchanged.
-
-SCPI 6.2.1:
-The short form mnemonic is usually the first four characters of the long form 
-command header. The exception to this is when the long form consists of more 
-than four characters and the fourth character is a vowel. In such cases, the 
-vowel is dropped and the short form becomes the first three characters of 
-the long form. 
-
-Got to watch out for that "usually".  See scpi_canon for how to handle
-the more general case.
-
-=cut
 
 sub scpi_shortform {
     my $string = shift;
@@ -204,24 +140,6 @@ sub match_keyword {
     return 0;
 }
 
-=head2 scpi_parse(string [,hash])
-
-$hash = scpi_parse(string [,hash])
-parse scpi command or response string, create
-a tree structure with hash keys for the mnemonic
-components, entries for the values.
-
-example $string = ":Source:Voltage:A 3.0 V;B 2.7V;:Source:Average ON"
-results in $hash{Source}->{Voltage}->{A}->{_VALUE} = '3.0 V'
-           $hash{Source}->{Voltage}->{B}->{_VALUE} = '2.7V'
-           $hash{Source}->{Average}->{_VALUE} = 'ON'
-
-
-If a hash is given as a parameter of the call, the
-information parsed from the string is combined with
-the input hash.
-
-=cut 
 
 sub scpi_parse {
     my $str = shift;
@@ -378,16 +296,6 @@ sub _scpi_value {
     return $str;
 }
 
-=head2  arrayref = scpi_parse_sequence(string[,arrayref])
-
-returns an array of hashes, each hash is a tree structure
-corresponding to a single scpi command (like scpi_parse)
-Useful for when the sequence of commands is significant.
-
-If an arrayref is passed in, the parsed string results are
-appended as new entries.
-
-=cut
 
 sub scpi_parse_sequence {
     my $str = shift;
@@ -535,18 +443,6 @@ sub scpi_parse_sequence {
     return $d;
 }
 
-=head2 $canonhash = scpi_canon($hash[,$overridehash])
-
-revise a hash tree of scpi mnemonics to use
-the 'shorter' forms, in uppercase
-
-The "override" hash has the same form as the mnemonic
-hash (but with no _VALUE leaves on the tree), but each
-key is in the form 'MESSage' where uppercase is the 
-shorter form. This is to allow shortening of mnemonics
-where the normal shortening rules don't work. 
-
-=cut
 
 sub scpi_canon {
     my $h        = shift;
@@ -609,16 +505,6 @@ sub scpi_canon {
     return $n;
 }
 
-=head2 $flat = scpi_flat($thing[,$override])
-
-convert the tree structure  to a 'flat'
-key space:  h->{a}->{b}->{INPUT3} ->  f{A:B:INP3}, canonicalizing the keys
-This is useful for comparing values between two hash structures
-
-if $thing = hash ref -> flat is corresponding hash
-if $thing = array ref -> flat is an array ref to flat hashes
-
-=cut
 
 sub scpi_flat {
     my $h  = shift;
@@ -672,3 +558,136 @@ sub _scpi_fnode {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::SCPI - Match L<SCPI|http://www.ivifoundation.org/scpi/> headers and parameters against keywords
+
+=head1 VERSION
+
+version 3.553
+
+=head1 Interface
+
+This module exports a single function:
+
+=head2 scpi_match($header, $keyword)
+
+Return true, if C<$header> matches the SCPI keyword expression C<$keyword>.
+
+=head3 Examples
+
+The calls
+
+ scpi_match($header, 'voltage[:APERture]')
+ scpi_match($header, 'voltage|CURRENT|resistance')
+ scpi_match($header, '[:abcdef]:ghi[:jkl]')
+
+are convenient replacements for
+
+ $header =~ /^(voltage:aperture|voltage:aper|voltage|volt:aperture|volt:aper|volt)$/i
+ $header =~ /^(voltage|volt|current|curr|resistance|res)$/i
+ $header =~ /^(:abcdef:ghi:jkl|:abcdef:ghi|:abcd:ghi:jkl|:abcd:ghi|:ghi:jkl|:ghi)$/i
+
+respectively.
+
+Leading and trailing whitespace is removed from the first argument, before
+ matching against the keyword.
+
+=head3 Keyword Structure
+
+See Sec. 6 "Program Headers" in the SCPI spec. Always give the long form of a
+keyword; the short form will be derived automatically. The colon is optional
+for the first mnemonic. There must be at least one non-optional mnemonic in the
+keyword.
+
+C<scpi_match> will throw, if it is given an invalid keyword.
+
+=head2 scpi_shortform($keyword)
+
+returns the "short form" of the input keyword, according to the 
+SCPI spec. Note that the keyword can have an appended number,
+that needs to be preserved: sweep1 -> SWE1. Any trailing '?' is
+also preserved, which is useful for general SCPI parsing purposes.
+
+BEWARE: some instruments have ambivalant 'shortform' when
+constructed using normal rules:
+(Tektronix DPO4104  ACQUIRE:NUMENV  and ACQUIRE:NUMAVG)
+you have to be aware of the mnemonic heirarchy for this,
+so "scpi_canon" has a way to deal with such special cases. 
+
+"Common" keywords (that start with '*') are returned unchanged.
+
+SCPI 6.2.1:
+The short form mnemonic is usually the first four characters of the long form 
+command header. The exception to this is when the long form consists of more 
+than four characters and the fourth character is a vowel. In such cases, the 
+vowel is dropped and the short form becomes the first three characters of 
+the long form. 
+
+Got to watch out for that "usually".  See scpi_canon for how to handle
+the more general case.
+
+=head2 scpi_parse(string [,hash])
+
+$hash = scpi_parse(string [,hash])
+parse scpi command or response string, create
+a tree structure with hash keys for the mnemonic
+components, entries for the values.
+
+example $string = ":Source:Voltage:A 3.0 V;B 2.7V;:Source:Average ON"
+results in $hash{Source}->{Voltage}->{A}->{_VALUE} = '3.0 V'
+           $hash{Source}->{Voltage}->{B}->{_VALUE} = '2.7V'
+           $hash{Source}->{Average}->{_VALUE} = 'ON'
+
+If a hash is given as a parameter of the call, the
+information parsed from the string is combined with
+the input hash.
+
+=head2 arrayref = scpi_parse_sequence(string[,arrayref])
+
+returns an array of hashes, each hash is a tree structure
+corresponding to a single scpi command (like scpi_parse)
+Useful for when the sequence of commands is significant.
+
+If an arrayref is passed in, the parsed string results are
+appended as new entries.
+
+=head2 $canonhash = scpi_canon($hash[,$overridehash])
+
+revise a hash tree of scpi mnemonics to use
+the 'shorter' forms, in uppercase
+
+The "override" hash has the same form as the mnemonic
+hash (but with no _VALUE leaves on the tree), but each
+key is in the form 'MESSage' where uppercase is the 
+shorter form. This is to allow shortening of mnemonics
+where the normal shortening rules don't work. 
+
+=head2 $flat = scpi_flat($thing[,$override])
+
+convert the tree structure  to a 'flat'
+key space:  h->{a}->{b}->{INPUT3} ->  f{A:B:INP3}, canonicalizing the keys
+This is useful for comparing values between two hash structures
+
+if $thing = hash ref -> flat is corresponding hash
+if $thing = array ref -> flat is an array ref to flat hashes
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2016       Charles Lane, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

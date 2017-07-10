@@ -1,5 +1,5 @@
 package WebService::Braintree::ClientTokenGateway;
-$WebService::Braintree::ClientTokenGateway::VERSION = '0.9';
+$WebService::Braintree::ClientTokenGateway::VERSION = '0.91';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 

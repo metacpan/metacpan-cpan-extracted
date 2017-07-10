@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Dump;
 
-our $DATE = '2017-06-24'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 use strict;
@@ -125,7 +125,7 @@ sub dump_pericmd_script {
             my $meth = $args{method} // 'self-dump';
             if ($meth eq 'self-dump') {
                 local $ENV{PERINCI_CMDLINE_DUMP} = $tag;
-                system $^X, $filename;
+                system $^X, (map {"-I$_"} @$libs), $filename;
             } else {
                 my @cmd = (
                     $^X, (map {"-I$_"} @$libs),
@@ -209,7 +209,7 @@ Perinci::CmdLine::Dump - Run a Perinci::CmdLine-based script but only to dump th
 
 =head1 VERSION
 
-This document describes version 0.10 of Perinci::CmdLine::Dump (from Perl distribution Perinci-CmdLine-Dump), released on 2017-06-24.
+This document describes version 0.11 of Perinci::CmdLine::Dump (from Perl distribution Perinci-CmdLine-Dump), released on 2017-07-07.
 
 =for Pod::Coverage ^(dump_perinci_cmdline_script)$
 

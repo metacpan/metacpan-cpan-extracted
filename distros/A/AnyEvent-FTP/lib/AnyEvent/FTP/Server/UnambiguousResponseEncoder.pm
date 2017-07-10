@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: Server response encoder that encodes responses so they cannot be confused
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 with 'AnyEvent::FTP::Server::Role::ResponseEncoder';
@@ -15,10 +15,10 @@ with 'AnyEvent::FTP::Server::Role::ResponseEncoder';
 sub encode
 {
   my $self = shift;
-  
+
   my $code;
   my $message;
-  
+
   if(ref $_[0])
   {
     $code = $_[0]->code;
@@ -28,11 +28,11 @@ sub encode
   {
     ($code, $message) = @_;
   }
-  
+
   $message = [ $message ] unless ref($message) eq 'ARRAY';
-  
+
   my $last = pop @$message;
-  
+
   return join "\015\012", (map { "$code-$_" } @$message), "$code $last\015\012";
 }
 
@@ -50,7 +50,7 @@ AnyEvent::FTP::Server::UnambiguousResponseEncoder - Server response encoder that
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

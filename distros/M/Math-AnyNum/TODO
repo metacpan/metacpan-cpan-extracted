@@ -1,9 +1,7 @@
 ## TODO list for Math::AnyNum
 
-# Add the following methods:
-
-    exp2  [?]
-    exp10 [?]
+# Use `Rmpfr_q_div()` and `Rmpfr_z_div()` with Math::MPFR >= 3.36.
+# Use `Rmpfr_z_sub()` when MPFR >= 3.1.0 is available.
 
 # Add the following conversion methods:
 

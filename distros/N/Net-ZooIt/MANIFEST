@@ -1,8 +1,15 @@
+bin/pod2md
+bin/release
+Changes
 COPYING
 lib/Net/ZooIt.pm
 Makefile.PL
 MANIFEST			This list of files
 README
+t/etc/log4j.properties
+t/etc/zoo.cfg.default
+t/lib/ZooItServer.pm
+t/connect.t
 t/election.t
 t/lock.t
 t/lock_to.t

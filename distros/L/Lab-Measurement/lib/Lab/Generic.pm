@@ -1,5 +1,7 @@
 package Lab::Generic;
-$Lab::Generic::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: General function library for the L::M classes
+$Lab::Generic::VERSION = '3.553';
 use Lab::Generic::CLOptions;
 
 
@@ -252,3 +254,32 @@ sub seconds2time {
 
 use Lab::GenericSignals;
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::Generic - General function library for the L::M classes
+
+=head1 VERSION
+
+version 3.553
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2013       Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Alexei Iankilevitch, Andreas K. Huettel, Christian Butschkow
+            2015       Alois Dirnaichner, Christian Butschkow
+            2016       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

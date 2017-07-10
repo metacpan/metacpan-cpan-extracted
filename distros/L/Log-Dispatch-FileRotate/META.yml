@@ -5,7 +5,6 @@ author:
 build_requires:
   POSIX: '0'
   Path::Tiny: '0.018'
-  Socket: '0'
   Test::More: '0.88'
   Test::Warn: '0'
   warnings: '0'
@@ -33,5 +32,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Log-Dispatch-FileRotate
   homepage: http://search.cpan.org/dist/Log-Dispatch-FileRotate/
   repository: git://github.com/mschout/perl-log-dispatch-filerotate.git
-version: '1.26'
+version: '1.27'
 x_serialization_backend: 'YAML::Tiny version 1.69'

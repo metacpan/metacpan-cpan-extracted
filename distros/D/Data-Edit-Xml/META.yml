@@ -15,7 +15,7 @@ name: Data-Edit-Xml
 provides:
   Data::Edit::Xml:
     file: lib/Data/Edit/Xml.pm
-    version: '2017.631'
+    version: '2017.704'
 requires:
   Carp: '0'
   Data::Table::Text: '0'
@@ -23,4 +23,4 @@ requires:
   XML::Parser: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2017.631'
+version: '2017.704'

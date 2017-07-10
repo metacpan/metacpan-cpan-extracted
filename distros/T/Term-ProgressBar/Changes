@@ -1,5 +1,8 @@
 Revision history for Perl extension Term::ProgressBar
 
+2.19  2017-07-10 MANWAR
+      - Fixed inconsistent version as reported by CPANTS.
+
 2.18  2016-12-06 MANWAR
       - Add MANIFEST file.
       - Removed META.yml file.

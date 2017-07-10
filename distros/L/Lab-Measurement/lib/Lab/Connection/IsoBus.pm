@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
-
 package Lab::Connection::IsoBus;
-$Lab::Connection::IsoBus::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Oxford Instruments IsoBus connection
+$Lab::Connection::IsoBus::VERSION = '3.553';
 use strict;
 use Lab::Bus::VISA;
 use Lab::Connection;
@@ -80,9 +80,10 @@ sub is_blocked {
 
 1;
 
-#
-# That's all, all that was needed was the additional field "isobus_address".
-#
+
+1;
+
+__END__
 
 =pod
 
@@ -90,7 +91,11 @@ sub is_blocked {
 
 =head1 NAME
 
-Lab::Connection::IsoBus - IsoBus connection
+Lab::Connection::IsoBus - Oxford Instruments IsoBus connection
+
+=head1 VERSION
+
+version 3.553
 
 =head1 SYNOPSIS
 
@@ -109,7 +114,6 @@ transparently handled via a pre-existing bus and connection object (e.g. serial 
 
 It inherits from L<Lab::Connection>.
 
-
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -119,11 +123,9 @@ It inherits from L<Lab::Connection>.
    isobus_address => 3,
  }
 
-
 =head1 METHODS
 
 This just falls back on the methods inherited from L<Lab::Connection>.
-
 
 =head2 config
 
@@ -136,7 +138,7 @@ Without arguments, returns a reference to the complete $self->Config aka @_ of t
 
  $Config = $connection->Config();
  $IsoBus_Address = $connection->Config()->{'isobus_address'};
- 
+
 =head1 CAVEATS/BUGS
 
 Probably few. Mostly because there's not a lot to be done here. Please report.
@@ -151,13 +153,18 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       David Kalok, Florian Olbrich, Stefan Geissler
+            2013       Stefan Geissler
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

@@ -1,6 +1,6 @@
 =head1 LICENSE
 
-Copyright [1999-2016] EMBL-European Bioinformatics Institute
+Copyright [2015-2017] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -151,7 +151,7 @@ so using the next() function is preferable to using sweeps.
 =cut
 
 package Bio::DB::HTS::VCF;
-$Bio::DB::HTS::VCF::VERSION = '2.7';
+$Bio::DB::HTS::VCF::VERSION = '2.8';
 
 use Bio::DB::HTS;
 use strict;
@@ -207,7 +207,7 @@ sub close
 }
 
 package Bio::DB::HTS::VCF::Sweep ;
-$Bio::DB::HTS::VCF::Sweep::VERSION = '2.7';
+$Bio::DB::HTS::VCF::Sweep::VERSION = '2.8';
 
 use Bio::DB::HTS;
 use strict;

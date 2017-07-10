@@ -38,9 +38,9 @@
       "runtime" : {
          "requires" : {
             "Catmandu" : "1.0601",
-            "Catmandu::SRU" : "0.032",
+            "Catmandu::SRU" : "0.040",
             "Readonly" : "0",
-            "perl" : "v5.10.1"
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
@@ -65,7 +65,7 @@
          "web" : "https://github.com/jorol/Catmandu-MAB2"
       }
    },
-   "version" : "0.15",
+   "version" : "0.19",
    "x_contributors" : [
       "Johann Rolschewski <rolschewski@gmail.com>"
    ],

@@ -32,187 +32,109 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: lib/App/Chart/Series/Derived/Donchian.pm:33
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:127
-msgid "Donchian Channel"
+#: lib/App/Chart/Series/Derived/RangeMidpoint.pm:32
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:512
+msgid "Range Midpoint"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/Donchian.pm:34
-msgid "Donchian"
+#: lib/App/Chart/Series/Derived/RangeMidpoint.pm:33
+msgid "Range Mid"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/Donchian.pm:36
+#: lib/App/Chart/Series/Derived/RangeMidpoint.pm:34
 msgctxt "manual-node"
-msgid "Donchian Channel"
+msgid "Range Midpoint"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/Donchian.pm:39
-#: lib/App/Chart/Series/Derived/RSquared.pm:49
-#: lib/App/Chart/Series/Derived/Fisher.pm:44
-#: lib/App/Chart/Series/Derived/ATR.pm:44
-#: lib/App/Chart/Series/Derived/FRAMAdimension.pm:40
-#: lib/App/Chart/Series/Derived/LinRegStderr.pm:69
-#: lib/App/Chart/Series/Derived/CMO.pm:49
-#: lib/App/Chart/Series/Derived/EMAx3.pm:36
-#: lib/App/Chart/Series/Derived/ElderPower.pm:43
-#: lib/App/Chart/Series/Derived/LinRegSlope.pm:40
-#: lib/App/Chart/Series/Derived/SMA.pm:37
-#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:37
-#: lib/App/Chart/Series/Derived/COG.pm:47
-#: lib/App/Chart/Series/Derived/EMAx2.pm:36
-#: lib/App/Chart/Series/Derived/RSI.pm:47
-#: lib/App/Chart/Series/Derived/Median.pm:37
-#: lib/App/Chart/Series/Derived/ZLEMA.pm:43
-#: lib/App/Chart/Series/Derived/HullMA.pm:46
-#: lib/App/Chart/Series/Derived/GuppyMMA.pm:45
-#: lib/App/Chart/Series/Derived/TMA.pm:46
-#: lib/App/Chart/Series/Derived/DPO.pm:44
-#: lib/App/Chart/Series/Derived/T3.pm:48
+#: lib/App/Chart/Series/Derived/RangeMidpoint.pm:39
+#: lib/App/Chart/Series/Derived/TRIX.pm:41
+#: lib/App/Chart/Series/Derived/AdaptiveLaguerreAlpha.pm:39
 #: lib/App/Chart/Series/Derived/CCI.pm:46
-#: lib/App/Chart/Series/Derived/PFE.pm:61
-#: lib/App/Chart/Series/Derived/MFI.pm:62
-#: lib/App/Chart/Series/Derived/TEMA.pm:37
-#: lib/App/Chart/Series/Derived/RWI.pm:95
-#: lib/App/Chart/Series/Derived/ADX.pm:43
-#: lib/App/Chart/Series/Derived/Keltner.pm:36
-#: lib/App/Chart/Series/Derived/WilliamsR.pm:38
-#: lib/App/Chart/Series/Derived/Ulcer.pm:53
-#: lib/App/Chart/Series/Derived/TwiggsMF.pm:43
-#: lib/App/Chart/Series/Derived/VWMA.pm:36
-#: lib/App/Chart/Series/Derived/EPMA.pm:134
-#: lib/App/Chart/Series/Derived/Momentum.pm:36
-#: lib/App/Chart/Series/Derived/WMA.pm:42
-#: lib/App/Chart/Series/Derived/Ease.pm:50
-#: lib/App/Chart/Series/Derived/Bollinger.pm:37
+#: lib/App/Chart/Series/Derived/Stddev.pm:38
 #: lib/App/Chart/Series/Derived/KAMAalpha.pm:44
-#: lib/App/Chart/Series/Derived/NATR.pm:55
-#: lib/App/Chart/Series/Derived/Aroon.pm:38
-#: lib/App/Chart/Series/Derived/VHF.pm:41
-#: lib/App/Chart/Series/Derived/AdaptiveLaguerre.pm:57
-#: lib/App/Chart/Series/Derived/VOLR.pm:41
+#: lib/App/Chart/Series/Derived/GAPO.pm:53
+#: lib/App/Chart/Series/Derived/TEMA.pm:37
+#: lib/App/Chart/Series/Derived/ElderPower.pm:43
+#: lib/App/Chart/Series/Derived/TwiggsMF.pm:43
+#: lib/App/Chart/Series/Derived/HullMA.pm:46
+#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:37
+#: lib/App/Chart/Series/Derived/ATR.pm:44
 #: lib/App/Chart/Series/Derived/REMA.pm:52
 #: lib/App/Chart/Series/Derived/REMA.pm:57
-#: lib/App/Chart/Series/Derived/TRIX.pm:41
-#: lib/App/Chart/Series/Derived/StochRSI.pm:45
-#: lib/App/Chart/Series/Derived/EMA.pm:68
-#: lib/App/Chart/Series/Derived/IMI.pm:45
-#: lib/App/Chart/Series/Derived/Prev.pm:34
-#: lib/App/Chart/Series/Derived/Stddev.pm:38
-#: lib/App/Chart/Series/Derived/RangeMidpoint.pm:39
-#: lib/App/Chart/Series/Derived/SineMA.pm:42
 #: lib/App/Chart/Series/Derived/Ultimate.pm:42
-#: lib/App/Chart/Series/Derived/AdaptiveLaguerreAlpha.pm:39
-#: lib/App/Chart/Series/Derived/GAPO.pm:53
-#: lib/App/Chart/Series/Derived/DEMA.pm:50
-#: lib/App/Chart/Series/Derived/PGO.pm:56
+#: lib/App/Chart/Series/Derived/SMA.pm:37
+#: lib/App/Chart/Series/Derived/Ease.pm:50
+#: lib/App/Chart/Series/Derived/VWMA.pm:36
+#: lib/App/Chart/Series/Derived/StochRSI.pm:45
+#: lib/App/Chart/Series/Derived/VHF.pm:41
+#: lib/App/Chart/Series/Derived/RSquared.pm:49
+#: lib/App/Chart/Series/Derived/LinRegSlope.pm:40
+#: lib/App/Chart/Series/Derived/CMO.pm:49
+#: lib/App/Chart/Series/Derived/WilliamsR.pm:38
+#: lib/App/Chart/Series/Derived/COG.pm:47
 #: lib/App/Chart/Series/Derived/QStick.pm:42
-#: lib/App/Chart/Series/Derived/DMI.pm:40
+#: lib/App/Chart/Series/Derived/TMA.pm:46
+#: lib/App/Chart/Series/Derived/Ulcer.pm:53
+#: lib/App/Chart/Series/Derived/EMAx2.pm:36
 #: lib/App/Chart/Series/Derived/FOSC.pm:62
+#: lib/App/Chart/Series/Derived/SineMA.pm:42
+#: lib/App/Chart/Series/Derived/Momentum.pm:36
+#: lib/App/Chart/Series/Derived/Median.pm:37
+#: lib/App/Chart/Series/Derived/GuppyMMA.pm:45
+#: lib/App/Chart/Series/Derived/WMA.pm:42
+#: lib/App/Chart/Series/Derived/NATR.pm:55
+#: lib/App/Chart/Series/Derived/RSI.pm:47
+#: lib/App/Chart/Series/Derived/RWI.pm:95
+#: lib/App/Chart/Series/Derived/DEMA.pm:50
+#: lib/App/Chart/Series/Derived/Donchian.pm:39
+#: lib/App/Chart/Series/Derived/Prev.pm:34
+#: lib/App/Chart/Series/Derived/EPMA.pm:134
+#: lib/App/Chart/Series/Derived/DMI.pm:40
+#: lib/App/Chart/Series/Derived/LinRegStderr.pm:69
 #: lib/App/Chart/Series/Derived/ChaikinMF.pm:43
+#: lib/App/Chart/Series/Derived/VOLR.pm:41
+#: lib/App/Chart/Series/Derived/PFE.pm:61
+#: lib/App/Chart/Series/Derived/ADX.pm:43
+#: lib/App/Chart/Series/Derived/Bollinger.pm:37
+#: lib/App/Chart/Series/Derived/Aroon.pm:38
+#: lib/App/Chart/Series/Derived/IMI.pm:45
+#: lib/App/Chart/Series/Derived/DPO.pm:44
+#: lib/App/Chart/Series/Derived/FRAMAdimension.pm:40
+#: lib/App/Chart/Series/Derived/AdaptiveLaguerre.pm:57
+#: lib/App/Chart/Series/Derived/PGO.pm:56
+#: lib/App/Chart/Series/Derived/MFI.pm:62
+#: lib/App/Chart/Series/Derived/EMA.pm:68
+#: lib/App/Chart/Series/Derived/ZLEMA.pm:43
+#: lib/App/Chart/Series/Derived/Keltner.pm:36
+#: lib/App/Chart/Series/Derived/T3.pm:48
+#: lib/App/Chart/Series/Derived/EMAx3.pm:36
+#: lib/App/Chart/Series/Derived/Fisher.pm:44
 msgid "Days"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/RSquared.pm:40
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:292
-msgid "R-Squared Index"
+#: lib/App/Chart/Series/Derived/TRIX.pm:33
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:357
+msgid "TRIX"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/RSquared.pm:41
-msgid "R-Squared"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RSquared.pm:42
+#: lib/App/Chart/Series/Derived/TRIX.pm:35
 msgctxt "manual-node"
-msgid "R-Squared Index"
+msgid "TRIX"
 msgstr ""
 
-#: lib/App/Chart/Suffix/JK.pm:31
-msgid "Jakarta"
-msgstr ""
-
-#: lib/App/Chart/Suffix/JK.pm:49
-msgid "_Jakarta Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/JK.pm:50
-msgid "Open web browser at the Jakarta Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TGE.pm:62
-msgid "TGE _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TGE.pm:63
-msgid ""
-"Open web browser at the Tokyo Grain Exchange contract specifications for "
-"this commodity"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TGE.pm:169
-msgid "TGE"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TGE.pm:214 lib/App/Chart/Suffix/TGE.pm:258
-#, perl-brace-format
-msgid "TGE data {filename}"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Fisher.pm:36
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:152
-msgid "Fisher Transform"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Fisher.pm:37
-msgid "Fisher"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Fisher.pm:38
-msgctxt "manual-node"
-msgid "Fisher Transform"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/NVI.pm:37
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:252
-msgid "NVI - Negative Volume Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/NVI.pm:38
-msgid "NVI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/NVI.pm:39
-#: lib/App/Chart/Series/Derived/PVI.pm:31
-msgctxt "manual-node"
-msgid "Negative Volume Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ATR.pm:36
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:52
-msgid "ATR - Average True Range"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ATR.pm:37
-msgid "ATR"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ATR.pm:38
-msgctxt "manual-node"
-msgid "Average True Range"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/RawLatest.pm:28 lib/App/Chart/Gtk2/OpenDialog.pm:113
+#: lib/App/Chart/Gtk2/IntradayModeComboBox.pm:36
 #: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:32
-#: lib/App/Chart/Gtk2/IntradaySave.pm:36 lib/App/Chart/Gtk2/Job/Intraday.pm:35
+#: lib/App/Chart/Gtk2/RawLatest.pm:28 lib/App/Chart/Gtk2/View.pm:42
+#: lib/App/Chart/Gtk2/OpenDialog.pm:113 lib/App/Chart/Gtk2/Job/Intraday.pm:35
+#: lib/App/Chart/Gtk2/IntradaySave.pm:36
 #: lib/App/Chart/Gtk2/IntradayDialog.pm:47
 #: lib/App/Chart/Gtk2/IntradayDialog.pm:130
-#: lib/App/Chart/Gtk2/IntradayModeComboBox.pm:36
-#: lib/App/Chart/Gtk2/RawInfo.pm:32 lib/App/Chart/Gtk2/View.pm:42
-#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:39
-#: lib/App/Chart/Gtk2/DeleteDialog.pm:32
-#: lib/App/Chart/Gtk2/IntradayImage.pm:43
 #: lib/App/Chart/Gtk2/WatchlistDialog.pm:169
-#: lib/App/Chart/Gtk2/WeblinkMenu.pm:41 lib/App/Chart/Gtk2/TickerMenu.pm:36
-#: lib/App/Chart/Gtk2/RawDialog.pm:54 lib/App/Chart/Gtk2/RawDialog.pm:186
+#: lib/App/Chart/Gtk2/WeblinkMenu.pm:41
+#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:39
+#: lib/App/Chart/Gtk2/IntradayImage.pm:43 lib/App/Chart/Gtk2/TickerMenu.pm:36
+#: lib/App/Chart/Gtk2/DeleteDialog.pm:32 lib/App/Chart/Gtk2/RawDialog.pm:54
+#: lib/App/Chart/Gtk2/RawDialog.pm:186 lib/App/Chart/Gtk2/RawInfo.pm:32
 msgid "Symbol"
 msgstr ""
 
@@ -226,1464 +148,6 @@ msgstr ""
 
 #: lib/App/Chart/Suffix/AS.pm:44
 msgid "Open web browser at the Amsterdam Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Weblink/SandP.pm:43
-msgid "Standard and _Poors index information"
-msgstr ""
-
-#: lib/App/Chart/Weblink/SandP.pm:44
-msgid ""
-"Open web browser at the Standard and Poors web site page for this index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/OpenDialog.pm:57
-msgid "Chart: Open"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/OpenDialog.pm:104
-msgid ""
-"Not in database, click \"New\" to download.\n"
-"Be sure capitalization is right for download.\n"
-"(Or click/return again to really open.)"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/OpenDialog.pm:120
-#: lib/App/Chart/Gtk2/IntradayDialog.pm:137
-#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:128
-msgid "Enter"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/OpenDialog.pm:165
-msgctxt "manual-node"
-msgid "Open"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BA.pm:31
-msgid "Buenos Aires"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/FRAMAdimension.pm:30
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:467
-msgid "FRAMA - Dimension"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/FRAMAdimension.pm:31
-msgid "FRAMA dimension"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/FRAMAdimension.pm:32
-#: lib/App/Chart/Series/Derived/FRAMAalpha.pm:31
-#: lib/App/Chart/Series/Derived/FRAMA.pm:46
-msgctxt "manual-node"
-msgid "Fractal Adaptive Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Symlist.pm:201
-msgid "(No name)"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/LinRegStderr.pm:60
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:497
-msgid "Linear Regression Stderr"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/LinRegStderr.pm:61
-msgid "Linreg Stderr"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/LinRegStderr.pm:62
-msgctxt "manual-node"
-msgid "Linear Regression Standard Error"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/CMO.pm:39
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:87
-msgid "CMO - Chande Momentum Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/CMO.pm:40
-msgid "CMO"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/CMO.pm:41
-msgctxt "manual-node"
-msgid "Chande Momentum Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MU.pm:33
-msgid "Munich"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MU.pm:47
-msgid "_Munich Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MU.pm:48
-msgid "Open web browser at the Munich Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PVI.pm:29
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:272
-msgid "PVI - Positive Volume Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PVI.pm:30
-msgid "PVI"
-msgstr ""
-
-#: lib/App/Chart/Suffix/HM.pm:33 lib/App/Chart/Suffix/H.pm:32
-msgid "Hamburg"
-msgstr ""
-
-#: lib/App/Chart/Suffix/HM.pm:47
-msgid "_Hamburg Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/HM.pm:48
-msgid "Open web browser at the Hamburg Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/TA.pm:137 lib/App/Chart/Series/Indicator.pm:55
-msgctxt "separator"
-msgid ","
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EMAx3.pm:29
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:457
-msgid "EMA of EMA of EMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EMAx3.pm:30
-msgid "EMAx3"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EMAx3.pm:31
-msgctxt "manual-node"
-msgid "EMA of EMA of EMA"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SG.pm:33
-msgid "Stuttgart"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SG.pm:47
-msgid "_Stuttgart Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SG.pm:48
-msgid "Open web browser at the Stuttgart Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MLC.pm:43
-msgctxt "manual-node"
-msgid "MLC Funds"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MLC.pm:65
-msgid "MLC"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MLC.pm:140
-#, perl-brace-format
-msgid "MLC: invalid symbol, should be \"Fund,Product.MLC\": {symbol}\n"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ElderPower.pm:35
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:142
-msgid "Elder Bull/Bear Power"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ElderPower.pm:36
-msgid "Elder Power"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ElderPower.pm:37
-msgctxt "manual-node"
-msgid "Elder Bull/Bear Power"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TSI.pm:68
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:362
-msgid "TSI - True Strength Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TSI.pm:69
-msgid "TSI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TSI.pm:70
-msgctxt "manual-node"
-msgid "True Strength Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TSI.pm:78
-msgid "EMA-1 Days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TSI.pm:85
-msgid "EMA-2 Days"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:60
-msgid "Download a new quote for this symbol"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:65
-#: lib/App/Chart/Gtk2/TickerMenu.pm:87
-msgid "_Chart"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:66
-#: lib/App/Chart/Gtk2/TickerMenu.pm:88
-msgid "Go to this symbol in the main Chart window"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:72 lib/App/Chart/Gtk2/Main.pm:200
-#: lib/App/Chart/Gtk2/WatchlistDialog.pm:104
-#: lib/App/Chart/Gtk2/TickerMenu.pm:94
-msgid "_Intraday"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:73
-#: lib/App/Chart/Gtk2/TickerMenu.pm:95
-msgid "View intraday graphs for this symbol"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:78 lib/App/Chart/Gtk2/Main.pm:235
-#: lib/App/Chart/Gtk2/TickerMenu.pm:101
-msgid "_Web"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/LinRegSlope.pm:30
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:492
-msgid "Linear Regression Slope"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/LinRegSlope.pm:31
-msgid "Linreg Slope"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/LinRegSlope.pm:32
-msgctxt "manual-node"
-msgid "Linear Regression Slope"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IntradaySave.pm:63
-msgid "Chart: Save Intraday Image"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IntradaySave.pm:80
-msgid "Save intraday image to file"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IntradaySave.pm:150
-#: lib/App/Chart/Gtk2/IntradayImage.pm:167
-#: lib/App/Chart/Gtk2/IntradayImage.pm:182
-msgid "(No data)"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/SMA.pm:30
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:22
-msgid "SMA - Simple MA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/SMA.pm:31
-msgid "SMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/SMA.pm:32
-msgctxt "manual-node"
-msgid "Simple Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BEN.pm:35
-msgid "Bendigo"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BEN.pm:51
-msgid "BSX _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BEN.pm:52
-msgid ""
-"Open web browser at the Bendigo Stock Exchange information page for this "
-"company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BEN.pm:91
-msgid "BSX stock numbers"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Trendscore.pm:37
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:372
-msgid "Trendscore"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Trendscore.pm:39
-msgctxt "manual-node"
-msgid "Trendscore"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:27
-#: lib/App/Chart/Series/Derived/EMA.pm:61
-msgid "EMA - Exponential MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:32
-#: lib/App/Chart/Series/Derived/WMA.pm:35
-msgid "WMA - Weighted MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:37
-#: lib/App/Chart/Gtk2/WatchlistDialog.pm:232
-#: lib/App/Chart/Series/Derived/Volume.pm:28
-#: lib/App/Chart/Gtk2/SeriesTreeView.pm:69
-msgid "Volume"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:42
-#: lib/App/Chart/Series/Derived/ADX.pm:32
-msgid "ADX - Average Directional Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:47
-#: lib/App/Chart/Series/Derived/ASI.pm:38
-msgid "ASI - Accumulative Swing Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:57
-#: lib/App/Chart/Series/Derived/AccDist.pm:29
-msgid "Accumulation/Distribution Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:62
-#: lib/App/Chart/Series/Derived/AdaptiveLaguerre.pm:51
-msgid "Adaptive Laguerre Filter"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:72
-#: lib/App/Chart/Series/Derived/Aroon.pm:29
-#: lib/App/Chart/Series/Derived/Aroon.pm:30
-msgid "Aroon"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:77
-#: lib/App/Chart/Series/Derived/Bollinger.pm:31
-msgid "Bollinger Bands"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:82
-#: lib/App/Chart/Series/Derived/CCI.pm:38
-msgid "CCI - Commodity Channel Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:92
-#: lib/App/Chart/Series/Derived/COG.pm:40
-msgid "Centre of Gravity"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:97
-#: lib/App/Chart/Series/Derived/ChaikinMF.pm:33
-msgid "Chaikin Money Flow"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:102
-#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:28
-msgid "Chaikin Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:107
-#: lib/App/Chart/Series/Derived/Coppock.pm:28
-msgid "Coppock Curve"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:112
-#: lib/App/Chart/Series/Derived/DMI.pm:32
-msgid "DMI - Directional Movement Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:117
-#: lib/App/Chart/Series/Derived/DPO.pm:36
-msgid "DPO - Detrended Price Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:122
-#: lib/App/Chart/Series/Derived/DarvasBoxes.pm:51
-msgid "Darvas Boxes"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:132
-#: lib/App/Chart/Series/Derived/EPMA.pm:127
-msgid "EPMA - Endpoint MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:137
-#: lib/App/Chart/Series/Derived/Ease.pm:42
-msgid "Ease of Movement"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:147
-#: lib/App/Chart/Series/Derived/FRAMA.pm:44
-msgid "FRAMA - Fractal Adaptive MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:157
-#: lib/App/Chart/Series/Derived/ForceIndex.pm:35
-msgid "Force Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:162
-#: lib/App/Chart/Series/Derived/GuppyMMA.pm:38
-msgid "Guppy Multiple MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:167
-#: lib/App/Chart/Series/Derived/HullMA.pm:40
-msgid "Hull MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:172
-#: lib/App/Chart/Series/Derived/IMI.pm:35
-msgid "IMI - Intraday Momentum Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:177
-#: lib/App/Chart/Series/Derived/Ichimoku.pm:31
-msgid "Ichimoku Kinko Hyo"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:182
-#: lib/App/Chart/Series/Derived/Inertia.pm:43
-msgid "Inertia (smoothed RVI)"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:187
-#: lib/App/Chart/Series/Derived/KAMA.pm:46
-msgid "KAMA - Kaufmann Adaptive MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:192
-#: lib/App/Chart/Series/Derived/KVO.pm:31
-msgid "KVO - Klinger Volume Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:197
-#: lib/App/Chart/Series/Derived/Keltner.pm:29
-msgid "Keltner Channel"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:202
-#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:31
-msgid "Kirshenbaum Bands"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:207
-#: lib/App/Chart/Series/Derived/LaguerreFilter.pm:49
-msgid "Laguerre Filter"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:212
-#: lib/App/Chart/Series/Derived/MACD.pm:29
-msgid "MACD - Momentum Advance/Decline"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:217
-#: lib/App/Chart/Series/Derived/MASS.pm:40
-msgid "MASS Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:222
-#: lib/App/Chart/Series/Derived/MFI.pm:52
-msgid "MFI - Money Flow Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:227
-#: lib/App/Chart/Series/Derived/MedianAverage.pm:38
-msgid "Median-Average Adaptive"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:232
-#: lib/App/Chart/Series/Derived/Midpoint.pm:30
-msgid "Midpoint (H+L)/2"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:237
-#: lib/App/Chart/Series/Derived/Momentum.pm:28
-msgid "Momentum"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:247
-#: lib/App/Chart/Series/Derived/NATR.pm:47
-msgid "NATR - Normalized ATR"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:257
-#: lib/App/Chart/Series/Derived/OBV.pm:29
-msgid "OBV - On-balance Volume"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:262
-#: lib/App/Chart/Series/Derived/PFE.pm:51
-msgid "PFE - Polarized Fractal Efficiency"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:267
-#: lib/App/Chart/Series/Derived/PGO.pm:48
-msgid "PGO - Pretty Good Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:277
-#: lib/App/Chart/Series/Derived/PVT.pm:34
-msgid "PVT - Price Volume Trend"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:282
-#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:31
-msgid "Parabolic SAR"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:287
-#: lib/App/Chart/Series/Derived/QStick.pm:32
-msgid "QStick"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:297
-#: lib/App/Chart/Series/Derived/RAVI.pm:29
-msgid "RAVI"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:302
-#: lib/App/Chart/Series/Derived/REMA.pm:46
-msgid "REMA - Regularized EMA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:307
-#: lib/App/Chart/Series/Derived/REMA_Momentum.pm:28
-msgid "REMA Momentum"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:312
-#: lib/App/Chart/Series/Derived/ROC.pm:28
-msgid "ROC - Rate of Change"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:317
-#: lib/App/Chart/Series/Derived/RSI.pm:37
-msgid "RSI - Relative Strength Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:322
-#: lib/App/Chart/Series/Derived/RVI.pm:53
-msgid "RVI - Relative Volatility Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:327
-#: lib/App/Chart/Series/Derived/RWI.pm:86
-msgid "RWI - Random Walk Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:332
-#: lib/App/Chart/Series/Derived/StochRSI.pm:35
-msgid "Stochastic RSI"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:337
-#: lib/App/Chart/Series/Derived/Stochastics.pm:30
-msgid "Stochastics %K/%D"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:342
-#: lib/App/Chart/Series/Derived/T3.pm:42
-msgid "T3 Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:347
-#: lib/App/Chart/Series/Derived/TDREI.pm:70
-msgid "TD REI - Range Expansion Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:352
-#: lib/App/Chart/Series/Derived/TII.pm:42
-msgid "TII - Trend Intensity Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:357
-#: lib/App/Chart/Series/Derived/TRIX.pm:33
-msgid "TRIX"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:377
-#: lib/App/Chart/Series/Derived/TwiggsMF.pm:33
-msgid "Twiggs Money Flow"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:382
-#: lib/App/Chart/Series/Derived/TypicalPrice.pm:30
-msgid "Typical Price (H+L+C)/3"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:387
-#: lib/App/Chart/Series/Derived/Ulcer.pm:45
-msgid "Ulcer Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:392
-#: lib/App/Chart/Series/Derived/Ultimate.pm:32
-msgid "Ultimate Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:397
-#: lib/App/Chart/Series/Derived/VHF.pm:31
-msgid "VHF - Vertical Horizontal Filter"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:402
-#: lib/App/Chart/Series/Derived/VIDYA.pm:41
-msgid "VIDYA - Variable Index Dynamic"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:407
-#: lib/App/Chart/Series/Derived/VWMA.pm:30
-msgid "VWMA - Volume Weighted"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:412
-#: lib/App/Chart/Series/Derived/VOLR.pm:31
-msgid "Volatility Ratio"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:417
-#: lib/App/Chart/Series/Derived/WeightedClose.pm:31
-msgid "Weighted Close (H+L+2*C)/4"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:422
-#: lib/App/Chart/Series/Derived/WilliamsR.pm:28
-msgid "Williams %R"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:427
-#: lib/App/Chart/Series/Derived/WilliamsAccDist.pm:30
-msgid "Williams Accumulation/Distribution"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:432
-#: lib/App/Chart/Series/Derived/ZLEMA.pm:37
-msgid "ZLEMA - Zero Lag EMA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:437
-#: lib/App/Chart/Series/Derived/ZigZag.pm:30
-msgid "Zig Zag"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:442
-#: lib/App/Chart/Series/Derived/AdaptiveLaguerreAlpha.pm:29
-msgid "Adaptive Laguerre - Alpha"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:447
-#: lib/App/Chart/Series/Derived/DEMA.pm:43
-msgid "DEMA - Double EMA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:452
-#: lib/App/Chart/Series/Derived/EMAx2.pm:29
-msgid "EMA of EMA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:462
-#: lib/App/Chart/Series/Derived/FRAMAalpha.pm:29
-msgid "FRAMA - Alpha"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:472
-#: lib/App/Chart/Series/Derived/FOSC.pm:52
-#, perl-format
-msgid "Forecast Oscillator %F"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:477
-#: lib/App/Chart/Series/Derived/GAPO.pm:44
-msgid "GAPO"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:482
-#: lib/App/Chart/Series/Derived/KAMAalpha.pm:34
-msgid "KAMA - Alpha"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:487
-#: lib/App/Chart/Series/Derived/KVOforce.pm:44
-msgid "KVO volume force"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:502
-#: lib/App/Chart/Series/Derived/MedianAverageAlpha.pm:29
-msgid "Median-Average - Alpha"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:507
-#: lib/App/Chart/Series/Derived/Median.pm:30
-msgid "Moving Median"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:512
-#: lib/App/Chart/Series/Derived/RangeMidpoint.pm:32
-msgid "Range Midpoint"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:517
-#: lib/App/Chart/Series/Derived/SineMA.pm:35
-msgid "Sine Weighted MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:522
-#: lib/App/Chart/Series/Derived/Stddev.pm:28
-msgid "Standard Deviation"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:527
-#: lib/App/Chart/Series/Derived/SwingIndex.pm:38
-msgid "Swing Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:532
-#: lib/App/Chart/Series/Derived/TEMA.pm:30
-msgid "TEMA - Triple EMA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:537
-#: lib/App/Chart/Series/Derived/TMA.pm:39
-msgid "TMA - Triangular MA"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:542
-#: lib/App/Chart/Series/Derived/TrendingBandiniLines.pm:32
-msgid "Trending Bandini Lines"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:547
-#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:30
-#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:31
-msgid "VIDYA alpha"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:557
-#: lib/App/Chart/Series/Derived/TrueRange.pm:27
-msgid "True Range"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/WilliamsAccDist.pm:31
-msgid "Williams Acc/Dist"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/WilliamsAccDist.pm:32
-msgctxt "manual-node"
-msgid "Williams Accumulation/Distribution"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KS.pm:34
-msgid "Seoul"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KS.pm:59
-msgid "_Korea Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KS.pm:60
-msgid "Open web browser at the Korea Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CAS.pm:39
-msgid "Casablanca"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CAS.pm:45
-msgctxt "manual-node"
-msgid "Casablanca Stock Exchange"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CAS.pm:57
-msgid "Casablanca _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CAS.pm:58
-msgid ""
-"Open web browser at the Casablanca Stock Exchange page for this company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CAS.pm:117
-#, perl-brace-format
-msgid "Casablanca dividends {symbol}"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:32
-msgid "Kirshenbaum"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:33
-msgctxt "manual-node"
-msgid "Kirshenbaum Bands"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:42
-msgid "Stderrs"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/COG.pm:41
-msgid "COG"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/COG.pm:42
-msgctxt "manual-node"
-msgid "Centre of Gravity Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LIFFE.pm:49
-msgid "LIFFE _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LIFFE.pm:50
-msgid ""
-"Open web browser at the LIFFE contract specifications for this commodity."
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/AccDist.pm:30
-msgid "Acc/Dist"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/AccDist.pm:31
-msgctxt "manual-node"
-msgid "Accumulation/Distribution"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/PreferencesDialog.pm:49
-msgid "LME Username"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/PreferencesDialog.pm:53
-msgid "LME Password"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/PreferencesDialog.pm:63
-msgid "Chart: Preferences"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/PreferencesDialog.pm:130
-msgctxt "manual-node"
-msgid "Preferences"
-msgstr ""
-
-#: lib/App/Chart/Suffix/D.pm:33
-msgid "Dusseldorf"
-msgstr ""
-
-#: lib/App/Chart/Suffix/D.pm:46
-msgid "_Dusseldorf Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/D.pm:47
-msgid "Open web browser at the Dusseldorf Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Finance/Yahoo/Exchanges.pm:41 lib/App/Chart/Yahoo.pm:167
-msgid "Yahoo exchanges page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/DarvasBoxes.pm:52
-msgid "Darvas"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/DarvasBoxes.pm:53
-msgctxt "manual-node"
-msgid "Darvas Boxes"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BC.pm:33
-msgid "Barcelona"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BC.pm:47
-msgid "_Barcelona Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BC.pm:48
-msgid "Open web browser at the Barcelona Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Timebase/Months.pm:44
-msgid "Monthly"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/FRAMAalpha.pm:30
-msgid "FRAMA alpha"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EMAx2.pm:30
-msgid "EMAofEMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EMAx2.pm:31
-msgctxt "manual-node"
-msgid "EMA of EMA"
-msgstr ""
-
-#: lib/App/Chart/Suffix/FQ.pm:45 lib/App/Chart/Suffix/TSP.pm:60
-msgid "_TSP Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/FQ.pm:46 lib/App/Chart/Suffix/TSP.pm:61
-msgid "Open web browser at the US Government Thrift Savings Plan"
-msgstr ""
-
-#: lib/App/Chart/Suffix/FQ.pm:56
-msgid "_Fed Bonds Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/FQ.pm:57
-msgid "Open web browser at the US Treasury Federal Bonds site"
-msgstr ""
-
-#: lib/App/Chart/Suffix/FQ.pm:104
-#, perl-brace-format
-msgid "Finance::Quote {method} {symbol_range}"
-msgstr ""
-
-#: lib/App/Chart/Suffix/FQ.pm:253
-msgid "Unknown error"
-msgstr ""
-
-#: lib/App/Chart/Suffix/FQ.pm:255
-msgid "No data from FQ method"
-msgstr ""
-
-#: lib/App/Chart/Google.pm:53
-msgid "_Google Stock Page"
-msgstr ""
-
-#: lib/App/Chart/Google.pm:54
-msgid "Open web browser at the Google Finance page for these shares"
-msgstr ""
-
-#: lib/App/Chart/Google.pm:85
-msgid "Google"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KQ.pm:50
-msgid "KOSDAQ _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KQ.pm:51
-msgid "Open web browser at the KOSDAQ Exchange page for this company"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RSI.pm:38
-msgid "RSI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RSI.pm:39
-msgctxt "manual-node"
-msgid "Relative Strength Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Median.pm:31
-msgid "Median"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Median.pm:32
-msgctxt "manual-node"
-msgid "Moving Median"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ZLEMA.pm:38
-msgid "ZLEMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ZLEMA.pm:39
-msgctxt "manual-node"
-msgid "Zero-Lag Exponential Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/HullMA.pm:42
-msgctxt "manual-node"
-msgid "Hull Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Diagnostics.pm:57
-msgid "Chart: Diagnostics"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/GuppyMMA.pm:39
-msgid "GMMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/GuppyMMA.pm:40
-msgctxt "manual-node"
-msgid "Guppy Multiple Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/GuppyMMA.pm:46
-msgctxt "long-moving-average"
-msgid "Long"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TrueRange.pm:28
-msgid "TR"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TrueRange.pm:29
-msgctxt "manual-node"
-msgid "True Range"
-msgstr ""
-
-#: lib/App/Chart/Database/Create.pm:144 lib/App/Chart/Database/Create.pm:245
-#, perl-brace-format
-msgid "Creating {filename}\n"
-msgstr ""
-
-#: lib/App/Chart/Database/Create.pm:315
-#: lib/App/Chart/Gtk2/Symlist/Alerts.pm:28 lib/App/Chart/Gtk2/RawDialog.pm:168
-msgid "Alerts"
-msgstr ""
-
-#: lib/App/Chart/Database/Create.pm:316
-#: lib/App/Chart/Gtk2/Symlist/Favourites.pm:27
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:191
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:337
-msgid "Favourites"
-msgstr ""
-
-#: lib/App/Chart/Database/Create.pm:317
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:192
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:340
-#: lib/App/Chart/Gtk2/Symlist/All.pm:30
-msgid "All"
-msgstr ""
-
-#: lib/App/Chart/Database/Create.pm:318
-#: lib/App/Chart/Gtk2/Symlist/Historical.pm:27
-msgid "Historical"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TMA.pm:40
-msgid "TMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TMA.pm:41
-msgctxt "manual-node"
-msgid "Triangular Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TII.pm:43
-msgid "TII"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TII.pm:44
-msgctxt "manual-node"
-msgid "Trend Intensity Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TII.pm:52
-msgid "MA Days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TII.pm:57
-msgid "Dev Days"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:38 lib/App/Chart/Suffix/AX.pm:60
-#: lib/App/Chart/Yahoo.pm:68
-msgctxt "manual-node"
-msgid "Yahoo Finance"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:77
-msgid "NYSE _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:78
-msgid "Open web browser at the New York Stock Exchange page for this company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:86
-msgid "AMEX _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:87
-msgid "Open web browser at the American Stock Exchange page for this company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:94
-msgid "NASDAQ _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:95
-msgid "Open web browser at the NASDAQ page for this company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:135
-msgid "Brussels"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:143
-msgid "Brussels Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:144
-msgid "Open web browser at the Brussels Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:169
-msgid "Colombo"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:177
-msgid "_CSE Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:178
-msgid "Open web browser at the Colombo Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:244
-msgid "Karachi"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:252
-msgid "_Karachi Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:253
-msgid "Open web browser at the Karachi Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:275
-msgid "_Tokyo Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:276
-msgid "Open web browser at the Tokyo Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:318
-msgid "Manila"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:326
-msgctxt "phillipine"
-msgid "_PSE Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:327
-msgid "Open web browser at the Phillipine Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:335
-msgid "Prague"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:343
-msgctxt "prague"
-msgid "_PSE Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:344
-msgid "Open web browser at the Prague Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:438
-msgid "Santiago"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:446
-msgid "_Santiago Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NoSuffix.pm:447
-msgid "Open web browser at the Santiago Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/FRAMA.pm:45
-msgid "FRAMA"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NYM.pm:46
-msgid "NYMEX _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NYM.pm:47
-msgid ""
-"Open web browser at the NYMEX/COMEX contract specifications for this "
-"commodity"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ROC.pm:29
-msgid "ROC"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ROC.pm:30
-#: lib/App/Chart/Series/Derived/Momentum.pm:30
-msgctxt "manual-node"
-msgid "Momentum and Rate of Change"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TDREI.pm:71
-msgid "TDREI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TDREI.pm:72
-msgctxt "manual-node"
-msgid "TD Range Expansion Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TDREI.pm:80
-#: lib/App/Chart/Series/Derived/RVI.pm:63
-#: lib/App/Chart/Series/Derived/Inertia.pm:53
-msgid "Stddev Days"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Job.pm:158 lib/App/Chart/Gtk2/Subprocess.pm:228
-msgid "Stopped"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CME.pm:44
-msgid "CME _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CME.pm:45
-msgid ""
-"Open web browser at the Chicago Mercantile Exchange contract specifications "
-"for this commodity"
-msgstr ""
-
-#: lib/App/Chart/Timebase/Days.pm:49
-msgid "Daily"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/DPO.pm:37
-msgid "DPO"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/DPO.pm:38
-msgctxt "manual-node"
-msgid "Detrended Price Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KCBT.pm:34
-msgid "Kansas City"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KCBT.pm:57
-msgid "KCBT _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KCBT.pm:58
-msgid ""
-"Open web browser at the Kansas City Board of Trade contract specifications "
-"for this commodity"
-msgstr ""
-
-#: lib/App/Chart/Timebase/Quarters.pm:46
-msgid "Quarterly"
-msgstr ""
-
-#: lib/App/Chart/Latest.pm:109 lib/App/Chart/Gtk2/Graph.pm:348
-#: lib/App/Chart/Gtk2/TickerModel.pm:93
-msgid "no data"
-msgstr ""
-
-#: lib/App/Chart/Latest.pm:188
-msgid "Today"
-msgstr ""
-
-#: lib/App/Chart/Latest.pm:245
-msgctxt "billions"
-msgid "b"
-msgstr ""
-
-#: lib/App/Chart/Latest.pm:249
-msgctxt "millions"
-msgid "m"
-msgstr ""
-
-#: lib/App/Chart/Latest.pm:253
-msgctxt "thousands"
-msgid "k"
-msgstr ""
-
-#: lib/App/Chart/Suffix/ST.pm:33
-msgid "Stockholm"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TO.pm:34
-msgid "Toronto"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TO.pm:83
-msgid "_Toronto Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TO.pm:84
-msgid "Open web browser at the Toronto Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TypicalPrice.pm:31
-msgid "Typ"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TypicalPrice.pm:32
-msgctxt "manual-node"
-msgid "Typical Price"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MA.pm:33
-msgid "Madrid"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MA.pm:57
-msgid "_Madrid Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MA.pm:58
-msgid "Open web browser at the Madrid Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/TZ.pm:169
-msgid "Local time"
-msgstr ""
-
-#: lib/App/Chart/TZ.pm:175
-msgid "Chicago"
-msgstr ""
-
-#: lib/App/Chart/TZ.pm:180
-msgid "London"
-msgstr ""
-
-#: lib/App/Chart/TZ.pm:185
-msgid "New York"
-msgstr ""
-
-#: lib/App/Chart/TZ.pm:190
-msgid "Sydney"
-msgstr ""
-
-#: lib/App/Chart/TZ.pm:195
-msgid "Tokyo"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/T3.pm:43
-msgid "T3"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/T3.pm:44
-msgctxt "manual-node"
-msgid "T3 Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/T3.pm:53
-msgid "Factor"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TW.pm:33
-msgid "Taiwan"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TW.pm:54
-msgid "_Taiwan Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/TW.pm:55
-msgid "Open web browser at the Taiwan Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KVOforce.pm:45
-msgid "KVO force"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KVOforce.pm:46
-#: lib/App/Chart/Series/Derived/KVO.pm:33
-msgctxt "manual-node"
-msgid "Klinger Volume Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/CCI.pm:39
-msgid "CCI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/CCI.pm:40
-msgctxt "manual-node"
-msgid "Commodity Channel Index"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:108
-msgid "retry"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:117
-msgid "processing"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:327
-msgid "writing database"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:542
-#, perl-brace-format
-msgid "{symbol} no data at all, marked historical"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:547
-#, perl-brace-format
-msgid "{symbol} no data for {days} days, marked historical"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:1224
-#, perl-brace-format
-msgid "{lodate} to {hidate}"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:1237
-#, perl-brace-format
-msgid "{start_symbol} to {end_symbol}"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:1278
-msgid "Download:"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:1312
-msgid "Checking historical"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:1330
-#, perl-brace-format
-msgid ""
-"Warning, pattern \"{pattern}\" doesn't match anything in the database, "
-"ignoring\n"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:1359
-msgid "No symbols specified to download\n"
-msgstr ""
-
-#: lib/App/Chart/Download.pm:1371
-#, perl-brace-format
-msgid ""
-"Warning, no symbols in \"{symlist}\" are currently in the database\n"
-"(only symbols already in the database are downloaded from lists)\n"
-msgstr ""
-
-#: lib/App/Chart/Suffix/AX.pm:94
-msgid "ASX _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/AX.pm:95
-msgid ""
-"Open web browser at the Australian Stock Exchange page for this company "
-"(bad javascript bloat)"
 msgstr ""
 
 #: lib/App/Chart/Gtk2/Main.pm:75
@@ -1804,6 +268,12 @@ msgstr ""
 msgid "Force a redraw of the entire Chart display."
 msgstr ""
 
+#: lib/App/Chart/Gtk2/Main.pm:200 lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:72
+#: lib/App/Chart/Gtk2/WatchlistDialog.pm:104
+#: lib/App/Chart/Gtk2/TickerMenu.pm:94
+msgid "_Intraday"
+msgstr ""
+
 #: lib/App/Chart/Gtk2/Main.pm:201
 msgctxt "Main-accelerator-key"
 msgid "<Ctrl>I"
@@ -1819,6 +289,11 @@ msgstr ""
 
 #: lib/App/Chart/Gtk2/Main.pm:229
 msgid "_Raw data"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Main.pm:235 lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:78
+#: lib/App/Chart/Gtk2/TickerMenu.pm:101
+msgid "_Web"
 msgstr ""
 
 #: lib/App/Chart/Gtk2/Main.pm:241
@@ -2020,1241 +495,89 @@ msgstr ""
 msgid "Loading {symbol} ..."
 msgstr ""
 
-#: lib/App/Chart/Suffix/VI.pm:32
-msgid "Vienna"
+#: lib/App/Chart/Gtk2/TickerMain.pm:48
+msgid "Chart: Ticker"
 msgstr ""
 
-#: lib/App/Chart/Suffix/VI.pm:53
-msgid "_Vienna Stock Exchange Home Page"
+#: lib/App/Chart/Gtk2/TickerMain.pm:154
+msgid "Command Line"
 msgstr ""
 
-#: lib/App/Chart/Suffix/VI.pm:54
-msgid "Open web browser at the Vienna Stock Exchange home page"
+#: lib/App/Chart/Suffix/CCOM.pm:59
+msgid "C-COM _Contract Specifications"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Job/Intraday.pm:49 lib/App/Chart/Gtk2/RawDialog.pm:154
-msgid "Intraday"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Job/Intraday.pm:61
-#, perl-brace-format
-msgid "Intraday {symbol} {mode}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Job/Intraday.pm:66
-msgid "Downloading ..."
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MedianAverage.pm:39
-msgid "Median-Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MedianAverage.pm:40
-#: lib/App/Chart/Series/Derived/MedianAverageAlpha.pm:31
-msgctxt "manual-node"
-msgid "Median-Average Adaptive Filter"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:85
-msgid "LME _Commodity Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:86
-msgid "Open web browser at the London Metal Exchange page for this commodity"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:183
-msgid "LME login"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:500
-msgid "LME historical downloads page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:589
-msgid "LME month xls"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:624
-#, perl-brace-format
-msgid "LME data {filename}"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:785
-#, perl-brace-format
-msgid "LME volumes {filename}"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:957
-#, perl-brace-format
-msgid "LME daily {type} {date}"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LME.pm:986
-#, perl-brace-format
-msgid "LME daily latest {type}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IntradayDialog.pm:82
-msgid "Cr_oss"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IntradayDialog.pm:86
-#: lib/App/Chart/Gtk2/IntradayDialog.pm:290
-msgid "Chart: Intraday"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IntradayDialog.pm:274
-msgctxt "manual-node"
-msgid "Intraday"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IntradayDialog.pm:287
-#, perl-brace-format
-msgid "Chart: Intraday: {symbol} - {modename}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IntradayDialog.pm:310
-msgid "Download: "
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MASS.pm:41
-msgid "MASS"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MASS.pm:42
-msgctxt "manual-node"
-msgid "MASS Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MASS.pm:47
-msgid "EMA days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MASS.pm:52
-msgid "Sum days"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NS.pm:33
-msgid "Mumbai"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NS.pm:51
-msgid "NSE _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NS.pm:52
+#: lib/App/Chart/Suffix/CCOM.pm:60
 msgid ""
-"Open web browser at the National Stock Exchange of India page for this "
-"company"
+"Open web browser at the Central Japan Commodities Exchange contract "
+"specifications for this commodity"
 msgstr ""
 
-#: lib/App/Chart/Suffix/ZAG.pm:32
-msgid "Zagreb"
+#: lib/App/Chart/Series/Derived/AdaptiveLaguerreAlpha.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:442
+msgid "Adaptive Laguerre - Alpha"
 msgstr ""
 
-#: lib/App/Chart/Suffix/ZAG.pm:52
-msgid "ZSE _Company Information"
+#: lib/App/Chart/Series/Derived/AdaptiveLaguerreAlpha.pm:30
+msgid "Adaptive Laguerre Alpha"
 msgstr ""
 
-#: lib/App/Chart/Suffix/ZAG.pm:53
-msgid ""
-"Open web browser at the Zagreb Stock Exchange information page for this "
-"company"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PVT.pm:35
-msgid "PVT"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PVT.pm:36
-msgctxt "manual-node"
-msgid "Price and Volume Trend"
-msgstr ""
-
-#: lib/App/Chart/Suffix/HK.pm:31
-msgid "Hong Kong"
-msgstr ""
-
-#: lib/App/Chart/Suffix/HK.pm:50
-msgid "HKEX _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/HK.pm:51
-msgid "Open web browser at the Hong Kong Stock Exchange page for this company"
-msgstr ""
-
-#: lib/App/Chart/Timebase/Years.pm:39
-msgid "Yearly"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CR.pm:34
-msgid "Caracas"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CR.pm:65
-msgid "_Caracas Stock Exchange"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CR.pm:66
-msgid "Open web browser at the Caracas Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/FinanceQuote.pm:50
-#, perl-brace-format
-msgid "FinanceQuote {method} {symbol_range}"
-msgstr ""
-
-#: lib/App/Chart/Series.pm:552
-msgid "Can only raise App::Chart::Series to a scalar power"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SIMEX.pm:79 lib/App/Chart/Suffix/SI.pm:52
-msgid "SGX _Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SIMEX.pm:80 lib/App/Chart/Suffix/SI.pm:53
-msgid "Open web browser at the Singapore Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PFE.pm:52
-msgid "PFE"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PFE.pm:53
-msgctxt "manual-node"
-msgid "Polarized Fractal Efficiency"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PFE.pm:66
-#: lib/App/Chart/Series/Derived/MACD.pm:51
-msgid "Smooth"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MFI.pm:53
-msgid "MFI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MFI.pm:54
-msgctxt "manual-node"
-msgid "Money Flow Index"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CO.pm:33
-msgid "Copenhagen"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CO.pm:59
-msgid "_Copenhagen Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CO.pm:60
-msgid "Open web browser at the Copenhagen Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TEMA.pm:31
-msgid "TEMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TEMA.pm:32
-#: lib/App/Chart/Series/Derived/DEMA.pm:45
-msgctxt "manual-node"
-msgid "Double and Triple Exponential Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KAMA.pm:47
-msgid "KAMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KAMA.pm:48
-#: lib/App/Chart/Series/Derived/KAMAalpha.pm:36
-msgctxt "manual-node"
-msgid "Kaufman Adaptive Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:32
-msgid "SAR"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:33
-msgctxt "manual-node"
-msgid "Parabolic SAR"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:37
-msgid "Initial accel"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:45
-msgid "Max accel"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KEX.pm:77
-msgid "KEX _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KEX.pm:78
-msgid ""
-"Open web browser at the Kansai Commodities Exchange contract specifications "
-"for this commodity"
-msgstr ""
-
-#: lib/App/Chart/Suffix/KEX.pm:138
-#, perl-brace-format
-msgid "KEX intraday {commodity}"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ASI.pm:39
-msgid "ASI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ASI.pm:40
-#: lib/App/Chart/Series/Derived/SwingIndex.pm:40
-msgctxt "manual-node"
-msgid "Accumulative Swing Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RWI.pm:87
-msgid "RWI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RWI.pm:88
-msgctxt "manual-node"
-msgid "Random Walk Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Graph.pm:89
-msgid "Horizontal adjustment"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Graph.pm:97
-msgid "Vertical adjustment"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Graph.pm:328 lib/App/Chart/Gtk2/View.pm:135
-msgid "Use File/Open to open or add a symbol"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ADX.pm:33
-msgid "ADX"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ADX.pm:34
-msgctxt "manual-node"
-msgid "Average Directional Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Keltner.pm:30
-msgid "Keltner"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Keltner.pm:31
-msgctxt "manual-node"
-msgid "Keltner Channel"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Keltner.pm:41
-msgid "Width"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/WilliamsR.pm:29
-#: lib/App/Chart/Series/Derived/Stochastics.pm:31
-msgid "%R"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/WilliamsR.pm:30
-msgctxt "manual-node"
-msgid "Williams %R"
-msgstr ""
-
-#: lib/App/Chart/Suffix/HA.pm:31
-msgid "Hanover"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ulcer.pm:46
-msgid "Ulcer"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ulcer.pm:47
-msgctxt "manual-node"
-msgid "Ulcer Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TwiggsMF.pm:34
-msgid "Twiggs MF"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/TwiggsMF.pm:35
-msgctxt "manual-node"
-msgid "Twiggs Money Flow"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/VWMA.pm:31
-msgid "VWMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/VWMA.pm:32
-msgctxt "manual-node"
-msgid "Volume Weighted Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:51
-msgctxt "manual-node"
-msgid "Barchart"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:132
-#, perl-brace-format
-msgid "Barchart quote {symbol} ({barchart_commodity})"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:319
-msgid "Barchart"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:345
-#, perl-brace-format
-msgid "Barchart five day {symbol}"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:349
-#, perl-brace-format
-msgid "Barchart five day {symbol} ({barchart_symbol})"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:493 lib/App/Chart/Suffix/MGEX.pm:103
-#: lib/App/Chart/Yahoo.pm:762
-#, perl-brace-format
-msgid "_{n} Day"
-msgid_plural "_{n} Days"
-msgstr[0] ""
-msgstr[1] ""
-
-#: lib/App/Chart/Barchart.pm:502
-msgid "_Daily 2 Months"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:507
-msgid "_Daily 1 Year"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:526
-#, perl-brace-format
-msgid "Barchart intraday page {symbol} {mode}"
-msgstr ""
-
-#: lib/App/Chart/Barchart.pm:567
-#, perl-brace-format
-msgid "No such symbol {symbol}\n"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MI.pm:37
-msgid "Milan"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MI.pm:65
-msgid "_Milan Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MI.pm:66
-msgid "Open web browser at the Milan Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Coppock.pm:29
-msgid "Coppock"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Coppock.pm:30
-msgctxt "manual-node"
-msgid "Coppock Curve"
-msgstr ""
-
-#: lib/App/Chart/DownloadHandler/IndivChunks.pm:53
-#, perl-brace-format
-msgid "{name} nothing further expected yet for {symbol}"
-msgstr ""
-
-#: lib/App/Chart/DownloadHandler/IndivChunks.pm:63
-#: lib/App/Chart/DownloadHandler/IndivChunks.pm:119
-msgid "data"
-msgstr ""
-
-#: lib/App/Chart/DownloadHandler/IndivChunks.pm:136
-#, perl-brace-format
-msgid "{name} apparent limit of data for {symbol}"
-msgstr ""
-
-#: lib/App/Chart/IntradayHandler.pm:70
-#, perl-brace-format
-msgid "Intraday image {symbol} {mode}"
-msgstr ""
-
-#: lib/App/Chart/IntradayHandler.pm:112
-#, perl-brace-format
-msgid "Error: {status_line}"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EPMA.pm:128
-msgid "EPMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EPMA.pm:129
-msgctxt "manual-node"
-msgid "Endpoint Moving Average"
-msgstr ""
-
-#: lib/App/Chart.pm:101
-#, perl-brace-format
-msgid "%a {d_fmt}"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ForceIndex.pm:36
-msgid "Force"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ForceIndex.pm:37
-msgctxt "manual-node"
-msgid "Force Index"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ForceIndex.pm:43
-#: lib/App/Chart/Series/Derived/RVI.pm:68
-#: lib/App/Chart/Series/Derived/Inertia.pm:58
-msgid "Smooth Days"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NYB.pm:45
-msgid "NYBOT _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/NYB.pm:46
-msgid ""
-"Open web browser at the NYBEX/COMEX contract specifications for this "
-"commodity"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/WMA.pm:36
-msgid "WMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/WMA.pm:37
-msgctxt "manual-node"
-msgid "Weighted Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BI.pm:33
-msgid "Bilbao"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BI.pm:48
-msgid "_Bilbao Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BI.pm:49
-msgid "Open web browser at the Bilbao Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DeleteSymlistDialog.pm:45
-msgid "Chart: Delete Symlist"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DeleteSymlistDialog.pm:85
-#, perl-brace-format
-msgid "Delete symlist \"{name}\" ?"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DeleteSymlistDialog.pm:87
-#, perl-brace-format
-msgid "It has {length} symbol in it."
-msgid_plural "It has {length} symbols in it."
-msgstr[0] ""
-msgstr[1] ""
-
-#: lib/App/Chart/Gtk2/WatchlistModel.pm:156
-#, perl-brace-format
-msgid "ex {dividend}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistModel.pm:158
-#: lib/App/Chart/Gtk2/TickerModel.pm:99
-msgid "halt"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistModel.pm:159
-#: lib/App/Chart/Gtk2/TickerModel.pm:100
-msgid "limit up"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistModel.pm:160
-#: lib/App/Chart/Gtk2/TickerModel.pm:101
-msgid "limit down"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistModel.pm:188
-#: lib/App/Chart/Gtk2/WatchlistDialog.pm:742 lib/App/Chart/EmacsMain.pm:342
-#, perl-brace-format
-msgid "Quote: {quote_date} {quote_time}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistModel.pm:196
-#: lib/App/Chart/Gtk2/WatchlistDialog.pm:750 lib/App/Chart/EmacsMain.pm:349
-#, perl-brace-format
-msgid "Last:  {last_date} {last_time}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistModel.pm:204
-#: lib/App/Chart/Gtk2/WatchlistDialog.pm:756 lib/App/Chart/EmacsMain.pm:354
-#, perl-brace-format
-msgid "{location} time; source {source}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/WatchlistModel.pm:219 lib/App/Chart/EmacsMain.pm:314
-msgid "[bad]"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ease.pm:43
-msgid "Ease"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ease.pm:44
-msgctxt "manual-node"
-msgid "Ease of Movement"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:32
-#: lib/App/Chart/Series/Derived/VIDYA.pm:43
-msgctxt "manual-node"
-msgid "Variable Index Dynamic Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:40
-#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:38
-msgid "Fast Days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:45
-#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:45
-#: lib/App/Chart/Series/Derived/Stochastics.pm:50
-msgid "Slow Days"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:54
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:50
-msgid "None"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:95
-msgid "Low Priority"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:119
-msgid "TA-Lib"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:200
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:207
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:223
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:224
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:225
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:245
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:263
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:270
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:271
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:277
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:282
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:283
-msgid "GT Misc"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:293
-msgid "Genius Trader"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:315
-#: lib/App/Chart/Gtk2/IndicatorModel.pm:332
-#, perl-brace-format
-msgid "GT {name}"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RVI.pm:54
-msgid "RVI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RVI.pm:55
-msgctxt "manual-node"
-msgid "Relative Volatility Index"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LJ.pm:37
-msgid "Ljubljana"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LJ.pm:59
-msgid "LJSE _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LJ.pm:60
-msgid ""
-"Open web browser at the Ljubljana Stock Exchange information page for this "
-"company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LJ.pm:102
-msgid "LJSE price file"
-msgstr ""
-
-#: lib/App/Chart/Suffix/LJ.pm:336 lib/App/Chart/Yahoo.pm:527
-msgid "Yahoo"
-msgstr ""
-
-#: lib/App/Chart/Suffix/OL.pm:35
-msgid "Oslo"
-msgstr ""
-
-#: lib/App/Chart/Suffix/OL.pm:63
-msgid "Oslo Bors _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/OL.pm:64
-msgid "Open web browser at the Oslo Stock Exchange page for this company"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KVO.pm:32
-msgid "KVO"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KVO.pm:39
-#: lib/App/Chart/Series/Derived/MACD.pm:37
-msgid "Fast days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KVO.pm:46
-#: lib/App/Chart/Series/Derived/MACD.pm:44
-msgid "Slow days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KVO.pm:53
-msgid "Trigger"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KVO.pm:60
-#: lib/App/Chart/Series/Derived/MACD.pm:58
-msgid "Histogram"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:73
-msgid "Chart: Download"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:74
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:57
-msgid "_Start"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:75
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:58
-msgid "_Stop"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:86
-msgid "Subprocesses"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:115
-msgid "Jobs"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:150
-msgid "Messages"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:185
-msgid "What:"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:190
-msgid "One symbol"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:206
-msgid "When:"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:210
-msgid "Update"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/DownloadDialog.pm:211
-msgid "Backto"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Midpoint.pm:31
-msgid "Mid"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Midpoint.pm:32
-msgctxt "manual-node"
-msgid "Midpoint"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/AboutDialog.pm:36
-msgid ""
-"Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Kevin "
-"Ryde"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/AboutDialog.pm:59
-#, perl-brace-format
-msgid ""
-"Chart is Free Software, distributed under the terms of the GNU General "
-"Public License as published by the Free Software Foundation, either version "
-"3 of the License, or (at your option) any later version.  Click on the "
-"License button below for the full text.\n"
-"\n"
-"Chart is distributed in the hope that it will be useful, but WITHOUT ANY "
-"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS "
-"FOR A PARTICULAR PURPOSE.  See the license for more.\n"
-"\n"
-"You are running under: Perl {perlver}, Gtk2-Perl {gtkperlver}, Gtk "
-"{gtkver}, Glib-Perl {glibperlver}, Glib {glibver}\n"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Bollinger.pm:32
-msgid "Bollinger"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Bollinger.pm:33
-msgctxt "manual-node"
-msgid "Bollinger Bands"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Bollinger.pm:42
-msgid "Stddevs"
-msgstr ""
-
-#: lib/App/Chart/Suffix/ATH.pm:52
-msgid "Athens"
-msgstr ""
-
-#: lib/App/Chart/Suffix/ATH.pm:70
-msgid "ATHEX _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/ATH.pm:71
-msgid "Open web browser at the Athens Stock Exchange page for this company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/ATH.pm:224
-msgid "ATHEX"
-msgstr ""
-
-#: lib/App/Chart/Suffix/ATH.pm:242
-#, perl-brace-format
-msgid "ATHEX 30 days data {symbol}"
-msgstr ""
-
-#: lib/App/Chart/Suffix/ATH.pm:313
-msgid "ATHEX dividends"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SW.pm:31
-msgid "Switzerland"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SW.pm:54
-msgid "_SWX Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SW.pm:55
-msgid "Open web browser at the Swiss Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MON.pm:33
-msgid "Montreal"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MON.pm:64
-msgid "MX _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MON.pm:65
-msgid ""
-"Open web browser at the Montreal Exchange contract specifications for this "
-"commodity"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BK.pm:34
-msgid "Bangkok"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BK.pm:71
-msgid "_SET Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BK.pm:72
-msgid "Open web browser at the Stock Exchange of Thailand home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/KAMAalpha.pm:35
-msgid "KAMA alpha"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RAVI.pm:31
-msgctxt "manual-node"
-msgid "RAVI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RAVI.pm:38
-msgid "Short Days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RAVI.pm:43
-msgid "Long Days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/NATR.pm:48
-msgid "NATR"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/NATR.pm:49
-msgctxt "manual-node"
-msgid "Normalized ATR"
-msgstr ""
-
-#: lib/App/Chart/Suffix/VX.pm:48
-msgid "_Virt-X Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/VX.pm:49
-msgid "Open web browser at the Virt-X Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Aroon.pm:31
-msgctxt "manual-node"
-msgid "Aroon"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:56
-msgid "Chart: Annotations"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:57
-msgid "_Today"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:97
-#: lib/App/Chart/Gtk2/SeriesTreeView.pm:58 lib/App/Chart/Gtk2/RawDialog.pm:338
-msgid "Date"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:110
-#: lib/App/Chart/Gtk2/RawDialog.pm:283 lib/App/Chart/Gtk2/RawDialog.pm:356
-msgid "Note"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:154
-#, perl-brace-format
-msgid "Chart: Annotations: {symbol}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:210
-msgctxt "manual-node"
-msgid "Annotations"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MACD.pm:30
-msgid "MACD"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MACD.pm:31
-msgctxt "manual-node"
-msgid "MACD"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CBT.pm:50
-msgid "_CBOT Home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CBT.pm:51
-msgid "Open web browser at the Chicago Board of Trade home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/OB.pm:40
-msgid "OTC BB _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/OB.pm:41
-msgid "Open web browser at the OTC bulletin board page for this company"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/VHF.pm:32
-msgid "VHF"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/VHF.pm:33
-msgctxt "manual-node"
-msgid "Vertical Horizontal Filter"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/AdaptiveLaguerre.pm:52
-msgid "Adaptive Laguerre"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/AdaptiveLaguerre.pm:53
 #: lib/App/Chart/Series/Derived/AdaptiveLaguerreAlpha.pm:31
+#: lib/App/Chart/Series/Derived/AdaptiveLaguerre.pm:53
 msgctxt "manual-node"
 msgid "Adaptive Laguerre Filter"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/VOLR.pm:32
-msgid "VOLR"
+#: lib/App/Chart/Series/Derived/CCI.pm:38
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:82
+msgid "CCI - Commodity Channel Index"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/VOLR.pm:33
+#: lib/App/Chart/Series/Derived/CCI.pm:39
+msgid "CCI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/CCI.pm:40
 msgctxt "manual-node"
-msgid "Volatility Ratio"
+msgid "Commodity Channel Index"
 msgstr ""
 
-#: lib/App/Chart/Suffix/SI.pm:32
-msgid "Singapore"
+#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:60
+msgid "Download a new quote for this symbol"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/DeleteDialog.pm:42
-msgid "Chart: Delete Symbol"
+#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:65
+#: lib/App/Chart/Gtk2/TickerMenu.pm:87
+msgid "_Chart"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/DeleteDialog.pm:49
-msgid "And delete your annotations too"
+#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:66
+#: lib/App/Chart/Gtk2/TickerMenu.pm:88
+msgid "Go to this symbol in the main Chart window"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/DeleteDialog.pm:54
-msgid "(No annotations, just downloaded data.)"
+#: lib/App/Chart/Gtk2/WatchlistSymbolMenu.pm:73
+#: lib/App/Chart/Gtk2/TickerMenu.pm:95
+msgid "View intraday graphs for this symbol"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/DeleteDialog.pm:66
-#, perl-brace-format
-msgid "Delete symbol {symbol} ?"
+#: lib/App/Chart/Series/Derived/WilliamsAccDist.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:427
+msgid "Williams Accumulation/Distribution"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Job/Latest.pm:46 lib/App/Chart/Gtk2/RawDialog.pm:133
-msgid "Latest"
+#: lib/App/Chart/Series/Derived/WilliamsAccDist.pm:31
+msgid "Williams Acc/Dist"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Job/Latest.pm:87
-#, perl-brace-format
-msgid "Latest {symbol_list} (and maybe {extra_list})"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Job/Latest.pm:90
-#, perl-brace-format
-msgid "Latest {symbol_list}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Job/Latest.pm:138
-msgid "..."
-msgstr ""
-
-#: lib/App/Chart/Suffix/PA.pm:33
-msgid "Paris"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/REMA.pm:47
-msgid "REMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/REMA.pm:48
+#: lib/App/Chart/Series/Derived/WilliamsAccDist.pm:32
 msgctxt "manual-node"
-msgid "Regularized Exponential Moving Average"
+msgid "Williams Accumulation/Distribution"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/TRIX.pm:35
-msgctxt "manual-node"
-msgid "TRIX"
-msgstr ""
-
-#: lib/App/Chart/Suffix/PK.pm:40
-msgid "Pink Sheets _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/PK.pm:41
-msgid "Open web browser at the Pink Sheets page for this company"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:152
-msgid "T.B.A."
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:153
-msgid "Est"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:154
-msgid "Unknown"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:162
-#, perl-brace-format
-msgid "{newnum} for {oldnum}, {note}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:166
-#, perl-brace-format
-msgid "{newnum} for {oldnum}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:56
-msgid "Chart: Vacuum"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:65
-msgid ""
-"Compact and clean out the database.\n"
-"(May take a while if the database is big.)"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:71
-msgid "Consistency Checks"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:77
-msgid "Compact Files"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:83
-msgid "Verbose"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:166
-msgid "Starting vacuum job"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:167
-msgid "Vacuuming ...\n"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:173
-#: lib/App/Chart/Gtk2/JobsRunningDialog.pm:74
-msgid "Vacuum database"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/VacuumDialog.pm:218
-msgid "done\n"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/REMA_Momentum.pm:30
-msgctxt "manual-node"
-msgid "REMA Momentum"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/StochRSI.pm:36
-msgid "Stoch RSI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/StochRSI.pm:37
-msgctxt "manual-node"
-msgid "Stochastic RSI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/SwingIndex.pm:39
-msgid "Swing"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BE.pm:34
-msgid "Berlin"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BE.pm:47
-msgid "_Berlin Stock Exchange Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/BE.pm:48
-msgid "Open web browser at the Berlin Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EMA.pm:62
-msgid "EMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/EMA.pm:63
-msgctxt "manual-node"
-msgid "Exponential Moving Average"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/IMI.pm:36
-msgid "IMI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/IMI.pm:37
-msgctxt "manual-node"
-msgid "Intraday Momentum Index"
-msgstr ""
-
-#: lib/App/Chart/Suffix/WCE.pm:32
-msgid "Winnipeg"
-msgstr ""
-
-#: lib/App/Chart/Suffix/WCE.pm:53
-msgid "WCE _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/WCE.pm:54
-msgid ""
-"Open web browser at the Winnipeg Commodity Exchange contract specifications "
-"for this commodity"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MGEX.pm:32
-msgid "Minneapolis"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MGEX.pm:52
-msgid "MGEX _Product Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MGEX.pm:53
-msgid ""
-"Open web browser at the Minneapolis Grain Exchange product information page "
-"for this company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MGEX.pm:97
-msgid "_1 1/2 Days"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MGEX.pm:120
-#, perl-brace-format
-msgid "Intraday page {symbol} {mode}"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MGEX.pm:146
-#, perl-brace-format
-msgid "No chart available for {symbol}\n"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Prev.pm:27
-msgid "Prev"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Heading.pm:91
-#, perl-brace-format
-msgid "to week {date}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Heading.pm:94
-msgid "to %b %Y"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Heading.pm:96
-msgid "to %Y"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Heading.pm:98
-msgid "to decade %Y"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Heading.pm:102
-#, perl-brace-format
-msgid "to {date}"
+#: lib/App/Chart/Series/Derived/Stddev.pm:28
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:522
+msgid "Standard Deviation"
 msgstr ""
 
 #: lib/App/Chart/Series/Derived/Stddev.pm:29
@@ -3266,94 +589,322 @@ msgctxt "manual-node"
 msgid "Standard Deviation"
 msgstr ""
 
-#: lib/App/Chart/Suffix/BM.pm:31
-msgid "Bremen"
+#: lib/App/Chart/Series/TA.pm:137 lib/App/Chart/Series/Indicator.pm:55
+msgctxt "separator"
+msgid ","
 msgstr ""
 
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:42
-msgid "Default LineStyle"
+#: lib/App/Chart/Suffix/BC.pm:33
+msgid "Barcelona"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:43
-msgid "Candles"
+#: lib/App/Chart/Suffix/BC.pm:47
+msgid "_Barcelona Stock Exchange Home Page"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:44
-msgid "OHLC"
+#: lib/App/Chart/Suffix/BC.pm:48
+msgid "Open web browser at the Barcelona Stock Exchange home page"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:45
-msgid "Points"
+#: lib/App/Chart/Suffix/SS.pm:34
+msgid "Shanghai"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:46
-msgid "Line"
+#: lib/App/Chart/Suffix/SS.pm:67
+msgid "SSE _Index Information"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:47
-msgid "High/Low"
+#: lib/App/Chart/Suffix/SS.pm:68
+msgid "Open web browser at the Shanghai Stock Exchange page for this index"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:48
-msgid "Bars"
+#: lib/App/Chart/Suffix/CA.pm:34
+msgid "Cairo"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:49
-msgid "Stops"
+#: lib/App/Chart/Suffix/CA.pm:63
+msgid "_CASE Home Page"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Ticker.pm:219
-#, perl-brace-format
-msgid "{symlistname} list is empty ... "
+#: lib/App/Chart/Suffix/CA.pm:64
+msgid "Open web browser at the Cairo and Alexandria Stock Exchange home page"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Ticker.pm:221
-msgid "No symlist ... "
+#: lib/App/Chart/Series/Derived/PVI.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:272
+msgid "PVI - Positive Volume Index"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Ticker.pm:248
+#: lib/App/Chart/Series/Derived/PVI.pm:30
+msgid "PVI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PVI.pm:31
+#: lib/App/Chart/Series/Derived/NVI.pm:39
 msgctxt "manual-node"
-msgid "Ticker"
+msgid "Negative Volume Index"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/JobsRunningDialog.pm:35
-msgid "Chart: Jobs Running Query"
+#: lib/App/Chart/Suffix/NYM.pm:46
+msgid "NYMEX _Contract Specifications"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/JobsRunningDialog.pm:36
-msgid "Job(s) still running, stop them ?"
+#: lib/App/Chart/Suffix/NYM.pm:47
+msgid ""
+"Open web browser at the NYMEX/COMEX contract specifications for this "
+"commodity"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Job/Download.pm:37
-#, perl-brace-format
-msgid "Download {what} backto {year}"
+#: lib/App/Chart/Series/Derived/KAMAalpha.pm:34
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:482
+msgid "KAMA - Alpha"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Job/Download.pm:41
-#, perl-brace-format
-msgid "Download {what}"
+#: lib/App/Chart/Series/Derived/KAMAalpha.pm:35
+msgid "KAMA alpha"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/Job/Download.pm:50
-msgid "Download"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RangeMidpoint.pm:33
-msgid "Range Mid"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/RangeMidpoint.pm:34
+#: lib/App/Chart/Series/Derived/KAMAalpha.pm:36
+#: lib/App/Chart/Series/Derived/KAMA.pm:48
 msgctxt "manual-node"
-msgid "Range Midpoint"
+msgid "Kaufman Adaptive Moving Average"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:29
-msgid "Chaikin Osc"
+#: lib/App/Chart/Series/Derived/TypicalPrice.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:382
+msgid "Typical Price (H+L+C)/3"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:30
+#: lib/App/Chart/Series/Derived/TypicalPrice.pm:31
+msgid "Typ"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TypicalPrice.pm:32
 msgctxt "manual-node"
-msgid "Chaikin Oscillator"
+msgid "Typical Price"
+msgstr ""
+
+#: lib/App/Chart/Suffix/PK.pm:40
+msgid "Pink Sheets _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/PK.pm:41
+msgid "Open web browser at the Pink Sheets page for this company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/SI.pm:32
+msgid "Singapore"
+msgstr ""
+
+#: lib/App/Chart/Suffix/SI.pm:52 lib/App/Chart/Suffix/SIMEX.pm:79
+msgid "SGX _Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/SI.pm:53 lib/App/Chart/Suffix/SIMEX.pm:80
+msgid "Open web browser at the Singapore Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Midpoint.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:232
+msgid "Midpoint (H+L)/2"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Midpoint.pm:31
+msgid "Mid"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Midpoint.pm:32
+msgctxt "manual-node"
+msgid "Midpoint"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MA.pm:33
+msgid "Madrid"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MA.pm:57
+msgid "_Madrid Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MA.pm:58
+msgid "Open web browser at the Madrid Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/View.pm:135 lib/App/Chart/Gtk2/Graph.pm:328
+msgid "Use File/Open to open or add a symbol"
+msgstr ""
+
+#: lib/App/Chart/Suffix/RBA.pm:46
+msgctxt "manual-node"
+msgid "Reserve Bank of Australia"
+msgstr ""
+
+#: lib/App/Chart/Suffix/RBA.pm:57
+msgid "_RBA Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/RBA.pm:58
+msgid "Open web browser at the Reserve Bank of Australia home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/RBA.pm:159 lib/App/Chart/Suffix/RBA.pm:534
+msgid "RBA past three days"
+msgstr ""
+
+#: lib/App/Chart/Suffix/RBA.pm:186
+msgid "RBA historical page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/RBA.pm:517
+msgid "RBA"
+msgstr ""
+
+#: lib/App/Chart/Suffix/RBA.pm:554
+#, perl-brace-format
+msgid "RBA data {filename}"
+msgstr ""
+
+#: lib/App/Chart/TZ.pm:169
+msgid "Local time"
+msgstr ""
+
+#: lib/App/Chart/TZ.pm:175
+msgid "Chicago"
+msgstr ""
+
+#: lib/App/Chart/TZ.pm:180
+msgid "London"
+msgstr ""
+
+#: lib/App/Chart/TZ.pm:185
+msgid "New York"
+msgstr ""
+
+#: lib/App/Chart/TZ.pm:190
+msgid "Sydney"
+msgstr ""
+
+#: lib/App/Chart/TZ.pm:195
+msgid "Tokyo"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TSI.pm:68
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:362
+msgid "TSI - True Strength Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TSI.pm:69
+msgid "TSI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TSI.pm:70
+msgctxt "manual-node"
+msgid "True Strength Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TSI.pm:78
+msgid "EMA-1 Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TSI.pm:85
+msgid "EMA-2 Days"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CAS.pm:39
+msgid "Casablanca"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CAS.pm:45
+msgctxt "manual-node"
+msgid "Casablanca Stock Exchange"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CAS.pm:57
+msgid "Casablanca _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CAS.pm:58
+msgid ""
+"Open web browser at the Casablanca Stock Exchange page for this company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CAS.pm:117
+#, perl-brace-format
+msgid "Casablanca dividends {symbol}"
+msgstr ""
+
+#: lib/App/Chart.pm:101
+#, perl-brace-format
+msgid "%a {d_fmt}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TII.pm:42
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:352
+msgid "TII - Trend Intensity Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TII.pm:43
+msgid "TII"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TII.pm:44
+msgctxt "manual-node"
+msgid "Trend Intensity Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TII.pm:52
+msgid "MA Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TII.pm:57
+msgid "Dev Days"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/OpenDialog.pm:57
+msgid "Chart: Open"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/OpenDialog.pm:104
+msgid ""
+"Not in database, click \"New\" to download.\n"
+"Be sure capitalization is right for download.\n"
+"(Or click/return again to really open.)"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/OpenDialog.pm:120
+#: lib/App/Chart/Gtk2/IntradayDialog.pm:137
+#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:128
+msgid "Enter"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/OpenDialog.pm:165
+msgctxt "manual-node"
+msgid "Open"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/GAPO.pm:44
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:477
+msgid "GAPO"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/GAPO.pm:46
+msgctxt "manual-node"
+msgid "Gopalakrishnan Range Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TEMA.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:532
+msgid "TEMA - Triple EMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TEMA.pm:31
+msgid "TEMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TEMA.pm:32
+#: lib/App/Chart/Series/Derived/DEMA.pm:45
+msgctxt "manual-node"
+msgid "Double and Triple Exponential Moving Average"
 msgstr ""
 
 #: lib/App/Chart/Vacuum.pm:76
@@ -3414,40 +965,1364 @@ msgstr ""
 msgid "Check alphabetical symlists order"
 msgstr ""
 
-#: lib/App/Chart/Timebase/Decades.pm:41
-msgid "Decadic"
+#: lib/App/Chart/Series/Derived/ElderPower.pm:35
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:142
+msgid "Elder Bull/Bear Power"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/TickerModel.pm:103
-msgid "unch"
+#: lib/App/Chart/Series/Derived/ElderPower.pm:36
+msgid "Elder Power"
 msgstr ""
 
-#: lib/App/Chart/Suffix/CA.pm:34
-msgid "Cairo"
+#: lib/App/Chart/Series/Derived/ElderPower.pm:37
+msgctxt "manual-node"
+msgid "Elder Bull/Bear Power"
 msgstr ""
 
-#: lib/App/Chart/Suffix/CA.pm:63
-msgid "_CASE Home Page"
+#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:31
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:282
+msgid "Parabolic SAR"
 msgstr ""
 
-#: lib/App/Chart/Suffix/CA.pm:64
-msgid "Open web browser at the Cairo and Alexandria Stock Exchange home page"
+#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:32
+msgid "SAR"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:33
+msgctxt "manual-node"
+msgid "Parabolic SAR"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:37
+msgid "Initial accel"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ParabolicSAR.pm:45
+msgid "Max accel"
+msgstr ""
+
+#: lib/App/Chart/Suffix/HM.pm:33 lib/App/Chart/Suffix/H.pm:32
+msgid "Hamburg"
+msgstr ""
+
+#: lib/App/Chart/Suffix/HM.pm:47
+msgid "_Hamburg Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/HM.pm:48
+msgid "Open web browser at the Hamburg Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TwiggsMF.pm:33
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:377
+msgid "Twiggs Money Flow"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TwiggsMF.pm:34
+msgid "Twiggs MF"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TwiggsMF.pm:35
+msgctxt "manual-node"
+msgid "Twiggs Money Flow"
+msgstr ""
+
+#: lib/App/Chart/Suffix/D.pm:33
+msgid "Dusseldorf"
+msgstr ""
+
+#: lib/App/Chart/Suffix/D.pm:46
+msgid "_Dusseldorf Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/D.pm:47
+msgid "Open web browser at the Dusseldorf Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TrendingBandiniLines.pm:32
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:542
+msgid "Trending Bandini Lines"
 msgstr ""
 
 #: lib/App/Chart/Series/Derived/TrendingBandiniLines.pm:33
 msgid "Bandini"
 msgstr ""
 
-#: lib/App/Chart/Suffix/BO.pm:33
-msgid "Bombay"
+#: lib/App/Chart/Series/Derived/HullMA.pm:40
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:167
+msgid "Hull MA"
 msgstr ""
 
-#: lib/App/Chart/Suffix/BO.pm:54
-msgid "BSE _Company Information"
+#: lib/App/Chart/Series/Derived/HullMA.pm:42
+msgctxt "manual-node"
+msgid "Hull Moving Average"
 msgstr ""
 
-#: lib/App/Chart/Suffix/BO.pm:55
-msgid "Open web browser at the Bombay Stock Exchange page for this company"
+#: lib/App/Chart/FinanceQuote.pm:50
+#, perl-brace-format
+msgid "FinanceQuote {method} {symbol_range}"
+msgstr ""
+
+#: lib/App/Chart/Timebase/Days.pm:49
+msgid "Daily"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ROC.pm:28
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:312
+msgid "ROC - Rate of Change"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ROC.pm:29
+msgid "ROC"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ROC.pm:30
+#: lib/App/Chart/Series/Derived/Momentum.pm:30
+msgctxt "manual-node"
+msgid "Momentum and Rate of Change"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Heading.pm:91
+#, perl-brace-format
+msgid "to week {date}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Heading.pm:94
+msgid "to %b %Y"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Heading.pm:96
+msgid "to %Y"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Heading.pm:98
+msgid "to decade %Y"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Heading.pm:102
+#, perl-brace-format
+msgid "to {date}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:31
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:202
+msgid "Kirshenbaum Bands"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:32
+msgid "Kirshenbaum"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:33
+msgctxt "manual-node"
+msgid "Kirshenbaum Bands"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Kirshenbaum.pm:42
+msgid "Stderrs"
+msgstr ""
+
+#: lib/App/Chart/Suffix/AX.pm:60 lib/App/Chart/Suffix/NoSuffix.pm:38
+#: lib/App/Chart/Yahoo.pm:68
+msgctxt "manual-node"
+msgid "Yahoo Finance"
+msgstr ""
+
+#: lib/App/Chart/Suffix/AX.pm:94
+msgid "ASX _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/AX.pm:95
+msgid ""
+"Open web browser at the Australian Stock Exchange page for this company "
+"(bad javascript bloat)"
+msgstr ""
+
+#: lib/App/Chart/Suffix/WCE.pm:32
+msgid "Winnipeg"
+msgstr ""
+
+#: lib/App/Chart/Suffix/WCE.pm:53
+msgid "WCE _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/WCE.pm:54
+msgid ""
+"Open web browser at the Winnipeg Commodity Exchange contract specifications "
+"for this commodity"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:56
+msgid "Chart: Vacuum"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:57
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:74
+msgid "_Start"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:58
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:75
+msgid "_Stop"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:65
+msgid ""
+"Compact and clean out the database.\n"
+"(May take a while if the database is big.)"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:71
+msgid "Consistency Checks"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:77
+msgid "Compact Files"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:83
+msgid "Verbose"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:166
+msgid "Starting vacuum job"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:167
+msgid "Vacuuming ...\n"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:173
+#: lib/App/Chart/Gtk2/JobsRunningDialog.pm:74
+msgid "Vacuum database"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/VacuumDialog.pm:218
+msgid "done\n"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ATR.pm:36
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:52
+msgid "ATR - Average True Range"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ATR.pm:37
+msgid "ATR"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ATR.pm:38
+msgctxt "manual-node"
+msgid "Average True Range"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/REMA.pm:46
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:302
+msgid "REMA - Regularized EMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/REMA.pm:47
+msgid "REMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/REMA.pm:48
+msgctxt "manual-node"
+msgid "Regularized Exponential Moving Average"
+msgstr ""
+
+#: lib/App/Chart/DownloadHandler/IndivChunks.pm:53
+#, perl-brace-format
+msgid "{name} nothing further expected yet for {symbol}"
+msgstr ""
+
+#: lib/App/Chart/DownloadHandler/IndivChunks.pm:63
+#: lib/App/Chart/DownloadHandler/IndivChunks.pm:119
+msgid "data"
+msgstr ""
+
+#: lib/App/Chart/DownloadHandler/IndivChunks.pm:136
+#, perl-brace-format
+msgid "{name} apparent limit of data for {symbol}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ultimate.pm:32
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:392
+msgid "Ultimate Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ultimate.pm:33
+msgid "Ultimate"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ultimate.pm:34
+msgctxt "manual-node"
+msgid "Ultimate Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/SMA.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:22
+msgid "SMA - Simple MA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/SMA.pm:31
+msgid "SMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/SMA.pm:32
+msgctxt "manual-node"
+msgid "Simple Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ease.pm:42
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:137
+msgid "Ease of Movement"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ease.pm:43
+msgid "Ease"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ease.pm:44
+msgctxt "manual-node"
+msgid "Ease of Movement"
+msgstr ""
+
+#: lib/App/Chart/Suffix/VI.pm:32
+msgid "Vienna"
+msgstr ""
+
+#: lib/App/Chart/Suffix/VI.pm:53
+msgid "_Vienna Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/VI.pm:54
+msgid "Open web browser at the Vienna Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Timebase/Weeks.pm:47
+msgid "Weekly"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Intraday.pm:49 lib/App/Chart/Gtk2/RawDialog.pm:154
+msgid "Intraday"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Intraday.pm:61
+#, perl-brace-format
+msgid "Intraday {symbol} {mode}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Intraday.pm:66
+msgid "Downloading ..."
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IntradaySave.pm:63
+msgid "Chart: Save Intraday Image"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IntradaySave.pm:80
+msgid "Save intraday image to file"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IntradaySave.pm:150
+#: lib/App/Chart/Gtk2/IntradayImage.pm:167
+#: lib/App/Chart/Gtk2/IntradayImage.pm:182
+msgid "(No data)"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VIDYA.pm:41
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:402
+msgid "VIDYA - Variable Index Dynamic"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VIDYA.pm:42
+msgid "VIDYA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VIDYA.pm:43
+#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:32
+msgctxt "manual-node"
+msgid "Variable Index Dynamic Average"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BA.pm:31
+msgid "Buenos Aires"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/PreferencesDialog.pm:49
+msgid "LME Username"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/PreferencesDialog.pm:53
+msgid "LME Password"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/PreferencesDialog.pm:63
+msgid "Chart: Preferences"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/PreferencesDialog.pm:130
+msgctxt "manual-node"
+msgid "Preferences"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ForceIndex.pm:35
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:157
+msgid "Force Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ForceIndex.pm:36
+msgid "Force"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ForceIndex.pm:37
+msgctxt "manual-node"
+msgid "Force Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ForceIndex.pm:43
+#: lib/App/Chart/Series/Derived/RVI.pm:68
+#: lib/App/Chart/Series/Derived/Inertia.pm:58
+msgid "Smooth Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VWMA.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:407
+msgid "VWMA - Volume Weighted"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VWMA.pm:31
+msgid "VWMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VWMA.pm:32
+msgctxt "manual-node"
+msgid "Volume Weighted Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TDREI.pm:70
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:347
+msgid "TD REI - Range Expansion Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TDREI.pm:71
+msgid "TDREI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TDREI.pm:72
+msgctxt "manual-node"
+msgid "TD Range Expansion Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TDREI.pm:80
+#: lib/App/Chart/Series/Derived/RVI.pm:63
+#: lib/App/Chart/Series/Derived/Inertia.pm:53
+msgid "Stddev Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/StochRSI.pm:35
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:332
+msgid "Stochastic RSI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/StochRSI.pm:36
+msgid "Stoch RSI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/StochRSI.pm:37
+msgctxt "manual-node"
+msgid "Stochastic RSI"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BI.pm:33
+msgid "Bilbao"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BI.pm:48
+msgid "_Bilbao Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BI.pm:49
+msgid "Open web browser at the Bilbao Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KEX.pm:77
+msgid "KEX _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KEX.pm:78
+msgid ""
+"Open web browser at the Kansai Commodities Exchange contract specifications "
+"for this commodity"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KEX.pm:138
+#, perl-brace-format
+msgid "KEX intraday {commodity}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TOCOM.pm:49
+msgid "TOCOM _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TOCOM.pm:50
+msgid ""
+"Open web browser at the Tokyo Commodities Exchange contract specifications "
+"for this commodity"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TGE.pm:62
+msgid "TGE _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TGE.pm:63
+msgid ""
+"Open web browser at the Tokyo Grain Exchange contract specifications for "
+"this commodity"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TGE.pm:169
+msgid "TGE"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TGE.pm:214 lib/App/Chart/Suffix/TGE.pm:258
+#, perl-brace-format
+msgid "TGE data {filename}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/FRAMAalpha.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:462
+msgid "FRAMA - Alpha"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/FRAMAalpha.pm:30
+msgid "FRAMA alpha"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/FRAMAalpha.pm:31
+#: lib/App/Chart/Series/Derived/FRAMA.pm:46
+#: lib/App/Chart/Series/Derived/FRAMAdimension.pm:32
+msgctxt "manual-node"
+msgid "Fractal Adaptive Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Suffix/JK.pm:31
+msgid "Jakarta"
+msgstr ""
+
+#: lib/App/Chart/Suffix/JK.pm:49
+msgid "_Jakarta Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/JK.pm:50
+msgid "Open web browser at the Jakarta Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/F.pm:33
+msgid "Frankfurt"
+msgstr ""
+
+#: lib/App/Chart/Suffix/OL.pm:35
+msgid "Oslo"
+msgstr ""
+
+#: lib/App/Chart/Suffix/OL.pm:63
+msgid "Oslo Bors _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/OL.pm:64
+msgid "Open web browser at the Oslo Stock Exchange page for this company"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VHF.pm:31
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:397
+msgid "VHF - Vertical Horizontal Filter"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VHF.pm:32
+msgid "VHF"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VHF.pm:33
+msgctxt "manual-node"
+msgid "Vertical Horizontal Filter"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RAVI.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:297
+msgid "RAVI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RAVI.pm:31
+msgctxt "manual-node"
+msgid "RAVI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RAVI.pm:38
+msgid "Short Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RAVI.pm:43
+msgid "Long Days"
+msgstr ""
+
+#: lib/App/Chart/Google.pm:53
+msgid "_Google Stock Page"
+msgstr ""
+
+#: lib/App/Chart/Google.pm:54
+msgid "Open web browser at the Google Finance page for these shares"
+msgstr ""
+
+#: lib/App/Chart/Google.pm:85
+msgid "Google"
+msgstr ""
+
+#: lib/App/Chart/Suffix/SA.pm:33
+msgid "Sao Paulo"
+msgstr ""
+
+#: lib/App/Chart/Suffix/SA.pm:48
+msgid "_Sao Paolo Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/SA.pm:49
+msgid "Open web browser at the Sao Paolo Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Timebase/Years.pm:39
+msgid "Yearly"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MASS.pm:40
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:217
+msgid "MASS Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MASS.pm:41
+msgid "MASS"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MASS.pm:42
+msgctxt "manual-node"
+msgid "MASS Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MASS.pm:47
+msgid "EMA days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MASS.pm:52
+msgid "Sum days"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KQ.pm:50
+msgid "KOSDAQ _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KQ.pm:51
+msgid "Open web browser at the KOSDAQ Exchange page for this company"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RSquared.pm:40
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:292
+msgid "R-Squared Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RSquared.pm:41
+msgid "R-Squared"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RSquared.pm:42
+msgctxt "manual-node"
+msgid "R-Squared Index"
+msgstr ""
+
+#: lib/App/Chart/Suffix/L.pm:53
+msgid "LSE _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/L.pm:54
+msgid "Open web browser at the London Stock Exchange page for this company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KL.pm:31
+msgid "Kuala Lumpur"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KL.pm:48
+msgid "_Kuala Lumpur Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KL.pm:49
+msgid "Open web browser at the Kuala Lumpur Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job.pm:158 lib/App/Chart/Gtk2/Subprocess.pm:228
+msgid "Stopped"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LinRegSlope.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:492
+msgid "Linear Regression Slope"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LinRegSlope.pm:31
+msgid "Linreg Slope"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LinRegSlope.pm:32
+msgctxt "manual-node"
+msgid "Linear Regression Slope"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BM.pm:31
+msgid "Bremen"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LJ.pm:37
+msgid "Ljubljana"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LJ.pm:59
+msgid "LJSE _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LJ.pm:60
+msgid ""
+"Open web browser at the Ljubljana Stock Exchange information page for this "
+"company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LJ.pm:102
+msgid "LJSE price file"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LJ.pm:336 lib/App/Chart/Yahoo.pm:527
+msgid "Yahoo"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MLC.pm:43
+msgctxt "manual-node"
+msgid "MLC Funds"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MLC.pm:65
+msgid "MLC"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MLC.pm:140
+#, perl-brace-format
+msgid "MLC: invalid symbol, should be \"Fund,Product.MLC\": {symbol}\n"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/OBV.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:257
+msgid "OBV - On-balance Volume"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/OBV.pm:30
+msgid "OBV"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/OBV.pm:31
+msgctxt "manual-node"
+msgid "On-Balance Volume"
+msgstr ""
+
+#: lib/App/Chart/Suffix/GHA.pm:50
+msgid "Accra"
+msgstr ""
+
+#: lib/App/Chart/Suffix/GHA.pm:67
+msgid "GSE _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/GHA.pm:68
+msgid ""
+"Open web browser at the Ghana Stock Exchange information page for this "
+"company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/GHA.pm:85
+msgid "GSE"
+msgstr ""
+
+#: lib/App/Chart/Suffix/GHA.pm:104 lib/App/Chart/Suffix/GHA.pm:208
+msgid "GSE latest daily data"
+msgstr ""
+
+#: lib/App/Chart/Suffix/GHA.pm:119
+#, perl-brace-format
+msgid "GSE data {date}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/FRAMA.pm:44
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:147
+msgid "FRAMA - Fractal Adaptive MA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/FRAMA.pm:45
+msgid "FRAMA"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:77
+msgid "NYSE _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:78
+msgid "Open web browser at the New York Stock Exchange page for this company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:86
+msgid "AMEX _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:87
+msgid "Open web browser at the American Stock Exchange page for this company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:94
+msgid "NASDAQ _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:95
+msgid "Open web browser at the NASDAQ page for this company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:135
+msgid "Brussels"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:143
+msgid "Brussels Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:144
+msgid "Open web browser at the Brussels Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:169
+msgid "Colombo"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:177
+msgid "_CSE Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:178
+msgid "Open web browser at the Colombo Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:244
+msgid "Karachi"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:252
+msgid "_Karachi Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:253
+msgid "Open web browser at the Karachi Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:275
+msgid "_Tokyo Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:276
+msgid "Open web browser at the Tokyo Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:318
+msgid "Manila"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:326
+msgctxt "phillipine"
+msgid "_PSE Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:327
+msgid "Open web browser at the Phillipine Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:335
+msgid "Prague"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:343
+msgctxt "prague"
+msgid "_PSE Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:344
+msgid "Open web browser at the Prague Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:438
+msgid "Santiago"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:446
+msgid "_Santiago Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NoSuffix.pm:447
+msgid "Open web browser at the Santiago Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MI.pm:37
+msgid "Milan"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MI.pm:65
+msgid "_Milan Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MI.pm:66
+msgid "Open web browser at the Milan Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ST.pm:33
+msgid "Stockholm"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RVI.pm:53
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:322
+msgid "RVI - Relative Volatility Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RVI.pm:54
+msgid "RVI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RVI.pm:55
+msgctxt "manual-node"
+msgid "Relative Volatility Index"
+msgstr ""
+
+#: lib/App/Chart/Suffix/HA.pm:31
+msgid "Hanover"
+msgstr ""
+
+#: lib/App/Chart/Suffix/OB.pm:40
+msgid "OTC BB _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/OB.pm:41
+msgid "Open web browser at the OTC bulletin board page for this company"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MACD.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:212
+msgid "MACD - Momentum Advance/Decline"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MACD.pm:30
+msgid "MACD"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MACD.pm:31
+msgctxt "manual-node"
+msgid "MACD"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MACD.pm:37
+#: lib/App/Chart/Series/Derived/KVO.pm:39
+msgid "Fast days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MACD.pm:44
+#: lib/App/Chart/Series/Derived/KVO.pm:46
+msgid "Slow days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MACD.pm:51
+#: lib/App/Chart/Series/Derived/PFE.pm:66
+msgid "Smooth"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MACD.pm:58
+#: lib/App/Chart/Series/Derived/KVO.pm:60
+msgid "Histogram"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/NVI.pm:37
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:252
+msgid "NVI - Negative Volume Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/NVI.pm:38
+msgid "NVI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/SwingIndex.pm:38
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:527
+msgid "Swing Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/SwingIndex.pm:39
+msgid "Swing"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/SwingIndex.pm:40
+#: lib/App/Chart/Series/Derived/ASI.pm:40
+msgctxt "manual-node"
+msgid "Accumulative Swing Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Trendscore.pm:37
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:372
+msgid "Trendscore"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Trendscore.pm:39
+msgctxt "manual-node"
+msgid "Trendscore"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IntradayDialog.pm:82
+msgid "Cr_oss"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IntradayDialog.pm:86
+#: lib/App/Chart/Gtk2/IntradayDialog.pm:290
+msgid "Chart: Intraday"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IntradayDialog.pm:274
+msgctxt "manual-node"
+msgid "Intraday"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IntradayDialog.pm:287
+#, perl-brace-format
+msgid "Chart: Intraday: {symbol} - {modename}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IntradayDialog.pm:310
+msgid "Download: "
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DarvasBoxes.pm:51
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:122
+msgid "Darvas Boxes"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DarvasBoxes.pm:52
+msgid "Darvas"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DarvasBoxes.pm:53
+msgctxt "manual-node"
+msgid "Darvas Boxes"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:73
+msgid "Chart: Download"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:86
+msgid "Subprocesses"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:115
+msgid "Jobs"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:150
+msgid "Messages"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:185
+msgid "What:"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:190
+msgid "One symbol"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:191
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:337
+#: lib/App/Chart/Database/Create.pm:316
+#: lib/App/Chart/Gtk2/Symlist/Favourites.pm:27
+msgid "Favourites"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:192
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:340
+#: lib/App/Chart/Database/Create.pm:317 lib/App/Chart/Gtk2/Symlist/All.pm:30
+msgid "All"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:206
+msgid "When:"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:210
+msgid "Update"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DownloadDialog.pm:211
+msgid "Backto"
+msgstr ""
+
+#: lib/App/Chart/Timebase/Decades.pm:41
+msgid "Decadic"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LaguerreFilter.pm:49
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:207
+msgid "Laguerre Filter"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LaguerreFilter.pm:50
+msgid "Laguerre"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LaguerreFilter.pm:51
+msgctxt "manual-node"
+msgid "Laguerre Filter"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LaguerreFilter.pm:55
+msgid "Alpha"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/CMO.pm:39
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:87
+msgid "CMO - Chande Momentum Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/CMO.pm:40
+msgid "CMO"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/CMO.pm:41
+msgctxt "manual-node"
+msgid "Chande Momentum Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WeightedClose.pm:31
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:417
+msgid "Weighted Close (H+L+2*C)/4"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WeightedClose.pm:32
+msgid "WCL"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WeightedClose.pm:33
+msgctxt "manual-node"
+msgid "Weighted Close"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KCBT.pm:34
+msgid "Kansas City"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KCBT.pm:57
+msgid "KCBT _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KCBT.pm:58
+msgid ""
+"Open web browser at the Kansas City Board of Trade contract specifications "
+"for this commodity"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WilliamsR.pm:28
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:422
+msgid "Williams %R"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WilliamsR.pm:29
+#: lib/App/Chart/Series/Derived/Stochastics.pm:31
+msgid "%R"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WilliamsR.pm:30
+msgctxt "manual-node"
+msgid "Williams %R"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TrueRange.pm:27
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:557
+msgid "True Range"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TrueRange.pm:28
+msgid "TR"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TrueRange.pm:29
+msgctxt "manual-node"
+msgid "True Range"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TW.pm:33
+msgid "Taiwan"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TW.pm:54
+msgid "_Taiwan Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TW.pm:55
+msgid "Open web browser at the Taiwan Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LIFFE.pm:49
+msgid "LIFFE _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LIFFE.pm:50
+msgid ""
+"Open web browser at the LIFFE contract specifications for this commodity."
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/COG.pm:40
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:92
+msgid "Centre of Gravity"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/COG.pm:41
+msgid "COG"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/COG.pm:42
+msgctxt "manual-node"
+msgid "Centre of Gravity Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Diagnostics.pm:57
+msgid "Chart: Diagnostics"
+msgstr ""
+
+#: lib/App/Chart/Latest.pm:109 lib/App/Chart/Gtk2/TickerModel.pm:93
+#: lib/App/Chart/Gtk2/Graph.pm:348
+msgid "no data"
+msgstr ""
+
+#: lib/App/Chart/Latest.pm:188
+msgid "Today"
+msgstr ""
+
+#: lib/App/Chart/Latest.pm:245
+msgctxt "billions"
+msgid "b"
+msgstr ""
+
+#: lib/App/Chart/Latest.pm:249
+msgctxt "millions"
+msgid "m"
+msgstr ""
+
+#: lib/App/Chart/Latest.pm:253
+msgctxt "thousands"
+msgid "k"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/QStick.pm:32
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:287
+msgid "QStick"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/QStick.pm:34
+msgctxt "manual-node"
+msgid "QStick"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/TickerModel.pm:99
+#: lib/App/Chart/Gtk2/WatchlistModel.pm:158
+msgid "halt"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/TickerModel.pm:100
+#: lib/App/Chart/Gtk2/WatchlistModel.pm:159
+msgid "limit up"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/TickerModel.pm:101
+#: lib/App/Chart/Gtk2/WatchlistModel.pm:160
+msgid "limit down"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/TickerModel.pm:103
+msgid "unch"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TMA.pm:39
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:537
+msgid "TMA - Triangular MA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TMA.pm:40
+msgid "TMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/TMA.pm:41
+msgctxt "manual-node"
+msgid "Triangular Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ASI.pm:38
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:47
+msgid "ASI - Accumulative Swing Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ASI.pm:39
+msgid "ASI"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/AboutDialog.pm:36
+msgid ""
+"Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Kevin "
+"Ryde"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/AboutDialog.pm:59
+#, perl-brace-format
+msgid ""
+"Chart is Free Software, distributed under the terms of the GNU General "
+"Public License as published by the Free Software Foundation, either version "
+"3 of the License, or (at your option) any later version.  Click on the "
+"License button below for the full text.\n"
+"\n"
+"Chart is distributed in the hope that it will be useful, but WITHOUT ANY "
+"WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS "
+"FOR A PARTICULAR PURPOSE.  See the license for more.\n"
+"\n"
+"You are running under: Perl {perlver}, Gtk2-Perl {gtkperlver}, Gtk "
+"{gtkver}, Glib-Perl {glibperlver}, Glib {glibver}\n"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PVT.pm:34
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:277
+msgid "PVT - Price Volume Trend"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PVT.pm:35
+msgid "PVT"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PVT.pm:36
+msgctxt "manual-node"
+msgid "Price and Volume Trend"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ulcer.pm:45
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:387
+msgid "Ulcer Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ulcer.pm:46
+msgid "Ulcer"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ulcer.pm:47
+msgctxt "manual-node"
+msgid "Ulcer Index"
 msgstr ""
 
 #: lib/App/Chart/Gtk2/WatchlistDialog.pm:79
@@ -3482,6 +2357,13 @@ msgstr ""
 #: lib/App/Chart/Gtk2/WatchlistDialog.pm:222
 #: lib/App/Chart/Gtk2/SeriesTreeView.pm:67
 msgid "Low"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/WatchlistDialog.pm:232
+#: lib/App/Chart/Series/Derived/Volume.pm:28
+#: lib/App/Chart/Gtk2/SeriesTreeView.pm:69
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:37
+msgid "Volume"
 msgstr ""
 
 #: lib/App/Chart/Gtk2/WatchlistDialog.pm:242
@@ -3524,34 +2406,173 @@ msgctxt "manual-node"
 msgid "Watchlist"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/ZigZag.pm:32
+#: lib/App/Chart/Gtk2/WatchlistDialog.pm:742
+#: lib/App/Chart/Gtk2/WatchlistModel.pm:188 lib/App/Chart/EmacsMain.pm:342
+#, perl-brace-format
+msgid "Quote: {quote_date} {quote_time}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/WatchlistDialog.pm:750
+#: lib/App/Chart/Gtk2/WatchlistModel.pm:196 lib/App/Chart/EmacsMain.pm:349
+#, perl-brace-format
+msgid "Last:  {last_date} {last_time}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/WatchlistDialog.pm:756
+#: lib/App/Chart/Gtk2/WatchlistModel.pm:204 lib/App/Chart/EmacsMain.pm:354
+#, perl-brace-format
+msgid "{location} time; source {source}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Latest.pm:46 lib/App/Chart/Gtk2/RawDialog.pm:133
+msgid "Latest"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Latest.pm:87
+#, perl-brace-format
+msgid "Latest {symbol_list} (and maybe {extra_list})"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Latest.pm:90
+#, perl-brace-format
+msgid "Latest {symbol_list}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Latest.pm:138
+msgid "..."
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EMAx2.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:452
+msgid "EMA of EMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EMAx2.pm:30
+msgid "EMAofEMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EMAx2.pm:31
 msgctxt "manual-node"
-msgid "Zig Zag Indicator"
+msgid "EMA of EMA"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/ZigZag.pm:36
-msgid "% Change"
+#: lib/App/Chart/Series/Derived/FOSC.pm:52
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:472
+#, perl-format
+msgid "Forecast Oscillator %F"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/ZigZag.pm:43
-msgid "Closes"
+#: lib/App/Chart/Series/Derived/FOSC.pm:53
+msgid "FOSC"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/LaguerreFilter.pm:50
-msgid "Laguerre"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/LaguerreFilter.pm:51
+#: lib/App/Chart/Series/Derived/FOSC.pm:54
 msgctxt "manual-node"
-msgid "Laguerre Filter"
+msgid "Forecast Oscillator"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/LaguerreFilter.pm:55
-msgid "Alpha"
+#: lib/App/Chart/Series/Derived/SineMA.pm:35
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:517
+msgid "Sine Weighted MA"
 msgstr ""
 
-#: lib/App/Chart/Timebase/Weeks.pm:47
-msgid "Weekly"
+#: lib/App/Chart/Series/Derived/SineMA.pm:36
+msgid "SineMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/SineMA.pm:37
+msgctxt "manual-node"
+msgid "Sine Weighted Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NYB.pm:45
+msgid "NYBOT _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NYB.pm:46
+msgid ""
+"Open web browser at the NYBEX/COMEX contract specifications for this "
+"commodity"
+msgstr ""
+
+#: lib/App/Chart/IntradayHandler.pm:70
+#, perl-brace-format
+msgid "Intraday image {symbol} {mode}"
+msgstr ""
+
+#: lib/App/Chart/IntradayHandler.pm:112
+#, perl-brace-format
+msgid "Error: {status_line}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MedianAverageAlpha.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:502
+msgid "Median-Average - Alpha"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MedianAverageAlpha.pm:30
+msgid "Median-Average Alpha"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MedianAverageAlpha.pm:31
+#: lib/App/Chart/Series/Derived/MedianAverage.pm:40
+msgctxt "manual-node"
+msgid "Median-Average Adaptive Filter"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:42
+msgid "Default LineStyle"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:43
+msgid "Candles"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:44
+msgid "OHLC"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:45
+msgid "Points"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:46
+msgid "Line"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:47
+msgid "High/Low"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:48
+msgid "Bars"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:49
+msgid "Stops"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/LineStyleComboBox.pm:50
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:54
+msgid "None"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/WatchlistModel.pm:156
+#, perl-brace-format
+msgid "ex {dividend}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/WatchlistModel.pm:219 lib/App/Chart/EmacsMain.pm:314
+msgid "[bad]"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Momentum.pm:28
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:237
+msgid "Momentum"
+msgstr ""
+
+#: lib/App/Chart/Timebase/Quarters.pm:46
+msgid "Quarterly"
 msgstr ""
 
 #: lib/App/Chart/Suffix/NZ.pm:42
@@ -3575,87 +2596,851 @@ msgstr ""
 msgid "NZX dividends"
 msgstr ""
 
-#: lib/App/Chart/EmacsMain.pm:153
-msgid "See *chart-process-backtrace* buffer"
+#: lib/App/Chart/Series/Derived/REMA_Momentum.pm:28
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:307
+msgid "REMA Momentum"
 msgstr ""
 
-#: lib/App/Chart/Suffix/TOCOM.pm:49
-msgid "TOCOM _Contract Specifications"
+#: lib/App/Chart/Series/Derived/REMA_Momentum.pm:30
+msgctxt "manual-node"
+msgid "REMA Momentum"
 msgstr ""
 
-#: lib/App/Chart/Suffix/TOCOM.pm:50
+#: lib/App/Chart/Suffix/CME.pm:44
+msgid "CME _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CME.pm:45
 msgid ""
-"Open web browser at the Tokyo Commodities Exchange contract specifications "
+"Open web browser at the Chicago Mercantile Exchange contract specifications "
 "for this commodity"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/VIDYA.pm:42
-msgid "VIDYA"
+#: lib/App/Chart/Gtk2/Symlist.pm:201
+msgid "(No name)"
 msgstr ""
 
-#: lib/App/Chart/Suffix/F.pm:33
-msgid "Frankfurt"
+#: lib/App/Chart/Series/Derived/Median.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:507
+msgid "Moving Median"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/SeriesTreeView.pm:65
-msgid "Open"
+#: lib/App/Chart/Series/Derived/Median.pm:31
+msgid "Median"
 msgstr ""
 
-#: lib/App/Chart/Gtk2/SeriesTreeView.pm:68
-msgid "Close"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/SeriesTreeView.pm:70
-msgid "Openint"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/SineMA.pm:36
-msgid "SineMA"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/SineMA.pm:37
+#: lib/App/Chart/Series/Derived/Median.pm:32
 msgctxt "manual-node"
-msgid "Sine Weighted Moving Average"
+msgid "Moving Median"
 msgstr ""
 
-#: lib/App/Chart/Yahoo.pm:81
-msgid "_Yahoo Stock Page"
+#: lib/App/Chart/Series/Derived/GuppyMMA.pm:38
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:162
+msgid "Guppy Multiple MA"
 msgstr ""
 
-#: lib/App/Chart/Yahoo.pm:82
-msgid "Open web browser at the Yahoo quote page for this stock"
+#: lib/App/Chart/Series/Derived/GuppyMMA.pm:39
+msgid "GMMA"
 msgstr ""
 
-#: lib/App/Chart/Yahoo.pm:329
-#, perl-brace-format
-msgid "Yahoo quotes {symbol_range}"
-msgstr ""
-
-#: lib/App/Chart/Yahoo.pm:395
-msgid "unknown"
-msgstr ""
-
-#: lib/App/Chart/Yahoo.pm:650
-msgid "Yahoo info"
-msgstr ""
-
-#: lib/App/Chart/Yahoo.pm:661
-#, perl-brace-format
-msgid "Yahoo info {symbolrange}"
-msgstr ""
-
-#: lib/App/Chart/Yahoo.pm:770
-#, perl-brace-format
-msgid "Yahoo intraday {symbol} {mode}"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ultimate.pm:33
-msgid "Ultimate"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ultimate.pm:34
+#: lib/App/Chart/Series/Derived/GuppyMMA.pm:40
 msgctxt "manual-node"
-msgid "Ultimate Oscillator"
+msgid "Guppy Multiple Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/GuppyMMA.pm:46
+msgctxt "long-moving-average"
+msgid "Long"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/KAMA.pm:46
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:187
+msgid "KAMA - Kaufmann Adaptive MA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/KAMA.pm:47
+msgid "KAMA"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:95
+msgid "Low Priority"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:119
+msgid "TA-Lib"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:200
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:207
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:223
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:224
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:225
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:245
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:263
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:270
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:271
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:277
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:282
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:283
+msgid "GT Misc"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:293
+msgid "Genius Trader"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:315
+#: lib/App/Chart/Gtk2/IndicatorModel.pm:332
+#, perl-brace-format
+msgid "GT {name}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WMA.pm:35
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:32
+msgid "WMA - Weighted MA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WMA.pm:36
+msgid "WMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/WMA.pm:37
+msgctxt "manual-node"
+msgid "Weighted Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BEN.pm:35
+msgid "Bendigo"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BEN.pm:51
+msgid "BSX _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BEN.pm:52
+msgid ""
+"Open web browser at the Bendigo Stock Exchange information page for this "
+"company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BEN.pm:91
+msgid "BSX stock numbers"
+msgstr ""
+
+#: lib/App/Chart/Weblink/SandP.pm:43
+msgid "Standard and _Poors index information"
+msgstr ""
+
+#: lib/App/Chart/Weblink/SandP.pm:44
+msgid ""
+"Open web browser at the Standard and Poors web site page for this index"
+msgstr ""
+
+#: lib/App/Chart/Suffix/FQ.pm:45 lib/App/Chart/Suffix/TSP.pm:60
+msgid "_TSP Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/FQ.pm:46 lib/App/Chart/Suffix/TSP.pm:61
+msgid "Open web browser at the US Government Thrift Savings Plan"
+msgstr ""
+
+#: lib/App/Chart/Suffix/FQ.pm:56
+msgid "_Fed Bonds Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/FQ.pm:57
+msgid "Open web browser at the US Treasury Federal Bonds site"
+msgstr ""
+
+#: lib/App/Chart/Suffix/FQ.pm:104
+#, perl-brace-format
+msgid "Finance::Quote {method} {symbol_range}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/FQ.pm:253
+msgid "Unknown error"
+msgstr ""
+
+#: lib/App/Chart/Suffix/FQ.pm:255
+msgid "No data from FQ method"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:56
+msgid "Chart: Annotations"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:57
+msgid "_Today"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:97
+#: lib/App/Chart/Gtk2/RawDialog.pm:338 lib/App/Chart/Gtk2/SeriesTreeView.pm:58
+msgid "Date"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:110
+#: lib/App/Chart/Gtk2/RawDialog.pm:283 lib/App/Chart/Gtk2/RawDialog.pm:356
+msgid "Note"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:154
+#, perl-brace-format
+msgid "Chart: Annotations: {symbol}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/AnnotationsDialog.pm:210
+msgctxt "manual-node"
+msgid "Annotations"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ZigZag.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:437
+msgid "Zig Zag"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ZigZag.pm:32
+msgctxt "manual-node"
+msgid "Zig Zag Indicator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ZigZag.pm:36
+msgid "% Change"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ZigZag.pm:43
+msgid "Closes"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/AccDist.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:57
+msgid "Accumulation/Distribution Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/AccDist.pm:30
+msgid "Acc/Dist"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/AccDist.pm:31
+msgctxt "manual-node"
+msgid "Accumulation/Distribution"
+msgstr ""
+
+#: lib/App/Chart/Series.pm:552
+msgid "Can only raise App::Chart::Series to a scalar power"
+msgstr ""
+
+#: lib/App/Chart/IndicatorInfo.pm:80 lib/App/Chart/IndicatorInfo.pm:113
+msgctxt "manual-node"
+msgid "Other Indicator Packages"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/NATR.pm:47
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:247
+msgid "NATR - Normalized ATR"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/NATR.pm:48
+msgid "NATR"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/NATR.pm:49
+msgctxt "manual-node"
+msgid "Normalized ATR"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RSI.pm:37
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:317
+msgid "RSI - Relative Strength Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RSI.pm:38
+msgid "RSI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RSI.pm:39
+msgctxt "manual-node"
+msgid "Relative Strength Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RWI.pm:86
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:327
+msgid "RWI - Random Walk Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RWI.pm:87
+msgid "RWI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/RWI.pm:88
+msgctxt "manual-node"
+msgid "Random Walk Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MedianAverage.pm:38
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:227
+msgid "Median-Average Adaptive"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/MedianAverage.pm:39
+msgid "Median-Average"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/JobsRunningDialog.pm:35
+msgid "Chart: Jobs Running Query"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/JobsRunningDialog.pm:36
+msgid "Job(s) still running, stop them ?"
+msgstr ""
+
+#: lib/App/Chart/DownloadHandler.pm:119
+#, perl-brace-format
+msgid "{name}: next check {datetime}"
+msgstr ""
+
+#: lib/App/Chart/DownloadHandler.pm:152
+#, perl-brace-format
+msgid "{symbol} already got data to {date}"
+msgstr ""
+
+#: lib/App/Chart/Database/Create.pm:144 lib/App/Chart/Database/Create.pm:245
+#, perl-brace-format
+msgid "Creating {filename}\n"
+msgstr ""
+
+#: lib/App/Chart/Database/Create.pm:315 lib/App/Chart/Gtk2/RawDialog.pm:168
+#: lib/App/Chart/Gtk2/Symlist/Alerts.pm:28
+msgid "Alerts"
+msgstr ""
+
+#: lib/App/Chart/Database/Create.pm:318
+#: lib/App/Chart/Gtk2/Symlist/Historical.pm:27
+msgid "Historical"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:152
+msgid "T.B.A."
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:153
+msgid "Est"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:154
+msgid "Unknown"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:162
+#, perl-brace-format
+msgid "{newnum} for {oldnum}, {note}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Graph/Plugin/Text.pm:166
+#, perl-brace-format
+msgid "{newnum} for {oldnum}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DEMA.pm:43
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:447
+msgid "DEMA - Double EMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DEMA.pm:44
+msgid "DEMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Donchian.pm:33
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:127
+msgid "Donchian Channel"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Donchian.pm:34
+msgid "Donchian"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Donchian.pm:36
+msgctxt "manual-node"
+msgid "Donchian Channel"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ATH.pm:52
+msgid "Athens"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ATH.pm:70
+msgid "ATHEX _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ATH.pm:71
+msgid "Open web browser at the Athens Stock Exchange page for this company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ATH.pm:224
+msgid "ATHEX"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ATH.pm:242
+#, perl-brace-format
+msgid "ATHEX 30 days data {symbol}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ATH.pm:313
+msgid "ATHEX dividends"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Prev.pm:27
+msgid "Prev"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MU.pm:33
+msgid "Munich"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MU.pm:47
+msgid "_Munich Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MU.pm:48
+msgid "Open web browser at the Munich Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/UserAgent.pm:108
+msgid "connect"
+msgstr ""
+
+#: lib/App/Chart/UserAgent.pm:118
+#, perl-brace-format
+msgid "{got} of {total} bytes"
+msgstr ""
+
+#: lib/App/Chart/UserAgent.pm:121
+#, perl-brace-format
+msgid "{got} bytes"
+msgstr ""
+
+#: lib/App/Chart/Suffix/PA.pm:33
+msgid "Paris"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EPMA.pm:127
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:132
+msgid "EPMA - Endpoint MA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EPMA.pm:128
+msgid "EPMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EPMA.pm:129
+msgctxt "manual-node"
+msgid "Endpoint Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BK.pm:34
+msgid "Bangkok"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BK.pm:71
+msgid "_SET Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BK.pm:72
+msgid "Open web browser at the Stock Exchange of Thailand home page"
+msgstr ""
+
+#: lib/App/Chart/Finance/Yahoo/Exchanges.pm:41 lib/App/Chart/Yahoo.pm:167
+msgid "Yahoo exchanges page"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DMI.pm:32
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:112
+msgid "DMI - Directional Movement Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DMI.pm:33
+msgid "DMI"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DMI.pm:34
+msgctxt "manual-node"
+msgid "Directional Movement Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LinRegStderr.pm:60
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:497
+msgid "Linear Regression Stderr"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LinRegStderr.pm:61
+msgid "Linreg Stderr"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/LinRegStderr.pm:62
+msgctxt "manual-node"
+msgid "Linear Regression Standard Error"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:51
+msgctxt "manual-node"
+msgid "Barchart"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:132
+#, perl-brace-format
+msgid "Barchart quote {symbol} ({barchart_commodity})"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:319
+msgid "Barchart"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:345
+#, perl-brace-format
+msgid "Barchart five day {symbol}"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:349
+#, perl-brace-format
+msgid "Barchart five day {symbol} ({barchart_symbol})"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:493 lib/App/Chart/Suffix/MGEX.pm:103
+#: lib/App/Chart/Yahoo.pm:762
+#, perl-brace-format
+msgid "_{n} Day"
+msgid_plural "_{n} Days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/App/Chart/Barchart.pm:502
+msgid "_Daily 2 Months"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:507
+msgid "_Daily 1 Year"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:526
+#, perl-brace-format
+msgid "Barchart intraday page {symbol} {mode}"
+msgstr ""
+
+#: lib/App/Chart/Barchart.pm:567
+#, perl-brace-format
+msgid "No such symbol {symbol}\n"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Inertia.pm:43
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:182
+msgid "Inertia (smoothed RVI)"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Inertia.pm:44
+msgid "Inertia"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Inertia.pm:45
+msgctxt "manual-node"
+msgid "Inertia"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Inertia.pm:65
+msgid "LSQMA Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ichimoku.pm:31
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:177
+msgid "Ichimoku Kinko Hyo"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ichimoku.pm:32
+msgid "Ichimoku"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ichimoku.pm:33
+msgctxt "manual-node"
+msgid "Ichimoku Kinko Hyo"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ichimoku.pm:40
+msgid "Tenkan Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Ichimoku.pm:45
+msgid "Kijun Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/KVOforce.pm:44
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:487
+msgid "KVO volume force"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/KVOforce.pm:45
+msgid "KVO force"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/KVOforce.pm:46
+#: lib/App/Chart/Series/Derived/KVO.pm:33
+msgctxt "manual-node"
+msgid "Klinger Volume Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CR.pm:34
+msgid "Caracas"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CR.pm:65
+msgid "_Caracas Stock Exchange"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CR.pm:66
+msgid "Open web browser at the Caracas Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ChaikinMF.pm:33
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:97
+msgid "Chaikin Money Flow"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ChaikinMF.pm:34
+msgid "Chaikin MF"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ChaikinMF.pm:35
+msgctxt "manual-node"
+msgid "Chaikin Money Flow"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VOLR.pm:31
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:412
+msgid "Volatility Ratio"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VOLR.pm:32
+msgid "VOLR"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VOLR.pm:33
+msgctxt "manual-node"
+msgid "Volatility Ratio"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TO.pm:34
+msgid "Toronto"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TO.pm:83
+msgid "_Toronto Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TO.pm:84
+msgid "Open web browser at the Toronto Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PFE.pm:51
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:262
+msgid "PFE - Polarized Fractal Efficiency"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PFE.pm:52
+msgid "PFE"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PFE.pm:53
+msgctxt "manual-node"
+msgid "Polarized Fractal Efficiency"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TSP.pm:46
+msgctxt "manual-node"
+msgid "Thrift Savings Plan"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TSP.pm:92
+msgid "TSP"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TSP.pm:112
+msgid "TSP nothing further expected yet"
+msgstr ""
+
+#: lib/App/Chart/Suffix/TSP.pm:138
+#, perl-brace-format
+msgid "TSP data {date_range}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/VX.pm:48
+msgid "_Virt-X Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/VX.pm:49
+msgid "Open web browser at the Virt-X Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ADX.pm:32
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:42
+msgid "ADX - Average Directional Index"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ADX.pm:33
+msgid "ADX"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ADX.pm:34
+msgctxt "manual-node"
+msgid "Average Directional Index"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Download.pm:37
+#, perl-brace-format
+msgid "Download {what} backto {year}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Download.pm:41
+#, perl-brace-format
+msgid "Download {what}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Job/Download.pm:50
+msgid "Download"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Bollinger.pm:31
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:77
+msgid "Bollinger Bands"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Bollinger.pm:32
+msgid "Bollinger"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Bollinger.pm:33
+msgctxt "manual-node"
+msgid "Bollinger Bands"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Bollinger.pm:42
+msgid "Stddevs"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MGEX.pm:32
+msgid "Minneapolis"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MGEX.pm:52
+msgid "MGEX _Product Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MGEX.pm:53
+msgid ""
+"Open web browser at the Minneapolis Grain Exchange product information page "
+"for this company"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MGEX.pm:97
+msgid "_1 1/2 Days"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MGEX.pm:120
+#, perl-brace-format
+msgid "Intraday page {symbol} {mode}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MGEX.pm:146
+#, perl-brace-format
+msgid "No chart available for {symbol}\n"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/TickerMenu.pm:59
+msgid "_Symbols"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/TickerMenu.pm:69
+msgid "R_un"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/TickerMenu.pm:119
+msgid "_Hide"
+msgstr ""
+
+#: lib/App/Chart/Suffix/SICOM.pm:51
+msgid "SICOM _Contract Specifications"
+msgstr ""
+
+#: lib/App/Chart/Suffix/SICOM.pm:52
+msgid ""
+"Open web browser at the Singapore Commodities Exchange contract "
+"specifications for this commodity"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NS.pm:33
+msgid "Mumbai"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NS.pm:51
+msgid "NSE _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/NS.pm:52
+msgid ""
+"Open web browser at the National Stock Exchange of India page for this "
+"company"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:28
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:102
+msgid "Chaikin Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:29
+msgid "Chaikin Osc"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:30
+msgctxt "manual-node"
+msgid "Chaikin Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:38
+#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:40
+msgid "Fast Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ChaikinOsc.pm:45
+#: lib/App/Chart/Series/Derived/Stochastics.pm:50
+#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:45
+msgid "Slow Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Aroon.pm:29
+#: lib/App/Chart/Series/Derived/Aroon.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:72
+msgid "Aroon"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Aroon.pm:31
+msgctxt "manual-node"
+msgid "Aroon"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CBT.pm:50
+msgid "_CBOT Home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/CBT.pm:51
+msgid "Open web browser at the Chicago Board of Trade home page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BO.pm:33
+msgid "Bombay"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BO.pm:54
+msgid "BSE _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/BO.pm:55
+msgid "Open web browser at the Bombay Stock Exchange page for this company"
 msgstr ""
 
 #: lib/App/Chart/Series/Derived/Adjust.pm:31
@@ -3696,176 +3481,79 @@ msgstr ""
 msgid "{parent} - Adj {list}"
 msgstr ""
 
-#: lib/App/Chart/Suffix/SA.pm:33
-msgid "Sao Paulo"
+#: lib/App/Chart/Series/Derived/IMI.pm:35
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:172
+msgid "IMI - Intraday Momentum Index"
 msgstr ""
 
-#: lib/App/Chart/Suffix/SA.pm:48
-msgid "_Sao Paolo Stock Exchange Home Page"
+#: lib/App/Chart/Series/Derived/IMI.pm:36
+msgid "IMI"
 msgstr ""
 
-#: lib/App/Chart/Suffix/SA.pm:49
-msgid "Open web browser at the Sao Paolo Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/AdaptiveLaguerreAlpha.pm:30
-msgid "Adaptive Laguerre Alpha"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CCOM.pm:59
-msgid "C-COM _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/CCOM.pm:60
-msgid ""
-"Open web browser at the Central Japan Commodities Exchange contract "
-"specifications for this commodity"
-msgstr ""
-
-#: lib/App/Chart/Suffix/L.pm:53
-msgid "LSE _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/L.pm:54
-msgid "Open web browser at the London Stock Exchange page for this company"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/GAPO.pm:46
+#: lib/App/Chart/Series/Derived/IMI.pm:37
 msgctxt "manual-node"
-msgid "Gopalakrishnan Range Index"
+msgid "Intraday Momentum Index"
 msgstr ""
 
-#: lib/App/Chart/Suffix/TSP.pm:46
+#: lib/App/Chart/Series/Derived/DPO.pm:36
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:117
+msgid "DPO - Detrended Price Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DPO.pm:37
+msgid "DPO"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/DPO.pm:38
 msgctxt "manual-node"
-msgid "Thrift Savings Plan"
+msgid "Detrended Price Oscillator"
 msgstr ""
 
-#: lib/App/Chart/Suffix/TSP.pm:92
-msgid "TSP"
+#: lib/App/Chart/Series/Derived/FRAMAdimension.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:467
+msgid "FRAMA - Dimension"
 msgstr ""
 
-#: lib/App/Chart/Suffix/TSP.pm:112
-msgid "TSP nothing further expected yet"
+#: lib/App/Chart/Series/Derived/FRAMAdimension.pm:31
+msgid "FRAMA dimension"
 msgstr ""
 
-#: lib/App/Chart/Suffix/TSP.pm:138
+#: lib/App/Chart/Series/Derived/AdaptiveLaguerre.pm:51
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:62
+msgid "Adaptive Laguerre Filter"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/AdaptiveLaguerre.pm:52
+msgid "Adaptive Laguerre"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DeleteDialog.pm:42
+msgid "Chart: Delete Symbol"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DeleteDialog.pm:49
+msgid "And delete your annotations too"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DeleteDialog.pm:54
+msgid "(No annotations, just downloaded data.)"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DeleteDialog.pm:66
 #, perl-brace-format
-msgid "TSP data {date_range}"
+msgid "Delete symbol {symbol} ?"
 msgstr ""
 
-#: lib/App/Chart/Suffix/KL.pm:31
-msgid "Kuala Lumpur"
+#: lib/App/Chart/Suffix/CO.pm:33
+msgid "Copenhagen"
 msgstr ""
 
-#: lib/App/Chart/Suffix/KL.pm:48
-msgid "_Kuala Lumpur Stock Exchange Home Page"
+#: lib/App/Chart/Suffix/CO.pm:59
+msgid "_Copenhagen Stock Exchange Home Page"
 msgstr ""
 
-#: lib/App/Chart/Suffix/KL.pm:49
-msgid "Open web browser at the Kuala Lumpur Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/TickerMenu.pm:59
-msgid "_Symbols"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/TickerMenu.pm:69
-msgid "R_un"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/TickerMenu.pm:119
-msgid "_Hide"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ichimoku.pm:32
-msgid "Ichimoku"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ichimoku.pm:33
-msgctxt "manual-node"
-msgid "Ichimoku Kinko Hyo"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ichimoku.pm:40
-msgid "Tenkan Days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Ichimoku.pm:45
-msgid "Kijun Days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/MedianAverageAlpha.pm:30
-msgid "Median-Average Alpha"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/DEMA.pm:44
-msgid "DEMA"
-msgstr ""
-
-#: lib/App/Chart/UserAgent.pm:108
-msgid "connect"
-msgstr ""
-
-#: lib/App/Chart/UserAgent.pm:118
-#, perl-brace-format
-msgid "{got} of {total} bytes"
-msgstr ""
-
-#: lib/App/Chart/UserAgent.pm:121
-#, perl-brace-format
-msgid "{got} bytes"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MX.pm:33
-msgid "Mexico City"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MX.pm:50
-msgid "_BMV Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/MX.pm:51
-msgid "Open web browser at the Mexico Stock Exchange home page"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/OBV.pm:30
-msgid "OBV"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/OBV.pm:31
-msgctxt "manual-node"
-msgid "On-Balance Volume"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PGO.pm:49
-msgid "PGO"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/PGO.pm:50
-msgctxt "manual-node"
-msgid "Pretty Good Oscillator"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/QStick.pm:34
-msgctxt "manual-node"
-msgid "QStick"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/DMI.pm:33
-msgid "DMI"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/DMI.pm:34
-msgctxt "manual-node"
-msgid "Directional Movement Index"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/TickerMain.pm:48
-msgid "Chart: Ticker"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/TickerMain.pm:154
-msgid "Command Line"
+#: lib/App/Chart/Suffix/CO.pm:60
+msgid "Open web browser at the Copenhagen Stock Exchange home page"
 msgstr ""
 
 #: lib/App/Chart/Gtk2/RawDialog.pm:88 lib/App/Chart/Gtk2/RawDialog.pm:755
@@ -4006,180 +3694,70 @@ msgctxt "manual-node"
 msgid "Raw Data"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/Stochastics.pm:32
+#: lib/App/Chart/Suffix/HK.pm:31
+msgid "Hong Kong"
+msgstr ""
+
+#: lib/App/Chart/Suffix/HK.pm:50
+msgid "HKEX _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/HK.pm:51
+msgid "Open web browser at the Hong Kong Stock Exchange page for this company"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PGO.pm:48
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:267
+msgid "PGO - Pretty Good Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PGO.pm:49
+msgid "PGO"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/PGO.pm:50
 msgctxt "manual-node"
-msgid "Stochastics"
+msgid "Pretty Good Oscillator"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/Stochastics.pm:40
-msgid "%K Days"
+#: lib/App/Chart/Suffix/SW.pm:31
+msgid "Switzerland"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/Stochastics.pm:45
-#, perl-format
-msgid "%D Days"
+#: lib/App/Chart/Suffix/SW.pm:54
+msgid "_SWX Home Page"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/Stochastics.pm:79
-#, perl-brace-format
-msgid "%K {K_count}, %D {D_count}, no slow"
+#: lib/App/Chart/Suffix/SW.pm:55
+msgid "Open web browser at the Swiss Stock Exchange home page"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/Stochastics.pm:83
-#, perl-brace-format
-msgid "%K {K_count}, %D {D_count}, slow {slow_count}"
+#: lib/App/Chart/Timebase/Months.pm:44
+msgid "Monthly"
 msgstr ""
 
-#: lib/App/Chart/IndicatorInfo.pm:80 lib/App/Chart/IndicatorInfo.pm:113
-msgctxt "manual-node"
-msgid "Other Indicator Packages"
+#: lib/App/Chart/Suffix/BE.pm:34
+msgid "Berlin"
 msgstr ""
 
-#: lib/App/Chart/DownloadHandler.pm:119
-#, perl-brace-format
-msgid "{name}: next check {datetime}"
+#: lib/App/Chart/Suffix/BE.pm:47
+msgid "_Berlin Stock Exchange Home Page"
 msgstr ""
 
-#: lib/App/Chart/DownloadHandler.pm:152
-#, perl-brace-format
-msgid "{symbol} already got data to {date}"
+#: lib/App/Chart/Suffix/BE.pm:48
+msgid "Open web browser at the Berlin Stock Exchange home page"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/FOSC.pm:53
-msgid "FOSC"
+#: lib/App/Chart/Suffix/SG.pm:33
+msgid "Stuttgart"
 msgstr ""
 
-#: lib/App/Chart/Series/Derived/FOSC.pm:54
-msgctxt "manual-node"
-msgid "Forecast Oscillator"
+#: lib/App/Chart/Suffix/SG.pm:47
+msgid "_Stuttgart Stock Exchange Home Page"
 msgstr ""
 
-#: lib/App/Chart/Suffix/GHA.pm:50
-msgid "Accra"
-msgstr ""
-
-#: lib/App/Chart/Suffix/GHA.pm:67
-msgid "GSE _Company Information"
-msgstr ""
-
-#: lib/App/Chart/Suffix/GHA.pm:68
-msgid ""
-"Open web browser at the Ghana Stock Exchange information page for this "
-"company"
-msgstr ""
-
-#: lib/App/Chart/Suffix/GHA.pm:85
-msgid "GSE"
-msgstr ""
-
-#: lib/App/Chart/Suffix/GHA.pm:104 lib/App/Chart/Suffix/GHA.pm:208
-msgid "GSE latest daily data"
-msgstr ""
-
-#: lib/App/Chart/Suffix/GHA.pm:119
-#, perl-brace-format
-msgid "GSE data {date}"
-msgstr ""
-
-#: lib/App/Chart/Suffix/RBA.pm:46
-msgctxt "manual-node"
-msgid "Reserve Bank of Australia"
-msgstr ""
-
-#: lib/App/Chart/Suffix/RBA.pm:57
-msgid "_RBA Home Page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/RBA.pm:58
-msgid "Open web browser at the Reserve Bank of Australia home page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/RBA.pm:159 lib/App/Chart/Suffix/RBA.pm:534
-msgid "RBA past three days"
-msgstr ""
-
-#: lib/App/Chart/Suffix/RBA.pm:186
-msgid "RBA historical page"
-msgstr ""
-
-#: lib/App/Chart/Suffix/RBA.pm:517
-msgid "RBA"
-msgstr ""
-
-#: lib/App/Chart/Suffix/RBA.pm:554
-#, perl-brace-format
-msgid "RBA data {filename}"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/WeightedClose.pm:32
-msgid "WCL"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/WeightedClose.pm:33
-msgctxt "manual-node"
-msgid "Weighted Close"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SICOM.pm:51
-msgid "SICOM _Contract Specifications"
-msgstr ""
-
-#: lib/App/Chart/Suffix/SICOM.pm:52
-msgid ""
-"Open web browser at the Singapore Commodities Exchange contract "
-"specifications for this commodity"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Inertia.pm:44
-msgid "Inertia"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Inertia.pm:45
-msgctxt "manual-node"
-msgid "Inertia"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/Inertia.pm:65
-msgid "LSQMA Days"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ChaikinMF.pm:34
-msgid "Chaikin MF"
-msgstr ""
-
-#: lib/App/Chart/Series/Derived/ChaikinMF.pm:35
-msgctxt "manual-node"
-msgid "Chaikin Money Flow"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Subprocess.pm:96
-#, perl-brace-format
-msgid "Cannot start subprocess: {strerror}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Subprocess.pm:171
-msgid "Starting"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Subprocess.pm:172
-#, perl-brace-format
-msgid "Running job: {name}"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Subprocess.pm:249
-msgid "Read error"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Subprocess.pm:252
-msgid "Died"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Subprocess.pm:268
-msgid "Done"
-msgstr ""
-
-#: lib/App/Chart/Gtk2/Subprocess.pm:268
-msgid "Idle"
+#: lib/App/Chart/Suffix/SG.pm:48
+msgid "Open web browser at the Stuttgart Stock Exchange home page"
 msgstr ""
 
 #: lib/App/Chart/Gtk2/ViewStyleDialog.pm:58
@@ -4255,14 +3833,421 @@ msgstr ""
 msgid "Open the manual at the section \"{section}\""
 msgstr ""
 
-#: lib/App/Chart/Suffix/SS.pm:34
-msgid "Shanghai"
+#: lib/App/Chart/Series/Derived/MFI.pm:52
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:222
+msgid "MFI - Money Flow Index"
 msgstr ""
 
-#: lib/App/Chart/Suffix/SS.pm:67
-msgid "SSE _Index Information"
+#: lib/App/Chart/Series/Derived/MFI.pm:53
+msgid "MFI"
 msgstr ""
 
-#: lib/App/Chart/Suffix/SS.pm:68
-msgid "Open web browser at the Shanghai Stock Exchange page for this index"
+#: lib/App/Chart/Series/Derived/MFI.pm:54
+msgctxt "manual-node"
+msgid "Money Flow Index"
+msgstr ""
+
+#: lib/App/Chart/EmacsMain.pm:153
+msgid "See *chart-process-backtrace* buffer"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:108
+msgid "retry"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:117
+msgid "processing"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:327
+msgid "writing database"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:542
+#, perl-brace-format
+msgid "{symbol} no data at all, marked historical"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:547
+#, perl-brace-format
+msgid "{symbol} no data for {days} days, marked historical"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:1224
+#, perl-brace-format
+msgid "{lodate} to {hidate}"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:1237
+#, perl-brace-format
+msgid "{start_symbol} to {end_symbol}"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:1278
+msgid "Download:"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:1312
+msgid "Checking historical"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:1330
+#, perl-brace-format
+msgid ""
+"Warning, pattern \"{pattern}\" doesn't match anything in the database, "
+"ignoring\n"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:1359
+msgid "No symbols specified to download\n"
+msgstr ""
+
+#: lib/App/Chart/Download.pm:1371
+#, perl-brace-format
+msgid ""
+"Warning, no symbols in \"{symlist}\" are currently in the database\n"
+"(only symbols already in the database are downloaded from lists)\n"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Coppock.pm:28
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:107
+msgid "Coppock Curve"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Coppock.pm:29
+msgid "Coppock"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Coppock.pm:30
+msgctxt "manual-node"
+msgid "Coppock Curve"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:85
+msgid "LME _Commodity Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:86
+msgid "Open web browser at the London Metal Exchange page for this commodity"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:183
+msgid "LME login"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:500
+msgid "LME historical downloads page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:589
+msgid "LME month xls"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:624
+#, perl-brace-format
+msgid "LME data {filename}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:785
+#, perl-brace-format
+msgid "LME volumes {filename}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:957
+#, perl-brace-format
+msgid "LME daily {type} {date}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/LME.pm:986
+#, perl-brace-format
+msgid "LME daily latest {type}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EMA.pm:61
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:27
+msgid "EMA - Exponential MA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EMA.pm:62
+msgid "EMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EMA.pm:63
+msgctxt "manual-node"
+msgid "Exponential Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DeleteSymlistDialog.pm:45
+msgid "Chart: Delete Symlist"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DeleteSymlistDialog.pm:85
+#, perl-brace-format
+msgid "Delete symlist \"{name}\" ?"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/DeleteSymlistDialog.pm:87
+#, perl-brace-format
+msgid "It has {length} symbol in it."
+msgid_plural "It has {length} symbols in it."
+msgstr[0] ""
+msgstr[1] ""
+
+#: lib/App/Chart/Yahoo.pm:81
+msgid "_Yahoo Stock Page"
+msgstr ""
+
+#: lib/App/Chart/Yahoo.pm:82
+msgid "Open web browser at the Yahoo quote page for this stock"
+msgstr ""
+
+#: lib/App/Chart/Yahoo.pm:329
+#, perl-brace-format
+msgid "Yahoo quotes {symbol_range}"
+msgstr ""
+
+#: lib/App/Chart/Yahoo.pm:395
+msgid "unknown"
+msgstr ""
+
+#: lib/App/Chart/Yahoo.pm:650
+msgid "Yahoo info"
+msgstr ""
+
+#: lib/App/Chart/Yahoo.pm:661
+#, perl-brace-format
+msgid "Yahoo info {symbolrange}"
+msgstr ""
+
+#: lib/App/Chart/Yahoo.pm:770
+#, perl-brace-format
+msgid "Yahoo intraday {symbol} {mode}"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MX.pm:33
+msgid "Mexico City"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MX.pm:50
+msgid "_BMV Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/MX.pm:51
+msgid "Open web browser at the Mexico Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ZLEMA.pm:37
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:432
+msgid "ZLEMA - Zero Lag EMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ZLEMA.pm:38
+msgid "ZLEMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/ZLEMA.pm:39
+msgctxt "manual-node"
+msgid "Zero-Lag Exponential Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Stochastics.pm:30
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:337
+msgid "Stochastics %K/%D"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Stochastics.pm:32
+msgctxt "manual-node"
+msgid "Stochastics"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Stochastics.pm:40
+msgid "%K Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Stochastics.pm:45
+#, perl-format
+msgid "%D Days"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Stochastics.pm:79
+#, perl-brace-format
+msgid "%K {K_count}, %D {D_count}, no slow"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Stochastics.pm:83
+#, perl-brace-format
+msgid "%K {K_count}, %D {D_count}, slow {slow_count}"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Keltner.pm:29
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:197
+msgid "Keltner Channel"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Keltner.pm:30
+msgid "Keltner"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Keltner.pm:31
+msgctxt "manual-node"
+msgid "Keltner Channel"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Keltner.pm:41
+msgid "Width"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/SeriesTreeView.pm:65
+msgid "Open"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/SeriesTreeView.pm:68
+msgid "Close"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/SeriesTreeView.pm:70
+msgid "Openint"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/T3.pm:42
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:342
+msgid "T3 Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/T3.pm:43
+msgid "T3"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/T3.pm:44
+msgctxt "manual-node"
+msgid "T3 Moving Average"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/T3.pm:53
+msgid "Factor"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:30
+#: lib/App/Chart/Series/Derived/VIDYAalpha.pm:31
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:547
+msgid "VIDYA alpha"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KS.pm:34
+msgid "Seoul"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KS.pm:59
+msgid "_Korea Stock Exchange Home Page"
+msgstr ""
+
+#: lib/App/Chart/Suffix/KS.pm:60
+msgid "Open web browser at the Korea Stock Exchange home page"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:152
+#: lib/App/Chart/Series/Derived/Fisher.pm:36
+msgid "Fisher Transform"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:192
+#: lib/App/Chart/Series/Derived/KVO.pm:31
+msgid "KVO - Klinger Volume Oscillator"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/IndicatorModelGenerated.pm:457
+#: lib/App/Chart/Series/Derived/EMAx3.pm:29
+msgid "EMA of EMA of EMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EMAx3.pm:30
+msgid "EMAx3"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/EMAx3.pm:31
+msgctxt "manual-node"
+msgid "EMA of EMA of EMA"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/KVO.pm:32
+msgid "KVO"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/KVO.pm:53
+msgid "Trigger"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Ticker.pm:219
+#, perl-brace-format
+msgid "{symlistname} list is empty ... "
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Ticker.pm:221
+msgid "No symlist ... "
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Ticker.pm:248
+msgctxt "manual-node"
+msgid "Ticker"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Graph.pm:89
+msgid "Horizontal adjustment"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Graph.pm:97
+msgid "Vertical adjustment"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Subprocess.pm:96
+#, perl-brace-format
+msgid "Cannot start subprocess: {strerror}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Subprocess.pm:171
+msgid "Starting"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Subprocess.pm:172
+#, perl-brace-format
+msgid "Running job: {name}"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Subprocess.pm:249
+msgid "Read error"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Subprocess.pm:252
+msgid "Died"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Subprocess.pm:268
+msgid "Done"
+msgstr ""
+
+#: lib/App/Chart/Gtk2/Subprocess.pm:268
+msgid "Idle"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ZAG.pm:32
+msgid "Zagreb"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ZAG.pm:52
+msgid "ZSE _Company Information"
+msgstr ""
+
+#: lib/App/Chart/Suffix/ZAG.pm:53
+msgid ""
+"Open web browser at the Zagreb Stock Exchange information page for this "
+"company"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Fisher.pm:37
+msgid "Fisher"
+msgstr ""
+
+#: lib/App/Chart/Series/Derived/Fisher.pm:38
+msgctxt "manual-node"
+msgid "Fisher Transform"
 msgstr ""

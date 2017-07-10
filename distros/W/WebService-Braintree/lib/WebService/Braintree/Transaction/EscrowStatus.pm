@@ -1,5 +1,5 @@
 package WebService::Braintree::Transaction::EscrowStatus;
-$WebService::Braintree::Transaction::EscrowStatus::VERSION = '0.9';
+$WebService::Braintree::Transaction::EscrowStatus::VERSION = '0.91';
 use strict;
 
 use constant HoldPending => 'hold_pending';

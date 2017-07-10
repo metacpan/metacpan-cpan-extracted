@@ -1,11 +1,7 @@
-#!/usr/bin/perl -w
-
-#
-# general VISA Connection class for Lab::Bus::VISA
-# This one digests VISA resource names
-#
 package Lab::Connection::VISA;
-$Lab::Connection::VISA::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: VISA-type connection
+$Lab::Connection::VISA::VERSION = '3.553';
 use strict;
 use Lab::Bus::VISA;
 use Lab::Connection;
@@ -38,6 +34,11 @@ sub new {
 # That's all, all that was needed was the additional field "resource_name".
 #
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -46,7 +47,13 @@ sub new {
 
 Lab::Connection::VISA - VISA-type connection
 
+=head1 VERSION
+
+version 3.553
+
 =head1 SYNOPSIS
+
+Ths general VISA Connection class for Lab::Bus::VISA digests VISA resource names.
 
 This is not called directly. To make a VISA suppporting instrument use Lab::Connection::VISA, set
 the connection_type parameter accordingly:
@@ -63,7 +70,6 @@ NI VISA (L<Lab::VISA>) as backend.
 
 It inherits from L<Lab::Connection>.
 
-
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -73,11 +79,9 @@ It inherits from L<Lab::Connection>.
    resource_name => 'GPIB0::14::INSTR',
  }
 
-
 =head1 METHODS
 
 This just falls back on the methods inherited from L<Lab::Connection>.
-
 
 =head2 config
 
@@ -90,7 +94,7 @@ Without arguments, returns a reference to the complete $self->Config aka @_ of t
 
  $Config = $connection->Config();
  $GPIB_Address = $connection->Config()->{'gpib_address'};
- 
+
 =head1 CAVEATS/BUGS
 
 Probably few. Mostly because there's not a lot to be done here. Please report.
@@ -105,13 +109,18 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2010       Andreas K. Huettel
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Florian Olbrich
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

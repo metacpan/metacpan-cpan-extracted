@@ -1,0 +1,9 @@
+Input: abc
+Chain: hex
+Flags: inverse
+Output: 616263
+Chain: base64
+Flags: inverse
+Output: YWJj
+Chain: hash(sha256):hex
+Output: ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad

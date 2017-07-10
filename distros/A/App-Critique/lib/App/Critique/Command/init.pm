@@ -3,7 +3,7 @@ package App::Critique::Command::init;
 use strict;
 use warnings;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use App::Critique::Session;
@@ -49,11 +49,13 @@ sub execute {
         info(HR_LIGHT);
         info('Successuflly created session with the following configuration:');
         info(HR_LIGHT);
-        info('  perl_critic_profile = %s', $session->perl_critic_profile // '[auto]');
-        info('  perl_critic_theme   = %s', $session->perl_critic_theme   // '[auto]');
-        info('  perl_critic_policy  = %s', $session->perl_critic_policy  // '[auto]');
-        info('  git_work_tree       = %s', $session->git_work_tree       // '[auto]');
-        info('  git_branch          = %s', $session->git_branch          // '[auto]');
+        info('  perl_critic_profile = %s', $session->perl_critic_profile // '[...]');
+        info('  perl_critic_theme   = %s', $session->perl_critic_theme   // '[...]');
+        info('  perl_critic_policy  = %s', $session->perl_critic_policy  // '[...]');
+        info('  git_work_tree       = %s', $session->git_work_tree      );
+        info('  git_work_tree_root  = %s', $session->git_work_tree_root );
+        info('  git_branch          = %s', $session->git_branch         );
+        info('  git_HEAD_sha        = %s', $session->git_head_sha       );
         info(HR_LIGHT);
     }
     else {
@@ -88,7 +90,7 @@ App::Critique::Command::init - Initialize critique session file
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

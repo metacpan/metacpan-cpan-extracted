@@ -16,7 +16,10 @@ lib/Test2/Plugin/IOEvents/Base.pm
 lib/Test2/Plugin/IOEvents/STDERR.pm
 lib/Test2/Plugin/IOEvents/STDOUT.pm
 lib/Test2/Plugin/IOMuxer.pm
+lib/Test2/Plugin/IOMuxer/FORMAT.pm
 lib/Test2/Plugin/IOMuxer/Layer.pm
+lib/Test2/Plugin/IOMuxer/STDERR.pm
+lib/Test2/Plugin/IOMuxer/STDOUT.pm
 lib/Test2/Plugin/IOSync.pm
 lib/Test2/Plugin/OpenFixPerlIO.pm
 perltidyrc

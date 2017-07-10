@@ -18,3 +18,8 @@ Revision history for Data-Dx
     Now works with Perl 5.12 or greater
     (under Keyword::Declare 0.001003 or later)
 
+
+
+0.000005  Sat Jul  8 09:45:11 2017
+
+    Removed POD nit.

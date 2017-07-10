@@ -29,6 +29,7 @@ binmode(STDOUT,":encoding(latin-1)") or die;
   $symbol = 'HGI.AX';
   $symbol = 'STO.AX';
   $symbol = 'WOW.AX';
+  $symbol = 'SXA.MON';
   my $latest = App::Chart::Latest->get ($symbol);
   require Data::Dumper;
   print Data::Dumper->new([$latest])->Sortkeys(1)->Dump;

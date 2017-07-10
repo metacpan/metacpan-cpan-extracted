@@ -17,15 +17,15 @@
       "build" : {
          "requires" : {
             "Alien::Build" : "0.49",
-            "Alien::Build::MM" : "0.40",
+            "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Build::Autoconf" : "0.47",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.40",
-            "Alien::Build::MM" : "0.40",
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.008001"
          }
@@ -73,7 +73,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

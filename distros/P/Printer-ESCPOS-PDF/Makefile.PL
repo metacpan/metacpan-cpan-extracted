@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "PDF::API2" => 0,
     "Printer::ESCPOS::Profiles::Generic" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

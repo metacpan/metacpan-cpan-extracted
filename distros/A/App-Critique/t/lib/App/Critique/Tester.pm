@@ -14,35 +14,23 @@ BEGIN {
     $PSUEDO_HOME = Path::Tiny::tempdir( CLEANUP => 1 )
 }
 
-sub init_test_repo {
+sub init_test_env {
 
     # if we don't have git, why both testing
     Test::More::BAIL_OUT('Unable to find a `git` binary, not in path')
         unless Git::Wrapper->has_git_in_path;
 
-    # grab the test files for the repo
-    my $work_tree = Path::Tiny::tempdir( CLEANUP => 1 );
-    _copy_full_tree(
-        from => Path::Tiny->cwd->child('devel/git/test_repo'),
-        to   => $work_tree,
-    );
-
-    # and then create, add and commit
-    my $test_repo = Git::Wrapper->new( $work_tree );
-    $test_repo->init;
-
-    if ( my $err = $test_repo->ERR ) {
+    my $test_repo; 
+    eval {
+        $test_repo = init_test_repo('devel/git/test_repo', 1);
+        1;
+    } or do {
+        my $e = "$@";
         # if we get an error from running
         # init, we likely have a bad setup
         # so bail again ...
-        Test::More::BAIL_OUT('Unable to find a usable `git` binary, because: ' . join "\n" => @$err)
-            unless 0 == scalar @$err;
-    }
-
-    $test_repo->add( '*' );
-    $test_repo->commit({ message => 'initial commit' });
-
-    $TEMP_WORK_TREES{ $test_repo } = $work_tree;
+        Test::More::BAIL_OUT('Unable to find a usable `git` binary, because: ' . $e);
+    };
 
     return $test_repo;
 }
@@ -73,6 +61,31 @@ sub test {
     Test::More::unlike( $all, $_, '... failed match '.$_.' correctly' ) foreach @$bad;
 
     return ($out, $err);
+}
+
+sub init_test_repo {
+    my ($test_repo_path, $should_cleanup) = @_;
+    
+    # boolify 
+    $should_cleanup = !! $should_cleanup;
+
+    # grab the test files for the repo
+    my $work_tree = Path::Tiny::tempdir( CLEANUP => $should_cleanup );
+    _copy_full_tree(
+        from => Path::Tiny->cwd->child($test_repo_path),
+        to   => $work_tree,
+    );
+
+    # and then create, add and commit
+    my $test_repo = Git::Wrapper->new( $work_tree );
+    $test_repo->init;
+    $test_repo->add( '*' );
+    $test_repo->commit({ message => 'initial commit' });
+    
+    $TEMP_WORK_TREES{ $test_repo } = $work_tree
+        if $should_cleanup;
+
+    return $test_repo;
 }
 
 sub teardown_test_repo {

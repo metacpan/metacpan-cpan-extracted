@@ -1,5 +1,22 @@
 Revision history for Perl extension Set::SegmentTree.
 
+0.06 Sat Jul 8 20:42:00 2017
+	- We ACTUALLY require perl 5.013002
+	- And we check by passing minimum version test
+
+0.05  Sat Jul 8 18:14:00 2017
+	- REALLY only require perl 5.006
+
+0.04  Sat Jul 8 01:30:00 2017
+	- Only require perl 5.006
+	- remove the Data::UUID requirement in the test
+
+0.03  Sat Jul 8 01:10:00 2017
+	- Add more dependency pinning to Makefile for tests on old systems
+
+0.02  Fri Jul 7 13:50:00 2017
+	- Add Makefile.PL to the actual distribution file >_>
+
 0.01  Sat Jun 17 22:09:20 2017
 	- original version; created by h2xs 1.23 with options
 		-AXc -n Set::SegmentTree

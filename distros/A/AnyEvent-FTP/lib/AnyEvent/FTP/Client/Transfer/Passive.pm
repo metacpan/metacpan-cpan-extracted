@@ -9,14 +9,14 @@ use AnyEvent::Socket qw( tcp_connect );
 extends 'AnyEvent::FTP::Client::Transfer';
 
 # ABSTRACT: Passive transfer class for asynchronous ftp client
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 sub BUILD
 {
   my($self) = @_;
-  
+
   my $local = $self->convert_local($self->local);
-  
+
   my $data_connection = sub {
     my $res = shift;
     return if $res->is_preliminary;
@@ -29,7 +29,7 @@ sub BUILD
         {
           return "unable to connect to data port: $!";
         }
-        
+
         $self->xfer($fh,$local);
       };
       return;
@@ -87,7 +87,7 @@ AnyEvent::FTP::Client::Transfer::Passive - Passive transfer class for asynchrono
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 
@@ -98,6 +98,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

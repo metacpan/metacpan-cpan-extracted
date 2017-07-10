@@ -3,7 +3,7 @@ package App::Critique::Command;
 use strict;
 use warnings;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Path::Tiny ();
@@ -15,8 +15,8 @@ sub opt_spec {
     return (
         [ 'git-work-tree=s', 'git working tree, defaults to current working directory', { default => Path::Tiny->cwd } ],
         [],
-        [ 'verbose|v',       'display additional information', { default => $App::Critique::CONFIG{'VERBOSE'}                     } ],
         [ 'debug|d',         'display debugging information',  { default => $App::Critique::CONFIG{'DEBUG'}, implies => 'verbose' } ],
+        [ 'verbose|v',       'display additional information', { default => $App::Critique::CONFIG{'VERBOSE'}                     } ],
     );
 }
 
@@ -85,7 +85,7 @@ App::Critique::Command - Command base class for App::Critique
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

@@ -1,3 +1,10 @@
+1.52    2017-07-07 (PERLANCAR)
+
+	- Replace mention of DZP:GenShellCompletion with cpanm-shcompgen.
+
+	- [dist] Enable static install.
+
+
 1.51    2017-06-17 (PERLANCAR)
 
 	- Mention tutorial blog posts on

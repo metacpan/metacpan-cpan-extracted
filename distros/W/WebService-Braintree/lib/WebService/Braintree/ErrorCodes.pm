@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes;
-$WebService::Braintree::ErrorCodes::VERSION = '0.9';
+$WebService::Braintree::ErrorCodes::VERSION = '0.91';
 use strict;
 
 use WebService::Braintree::ErrorCodes::Address;

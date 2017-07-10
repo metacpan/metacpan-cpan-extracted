@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien-libtool/issues
   homepage: https://metacpan.org/pod/Alien::libtool
   repository: git://github.com/plicease/Alien-libtool.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'YAML::Tiny version 1.70'

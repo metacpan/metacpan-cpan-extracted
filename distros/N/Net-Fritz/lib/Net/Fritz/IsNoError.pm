@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::IsNoError;
 # ABSTRACT: a L<Moo::Role> discerning all other L<Net::Fritz> objects from a L<Net::Fritz::Error> object
-$Net::Fritz::IsNoError::VERSION = 'v0.0.7';
+$Net::Fritz::IsNoError::VERSION = 'v0.0.8';
 
 use Moo::Role;
 
@@ -31,7 +31,7 @@ Net::Fritz::IsNoError - a L<Moo::Role> discerning all other L<Net::Fritz> object
 
 =head1 VERSION
 
-version v0.0.7
+version v0.0.8
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ L<Net::Fritz::Error>.  B<All> L<Net::Fritz> objects thus support
 C<error> and C<errorcheck>
 
 If you want your code to just C<die()> on any error, call
-C<$obj->errorcheck> on every returned object (see first example
+C<$obj-E<gt>errorcheck> on every returned object (see first example
 above).
 
 If you just want to check for an error and handle it by yourself, call

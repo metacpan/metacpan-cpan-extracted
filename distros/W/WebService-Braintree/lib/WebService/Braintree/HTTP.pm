@@ -1,5 +1,5 @@
 package WebService::Braintree::HTTP;
-$WebService::Braintree::HTTP::VERSION = '0.9';
+$WebService::Braintree::HTTP::VERSION = '0.91';
 use HTTP::Request;
 use LWP::UserAgent;
 use WebService::Braintree::Xml;

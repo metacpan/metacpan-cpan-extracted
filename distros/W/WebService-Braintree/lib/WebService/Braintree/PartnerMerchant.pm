@@ -1,5 +1,5 @@
 package WebService::Braintree::PartnerMerchant;
-$WebService::Braintree::PartnerMerchant::VERSION = '0.9';
+$WebService::Braintree::PartnerMerchant::VERSION = '0.91';
 use Moose;
 extends 'WebService::Braintree::ResultObject';
 

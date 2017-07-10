@@ -27,17 +27,18 @@ sub __bernreal__ {
     my $f = Math::MPFR::Rmpfr_init2($PREC);
     my $p = Math::MPFR::Rmpfr_init2($PREC);
 
-    Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);    # f = zeta(n)
-    Math::MPFR::Rmpfr_set_ui($p, $n + 1, $ROUND); # p = n+1
-    Math::MPFR::Rmpfr_gamma($p, $p, $ROUND);      # p = gamma(p)
-    Math::MPFR::Rmpfr_mul($f, $f, $p, $ROUND);    # f = f * p
+    Math::MPFR::Rmpfr_zeta_ui($f, $n, $ROUND);                      # f = zeta(n)
+    Math::MPFR::Rmpfr_set_ui($p, $n + 1, $ROUND);                   # p = n+1
+    Math::MPFR::Rmpfr_gamma($p, $p, $ROUND);                        # p = gamma(p)
 
-    Math::MPFR::Rmpfr_const_pi($p, $ROUND);       # p = PI
-    Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND); # p = p^n
+    Math::MPFR::Rmpfr_mul($f, $f, $p, $ROUND);                      # f = f * p
 
-    Math::MPFR::Rmpfr_div_2exp($f, $f, $n - 1, $ROUND);    # f = f / 2^(n-1)
+    Math::MPFR::Rmpfr_const_pi($p, $ROUND);                         # p = PI
+    Math::MPFR::Rmpfr_pow_ui($p, $p, $n, $ROUND);                   # p = p^n
 
-    Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);             # f = f/p
+    Math::MPFR::Rmpfr_div_2ui($f, $f, $n - 1, $ROUND);              # f = f / 2^(n-1)
+
+    Math::MPFR::Rmpfr_div($f, $f, $p, $ROUND);                      # f = f/p
     Math::MPFR::Rmpfr_neg($f, $f, $ROUND) if $n % 4 == 0;
 
     $f;

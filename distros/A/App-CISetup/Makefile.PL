@@ -27,7 +27,6 @@ my %WriteMakefileArgs = (
     "IPC::Run3" => 0,
     "IPC::System::Simple" => 0,
     "List::AllUtils" => 0,
-    "List::Gather" => 0,
     "Moose" => 0,
     "Moose::Role" => 0,
     "MooseX::Getopt::Dashes" => 0,
@@ -55,7 +54,7 @@ my %WriteMakefileArgs = (
     "Test::Class::Moose::CLI" => 0,
     "Test::More" => "1.302015"
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,7 +71,6 @@ my %FallbackPrereqs = (
   "IPC::Run3" => 0,
   "IPC::System::Simple" => 0,
   "List::AllUtils" => 0,
-  "List::Gather" => 0,
   "Moose" => 0,
   "Moose::Role" => 0,
   "MooseX::Getopt::Dashes" => 0,

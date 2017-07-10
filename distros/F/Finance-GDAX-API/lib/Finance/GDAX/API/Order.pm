@@ -1,5 +1,5 @@
 package Finance::GDAX::API::Order;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use 5.20.0;
 use warnings;
 use Moose;
@@ -167,7 +167,7 @@ Finance::GDAX::API::Order - Perl interface to the GDAX Order API
   $order->product_id('BTC-USD');
   $order->funds(500.00);
   $response = $order->initiate;
-  if ($response->error) { die "Error: ".$response->error };
+  if ($order->error) { die "Error: ".$order->error };
   
 
 =head1 DESCRIPTION

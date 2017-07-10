@@ -7,7 +7,7 @@ use Path::Tiny ();
 use IPC::Cmd ();
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 
 has '+format' => 'tar';
@@ -189,7 +189,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 0.52
+version 0.55
 
 =head1 SYNOPSIS
 

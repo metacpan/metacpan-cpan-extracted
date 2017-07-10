@@ -1,5 +1,5 @@
 package MultiModuleTest::Example2;
-$MultiModuleTest::Example2::VERSION = '1.143160';
+$MultiModuleTest::Example2::VERSION = '1.171870';
 use strict;use warnings;
 
 use parent 'App::MultiModule::Task';

@@ -6,7 +6,7 @@ use 5.010;
 use Moo;
 
 # ABSTRACT: base class for AnyEvent::FTP::Client::Site::* classes
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 sub BUILDARGS
 {
@@ -30,7 +30,7 @@ AnyEvent::FTP::Client::Site::Base - base class for AnyEvent::FTP::Client::Site::
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 
@@ -41,6 +41,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

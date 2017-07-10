@@ -3,7 +3,7 @@ use File::Temp qw/tempfile/;
 
 def ok => ($INC{'Test2/Plugin/OpenFixPerlIO.pm'}, "Loaded OpenFixPerlIO");
 
-my ($fh, $file) = tempfile("$$-XXXXXXXX");
+my ($fh, $file) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
 binmode($fh, ":via($CLASS)");
 print $fh "Test2::API has been required, but has not been 'loaded' yet\n";
 

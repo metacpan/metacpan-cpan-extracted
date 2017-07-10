@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use POSIX qw/:locale_h/;
 
@@ -82,7 +82,7 @@ sub get {
     my $loc = POSIX::setlocale(POSIX::LC_TIME);
 
     # Amerikanisches Zeitformat einstellen
-    POSIX::setlocale(POSIX::LC_TIME,'en_US');
+    POSIX::setlocale(POSIX::LC_TIME,'C'); # Fix: CPAN Testers
 
     my $format = '%a, %d-%b-%Y %H:%M:%S GMT';
 
@@ -134,7 +134,7 @@ sub get {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 SEE ALSO
 

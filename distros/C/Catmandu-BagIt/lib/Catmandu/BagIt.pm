@@ -1,7 +1,7 @@
 package Catmandu::BagIt;
 
 use strict;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Catmandu::Sane;
 use Catmandu;
@@ -524,7 +524,7 @@ sub add_fetch {
     my ($self, $url, $size, $filename) = @_;
 
     die "usage add_fetch(url,size,filename)"
-            unless defined($url) && $size =~ /^\d+$/ && defined($filename);
+            unless defined($url) && $size =~ /^[0-9]+$/ && defined($filename);
 
     die "illegal file name $filename"
             unless $self->_is_legal_file_name($filename);
@@ -709,7 +709,7 @@ sub complete {
 
     $self->log->info("checking complete");
 
-    unless ($self->version and $self->version =~ /^\d+\.\d+$/) {
+    unless ($self->version and $self->version =~ /^[0-9]+\.[0-9]+$/) {
         $self->log->error("Tag 'BagIt-Version' not available in bagit.txt");
         $self->_push_error("Tag 'BagIt-Version' not available in bagit.txt");
     }
@@ -1456,6 +1456,8 @@ Catmandu::BagIt - Low level Catmandu interface to the BagIt packages.
 
 =item * L<Catmandu::Exporter::BagIt>
 
+=item * L<Catmandu::Store::File::BagIt>
+
 =back
 
 =head1 METHODS
@@ -1600,7 +1602,7 @@ Mirror a Catmandu::BagIt::Fetch object to local disk.
 
 =head1 SEE ALSO
 
-L<Catmandu::Importer::BagIt> , L<Catmandu::Exporter::BagIt>
+L<Catmandu::Importer::BagIt> , L<Catmandu::Exporter::BagIt> , L<Catmandu::Store::File::BagIt>
 
 =head1 AUTHOR
 

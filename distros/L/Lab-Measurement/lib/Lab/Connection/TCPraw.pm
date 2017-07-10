@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
-
 package Lab::Connection::TCPraw;
-$Lab::Connection::TCPraw::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Raw TCP connection; deprecated, use Socket instead
+$Lab::Connection::TCPraw::VERSION = '3.553';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -37,22 +37,34 @@ sub new {
 # That's all folks. For now.
 #
 
+1;
+
+__END__
+
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Lab::Connection::TCPraw - TCPraw connection; deprecated, use Socket instead
+Lab::Connection::TCPraw - Raw TCP connection; deprecated, use Socket instead
 
-=head1 AUTHOR/COPYRIGHT
+=head1 VERSION
 
- Copyright 2012      Hermann Kraus
-           2013      Andreas K. Hüttel
+version 3.553
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Florian Olbrich, Hermann Kraus
+            2013       Andreas K. Huettel
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

@@ -1,14 +1,14 @@
 package Dist::Zilla::Plugin::Prereqs::CheckCircular;
 
-our $DATE = '2017-07-04'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Moose;
-with 'Dist::Zilla::Role::InstallTool';
+with 'Dist::Zilla::Role::AfterBuild';
 
 use App::lcpan::Call qw(call_lcpan_script check_lcpan);
 use namespace::autoclean;
@@ -26,7 +26,7 @@ sub _list_my_modules {
     \%res;
 }
 
-sub setup_installer {
+sub after_build {
     my ($self) = @_;
 
     if ($ENV{DZIL_CHECKCIRCULAR_SKIP}) {
@@ -94,7 +94,7 @@ Dist::Zilla::Plugin::Prereqs::CheckCircular - Check for circular/recursive depen
 
 =head1 VERSION
 
-This document describes version 0.004 of Dist::Zilla::Plugin::Prereqs::CheckCircular (from Perl distribution Dist-Zilla-Plugin-Prereqs-CheckCircular), released on 2017-07-04.
+This document describes version 0.005 of Dist::Zilla::Plugin::Prereqs::CheckCircular (from Perl distribution Dist-Zilla-Plugin-Prereqs-CheckCircular), released on 2017-07-07.
 
 =head1 SYNOPSIS
 

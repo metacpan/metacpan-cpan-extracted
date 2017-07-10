@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/xaicron/p5-SQL-Format.svg?branch=master)](https://travis-ci.org/xaicron/p5-SQL-Format)
 # NAME
 
 SQL::Format - Yet another yet another SQL builder

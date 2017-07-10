@@ -3,13 +3,13 @@ package Alias::Any;
 use 5.012;
 use warnings;
 
-our $VERSION = '0.000003';
+our $VERSION = '0.000004';
 
 use Keyword::Declare;
 
 sub import {
     keyword alias (Variable|VariableDeclaration $variable, '=', Expr $expr) {
-        if ($^V >= 5.020) {
+        if ($^V >= 5.022) {
             qq{use feature 'refaliasing';}
           . qq{no warnings 'experimental::refaliasing';}
           . qq{\\$variable = \\$expr}
@@ -33,7 +33,7 @@ Alias::Any - Create lexical aliases under different versions of Perl
 
 =head1 VERSION
 
-This document describes Alias::Any version 0.000003
+This document describes Alias::Any version 0.000004
 
 
 =head1 SYNOPSIS
@@ -57,7 +57,11 @@ Under Perl 5.12 to 5.18, the module uses the 'alias' function
 from the Data::Alias module to create the requested alias.
 
 But Data::Alias doesn't work under Perl 5.24 or later, so under Perl
-5.20 or later, the module uses the built-in refaliasing mechanism.
+5.22 or later, the module uses the built-in refaliasing mechanism.
+
+(Unfortunately, the module does not work at all under Perl 5.20, because
+of a long-standing problem with compilation of large recursive regexes
+in that release.)
 
 This means you can define simple aliases using a consistent syntax,
 without needing to worry which version of Perl your code will run under.

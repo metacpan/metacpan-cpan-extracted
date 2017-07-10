@@ -1,8 +1,11 @@
 Revision history for Catmandu-BagIt
 
+0.15  2017-07-10 12:20:32 CEST
+    - Adding BagIt as Catmandu::Store::File
+    
 0.14  2017-07-04 10:17:17 CEST
     - Returning errors on read() in wantarray context
-    - Fixing mswin tests 
+    - Fixing mswin tests
 
 0.13  2017-06-28 11:34:24 CEST
     - Adding support for adding data using callback functions

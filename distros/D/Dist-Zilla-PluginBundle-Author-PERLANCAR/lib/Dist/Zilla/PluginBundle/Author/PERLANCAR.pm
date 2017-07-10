@@ -1,7 +1,7 @@
 package Dist::Zilla::PluginBundle::Author::PERLANCAR;
 
-our $DATE = '2017-02-09'; # DATE
-our $VERSION = '0.55'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.58'; # VERSION
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -17,6 +17,7 @@ sub configure {
     });
 
     $self->add_plugins(
+        ['ExecDir' => 'ExecDir script' => {dir=>'script'}],
         'PERLANCAR::BeforeBuild',
         'Rinci::AbstractFromMeta',
         'PodnameFromFilename',
@@ -29,25 +30,26 @@ sub configure {
         'IfBuilt',
         'MetaJSON',
         'MetaConfig',
-        'GenShellCompletion',
+        #'GenShellCompletion', # 2017-07-07 - disabled because i want to use DZP:StaticInstall to set x_static_install whenever possible. DZP:StaticInstall doesn't allow InstallTool plugins other than from MakeMaker and ModuleBuildTiny
         ['Authority' => {locate_comment=>1}],
         'OurDate',
         'OurDist',
         'PERLANCAR::OurPkgVersion',
         'PodWeaver',
         ['PruneFiles' => {match => ['~$', '^nytprof.*']}],
-        'ReadmeFromPod',
+        'Pod2Readme',
         'Rinci::AddPrereqs',
         'Rinci::AddToDb',
         'Rinci::Validate',
         'SetScriptShebang',
         'Test::Compile',
         'Test::Rinci',
-        'UploadToCPAN::WWWPAUSESimple',
+        'StaticInstall', # by default enable static install because 99% of the time my dist is pure-perl
         'EnsureSQLSchemaVersionedTest',
         ['Acme::CPANLists::Blacklist' => {module_list=>[q[PERLANCAR::Avoided::Modules I'm currently avoiding]]}],
         'Prereqs::EnsureVersion',
         'Prereqs::CheckCircular',
+        'UploadToCPAN::WWWPAUSESimple',
     );
 }
 
@@ -68,7 +70,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like PERLANCAR when y
 
 =head1 VERSION
 
-This document describes version 0.55 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2017-02-09.
+This document describes version 0.58 of Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2017-07-08.
 
 =head1 SYNOPSIS
 
@@ -93,6 +95,21 @@ when INSTALL=0 environment is specified. I also archive them using a script
 called C<archive-perl-release>. This is currently a script on my computer, you
 can get them from my 'scripts' github repo but this is optional and the release
 process won't fail if the script does not exist.
+
+There are extra stuffs related to L<Rinci>, which should have no effect if you
+are not using any Rinci metadata in the code.
+
+There are extra stuffs related to checking prerequisites: I have a blacklist of
+prerequisites to avoid so
+L<[Acme::CPANLists::Blacklist]|Dist::Zilla::Plugin::Acme::CPANLists::Blacklist>
+will fail the build if any of the blacklisted modules are used as a prerequisite
+(unless the prerequisite is explicitly whitelisted by
+L<[Acme::CPANLists::Whitelist]|Dist::Zilla::Plugin::Acme::CPANLists::Whitelist>).
+I avoid circular dependencies using
+L<[Prereqs::CheckCircular]|Dist::Zilla::Plugin::Prereqs::CheckCircular>. And I
+also maintain a file called F<pmversions.ini> where I put minimum versions of
+some modules and check this using
+L<[Prereqs::EnsureVersion]|Dist::Zilla::Plugin::Prereqs::EnsureVersion>.
 
 =for Pod::Coverage ^(configure)$
 

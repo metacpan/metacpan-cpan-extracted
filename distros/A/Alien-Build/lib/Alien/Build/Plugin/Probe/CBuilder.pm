@@ -8,7 +8,7 @@ use File::Temp ();
 use Capture::Tiny qw( capture_merged capture );
 
 # ABSTRACT: Probe for system libraries by guessing with ExtUtils::CBuilder
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 
 has options => sub { {} };
@@ -25,11 +25,45 @@ has program => 'int main(int argc, char *argv[]) { return 0; }';
 
 has version => undef;
 
+
+has aliens => [];
+
+
+has lang => 'C';
+
 sub init
 {
   my($self, $meta) = @_;
   
-  $meta->add_requires('configure' => 'ExtUtils::CBuilder' => 0 );
+  $meta->add_requires('configure' => 'ExtUtils::CBuilder' => 0 );  
+
+  if(@{ $self->aliens })
+  {  
+    die "You can't specify both 'aliens' and either 'cflags' or 'libs' for the Probe::CBuilder plugin" if $self->cflags || $self->libs;
+
+    $meta->add_requires('configure' => $_ => 0 ) for @{ $self->aliens };
+    $meta->add_requires('Alien::Build::Plugin::Probe::CBuilder' => '0.53');
+
+    my $cflags = '';
+    my $libs   = '';
+    foreach my $alien (@{ $self->aliens })
+    {
+      require Module::Load;
+      Module::Load::load($alien);
+      $cflags .= $alien->cflags . ' ';
+      $libs   .= $alien->libs   . ' ';
+    }
+    $self->cflags($cflags);
+    $self->libs($libs);
+  }
+  
+  my @cpp;
+  
+  if($self->lang ne 'C')
+  {
+    $meta->add_requires('Alien::Build::Plugin::Probe::CBuilder' => '0.53');
+    @cpp = ('C++' => 1) if $self->lang eq 'C++';
+  }
   
   $meta->register_hook(
     probe => sub {
@@ -44,19 +78,34 @@ sub init
       
       my $b = ExtUtils::CBuilder->new(%{ $self->options });
 
-      my($out1, $obj) = capture_merged {
+      my($out1, $obj) = capture_merged { eval {
         $b->compile(
           source               => 'mytest.c',
           extra_compiler_flags => $self->cflags,
+          @cpp,
         );
-      };
+      } };
       
-      my($out2, $exe) = capture_merged {
+      if(my $error = $@)
+      {
+        $build->log("compile failed: $error");
+        $build->log("compile failed: $out1");
+        die $@;
+      }
+      
+      my($out2, $exe) = capture_merged { eval {
         $b->link_executable(
           objects              => [$obj],
           extra_linker_flags   => $self->libs,
         );
-      };
+      } };
+      
+      if(my $error = $@)
+      {
+        $build->log("link failed: $error");
+        $build->log("link failed: $out2");
+        die $@;
+      }      
       
       my($out, $err, $ret) = capture { system($^O eq 'MSWin32' ? $exe : "./$exe") };
       die "execute failed" if $ret;
@@ -105,7 +154,7 @@ Alien::Build::Plugin::Probe::CBuilder - Probe for system libraries by guessing w
 
 =head1 VERSION
 
-version 0.52
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -113,6 +162,13 @@ version 0.52
  plugin 'Probe::CBuilder' => (
    cflags => '-I/opt/libfoo/include',
    libs   => '-L/opt/libfoo/lib -lfoo',
+ );
+
+alternately:
+
+ ues alienfile;
+ plugin 'Probe::CBuilder' => (
+   aliens => [ 'Alien::libfoo', 'Alien::libbar' ],
  );
 
 =head1 DESCRIPTION
@@ -145,6 +201,14 @@ The program to use in the test.
 
 This is a regular expression to parse the version out of the output from the
 test program.
+
+=head2 aliens
+
+List of aliens to query fro compiler and linker flags.
+
+=head2 lang
+
+The programming language to use.  One of either C<C> or C<C++>.
 
 =head1 SEE ALSO
 

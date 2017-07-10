@@ -1,5 +1,5 @@
 package WebService::Braintree;
-$WebService::Braintree::VERSION = '0.9';
+$WebService::Braintree::VERSION = '0.91';
 use strict;
 use warnings;
 use WebService::Braintree::Address;

@@ -1,5 +1,20 @@
 Revision history for Alien-Build
 
+0.55      2017-07-09 12:25:06 -0400
+  - Use lib/pkgconfig and share/aclocal from any Alien::Base requires.
+    Previously only Alien::Base modules build with alienfile + Alien::Build
+    were used.
+
+0.54      2017-07-07 01:28:54 -0400
+  - Alien::Build::MM add alien_prop target
+
+0.53      2017-07-06 13:04:34 -0400
+  - Build::SearchDep sets CXXFLAGS (in addition to CFLAGS) for C++ projects
+  - Probe::CBuilder adds aliens property
+  - Probe::CBuilder adds lang property
+  - Build::SearchDep adds public_I property
+  - Build::SearchDep adds public_l property
+
 0.52      2017-06-28 17:26:24 -0400
   - Enhanced Fetch::NetFTP plugin to try passive mode if active fails.
 

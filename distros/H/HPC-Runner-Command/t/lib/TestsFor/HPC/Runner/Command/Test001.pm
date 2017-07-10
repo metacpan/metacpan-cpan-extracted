@@ -54,6 +54,7 @@ sub test_000 : Tags(require) {
     require_ok('HPC::Runner::Command::execute_job::Utils::MemProfile');
     require_ok('HPC::Runner::Command::execute_job');
     require_ok('HPC::Runner::Command::execute_job::Logger::JSON');
+    require_ok('HPC::Runner::Command::execute_job::Logger::Lock');
     require_ok('HPC::Runner::Command::execute_array');
     require_ok('HPC::Runner::Command::single_node');
     require_ok('HPC::Runner::Command::stats');

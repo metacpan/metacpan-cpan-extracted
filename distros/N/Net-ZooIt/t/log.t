@@ -49,4 +49,10 @@ if (my $pid = fork) {
     Net::ZooIt::zdie "message";
 }
 
+ok(Net::ZooIt::zerr2txt(ZOK) eq 'ZOK', 'ZOK is ZOK');
+ok(Net::ZooIt::z2txt('err', ZOK) eq 'ZOK', 'err errors');
+ok(Net::ZooIt::z2txt('flag', ZOO_EPHEMERAL) eq 'ZOO_EPHEMERAL', 'flag node_flags');
+ok(Net::ZooIt::z2txt('ev', ZOO_SESSION_EVENT) eq 'ZOO_SESSION_EVENT', 'ev events');
+ok(Net::ZooIt::z2txt('st', ZOO_CONNECTED_STATE) eq 'ZOO_CONNECTED_STATE', 'st states');
+
 done_testing;

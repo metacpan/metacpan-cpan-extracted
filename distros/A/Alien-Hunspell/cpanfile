@@ -1,19 +1,26 @@
-requires "Alien::Base" => "0.032";
-requires "FFI::CheckLib" => "0";
-requires "File::ShareDir" => "1.03";
+requires "Alien::Base" => "0.038";
 requires "parent" => "0";
 requires "perl" => "5.006";
 
+on 'build' => sub {
+  requires "Alien::Build" => "0.51";
+  requires "Alien::Build::MM" => "0.40";
+  requires "Config" => "0";
+  requires "ExtUtils::MakeMaker" => "6.52";
+};
+
 on 'test' => sub {
-  requires "ExtUtils::CBuilder" => "0";
-  requires "Test::CChecker" => "0.07";
+  requires "Test2::V0" => "0.000060";
+  requires "Test::Alien" => "0";
   requires "Test::More" => "0.94";
   requires "perl" => "5.006";
 };
 
 on 'configure' => sub {
-  requires "Alien::Base::ModuleBuild" => "0.006";
-  requires "File::ShareDir" => "1.03";
+  requires "Alien::Build" => "0.51";
+  requires "Alien::Build::MM" => "0.40";
+  requires "Alien::Build::Plugin::Build::Autoconf" => "0.41";
+  requires "ExtUtils::MakeMaker" => "6.52";
   requires "perl" => "5.006";
 };
 
@@ -27,7 +34,6 @@ on 'develop' => sub {
   requires "Test::NoTabs" => "0";
   requires "Test::Pod" => "0";
   requires "Test::Pod::Coverage" => "0";
-  requires "Test::Pod::Spelling::CommonMistakes" => "0";
   requires "Test::Spelling" => "0";
   requires "Test::Strict" => "0";
   requires "YAML" => "0";

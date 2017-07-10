@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Service;
 # ABSTRACT: represents a TR064 service
-$Net::Fritz::Service::VERSION = 'v0.0.7';
+$Net::Fritz::Service::VERSION = 'v0.0.8';
 
 use Digest::MD5 qw(md5_hex);
 use SOAP::Lite; # +trace => [ transport => sub { print $_[0]->as_string } ]; # TODO: remove
@@ -318,7 +318,7 @@ Net::Fritz::Service - represents a TR064 service
 
 =head1 VERSION
 
-version v0.0.7
+version v0.0.8
 
 =head1 SYNOPSIS
 
@@ -364,21 +364,22 @@ L<Net::Fritz::Action>s.
 A hashref containing all L<Net::Fritz::Action>s of this service
 indexed by their L<Net::Fritz::Action/name>.
 
-=head2
+=head2 serviceType
 
 The I<serviceType> (string) of this service which is used by
 L<Net::Fritz::Device> to look up services.
 
-=head2
+=head2 serviceId
 
 The I<serviceId> (string) of this service.
 
-=head2
+=head2 controlURL
 
 The I<controlURL> (URL string) of this service which is needed to
-L</call> any L<Net::Fritz::Action>s of this service.
+L<call|Net::Fritz::Action/call> any L<Net::Fritz::Action>s of this
+service.
 
-=head2
+=head2 eventSubURL
 
 The I<eventSubURL> (URL string) of this service for subscribing to or
 unsubscribing from events.

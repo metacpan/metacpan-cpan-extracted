@@ -1,0 +1,8 @@
+Revision history for exact
+
+1.01      2017-07-07 18:16:59-04:00 America/New_York
+        - Deactivate TravisCI testing of 3 old Perl versions temporarily
+        - Check for any possible experiments before import (bug fix)
+
+1.00      2017-07-07 17:49:43-04:00 America/New_York
+        - First version, released on an unsuspecting world.

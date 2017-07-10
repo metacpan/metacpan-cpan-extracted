@@ -18,7 +18,7 @@ Perinci::CmdLine::Manual - Perinci::CmdLine manual
 
 =head1 VERSION
 
-This document describes version 1.51 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2017-06-17.
+This document describes version 1.52 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2017-07-07.
 
 =head1 DESCRIPTION
 
@@ -327,9 +327,8 @@ command-line option.
 C<shcompgen> is a CLI tool that can detect all scripts in PATH if they are using
 Perinci::CmdLine (as well as a few other frameworks) and generate shell
 completion scripts for them. It supports several shells. Combined with
-L<Dist::Zilla::Plugin::GenShellCompletion>, you can make it so that users
-installing your distribution can immediately/automatically activate tab
-completion for your scripts.
+L<cpanm-shcompgen>, you can install modules and have the shell completion of
+scripts activated immediately.
 
 =head1 PROGRESS INDICATOR
 

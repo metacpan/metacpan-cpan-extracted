@@ -5,7 +5,7 @@ use warnings;
 
 #use bignum;
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.1.3';
 
 sub new {
   my ($class, %opt) = @_;
@@ -25,8 +25,7 @@ sub new {
     die "Invalid format: '$format'\n";
   }
 
-
-  bless {
+  return bless {
     %opt,
     N          => 0,
     sum        => 0,
@@ -76,6 +75,8 @@ sub process {
   $self->{M2}   += $delta * ($num - $self->{mean});
 
   push( @{ $self->{data} }, $num ) if $self->{keep_data};
+
+  return;
 }
 
 sub N {
@@ -103,19 +104,17 @@ sub mean {
                          : $mean;
 }
 
-sub q1 {
-    my ($self,%opt) = @_;
-    return $self->percentile(0.25, %opt);
+sub quartile {
+    my ($self,$q,%opt) = @_;
+    if ($q !~ /^[01234]$/) {
+        die "Invalid quartile '$q'\n";
+    }
+    return $self->percentile($q / 4 * 100, %opt);
 }
 
 sub median {
     my ($self,%opt) = @_;
-    return $self->percentile(0.5, %opt);
-}
-
-sub q3 {
-    my ($self,%opt) = @_;
-    return $self->percentile(0.75, %opt);
+    return $self->percentile(50, %opt);
 }
 
 sub variance {
@@ -159,19 +158,21 @@ sub percentile {
     my $data = $self->{data};
 
     if (!$self->{keep_data} or scalar @{$data} == 0) {
+        die "Can't get percentile from empty dataset\n";
     }
 
-    if ($p < 0 or $p > 1) {
+    if ($p < 0 or $p > 100) {
         die "Invalid percentile '$p'\n";
     }
 
     if (!$self->{_is_sorted_}) {
         $data = [ sort {$a <=> $b} @{ $data } ];
+        $self->{data} = $data;
         $self->{_is_sorted_} = 1;
     }
 
     my $N = $self->N();
-    my $idx = ($N - 1) * $p;
+    my $idx = ($N - 1) * $p / 100;
 
     my $percentile =
         int($idx) == $idx ? $data->[$idx]
@@ -192,15 +193,39 @@ sub result {
         stderr     => $self->stderr(),
         min        => $self->min(),
         max        => $self->max(),
+        variance   => $self->variance(),
     );
 
     if ($self->{keep_data}) {
         %result = (%result,
             (
-                q1      => $self->q1(),
+                q1      => $self->quartile(1),
                 median  => $self->median(),
-                q3      => $self->q3(),
+                q3      => $self->quartile(3),
             )
+        );
+    }
+
+    # the following is a hack to accept multiple percentiles/quartiles
+    if ( exists $self->{percentile} ) {
+        my $percentile = ref $self->{percentile} eq 'ARRAY'
+          ? [ map { $self->percentile($_) } @{ $self->{percentile} } ]
+          : $self->percentile( $self->{percentile} );
+
+        %result = (
+            %result,
+            percentile => $percentile
+        );
+    }
+
+    if (exists $self->{quartile}) {
+        my $quartile = ref $self->{quartile} eq 'ARRAY'
+            ? [ map { $self->quartile($_) } @{ $self->{quartile} } ]
+            : $self->quartile( $self->{quartile} );
+
+        %result = (
+            %result,
+            quartile => $quartile,
         );
     }
 
@@ -261,7 +286,9 @@ App::St provides the core functionality of the L<st> application.
 
 =head2 stderr
 
-=head2 percentile
+=head2 percentile=<0..100>
+
+=head2 quartile=<0..4>
 
 =head2 min
 

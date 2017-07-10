@@ -8,12 +8,12 @@ use Moo;
 extends 'AnyEvent::FTP::Client::Site::Base';
 
 # ABSTRACT: Site specific commands for Proftpd
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub utime   { shift->client->push_command([SITE => "UTIME $_[0] $_[1]"]   ) }
-sub mkdir   { shift->client->push_command([SITE => "MKDIR $_[0]"]         ) } 
-sub rmdir   { shift->client->push_command([SITE => "RMDIR $_[0]"]         ) } 
+sub mkdir   { shift->client->push_command([SITE => "MKDIR $_[0]"]         ) }
+sub rmdir   { shift->client->push_command([SITE => "RMDIR $_[0]"]         ) }
 sub symlink { shift->client->push_command([SITE => "SYMLINK $_[0] $_[1]"] ) }
 
 
@@ -37,7 +37,7 @@ AnyEvent::FTP::Client::Site::Proftpd - Site specific commands for Proftpd
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -96,6 +96,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

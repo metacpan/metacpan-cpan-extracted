@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/lint-prereqs'
+    'script/lint-prereqs'
 );
 
 # no fake home requested

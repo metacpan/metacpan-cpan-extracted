@@ -20,7 +20,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '8.03';
+$VERSION = '8.04';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -1240,11 +1240,11 @@ __END__
 
 =head1 NAME
 
-Geo::IP2Location - Fast lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand name, elevation and usage type from IP address by using IP2Location database. It supports both IPv4 and IPv6 addressing. Please visit http://www.ip2location.com for more information.
+Geo::IP2Location - Lookup of country, region, city, latitude, longitude, ZIP code, time zone, ISP, domain name, connection type, IDD code, area code, weather station code and station, MCC, MNC, mobile carrier brand name, elevation and usage type by using IP address. It supports both IPv4 and IPv6 addressing. Please visit L<IP2Location Database|http://www.ip2location.com> for more information.
 
 =head1 SYNOPSIS
 
-  use Geo::IP2Location;
+	use Geo::IP2Location;
 	my $obj = Geo::IP2Location->open("IP-COUNTRY-REGION-CITY-LATITUDE-LONGITUDE-ZIPCODE-TIMEZONE-ISP-DOMAIN-NETSPEED-AREACODE-WEATHER-MOBILE-ELEVATION-USAGETYPE.BIN");
 
 	my $dbversion = $obj->get_database_version();
@@ -1280,7 +1280,7 @@ This Perl module provides fast lookup of country, region, city, latitude, longit
 
 This module can be used in many types of project such as:
 
- 1) select the geographically closest mirror
+ 1) auto-select the geographically closest mirror server
  2) analyze web server logs to determine the countries of visitors
  3) credit card fraud detection
  4) software export controls
@@ -1292,11 +1292,13 @@ This module can be used in many types of project such as:
 
 The complete IPv4 and IPv6 database are available at:
 
-http://www.ip2location.com
+L<IP2Location Product Page|http://www.ip2location.com/>
 
-The database will be updated in monthly basis for greater accuracy. Free sample database is available at:
+The database will be updated in monthly basis for greater accuracy.
 
-http://www.ip2location.com/developers
+Free IP2Location LITE database is also available at:
+
+L<IP2Location LITE Page|http://lite.ip2location.com/>
 
 =head1 CLASS METHODS
 
@@ -1404,17 +1406,19 @@ Returns the version number of database.
 
 Returns the version number of Perl module.
 
+=back
+
 =head1 SEE ALSO
 
-http://www.ip2location.com
+L<IP2Location Product Page|http://www.ip2location.com/>
 
 =head1 VERSION
 
-8.01
+8.04
 
 =head1 AUTHOR
 
-Copyright (c) 2016 IP2Location.com
+Copyright (c) 2017 IP2Location.com
 
 All rights reserved. This package is free software; It is licensed under the GPL.
 

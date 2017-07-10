@@ -1,12 +1,12 @@
 package App::GenPericmdCompleterScript;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Dmp;
 
@@ -416,7 +416,7 @@ sub gen_pericmd_completer_script {
     }
 
     if ($output_file ne '-') {
-        $log->trace("Outputing result to %s ...", $output_file);
+        log_trace("Outputing result to %s ...", $output_file);
         if ((-f $output_file) && !$args{overwrite}) {
             return [409, "Output file '$output_file' already exists (please use --overwrite if you want to override)"];
         }
@@ -428,7 +428,7 @@ sub gen_pericmd_completer_script {
             or return [500, "Can't write '$output_file': $!"];
 
         chmod 0755, $output_file or do {
-            $log->warn("Can't 'chmod 0755, $output_file': $!");
+            log_warn("Can't 'chmod 0755, $output_file': $!");
         };
 
         my $output_name = $output_file;
@@ -456,12 +456,16 @@ App::GenPericmdCompleterScript - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.10 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2017-01-12.
+This document describes version 0.11 of App::GenPericmdCompleterScript (from Perl distribution App-GenPericmdCompleterScript), released on 2017-07-08.
 
 =head1 FUNCTIONS
 
 
-=head2 gen_pericmd_completer_script(%args) -> [status, msg, result, meta]
+=head2 gen_pericmd_completer_script
+
+Usage:
+
+ gen_pericmd_completer_script(%args) -> [status, msg, result, meta]
 
 Generate Perinci::CmdLine completer script.
 
@@ -585,7 +589,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

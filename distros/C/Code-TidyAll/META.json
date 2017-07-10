@@ -125,123 +125,123 @@
    "provides" : {
       "Code::TidyAll" : {
          "file" : "lib/Code/TidyAll.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Cache" : {
          "file" : "lib/Code/TidyAll/Cache.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::CacheModel" : {
          "file" : "lib/Code/TidyAll/CacheModel.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::CacheModel::Shared" : {
          "file" : "lib/Code/TidyAll/CacheModel/Shared.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Config::INI::Reader" : {
          "file" : "lib/Code/TidyAll/Config/INI/Reader.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Git::Precommit" : {
          "file" : "lib/Code/TidyAll/Git/Precommit.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Git::Prereceive" : {
          "file" : "lib/Code/TidyAll/Git/Prereceive.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Git::Util" : {
          "file" : "lib/Code/TidyAll/Git/Util.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin" : {
          "file" : "lib/Code/TidyAll/Plugin.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::CSSUnminifier" : {
          "file" : "lib/Code/TidyAll/Plugin/CSSUnminifier.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::JSBeautify" : {
          "file" : "lib/Code/TidyAll/Plugin/JSBeautify.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::JSHint" : {
          "file" : "lib/Code/TidyAll/Plugin/JSHint.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::JSLint" : {
          "file" : "lib/Code/TidyAll/Plugin/JSLint.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::JSON" : {
          "file" : "lib/Code/TidyAll/Plugin/JSON.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::MasonTidy" : {
          "file" : "lib/Code/TidyAll/Plugin/MasonTidy.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::PHPCodeSniffer" : {
          "file" : "lib/Code/TidyAll/Plugin/PHPCodeSniffer.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::PerlCritic" : {
          "file" : "lib/Code/TidyAll/Plugin/PerlCritic.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::PerlTidy" : {
          "file" : "lib/Code/TidyAll/Plugin/PerlTidy.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::PerlTidySweet" : {
          "file" : "lib/Code/TidyAll/Plugin/PerlTidySweet.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::PodChecker" : {
          "file" : "lib/Code/TidyAll/Plugin/PodChecker.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::PodSpell" : {
          "file" : "lib/Code/TidyAll/Plugin/PodSpell.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::PodTidy" : {
          "file" : "lib/Code/TidyAll/Plugin/PodTidy.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Plugin::SortLines" : {
          "file" : "lib/Code/TidyAll/Plugin/SortLines.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Result" : {
          "file" : "lib/Code/TidyAll/Result.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Role::HasIgnore" : {
          "file" : "lib/Code/TidyAll/Role/HasIgnore.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Role::Tempdir" : {
          "file" : "lib/Code/TidyAll/Role/Tempdir.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::SVN::Precommit" : {
          "file" : "lib/Code/TidyAll/SVN/Precommit.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::SVN::Util" : {
          "file" : "lib/Code/TidyAll/SVN/Util.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Code::TidyAll::Util::Zglob" : {
          "file" : "lib/Code/TidyAll/Util/Zglob.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       },
       "Test::Code::TidyAll" : {
          "file" : "lib/Test/Code/TidyAll.pm",
-         "version" : "0.60"
+         "version" : "0.61"
       }
    },
    "release_status" : "stable",
@@ -256,7 +256,7 @@
          "web" : "https://github.com/houseabsolute/perl-code-tidyall"
       }
    },
-   "version" : "0.60",
+   "version" : "0.61",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"
@@ -977,7 +977,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.60",
+                  "tag" : "v0.61",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

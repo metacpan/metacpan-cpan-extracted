@@ -82,7 +82,7 @@ continued through the pipeline instead.
 
 =item *
 
-Failed: The pipeline did not complete successfully.
+Failed: The pipeline execution did not complete successfully.
 
 =back
 

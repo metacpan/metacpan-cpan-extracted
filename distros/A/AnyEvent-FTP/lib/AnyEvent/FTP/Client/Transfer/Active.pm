@@ -10,27 +10,27 @@ use AnyEvent::Socket qw( tcp_server );
 extends 'AnyEvent::FTP::Client::Transfer';
 
 # ABSTRACT: Active transfer class for asynchronous ftp client
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 sub BUILD
 {
   my($self) = @_;
-  
+
   my $local = $self->convert_local($self->local);
-  
+
   my $count = 0;
   my $guard;
   $guard = tcp_server $self->client->{my_ip}, undef, sub {
     my($fh, $host, $port) = @_;
     # TODO double check the host/port combo here.
-    
+
     return close $fh if ++$count > 1;
-    
+
     undef $guard; # close to additional connections.
 
     $self->xfer($fh,$local);
   }, sub {
-  
+
     my($fh, $host, $port) = @_;
     my $ip_and_port = join(',', split(/\./, $self->client->{my_ip}), $port >> 8, $port & 0xff);
 
@@ -44,12 +44,12 @@ sub BUILD
       undef $w;
     });
   };
-  
+
   $self->cv->cb(sub {
     my $res = eval { shift->recv } // $@;
     $self->emit('close' => $res);
   });
-  
+
 }
 
 package AnyEvent::FTP::Client::Transfer::Active::Fetch;
@@ -87,7 +87,7 @@ AnyEvent::FTP::Client::Transfer::Active - Active transfer class for asynchronous
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 
@@ -98,6 +98,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

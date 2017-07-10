@@ -76,7 +76,6 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "sigtrap" => 0,
     "strict" => 0,
-    "threads" => 0,
     "utf8" => 0,
     "vars" => 0,
     "warnings" => 0
@@ -95,7 +94,7 @@ my %WriteMakefileArgs = (
     "aliased" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.552",
+  "VERSION" => "3.553",
   "test" => {
     "TESTS" => "t/*.t t/Analysis/*.t t/Instrument/*.t t/Lab/Test/*.t t/Moose/*.t t/Moose/Connection/*.t t/Moose/DataFile/*.t t/Moose/Instrument/*.t t/SCPI/*.t t/XPRESS/*.t"
   }
@@ -174,7 +173,6 @@ my %FallbackPrereqs = (
   "parent" => 0,
   "sigtrap" => 0,
   "strict" => 0,
-  "threads" => 0,
   "utf8" => 0,
   "vars" => 0,
   "warnings" => 0

@@ -1,0 +1,17 @@
+Net::ZooIt Revision History
+===========================
+
+0.1  2017-06-27
+  - initial version
+
+0.20  2017-06-30
+  - make release, make tag
+  - LICENSE
+  - README in markdown, gen w/o external tool
+
+0.21  2017-07-06
+  - Fix bin/release prepare version check regex
+  - Improve logging for waits on watches
+
+0.22  2017-07-07
+  - Fix MANIFEST

@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use JSON ();
 use Data::Printer ();
@@ -100,6 +100,31 @@ sub hash {
 # -----------------------------------------------------------------------------
 
 =head2 Akzessoren
+
+=head3 id() - Id der Seite
+
+=head4 Synopsis
+
+    $id = $pag->id;
+
+=head4 Description
+
+Liefere die Id der Seite.
+
+=head4 Returns
+
+Space (integer)
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub id {
+    my $self = shift;
+    return $self->{'perl'}->{'id'} || $self->throw;
+}
+
+# -----------------------------------------------------------------------------
 
 =head3 space() - Name des Space, in dem die Seite liegt
 
@@ -208,7 +233,7 @@ sub asString {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

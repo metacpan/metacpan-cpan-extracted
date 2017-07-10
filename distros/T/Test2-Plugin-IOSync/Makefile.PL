@@ -18,14 +18,19 @@ my %WriteMakefileArgs = (
   "NAME" => "Test2::Plugin::IOSync",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "IO::Handle" => 0,
     "PerlIO" => 0,
-    "Test2::API" => "1.302084",
+    "Test2::API" => "1.302086",
     "Time::HiRes" => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::Bundle::Extended" => "0.000070"
+    "File::Temp" => 0,
+    "IPC::Open3" => 0,
+    "List::Util" => 0,
+    "Test2::Bundle::Extended" => "0.000072",
+    "Test2::Formatter::TAP" => "1.302086"
   },
-  "VERSION" => "0.000007",
+  "VERSION" => "0.000009",
   "test" => {
     "TESTS" => "t/*.t t/IOEvents/*.t t/IOMuxer/*.t"
   }
@@ -34,9 +39,14 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "File::Temp" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "List::Util" => 0,
   "PerlIO" => 0,
-  "Test2::API" => "1.302084",
-  "Test2::Bundle::Extended" => "0.000070",
+  "Test2::API" => "1.302086",
+  "Test2::Bundle::Extended" => "0.000072",
+  "Test2::Formatter::TAP" => "1.302086",
   "Time::HiRes" => 0
 );
 

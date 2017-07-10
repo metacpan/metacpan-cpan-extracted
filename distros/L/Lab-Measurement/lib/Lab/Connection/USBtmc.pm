@@ -1,13 +1,7 @@
-#!/usr/bin/perl -w
-
-#
-# GPIB Connection class for Lab::Bus::USBtmc
-#
-
-# TODO: Access to GPIB attributes, device clear, ...
-
 package Lab::Connection::USBtmc;
-$Lab::Connection::USBtmc::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: F</dev/usbtmc> Linux USB Test&Measurement kernel driver connection
+$Lab::Connection::USBtmc::VERSION = '3.553';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -88,13 +82,22 @@ sub Clear {
 # EnableTermChar, SetTermChar from Lab::Connection::GPIB are sufficient.
 #
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
 
 =head1 NAME
 
-Lab::Connection::USBtmc - F</dev/usbtmc> connection
+Lab::Connection::USBtmc - F</dev/usbtmc> Linux USB Test&Measurement kernel driver connection
+
+=head1 VERSION
+
+version 3.553
 
 =head1 SYNOPSIS
 
@@ -168,13 +171,17 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Florian Olbrich, Hermann Kraus
+            2016       Charles Lane, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

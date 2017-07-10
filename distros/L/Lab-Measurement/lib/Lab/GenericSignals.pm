@@ -1,6 +1,7 @@
-
 package Lab::GenericSignals;
-$Lab::GenericSignals::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Signal handling
+$Lab::GenericSignals::VERSION = '3.553';
 use warnings;
 use strict;
 
@@ -21,3 +22,31 @@ END {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Lab::GenericSignals - Signal handling
+
+=head1 VERSION
+
+version 3.553
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2014       Andreas K. Huettel
+            2015       Christian Butschkow
+            2016       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -24,9 +24,11 @@ Readonly my $MAXVAL_8_BIT  => 2**$_8_BIT - 1;
 Readonly my $_16_BIT       => 16;
 Readonly my $MAXVAL_16_BIT => 2**$_16_BIT - 1;
 Readonly my $HUNDRED       => 100.;
-Readonly my $INFINITE      => -1;
+Readonly my $THOUSAND      => 1000.;
+Readonly my $INFINITY      => -1;
 Readonly my $I_TL_Y        => 3;
 Readonly my $RGB_FRAMES    => 3;
+Readonly my $_1_0_25       => 1.000025;
 
 #$Image::Sane::DEBUG = 1;
 
@@ -57,7 +59,10 @@ my $status           = SANE_STATUS_GOOD;
 my $SPACE            = q{ };
 my $EMPTY            = q{};
 my $DASH             = q{-};
-my @args             = (
+my @version          = Image::Sane->get_version;
+my $version =
+  $version[0] + $version[1] / $THOUSAND + $version[2] / $THOUSAND / $THOUSAND;
+my @args = (
     \%options,
     'd|device-name=s' => \$devname,
     'L|list-devices',
@@ -432,7 +437,7 @@ sub parse_scalar {
 sub parse_vector {
     my ( $opt, $str ) = @_;
 
-    my $index      = $INFINITE;
+    my $index      = $INFINITY;
     my $prev_value = 0;
     my $prev_index = 0;
     my $separator  = $EMPTY;
@@ -734,7 +739,7 @@ sub scan_it {
     my @format_name = qw( gray RGB red green blue );
     my $total_bytes = 0;
 
-    # my $hang_over = $INFINITE;
+    # my $hang_over = $INFINITY;
 
     my $parm;
     while (1) {
@@ -989,7 +994,7 @@ sub buffer_data {    ## no critic (ProhibitManyArgs)
         #      if ($len > 0) {
         #       printstdout($buffer);
         #       $buffer = $hang_over.$buffer;
-        #       $hang_over = $INFINITE;
+        #       $hang_over = $INFINITY;
         #       $start = 1;
         #      }
         #     }
@@ -1067,10 +1072,24 @@ sub log_batch_scan {
             #  }
         }
 
-        printstderr(
-            sprintf
-              "Scanning %d pages, incrementing by %d, numbering from %d\n",
-            $batch_count, $batch_increment, $batch_start_at );
+        if ( $version > $_1_0_25 ) {
+            my $plural = $batch_count == 1 ? $EMPTY : 's';
+            if ( $batch_count == $INFINITY ) {
+                printstderr( sprintf 'Scanning infinity ' );
+            }
+            else {
+                printstderr( sprintf 'Scanning %d ', $batch_count );
+            }
+            printstderr(
+                sprintf "page%s, incrementing by %d, numbering from %d\n",
+                $plural, $batch_increment, $batch_start_at );
+        }
+        else {
+            printstderr(
+                sprintf
+                  "Scanning %d pages, incrementing by %d, numbering from %d\n",
+                $batch_count, $batch_increment, $batch_start_at );
+        }
     }
     return;
 }
@@ -1173,6 +1192,12 @@ sub scan_pages {
 
         if ( not ok_for_next_page() ) { last }
     }
+    if ( $batch and $version > $_1_0_25 ) {
+        printstderr(
+            sprintf "Batch terminated, %d pages scanned\n",
+            ( $n - $batch_start_at ) / $batch_increment
+        );
+    }
 
     try {
         $device->cancel;
@@ -1183,7 +1208,7 @@ sub scan_pages {
 
 sub ok_for_next_page {
     return (
-        $batch and ( $batch_count == $INFINITE
+        $batch and ( $batch_count == $INFINITY
             or --$batch_count )
           and ($status == SANE_STATUS_GOOD
             or $status == SANE_STATUS_EOF )
@@ -1646,7 +1671,7 @@ if ($batch_count) {
     $batch = 1;
 }
 elsif ($batch) {
-    $batch_count = $INFINITE;
+    $batch_count = $INFINITY;
 }
 else {
     $batch_count = 1;

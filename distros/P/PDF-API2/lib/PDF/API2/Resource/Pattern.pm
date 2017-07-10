@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource';
 use strict;
 use warnings;
 
-our $VERSION = '2.032'; # VERSION
+our $VERSION = '2.033'; # VERSION
 
 sub new {
     my ($class, $pdf, $name) = @_;

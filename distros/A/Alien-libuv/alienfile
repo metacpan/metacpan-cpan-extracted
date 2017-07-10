@@ -9,9 +9,10 @@ share {
   # note on apple weirdisms: https://github.com/joyent/libuv/issues/1200
   meta->prop->{env}->{LIBTOOLIZE} = 'libtoolize' if $^O eq 'darwin';
 
-  requires 'Alien::autoconf' => '0.02';
-  requires 'Alien::automake' => '0.02';
-  requires 'Alien::libtool'  => '0.02';
+  requires 'Alien::autoconf' => '0.03';
+  requires 'Alien::automake' => '0.05';
+  requires 'Alien::libtool'  => '0.04';
+  requires 'Alien::m4'       => '0.11';
 
   plugin Download => (
     url     => 'http://dist.libuv.org/dist/v1.12.0',

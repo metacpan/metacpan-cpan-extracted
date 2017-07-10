@@ -1,5 +1,5 @@
 package WebService::Braintree::PayPalDetails;
-$WebService::Braintree::PayPalDetails::VERSION = '0.9';
+$WebService::Braintree::PayPalDetails::VERSION = '0.91';
 
 use Moose;
 extends 'WebService::Braintree::ResultObject';

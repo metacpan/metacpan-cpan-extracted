@@ -1,11 +1,13 @@
 package HPC::Runner::Command::submit_jobs::Utils::Log;
 
-##TODO Move This?
+use Moose::Role;
+use namespace::autoclean;
+with 'HPC::Runner::Command::Utils::Log';
 
 use Text::ASCIITable;
-
-use MooseX::App::Role;
-with 'HPC::Runner::Command::Utils::Log';
+use File::Spec;
+use File::Slurp;
+use Log::Log4perl qw(:easy);
 
 sub print_table_schedule_info {
     my $self = shift;
@@ -59,8 +61,6 @@ sub summarize_jobs {
     my $x    = 0;
     my @rows = ();
 
-    $DB::single = 2;
-
     #SIGHS
     #cmd_start is zero indexes
     #But batches are 1 indexes
@@ -106,6 +106,33 @@ sub summarize_jobs {
     $self->app_log->info( "\n" . $t );
 
     return \@rows;
+}
+
+sub write_job_project_table {
+    my $self = shift;
+
+    my $job_file = File::Spec->catdir( $self->logdir, 'project_job_table.md' );
+    write_file( $job_file, '| Job | Status | Notes |'."\n" );
+    foreach my $job ( $self->all_schedules ) {
+      write_file($job_file, {append => 1}, '| '.$job.' | | |'."\n");
+    }
+    $self->app_log->info('Project table per job: '.$job_file);
+}
+
+sub write_task_project_table {
+    my $self = shift;
+
+    my $task_file = File::Spec->catdir( $self->logdir, 'project_task_table.md' );
+    write_file( $task_file, '| Job | TaskID | Status | Notes |'."\n" );
+    foreach my $job ( $self->all_schedules ) {
+        my $cmd_start         = $self->jobs->{$job}->{cmd_start} + 1;
+        my $cmd_end = $self->jobs->{$job}->cmd_counter + $cmd_start;
+        for(my $x=$cmd_start; $x<=$cmd_end; $x++){
+          write_file($task_file, {append => 1}, '| '.$job.' | '.$x.' | | |'."\n");
+        }
+    }
+
+    $self->app_log->info('Project table per task: '.$task_file);
 }
 
 1;

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Dancer2::Plugin::JWT;
 # ABSTRACT: JSON Web Token made simple for Dancer2
-$Dancer2::Plugin::JWT::VERSION = '0.011';
+$Dancer2::Plugin::JWT::VERSION = '0.012';
 use Dancer2::Plugin;
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use URI;
@@ -22,9 +22,13 @@ register jwt => sub {
     my $dsl = shift;
     my @args = @_;
 
-
     if (@args) {
         $dsl->app->request->var(jwt => $args[0]);
+    }
+    else {
+	if ($dsl->app->request->var('jwt_status') eq "missing") {
+	    $dsl->app->execute_hook('plugin.jwt.jwt_exception' => 'No JWT is present');
+	}
     }
     return $dsl->app->request->var('jwt') || undef;
 };
@@ -103,23 +107,23 @@ on_plugin_import {
             }
         }
 
-		if ( defined $need_key ) {
-			if ( $need_key eq 1 ) {
-				# TODO: add code to handle RSA keys or parse JWK hash string:
-				##instance of Crypt::PK::RSA
-				#my $data = decode_jwt(token=>$t, key=>Crypt::PK::RSA->new('keyfile.pem'));
-				#
-				##instance of Crypt::X509 (public key only)
-				#my $data = decode_jwt(token=>$t, key=>Crypt::X509->new(cert=>$cert));
-				#
-				##instance of Crypt::OpenSSL::X509 (public key only)
-				#my $data = decode_jwt(token=>$t, key=>Crypt::OpenSSL::X509->new_from_file('cert.pem'));
-			} elsif ( $need_key eq 2 ) {
-				# TODO: add code to handle ECC keys or parse JWK hash string:
-				#instance of Crypt::PK::ECC
-				#my $data = decode_jwt(token=>$t, key=>Crypt::PK::ECC->new('keyfile.pem'));
-			}
-		}
+	if ( defined $need_key ) {
+	    if ( $need_key eq 1 ) {
+		# TODO: add code to handle RSA keys or parse JWK hash string:
+		##instance of Crypt::PK::RSA
+		#my $data = decode_jwt(token=>$t, key=>Crypt::PK::RSA->new('keyfile.pem'));
+		#
+		##instance of Crypt::X509 (public key only)
+		#my $data = decode_jwt(token=>$t, key=>Crypt::X509->new(cert=>$cert));
+		#
+		##instance of Crypt::OpenSSL::X509 (public key only)
+		#my $data = decode_jwt(token=>$t, key=>Crypt::OpenSSL::X509->new_from_file('cert.pem'));
+	    } elsif ( $need_key eq 2 ) {
+		# TODO: add code to handle ECC keys or parse JWK hash string:
+		#instance of Crypt::PK::ECC
+		#my $data = decode_jwt(token=>$t, key=>Crypt::PK::ECC->new('keyfile.pem'));
+	    }
+	}
     }
 
     if ( exists $config->{need_iat} && defined $config->{need_iat} ) {
@@ -162,13 +166,27 @@ on_plugin_import {
                 if ($encoded) {
                     my $decoded;
                     eval {
-                        $decoded = decode_jwt( token => $encoded, key => $secret, verify_iat => $need_iat, verify_nbf => $need_nbf, verify_exp => defined $need_exp ? 1 : 0 , leeway => $need_leeway, accepted_alg => $alg, accepted_enc => $enc );
+                        $decoded = decode_jwt( token        => $encoded, 
+					       key          => $secret, 
+					       verify_iat   => $need_iat,
+					       verify_nbf   => $need_nbf,
+					       verify_exp   => defined $need_exp ? 1 : 0 ,
+					       leeway       => $need_leeway, 
+					       accepted_alg => $alg, 
+					       accepted_enc => $enc );
                     };
                     if ($@) {
                         $app->execute_hook('plugin.jwt.jwt_exception' => ($a = $@));
                     };
                     $app->request->var('jwt', $decoded);
+		    ## no token
+		    $app->request->var('jwt_status' => 'present');
+
                 }
+		else {
+		    ## no token
+		    $app->request->var('jwt_status' => 'missing');
+		}
             }
         )
     );
@@ -180,7 +198,13 @@ on_plugin_import {
                 my $response = shift;
                 my $decoded = $dsl->app->request->var('jwt');
                 if (defined($decoded)) {
-                    my $encoded = encode_jwt( payload => $decoded, key => $secret, alg => $alg, enc => $enc, auto_iat => $need_iat, relative_exp => $need_exp, relative_nbf => $need_nbf );
+                    my $encoded = encode_jwt( payload      => $decoded, 
+					      key          => $secret, 
+					      alg          => $alg,
+					      enc          => $enc,
+					      auto_iat     => $need_iat,
+					      relative_exp => $need_exp,
+					      relative_nbf => $need_nbf );
                     $response->headers->authorization($encoded);
                     if ($response->status =~ /^3/) {
                         my $u = URI->new( $response->header("Location") );
@@ -227,6 +251,11 @@ Dancer2::Plugin::JWT - JSON Web Token made simple for Dancer2
          ...
      };
 
+     hook 'plugin.jwt.jwt_exception' => sub {
+         my $error = shift;
+         # do something
+     };
+
 =head1 DESCRIPTION
 
 Registers the C<jwt> keyword that can be used to set or retrieve the payload
@@ -237,12 +266,21 @@ To this to work it is required to have a secret defined in your config.yml file:
    plugins:
       JWT:
           secret: "string or path to private RSA\EC key"
-          alg: HS256 # default, or others supported by Crypt::JWT
-          enc: # required onlt for JWE 
-          need_iat: 1 # add issued at field
-          need_nbf: 1 # check not before field
-          need_exp: 600 # in seconds
-          need_leeway: 30 # timeshift for expiration
+          # default, or others supported by Crypt::JWT
+          alg: HS256 
+          # required onlt for JWE 
+          enc: 
+          # add issued at field
+          need_iat: 1 
+          # check not before field
+          need_nbf: 1 
+          # in seconds
+          need_exp: 600 
+          # timeshift for expiration
+          need_leeway: 30 
+
+B<NOTE:> A empty call (without arguments) to jwt will trigger the
+exception hook if there is no jwt defined.
 
 =head1 BUGS
 
@@ -253,13 +291,13 @@ L<here|https://github.com/ambs/Dancer2-Plugin-JWT/>.
 
 To Lee Johnson for his talk "JWT JWT JWT" in YAPC::EU::2015.
 
-To Yuji Shimada for JSON::WebToken.
-
 To Nuno Carvalho for brainstorming and help with testing.
+
+To user2014, thanks for making the module use Crypt::JWT.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 Alberto Simões, all rights reserved.
+Copyright 2015-2017 Alberto Simões, all rights reserved.
 
 This module is free software and is published under the same terms as Perl itself.
 

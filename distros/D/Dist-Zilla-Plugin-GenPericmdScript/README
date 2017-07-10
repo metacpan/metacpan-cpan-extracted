@@ -1,20 +1,27 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::GenPericmdScript - Generate Perinci::CmdLine script
 
+VERSION
+    This document describes version 0.41 of
+    Dist::Zilla::Plugin::GenPericmdScript (from Perl distribution
+    Dist-Zilla-Plugin-GenPericmdScript), released on 2017-07-07.
+
+SYNOPSIS
     In dist.ini:
 
-     ; generate a script, by default called bin/check-palindrome
+     ; generate a script, by default called script/check-palindrome
      [GenPericmdScript]
      url=/My/Palindrome/check_palindrome
-    
-     ; generate another script, called bin/lssrv
+
+     ; generate another script, called script/lssrv
      [GenPericmdScript / Gen_lssrv]
      url=/My/App/list_servers
      name=lssrv
 
-    After build, bin/check-palindrome and bin/lssrv will be created.
+    After build, "script/check-palindrome" and "script/lssrv" will be
+    created.
 
 DESCRIPTION
-
     After you add Rinci metadata to your function, e.g.:
 
      package My::Palindrome;
@@ -32,8 +39,8 @@ DESCRIPTION
          $text eq reverse($text);
      }
 
-    you can create a command-line script for that function that basically
-    is not much more than:
+    you can create a command-line script for that function that basically is
+    not much more than:
 
      #!perl
      use Perinci::CmdLine::Any;
@@ -41,7 +48,7 @@ DESCRIPTION
 
     This Dist::Zilla plugin lets you automate the creation of such scripts.
 
-    Creating scripts. To create a single script, put this in dist.ini:
+    Creating scripts. To create a single script, put this in "dist.ini":
 
      [GenPericmdScript]
      ;required
@@ -50,22 +57,19 @@ DESCRIPTION
      abstract=Check if a text is a palindrome
      ; ...
 
-    To create more scripts, load the plugin again using the [Plugin/Name]
+    To create more scripts, load the plugin again using the "[Plugin/Name]"
     syntax, e.g.:
 
      [GenPericmdScript / GenAnotherScript]
      ...
 
 CONFIGURATION (SCRIPT SPECIFICATION)
-
- url* => str
-
+  url* => str
     Riap URL. If the script does not contain subcommand, this should refer
     to a function URL. If the script contains subcommands, this should
     usually refer to a package URL.
 
- subcommands => str
-
+  subcommands => str
     For creating a CLI script with subcommands. Value is a
     whitespace-separated entries of subcommand specification. Each
     subcommand specification must be in the form of
@@ -73,45 +77,36 @@ CONFIGURATION (SCRIPT SPECIFICATION)
 
      delete=/My/App/delete_item add=/My/App/add_item refresh=/My/App/refresh_item:Refetch an item from source
 
- subcommands_from_package_functions => bool
-
+  subcommands_from_package_functions => bool
     Will be passed to Perinci::CmdLine::Gen backend.
 
- include_package_functions_match => re
-
+  include_package_functions_match => re
     Will be passed to Perinci::CmdLine::Gen backend.
 
- exclude_package_functions_match => re
-
+  exclude_package_functions_match => re
     Will be passed to Perinci::CmdLine::Gen backend.
 
- name => str
-
+  name => str
     Name of script to create. Default will be taken from function (or
-    package) name, with _ replaced to -.
+    package) name, with "_" replaced to "-".
 
- summary => str
+  summary => str
+    Will be passed to Perinci::CmdLine::Gen backend (as "script_summary").
 
-    Will be passed to Perinci::CmdLine::Gen backend (as script_summary).
-
- cmdline => str
-
+  cmdline => str
     Select module to use. Default is Perinci::CmdLine::Any, but you can set
-    this to classic (equals to Perinci::CmdLine::Classic), any
-    (Perinci::CmdLine::Any), or lite (Perinci::CmdLine::Lite) or module
+    this to "classic" (equals to Perinci::CmdLine::Classic), "any"
+    (Perinci::CmdLine::Any), or "lite" (Perinci::CmdLine::Lite) or module
     name.
 
- prefer_lite => bool (default: 1)
-
-    If set to 0 and you are using Perinci::CmdLine::Any, -prefer_lite
+  prefer_lite => bool (default: 1)
+    If set to 0 and you are using "Perinci::CmdLine::Any", "-prefer_lite"
     option will be passed in the code.
 
- enable_log => bool
+  enable_log => bool
+    Will be passed to Perinci::CmdLine object construction code (as "log").
 
-    Will be passed to Perinci::CmdLine object construction code (as log).
-
- default_log_level => str
-
+  default_log_level => str
     If set, will add this code to the generated script:
 
      BEGIN { no warnings; $main::Log_Level = "..." }
@@ -119,84 +114,92 @@ CONFIGURATION (SCRIPT SPECIFICATION)
     This can be used if you want your script to be verbose by default, for
     example.
 
- pass_cmdline_object => bool
-
+  pass_cmdline_object => bool
     Will be passed to Perinci::CmdLine object construction code.
 
- extra_urls_for_version => str
-
+  extra_urls_for_version => str
     Comma-separated string, will be passed to Perinci::CmdLine object
     construction code (as array).
 
- config_filename => str|array[str]
-
+  config_filename => str|array[str]
     Will be passed to Perinci::CmdLine object construction code.
 
- config_dirs => array[str]
-
+  config_dirs => array[str]
     Will be passed to Perinci::CmdLine object construction code.
 
- ssl_verify_hostname => bool (default: 1)
-
+  ssl_verify_hostname => bool (default: 1)
     If set to 0, will add this code to the generated script:
 
      $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
 
-    This can be used if the Riap function URL is https and you don't want
-    to verify.
+    This can be used if the Riap function URL is https and you don't want to
+    verify.
 
- load_modules => array[str]
-
+  load_modules => array[str]
     Extra modules to load in the generated script.
 
- code_before_instantiate_cmdline => str
-
- code_after_end => str
-
- default_format => str
-
+  code_before_instantiate_cmdline => str
+  code_after_end => str
+  default_format => str
     Passed to Perinci::CmdLine object construction code.
 
- skip_format => bool
-
+  skip_format => bool
     Passed to Perinci::CmdLine object construction code.
 
- use_utf8 => bool
-
+  use_utf8 => bool
     Passed to Perinci::CmdLine object construction code.
 
- allow_prereq => bool
-
+  allow_prereq => bool
     Will be passed to Perinci::CmdLine::Gen backend.
 
- per_arg_json => bool
-
+  per_arg_json => bool
     Will be passed to Perinci::CmdLine::Gen backend.
 
- per_arg_yaml => bool
-
+  per_arg_yaml => bool
     Will be passed to Perinci::CmdLine::Gen backend.
 
 CONFIGURATION (OTHER)
-
- inline_generate_completer => bool (default: 1)
-
+  inline_generate_completer => bool (default: 1)
     Perinci::CmdLine::Inline-generated scripts currently cannot do shell
     completion on its own, but relies on a separate completer script (e.g.
-    if the script is bin/foo then the completer will be generated at
-    bin/_foo). This option can be used to suppress the generation of
+    if the script is "script/foo" then the completer will be generated at
+    "script/_foo"). This option can be used to suppress the generation of
     completer script.
 
- build_load_modules => array[str]
-
+  build_load_modules => array[str]
     Load modules during build process.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-GenPericmdScript>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-GenPericmdScript>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Gen
+    PericmdScript>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci
 
     Pod::Weaver::Plugin::Rinci to fill more stuffs to the POD of the
     generated script.
 
-    Dist::Zilla::Plugin::Rinci::* for plugins that utilize Rinci metadata.
+    "Dist::Zilla::Plugin::Rinci::*" for plugins that utilize Rinci metadata.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

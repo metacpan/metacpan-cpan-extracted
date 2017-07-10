@@ -7,7 +7,7 @@ use Moo::Role;
 use AnyEvent::FTP::Client::Response;
 
 # ABSTRACT: Response buffer role for asynchronous ftp client
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub on_next_response
@@ -40,7 +40,7 @@ sub process_message_line
       );
       delete $self->{response_buffer}->{$_} for qw( code message );
       my $once = delete $self->{response_buffer}->{once};
-      $_->($response) 
+      $_->($response)
         for @{ $self->{response_buffer}->{each} }, @{ $once };
     }
   }
@@ -68,7 +68,7 @@ AnyEvent::FTP::Client::Role::ResponseBuffer - Response buffer role for asynchron
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -83,6 +83,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

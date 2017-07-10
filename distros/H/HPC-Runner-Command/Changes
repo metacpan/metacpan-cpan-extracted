@@ -1,5 +1,10 @@
 Revision history for HPC-Runner-Command
 
+3.2.7  2017-07-07 11:24:22 GST
+	- Bug fix for slurm array deps
+	- Added lock file to JSON-Logger. Files in archive are not thread safe.
+	- Added experimental tag to JSON logger.
+
 3.2.6  2017-07-05 11:46:45 GST
 	- Enhancements to the logging interface
 	- New JSON logging interface

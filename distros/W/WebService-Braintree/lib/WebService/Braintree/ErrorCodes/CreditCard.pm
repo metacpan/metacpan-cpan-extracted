@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::CreditCard;
-$WebService::Braintree::ErrorCodes::CreditCard::VERSION = '0.9';
+$WebService::Braintree::ErrorCodes::CreditCard::VERSION = '0.91';
 use strict;
 
 use constant BillingAddressConflict                                   => "91701";

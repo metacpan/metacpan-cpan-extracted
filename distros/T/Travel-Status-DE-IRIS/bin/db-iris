@@ -6,7 +6,7 @@ use utf8;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 use DateTime;
 use DateTime::Format::Strptime;
@@ -20,7 +20,7 @@ use Travel::Status::DE::IRIS::Stations;
 my ( $date, $time );
 my $datetime       = DateTime->now( time_zone => 'Europe/Berlin' );
 my $developer_mode = 0;
-my $lookahead      = 3 * 60;
+my $lookahead      = 2 * 60;
 my $realtime       = 0;
 my $with_related   = 1;
 my ( $filter_via, $track_via, $status_via );
@@ -530,7 +530,7 @@ I<station>
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 DESCRIPTION
 

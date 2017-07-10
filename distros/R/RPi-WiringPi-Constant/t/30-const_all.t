@@ -4,6 +4,11 @@ use warnings;
 use Test::More;
 use RPi::WiringPi::Constant qw(:all);
 
+# pwm_mode
+
+is PWM_MODE_MS, 0, "PWM_MODE_MS ok";
+is PWM_MODE_BAL, 1, "PWM_MODE_BAL ok";
+
 # pinmode
 
 is INPUT, 0, "INPUT const ok";

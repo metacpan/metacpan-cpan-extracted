@@ -1,11 +1,16 @@
 requires "Carp" => "0";
+requires "IO::Handle" => "0";
 requires "PerlIO" => "0";
-requires "Test2::API" => "1.302084";
+requires "Test2::API" => "1.302086";
 requires "Time::HiRes" => "0";
 requires "perl" => "5.008001";
 
 on 'test' => sub {
-  requires "Test2::Bundle::Extended" => "0.000070";
+  requires "File::Temp" => "0";
+  requires "IPC::Open3" => "0";
+  requires "List::Util" => "0";
+  requires "Test2::Bundle::Extended" => "0.000072";
+  requires "Test2::Formatter::TAP" => "1.302086";
 };
 
 on 'configure' => sub {

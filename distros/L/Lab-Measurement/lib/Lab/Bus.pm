@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
-
 package Lab::Bus;
-$Lab::Bus::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Bus base class
+$Lab::Bus::VERSION = '3.553';
 use strict;
 
 use Lab::Generic;
@@ -152,6 +152,8 @@ sub DESTROY {
 
 1;
 
+__END__
+
 =pod
 
 =encoding utf-8
@@ -159,6 +161,10 @@ sub DESTROY {
 =head1 NAME
 
 Lab::Bus - Bus base class
+
+=head1 VERSION
+
+version 3.553
 
 =head1 SYNOPSIS
 
@@ -189,7 +195,6 @@ Yes, this breaks object orientation a little, but it comes so handy!
 
 Place your twin searching code in C<$self->_search_twin()>. Make sure it
 evaluates C<$self->IgnoreTwin()>. Look at L<Lab::Bus::LinuxGPIB>.
-
 
 =head1 CONSTRUCTOR
 
@@ -227,30 +232,31 @@ Probably few. Mostly because there's not so much done here.
 
 =over 4
 
-=item 
+=item
 
 L<Lab::Bus::GPIB>
 
-=item 
+=item
 
 L<Lab::Bus::MODBUS>
 
-=item 
+=item
 
 and many more...
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2004-2006 Daniel Schröer <schroeer@cpan.org>, 
-           2009-2010 Daniel Schröer, Andreas K. Hüttel (L<http://www.akhuettel.de/>) and David Kalok,
-           2010      Matthias Völker <mvoelker@cpan.org>
-           2011      Florian Olbrich, Andreas K. Hüttel
-           2012      Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011-2012  Andreas K. Huettel, Florian Olbrich
+            2014       Alexei Iankilevitch
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

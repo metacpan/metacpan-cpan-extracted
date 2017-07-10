@@ -11,7 +11,7 @@ use strict;
 use warnings;
 
 use lib qw(../lib);
-use Math::AnyNum qw(ipow ilog10 idiv);
+use Math::AnyNum qw(ipow ipow10 ilog10 idiv);
 
 sub asciibet {
     map { chr } 0 .. 255;
@@ -67,7 +67,7 @@ sub arithmethic_coding {
     #~ say $U;
 
     my $pow = ilog10($pf);
-    my $enc = idiv($U - 1, ipow(10, $pow));
+    my $enc = idiv($U - 1, ipow10($pow));
 
     return ($enc, $pow, \%freq);
 }
@@ -76,7 +76,7 @@ sub arithmethic_decoding {
     my ($enc, $pow, $freq) = @_;
 
     # Multiply enc by 10^pow
-    $enc *= ipow(10, $pow);
+    $enc *= ipow10($pow);
 
     my $base = Math::AnyNum->new(0);
     $base += $_ for values %{$freq};

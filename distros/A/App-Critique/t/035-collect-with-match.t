@@ -14,7 +14,7 @@ BEGIN {
     use_ok('App::Critique');
 }
 
-my $test_repo = App::Critique::Tester::init_test_repo();
+my $test_repo = App::Critique::Tester::init_test_env();
 my $work_tree = $test_repo->dir;
 my $work_base = Path::Tiny::path( $work_tree )->basename;
 
@@ -63,12 +63,14 @@ subtest '... testing collect' => sub {
         ],
         [
             qr/Session file loaded/,
-            qr/Not Matched\: skipping file \(bin\/my-app\)/,
-            qr/Not Matched\: skipping file \(lib\/My\/Test\/WithoutViolations\.pm\)/,
-            qr/Not Matched\: skipping file \(lib\/My\/Test\/WithViolations\.pm\)/,
-            qr/Not Matched\: skipping file \(share\/debug.pl\)/,
-            qr/Matched\: keeping file \(t\/000\-test\-with\-violations\.t\)/,
-            qr/Matched\: keeping file \(t\/001\-test\-without-violations\.t\)/,
+            qr/\.\.\. adding file \(bin\/my-app\)/,
+            qr/\.\.\. adding file \(lib\/My\/Test\/WithoutViolations\.pm\)/,
+            qr/\.\.\. adding file \(lib\/My\/Test\/WithViolations\.pm\)/,
+            qr/\.\.\. adding file \(share\/debug.pl\)/,
+            qr/\.\.\. adding file \(t\/000\-test\-with\-violations\.t\)/,
+            qr/\.\.\. adding file \(t\/001\-test\-without-violations\.t\)/,
+            qr/Accumulated 7 files, now processing/,
+            qr/Filtered 5 files, left with 2/,            
             qr/Collected 2 perl file\(s\) for critique/,
             qr/Including t\/000\-test\-with\-violations\.t/,
             qr/Including t\/001\-test\-without-violations\.t/,
@@ -102,8 +104,8 @@ subtest '... testing status' => sub {
         ],
         [
             qr/Session file loaded/,
-            qr/perl_critic_policy\s+\: Variables\:\:ProhibitUnusedVariables/,
-            qr/git_work_tree\s*\: $work_tree/,
+            qr/perl_critic_policy\s+\= Variables\:\:ProhibitUnusedVariables/,
+            qr/git_work_tree\s*\= $work_tree/,
                 qr/t\/000\-test\-with\-violations\.t/,
                 qr/t\/001\-test\-without-violations\.t/,
             qr/TOTAL\: 2 file\(s\)/,

@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::CS::Conll2009;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -2308,10 +2308,18 @@ C	SubPOS=n|Num=S|Cas=1
 C	SubPOS=n|Num=S|Cas=1|Sem=K
 C	SubPOS=n|Num=S|Cas=1|Sem=m
 C	SubPOS=n|Num=S|Cas=1|Var=1
+C	SubPOS=n|Num=S|Cas=2
+C	SubPOS=n|Num=S|Cas=2|Var=1
+C	SubPOS=n|Num=S|Cas=3
+C	SubPOS=n|Num=S|Cas=3|Var=1
 C	SubPOS=n|Num=S|Cas=4
 C	SubPOS=n|Num=S|Cas=4|Var=1
 C	SubPOS=n|Num=S|Cas=5
 C	SubPOS=n|Num=S|Cas=5|Var=1
+C	SubPOS=n|Num=S|Cas=6
+C	SubPOS=n|Num=S|Cas=6|Var=1
+C	SubPOS=n|Num=S|Cas=7
+C	SubPOS=n|Num=S|Cas=7|Var=1
 C	SubPOS=n|Num=S|Cas=X
 C	SubPOS=n|Num=X|Cas=X
 C	SubPOS=o|Var=1
@@ -5389,7 +5397,7 @@ Lingua::Interset::Tagset::CS::Conll2009 - Driver for the Czech tagset of the CoN
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

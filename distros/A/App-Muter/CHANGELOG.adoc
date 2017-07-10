@@ -1,0 +1,13 @@
+= Changelog
+
+v0.2.0::
+* The "Ignore Them Still" release.
+* Add an App::Muter package so PAUSE will index the distribution.
+* Add a `-r`/`--reverse` flag (#1, suggested by Toby Inkster).
+
+v0.1.1::
+* Add an appropriate dependency on MIME::Base64 so that the url64 encoding
+  functions are available.
+
+v0.1.0::
+* Initial release.

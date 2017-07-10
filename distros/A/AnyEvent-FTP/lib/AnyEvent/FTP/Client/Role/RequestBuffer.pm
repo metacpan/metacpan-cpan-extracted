@@ -7,7 +7,7 @@ use Moo::Role;
 use AnyEvent;
 
 # ABSTRACT: Request buffer role for asynchronous ftp client
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 has request_buffer => (
@@ -18,54 +18,54 @@ has request_buffer => (
 sub push_command
 {
   my $cv;
-  
+
   $cv = pop if (ref $_[-1]) eq 'AnyEvent::CondVar';
   $cv //= AnyEvent->condvar;
 
   my($self, @commands) = @_;
-  
+
   push @{ $self->request_buffer }, { cmd => \@commands, cv => $cv };
-  
+
   $self->pop_command;
-  
+
   $cv;
 }
 
 sub unshift_command
 {
   my $cv;
-  
+
   $cv = pop if (ref $_[-1]) eq 'AnyEvent::CondVar';
   $cv //= AnyEvent->condvar;
 
   my($self, @commands) = @_;
-  
+
   unshift @{ $self->request_buffer }, { cmd => \@commands, cv => $cv };
-  
+
   $self->pop_command;
-  
+
   $cv;
 }
 
 sub pop_command
 {
   my($self) = @_;
-  
+
   $self->{ready} //= 1;
-  
+
   return $self unless defined $self->{handle};
-  
+
   unless(@{ $self->request_buffer } > 0)
   {
     $self->{ready} = 1;
     return $self;
   }
-  
+
   return unless $self->{ready};
 
   my($cmd, $args, $cb) =  @{ shift @{ $self->request_buffer->[0]->{cmd} } };
   my $line = defined $args ? join(' ', $cmd, $args) : $cmd;
-  
+
   my $handler;
   $handler  = sub {
     my $res = shift;
@@ -107,13 +107,13 @@ sub pop_command
       }
     }
   };
-  
+
   $self->on_next_response($handler);
-  
+
   $self->{ready} = 0;
   $self->emit('send', $cmd, $args);
   $self->{handle}->push_write("$line\015\012");
-  
+
   $self;
 }
 
@@ -138,7 +138,7 @@ AnyEvent::FTP::Client::Role::RequestBuffer - Request buffer role for asynchronou
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -153,6 +153,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

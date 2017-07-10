@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::SL::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -42,14 +42,14 @@ sub _create_atoms
         'decode_map' =>
         {
             # example: V-B
-            'Abbreviation'              => ['abbr' => 'abbr'],
+            'Abbreviation'              => ['abbr' => 'yes'],
             # Ordinal adjectives, unlike qualificative, cannot be graded. Interset currently does not provide for this distinction.
             # example qualificative: boljše, kasnejšimi, revnejših, pomembnejše, močnejšo
             'Adjective-qualificative'   => ['pos' => 'adj'],
             # example ordinal: mali, partijske, zunanjim, srednjih, azijskimi
             'Adjective-ordinal'         => ['pos' => 'adj', 'other' => {'adjtype' => 'ordinal'}],
             # example possessive: O'Brienovih, Časnikovih, nageljnovimi, dečkovih, starčeve
-            'Adjective-possessive'      => ['pos' => 'adj', 'poss' => 'poss'],
+            'Adjective-possessive'      => ['pos' => 'adj', 'poss' => 'yes'],
             # example: nanj, v, proti
             'Adposition-preposition'    => ['pos' => 'adp', 'adpostype' => 'prep'],
             # example: več, hitro, najbolj
@@ -89,11 +89,11 @@ sub _create_atoms
             # example personal: jaz, ti, on, ona, mi, vi, oni
             'Pronoun-personal'          => ['pos' => 'noun', 'prontype' => 'prs'],
             # example possessive: moj, tvoj, njegove, naše, vašo, njihove
-            'Pronoun-possessive'        => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            'Pronoun-possessive'        => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             # example reflexive: sebe, se, sebi, si, seboj, svoj, svoja
             # Both reflexive and possessive reflexive pronouns are included in Pronoun-reflexive.
             # The possessive reflexives are recognized by Referent-Type=possessive.
-            'Pronoun-reflexive'         => ['pos' => 'noun|adj', 'prontype' => 'prs', 'reflex' => 'reflex'],
+            'Pronoun-reflexive'         => ['pos' => 'noun|adj', 'prontype' => 'prs', 'reflex' => 'yes'],
             # example relative: kar, česar, čimer, kdorkoli, katerih, kakršna, kolikor
             'Pronoun-relative'          => ['pos' => 'noun|adj', 'prontype' => 'rel'],
             # example copula: bi, bova, bomo, bom, boste, boš, bosta, bodo, bo, sva, smo, nismo, sem, nisem, ste, si, nisi, sta, nista, so, niso, je, ni, bili, bila, bile, bil, bilo
@@ -111,7 +111,7 @@ sub _create_atoms
                                                                                'ind' => 'Pronoun-indefinite',
                                                                                'int' => 'Pronoun-interrogative',
                                                                                'neg' => 'Pronoun-negative',
-                                                                               'prs' => { 'reflex' => { 'reflex' => 'Pronoun-reflexive',
+                                                                               'prs' => { 'reflex' => { 'yes' => 'Pronoun-reflexive',
                                                                                                         '@'      => 'Pronoun-personal' }},
                                                                                'rel' => 'Pronoun-relative',
                                                                                '@'   => 'Noun-common' }}}},
@@ -121,10 +121,10 @@ sub _create_atoms
                                                                              'ind' => 'Pronoun-indefinite',
                                                                              'int' => 'Pronoun-interrogative',
                                                                              'neg' => 'Pronoun-negative',
-                                                                             'prs' => { 'reflex' => { 'reflex' => 'Pronoun-reflexive',
+                                                                             'prs' => { 'reflex' => { 'yes' => 'Pronoun-reflexive',
                                                                                                       '@'      => 'Pronoun-possessive' }},
                                                                              'rel' => 'Pronoun-relative',
-                                                                             '@'   => { 'poss' => { 'poss' => 'Adjective-possessive',
+                                                                             '@'   => { 'poss' => { 'yes' => 'Adjective-possessive',
                                                                                                     '@'    => { 'other/adjtype' => { 'ordinal' => 'Adjective-ordinal',
                                                                                                                                      '@'       => 'Adjective-qualificative' }}}}}}}},
                        'num'  => { 'numtype' => { 'ord'  => 'Numeral-ordinal',
@@ -143,7 +143,7 @@ sub _create_atoms
                        'int'  => 'Interjection',
                        'punc' => 'PUNC',
                        'sym'  => 'PUNC',
-                       '@'    => { 'abbr' => { 'abbr' => 'Abbreviation' }}}
+                       '@'    => { 'abbr' => { 'yes' => 'Abbreviation' }}}
         }
     );
     # DEGREE OF COMPARISON ####################
@@ -297,7 +297,7 @@ sub _create_atoms
         'simple_decode_map' =>
         {
             'personal'   => '',
-            'possessive' => 'poss'
+            'possessive' => 'yes'
         }
     );
     # VERB FORM ####################
@@ -1281,7 +1281,7 @@ Lingua::Interset::Tagset::SL::Conll - Driver for the Slovene tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

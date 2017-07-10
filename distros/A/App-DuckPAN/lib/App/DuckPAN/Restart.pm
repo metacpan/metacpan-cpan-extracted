@@ -1,7 +1,7 @@
 package App::DuckPAN::Restart;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Automatic restarting of application on file change
-$App::DuckPAN::Restart::VERSION = '1018';
+$App::DuckPAN::Restart::VERSION = '1019';
 use File::Find::Rule;
 use Filesys::Notify::Simple;
 
@@ -161,7 +161,7 @@ App::DuckPAN::Restart - Automatic restarting of application on file change
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

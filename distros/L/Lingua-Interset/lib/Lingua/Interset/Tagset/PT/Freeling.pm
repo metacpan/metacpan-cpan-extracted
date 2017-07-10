@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::PT::Freeling;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -118,14 +118,14 @@ sub _create_atoms
             # qualificative adjective
             'Q' => [],
             # possessive adjective
-            'P' => ['poss' => 'poss'],
+            'P' => ['poss' => 'yes'],
             # ordinal numeral/adjective
             'O' => ['numtype' => 'ord']
         },
         'encode_map' =>
         {
             'numtype' => { 'ord' => 'O',
-                           '@'   => { 'poss' => { 'poss' => 'P',
+                           '@'   => { 'poss' => { 'yes' => 'P',
                                                   '@'    => 'Q' }}}
         }
     );
@@ -155,7 +155,7 @@ sub _create_atoms
         },
         'encode_map' =>
         {
-            'poss' => { 'poss' => 'P',
+            'poss' => { 'yes' => 'P',
                         '@'    => { 'prontype' => { 'prs' => 'P',
                                                     'art' => 'A',
                                                     'dem' => 'D',
@@ -1067,7 +1067,7 @@ Lingua::Interset::Tagset::PT::Freeling - Driver for the EAGLES-based tagset for 
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

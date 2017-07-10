@@ -6,17 +6,17 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Event interface for AnyEvent::FTP objects
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub define_events
 {
   my $class = shift;
-  
+
   foreach my $name (@_)
   {
     my $method_name = join '::', $class, "on_$name";
-    my $method = sub { 
+    my $method = sub {
       my($self, $cb) = @_;
       push @{ $self->{event}->{$name} }, $cb;
       $self;
@@ -51,20 +51,20 @@ AnyEvent::FTP::Role::Event - Event interface for AnyEvent::FTP objects
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
  package AnyEvent::FTP::Foo;
- 
+
  use Moo;
  with 'AnyEvent::FTP::Role::Event';
  __PACKAGE__->define_events(qw( error good ));
- 
+
  sub some_method
  {
    my($self) = @_;
-   
+
    if($self->other_method)
    {
      $self->emit(good => 'paylod message');
@@ -78,7 +78,7 @@ version 0.09
 later on somewhere else
 
  use AnyEvent::FTP::Foo;
- 
+
  my $foo = AnyEvent::FTP::Foo->new;
  $foo->on_good(sub {
    my($message) = @_;
@@ -88,7 +88,7 @@ later on somewhere else
    my($message) = @_;
    print "failed: $message";
  });
- 
+
  $foo->some_method
 
 =head1 DESCRIPTION
@@ -130,6 +130,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

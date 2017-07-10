@@ -173,5 +173,5 @@ requires:
 resources:
   homepage: http://user42.tuxfamily.org/chart/index.html
   license: http://www.gnu.org/licenses/gpl.html
-version: '260'
+version: '261'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

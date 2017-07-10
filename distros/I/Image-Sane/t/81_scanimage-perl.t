@@ -15,7 +15,7 @@ else {
 }
 
 my $scanimage_perl =
-    'PERL5LIB="blib:blib/arch:lib:\$PERL5LIB" '
+    'PERL5LIB="blib:blib/arch:lib:$PERL5LIB" '
   . "$EXECUTABLE_NAME examples/scanimage-perl";
 my $identify = "; identify -format '%m %G %g %z-bit %r' out*.pnm; rm out*.pnm";
 

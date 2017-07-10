@@ -24,5 +24,5 @@ requires:
   Test::Pod::Coverage: '0'
   Time::HiRes: '0'
   XML::XPath: '0'
-version: v3.4.0
+version: v3.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

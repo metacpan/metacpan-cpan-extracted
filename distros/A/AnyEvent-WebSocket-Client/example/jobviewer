@@ -18,9 +18,9 @@ if(@ARGV == 0)
   my $res = $ua->get($uri);
   die $res->status_line unless $res->is_success;
   my $data = from_json($res->decoded_content);
-  
+
   my $table = Text::Table->new( 'id', 'command' );
-  
+
   foreach my $server (sort keys %$data)
   {
     foreach my $id (sort keys %{ $data->{$server} })
@@ -28,7 +28,7 @@ if(@ARGV == 0)
       $table->load([ "$server:$id", join(' ', '%', @{ $data->{$server}->{$id}}) ]);
     }
   }
-  
+
   print $table;
   print "\n";
   print "usage: $0 [ id ]\n";
@@ -42,7 +42,7 @@ unless(defined $server && defined $id)
   exit 2;
 }
 
-$uri->path("/job/$server/$id.json");
+$uri->path("/job/$server/$id/json");
 my $ua = LWP::UserAgent->new;
 my $res = $ua->get($uri);
 die $res->status_line unless $res->is_success;

@@ -39,7 +39,6 @@ MANIFEST
 META.json
 META.yml
 README.pod
-TODO.md
 t/00-load.t
 t/boilerplate.t
 t/cmd-branch-clean.t
@@ -81,3 +80,4 @@ t/pom.t
 t/repo.t
 t/spelling.t
 t/workflow.t
+TODO.md

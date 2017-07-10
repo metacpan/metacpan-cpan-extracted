@@ -3,9 +3,9 @@ package PDF::API2::Resource::Font::CoreFont::bankgothic;
 use strict;
 use warnings;
 
-our $VERSION = '2.032'; # VERSION
+our $VERSION = '2.033'; # VERSION
 
-sub fontdata { return {
+sub data { return {
     'fontname' => 'BankGothicMediumBT',
     'type' => 'TrueType',
     'apiname' => 'BaGo',

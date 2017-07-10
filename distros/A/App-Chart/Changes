@@ -16,8 +16,11 @@ You should have received a copy of the GNU General Public License
 along with Chart.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 261, July 2017
+    - withdraw undocumented M-X .MON, not ready to use
+
 Version 260, April 2017
-    - Yahoo exchanges moved
+    - Yahoo exchanges page moved
 
 Version 259, April 2017
     - Emacs chart-ses-refresh fix waiting for quotes to download

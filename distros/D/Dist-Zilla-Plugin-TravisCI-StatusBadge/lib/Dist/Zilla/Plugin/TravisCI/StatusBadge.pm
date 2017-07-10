@@ -10,7 +10,7 @@ use Moose;
 use namespace::autoclean;
 use Dist::Zilla::File::OnDisk;
 
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 our $AUTHORITY = 'cpan:CHIM'; # AUTHORITY
 
 with qw(
@@ -123,7 +123,7 @@ sub after_build {
             : 'raw'                             # Dist::Zilla pre-5.0
             ;
 
-    Path::Tiny::path( $file )->spew_raw(
+    $file->spew_raw(
         $encoding eq 'raw'
             ? $edited
             : encode( $encoding, $edited )
@@ -205,9 +205,9 @@ sub _try_any_readme {
 
         $self->clear_readme;
 
-        my $file = $self->zilla->root->file( $name );
+        my $file = $self->zilla->root->child( $name );
 
-        if ( -e $file ) {
+        if ( $file->exists ) {
             $self->readme( $name );
             $zillafile = $file;
             last;
@@ -233,7 +233,7 @@ Dist::Zilla::Plugin::TravisCI::StatusBadge - Get Travis CI status badge for your
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

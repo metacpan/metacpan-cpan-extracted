@@ -1,0 +1,40 @@
+NAME
+    WWW::RiotGames::LeagueOfLegends - Perl wrapper around the Riot Games
+    League of Legends API
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use aliased 'WWW::RiotGames::LeagueOfLegends' => 'LoL';
+
+      my $lol = LoL->new( api_key => $api_key );
+      # defaults ( region => 'na', timeout => 5 )
+
+      my $champions = $lol->champions;
+      my $champion_static_data = $lol->static_data( type => 'champions', id => 1 );
+      my $summoner = $lol->summoner( summoner_name => 'Bob' );
+
+DESCRIPTION
+    WWW::RiotGames::LeagueOfLegends is a simple Perl wrapper around the Riot
+    Games League of Legends API.
+
+    It is as simple as creating a new WWW::RiotGames::LeagueOfLegends object
+    and calling ->method Each key/value pair becomes part of a query string,
+    for example:
+
+      $lol->static_data( type => 'champions', id => 1 );
+
+    results in the query string
+
+      https://na1.api.riotgames.com/lol/static-data/v3/champions/1
+      # api_key is added on
+
+AUTHOR
+    Justin Hunter <justin.d.hunter@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by Justin Hunter
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

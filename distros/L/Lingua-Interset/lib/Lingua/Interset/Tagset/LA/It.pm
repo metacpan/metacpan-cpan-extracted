@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::LA::It;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -116,7 +116,7 @@ sub _create_atoms
             # prepositional (always or not) particle (examples: ad, contra, in, cum, per)
             'S4' => ['pos' => 'adp', 'adpostype' => 'prep', 'other' => {'flexcat' => 'preppart'}],
             # pseudo-lemma / abbreviation
-            '-5'  => ['abbr' => 'abbr'],
+            '-5'  => ['abbr' => 'yes'],
             # pseudo-lemma / number
             'G5' => ['pos' => 'num', 'numform' => 'digit'],
             # punctuation
@@ -188,7 +188,7 @@ sub _create_atoms
                        'punc' => '--',
                        '@'    => { 'other/flexcat' => { 'invar'    => 'O4',
                                                         'preppart' => 'S4',
-                                                        '@'        => { 'abbr' => { 'abbr' => '-5',
+                                                        '@'        => { 'abbr' => { 'yes' => '-5',
                                                                                     '@'    => 'O4' }}}}}
         }
     );
@@ -465,12 +465,12 @@ sub _create_atoms
             # III variation of wordform (illuc)
             'C' => ['variant' => '3'],
             # author mistake, or bad reading? (quod)
-            'x' => ['typo' => 'typo'],
-            'X' => ['typo' => 'typo']
+            'x' => ['typo' => 'yes'],
+            'X' => ['typo' => 'yes']
         },
         'encode_map' =>
         {
-            'typo' => { 'typo' => 'X',
+            'typo' => { 'yes' => 'X',
                         '@'    => { 'variant' => { ''  => '-',
                                                    '1' => 'A',
                                                    '2' => 'B',
@@ -2227,7 +2227,7 @@ Lingua::Interset::Tagset::LA::It - Driver for the positional tagset of the Index
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

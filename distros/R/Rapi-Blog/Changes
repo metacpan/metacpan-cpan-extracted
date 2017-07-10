@@ -1,5 +1,9 @@
 Revision history for Rapi::Blog
 
+1.0004 2017-07-06
+    - Require RapidApp 1.3002 (VANSTYN)
+    - Grid cell/row max-height now only enabled in Posts grid (VANSTYN)
+
 1.0003 2017-06-28
     - Better handling for when the app is mounted on a sub-url (VANSTYN)
     - Misc POD fixes

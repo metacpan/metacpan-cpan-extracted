@@ -6,7 +6,7 @@
 package Lingua::Interset::Tagset::DE::Smor;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -67,7 +67,7 @@ sub _create_atoms
             '+NPROP'   => ['pos' => 'noun', 'nountype' => 'prop'],
             '+ORD'     => ['pos' => 'adj', 'numtype' => 'ord'],
             # possessive pronoun
-            '+POSS'    => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            '+POSS'    => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             # if morph feature <Attr> then pos => 'adj'
             # if morph feature <Subst> then pos => 'noun'
             '+POSTP'   => ['pos' => 'adp', 'adpostype' => 'post'],
@@ -85,7 +85,7 @@ sub _create_atoms
             # if morph feature <Attr> then pos => 'adj'
             # if morph feature <Subst> then pos => 'noun'
             '+SYMBOL'  => ['pos' => 'sym'],
-            '+TRUNC'   => ['hyph' => 'hyph'],
+            '+TRUNC'   => ['hyph' => 'yes'],
             '+V'       => ['pos' => 'verb'],
             '+VPART'   => ['pos' => 'part', 'parttype' => 'vbp'],
             '+WADV'    => ['pos' => 'adv', 'prontype' => 'int'],
@@ -97,7 +97,7 @@ sub _create_atoms
         {
             'pos' => { 'noun' => { 'prontype' => { 'dem' => '+DEM',
                                                    'ind' => '+INDEF',
-                                                   'prs' => { 'poss' => { 'poss' => '+POSS',
+                                                   'prs' => { 'poss' => { 'yes' => '+POSS',
                                                                           '@'    => '+PPRO' }},
                                                    'rcp' => '+PPRO',
                                                    'rel' => '+REL',
@@ -129,7 +129,7 @@ sub _create_atoms
                        'int'  => '+INTJ',
                        'sym'  => '+SYMBOL',
                        'punc' => '+PUNCT',
-                       '@'    => { 'hyph' => { 'hyph' => '+TRUNC' }}}
+                       '@'    => { 'hyph' => { 'yes' => '+TRUNC' }}}
         }
     );
     # UNINFLECTED SHORT FORMS OF ADJECTIVES ####################
@@ -192,13 +192,13 @@ sub _create_atoms
             # <+PPRO><Refl> = reflexive pronoun (dich, dir, euch, mich, mir, sich, uns)
             'Pers'  => ['prontype' => 'prs'],
             'Rec'   => ['prontype' => 'rcp'],
-            'Refl'  => ['prontype' => 'prs', 'reflex' => 'reflex']
+            'Refl'  => ['prontype' => 'prs', 'reflex' => 'yes']
         },
         'encode_map' =>
         {
-            'reflex' => { 'reflex' => 'Refl',
+            'reflex' => { 'yes' => 'Refl',
                           '@'      => { 'prontype' => { 'rcp' => 'Rec',
-                                                        'prs' => { 'poss' => { 'poss' => { 'pos' => { 'noun' => 'Subst',
+                                                        'prs' => { 'poss' => { 'yes' => { 'pos' => { 'noun' => 'Subst',
                                                                                                       'adj'  => 'Attr' }},
                                                                                '@'    => 'Pers' }},
                                                         '@'   => { 'other/pronform' => { 'pro' => 'Pro',
@@ -1406,7 +1406,7 @@ Lingua::Interset::Tagset::DE::Smor - Driver for the German tagset of SMOR (Stutt
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

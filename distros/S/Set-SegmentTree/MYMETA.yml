@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Immutable segment trees with flatbuffers in perl'
 author:
   - 'David Ihnen <davidihnen@gmail.com>'
 build_requires:
@@ -18,9 +18,19 @@ no_index:
     - inc
     - t
 requires:
+  Carp: '1.36'
+  Cwd: '3.56'
+  Data::UUID: '1.221'
+  ExtUtils::MakeMaker: '7.0401'
+  File::Find: '1.29'
   File::Map: '0.64'
-  Set::IntervalTree: '0.01'
+  File::Path: '2.09'
+  IO::File: '1.16'
+  List::Util: '1.46'
+  Readonly: '2.05'
+  Test::More: '1.302067'
   Test::XT: '0.04'
-version: '0.01'
+  Time::HiRes: '1.9726'
+version: '0.06'
 x_module_name: Set::SegmentTree
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

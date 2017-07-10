@@ -1,0 +1,12 @@
+Input: YWJjCmRlZgpnaGkKamtsCm1ubwpwcXIK
+Chain: -hex:xml:base64
+Output: 6162630a6465660a6768690a6a6b6c0a6d6e6f0a7071720a
+Flags: reverse
+Chain: -base64:identity:url64
+Output: YWJjCmRlZgpnaGkKamtsCm1ubwpwcXIK
+Flags: reverse
+Chain: -uuencode:identity:url64
+Output: 886)C"F1E9@IG:&D*:FML"FUN;PIP<7(*
+ `
+ 
+Flags: reverse

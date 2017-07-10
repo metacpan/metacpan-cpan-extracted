@@ -1,5 +1,5 @@
 package WebService::Braintree::Dispute::TransactionDetails;
-$WebService::Braintree::Dispute::TransactionDetails::VERSION = '0.9';
+$WebService::Braintree::Dispute::TransactionDetails::VERSION = '0.91';
 
 use Moose;
 extends 'WebService::Braintree::ResultObject';

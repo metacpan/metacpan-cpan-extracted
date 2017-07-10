@@ -58,7 +58,7 @@ use Catmandu::Util qw(xml_escape is_different :array :is);
 use List::Util;
 use Moo;
 
-our $VERSION = '1.16';
+our $VERSION = '1.161';
 
 with 'Catmandu::Exporter', 'Catmandu::Exporter::MARC::Base';
 

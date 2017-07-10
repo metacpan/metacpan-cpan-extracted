@@ -21,7 +21,7 @@ method calls. The YAML commands are produced in Lab::Moose::Instrument::Zhinst.
 =cut
 
 package Lab::Moose::Connection::Zhinst;
-$Lab::Moose::Connection::Zhinst::VERSION = '3.552';
+$Lab::Moose::Connection::Zhinst::VERSION = '3.553';
 use 5.010;
 
 use Moose;

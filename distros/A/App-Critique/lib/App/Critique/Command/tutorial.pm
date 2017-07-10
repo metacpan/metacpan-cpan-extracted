@@ -3,7 +3,7 @@ package App::Critique::Command::tutorial;
 use strict;
 use warnings;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use App::Critique -command;
@@ -22,7 +22,7 @@ App::Critique::Command::tutorial - Tutorial about how to use critique
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 DESCRIPTION
 

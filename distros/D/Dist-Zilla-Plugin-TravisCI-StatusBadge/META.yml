@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,11 +22,11 @@ meta-spec:
 name: Dist-Zilla-Plugin-TravisCI-StatusBadge
 no_index:
   directory:
-    - t
-    - xt
+    - corpus
     - eg
     - examples
-    - corpus
+    - t
+    - xt
   namespace:
     - t::lib
   package:
@@ -34,9 +34,9 @@ no_index:
 provides:
   Dist::Zilla::Plugin::TravisCI::StatusBadge:
     file: lib/Dist/Zilla/Plugin/TravisCI/StatusBadge.pm
-    version: '0.006'
+    version: '0.007'
 requires:
-  Dist::Zilla: '0'
+  Dist::Zilla: '6.000'
   Moose: '0'
   Path::Tiny: '0'
   namespace::autoclean: '0'
@@ -47,5 +47,6 @@ resources:
   bugtracker: https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge/issues
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-TravisCI-StatusBadge
   repository: https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge.git
-version: '0.006'
+version: '0.007'
 x_authority: cpan:CHIM
+x_serialization_backend: 'YAML::Tiny version 1.63'

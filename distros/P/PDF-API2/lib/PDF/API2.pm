@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.032'; # VERSION
+our $VERSION = '2.033'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -1107,7 +1107,7 @@ sub page {
     $self->{'pdf'}->out_obj($self->{'pages'});
     if ($index == 0) {
         push @{$self->{'pagestack'}}, $page;
-        weaken $self->{'pagestack'}->[0];
+        weaken $self->{'pagestack'}->[-1];
     }
     elsif ($index < 0) {
         splice @{$self->{'pagestack'}}, $index, 0, $page;

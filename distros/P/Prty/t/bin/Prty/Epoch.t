@@ -43,6 +43,8 @@ sub test_epoch : Test(1) {
 sub test_as : Test(1) {
     my $self = shift;
 
+    $ENV{'TZ'} = 'CET'; # Fix: CPAN Testers
+
     my $str = Prty::Epoch->new(1464342621.73231)->as('YYYY-MM-DD HH:MI:SS');
     $self->is($str,'2016-05-27 11:50:21');
 }

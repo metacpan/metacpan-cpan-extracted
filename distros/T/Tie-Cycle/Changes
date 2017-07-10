@@ -1,5 +1,8 @@
 Revision history for Perl module Tie::Cycle
 
+1.225 2017-07-09T17:49:10Z
+	* Bump the version to reindex (See https://github.com/andk/pause/issues/248 )
+
 1.224 2017-04-18T11:41:22Z
 	* Fix up various dist things and clarify that this is under
 	the Artistic License 2.0.

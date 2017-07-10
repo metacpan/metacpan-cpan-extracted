@@ -1,6 +1,87 @@
-SYNOPSIS
+NAME
+    App::rmhere - Delete files in current directory
 
+VERSION
+    This document describes version 0.08 of App::rmhere (from Perl
+    distribution App-rmhere), released on 2017-07-07.
+
+SYNOPSIS
     See rmhere script.
 
 DESCRIPTION
+FUNCTIONS
+  rmhere
+    Usage:
+
+     rmhere(%args) -> [status, msg, result, meta]
+
+    Delete files in current directory.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   estimate => *bool*
+
+        Count files first before start deleting.
+
+        With this opotion, the program will do an "opendir" and list the
+        directory first. This can take several minutes if the directory is
+        large, so the program will not start deleting after several minutes.
+        But with this option, we know how many files we want to delete, so
+        the progress report will know when to reach 100%.
+
+    *   here => *str*
+
+        Override current directory.
+
+    *   interactive => *bool* (default: 1)
+
+        Whether to ask first before deleting each file.
+
+    *   progress => *bool*
+
+        Show progress report.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-rmhere>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-rmhere>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-rmhere>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

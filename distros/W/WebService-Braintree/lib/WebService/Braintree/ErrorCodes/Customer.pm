@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Customer;
-$WebService::Braintree::ErrorCodes::Customer::VERSION = '0.9';
+$WebService::Braintree::ErrorCodes::Customer::VERSION = '0.91';
 use strict;
 
 use constant CompanyIsTooLong       => "81601";

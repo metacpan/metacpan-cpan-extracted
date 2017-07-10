@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile;
-$Lab::Moose::DataFile::VERSION = '3.552';
+$Lab::Moose::DataFile::VERSION = '3.553';
 use 5.010;
 use warnings;
 use strict;

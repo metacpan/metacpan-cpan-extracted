@@ -1,5 +1,5 @@
 package Lab::Instrument::HP83732A;
-$Lab::Instrument::HP83732A::VERSION = '3.552';
+$Lab::Instrument::HP83732A::VERSION = '3.553';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);

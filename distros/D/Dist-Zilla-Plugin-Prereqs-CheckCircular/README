@@ -1,11 +1,18 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::Prereqs::CheckCircular - Check for
+    circular/recursive dependencies (using local CPAN mirror)
 
+VERSION
+    This document describes version 0.005 of
+    Dist::Zilla::Plugin::Prereqs::CheckCircular (from Perl distribution
+    Dist-Zilla-Plugin-Prereqs-CheckCircular), released on 2017-07-07.
+
+SYNOPSIS
     In dist.ini:
 
      [Prereqs::CheckCircular]
 
 DESCRIPTION
-
     This plugin will check that there is no circular dependency being
     formed. This is done by: collecting all RuntimeRequires prereqs of the
     distribution, then feeding them to App::lcpan to get the recursive
@@ -14,12 +21,35 @@ DESCRIPTION
     build is aborted.
 
 ENVIRONMENT
-
- DZIL_CHECKCIRCULAR_SKIP => bool
-
+  DZIL_CHECKCIRCULAR_SKIP => bool
     Can be set to 1 to skip checking circular dependency.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Prereqs-CheckCircular>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Prereqs-CheckCircul
+    ar>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Pre
+    reqs-CheckCircular>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     App::lcpan, lcpan
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

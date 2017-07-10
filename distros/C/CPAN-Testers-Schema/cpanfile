@@ -31,6 +31,7 @@ on 'test' => sub {
 
 on 'test' => sub {
   recommends "CPAN::Meta" => "2.120900";
+  recommends "Test::mysqld" => "0";
 };
 
 on 'configure' => sub {

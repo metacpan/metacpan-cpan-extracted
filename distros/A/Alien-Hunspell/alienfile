@@ -1,0 +1,42 @@
+use alienfile;
+
+plugin 'PkgConfig' => (
+  pkg_name => 'hunspell',
+);
+ 
+share {
+
+  #requires 'Alien::Build'    => '0.51';
+  requires 'Alien::autoconf' => '0.02';
+  requires 'Alien::automake' => '0.02';
+  requires 'Alien::libtool'  => '0.02';
+  
+  plugin 'Download' => (
+    url => 'https://github.com/hunspell/hunspell/releases',
+    version => qr/^v([0-9\.]+)\.tar\.gz$/,
+  );
+
+  plugin 'Extract' => 'tar.gz';
+  plugin 'Build::Autoconf' => (
+    ffi => 1,
+  );
+
+  my @acflags;
+  unshift @acflags, '--disable-nls' if $^O =~ /^(?:MSWin32|darwin|freebsd)/;
+
+  build [
+    [ 'sh', -c => 'autoreconf -vfi' ],
+    "%{configure} --disable-shared --enable-static @acflags",
+    '%{make}',
+    '%{make} install',
+  ];
+
+  ffi {
+    build [
+      [ 'sh', -c => 'autoreconf -vfi' ],
+      "%{configure} --disable-static --enable-shared --libdir=%{.install.autoconf_prefix}/dynamic @acflags",
+      '%{make}',
+      '%{make} install',
+    ];
+  };
+};

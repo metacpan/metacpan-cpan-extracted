@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Prty::Hash;
 use Scalar::Util ();
@@ -243,7 +243,7 @@ sub extract {
         my ($key,$dashPrefix,$val,$skip);
 
         $key = $argA->[$i];
-        $dashPrefix = $key =~ s/^(-+)//? $1: '';
+        $dashPrefix = defined($key) && $key =~ s/^(-+)//? $1: '';
 
         if ($properties) {
             # Property-Liste: KEY,VAL
@@ -506,7 +506,7 @@ sub extractMulti {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

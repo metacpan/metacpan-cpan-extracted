@@ -1,11 +1,7 @@
-#!/usr/bin/perl -w
-
-#
-# VICP Connection class for Lab::Bus::VICP
-#
-
 package Lab::Connection::VICP;
-$Lab::Connection::VICP::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: VICP ethernet protocol connection
+$Lab::Connection::VICP::VERSION = '3.553';
 use strict;
 use Time::HiRes qw (usleep sleep);
 use Lab::Connection::GPIB;
@@ -78,6 +74,11 @@ sub Query {
 # EnableTermChar, SetTermChar from Lab::Connection::GPIB are sufficient.
 #
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -86,9 +87,13 @@ sub Query {
 
 Lab::Connection::VICP - VICP ethernet protocol connection
 
+=head1 VERSION
+
+version 3.553
+
 =head1 SYNOPSIS
 
-Connection class which uses VICP ethernet protocol backend. 
+Connection class which uses the VICP ethernet protocol backend. 
 The communication is primarily GPIB/IEEE-488 syntax.
 
 This is not called directly. To make a GPIB suppporting instrument use Lab::Connection::VICP, set
@@ -125,7 +130,6 @@ For L<Lab::Bus::VICP>, the generic methods of L<Lab::Connection> suffice, so onl
 
 This just falls back on the methods inherited from L<Lab::Connection>.
 
-
 =head2 config
 
 Provides unified access to the fields in initial @_ to all the child classes.
@@ -135,7 +139,7 @@ Without arguments, returns a reference to the complete $self->Config aka @_ of t
 
  $Config = $connection->Config();
  $ipaddr = $connection->Config()->{'host_addr'};
- 
+
 =head1 CAVEATS/BUGS
 
 Probably few. Mostly because there's not a lot to be done here. Please report.
@@ -150,13 +154,15 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2016       Charles Lane
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

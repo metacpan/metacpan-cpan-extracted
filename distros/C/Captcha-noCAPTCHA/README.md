@@ -85,8 +85,6 @@ The following modules or resources may be of interest.
 
 [HTML::FormHandlerX::Field::noCAPTCHA](https://metacpan.org/pod/HTML::FormHandlerX::Field::noCAPTCHA)
 
-See it in action at [https://www.httpuptime.com](https://www.httpuptime.com)
-
 # AUTHOR
 
 Chuck Larson `<clarson@cpan.org>`
@@ -97,7 +95,7 @@ leejo `<leejo@cpan.org>`
 
 # COPYRIGHT & LICENSE
 
-Copyright 2015, Chuck Larson `<chuck+github@endcapsoftwware.com>`
+Copyright 2017, Chuck Larson `<chuck+github@endcapsoftwware.com>`
 
 This projects work sponsered by End Cap Software, LLC.
 [http://www.endcapsoftware.com](http://www.endcapsoftware.com)

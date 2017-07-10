@@ -25,7 +25,6 @@ lib/Mojolicious/Plugin/Tables/resources/templates/tables/view.html.ep
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-Mojolicious-Plugin-Tables-0.06.tar.gz
 README.md
 t/00basic.t
 t/01template_override.t

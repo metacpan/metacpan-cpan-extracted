@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::RS_FSV;
-$Lab::Moose::Instrument::RS_FSV::VERSION = '3.552';
+$Lab::Moose::Instrument::RS_FSV::VERSION = '3.553';
 use 5.010;
 
 use PDL::Core qw/pdl cat/;

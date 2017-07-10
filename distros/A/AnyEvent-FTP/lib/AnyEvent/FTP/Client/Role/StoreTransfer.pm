@@ -6,16 +6,16 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Store transfer interface for AnyEvent::FTP objects
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 sub xfer
 {
   my($self, $fh, $local) = @_;
-  
+
   my $handle = $self->handle($fh);
-  
+
   return unless defined $local;
-  
+
   $handle->on_drain(sub {
     my $data = $local->();
     if(defined $data)
@@ -32,10 +32,10 @@ sub xfer
 sub convert_local
 {
   my($self, $local) = @_;
-  
+
   return unless defined $local;
   return $local if ref($local) eq 'CODE';
-  
+
   if(ref($local) eq '')
   {
     open my $fh, '<', $local;
@@ -92,7 +92,7 @@ AnyEvent::FTP::Client::Role::StoreTransfer - Store transfer interface for AnyEve
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 
@@ -103,6 +103,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use t::Util;
+use lib 't/lib';
+use Util;
 use Test::More;
 
 my $test = mk_test 'select';

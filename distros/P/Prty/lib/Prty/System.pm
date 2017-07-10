@@ -4,12 +4,14 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
+use Prty::Shell;
 use Prty::FileHandle;
 use Socket ();
 use Sys::Hostname ();
 use 5.010;
+use Prty::Option;
 
 # -----------------------------------------------------------------------------
 
@@ -36,7 +38,8 @@ L<Prty::Object>
 =head4 Description
 
 Liefere die Anzahl der CPUs des Systems. Diese Methode ist nicht
-portabel, sie basiert auf /proc/cpuinfo des Linux-Kernels.
+portabel, sie basiert auf /proc/cpuinfo des Linux-Kernels bzw.
+dem dem Kommando 'sysctl -n hw.ncpu' von FreeBSD.
 
 =cut
 
@@ -45,14 +48,23 @@ portabel, sie basiert auf /proc/cpuinfo des Linux-Kernels.
 sub numberOfCpus {
     my $this = shift;
 
-    my $n = 0;
-    my $fh = Prty::FileHandle->new('<','/proc/cpuinfo');
-    while (<$fh>) {
-        if (/^processor/) {
-            $n++;
+    state $n = 0;
+    if (!$n) {
+        if ($^O eq 'freebsd') {
+            # Fix: CPAN Testers
+            $n = Prty::Shell->exec('sysctl -n hw.ncpu',-capture=>'stdout');
+            chomp $n;
+        }
+        else {
+            my $fh = Prty::FileHandle->new('<','/proc/cpuinfo');
+            while (<$fh>) {
+                if (/^processor/) {
+                    $n++;
+                }
+            }
+            $fh->close;
         }
     }
-    $fh->close;
 
     return $n;
 }
@@ -230,12 +242,31 @@ sub uid {
 
     $path = $class->searchProgram($program);
 
+=head4 Options
+
+=over 4
+
+=item -sloppy => $bool (Default: 0)
+
+Wirf keine Exception, wenn das Programm nicht gefunden wird,
+sondern liefere C<undef>.
+
+=back
+
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub searchProgram {
-    my ($class,$program) = @_;
+    my ($class,$program) = splice @_,0,2;
+
+    my $sloppy = 0;
+
+    if (@_) {
+        Prty::Option->extract(\@_,
+            -sloppy=>\$sloppy,
+        );
+    }
 
     if (substr($program,0,1) eq '/') {
         # Wenn absoluter Pfad, diesen liefern
@@ -252,6 +283,10 @@ sub searchProgram {
 
     # Nicht gefunden
 
+    if ($sloppy) {
+        return undef;
+    }
+
     $class->throw(
         q{PATH-00020: Programm/Skript nicht gefunden},
         Program=>$program,
@@ -263,7 +298,7 @@ sub searchProgram {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ The promotion rules can be summarized as follows:
 
     (Complex, Complex)   -> Complex
 
-For explicit conversions, Math::AnyNum provides the following methods:
+For explicit conversions, Math::AnyNum provides the following functions:
 
     int(x)          # converts x to an integer (NaN if not possible)
     rat(x)          # converts x to a rational (NaN if not possible)
@@ -87,17 +87,19 @@ The following functions are exportable:
     :special
         beta eta gamma lgamma lngamma digamma zeta
         Ai Ei Li Li2 LambertW BesselJ BesselY lgrt
-        pow sqrt cbrt root exp ln log log2 log10 mod
-        abs erf erfc sqr norm hypot agm bernreal harmreal
+        pow sqrt cbrt root exp exp2 exp10 ln log
+        log2 log10 mod abs erf erfc sqr norm hypot
+        agm bernreal harmreal
 
     :ntheory
         factorial dfactorial mfactorial primorial
         binomial lucas fibonacci bernfrac harmfrac
         lcm gcd valuation kronecker remdiv divmod
-        iadd isub imul idiv imod ipow iroot isqrt
-        icbrt ilog ilog2 ilog10 isqrtrem irootrem
-        powmod invmod is_power is_square is_prime
-        next_prime
+        iadd isub imul idiv imod ipow ipow2 ipow10
+        iroot isqrt icbrt ilog ilog2 ilog10 invmod
+        powmod isqrtrem irootrem is_power is_square
+        is_prime is_coprime next_prime rising_factorial
+        falling_factorial
 
     :misc
         rand irand seed iseed floor ceil round sgn neg inv
@@ -358,7 +360,7 @@ Returns an object containing the value C<0>.
 
 =head2 i
 
-    Math::AnyNum->i                               #=> Float
+    Math::AnyNum->i                               #=> Complex
 
 Returns the imaginary unit, which is C<sqrt(-1)>.
 
@@ -402,8 +404,8 @@ Returns the Euler-Mascheroni constant, which is C<0.57721...>.
 
     Math::AnyNum->catalan                         #=> Float
 
-Returns the value of Catalan's constant, also known
-as Beta(2) or G, and starts as: C<0.91596...>.
+Returns the Catalan constant, also known as C<Beta(2)> or C<G>,
+and starts as: C<0.91596...>.
 
 
 =head1 ARITHMETIC OPERATIONS
@@ -516,7 +518,7 @@ Raises C<x> to power C<y> and returns the result.
 
 When both C<x> and C<y> are integers, it does integer exponentiation and returns the exact result.
 
-When only C<y> is an integer, it does rational exponentiation based on the identity: C<(a/b)**n = a**n / b**n>,
+When C<x> is rational and C<y> is an integer, it does rational exponentiation based on the identity: C<(a/b)**n = a**n / b**n>,
 which also computes the exact result.
 
 Otherwise, it does floating-point exponentiation, which is equivalent with C<exp(log(x) * y)>.
@@ -526,6 +528,18 @@ Otherwise, it does floating-point exponentiation, which is equivalent with C<exp
     exp(x)                                        #=> Any
 
 Natural exponentiation of C<x> (i.e.: C<e**x>).
+
+=head2 exp2
+
+    exp2(x)                                       #=> Any
+
+Raises 2 to the power of C<x>. (i.e.: C<2**x>)
+
+=head2 exp10
+
+    exp10(x)                                      #=> Any
+
+Raises 10 to the power of C<x>. (i.e.: C<10**x>)
 
 =head2 ln / log
 
@@ -542,13 +556,13 @@ B<NOTE:> C<log(x, y)> is equivalent with C<log(x) / log(y)>.
     log2(x)                                       #=> Any
     log10(x)                                      #=> Any
 
-Logarithm of C<x> to base 2 or base 10, respectively.
+Logarithm of C<x> to base 2 and base 10, respectively.
 
 =head2 lgrt
 
     lgrt(x)                                       #=> Any
 
-Logarithmic-root of C<x>, which is the largest solution to C<a**a = b>, where C<b> is known.
+Logarithmic-root of C<x>, which is the solution to C<a**a = x>, where C<x> is known.
 When the value of C<x> is less than C<e**(-1/e)>, it returns a complex number. It also accepts complex numbers as input.
 
 Example:
@@ -630,14 +644,12 @@ The Gamma function on C<x>. Returns Inf when C<x> is zero, and NaN when C<x> is 
     lgamma(x)                                     #=> Float | Inf | NaN
 
 The logarithm of the absolute value of the Gamma function.
-Returns Inf when C<x> is negative or equal to zero.
 
 =head2 lngamma
 
-    lngamma(x)                                    #=> Float | Inf
+    lngamma(x)                                    #=> Float | Inf | NaN
 
 The natural logarithm of the Gamma function on C<x>.
-Returns Inf when C<x> is negative or equal to zero.
 
 =head2 digamma
 
@@ -826,6 +838,20 @@ All operations in this section are done with integers.
 
 Integer addition, subtraction, multiplication, division and exponentiation.
 
+=head2 ipow2
+
+    ipow2(n)                                      #=> Int
+
+Raises C<2> to the power C<n>, by first truncating C<n> to an integer.
+Returns C<0> when C<n> is negative.
+
+=head2 ipow10
+
+    ipow10(n)                                     #=> Int
+
+Raises C<10> to the power C<n>, by first truncating C<n> to an integer.
+Returns C<0> when C<n> is negative.
+
 =head2 imod
 
     imod(x, y)                                    #=> Int | NaN
@@ -841,7 +867,7 @@ where both are integers. When C<y> is zero, it returns two NaN values.
 
 =head2 invmod
 
-    invmod(x, y)
+    invmod(x, y)                                  #=> Int | NaN
 
 Computes the inverse of C<x> modulo C<y> and returns the result.
 When no inverse exists, the NaN value is returned.
@@ -934,7 +960,7 @@ Removes all occurrences of the factor C<k> from integer C<n>.
 
 In general, the following statement holds true:
 
-    remdiv(n, k) == n / k**valuation(n, k)
+    remdiv(n, k) == n / k**(valuation(n, k))
 
 =head2 kronecker
 
@@ -975,7 +1001,27 @@ Example:
 
     mfactorial(n, m)                              #=> Int | NaN
 
-Generalized m-factorial of C<n>. Returns NaN when C<n> is negative. (requires GMP>=5.1.0)
+Generalized m-factorial of C<n>. Returns NaN when C<n> or C<m> is negative. (requires GMP>=5.1.0)
+
+=head2 rising_factorial
+
+    rising_factorial(n, k)                        #=> Int | NaN
+
+Rising factorial, C<n * (n + 1) * ... * (n + k - 1)>, defined as:
+
+    binomial(n + k - 1, k) * k!
+
+Returns NaN for negative values of C<k>.
+
+=head2 falling_factorial
+
+    falling_factorial(n, k)                       #=> Int | NaN
+
+Falling factorial, C<n * (n - 1) * ... * (n - k + 1)>, defined as:
+
+    binomial(n, k) * k!
+
+Returns NaN for negative values of C<k>.
 
 =head2 binomial
 
@@ -1127,8 +1173,8 @@ otherwise returns an integer between C<0> (inclusive) and C<x> (inclusive).
 
 If C<x> is greater that C<y>, the returned result will be in the range C<[y, x]>.
 
-The PRNG behind this method is called the "Mersenne Twister".
-Although it generates high-quality pseudorandom integers, it is B<NOT> cryptographically secure!
+The PRNG behind this function is called the "Mersenne Twister". Although it generates high-quality pseudorandom
+integers, it is B<NOT> cryptographically secure!
 
 Example:
 

@@ -11,10 +11,10 @@ use warnings;
 
 use lib qw(../lib);
 use Memoize qw(memoize);
+use experimental qw(signatures);
 use Math::AnyNum qw(:overload pi);
 
-sub bernoulli_number {
-    my ($n) = @_;
+sub bernoulli_number($n) {
 
     return 0 if $n > 1 && $n % 2;    # Bn = 0 for all odd n > 1
 
@@ -30,15 +30,14 @@ sub bernoulli_number {
     return $A[0];                    # which is Bn
 }
 
-sub factorial {
-    $_[0] < 2 ? 1 : factorial($_[0] - 1) * $_[0];
+sub factorial($n) {
+    $n < 2 ? 1 : factorial($n - 1) * $n;
 }
 
 memoize('factorial');
 
-sub zeta_2n {
-    my ($n2) = 2 * $_[0];
-    ((-1)**($_[0] + 1) * 2**($n2 - 1) * pi**$n2 * bernoulli_number($n2)) / factorial($n2);
+sub zeta_2n($n) {
+    (-1)**($n + 1) * (1 << (2 * $n - 1)) * bernoulli_number(2 * $n) / factorial(2 * $n) * pi**(2 * $n);
 }
 
 for my $i (1 .. 10) {

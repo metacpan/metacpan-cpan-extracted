@@ -1,5 +1,7 @@
 package Lab::Instrument;
-$Lab::Instrument::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: Instrument base class
+$Lab::Instrument::VERSION = '3.553';
 use strict;
 use warnings;
 
@@ -1302,6 +1304,11 @@ sub function_list_index {
 #
 #
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -1309,6 +1316,10 @@ sub function_list_index {
 =head1 NAME
 
 Lab::Instrument - Instrument base class
+
+=head1 VERSION
+
+version 3.553
 
 =head1 SYNOPSIS
 
@@ -1337,15 +1348,12 @@ connection parameter "ignore_twins => 1" to force the creation of a new bus
 object, but this is discouraged - it will kill bus management and you might run
 into hardware/resource sharing issues.
 
-
-
 =head1 DESCRIPTION
 
 C<Lab::Instrument> is the base class for Instruments. It doesn't do much by
 itself, but is meant to be inherited in specific instrument drivers. It provides
 general C<read>, C<write> and C<query> methods and basic connection handling
 (internally, C<_set_connection>, C<_check_connection>).
-
 
 =head1 CONSTRUCTOR
 
@@ -1363,13 +1371,13 @@ child class constructor.
 =head2 write
 
  $instrument->write($command <, {optional hashref/hash}> );
- 
+
 Sends the command C<$command> to the instrument. An option hash can be supplied
 as second or also as only argument. Generally, all options are passed to the
 connection/bus, so additional named options may be supported based on the
 connection and bus and can be passed as a hashref or hash. See
 L<Lab::Connection>.
- 
+
 Optional named parameters for hash:
 
  error_check => 1/0
@@ -1419,7 +1427,7 @@ available) from the device.
 
 	$status = $instrument->get_status();
 	if( $instrument->get_status('ERROR') ) {...}
-	
+
 Method stub to be overwritten. This returns the status reported by the device
 (e.g. the status byte retrieved via serial poll from GPIB devices). When
 implementing, use only information which can be retrieved very fast from the
@@ -1437,7 +1445,6 @@ If present, the first argument is interpreted as a key and the corresponding
 value of the hash above is returned directly.
 
 The 'ERROR'-key has to be implemented in every device driver!
-
 
 =head2 check_errors
 
@@ -1458,7 +1465,7 @@ errors and throws a Lab::Exception::DeviceError. The list of errors, the device
 class and the last issued command(s) (if the script provided them) are enclosed.
 
 =head2 _check_args
- 
+
 Parse the arguments given to a method. The typical use is like this:
 
  sub my_method () {
@@ -1530,18 +1537,22 @@ Probably many, with all the porting. This will get better.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2004-2006 Daniel Schröer <schroeer@cpan.org>, 
-           2009-2010 Daniel Schröer, Andreas K. Hüttel (L<http://www.akhuettel.de/>) and David Kalok,
-           2010      Matthias Völker <mvoelker@cpan.org>
-           2011      Florian Olbrich, Andreas K. Hüttel
-	   2012      Andreas K. Hüttel
-	   2013      Stefan Geissler, Christian Butschkow, Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2005-2006  Daniel Schroeer
+            2009       Andreas K. Huettel
+            2010       Andreas K. Huettel, Daniel Schroeer, Florian Olbrich, Matthias Voelker
+            2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Florian Olbrich, Stefan Geissler
+            2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Alexei Iankilevitch, Christian Butschkow
+            2016       Charles Lane, Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

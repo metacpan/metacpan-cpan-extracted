@@ -28,7 +28,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -794,7 +794,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.60
+version 0.61
 
 =head1 SYNOPSIS
 

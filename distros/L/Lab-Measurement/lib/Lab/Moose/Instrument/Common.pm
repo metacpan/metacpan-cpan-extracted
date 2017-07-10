@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::Common;
-$Lab::Moose::Instrument::Common::VERSION = '3.552';
+$Lab::Moose::Instrument::Common::VERSION = '3.553';
 use Moose::Role;
 use MooseX::Params::Validate;
 

@@ -1,13 +1,14 @@
-#!/usr/bin/perl -w
-
+package Lab::Connection::LinuxGPIB;
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: LinuxGPIB connection
+$Lab::Connection::LinuxGPIB::VERSION = '3.553';
 #
 # GPIB Connection class for Lab::Bus::LinuxGPIB
 #
-
+#
 # TODO: Access to GPIB attributes, device clear, ...
+#
 
-package Lab::Connection::LinuxGPIB;
-$Lab::Connection::LinuxGPIB::VERSION = '3.552';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -84,6 +85,11 @@ sub Query {
 # EnableTermChar, SetTermChar from Lab::Connection::GPIB are sufficient.
 #
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -91,6 +97,10 @@ sub Query {
 =head1 NAME
 
 Lab::Connection::LinuxGPIB - LinuxGPIB connection
+
+=head1 VERSION
+
+version 3.553
 
 =head1 SYNOPSIS
 
@@ -129,7 +139,6 @@ For L<Lab::Bus::LinuxGPIB>, the generic methods of L<Lab::Connection> suffice, s
 
 This just falls back on the methods inherited from L<Lab::Connection>.
 
-
 =head2 config
 
 Provides unified access to the fields in initial @_ to all the child classes.
@@ -141,7 +150,7 @@ Without arguments, returns a reference to the complete $self->Config aka @_ of t
 
  $Config = $connection->Config();
  $GPIB_Address = $connection->Config()->{'gpib_address'};
- 
+
 =head1 CAVEATS/BUGS
 
 Probably few. Mostly because there's not a lot to be done here. Please report.
@@ -156,13 +165,17 @@ Probably few. Mostly because there's not a lot to be done here. Please report.
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2011      Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Florian Olbrich
+            2016       Simon Reinhardt
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

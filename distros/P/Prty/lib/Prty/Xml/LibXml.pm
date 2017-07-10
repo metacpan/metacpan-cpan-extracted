@@ -4,10 +4,9 @@ use base qw/XML::LibXML/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Encode ();
-use Prty::Perl;
 
 # -----------------------------------------------------------------------------
 
@@ -29,14 +28,6 @@ um zusätzliche Funktionalität.
 =head1 METHODS
 
 =head2 Erweiterung XML::LibXML::Document
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-package XML::LibXML::Document;
-
-# -----------------------------------------------------------------------------
 
 =head3 toFormattedString() - Formatiertes XML
 
@@ -73,7 +64,7 @@ Formatiertes XML (UTF-8 encoded String)
 
 # -----------------------------------------------------------------------------
 
-sub toFormattedString {
+*XML::LibXML::Document::toFormattedString = sub {
     my $self = shift;
 
     # Entferne alle leeren Text-Knoten
@@ -85,19 +76,11 @@ sub toFormattedString {
     }
 
     return Encode::decode('utf-8',$self->toString(1));
-}
+};
 
 # -----------------------------------------------------------------------------
 
 =head2 Erweiterung XML::LibXML::Node
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-package XML::LibXML::Node;
-
-# -----------------------------------------------------------------------------
 
 =head3 removeNode() - Entferne Knoten
 
@@ -121,13 +104,13 @@ nichts
 
 # -----------------------------------------------------------------------------
 
-Prty::Perl->createAlias(removeNode=>\&unbindNode);
+*XML::LibXML::Node::removeNode = *XML::LibXML::Node::unbindNode;
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

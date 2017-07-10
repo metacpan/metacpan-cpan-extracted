@@ -8,7 +8,6 @@ Makefile.PL
 README
 README.pod
 dist.ini
-forward
 lib/Catalyst/Helper/Model/DBIC/Schema/ForRapidDbic.pm
 lib/Catalyst/Model/RapidApp/CoreSchema.pm
 lib/Catalyst/Plugin/RapidApp.pm

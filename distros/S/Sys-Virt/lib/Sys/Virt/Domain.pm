@@ -3582,6 +3582,10 @@ Limit copy to top of source backing chain
 
 Reuse existing external file for copy
 
+=item Sys::Virt::Domain::BLOCK_COPY_TRANSIENT_JOB
+
+Don't force usage of recoverable job for the copy operation
+
 =back
 
 =head2 DOMAIN BLOCK JOB ABORT CONSTANTS

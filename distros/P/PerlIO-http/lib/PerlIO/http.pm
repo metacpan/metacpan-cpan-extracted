@@ -1,7 +1,5 @@
 package PerlIO::http;
-{
-  $PerlIO::http::VERSION = '0.002';
-}
+$PerlIO::http::VERSION = '0.003';
 use strict;
 use warnings;
 
@@ -13,9 +11,11 @@ XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION);
 
 #ABSTRACT: HTTP filehandles
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ PerlIO::http - HTTP filehandles
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -32,8 +32,6 @@ version 0.002
 =head1 DESCRIPTION
 
 This layer enables one to read a file from the internet.
-
-=encoding utf8
 
 =head1 SYNTAX
 
@@ -73,4 +71,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -3,7 +3,7 @@ package Net::ZooIt;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 use Sys::Hostname qw(hostname);
 use Carp qw(croak);
@@ -49,18 +49,32 @@ sub zwarn { logger ZOOIT_WARN, @_ }
 sub zinfo { logger ZOOIT_INFO, @_ }
 sub zdebug { logger ZOOIT_DEBUG, @_ }
 
-sub zerr2txt {
-    my $err = shift;
-    our %code2name;
-    unless (%code2name) {
-        foreach my $name (@{$Net::ZooKeeper::EXPORT_TAGS{errors}}) {
-            no strict "refs";
-            my $code = &$name;
-            use strict "refs";
-            $code2name{$code} = $name;
+sub z2txt {
+    my ($type, $val) = @_;
+    our %tv2txt;
+    unless (%tv2txt) {
+        foreach my $t (qw(errors events node_flags states)) {
+            foreach my $name (@{$Net::ZooKeeper::EXPORT_TAGS{$t}}) {
+                no strict "refs";
+                my $code = &$name();
+                use strict "refs";
+                defined $code and $tv2txt{$t}->{$code} = $name;
+            }
         }
     }
-    return $code2name{$err};
+    my $t = {qw(
+        err errors error errors
+        ev events event events
+        st states state states
+        node node_flags flag node_flags
+    )}->{$type} // $type;
+    $tv2txt{$t} or zerr "z2txt: unknown type $type" and return;
+    my $txt = $tv2txt{$t}->{$val} or return;
+    return $txt;
+}
+
+sub zerr2txt {
+    return z2txt 'errors', shift;
 }
 
 # Generate and split sequential znode names
@@ -132,7 +146,12 @@ sub new_lock {
         $dt //= 60;
         $dt *= 1000;
         my $w = $p{zk}->watch(timeout => $dt);
-        $w->wait if $p{zk}->exists("$p{path}/$lock_prev", watch => $w);
+        if ($p{zk}->exists("$p{path}/$lock_prev", watch => $w)) {
+            zinfo "Wait for delete $p{path}/$lock_prev";
+            $w->wait;
+            my $event = z2txt('ev', $w->{event}) // 'timeout';
+            zinfo "Wait for delete $p{path}/$lock_prev over: $event";
+        }
     }
 }
 
@@ -200,7 +219,12 @@ sub get_queue {
             $dt //= 60;
             $dt *= 1000;
             my $w = $self->{zk}->watch(timeout => $dt);
-            $w->wait unless $self->{zk}->get_children("$self->{queue}", watch => $w);
+            unless ($self->{zk}->get_children("$self->{queue}", watch => $w)) {
+                zinfo "Wait for children in $self->{queue}";
+                $w->wait;
+                my $event = z2txt('ev', $w->{event}) // 'timeout';
+                zinfo "Wait for children in $self->{queue} over: $event";
+            }
             next;
         }
         # Get data, attempt to delete znode with lowest seq number

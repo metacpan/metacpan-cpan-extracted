@@ -2,7 +2,7 @@ package Test2::Event::Output;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 use Carp qw/croak/;
 

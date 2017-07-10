@@ -30,12 +30,11 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "POSIX" => 0,
     "Path::Tiny" => "0.018",
-    "Socket" => 0,
     "Test::More" => "0.88",
     "Test::Warn" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.26",
+  "VERSION" => "1.27",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -51,7 +50,6 @@ my %FallbackPrereqs = (
   "POSIX" => 0,
   "Params::Validate" => 0,
   "Path::Tiny" => "0.018",
-  "Socket" => 0,
   "Test::More" => "0.88",
   "Test::Warn" => 0,
   "base" => 0,

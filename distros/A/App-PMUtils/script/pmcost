@@ -1,0 +1,332 @@
+#!perl
+
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.70'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use Log::ger;
+
+use App::PMUtils;
+use Perinci::CmdLine::Any;
+
+our %SPEC;
+$SPEC{pmcost} = {
+    v => 1.1,
+    summary => 'Load Perl module with Devel::EndStats',
+    description => <<'_',
+
+
+
+_
+    args => {
+        module => $App::PMUtils::arg_module_multiple,
+        hide_core => {
+            schema => 'bool',
+        },
+        sort => {
+            schema => ['str*', in=>[map {($_,"-$_")}
+                                        qw/file time caller order lines/]],
+        },
+        hide_noncore => {
+            schema => 'bool',
+        },
+        show_memsize => {
+            schema => 'bool',
+        },
+    },
+    examples => [
+        {test=>0, 'x.doc.show_result'=>0, src=>"pmcost Perinci::CmdLine", src_plang=>"bash"},
+        {test=>0, 'x.doc.show_result'=>0, src=>"pmcost if=1,Perinci::CmdLine", src_plang=>"bash"},
+    ],
+};
+sub pmcost {
+    my %args = @_;
+    my $mods = $args{module};
+
+    my $de_import = "verbose,1";
+    $de_import .= ",hide_core,1" if $args{hide_core};
+    $de_import .= ",hide_noncore,1" if $args{hide_noncore};
+    $de_import .= ",show_memsize,1,sort,-memsize" if $args{show_memsize};
+    $de_import .= ",sort,$args{sort}" if $args{sort};
+    my @cmd = ($^X, "-MDevel::EndStats=$de_import");
+
+    for my $mod (@$mods) {
+        $mod =~ s!/!::!g;
+        push @cmd, "-M$mod";
+    }
+
+    push @cmd, "-e1";
+
+    log_trace("exec(%s)", \@cmd);
+    exec @cmd;
+    # [200]; # won't get reached
+}
+
+Perinci::CmdLine::Any->new(
+    url => '/main/pmcost',
+)->run;
+
+# ABSTRACT: Load Perl module with Devel::EndStats
+# PODNAME: pmcost
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pmcost - Load Perl module with Devel::EndStats
+
+=head1 VERSION
+
+This document describes version 0.70 of pmcost (from Perl distribution App-PMUtils), released on 2017-07-08.
+
+=head1 SYNOPSIS
+
+ % pmcost HTTP::Tiny
+
+ # Start stats from Devel::EndStats:
+ # Program runtime duration: 0.011s
+ # Total number of required files loaded: 13
+ # Total number of required lines loaded: 6789
+ # Seq  Lines  Load Time         Module
+ #  11     54     0.128ms(  1%)    SelectSaver.pm (loaded by IO::Handle)
+ #  13     68     0.488ms(  4%)    IO.pm (loaded by IO::Handle)
+ #   4    100     0.091ms(  0%)    bytes.pm (loaded by HTTP::Tiny)
+ #  17    143     0.387ms(  3%)    IO/Socket/UNIX.pm (loaded by IO::Socket)
+ #   9    170     0.306ms(  2%)    Symbol.pm (loaded by IO::Handle)
+ #   5    283     0.368ms(  3%)    Errno.pm (loaded by HTTP::Tiny::Handle)
+ #  14    355     0.226ms(  2%)    XSLoader.pm (loaded by IO)
+ #  16    466     1.182ms( 10%)    IO/Socket/INET.pm (loaded by IO::Socket)
+ #   6    569     5.831ms( 53%)    IO/Socket.pm (loaded by HTTP::Tiny::Handle)
+ #   7    653     1.912ms( 17%)    IO/Handle.pm (loaded by IO::Socket)
+ #   2    709     1.035ms(  9%)    Carp.pm (loaded by HTTP::Tiny)
+ #  15   1114     1.328ms( 12%)    Socket.pm (loaded by IO::Socket)
+ #   1   2105    10.889ms( 99%)    HTTP/Tiny.pm (loaded by main)
+ # End of stats
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--hide-core>
+
+=item B<--hide-noncore>
+
+=item B<--module-json>=I<s>
+
+See C<--module>.
+
+=item B<--module>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--show-memsize>
+
+=item B<--sort>=I<s>
+
+Valid values:
+
+ ["file","-file","time","-time","caller","-caller","order","-order","lines","-lines"]
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C pmcost pmcost
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete pmcost 'p/*/`pmcost`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/pmcost.conf>, F<~/pmcost.conf>, or F</etc/pmcost.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ format (see --format)
+ hide_core (see --hide-core)
+ hide_noncore (see --hide-noncore)
+ module (see --module)
+ naked_res (see --naked-res)
+ show_memsize (see --show-memsize)
+ sort (see --sort)
+
+=head1 ENVIRONMENT
+
+=head2 PMCOST_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/pmcost.conf>
+
+F<~/pmcost.conf>
+
+F</etc/pmcost.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PMUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PMUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<plcost> (from L<App::PlUtils> distribution)
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

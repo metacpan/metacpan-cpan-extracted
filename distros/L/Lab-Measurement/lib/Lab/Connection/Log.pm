@@ -1,5 +1,5 @@
 package Lab::Connection::Log;
-$Lab::Connection::Log::VERSION = '3.552';
+$Lab::Connection::Log::VERSION = '3.553';
 use 5.010;
 use warnings;
 use strict;

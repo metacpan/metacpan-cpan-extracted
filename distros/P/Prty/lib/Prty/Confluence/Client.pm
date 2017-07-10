@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use LWP::UserAgent ();
 use Prty::Option;
@@ -117,14 +117,17 @@ sub new {
 
 =head4 Synopsis
 
-    $cli->createPage($parentId,$title,$markup,@opts);
+    $pag = $cli->createPage($parentId,$title,$markup,@opts);
 
 =head4 Description
 
 Erzeuge eine Confluence-Seite mit Titel $title und Inhalt $markup
 (= Wiki Code) als Unterseite von der Seite mit der Seiten-Id
-$parentId. Die erzeugte Seite wird (notwendigerweise) demselben
-Space wie die übergeordnete Seite zugeordnet.
+$parentId und liefere das Seiten-Objekt der der erzeugten Seite
+zurück.
+
+Die erzeugte Seite ist (notwendigerweise) demselben Space wie die
+übergeordnete Seite zugeordnet.
 
 =head4 Arguments
 
@@ -189,7 +192,7 @@ sub createPage {
 
     my $pag = $self->getPage($parentId);
 
-    $self->send(
+    my $res = $self->send(
         POST => "rest/api/content",
         'application/json',
         JSON::encode_json({
@@ -212,7 +215,15 @@ sub createPage {
         })
     );
 
-    return;
+    # Instantiiere Seiten-Objekt der erzeugten Seite und liefere
+    # dieses zurück
+
+    $pag = Prty::Confluence::Page->new($res->content);
+    if ($self->verbose) {
+        warn sprintf "---RESULT---\n%s\n",$pag->asString;
+    }
+
+    return $pag;
 }
 
 # -----------------------------------------------------------------------------
@@ -584,7 +595,7 @@ sub url {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

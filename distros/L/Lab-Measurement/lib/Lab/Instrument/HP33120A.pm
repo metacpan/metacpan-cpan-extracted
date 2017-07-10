@@ -1,5 +1,5 @@
 package Lab::Instrument::HP33120A;
-$Lab::Instrument::HP33120A::VERSION = '3.552';
+$Lab::Instrument::HP33120A::VERSION = '3.553';
 use 5.006;
 use strict;
 use warnings;

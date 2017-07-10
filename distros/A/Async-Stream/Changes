@@ -9,3 +9,9 @@ Revision history for Async-Stream
 0.04    24.06.17
         Fix for bug with several request to same item
 
+0.05    07.07.17
+        rename public method sort -> arrange, cut_sort -> cut_arrange, each -> for_each
+        add posobility to make streams with prefetching.
+0.06    09.07.17
+        Adding possibility to merge and branch streams
+

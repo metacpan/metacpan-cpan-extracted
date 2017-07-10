@@ -1,5 +1,5 @@
 package WebService::Braintree::ErrorCodes::Subscription;
-$WebService::Braintree::ErrorCodes::Subscription::VERSION = '0.9';
+$WebService::Braintree::ErrorCodes::Subscription::VERSION = '0.91';
 use strict;
 
 use constant BillingDayOfMonthCannotBeUpdated                   => "91918";

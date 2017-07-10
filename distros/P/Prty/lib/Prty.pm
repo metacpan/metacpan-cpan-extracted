@@ -3,7 +3,7 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 =encoding utf8
 
@@ -632,13 +632,13 @@ L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =back
 
-=head1 INSTALL
+=head1 INSTALLATION
 
             $ cpanm Prty
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

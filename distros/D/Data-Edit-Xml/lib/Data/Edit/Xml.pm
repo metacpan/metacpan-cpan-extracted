@@ -12,7 +12,7 @@ use Carp;
 use XML::Parser;                                                                # https://metacpan.org/pod/XML::Parser
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Table::Text qw(:all);
-our $VERSION = 2017.631;
+our $VERSION = 2017.704;
 
 # Static initialization
 my $userParametersTable = <<END;                                                # Parameters that the user can set
@@ -390,12 +390,37 @@ sub c($$$)                                                                      
   $c ? (wantarray ? @$c : $c) : (wantarray ? () : [])                           # Contents if there are any either as an array or an array reference
  }
 
-sub nc($@)                                                                      # Check that a tag does not contain any of the specified sub tags at the next level
- {my ($node, @keys) = @_;                                                       # Node, possible tags immediately under the node
-  for(@keys)
-   {return 0 if $node->indexes->{$_};                                           # False - one of the tags has been found
+sub present($@)                                                                 # Count the number of the specified tag types present immediately under a node
+ {my ($node, @names) = @_;                                                      # Node, possible tags immediately under the node
+  my %i = %{$node->indexes};                                                    # Index of child nodes
+  grep {$i{$_}} @names                                                          # Count of tag types present
+ }
+
+sub count($@)                                                                   # Count the number of instances of the specified tags under the specified node, either by tag in array context or in total in scalar context
+ {my ($node, @names) = @_;                                                      # Node, possible tags immediately under the node
+  if (wantarray)                                                                # In array context return the count for each tag specified
+   {my @c;                                                                      # Count for the corresponding tag
+    my %i = %{$node->indexes};                                                  # Index of child nodes
+    for(@names)
+     {if (my $i = $i{$_}) {push @c, scalar(@$i)} else {push @c, 0};             # Save corresponding count
+     }
+    return @c;                                                                  # Return count for each tag specified
    }
-  1                                                                             # True - none of the specified tags were found
+  else                                                                          # In scalar context count the total number of instances of the named tags
+   {if (@names)
+     {my $c = 0;                                                                # Tag count
+      my %i = %{$node->indexes};                                                # Index of child nodes
+      for(@names)
+       {if (my $i = $i{$_}) {$c += scalar(@$i)}
+       }
+      return $c;
+     }
+    else                                                                        # In scalar context, with no tags specified, return the number of nodes under the current node
+     {my @c = $node->contents;
+      return scalar(@c);                                                        # Count of all tags including CDATA
+     }
+   }
+  confess "This should not happen"
  }
 
 sub first($)                                                                    # Get the first node below this node
@@ -403,14 +428,35 @@ sub first($)                                                                    
   $node->content->[0]
  }
 
-sub firstOf($@)                                                                 # The tags for the nodes under this node for which we want the first elements
+sub blankText($)                                                                # Confirm that this is a blank text node
+ {my ($node) = @_;                                                              # Node
+  $node->isText and $node->text =~ m(\A\s*\Z)s                                     # Text and blank
+ }
+
+sub firstNotBlank($)                                                            # Get the first node below this node which is not blank text
+ {my ($node) = @_;                                                              # Node
+  for($node->contents)                                                          # Possibilities
+   {return $_ if !$_->blankText;                                                # Not blank text
+   }
+  undef                                                                         # No such node
+ }
+
+sub firstOf($@)                                                                 # Find the first instance of each of the specified tags under the specified node
  {my ($node, @names) = @_;                                                      # Node, tags to find the first instance of
-  map {$node->indexes->{$_}->[0]} @names;                                       # Find first tag with the specified name or undef
+  map {$node->indexes->{$_}->[0]} @names;                                       # Find first tag with the specified name or undef if no such
  }
 
 sub last($)                                                                     # Get the last node below this node
  {my ($node) = @_;                                                              # Node
   $node->content->[-1]
+ }
+
+sub lastNotBlank($)                                                             # Get the last node below this node which is not blank text
+ {my ($node) = @_;                                                              # Node
+  for(reverse $node->contents)                                                  # Possibilities
+   {return $_ if !$_->blankText;                                                # Not blank text
+   }
+  undef                                                                         # No such node
  }
 
 sub isFirst($)                                                                  # Is this node first under its parent?
@@ -448,6 +494,14 @@ sub next($)                                                                     
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
  }
 
+sub nextNotBlank($)                                                             # Get the next node following this node which is not blank text
+ {my ($node) = @_;                                                              # Node
+  for(my $n = $node->next; $n; $n = $n->next)                                   # Possibilities
+   {return $n if !$n->blankText;                                                # Not blank text
+   }
+  undef                                                                         # No such node
+ }
+
 sub prev($)                                                                     # Get the node previous to the current node
  {my ($node) = @_;                                                              # Node
   return undef if $node->isFirst;                                               # No node precedes the first node at a level or the top most node
@@ -457,6 +511,14 @@ sub prev($)                                                                     
     return pop @c if $c == $node                                                # Previous node if this is the current node
    }
   confess "Node not found in parent";                                           # Something wrong with parent/child relationship
+ }
+
+sub prevNotBlank($)                                                             # Get the previous node preceding this node which is not blank text
+ {my ($node) = @_;                                                              # Node
+  for(my $p = $node->prev; $p; $p = $p->prev)                                   # Possibilities
+   {return $p if !$p->blankText;                                                # Not blank text
+   }
+  undef                                                                         # No such node
  }
 
 sub by($$;@)                                                                    # Post-order traversal of a parse tree or sub tree
@@ -562,7 +624,7 @@ sub deleteAttr($$;$)                                                            
   $node
  }
 
-sub deleteAttrs($@)            ## needs test                                                 # Delete any attributes mentioned in a list without checking their values
+sub deleteAttrs($@)                                                             # Delete any attributes mentioned in a list without checking their values
  {my ($node, @attrs) = @_;                                                      # Node, attribute name, optional attribute value to check first
   my $a = $node->attributes;                                                    # Attributes hash
   delete $a->{$_} for @attrs;
@@ -665,9 +727,15 @@ sub replaceWith($$)                                                             
      {splice(@$c, $i, 1, $new);                                                 # Replace old node with new node
       $parent->indexNode;                                                       # Rebuild indices for parent
      }
+    $parent->indexNode;                                                         # Rebuild indices for parent
    }
   $old->parent = undef;                                                         # Cut out node
-  [$old, $new]                                                                  # Return [old node - which will still refer to its content and be a parse tree in its own right, new node]
+  $new                                                                          # Return new node
+ }
+
+sub replaceWithText($$)                                                         # Replace a node (and all its content) with a new text node
+ {my ($old, $text) = @_;                                                        # Old node, text of new node
+  $old->replaceWith($old->newText($text))                                       # Create a new text node, replace the old node and return the result
  }
 
 #2 Cut and Put                                                                  # Move nodes around in the parse tree
@@ -725,22 +793,28 @@ sub putLast($$)                                                                 
   $new                                                                          # Return the new node
  }
 
-sub putFirstAsText($$)                                                          ## Add a text node first under a parent
- {my ($parent, $parse) = @_;                                                    # The parent node, the string to be added which might contain unparsed xml as well as text
-  my $node = bless {};                                                          # New node
-  $node->tag = cdata;                                                           # Text node
-  $node->text = $parse;                                                         # Save text
-  unshift @{$parent->content}, $node;                                           # Add new node to parent
-  $parent                                                                       # Return parent
+sub putFirstAsText($$)                                                          # Add a text node first under a parent
+ {my ($node, $text) = @_;                                                       # The parent node, the string to be added which might contain unparsed xml as well as text
+  $node->putFirst($node->newText($text));                                       # Add new text node
+  $node                                                                         # Return parent node
  }
 
-sub putLastAsText($$)                                                           ## Add a text node last under a parent
- {my ($parent, $parse) = @_;                                                    # The parent node, the string to be added which might contain unparsed xml as well as text
-  my $node = bless {};                                                          # New node
-  $node->tag = cdata;                                                           # Text node
-  $node->text = $parse;                                                         # Save text
-  push @{$parent->content}, $node;                                              # Add new node to parent
-  $parent                                                                       # Return parent
+sub putLastAsText($$)                                                           # Add a text node last under a parent
+ {my ($node, $text) = @_;                                                       # The parent node, the string to be added which might contain unparsed xml as well as text
+  $node->putLast($node->newText($text));                                        # Add new text node
+  $node                                                                         # Return parent node
+ }
+
+sub putNextAsText($$)                                                           # Add a text node following this node
+ {my ($node, $text) = @_;                                                       # The parent node, the string to be added which might contain unparsed xml as well as text
+  $node->putNext($node->newText($text));                                        # Add new text node
+  $node                                                                         # Return parent node
+ }
+
+sub putPrevAsText($$)                                                           # Add a text node following this node
+ {my ($node, $text) = @_;                                                       # The parent node, the string to be added which might contain unparsed xml as well as text
+  $node->putPrev($node->newText($text));                                        # Add new text node
+  $node                                                                         # Return parent node
  }
 
 # Examples
@@ -1059,6 +1133,29 @@ Get all the nodes with the tag of the specified name below the current node
   2  $tag       tag
   3  $position
 
+=head3 present($node, @tags)
+
+Count the number of the specified tag types present immediately under a node
+
+     Parameter  Description
+  1  $node      Node
+  2  @tags      Tags to find
+
+=head3 count($node, @tags)
+
+Count the number of instances of the specified tags under the specified node, either by tag in array context or in total in scalar context
+
+     Parameter  Description
+  1  $node      Node
+  2  @tags      Tags to find
+
+=head3 blankText($node)
+
+Confirm that this is a blank text node
+
+     Parameter  Description
+  1  $node      Node
+
 =head3 first($node)
 
 Get the first node below this node
@@ -1066,9 +1163,16 @@ Get the first node below this node
      Parameter  Description
   1  $node      Node
 
+=head3 firstNotBlank($node)
+
+Get the first node below this node which is not blank text
+
+     Parameter  Description
+  1  $node      Node
+
 =head3 firstOf($node, @tags)
 
-Get the first node below this node
+Find the first instance of each of the specified tags under the specified node
 
      Parameter  Description
   1  $node      Node
@@ -1077,6 +1181,13 @@ Get the first node below this node
 =head3 last($node)
 
 Get the last node below this node
+
+     Parameter  Description
+  1  $node      Node
+
+=head3 lastNotBlank($node)
+
+Get the last node below this node which is not blank text
 
      Parameter  Description
   1  $node      Node
@@ -1116,6 +1227,14 @@ Get the node next to the current node
      Parameter  Description
   1  $node      Node
 
+
+=head3 nextNotBlank($node)
+
+Get the next node following this node which is not blank text
+
+     Parameter  Description
+  1  $node      Node
+
 =head3 prev($node)
 
 Get the node previous to the current node
@@ -1123,9 +1242,25 @@ Get the node previous to the current node
      Parameter  Description
   1  $node      Node
 
+=head3 prevNotBlank($node)
+
+Get the previous node preceding this node which is not blank text
+
+     Parameter  Description
+  1  $node      Node
+
 =head3 by($node, $sub, @context)
 
 Post-order traversal of a parse tree or sub tree
+
+     Parameter  Description
+  1  $node      Starting node
+  2  $sub       sub to call for each sub node
+  3  @context   accumulated context
+
+=head3 byReverse($node, $sub, @context)
+
+Reverse post-order traversal of a parse tree or sub tree
 
      Parameter  Description
   1  $node      Starting node
@@ -1285,11 +1420,19 @@ Unwrap a node by inserting its content into its parent at the point containing t
 
 =head4 replaceWith($old, $new)
 
-Replace a node (and all its content) with a new node (and all its content)
+Replace a node (and all its content) with a new node (and all its content) and return the new node
 
      Parameter  Description
-  1  $old       Old node
-  2  $new       new node
+  1  $old       Old node to be replaced
+  2  $new       New node to replace old node
+
+=head4 replaceWithText($old, $text)
+
+Replace a node (and all its content) with a new text node and return the new text node
+
+     Parameter  Description
+  1  $old       Old node to be replaced
+  2  $text      Text of new node to replace old node
 
 =head3 Cut and Put
 
@@ -1334,6 +1477,37 @@ Place the new node at the end of the content of the original node
   1  $old       Original node
   2  $new       new node
 
+=head4 putFirstAsText($node, $text)
+
+Create a new text mode and place it first under the specified node
+
+     Parameter  Description
+  1  $node      Existing node
+  2  $text      Text of new node
+
+=head4 putLastAsText($node, $text)
+
+Create a new text mode and place it last under the specified node
+
+     Parameter  Description
+  1  $node      Existing node
+  2  $text      Text of new node
+
+=head4 putNextAsText($node, $text)
+
+Create a new text mode and place it after the current node
+
+     Parameter  Description
+  1  $node      Existing node
+  2  $text      Text of new node
+
+=head4 putPrevAsText($node, $text)
+
+Create a new text mode and place it before the current node
+
+     Parameter  Description
+  1  $node      Existing node
+  2  $text      Text of new node
 
 =head1 Index of methods by name
 
@@ -1344,7 +1518,9 @@ L</attr :lvalue($node, $attribute)>
 L</attrCount($node)>
 L</attrs($node, @attributes)>
 L</before($node, $re)>
+L</blankText($node)>
 L</by($node, $sub, @context)>
+L</byReverse($node, $sub, @context)>
 L</c($node, $tag, $position)>
 L</cdata()>
 L</change($node, $name, @tags)>
@@ -1358,11 +1534,13 @@ L</contentBeyondAsTags($node)>
 L</contents($node)>
 L</contentString($node)>
 L</context($node)>
+L</count($node, @tags)>
 L</cut($node)>
 L</deleteAttr($node, $attr, $value)>
 L</deleteAttrs($node, @attr)>
 L</deleteConditions($node, @conditions)>
 L</first($node)>
+L</firstNotBlank($node)>
 L</firstOf($node, @tags)>
 L</get($node, @position)>
 L</index($node)>
@@ -1372,7 +1550,9 @@ L</isLast($node)>
 L</isOnlyChild($node)>
 L</isText($node)>
 L</last($node)>
+L</lastNotBlank($node)>
 L</listConditions($node)>
+L</nextNotBlank($node)>
 L</new()>
 L</newTag()>
 L</newText()>
@@ -1380,16 +1560,23 @@ L</Data::Edit::Xml::newTree()>
 L</next($node)>
 L</over($node, $re)>
 L</position($node)>
+L</present($node, @tags)>
 L</prev($node)>
+L</prevNotBlank($node)>
 L</PrettyContentString($node)>
 L</prettyString($node)>
 L</putFirst($old, $new)>
+L</putFirstAsText($node, $text)>
 L</putLast($old, $new)>
+L</putLastAsText($node, $text)>
 L</putNext($old, $new)>
+L</putNextAsText($node, $text)>
 L</putPrev($old, $new)>
+L</putPrevAsText($node, $text)>
 L</renameAttr($node, $old, $new)>
 L</renameAttrValue($node, $old, $oldValue, $new, $newValue)>
 L</replaceWith($old, $new)>
+L</replaceWithText($old, $text)>
 L</setAttr($node, %values)>
 L</string($node)>
 L</stringWithCondition($node, @conditions)>
@@ -1429,7 +1616,7 @@ under the same terms as Perl itself.
 __DATA__
 use warnings FATAL=>qw(all);
 use strict;
-use Test::More tests=>96;
+use Test::More tests=>116;
 use Data::Table::Text qw(:all);
 
 sub sample1{Data::Edit::Xml::new(inputString=><<END)}                           # Sample test xml
@@ -1532,8 +1719,20 @@ END
   ok $x->get(qw(head),1)->before(qr(\Ahead bar CDATA\Z));
 
   ok @{$x->c(qw(head))}  == 2;
-  ok $x->c("head")->[0]->nc(qw(aa bb cc)) == 1;                                 # First head does not contain aa or bb or cc
-  ok $x->c("head")->[0]->nc(qw(em bb cc)) == 0;                                 # First head does not not contain em or bb or cc
+  ok $x->get(qw(tail))->present(qw(foot middle aaa bbb)) == 2;                  # Presence of the specified tags
+  ok $x->get(qw(tail))->present(qw(foot aaa bbb)) == 1;
+  ok $x->get(qw(tail))->present(qw(     aaa bbb)) == 0;
+  ok $x->get(qw(tail foot))->present(qw(aaa bbb)) == 0;
+  if (1)
+   {my $c = $x->count(qw(head tail aaa));
+    ok $c == 3;
+    my @c = $x->count(qw(head tail aaa));
+    ok "@c" eq "2 1 0";
+    my $t = $x->count(qw(CDATA));
+    ok $t == 1;
+    my $T = $x->count;
+    ok $T == 5;
+   }
 
   if (1)                                                                        # First of
    {my ($foot, $middle) = $x->get(qw(tail))->firstOf(qw(foot middle));
@@ -1556,7 +1755,8 @@ END
 
   ok $x->get(qw(tail))->first->next->id eq 'mm';
   ok $x->get(qw(tail))->last->prev->prev->isFirst;
-  ok $x->get(qw(head))->get(qw(em))->first->at(qw(CDATA em head foo));  # At
+
+  ok $x->get(qw(head))->get(qw(em))->first->at(qw(CDATA em head foo));          # At
 
   if (1)                                                                        # Through
    {my @t;
@@ -1629,7 +1829,13 @@ END
 
   ok sample2->get(qw(b))->unwrap->[0]->string eq '<a id="aa"><c id="cc"/></a>';
   ok sample2->get(qw(b c))->putFirst(sample2)->parent->parent->parent->string eq '<a id="aa"><b id="bb"><c id="cc"><a id="aa"><b id="bb"><c id="cc"/></b></a></c></b></a>';
-  ok sample2->get(qw(b c))->replaceWith(sample2)->[1]->get(qw(b c))->up(qw(a b))->string eq '<a id="aa"><b id="bb"><c id="cc"/></b></a>';
+  ok sample2->get(qw(b c))->replaceWith(sample2)->get(qw(b c))->up(qw(a b))->string eq '<a id="aa"><b id="bb"><c id="cc"/></b></a>';
+
+  if (1)
+   {my $x = sample2;
+    $x->get(qw(b c))->replaceWithText(qq(<d id="dd">));
+    ok $x->string eq '<a id="aa"><b id="bb"><d id="dd"></b></a>';
+   }
 
 # Editting - tag /attributes
 
@@ -1643,6 +1849,28 @@ END
 
   ok  sample2->renameAttrValue(qw(id aa ID AA))->string eq '<a ID="AA"><b id="bb"><c id="cc"/></b></a>';
   ok !sample2->changeAttrValue(qw(ID AA id aa));
+ }
+
+if (1)                                                                          # Blank text
+ {use Data::Dump qw(dump);
+  my $x = Data::Edit::Xml::new(inputString=>"<a><b/><c/><d/></a>");
+  $x->putFirstAsText(' ');
+  $x->get(qw(b))->putNextAsText(' ');
+  $x->get(qw(d))->putPrevAsText(' ');
+  $x->putLastAsText(' ');
+
+  ok $x->contentAsTags eq qq(CDATA b CDATA c CDATA d CDATA);
+  ok $x->first->tag eq qq(CDATA);
+  ok $x->first->blankText == 1 ;
+  ok $x->firstNotBlank->tag eq qq(b);
+  ok $x->first->nextNotBlank->tag eq qq(b);
+  ok $x->firstNotBlank->nextNotBlank->tag eq qq(c);
+
+  ok $x->last->tag eq qq(CDATA);
+  ok $x->last->blankText == 1 ;
+  ok $x->lastNotBlank->tag eq qq(d);
+  ok $x->last->prevNotBlank->tag eq qq(d);
+  ok $x->lastNotBlank->prevNotBlank->tag eq qq(c);
  }
 
 if (1)                                                                          # Create
@@ -1719,7 +1947,11 @@ if (1)                                                                          
   $c->putFirstAsText("<d id=\"dd\">DDDD</d>");
   ok $x->string eq "<a id=\"aa\"><b id=\"bb\"><c id=\"cc\"><d id=\"dd\">DDDD</d></c></b></a>";
   $c->putLastAsText("<e id=\"ee\">EEEE</e>");
-  ok $x->string eq "<a id=\"aa\"><b id=\"bb\"><c id=\"cc\"><d id=\"dd\">DDDD</d><e id=\"ee\">EEEE</e></c></b></a>"
+  ok $x->string eq "<a id=\"aa\"><b id=\"bb\"><c id=\"cc\"><d id=\"dd\">DDDD</d><e id=\"ee\">EEEE</e></c></b></a>";
+  $c->putNextAsText("<n id=\"nn\">NNNN</n>");
+  ok $x->string eq "<a id=\"aa\"><b id=\"bb\"><c id=\"cc\"><d id=\"dd\">DDDD</d><e id=\"ee\">EEEE</e></c><n id=\"nn\">NNNN</n></b></a>";
+  $c->putPrevAsText("<p id=\"pp\">PPPP</p>");
+  ok $x->string eq '<a id="aa"><b id="bb"><p id="pp">PPPP</p><c id="cc"><d id="dd">DDDD</d><e id="ee">EEEE</e></c><n id="nn">NNNN</n></b></a>';
  }
 
 if (1)                                                                          # New

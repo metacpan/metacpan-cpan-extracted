@@ -1,0 +1,98 @@
+NAME
+    Perinci::CmdLine::Dump - Run a Perinci::CmdLine-based script but only to
+    dump the object
+
+VERSION
+    This document describes version 0.11 of Perinci::CmdLine::Dump (from
+    Perl distribution Perinci-CmdLine-Dump), released on 2017-07-07.
+
+FUNCTIONS
+  dump_pericmd_script
+    Usage:
+
+     dump_pericmd_script(%args) -> [status, msg, result, meta]
+
+    Run a Perinci::CmdLine-based script but only to dump the object.
+
+    This function runs a CLI script that uses "Perinci::CmdLine" (or its
+    variant "Perinci::CmdLine::Lite" or "Perinci::CmdLine::Any") but
+    monkey-patches "Perinci::CmdLine::Base" beforehand so that "run()" will
+    dump the object and then exit. The goal is to get the object without
+    actually running the script.
+
+    This can be used to gather information about the script and then
+    generate documentation about it (e.g. "Pod::Weaver::Plugin::Rinci" to
+    insert POD sections based on information from the Rinci metadata of the
+    function used by the script) or do other things (e.g. "App::shcompgen"
+    to generate a completion script for the original script).
+
+    CLI script needs to use "Perinci::CmdLine". This is detected currently
+    by a simple regex. If script is not detected as using
+    "Perinci::CmdLine", status 412 is returned.
+
+    Will return the "Perinci::CmdLine" object dump. In addition to that, if
+    detected that script refers to function URL "/main" (which might mean
+    that function metadata is embedded in the script itself and not in a
+    separate module), will also dump the target function's metadata in
+    "func.meta" in this function's result metadata.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *str*
+
+        Path to the script.
+
+    *   libs => *array[str]*
+
+        Libraries to unshift to @INC when running script.
+
+    *   method => *str*
+
+        The "patch" method is using monkey-patching to replace run() with a
+        routine that dumps the object and exit. This has a disadvantage of
+        exiting too early, for example some attributes like "common_opts" is
+        filled during run(). Another method is "self-dump" that requires
+        Perinci::CmdLine::Lite version 1.73 or later.
+
+        The default is to use "self-dump", but "patch" for /main/.
+
+    *   skip_detect => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-Dump>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-Dump>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Dump>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
@@ -163,7 +164,33 @@ mode: c
 End:
 */
 
-#line 1 "/usr/home/ben/projects/Text-Fuzzy/text-fuzzy.c.in"
+static int n_mallocs
+#ifdef __GNUC__
+__attribute__ ((unused))
+#endif /* def __GNUC__ */
+;
+
+#define ALLOC(x,n) {				\
+	x = malloc (sizeof (* x) * n);		\
+	n_mallocs++;				\
+	FAIL(!x, memory_failure);		\
+    }
+
+#define ZALLOC(x,n) {				\
+	x = calloc (n, sizeof (* x));		\
+	n_mallocs++;				\
+	FAIL(!x, memory_failure);		\
+    }
+
+#define FREE(x) {				\
+	free (x);				\
+	x = 0;					\
+	n_mallocs--;				\
+    }
+
+#line 1 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+
+
 
 /* For error-handling for the file opening functions. */
 
@@ -190,8 +217,8 @@ End:
 
 /* Alphabet over unicode characters. */
 
-typedef struct ualphabet {
-
+typedef struct ualphabet
+{
     /* The smallest character in our alphabet. */
     int min;
 
@@ -212,8 +239,8 @@ ualphabet_t;
 
 /* This structure contains one string of whatever type. */
 
-typedef struct text_fuzzy_string {
-
+typedef struct text_fuzzy_string
+{
     /* The text of the string. */
     char * text;
 
@@ -226,6 +253,10 @@ typedef struct text_fuzzy_string {
 
     /* The length of "unicode". */
     int ulength;
+
+    /* Is "text" allocated? */
+
+    unsigned int allocated : 1;
 }
 text_fuzzy_string_t;
 
@@ -243,13 +274,12 @@ struct candidate {
    paraphenalia used in searching for the string, for example the
    alphabet of the string. */
 
-typedef struct text_fuzzy {
-
+typedef struct text_fuzzy
+{
     /* The string we are to match. */
     text_fuzzy_string_t text;
 
     /* The matching string. */
-
     text_fuzzy_string_t b;
 
     /* The maximum edit distance we allow for. */
@@ -417,7 +447,8 @@ FUNC (generate_ualphabet) (text_fuzzy_t * tf)
     /* Create a zeroed alphabet. */
 
     u->alphabet = calloc (u->size, sizeof (char));
-    FAIL_MSG (! u->alphabet, memory_failure, "Could not allocate %d memory slots",
+    FAIL_MSG (! u->alphabet, memory_failure,
+	      "Could not allocate %d memory slots",
 	      u->size);
 
     tf->n_mallocs++;
@@ -427,8 +458,6 @@ FUNC (generate_ualphabet) (text_fuzzy_t * tf)
     for (i = 0; i < t->ulength; i++) {
 
 	/* Character at position "i". */
-
-
 
 	int c;
 
@@ -700,7 +729,7 @@ FUNC (compare_single) (text_fuzzy_t * tf)
 	    candidate_t * c;
 	    c = malloc (sizeof (candidate_t));
 	    FAIL (! c, memory_failure);
-	    tf->n_mallocs+=1;
+	    tf->n_mallocs += 1;
 	    c->distance = d;
 	    c->offset = tf->offset;
 	    c->next = 0;
@@ -777,7 +806,6 @@ FUNC (free_candidates) (text_fuzzy_t * text_fuzzy, int * candidates)
     }
     OK;
 }
-
 
 /* This is the threshold above which we do not bother computing the
    alphabet of the string. If it has more than this number of unique
@@ -877,7 +905,8 @@ FUNC (end_scanning) (text_fuzzy_t * text_fuzzy)
 
 #define BUF_SIZE 0x1000
 
-typedef struct fuzzy_file {
+typedef struct fuzzy_file
+{
     const char * file_name;
     FILE * fh;
     char buf[BUF_SIZE];
@@ -1131,4 +1160,14 @@ An attempt was made to use the maximum edit distance which was unset.
 status: miscount
 
 */
+
+
+void
+text_fuzzy_check_memory ()
+{
+    if (n_mallocs != 0) {
+        (*text_fuzzy_error_handler) (__FILE__, __LINE__,
+	                                   "n_mallocs = %d", n_mallocs);
+    }
+}
 

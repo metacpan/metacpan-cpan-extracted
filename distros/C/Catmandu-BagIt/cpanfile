@@ -14,7 +14,6 @@ requires 'LWP::Simple','6.00';
 requires 'Path::Tiny','0.1';
 requires 'Path::Iterator::Rule','1.0';
 requires 'File::Copy','0';
-requires 'File::Path','0';
 requires 'IO','0';
 
 recommends 'Log::Log4perl', '1.44';

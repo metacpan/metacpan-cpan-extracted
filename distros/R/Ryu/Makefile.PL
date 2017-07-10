@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Ryu",
   "PREREQ_PM" => {
+    "Encode" => "1.98",
     "Future" => "0.35",
     "List::UtilsBy" => "0.10",
     "Log::Any" => "1.045",
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::Refcount" => "0.07",
     "Test::Warnings" => "0.024"
   },
-  "VERSION" => "0.021",
+  "VERSION" => "0.022",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,6 +54,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Encode" => "1.98",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Future" => "0.35",

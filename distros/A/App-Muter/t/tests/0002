@@ -1,0 +1,15 @@
+Input: abc
+ def
+ ghi
+ 
+Chain: hex
+Flags: inverse
+Output: 6162630a6465660a6768690a
+Chain: base64
+Flags: inverse
+Output: YWJjCmRlZgpnaGkK
+Chain: base64:hex
+Output: 59574a6a436d526c5a67706e61476b4b
+Chain: -hex:-base64
+Flags: reverse
+Output: 59574a6a436d526c5a67706e61476b4b

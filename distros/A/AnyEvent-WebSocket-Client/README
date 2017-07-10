@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.38
+    version 0.39
 
 SYNOPSIS
 
@@ -217,6 +217,8 @@ AUTHOR
     Toshio Ito
 
     José Joaquín Atria
+
+    Kivanc Yazan
 
 COPYRIGHT AND LICENSE
 

@@ -5,7 +5,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '1.42';
+our $VERSION = '1.43';
 
 use Exception::Class::Base;
 use Scalar::Util qw( blessed reftype );
@@ -221,7 +221,7 @@ Exception::Class - A module that allows you to declare real exception classes in
 
 =head1 VERSION
 
-version 1.42
+version 1.43
 
 =head1 SYNOPSIS
 
@@ -507,9 +507,13 @@ subclass will not be included.
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<https://github.com/houseabsolute/Exception-Class/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Exception-Class/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Exception-Class can be found at L<https://github.com/houseabsolute/Exception-Class>.
 
 =head1 DONATIONS
 
@@ -534,9 +538,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Leon Timmermans Ricardo Signes
+=for stopwords Alexander Batyrshin Leon Timmermans Ricardo Signes
 
 =over 4
+
+=item *
+
+Alexander Batyrshin <0x62ash@gmail.com>
 
 =item *
 
@@ -554,5 +562,8 @@ This software is copyright (c) 2017 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

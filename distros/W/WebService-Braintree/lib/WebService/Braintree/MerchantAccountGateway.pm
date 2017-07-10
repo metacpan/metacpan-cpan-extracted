@@ -1,5 +1,5 @@
 package WebService::Braintree::MerchantAccountGateway;
-$WebService::Braintree::MerchantAccountGateway::VERSION = '0.9';
+$WebService::Braintree::MerchantAccountGateway::VERSION = '0.91';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 

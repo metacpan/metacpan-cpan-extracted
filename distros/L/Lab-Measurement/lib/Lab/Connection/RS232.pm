@@ -14,7 +14,7 @@
 # TODO: a lot, ...
 
 package Lab::Connection::RS232;
-$Lab::Connection::RS232::VERSION = '3.552';
+$Lab::Connection::RS232::VERSION = '3.553';
 use Lab::Connection;
 use strict;
 use Lab::Exception;

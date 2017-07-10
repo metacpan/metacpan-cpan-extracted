@@ -1,6 +1,6 @@
 
 package Lab::Instrument::LabViewHeater;
-$Lab::Instrument::LabViewHeater::VERSION = '3.552';
+$Lab::Instrument::LabViewHeater::VERSION = '3.553';
 use strict;
 use warnings;
 use Lab::Instrument;

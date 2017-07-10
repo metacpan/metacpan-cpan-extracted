@@ -4,7 +4,7 @@
       "xaicron <xaicron {at} cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.12",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -59,7 +59,7 @@
    "provides" : {
       "SQL::Format" : {
          "file" : "lib/SQL/Format.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,8 @@
          "web" : "https://github.com/xaicron/p5-SQL-Format"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
+   "x_authority" : "cpan:XAICRON",
    "x_contributors" : [
       "Olivier Mengué <dolmen@cpan.org>",
       "karupanerura <karupa@cpan.org>",

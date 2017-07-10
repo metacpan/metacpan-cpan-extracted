@@ -1,5 +1,8 @@
 Revision history for Catmandu-MARC
 
+1.161  2017-07-06 14:36:29 CEST
+  - Fixing marc_replace_all evaluating search groups
+
 1.16  2017-07-04 15:27:51 CEST
   - Adding marc_copy (Carsten Klee) and marc_paste fix
 

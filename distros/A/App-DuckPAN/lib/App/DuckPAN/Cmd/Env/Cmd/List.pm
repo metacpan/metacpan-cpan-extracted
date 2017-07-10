@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Env::Cmd::List;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: List all env variables
-$App::DuckPAN::Cmd::Env::Cmd::List::VERSION = '1018';
+$App::DuckPAN::Cmd::Env::Cmd::List::VERSION = '1019';
 use Moo;
 with qw( App::DuckPAN::Cmd::Env::Cmd );
 
@@ -30,7 +30,7 @@ App::DuckPAN::Cmd::Env::Cmd::List - List all env variables
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

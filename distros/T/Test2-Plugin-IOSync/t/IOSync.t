@@ -7,9 +7,9 @@ BEGIN { *JSON = Test2::Plugin::IOMuxer::Layer->can('JSON') }
 
 ok($INC{'Test2/Plugin/OpenFixPerlIO.pm'}, "Loaded OpenFixPerlIO");
 
-my ($out_fh, $out_file) = tempfile("$$-XXXXXXXX");
-my ($err_fh, $err_file) = tempfile("$$-XXXXXXXX");
-my ($mux_fh, $mux_file) = tempfile("$$-XXXXXXXX");
+my ($out_fh, $out_file) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
+my ($err_fh, $err_file) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
+my ($mux_fh, $mux_file) = tempfile("$$-XXXXXXXX", TMPDIR => 1);
 close($mux_fh);
 
 {

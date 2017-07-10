@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::IT::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -47,13 +47,13 @@ sub _create_atoms
             # SP = proper noun (Italia, Milano, Nanni, Mayo, Allende)
             'SP' => ['pos' => 'noun', 'nountype' => 'prop'],
             # SW = foreign word (publishing, desktop, le, Tour, hard)
-            'SW' => ['pos' => 'noun', 'foreign' => 'foreign'],
+            'SW' => ['pos' => 'noun', 'foreign' => 'yes'],
             # SA = abbreviated noun (L., mq, km, cm, tel.)
-            'SA' => ['pos' => 'noun', 'abbr' => 'abbr'],
+            'SA' => ['pos' => 'noun', 'abbr' => 'yes'],
             # A = adjective (vero, stesso, nuovo, scorso, lungo)
             'A'  => ['pos' => 'adj'],
             # AP = possessive determiner (suo, mio, nostro, proprio, tuo, vostro)
-            'AP' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            'AP' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             # RD = definite article (il, lo, i, gli, la, le, l')
             'RD' => ['pos' => 'adj', 'prontype' => 'art', 'definite' => 'def'],
             # RI = indefinite article (un, uno, una, un')
@@ -64,7 +64,7 @@ sub _create_atoms
             'PI' => ['pos' => 'noun', 'prontype' => 'ind|tot|neg'],
             # PP = possessive pronoun (tuo, lo, nostro, miei, suoi, tuoi, sua, tua)
             ###!!! How do AP and PP differ? There are very few occurrences of PP.
-            'PP' => ['pos' => 'noun', 'prontype' => 'prs', 'poss' => 'poss'],
+            'PP' => ['pos' => 'noun', 'prontype' => 'prs', 'poss' => 'yes'],
             # PQ = personal pronoun (mi, io, me, ti, te, tu, lo, lui, l', li, la, lei, le, ci, noi, vi, voi, si, gli, ne, se, s', loro)
             'PQ' => ['pos' => 'noun', 'prontype' => 'prs'],
             # PR = relative pronoun (che, cui, quanto, qual)
@@ -103,10 +103,10 @@ sub _create_atoms
         'encode_map' =>
         {
             'pos' => { 'noun' => { 'prontype' => { ''    => { 'nountype' => { 'prop' => 'SP',
-                                                                              '@'    => { 'abbr' => { 'abbr' => 'SA',
-                                                                                                      '@'    => { 'foreign' => { 'foreign' => 'SW',
+                                                                              '@'    => { 'abbr' => { 'yes' => 'SA',
+                                                                                                      '@'    => { 'foreign' => { 'yes' => 'SW',
                                                                                                                                  '@'       => 'S' }}}}}},
-                                                   'prs' => { 'poss' => { 'poss' => 'PP',
+                                                   'prs' => { 'poss' => { 'yes' => 'PP',
                                                                           '@'    => 'PQ' }},
                                                    'int' => 'PT',
                                                    'rel' => 'PR',
@@ -509,7 +509,7 @@ Lingua::Interset::Tagset::IT::Conll - Driver for the Italian tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

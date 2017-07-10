@@ -1,12 +1,12 @@
 package App::LintPrereqs;
 
-our $DATE = '2017-01-01'; # DATE
-our $VERSION = '0.52'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.53'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use Config::IOD;
 use Fcntl qw(:DEFAULT);
@@ -109,7 +109,7 @@ sub _scan_prereqs {
         for my $file (@{$files{$phase}}) {
             my $scanres = $scanner->scan_file($file);
             unless ($scanres) {
-                $log->tracef("Scanned %s, got nothing", $file);
+                log_trace("Scanned %s, got nothing", $file);
             }
 
             # if we use PP::NotQuiteLite, it returns PPN::Context which supports
@@ -128,7 +128,7 @@ sub _scan_prereqs {
                 }
             }
 
-            $log->tracef("Scanned %s, got: %s", $file, $reqs);
+            log_trace("Scanned %s, got: %s", $file, $reqs);
             for my $req (keys %$reqs) {
                 my $v = $reqs->{$req};
                 if (exists $res{$phase}{$req}) {
@@ -339,7 +339,7 @@ sub lint_prereqs {
             }
             my $dir = $cfg->get_directive_before_key($section, $param);
             my $dir_s = $dir ? join(" ", @$dir) : "";
-            $log->tracef("section=%s, v=%s, param=%s, directive=%s", $section, $param, $v, $dir_s);
+            log_trace("section=%s, v=%s, param=%s, directive=%s", $section, $param, $v, $dir_s);
 
             my $mod = $param;
             $mods_from_ini{$phase}{$mod}   = $v unless $section =~ /assume-provided/;
@@ -352,9 +352,9 @@ sub lint_prereqs {
     _create_prereqs_for_Any_phase(\%mods_from_ini);
     _create_prereqs_for_Any_phase(\%assume_provided);
     _create_prereqs_for_Any_phase(\%assume_used);
-    $log->tracef("mods_from_ini: %s", \%mods_from_ini);
-    $log->tracef("assume_used: %s", \%assume_used);
-    $log->tracef("assume_provided: %s", \%assume_provided);
+    log_trace("mods_from_ini: %s", \%mods_from_ini);
+    log_trace("assume_used: %s", \%assume_used);
+    log_trace("assume_provided: %s", \%assume_provided);
 
     # get packages from current dist. assume package names from filenames,
     # should be better and scan using PPI
@@ -372,7 +372,7 @@ sub lint_prereqs {
             $dist_pkgs{$pkg}++;
         },
     }, "lib");
-    $log->tracef("Dist packages: %s", \%dist_pkgs);
+    log_trace("Dist packages: %s", \%dist_pkgs);
     my %test_dist_pkgs;
     find({
         #no_chdir => 1,
@@ -387,14 +387,14 @@ sub lint_prereqs {
             $dist_pkgs{$pkg}++;
         },
     }, "t/lib") if -d "t/lib";
-    $log->tracef("Dist packages (in tests): %s", \%test_dist_pkgs);
+    log_trace("Dist packages (in tests): %s", \%test_dist_pkgs);
 
     my %mods_from_scanned = _scan_prereqs(
         scanner => $args{lite} ? 'lite' : $args{scanner},
         extra_runtime_dirs => $args{extra_runtime_dirs},
         extra_test_dirs    => $args{extra_test_dirs},
     );
-    $log->tracef("mods_from_scanned: %s", \%mods_from_scanned);
+    log_trace("mods_from_scanned: %s", \%mods_from_scanned);
 
     if ($mods_from_ini{Any}{perl} && $mods_from_scanned{Any}{perl}) {
         if (version_ne($mods_from_ini{Any}{perl}, $mods_from_scanned{Any}{perl})) {
@@ -411,19 +411,19 @@ sub lint_prereqs {
 
     my $perlv; # min perl v to use in x.yyyzzz (numified)format
     if ($args{perl_version}) {
-        $log->tracef("Will assume perl %s (via perl_version argument)",
+        log_trace("Will assume perl %s (via perl_version argument)",
                      $args{perl_version});
         $perlv = $args{perl_version};
     } elsif ($mods_from_ini{Any}{perl}) {
-        $log->tracef("Will assume perl %s (via dist.ini)",
+        log_trace("Will assume perl %s (via dist.ini)",
                      $mods_from_ini{Any}{perl});
         $perlv = $mods_from_ini{Any}{perl};
     } elsif ($mods_from_scanned{Any}{perl}) {
-        $log->tracef("Will assume perl %s (via scan_prereqs)",
+        log_trace("Will assume perl %s (via scan_prereqs)",
                      $mods_from_scanned{Any}{perl});
         $perlv = $mods_from_scanned{Any}{perl};
     } else {
-        $log->tracef("Will assume perl %s (from running interpreter's \$^V)",
+        log_trace("Will assume perl %s (from running interpreter's \$^V)",
                      $^V);
         if ($^V =~ /^v(\d+)\.(\d+)\.(\d+)/) {
             $perlv = sprintf("%d\.%03d%03d", $1, $2, $3)+0;
@@ -442,7 +442,7 @@ sub lint_prereqs {
         for my $mod (keys %{$mods_from_ini{Any}}) {
             my $v = $mods_from_ini{Any}{$mod};
             next if $mod eq 'perl';
-            $log->tracef("Checking mod from dist.ini: %s (%s)", $mod, $v);
+            log_trace("Checking mod from dist.ini: %s (%s)", $mod, $v);
             my $is_core = Module::CoreList::More->is_still_core($mod, $v, $perlv);
             if (!$args{core_prereqs} && $is_core) {
                 push @errs, {
@@ -528,7 +528,7 @@ sub lint_prereqs {
             for (@$lm) { $lumped_mods{$_} = $mod }
         }
         last unless %lumped_mods;
-        $log->tracef("Checking lumped modules");
+        log_trace("Checking lumped modules");
         for my $mod (keys %lumped_mods) {
             my $v = $mods_from_ini{Any}{$mod};
             my $is_core = Module::CoreList::More->is_still_core($mod, $v, $perlv);
@@ -550,7 +550,7 @@ sub lint_prereqs {
         for my $mod (keys %{$mods_from_scanned{Any}}) {
             next if $mod eq 'perl';
             my $v = $mods_from_scanned{Any}{$mod};
-            $log->tracef("Checking mod from scanned: %s (%s)", $mod, $v);
+            log_trace("Checking mod from scanned: %s (%s)", $mod, $v);
             my $is_core = Module::CoreList::More->is_still_core($mod, $v, $perlv);
             next if exists $dist_pkgs{$mod}; # skip modules from same dist
             next if exists $test_dist_pkgs{$mod}; # skip test modules from same dist (XXX should check that $mod is only used in tests)
@@ -583,7 +583,7 @@ sub lint_prereqs {
     # check minimum versions specified in [versions] in our config
     {
         last unless $versions;
-        $log->tracef("Checking minimum versions ...");
+        log_trace("Checking minimum versions ...");
         for my $mod (keys %{$mods_from_ini{Any}}) {
             next if $mod eq 'perl';
             my $v = $mods_from_ini{Any}{$mod};
@@ -675,7 +675,7 @@ App::LintPrereqs - Check extraneous/missing/incorrect prerequisites in dist.ini
 
 =head1 VERSION
 
-This document describes version 0.52 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2016-01-01.
+This document describes version 0.53 of App::LintPrereqs (from Perl distribution App-LintPrereqs), released on 2017-07-08.
 
 =head1 SYNOPSIS
 
@@ -684,7 +684,11 @@ This document describes version 0.52 of App::LintPrereqs (from Perl distribution
 =head1 FUNCTIONS
 
 
-=head2 lint_prereqs(%args) -> [status, msg, result, meta]
+=head2 lint_prereqs
+
+Usage:
+
+ lint_prereqs(%args) -> [status, msg, result, meta]
 
 Check extraneous/missing/incorrect prerequisites in dist.ini.
 
@@ -817,7 +821,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,4 @@
+Changes
 lib/Prty.pm
 lib/Prty/ApplicationPaths.pm
 lib/Prty/Array.pm
@@ -151,6 +152,7 @@ lib/Prty/Unindent.pm
 lib/Prty/Url.pm
 lib/Prty/Xml/LibXml.pm
 lib/Prty/XTerm.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README

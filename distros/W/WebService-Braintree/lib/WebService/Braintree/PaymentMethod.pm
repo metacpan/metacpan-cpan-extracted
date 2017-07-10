@@ -1,5 +1,5 @@
 package WebService::Braintree::PaymentMethod;
-$WebService::Braintree::PaymentMethod::VERSION = '0.9';
+$WebService::Braintree::PaymentMethod::VERSION = '0.91';
 use Moose;
 extends 'WebService::Braintree::ResultObject';
 

@@ -1,0 +1,20 @@
+Input: Now's the time =
+ for all folk to come=
+  to the aid of their country.
+Chain: -quotedprintable
+Output: Now's the time for all folk to come to the aid of their country.
+Chain: -quotedprintable:hash(sha256):hex
+Output: dd245408c1806a6d5bc582e7314d0ba34ee1631f81ba22c34604e380504462ef
+Chain: -quotedprintable:base64
+Output: Tm93J3MgdGhlIHRpbWUgZm9yIGFsbCBmb2xrIHRvIGNvbWUgdG8gdGhlIGFpZCBvZiB0aGVpciBjb3VudHJ5Lg==
+Chain: -quotedprintable:base64(mime)
+Output: Tm93J3MgdGhlIHRpbWUgZm9yIGFsbCBmb2xrIHRvIGNvbWUgdG8gdGhlIGFpZCBvZiB0aGVpciBj
+ b3VudHJ5Lg==
+ 
+Chain: -quotedprintable:base64:quotedprintable
+Output: Tm93J3MgdGhlIHRpbWUgZm9yIGFsbCBmb2xrIHRvIGNvbWUgdG8gdGhlIGFpZCBvZiB0aGVpciB=
+ jb3VudHJ5Lg=3D=3D
+Chain: -quotedprintable:-base64:quotedprintable
+Output: Tm93J3MgdGhlIHRpbWUgZm9yIGFsbCBmb2xrIHRvIGNvbWUgdG8gdGhlIGFpZCBvZiB0aGVpciB=
+ jb3VudHJ5Lg=3D=3D
+Flags: reverse

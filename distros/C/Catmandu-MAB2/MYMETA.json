@@ -1,0 +1,73 @@
+{
+   "abstract" : "Catmandu modules for working with MAB2 data.",
+   "author" : [
+      "Johann Rolschewski <jorol@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Catmandu-MAB2",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "1.0601",
+            "Catmandu::SRU" : "0.032",
+            "Readonly" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Software::License" : "0.103010",
+            "Test::Exception" : "0.32",
+            "Test::More" : "1.001003",
+            "Test::Pod" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jorol/Catmandu-MAB2/issues"
+      },
+      "homepage" : "https://github.com/jorol/Catmandu-MAB2",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jorol/Catmandu-MAB2.git",
+         "web" : "https://github.com/jorol/Catmandu-MAB2"
+      }
+   },
+   "version" : "0.15",
+   "x_contributors" : [
+      "Johann Rolschewski <rolschewski@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0221"
+}

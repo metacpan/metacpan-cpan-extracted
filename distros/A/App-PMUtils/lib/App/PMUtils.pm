@@ -1,7 +1,7 @@
 package App::PMUtils;
 
-our $DATE = '2017-06-09'; # DATE
-our $VERSION = '0.68'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.70'; # VERSION
 
 use 5.010001;
 
@@ -188,7 +188,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.68 of App::PMUtils (from Perl distribution App-PMUtils), released on 2017-06-09.
+This document describes version 0.70 of App::PMUtils (from Perl distribution App-PMUtils), released on 2017-07-08.
 
 =head1 SYNOPSIS
 

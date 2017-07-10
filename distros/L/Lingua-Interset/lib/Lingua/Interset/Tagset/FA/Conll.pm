@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::FA::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -82,8 +82,8 @@ sub _create_atoms
             "PR\tJOPER"   => ['pos' => 'noun', 'prontype' => 'prs', 'variant' => 'short'], # m, t, š, mán, tán, šán (enclitic personal pronoun)
             "PR\tDEMON"   => ['pos' => 'noun', 'prontype' => 'dem'], # án, ín, hmín, čnán, ánjá (demonstrative pronoun)
             "PR\tINTG"    => ['pos' => 'noun', 'prontype' => 'int'], # če, kjá, čgúne, čí, črá (interrogative pronoun)
-            "PR\tCREFX"   => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'], # xod, xwíš, hm, ykdígr, hmdígr (common reflexive pronoun)
-            "PR\tUCREFX"  => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'], # (noncommon reflexive pronoun: not present in data)
+            "PR\tCREFX"   => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'], # xod, xwíš, hm, ykdígr, hmdígr (common reflexive pronoun)
+            "PR\tUCREFX"  => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'], # (noncommon reflexive pronoun: not present in data)
             "PR\tRECPR"   => ['pos' => 'noun', 'prontype' => 'rcp'], # (reciprocal pronoun: not present in data)
             "PR\t_"       => ['pos' => 'noun', 'prontype' => 'prs'], # hm, ykdígr, hmdígr, xúdš, xúdšán ###!!! The '_' fine POS also occurs with adjectives!
             # coarse PREM (pre-modifier of nouns, i.e. determiner?)
@@ -119,7 +119,7 @@ sub _create_atoms
         },
         'encode_map' =>
         {
-            'pos' => { 'noun' => { 'prontype' => { 'prs' => { 'reflex' => { 'reflex' => "PR\tCREFX",
+            'pos' => { 'noun' => { 'prontype' => { 'prs' => { 'reflex' => { 'yes' => "PR\tCREFX",
                                                                             '@'      => { 'variant' => { 'short' => "PR\tJOPER",
                                                                                                          '@'     => "PR\tSEPER" }}}},
                                                    'rcp' => "PR\tRECPR",
@@ -706,7 +706,7 @@ Lingua::Interset::Tagset::FA::Conll - Driver for the tagset of the Persian Depen
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

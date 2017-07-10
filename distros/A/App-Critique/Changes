@@ -1,5 +1,48 @@
 Revision history for Perl extension App::Critique
 
+0.05 07-07-2017
+    [IMPORTANT CHANGES]
+    - the output has changed and so has the workflow
+      too much to explain here, but trust me, it is 
+      better
+
+    [FEATURES]
+    - added the `--n` arg to the `collect` command
+      which will fork $n processes to collect the 
+      set of files with violations
+        - added interactive "pause" feature for 
+          when you are *NOT* running under `--n`
+    - added `--blame` flag to the `process` command
+      to display the git blame stats around the 
+      violation line
+    - adding a `clean` command to check to see if 
+      any files, which are slated to be fixed, 
+      have been deleted or not. 
+    - track the git SHA of HEAD when critique is 
+      first started
+    - added new configuration variables
+        - DATA_DIR 
+            - to specify the name of the directory
+              to store the session data in (defaults 
+              to ".critique")
+        - DATA_FILE
+            - to specify the name of the file used 
+              to store the session data in (default
+              to "session.json")
+
+    [EXPERIMENTAL]
+    - added a Rewriter feature which will attempt to
+      re-write a violation if possible 
+        - this is currently not well documented, but
+          should improve in the next few releases
+
+    [CLEANUP]
+    - make path display more consistent by always 
+      showing it from the root of the git checkout
+      even if our working directory is below it
+    - the `process` command will die unless you have 
+      an editor set up yet.
+
 0.04 13/8/2016
     [BUG FIXES]
     - fixed issue with warnings from Term::ReadKey

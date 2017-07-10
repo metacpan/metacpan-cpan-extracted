@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::RU::Syntagrus;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -48,7 +48,7 @@ sub _create_atoms
         {
             'A'    => ['pos' => 'adj'],
             'ADV'  => ['pos' => 'adv'],
-            'COM'  => ['hyph' => 'hyph'],
+            'COM'  => ['hyph' => 'yes'],
             'CONJ' => ['pos' => 'conj'],
             'INTJ' => ['pos' => 'int'],
             'NID'  => [], # unknown word
@@ -70,7 +70,7 @@ sub _create_atoms
                        'conj' => 'CONJ',
                        'part' => 'PART',
                        'int'  => 'INTJ',
-                       '@'    => { 'hyph' => { 'hyph' => 'COM',
+                       '@'    => { 'hyph' => { 'yes' => 'COM',
                                                '@'    => 'NID' }}}
         }
     );
@@ -89,7 +89,7 @@ sub _create_atoms
         'intfeature' => 'hyph',
         'simple_decode_map' =>
         {
-            'СЛ' => 'hyph'
+            'СЛ' => 'yes'
         }
     );
     # PO- (SMJAG) ####################
@@ -253,7 +253,7 @@ sub _create_atoms
         'intfeature' => 'typo',
         'simple_decode_map' =>
         {
-            'НЕСТАНД' => 'typo'
+            'НЕСТАНД' => 'yes'
         }
     );
     # OBSOLETE TAGS ####################
@@ -760,7 +760,7 @@ Lingua::Interset::Tagset::RU::Syntagrus - Driver for Syntagrus (Russian Dependen
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

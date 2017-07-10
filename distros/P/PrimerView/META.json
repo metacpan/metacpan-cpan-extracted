@@ -1,0 +1,35 @@
+{
+    "name": "PRIMERVIEW",
+    "abstract": "batch and single primer sequence maps",
+    "description": "Generate graphical outputs of primer sequence maps for batch sequence files",
+    "version": "3.0",
+    "release_status": "stable",
+    "author": [
+    "Damien OHalloran <damienoh@gwu.edu>"
+  ],
+    "license": ["gpl_2"],
+    "prereqs": {
+        "runtime": {
+            "requires": {
+                "perl": "5.006",
+                "Bio::Graphics": "0",
+                "Bio::SeqFeature::Generic": "0", 
+                "Bio::Tools::Run::Alignment::Muscle": "0",  
+                "Bio::AlignIO": "0",  
+                "Bio::Align::Graphics": "0",
+                "Bio::SeqIO": "0"
+            }
+        },
+        "build": {
+            "requires": {
+                "Test::More": "0"
+            }
+        }
+    },
+    "dynamic_config": 0,
+    "meta-spec": {
+        "version": "2",
+        "url": "https://metacpan.org/pod/CPAN::Meta::Spec"
+    },
+    "generated_by": "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001"
+}

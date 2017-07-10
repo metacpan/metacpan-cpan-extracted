@@ -1,0 +1,9 @@
+Neo4j::Cypher::Abstract - Generate Neo4j Cypher queries
+
+Mark A. Jensen
+
+To install, from the installation directory do:
+perl Build.PL
+./Build
+./Build test
+./Build install

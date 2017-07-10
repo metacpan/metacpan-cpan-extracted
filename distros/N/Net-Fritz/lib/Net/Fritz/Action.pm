@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Action;
 # ABSTRACT: represents a TR064 action
-$Net::Fritz::Action::VERSION = 'v0.0.7';
+$Net::Fritz::Action::VERSION = 'v0.0.8';
 
 use Moo;
 
@@ -96,7 +96,7 @@ Net::Fritz::Action - represents a TR064 action
 
 =head1 VERSION
 
-version v0.0.7
+version v0.0.8
 
 =head1 SYNOPSIS
 

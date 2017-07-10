@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/thedatahub/Catmandu-Store-Datahub/issues
   homepage: https://github.com/thedatahub/Catmandu-Store-Datahub
   repository: https://github.com/thedatahub/Catmandu-Store-Datahub.git
-version: '0.05'
+version: '0.06'
 x_contributors:
   - 'Matthias Vandermaesen <matthias@colada.be>'
   - 'Pieter De Praetere <pieter.de.praetere@helptux.be>'

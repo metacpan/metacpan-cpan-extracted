@@ -310,7 +310,7 @@ at your option, any later version of Perl 5 you may have available.
 
 # VERSION
 
-0.01
+0.06
 
 # AUTHOR
 

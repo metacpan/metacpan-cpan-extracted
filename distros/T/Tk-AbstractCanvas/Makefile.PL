@@ -1,20 +1,21 @@
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-#   the contents of the Makefile that is written.
 WriteMakefile(
-  'NAME'         => 'Tk::AbstractCanvas',
-  'VERSION'      => '1.4.A7QFZHF',
-  'ABSTRACT'     => 'Canvas with Abstract center, zoom, && rotate methods',
-  'AUTHOR'       => 'Pip Stuart <Pip@CPAN.Org>',
-  'EXE_FILES'    => [ 
-                    ],
-  'PREREQ_PM'    => {
+  'NAME'           => 'Tk::AbstractCanvas',
+# 'VERSION_FROM'   => 'lib/Tk/AbstractCanvas.pm',
+  'VERSION'        => '1.8',
+# 'ABSTRACT_FROM'  => 'lib/Tk/AbstractCanvas.pm',
+  'ABSTRACT'       => 'Canvas with Abstract center, zoom, and rotate methods',
+  'LICENSE'        => 'gpl_3',
+  'AUTHOR'         => [ 'Pip Stuart <Pip@CPAN.Org>' ],
+  'TEST_REQUIRES'  => {
     'Test'                           => 0,
+    'Test::More'                     => 0,
     'Test::Pod'                      => 0,
     'Test::Pod::Coverage'            => 0,
-    'Tk'                             => 0,
-    'Tk::Canvas'                     => 0,
-    'Tk::Derived'                    => 0,
-  }, # Module::Name => 1.1,
-  'dist'         => { 'COMPRESS' => 'gzip', 'SUFFIX' => 'tgz' },
+  }, # Module::Name                  => 1.1,
+  'PREREQ_PM'      => {
+    'Carp'                           => 0,
+  },
+  'dist'           => { 'COMPRESS'   => 'gzip',
+                        'SUFFIX'     => '.tgz' },
 );

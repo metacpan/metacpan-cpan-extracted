@@ -1,7 +1,7 @@
 package App::AcmeCpanauthors;
 
-our $DATE = '2016-10-01'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -228,7 +228,7 @@ App::AcmeCpanauthors - Unofficial CLI for Acme::CPANAuthors
 
 =head1 VERSION
 
-This document describes version 0.002 of App::AcmeCpanauthors (from Perl distribution App-AcmeCpanauthors), released on 2016-10-01.
+This document describes version 0.003 of App::AcmeCpanauthors (from Perl distribution App-AcmeCpanauthors), released on 2017-07-07.
 
 =head1 SYNOPSIS
 
@@ -237,7 +237,11 @@ See the included script L<acme-cpanauthors>.
 =head1 FUNCTIONS
 
 
-=head2 acme_cpanauthors(%args) -> [status, msg, result, meta]
+=head2 acme_cpanauthors
+
+Usage:
+
+ acme_cpanauthors(%args) -> [status, msg, result, meta]
 
 Unofficial CLI for Acme::CPANAuthors.
 
@@ -326,7 +330,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

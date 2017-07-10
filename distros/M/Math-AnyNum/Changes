@@ -1,5 +1,25 @@
 Revision history for Math-AnyNum
 
+0.10    2017-07-09
+
+        [ADDITIONS]
+
+        - Added the `exp2(x)` and `exp10(x)` functions.
+        - Added the `ipow2(x)` and `ipow10(x)` functions.
+        - Added the `falling_factorial(n, k)` and `rising_factorial(n, k)` functions.
+
+        [PERFORMANCE IMPROVEMENTS]
+
+        - Faster stringification of floating-point numbers (including complex numbers).
+        - Optimization in `mfactorial(n, m)` for native integers.
+        - Optimization in `binomial(n, k)` for values of `n` that fit inside an unsigned integer.
+
+        [FIXES]
+
+        - Fixed `eta(NaN)` to return `NaN` instead of `log(2)`.
+        - Fixed `atanh(NaN)` to return `NaN` instead of `NaN+NaNi`.
+        - Fixed the return value of `lgrt(+i)` and `lgrt(-i)`.
+
 0.09    2017-05-30
 
         [ADDITIONS]

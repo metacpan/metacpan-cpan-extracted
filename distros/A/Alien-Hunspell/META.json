@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -14,10 +14,20 @@
    },
    "name" : "Alien-Hunspell",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.51",
+            "Alien::Build::MM" : "0.40",
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Alien::Base::ModuleBuild" : "0.006",
-            "File::ShareDir" : "1.03",
+            "Alien::Build" : "0.51",
+            "Alien::Build::MM" : "0.40",
+            "Alien::Build::Plugin::Build::Autoconf" : "0.41",
+            "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.006"
          }
       },
@@ -32,7 +42,6 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
-            "Test::Pod::Spelling::CommonMistakes" : "0",
             "Test::Spelling" : "0",
             "Test::Strict" : "0",
             "YAML" : "0"
@@ -40,17 +49,15 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Base" : "0.032",
-            "FFI::CheckLib" : "0",
-            "File::ShareDir" : "1.03",
+            "Alien::Base" : "0.038",
             "parent" : "0",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "Test::CChecker" : "0.07",
+            "Test2::V0" : "0.000060",
+            "Test::Alien" : "0",
             "Test::More" : "0.94",
             "perl" : "5.006"
          }
@@ -69,7 +76,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.10",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

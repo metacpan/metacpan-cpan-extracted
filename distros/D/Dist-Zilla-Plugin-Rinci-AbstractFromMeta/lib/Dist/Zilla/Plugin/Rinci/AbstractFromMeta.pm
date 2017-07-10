@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Rinci::AbstractFromMeta;
 
-our $DATE = '2015-12-09'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,7 +19,7 @@ with (
 );
 
 use Data::Dump qw(dump);
-use File::Slurp::Tiny qw(read_file);
+use File::Slurper qw(read_text);
 use File::Spec::Functions qw(catfile);
 
 # either provide filename or filename+filecontent
@@ -89,7 +89,7 @@ sub _get_from_script {
 
     # check if script uses Perinci::CmdLine
     if (!defined($filecontent)) {
-        $filecontent = read_file $filename;
+        $filecontent = read_text $filename;
     } else {
         # we need an actual file later when we feed to pericmd dumper
         require File::Temp;
@@ -138,7 +138,7 @@ sub _get_from_script {
         no warnings;
         %main::SPEC = (); # empty first to avoid mixing with other scripts'
         (undef, undef, undef) = Capture::Tiny::capture(sub {
-            eval q{package main; use Perinci::CmdLine::Base::Patch::DumpAndExit -tag=>'$tag', -exit_method=>'die'; do "$filename"};
+            eval q{package main; use Perinci::CmdLine::Base::Patch::DumpAndExit -tag=>'$tag', -exit_method=>'die'; do "./$filename"};
         });
     }
     state $pa = do { require Perinci::Access; Perinci::Access->new };
@@ -245,7 +245,7 @@ Dist::Zilla::Plugin::Rinci::AbstractFromMeta - Fill out abstract from Rinci meta
 
 =head1 VERSION
 
-This document describes version 0.09 of Dist::Zilla::Plugin::Rinci::AbstractFromMeta (from Perl distribution Dist-Zilla-Plugin-Rinci-AbstractFromMeta), released on 2015-12-09.
+This document describes version 0.10 of Dist::Zilla::Plugin::Rinci::AbstractFromMeta (from Perl distribution Dist-Zilla-Plugin-Rinci-AbstractFromMeta), released on 2017-07-07.
 
 =head1 SYNOPSIS
 
@@ -270,10 +270,6 @@ metadata, why repeat it in the dzil Abstract?
 
 =for Pod::Coverage .+
 
-=head1 SEE ALSO
-
-L<Rinci>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-Rinci-AbstractFromMeta>.
@@ -290,13 +286,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Rinci>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

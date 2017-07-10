@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 # -----------------------------------------------------------------------------
 
@@ -151,11 +151,11 @@ B<Formate>
 
 =over 4
 
-=item 0
+=item Z<>0
 
 Text der Zeile (Default).
 
-=item 1
+=item Z<>1
 
 Text der Zeile mit angehängtem Newline und vorangestellter
 Zeilennummer im Format:
@@ -251,7 +251,7 @@ sub length {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

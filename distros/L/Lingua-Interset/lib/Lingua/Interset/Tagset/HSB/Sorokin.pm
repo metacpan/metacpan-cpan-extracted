@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::HSB::Sorokin;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -54,14 +54,14 @@ sub _create_atoms
             'CONJ'   => ['pos' => 'conj'],
             'PRT'    => ['pos' => 'part'],
             'INTERJ' => ['pos' => 'int'],
-            'ABBR'   => ['abbr' => 'abbr'],
+            'ABBR'   => ['abbr' => 'yes'],
             '.'      => ['pos' => 'punc'],
             'X'      => [],
             '_'      => []
         },
         'encode_map' =>
         {
-            'abbr' => { 'abbr' => 'ABBR',
+            'abbr' => { 'yes' => 'ABBR',
                         '@'    => { 'pos' => { 'noun' => { 'prontype' => { ''  => 'NOUN',
                                                                            '@' => 'PRON' }},
                                                'adj'  => { 'numtype' => { 'ord' => 'NUM',
@@ -110,14 +110,14 @@ sub _create_atoms
         'decode_map' =>
         {
             'personal'      => ['prontype' => 'prs'],
-            'reflexive'     => ['prontype' => 'prs', 'reflex' => 'reflex'],
+            'reflexive'     => ['prontype' => 'prs', 'reflex' => 'yes'],
             'relative'      => ['prontype' => 'rel'],
             'demonstrative' => ['prontype' => 'dem'],
             'negative'      => ['prontype' => 'neg']
         },
         'encode_map' =>
         {
-            'prontype' => { 'prs' => { 'reflex' => { 'reflex' => 'reflexive',
+            'prontype' => { 'prs' => { 'reflex' => { 'yes' => 'reflexive',
                                                      '@'      => 'personal' }},
                             'rel' => 'relative',
                             'dem' => 'demonstrative',
@@ -519,7 +519,7 @@ Lingua::Interset::Tagset::HSB::Sorokin - Driver for the Upper Sorbian tagset of 
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

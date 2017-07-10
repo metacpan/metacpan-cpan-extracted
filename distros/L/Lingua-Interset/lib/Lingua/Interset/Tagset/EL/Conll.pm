@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::EL::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -49,14 +49,14 @@ sub _create_atoms
             # proper noun: Αμερικανός, ΣΩΚΡΑΤΗΣ, Άγιος, Γερμανός, Γάλλος
             'NoPr'   => ['pos' => 'noun', 'nountype' => 'prop'],
             # initial: Ο., Ζ., M., Χ., Ν.
-            'INIT'   => ['pos' => 'noun', 'nountype' => 'prop', 'abbr' => 'abbr'],
+            'INIT'   => ['pos' => 'noun', 'nountype' => 'prop', 'abbr' => 'yes'],
             # Aj = adjective: επικεφαλής, επόμενος, ίδιος, τελικός, Αρτέμιδος
             'Aj'     => ['pos' => 'adj'],
             # Pn = pronoun
             # personal pronoun: εγώ, εμείς, εσείς
             'PnPe'   => ['pos' => 'noun', 'prontype' => 'prs'],
             # possessive pronoun: μου, του, της, μας, σας, τους
-            'PnPo'   => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            'PnPo'   => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             # relative pronoun: που, οποίος, οποία, οποίο
             'PnRe'   => ['pos' => 'noun|adj', 'prontype' => 'rel'],
             # relative or interrogative pronoun: όποιος, οποιαδήποτε
@@ -104,7 +104,7 @@ sub _create_atoms
             'AsPpPa' => ['pos' => 'adp', 'adpostype' => 'prep'],
             # LSPLIT = left split: γι', σ', απ', κατ', εφ'
             # example: γι' αυτή (for this) (γι' is an abbreviation of για)
-            'LSPLIT' => ['pos' => 'adp', 'adpostype' => 'prep', 'abbr' => 'abbr'],
+            'LSPLIT' => ['pos' => 'adp', 'adpostype' => 'prep', 'abbr' => 'yes'],
             # Cj = conjunction
             # coordinating conjunction: και, αλλά, ή, ενώ, όμως
             'CjCo'   => ['pos' => 'conj', 'conjtype' => 'coor'],
@@ -121,13 +121,13 @@ sub _create_atoms
             'PtSj'   => ['pos' => 'part', 'parttype' => 'inf'],
             # Rg = foreign word or abbreviation
             # abbreviation: κ., ΕΕ, π.Χ., ΗΠΑ, χλμ.
-            'RgAbXx' => ['abbr' => 'abbr'],
+            'RgAbXx' => ['abbr' => 'yes'],
             # abbreviatory noun, acronym: ΟΗΕ, ΝΑΤΟ, ΕΤΑ, ΣΕΒ, ΔΠΔΓ
-            'RgAnXx' => ['pos' => 'noun', 'abbr' => 'abbr'],
+            'RgAnXx' => ['pos' => 'noun', 'abbr' => 'yes'],
             # foreign word in foreign script: Sudan, van, OLAF, of, Journal
-            'RgFwOr' => ['foreign' => 'foreign', 'other' => {'script' => 'foreign'}],
+            'RgFwOr' => ['foreign' => 'yes', 'other' => {'script' => 'foreign'}],
             # foreign word transcribed to the Greek script: Ιράν, Ιράκ, Δρ, Μπους, Γιουστσένκο
-            'RgFwTr' => ['foreign' => 'foreign', 'other' => {'script' => 'translit'}],
+            'RgFwTr' => ['foreign' => 'yes', 'other' => {'script' => 'translit'}],
             # COMP = multi-word expression: εν_λόγω (this, said), εν_όψει (with a view), απ'_όλα (all), εν__λόγω, _εν_λόγω
             'COMP'   => ['other' => {'pos' => 'comp'}],
             # PUNCT = punctuation: ,, ., ", -, :
@@ -135,12 +135,12 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'pos' => { 'noun' => { 'prontype' => { ''    => { 'nountype' => { 'prop' => { 'abbr' => { 'abbr' => 'INIT',
+            { 'pos' => { 'noun' => { 'prontype' => { ''    => { 'nountype' => { 'prop' => { 'abbr' => { 'yes' => 'INIT',
                                                                                                         '@'    => 'NoPr' }},
-                                                                                '@'    => { 'abbr' => { 'abbr' => 'RgAnXx',
+                                                                                '@'    => { 'abbr' => { 'yes' => 'RgAnXx',
                                                                                                         '@'    => { 'advtype' => { 'tim' => 'DATE',
                                                                                                                                    '@'   => 'NoCm' }}}}}},
-                                                     'prs' => { 'poss' => { 'poss' => 'PnPo',
+                                                     'prs' => { 'poss' => { 'yes' => 'PnPo',
                                                                             '@'    => 'PnPe' }},
                                                      'dem' => 'PnDm',
                                                      'int|rel' => 'PnRi',
@@ -149,7 +149,7 @@ sub _create_atoms
                                                      '@'   => 'PnId' }},
                          'adj'  => { 'prontype' => { ''    => { 'numtype' => { 'ord'  => 'NmOd',
                                                                                '@'    => 'Aj' }},
-                                                     'prs' => { 'poss' => { 'poss' => 'PnPo',
+                                                     'prs' => { 'poss' => { 'yes' => 'PnPo',
                                                                             '@'    => 'PnPe' }},
                                                      'art' => { 'definite' => { 'def' => 'AtDf',
                                                                                 '@'   => 'AtId' }},
@@ -167,7 +167,7 @@ sub _create_atoms
                                                      '@'   => 'VbMn' }},
                          'adv'  => { 'numtype' => { 'mult' => 'NmMl',
                                                     '@'    => 'Ad' }},
-                         'adp'  => { 'abbr' => { 'abbr' => 'LSPLIT',
+                         'adp'  => { 'abbr' => { 'yes' => 'LSPLIT',
                                                  '@'    => { 'number' => { ''  => 'AsPpSp',
                                                                            '@' => 'AsPpPa' }}}},
                          'conj' => { 'conjtype' => { 'sub' => 'CjSb',
@@ -177,8 +177,8 @@ sub _create_atoms
                                                                              '@'   => { 'polarity' => { 'neg' => 'PtNg',
                                                                                                         '@'   => 'PtOt' }}}}}},
                          'punc' => 'PUNCT',
-                         '@'    => { 'abbr' => { 'abbr' => 'RgAbXx',
-                                                 '@'    => { 'foreign' => { 'foreign' => { 'other/script' => { 'foreign'  => 'RgFwOr',
+                         '@'    => { 'abbr' => { 'yes' => 'RgAbXx',
+                                                 '@'    => { 'foreign' => { 'yes' => { 'other/script' => { 'foreign'  => 'RgFwOr',
                                                                                                                'translit' => 'RgFwTr',
                                                                                                                '@'        => 'RgFwTr' }},
                                                                             '@'       => { 'other/pos' => { 'comp' => 'COMP',
@@ -899,7 +899,7 @@ Lingua::Interset::Tagset::EL::Conll - Driver for the Greek tagset of the CoNLL 2
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

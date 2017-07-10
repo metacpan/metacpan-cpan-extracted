@@ -6,7 +6,7 @@
 package Lingua::Interset::Tagset::ZH::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -128,7 +128,7 @@ sub _create_atoms
             # N Nhb: 誰 shuí = who, 您 nín = you, 筆者 bǐzhě = author/I, 孰 shú = what, 各人 gèrén = everyone
             # N Nhc: 之 zhī = it, 前者 = the former, 後者 = the latter, 凡此種種 = all these, 兩者 = both
             'Nhaa' => ['pos' => 'noun', 'prontype' => 'prs'],
-            'Nhab' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'],
+            'Nhab' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'],
             'Nhac' => ['pos' => 'noun', 'prontype' => 'prs', 'polite' => 'form'],
             'Nhb'  => ['pos' => 'noun', 'prontype' => 'int'],
             'Nhc'  => ['pos' => 'noun', 'prontype' => 'prn', 'gender' => 'neut'],
@@ -514,7 +514,7 @@ sub _create_atoms
                                                                                                               'ddb'  => 'Nddb',
                                                                                                               'ddc'  => 'Nddc',
                                                                                                               '@'    => 'Ndaaa' }},
-                                                                               '@'   => { 'prontype' => { 'prs' => { 'reflex' => { 'reflex' => 'Nhab',
+                                                                               '@'   => { 'prontype' => { 'prs' => { 'reflex' => { 'yes' => 'Nhab',
                                                                                                                                    '@'      => { 'polite' => { 'form' => 'Nhac',
                                                                                                                                                                '@'    => 'Nhaa' }}}},
                                                                                                           'int' => 'Nhb',
@@ -1176,7 +1176,7 @@ Lingua::Interset::Tagset::ZH::Conll - Driver for the Chinese tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

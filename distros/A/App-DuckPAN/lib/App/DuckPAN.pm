@@ -1,7 +1,7 @@
 package App::DuckPAN;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: The DuckDuckGo DuckPAN client
-$App::DuckPAN::VERSION = '1018';
+$App::DuckPAN::VERSION = '1019';
 use feature 'state';
 
 use Moo;
@@ -706,7 +706,7 @@ App::DuckPAN - The DuckDuckGo DuckPAN client
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 DuckPAN
 

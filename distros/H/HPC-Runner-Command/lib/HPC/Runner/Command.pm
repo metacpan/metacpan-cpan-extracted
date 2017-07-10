@@ -39,7 +39,7 @@ has 'submission_uuid' => (
     predicate => 'has_submissions_uuid',
 );
 
-our $VERSION = '3.2.6';
+our $VERSION = '3.2.7';
 
 app_strict 0;
 

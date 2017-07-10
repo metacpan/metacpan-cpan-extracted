@@ -1,5 +1,5 @@
 package WebService::Braintree::SettlementBatchSummaryGateway;
-$WebService::Braintree::SettlementBatchSummaryGateway::VERSION = '0.9';
+$WebService::Braintree::SettlementBatchSummaryGateway::VERSION = '0.91';
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 use Carp qw(confess);

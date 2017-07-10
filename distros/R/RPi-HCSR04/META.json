@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -37,5 +37,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/rpi-hcsr04/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/rpi-hcsr04.git",
+         "web" : "https://github.com/stevieb9/rpi-hcsr04"
+      }
+   },
+   "version" : "2.3602",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

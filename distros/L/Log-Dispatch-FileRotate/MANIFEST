@@ -10,9 +10,9 @@ README
 SIGNATURE
 lib/Log/Dispatch/FileRotate.pm
 t/author-pod-syntax.t
+t/author-signature.t
 t/basic.t
 t/file-open-failure.t
 t/lockfile-open-failure.t
 t/no-activity-bug.t
-t/signature.t
 t/size-with-underscore.t

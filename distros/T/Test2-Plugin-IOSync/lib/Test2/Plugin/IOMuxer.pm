@@ -2,11 +2,15 @@ package Test2::Plugin::IOMuxer;
 use strict;
 use warnings;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 
 use Test2::Plugin::OpenFixPerlIO;
 use Test2::Plugin::IOMuxer::Layer;
+use Test2::Plugin::IOMuxer::STDERR;
+use Test2::Plugin::IOMuxer::STDOUT;
+use Test2::Plugin::IOMuxer::FORMAT;
+
 use IO::Handle;
 
 use Test2::API qw{
@@ -32,6 +36,12 @@ sub import {
 
     my $file = $in;
 
+    mux_handle(\*STDOUT, $file, 'Test2::Plugin::IOMuxer::STDOUT');
+    mux_handle(\*STDERR, $file, 'Test2::Plugin::IOMuxer::STDERR');
+
+    mux_handle(Test2::API::test2_stdout(), $file, 'Test2::Plugin::IOMuxer::STDOUT') if Test2::API->can('test2_stdout');
+    mux_handle(Test2::API::test2_stderr(), $file, 'Test2::Plugin::IOMuxer::STDERR') if Test2::API->can('test2_stderr');
+
     test2_add_callback_post_load(sub {
         my @handles;
 
@@ -46,18 +56,15 @@ sub import {
             }
         }
 
-        mux_handle($_, $file) for @handles;
+        mux_handle($_, $file, 'Test2::Plugin::IOMuxer::FORMAT') for @handles;
     });
 
-    mux_handle(\*STDOUT, $file);
-    mux_handle(\*STDERR, $file);
-
-    mux_handle(Test2::API::test2_stdout(), $file) if Test2::API->can('test2_stdout');
-    mux_handle(Test2::API::test2_stderr(), $file) if Test2::API->can('test2_stderr');
 }
 
-sub mux_handle(*$) {
-    my ($fh, $file) = @_;
+sub mux_handle(*$;$) {
+    my ($fh, $file, $layer) = @_;
+
+    $layer ||= 'Test2::Plugin::IOMuxer::Layer';
 
     my $fileno = fileno($_[0]);
     die "Could not get fileno for handle" unless defined $fileno;
@@ -75,7 +82,7 @@ sub mux_handle(*$) {
         $Test2::Plugin::IOMuxer::Layer::MUX_FILES{$file} = $mh;
     }
 
-    binmode($_[0], ":via(Test2::Plugin::IOMuxer::Layer)");
+    binmode($_[0], ":via($layer)");
 }
 
 1;

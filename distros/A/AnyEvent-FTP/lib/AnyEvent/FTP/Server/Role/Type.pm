@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Type role for FTP server
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 has type => (
@@ -24,7 +24,7 @@ sub cmd_type
   my $type = uc $req->args;
   $type =~ s/^\s+//;
   $type =~ s/\s+$//;
-  
+
   if($type eq 'A' || $type eq 'I')
   {
     $self->type($type);
@@ -34,7 +34,7 @@ sub cmd_type
   {
     $con->send_response(500 => "Type not understood");
   }
-  
+
   $self->done;
 }
 
@@ -54,12 +54,12 @@ AnyEvent::FTP::Server::Role::Type - Type role for FTP server
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
  package AnyEvent::FTP::Server::Context::MyContext;
- 
+
  use Moo;
  extends 'AnyEvent::FTP::Server::Context';
  with 'AnyEvent::FTP::Server::Role::Type';
@@ -91,6 +91,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

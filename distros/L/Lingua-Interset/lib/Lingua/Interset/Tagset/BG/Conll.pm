@@ -7,7 +7,7 @@
 package Lingua::Interset::Tagset::BG::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -50,7 +50,7 @@ sub _create_atoms
         'decode_map' =>
         {
             # indeclinable foreign noun
-            'N' => ['pos' => 'noun', 'foreign' => 'foreign'],
+            'N' => ['pos' => 'noun', 'foreign' => 'yes'],
             # common noun
             'Nc' => ['pos' => 'noun', 'nountype' => 'com'],
             # proper noun
@@ -67,10 +67,10 @@ sub _create_atoms
             # If there is no second character, it is plural, which is genderless.
             # We do not decode the gender/number here, we are waiting for the features.
             # We have to preserve tags like "H Hm _" where the gender is not in the features.
-            'H' => ['pos' => 'noun|adj', 'nountype' => 'prop', 'poss' => 'poss', 'other' => {'subpos' => 'H'}],
-            'Hm' => ['pos' => 'noun|adj', 'nountype' => 'prop', 'poss' => 'poss', 'other' => {'subpos' => 'Hm'}],
-            'Hf' => ['pos' => 'noun|adj', 'nountype' => 'prop', 'poss' => 'poss', 'other' => {'subpos' => 'Hf'}],
-            'Hn' => ['pos' => 'noun|adj', 'nountype' => 'prop', 'poss' => 'poss', 'other' => {'subpos' => 'Hn'}],
+            'H' => ['pos' => 'noun|adj', 'nountype' => 'prop', 'poss' => 'yes', 'other' => {'subpos' => 'H'}],
+            'Hm' => ['pos' => 'noun|adj', 'nountype' => 'prop', 'poss' => 'yes', 'other' => {'subpos' => 'Hm'}],
+            'Hf' => ['pos' => 'noun|adj', 'nountype' => 'prop', 'poss' => 'yes', 'other' => {'subpos' => 'Hf'}],
+            'Hn' => ['pos' => 'noun|adj', 'nountype' => 'prop', 'poss' => 'yes', 'other' => {'subpos' => 'Hn'}],
             # adjective
             # subpos: A Af Am An
             # The second character encodes gender.
@@ -86,7 +86,7 @@ sub _create_atoms
             # P = probably error; the only example is "za_razlika_ot" ("in contrast to")
             'P' => ['pos' => 'noun|adj|adv', 'prontype' => 'prn'],
             'Pp' => ['pos' => 'noun', 'prontype' => 'prs'],
-            'Ps' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+            'Ps' => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
             'Pd' => ['pos' => 'noun|adj|adv', 'prontype' => 'dem'],
             'Pi' => ['pos' => 'noun|adj|adv', 'prontype' => 'int'],
             'Pr' => ['pos' => 'noun|adj|adv', 'prontype' => 'rel'],
@@ -190,8 +190,8 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'prontype' => { 'prs' => { 'poss' => { 'poss' => 'Ps',
-                                                     '@'    => 'Pp' }},
+            { 'prontype' => { 'prs' => { 'poss' => { 'yes' => 'Ps',
+                                                     '@'   => 'Pp' }},
                               'dem' => 'Pd',
                               'int' => { 'pos' => { 'part' => 'Ti',
                                                     '@'    => 'Pi' }},
@@ -203,8 +203,8 @@ sub _create_atoms
                               'prn' => 'P',
                               '@'   => { 'pos' => { 'noun' => { 'other/subpos' => { 'My' => 'My',
                                                                                     'Nm' => 'Nm',
-                                                                                    '@'  => { 'foreign' => { 'foreign' => 'N',
-                                                                                                             '@'       => { 'poss' => { 'poss' => { 'number' => { 'sing' => { 'gender' => { 'masc' => 'Hm',
+                                                                                    '@'  => { 'foreign' => { 'yes' => 'N',
+                                                                                                             '@'       => { 'poss' => { 'yes' => { 'number' => { 'sing' => { 'gender' => { 'masc' => 'Hm',
                                                                                                                                                                                             'fem'  => 'Hf',
                                                                                                                                                                                             'neut' => 'Hn',
                                                                                                                                                                                             '@'    => 'H' }},
@@ -216,7 +216,7 @@ sub _create_atoms
                                                                                                               'Af' => 'Af',
                                                                                                               'An' => 'An',
                                                                                                               'A'  => 'A',
-                                                                                                              '@'  => { 'poss' => { 'poss' => { 'number' => { 'sing' => { 'gender' => { 'masc' => 'Hm',
+                                                                                                              '@'  => { 'poss' => { 'yes' => { 'number' => { 'sing' => { 'gender' => { 'masc' => 'Hm',
                                                                                                                                                                                         'fem'  => 'Hf',
                                                                                                                                                                                         'neut' => 'Hn',
                                                                                                                                                                                         '@'    => 'H' }},
@@ -437,16 +437,16 @@ sub _create_atoms
             # e = entity
             'e' => ['pos' => 'noun'],
             # r = reflexive
-            'r' => ['reflex' => 'reflex'],
+            'r' => ['reflex' => 'yes'],
             # a = attribute
             'a' => ['pos' => 'adj'],
             # p = possessor
             # not normal possessive pronouns (my, his, our) but relative/indefinite/negative (whose, someone's, nobody's)
-            'p' => ['poss' => 'poss'],
+            'p' => ['poss' => 'yes'],
             # op = one possessor
-            'op' => ['poss' => 'poss', 'possnumber' => 'sing'],
+            'op' => ['poss' => 'yes', 'possnumber' => 'sing'],
             # mp = many possessors
-            'mp' => ['poss' => 'poss', 'possnumber' => 'plur'],
+            'mp' => ['poss' => 'yes', 'possnumber' => 'plur'],
             # q = quantity or degree
             'q' => ['pos' => 'num'],
             # l = location
@@ -458,8 +458,8 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'reflex' => { 'reflex' => 'r',
-                            '@'      => { 'poss' => { 'poss' => { 'possnumber' => { 'sing' => 'op',
+            { 'reflex' => { 'yes' => 'r',
+                            '@'      => { 'poss' => { 'yes' => { 'possnumber' => { 'sing' => 'op',
                                                                                     'plur'  => 'mp',
                                                                                     '@'    => 'p' }},
                                                       '@'    => { 'pos' => { 'adj|adv|noun' => '',
@@ -1284,7 +1284,7 @@ Lingua::Interset::Tagset::BG::Conll - Driver for the Bulgarian tagset of the CoN
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

@@ -7,13 +7,15 @@ build_requires:
   Test::DescribeMe: '0'
   Test::Exception: '0'
   Test::Mock::LWP::Dispatch: '0'
+  Test::Mock::Simple: '0'
   Test::More: '0'
+  Test::TempDir::Tiny: '0'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,29 +24,30 @@ name: Net-Fritz
 provides:
   Net::Fritz:
     file: lib/Net/Fritz.pm
-    version: v0.0.7
+    version: v0.0.8
   Net::Fritz::Action:
     file: lib/Net/Fritz/Action.pm
-    version: v0.0.7
+    version: v0.0.8
   Net::Fritz::Box:
     file: lib/Net/Fritz/Box.pm
-    version: v0.0.7
+    version: v0.0.8
   Net::Fritz::Data:
     file: lib/Net/Fritz/Data.pm
-    version: v0.0.7
+    version: v0.0.8
   Net::Fritz::Device:
     file: lib/Net/Fritz/Device.pm
-    version: v0.0.7
+    version: v0.0.8
   Net::Fritz::Error:
     file: lib/Net/Fritz/Error.pm
-    version: v0.0.7
+    version: v0.0.8
   Net::Fritz::IsNoError:
     file: lib/Net/Fritz/IsNoError.pm
-    version: v0.0.7
+    version: v0.0.8
   Net::Fritz::Service:
     file: lib/Net/Fritz/Service.pm
-    version: v0.0.7
+    version: v0.0.8
 requires:
+  AppConfig: '0'
   Digest::MD5: '0'
   LWP::UserAgent: '6.00'
   Moo: '0'
@@ -60,4 +63,5 @@ requires:
 resources:
   bugtracker: https://github.com/mmitch/fritz/issues
   repository: git://github.com/mmitch/fritz.git
-version: v0.0.7
+version: v0.0.8
+x_serialization_backend: 'YAML::Tiny version 1.70'

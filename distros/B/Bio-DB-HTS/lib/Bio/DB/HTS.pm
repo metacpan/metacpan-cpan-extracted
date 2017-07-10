@@ -1,7 +1,7 @@
 
 =head1 LICENSE
 
-Copyright [1999-2016] EMBL-European Bioinformatics Institute
+Copyright [2015-2017] EMBL-European Bioinformatics Institute
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -1283,7 +1283,7 @@ Rishi Nag E<lt>rishi@ebi.ac.ukE<gt>
 =cut
 
 package Bio::DB::HTS;
-$Bio::DB::HTS::VERSION = '2.7';
+$Bio::DB::HTS::VERSION = '2.8';
 
 use strict;
 use warnings;
@@ -1318,9 +1318,10 @@ sub new {
     my $force_refseq  = $args{-force_refseq};
 
     # file existence checks
-    unless ( $class->is_remote($hts_path) ) {
+    unless ( Bio::DB::HTSfile->is_remote($hts_path) ) {
+        use filetest 'access';
         -e $hts_path or croak "$hts_path does not exist";
-        -r _ or croak "is not readable";
+        -r $hts_path or croak "is not readable";
     }
     my $hts_file = Bio::DB::HTSfile->open($hts_path) or
       croak "$hts_path open: $!";
@@ -1343,11 +1344,6 @@ sub new {
 
 sub hts_file { shift->{hts_file} }
 
-sub is_remote {
-    my $self = shift;
-    my $path = shift;
-    return $path =~ /^(http|https|ftp):/;
-}
 
 sub clone {
     my $self = shift;
@@ -1377,7 +1373,8 @@ sub new_dna_accessor {
     return unless $accessor;
 
     if ( -e $accessor ) {    # a file, assume it is a fasta file
-        -r _ or croak "$accessor is not readable";
+        use filetest 'access';
+        -r $accessor or croak "$accessor is not readable";
         my $a = Bio::DB::HTS::Fai->open($accessor) or
           croak "$accessor open: $!" or
           croak "Can't open FASTA file $accessor: $!";
@@ -2082,7 +2079,7 @@ sub _glob_match {
 
 package Bio::DB::HTS::Fai;
 
-$Bio::DB::HTS::Fai::VERSION = '2.7';
+$Bio::DB::HTS::Fai::VERSION = '2.8';
 
 sub open { shift->load(@_) }
 
@@ -2099,7 +2096,7 @@ package Bio::SeqFeature::HTSCoverage;
 
 use base 'Bio::SeqFeature::Lite';
 
-$Bio::SeqFeature::HTSCoverage::VERSION = '2.7';
+$Bio::SeqFeature::HTSCoverage::VERSION = '2.8';
 
 sub coverage {
     my $self = shift;
@@ -2131,7 +2128,7 @@ sub gff3_string {
 
 package Bio::DB::HTSfile;
 
-$Bio::DB::HTS::HTSfile::VERSION = '2.7';
+$Bio::DB::HTS::HTSfile::VERSION = '2.8';
 
 use File::Spec;
 use Cwd;
@@ -2144,7 +2141,7 @@ sub index {
     my $autoindex = $hts_obj->{autoindex};
     my $path      = $hts_obj->{hts_path};
 
-    return $self->index_open_in_safewd($fh) if Bio::DB::HTS->is_remote($path);
+    return $self->index_open_in_safewd($fh) if Bio::DB::HTSfile->is_remote($path);
 
     if ($autoindex) {
         if ( !( -e "${path}.bai" or -e "${path}.crai" ) ) {

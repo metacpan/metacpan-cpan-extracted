@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Prty::Option;
 use Prty::Shell;
@@ -31,12 +31,19 @@ L<Prty::Object>
 =head4 Synopsis
 
     ($out,$err) = Prty::Ipc->filter($cmd,$in,@opt);
+    ($out,$err) = Prty::Ipc->filter($cmd,@opt);
 
 =head4 Description
 
-Rufe Kommando $cmd als Filter auf. Das Kommando erhält die
-Daten $in auf stdin und liefert die Daten $out und
-$err auf stdout bzw. stderr.
+Rufe Kommando $cmd als Filter auf. Das Kommando erhält die Daten
+$in auf stdin und liefert die Daten $out und $err auf stdout
+bzw. stderr.
+
+Achtung: Der Aufruf kann zu einem SIGPIPE führen, wenn per
+Parameter $in Daten an $cmd gesendet werden und das Kommando
+terminiert, bevor es alle Daten gelesen hat. Insbesondere sollten
+keine Daten an ein Kommando gesendet werden, das nicht von stdin
+liest!
 
 =head4 Options
 
@@ -56,16 +63,14 @@ geworfen, wenn das Kommando fehlschlägt.
 sub filter {
     my $class = shift;
     my $cmd = shift;
-    my $in = shift;
-    # @_: @opt
-
+    # @_: $in,@opt -or- @opt
+    
     my $ignoreError = 0;
 
-    if (@_) {
-        Prty::Option->extract(\@_,
-            -ignoreError=>\$ignoreError,
-        );
-    }
+    Prty::Option->extract(\@_,
+        -ignoreError=>\$ignoreError,
+    );
+    my $in = shift;
 
     local (*W,*R,*E,$/);
     my $pid = IPC::Open3::open3(\*W,\*R,\*E,$cmd);
@@ -94,14 +99,14 @@ sub filter {
         Prty::Shell->checkError($?,$err,$cmd);
     }
 
-    return  ($out,$err);
+    return ($out,$err);
 }
 
 # -----------------------------------------------------------------------------
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

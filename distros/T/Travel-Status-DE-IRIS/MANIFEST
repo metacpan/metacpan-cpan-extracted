@@ -22,12 +22,16 @@ t/33-result-route.t
 t/34-result-transfer.t
 t/35-result-wings.t
 t/in/fchg/8000041
+t/in/fchg/8000080
 t/in/fchg/8000086
 t/in/fchg/8000098
 t/in/fchg/8000207
 t/in/plan/8000041/150520/17
 t/in/plan/8000041/150520/18
 t/in/plan/8000041/150520/19
+t/in/plan/8000080/170526/18
+t/in/plan/8000080/170526/19
+t/in/plan/8000080/170526/20
 t/in/plan/8000086/140209/20
 t/in/plan/8000086/140209/21
 t/in/plan/8000086/140209/22
@@ -44,6 +48,7 @@ t/in/plan/8000207/150522/17
 t/in/station/EBILP
 t/in/station/EBO
 t/in/station/EDG
+t/in/station/EDO
 t/in/station/EE
 t/in/station/KK
 META.yml

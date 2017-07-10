@@ -1,4 +1,8 @@
-Revision history for Dist-Zilla-Plugin-EnsureSQLSchemaVersionedTest
+0.03    2017-07-07 (PERLANCAR)
+
+	- Switch from (ab)using InstallTool phase to using AfterBuild phase
+	  to do our stuffs, to be compatible with DZP:StaticInstall.
+
 
 0.02    2016-02-11 (PERLANCAR)
 

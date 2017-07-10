@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::TestReport;
-our $VERSION = '0.013';
+our $VERSION = '0.015';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -21,6 +21,31 @@ our $VERSION = '0.013';
 
 use CPAN::Testers::Schema::Base 'ResultSet';
 use Scalar::Util qw( blessed );
+
+#pod =method dist
+#pod
+#pod     my $rs = $rs->dist( 'Perl 5', 'CPAN-Testers-Schema' );
+#pod     my $rs = $rs->dist( 'Perl 5', 'CPAN-Testers-Schema', '0.012' );
+#pod
+#pod Fetch reports only for the given distribution, optionally for the given
+#pod version. Returns a new C<CPAN::Testers::Schema::ResultSet::TestReport>
+#pod object that will only return reports with the given data.
+#pod
+#pod This can be used to scan the full reports for specific data.
+#pod
+#pod =cut
+
+sub dist( $self, $lang, $dist, $version=undef ) {
+    return $self->search( {
+        'report' => [ -and =>
+            \[ "->> '\$.environment.language.name'=?", $lang ],
+            \[ "->> '\$.distribution.name'=?", $dist ],
+            ( defined $version ? (
+                \[ "->> '\$.distribution.version'=?", $version ],
+            ) : () ),
+        ],
+    } );
+}
 
 #pod =method insert_metabase_fact
 #pod
@@ -94,7 +119,7 @@ CPAN::Testers::Schema::ResultSet::TestReport - Query the raw test reports
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -106,6 +131,17 @@ version 0.013
 This object helps to insert and query the raw test reports.
 
 =head1 METHODS
+
+=head2 dist
+
+    my $rs = $rs->dist( 'Perl 5', 'CPAN-Testers-Schema' );
+    my $rs = $rs->dist( 'Perl 5', 'CPAN-Testers-Schema', '0.012' );
+
+Fetch reports only for the given distribution, optionally for the given
+version. Returns a new C<CPAN::Testers::Schema::ResultSet::TestReport>
+object that will only return reports with the given data.
+
+This can be used to scan the full reports for specific data.
 
 =head2 insert_metabase_fact
 

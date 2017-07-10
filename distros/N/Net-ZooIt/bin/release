@@ -1,0 +1,31 @@
+#!/bin/sh
+VERB=$1
+
+case $VERB in
+prepare)
+    [ `echo "$VERSION" | sed -n 's/^[0-9]\.[0-9][0-9].*/&/p'` ] || exit 1
+    echo VERSION $VERSION
+    sed -r 's/^(our .VERSION = ).+/\1'\'$VERSION\'';/' -i lib/Net/ZooIt.pm
+    PREV=`sed -rn 's/^([0-9.]+)  [-0-9]+/\1/p' Changes | tail -1`
+    cat <<EOF >>Changes
+
+$VERSION  `date +%F`
+`git log --oneline $PREV..HEAD | sed -r 's/^[0-9a-f]+ /  - /'`
+EOF
+    ;;
+finish)
+    TAG=`sed -rn 's/^([0-9.]+)  [-0-9]+/\1/p' Changes | tail -1`
+    echo TAG $TAG
+    git commit -am $TAG
+    git tag $TAG
+    ;;
+undo)
+    TAG=`git log --oneline --decorate | sed -rn 's/.*HEAD.*tag: ([0-9.]+).*/\1/p'`
+    [ "$TAG" ] || exit 2
+    git tag -d $TAG
+    git reset --hard HEAD^
+    ;;
+*)
+    exit 3
+    ;;
+esac

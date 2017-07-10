@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2008, 2009, 2010, 2016 Kevin Ryde
+# Copyright 2008, 2009, 2010, 2016, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -27,6 +27,7 @@ use App::Chart::Suffix::MON;
 {
   my $resp = HTTP::Response->new(200, 'OK');
   my $content = slurp ("$ENV{HOME}/chart/samples/mx/donnees_fin_jour-cgb-2.csv");
+  $content = slurp ("$ENV{HOME}/chart/samples/mx/nego_fin_jour_en.php_=o&symbol=&o=&f=CGB&from=2017-07-01&to=2017-07-05&dnld=Download.html");
   $resp->content($content);
   $resp->content_type('text/plain');
   my $h = App::Chart::Suffix::MON::daily_parse ($resp);

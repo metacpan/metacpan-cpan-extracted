@@ -6,7 +6,7 @@ use 5.010;
 use base qw( AnyEvent::FTP::Response );
 
 # ABSTRACT: Response class for asynchronous ftp client
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 sub get_address_and_port
@@ -47,7 +47,7 @@ AnyEvent::FTP::Client::Response - Response class for asynchronous ftp client
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -87,6 +87,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

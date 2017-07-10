@@ -7,7 +7,7 @@
 package Lingua::Interset::Tagset::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -164,7 +164,7 @@ Lingua::Interset::Tagset::Conll - Common code for drivers of tagsets from files 
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 DESCRIPTION
 

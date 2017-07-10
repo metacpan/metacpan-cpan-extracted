@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Server response encoder role
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 requires 'encode';
 requires 'new';
@@ -25,7 +25,7 @@ AnyEvent::FTP::Server::Role::ResponseEncoder - Server response encoder role
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 
@@ -36,6 +36,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

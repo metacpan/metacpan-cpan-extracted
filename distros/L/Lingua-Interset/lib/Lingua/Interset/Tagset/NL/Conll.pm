@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::NL::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -271,7 +271,7 @@ sub _create_atoms
                         'acc|dat' => 'datofacc',
                         'dat'     => 'dat',
                         'acc'     => 'acc',
-                        '@'       => { 'reflex' => { 'reflex' => '',
+                        '@'       => { 'reflex' => { 'yes' => '',
                                                      '@'      => 'neut' }}}
         }
     );
@@ -362,15 +362,15 @@ sub _create_atoms
         'surfeature' => 'misctype',
         'decode_map' =>
         {
-            'afkort'  => ['abbr' => 'abbr'], # abbreviation
-            'vreemd'  => ['foreign' => 'foreign'], # foreign expression
+            'afkort'  => ['abbr' => 'yes'], # abbreviation
+            'vreemd'  => ['foreign' => 'yes'], # foreign expression
             'symbool' => ['pos' => 'sym'], # symbol not included in Punc
         },
         'encode_map' =>
         {
             'pos' => { 'sym' => 'symbool',
-                       '@'   => { 'foreign' => { 'foreign' => 'vreemd',
-                                                 '@'       => { 'abbr' => { 'abbr' => 'afkort' }}}}}
+                       '@'   => { 'foreign' => { 'yes' => 'vreemd',
+                                                 '@'       => { 'abbr' => { 'yes' => 'afkort' }}}}}
         }
     );
     # ADPOSITION TYPE ####################
@@ -399,8 +399,8 @@ sub _create_atoms
         'decode_map' =>
         {
             'per'   => ['prontype' => 'prs'], # persoonlijk (me, ik, ons, we, je, u, jullie, ze, hem, hij, hen)
-            'bez'   => ['prontype' => 'prs', 'poss' => 'poss'], # beztittelijk (mijn, onze, je, jullie, zijner, zijn, hun)
-            'ref'   => ['prontype' => 'prs', 'reflex' => 'reflex'], # reflexief (me, mezelf, mij, ons, onszelf, je, jezelf, zich, zichzelf)
+            'bez'   => ['prontype' => 'prs', 'poss' => 'yes'], # beztittelijk (mijn, onze, je, jullie, zijner, zijn, hun)
+            'ref'   => ['prontype' => 'prs', 'reflex' => 'yes'], # reflexief (me, mezelf, mij, ons, onszelf, je, jezelf, zich, zichzelf)
             'rec'   => ['prontype' => 'rcp'], # reciprook (elkaar, elkaars)
             'aanw'  => ['prontype' => 'dem'], # aanwijzend (deze, dit, die, dat)
             'betr'  => ['prontype' => 'rel'], # betrekkelijk (welk, die, dat, wat, wie)
@@ -409,8 +409,8 @@ sub _create_atoms
         },
         'encode_map' =>
         {
-            'prontype' => { 'prs' => { 'poss' => { 'poss' => 'bez',
-                                                   '@'    => { 'reflex' => { 'reflex' => 'ref',
+            'prontype' => { 'prs' => { 'poss' => { 'yes' => 'bez',
+                                                   '@'    => { 'reflex' => { 'yes' => 'ref',
                                                                              '@'      => 'per' }}}},
                             'rcp' => 'rec',
                             'dem' => 'aanw',
@@ -512,7 +512,7 @@ sub _create_atoms
         'decode_map' =>
         {
             'trans'      => ['subcat' => 'tran'], # transitive (maken, zien, doen, nemen, geven)
-            'refl'       => ['reflex' => 'reflex'], # reflexive (verzetten, ontwikkelen, voelen, optrekken, concentreren)
+            'refl'       => ['reflex' => 'yes'], # reflexive (verzetten, ontwikkelen, voelen, optrekken, concentreren)
             'intrans'    => ['subcat' => 'intr'], # intransitive (komen, gaan, staan, vertrekken, spelen)
             'hulp'       => ['verbtype' => 'mod'], # auxiliary / modal (kunnen, moeten, hebben, gaan, laten)
             'hulpofkopp' => ['verbtype' => 'aux|cop'] # auxiliary or copula (worden, zijn, blijven, komen, wezen)
@@ -522,7 +522,7 @@ sub _create_atoms
             'verbtype' => { 'aux' => 'hulpofkopp',
                             'cop' => 'hulpofkopp',
                             'mod' => 'hulp',
-                            '@'   => { 'reflex' => { 'reflex' => 'refl',
+                            '@'   => { 'reflex' => { 'yes' => 'refl',
                                                      '@'      => { 'subcat' => { 'tran' => 'trans',
                                                                                  'intr' => 'intrans' }}}}}
         }
@@ -917,7 +917,7 @@ Lingua::Interset::Tagset::NL::Conll - Driver for the Dutch tagset of the CoNLL 2
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

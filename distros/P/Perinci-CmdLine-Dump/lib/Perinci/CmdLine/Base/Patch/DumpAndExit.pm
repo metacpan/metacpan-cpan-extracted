@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base::Patch::DumpAndExit;
 
-our $DATE = '2017-06-24'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,7 +61,7 @@ Perinci::CmdLine::Base::Patch::DumpAndExit - Patch Perinci::CmdLine::Base to dum
 
 =head1 VERSION
 
-This document describes version 0.10 of Perinci::CmdLine::Base::Patch::DumpAndExit (from Perl distribution Perinci-CmdLine-Dump), released on 2017-06-24.
+This document describes version 0.11 of Perinci::CmdLine::Base::Patch::DumpAndExit (from Perl distribution Perinci-CmdLine-Dump), released on 2017-07-07.
 
 =head1 DESCRIPTION
 

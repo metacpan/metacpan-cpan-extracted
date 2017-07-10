@@ -1,7 +1,7 @@
 package App::pmpatcher;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.06'; # VERSION
 
 use 5.010001;
 use strict;
@@ -247,7 +247,7 @@ App::pmpatcher - Apply a set of module patches on your Perl installation
 
 =head1 VERSION
 
-This document describes version 0.05 of App::pmpatcher (from Perl distribution App-pmpatcher), released on 2017-07-03.
+This document describes version 0.06 of App::pmpatcher (from Perl distribution App-pmpatcher), released on 2017-07-07.
 
 =head1 SYNOPSIS
 

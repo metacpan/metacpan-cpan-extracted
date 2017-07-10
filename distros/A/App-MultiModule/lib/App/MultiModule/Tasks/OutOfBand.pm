@@ -1,5 +1,5 @@
 package App::MultiModule::Tasks::OutOfBand;
-$App::MultiModule::Tasks::OutOfBand::VERSION = '1.143160';
+$App::MultiModule::Tasks::OutOfBand::VERSION = '1.171870';
 use strict;use warnings;
 use Storable;
 use Message::Match qw(mmatch);

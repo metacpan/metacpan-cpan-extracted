@@ -1,5 +1,5 @@
 package Lab::Instrument::Keithley2000;
-$Lab::Instrument::Keithley2000::VERSION = '3.552';
+$Lab::Instrument::Keithley2000::VERSION = '3.553';
 use strict;
 use Lab::Instrument;
 use Time::HiRes qw (usleep);

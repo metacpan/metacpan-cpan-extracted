@@ -1,7 +1,7 @@
 package Lab::XPRESS::Sweep::PulseLength;
 #Dist::Zilla: +PodWeaver
 # ABSTRACT: Pulse length sweep
-$Lab::XPRESS::Sweep::PulseLength::VERSION = '3.552';
+$Lab::XPRESS::Sweep::PulseLength::VERSION = '3.553';
 use Lab::XPRESS::Sweep::Sweep;
 use Time::HiRes qw/usleep/, qw/time/;
 use strict;
@@ -93,7 +93,7 @@ Lab::XPRESS::Sweep::PulseLength - Pulse length sweep
 
 =head1 VERSION
 
-version 3.552
+version 3.553
 
 =head1 SYNOPSIS
 
@@ -254,10 +254,13 @@ probably none
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by the Lab::Measurement team.
-  Copyright 2014-2015  Andreas K. Huettel
-            2016       Andreas K. Huettel, Simon Reinhardt
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2013       Alois Dirnaichner, Andreas K. Huettel, Christian Butschkow, Stefan Geissler
+            2014       Andreas K. Huettel
+            2016       Simon Reinhardt
             2017       Andreas K. Huettel
+
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

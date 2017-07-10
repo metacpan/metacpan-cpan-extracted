@@ -11,7 +11,7 @@ sub __ipow__ {
     Math::GMPz::Rmpz_pow_ui($r, $x, CORE::abs($y));
 
     if ($y < 0) {
-        Math::GMPz::Rmpz_sgn($r) || goto &Math::AnyNum::_inf;    # 0^(-y) = Inf
+        Math::GMPz::Rmpz_sgn($r) || goto &_inf;    # 0^(-y) = Inf
         state $ONE_Z = Math::GMPz::Rmpz_init_set_ui_nobless(1);
         Math::GMPz::Rmpz_tdiv_q($r, $ONE_Z, $r);
     }

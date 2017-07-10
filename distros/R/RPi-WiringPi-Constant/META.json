@@ -47,6 +47,6 @@
          "web" : "https://github.com/stevieb9/p5-rpi-wiringpi-constant"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

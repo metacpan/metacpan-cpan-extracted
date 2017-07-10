@@ -146,7 +146,7 @@
                             %= $paging_buts2->();
                             %= t table => (class=>'rows') => begin
                                 % for my $child (@children) {
-                                    % my $ckey = $child->id;
+                                    % my $ckey = $child->compound_ids;
                                     %= t tr => begin
                                         %= t td => begin
                                             %= link_to $child => url_for("/tables/$ctable/$ckey/view")

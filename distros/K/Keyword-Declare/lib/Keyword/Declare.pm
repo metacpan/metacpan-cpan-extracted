@@ -1,5 +1,5 @@
 package Keyword::Declare;
-our $VERSION = '0.001004';
+our $VERSION = '0.001005';
 
 use 5.012;     # required for pluggable keywords plus /.../r
 use warnings;
@@ -893,6 +893,8 @@ sub _resolve_matches {
 1; # Magic true value required at end of module
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
@@ -900,7 +902,7 @@ Keyword::Declare - Declare new Perl keywords...via a keyword...named C<keyword>
 
 =head1 VERSION
 
-This document describes Keyword::Declare version 0.001004
+This document describes Keyword::Declare version 0.001005
 
 
 =head1 STATUS
@@ -1029,7 +1031,7 @@ what you actually wanted. In particular, the module will not allow you
 to declare a new keyword named C<keyword>, as that way lies madness.
 
 
-=head3 Specifying keyword parameters
+=head2 Specifying keyword parameters
 
 The parameters of the keyword tell it how to parse the source code that
 follows it. The general syntax for each parameter is:
@@ -1046,7 +1048,7 @@ The type specifier is required, but the other three components
 are optional. Each component is described in the following sections.
 
 
-=head4 Keyword parameter types
+=head3 Keyword parameter types
 
 The type of each keyword parameter specifies how to parse the
 corresponding item in the source code after the keyword.
@@ -1054,7 +1056,7 @@ corresponding item in the source code after the keyword.
 The type of each keyword parameter may be specified as either a type
 name, a regex, or a literal string...
 
-=head5 Named types
+=head4 Named types
 
 A named type is simply a convenient label for some standard or
 user-defined regex or string. Most of the available named types are
@@ -1161,7 +1163,7 @@ for more detail on any of them that aren't.
 
 
 
-=head5 Regex and literal parameter types
+=head4 Regex and literal parameter types
 
 In addition to the standard named types listed in the previous section,
 a keyword parameter can have its type specified as either a regex or a
@@ -1199,7 +1201,7 @@ trailing modifiers: C</imnsxadlup>. For example:
                                            ^^^^
 
 
-=head4 Naming literal and regex types via C<keytype>
+=head3 Naming literal and regex types via C<keytype>
 
 Literal and regex parameter types are useful for matching non-standard
 syntax that PPR cannot recognize. However, using a regex or a literal
@@ -1243,7 +1245,7 @@ For example:
     {...}
 
 
-=head4 Junctive named types
+=head3 Junctive named types
 
 Sometimes a keyword may need to take two or more different types of arguments
 in the same syntactic slot. For example, you might wish to create a keyword
@@ -1287,7 +1289,7 @@ convert a non-named type to a named type using C<keytype>:
     list /rex/ from dogs();
 
 
-=head3 Scalar vs array keyword parameters
+=head2 Scalar vs array keyword parameters
 
 Declaring a keyword's parameter as a scalar (the usual approach) causes
 the source code parser to match the corresponding type of component
@@ -1305,7 +1307,7 @@ occurence becoming one element of the array.
     keyword tryall (Block @blocks) {...}
 
 
-=head4 Changing the number of expected parameter matches
+=head3 Changing the number of expected parameter matches
 
 An explicit quantifier can be appended to any parameter type to change the
 number of repetitions that parameter type will match.
@@ -1380,7 +1382,7 @@ the keyword body: as a single string (for scalar parameters), or as a list of
 individual matches (for array parameters).
 
 
-=head4 Providing a default for optional parameters
+=head3 Providing a default for optional parameters
 
 If a parameter is optional (i.e. it has a <?>, C<??>, C<?+>, <*>, <*?>,
 or C<*+> quantifier), you can specify a string to be placed in the
@@ -1423,7 +1425,7 @@ previous examples could also have been written:
     keyword checkpoint (Str @identifier = 'CHECKPOINT') {...}
 
 
-=head3 Handling whitespace between arguments
+=head2 Handling whitespace between arguments
 
 Normally, a keyword parses and discards any Perl whitespaces (spaces,
 tabs, newlines, comments, POD, etc.) between its arguments. Each
@@ -1487,7 +1489,7 @@ and, to be really safe, you need to handle every other Perlish
     $list =~ s{ ^ (?PerlOWS) $PPR::GRAMMAR }{}x;
 
 
-=head3 Keywords with trailing context
+=head2 Keywords with trailing context
 
 Sometimes a keyword implementation needs to modify more of the source
 code than just its own arguments. For example, a C<let> keyword might
@@ -1543,7 +1545,7 @@ the closing curly:
     }}}
 
 
-=head3 Specifying a keyword description
+=head2 Specifying a keyword description
 
 Normally the error messages the module generates refer to the
 keyword by name. For example, an error detected in parsing a

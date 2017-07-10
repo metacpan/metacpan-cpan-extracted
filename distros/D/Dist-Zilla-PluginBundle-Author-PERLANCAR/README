@@ -1,12 +1,19 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::PluginBundle::Author::PERLANCAR - Dist::Zilla like
+    PERLANCAR when you build your dists
 
+VERSION
+    This document describes version 0.58 of
+    Dist::Zilla::PluginBundle::Author::PERLANCAR (from Perl distribution
+    Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2017-07-08.
+
+SYNOPSIS
      # dist.ini
      [@Author::PERLANCAR]
 
     is equivalent to (see source).
 
 DESCRIPTION
-
     The gist:
 
     I avoid stuffs that might change line numbers (so OurPkgVersion instead
@@ -18,8 +25,47 @@ DESCRIPTION
 
     I install my dists after release (the eat-your-own-dog-food principle),
     except when INSTALL=0 environment is specified. I also archive them
-    using a script called archive-perl-release. This is currently a script
+    using a script called "archive-perl-release". This is currently a script
     on my computer, you can get them from my 'scripts' github repo but this
     is optional and the release process won't fail if the script does not
     exist.
+
+    There are extra stuffs related to Rinci, which should have no effect if
+    you are not using any Rinci metadata in the code.
+
+    There are extra stuffs related to checking prerequisites: I have a
+    blacklist of prerequisites to avoid so [Acme::CPANLists::Blacklist] will
+    fail the build if any of the blacklisted modules are used as a
+    prerequisite (unless the prerequisite is explicitly whitelisted by
+    [Acme::CPANLists::Whitelist]). I avoid circular dependencies using
+    [Prereqs::CheckCircular]. And I also maintain a file called
+    pmversions.ini where I put minimum versions of some modules and check
+    this using [Prereqs::EnsureVersion].
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-PERLANCAR>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-PluginBundle-Author-PERLAN
+    CAR>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBund
+    le-Author-PERLANCAR>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

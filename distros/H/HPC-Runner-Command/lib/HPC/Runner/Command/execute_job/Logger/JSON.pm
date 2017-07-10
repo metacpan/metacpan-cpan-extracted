@@ -3,6 +3,8 @@ package HPC::Runner::Command::execute_job::Logger::JSON;
 use Moose::Role;
 use namespace::autoclean;
 
+with 'HPC::Runner::Command::execute_job::Logger::Lock';
+
 use JSON;
 use File::Spec;
 use DateTime;
@@ -12,6 +14,7 @@ use File::Path qw(make_path remove_tree);
 use File::Slurp;
 use Cwd;
 use Data::Dumper;
+use Time::HiRes;
 
 has 'task_json' => (
     is       => 'rw',
@@ -58,6 +61,7 @@ sub create_json_task {
         start_time => $self->table_data->{start_time},
         jobname    => $job_meta->{jobname},
         task_id    => $self->counter,
+
         # submission_uuid => $self->submission_uuid,
         # task_uuid       => $uuid,
         # job_meta        => $job_meta,
@@ -69,12 +73,16 @@ sub create_json_task {
     my $basename = $self->data_tar->basename('.tar.gz');
     my $data_dir = File::Spec->catdir( $basename, $job_meta->{jobname} );
 
-    # make_path($data_dir);
+    $self->check_lock($data_dir);
+    $self->write_lock($data_dir);
 
     $self->add_to_running( $data_dir, $task_obj );
 
+    $self->remove_lock($data_dir);
+
     return $task_obj;
 }
+
 
 ## keep this or no?
 ##TODO Create Mem profile file
@@ -140,6 +148,9 @@ sub update_json_task {
         }
     }
 
+    $self->check_lock($data_dir);
+    $self->write_lock($data_dir);
+
     my $task_obj = $self->get_from_running($data_dir);
     $task_obj->{exit_time}      = $self->table_data->{exit_time};
     $task_obj->{duration}       = $self->table_data->{duration};
@@ -161,7 +172,8 @@ sub update_json_task {
     $self->remove_from_running($data_dir);
     ##TODO Add in mem for job
     my $complete = $self->add_to_complete( $data_dir, $task_obj );
-    # $self->create_task_file( $data_dir, $task_obj );
+
+    $self->remove_lock($data_dir);
     return $task_obj;
 }
 
@@ -169,6 +181,7 @@ sub add_to_complete {
     my $self      = shift;
     my $data_dir  = shift;
     my $task_data = shift;
+
 
     my $c_file = File::Spec->catfile( $data_dir, 'complete.json' );
     my $json_obj = $self->read_json($c_file);
@@ -209,10 +222,14 @@ sub write_json {
         $self->archive->replace_content( $file, $json_text );
     }
     else {
-        $self->archive->add_data( $file, $json_text );
+        $self->archive->add_data( $file, $json_text )
+          || $self->command_log->warn(
+            'We were not able to add ' . $file . ' to the archive' );
     }
 
-    $self->archive->write( $self->data_tar );
+    $self->archive->write( $self->data_tar )
+      || $self->command_log->warn(
+        'We were not able to write ' . $file . ' to the archive' );
 }
 
 1;

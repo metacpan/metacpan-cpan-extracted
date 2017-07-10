@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
-
 package Lab::Bus::VICP;
-$Lab::Bus::VICP::VERSION = '3.552';
+#Dist::Zilla: +PodWeaver
+#ABSTRACT: VICP bus
+$Lab::Bus::VICP::VERSION = '3.553';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);
@@ -662,6 +662,11 @@ sub VerboseIbstatus {
 
 1;
 
+
+1;
+
+__END__
+
 =pod
 
 =encoding utf-8
@@ -670,10 +675,13 @@ sub VerboseIbstatus {
 
 Lab::Bus::VICP - VICP bus
 
+=head1 VERSION
+
+version 3.553
+
 =head1 SYNOPSIS
 
 This is the bus class for the VICP connection used for GPIB communication
-
 
   my $GPIB = new Lab::Bus::VICP(remote_host=>'myhost' );
 
@@ -689,7 +697,6 @@ or implicit through instrument and connection creation:
 Note: you don't need to explicitly handle bus objects. The Instruments will create them themselves, and existing bus will
 be automagically reused.
 
-
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -699,9 +706,6 @@ be automagically reused.
   );
 
 Return blessed $self, with @_ accessible through $self->config().
-
-
-
 
            ===== TBD below ===
 
@@ -724,13 +728,11 @@ See C<Lab::Instrument::Read()>.
 
 TODO: this is probably not correct anymore
 
-
 =head2 connection_write
 
   $GPIB->connection_write( $InstrumentHandle, { Cmd => $Command } );
 
 Sends $Command to the instrument specified by the handle.
-
 
 =head2 connection_read
 
@@ -768,11 +770,11 @@ Few. Also, not a lot to be done here.
 
 =over 4
 
-=item 
+=item
 
 L<Lab::Bus>
 
-=item 
+=item
 
 L<Lab::Bus::MODBUS>
 
@@ -782,17 +784,15 @@ and many more...
 
 =back
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright 2004-2006 Daniel Schröer <schroeer@cpan.org>, 
-           2009-2010 Daniel Schröer, Andreas K. Hüttel (L<http://www.akhuettel.de/>) and David Kalok,
-           2010      Matthias Völker <mvoelker@cpan.org>
-           2011      Florian Olbrich, Andreas K. Hüttel
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2016       Charles Lane
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;
-

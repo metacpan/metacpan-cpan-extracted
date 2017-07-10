@@ -17,6 +17,13 @@ sub test_loadClass : Init(1) {
 sub test_unitTest : Test(10) {
     my $self = shift;
 
+    # Fix: CPAN Testers
+
+    if (!Prty::System->searchProgram('ffprobe',-sloppy=>1)) {
+        $self->skipTest('ffprobe not found');
+        return;
+    }
+
     my $file = $self->testPath(
         'prty/test/data/video/fluch-von-novgorod.mp4');
 

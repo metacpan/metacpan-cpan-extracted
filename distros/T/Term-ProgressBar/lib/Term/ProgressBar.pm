@@ -3,7 +3,7 @@ package Term::ProgressBar;
 use strict;
 use warnings;
 
-our $VERSION = '2.18';
+our $VERSION = '2.19';
 
 #XXX TODO Redo original test with count=20
 #         Amount Output

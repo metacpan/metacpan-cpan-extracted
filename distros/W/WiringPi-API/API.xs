@@ -164,13 +164,13 @@ int bmp180Temp(int pin){
 
     extern          void setPadDrive         (int group, int value) ;
     extern          void pwmToneWrite        (int pin, int freq) ;
-    extern          void pwmSetMode          (int mode) ;
-    extern          void pwmSetClock         (int divisor) ;
     extern          void gpioClockSet        (int pin, int freq) ;
 
 */
 
 MODULE = WiringPi::API  PACKAGE = WiringPi::API PREFIX = XS_
+
+PROTOTYPES: DISABLE
 
 #
 # core
@@ -242,6 +242,13 @@ physPinToGpio(physPin)
 void
 pwmSetRange(range)
     unsigned int range
+
+void
+pwmSetClock(divisor)
+    int divisor
+
+void pwmSetMode(mode)
+    int mode
 
 #
 # lcd

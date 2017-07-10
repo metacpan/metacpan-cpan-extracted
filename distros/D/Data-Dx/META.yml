@@ -23,4 +23,4 @@ requires:
   Term::ANSIColor: '0'
   Test::More: '0'
   perl: '5.01'
-version: '0.000004'
+version: '0.000005'

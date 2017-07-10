@@ -39,7 +39,6 @@ do { my $x = {
                                       'IPC::Run3' => '0',
                                       'IPC::System::Simple' => '0',
                                       'List::AllUtils' => '0',
-                                      'List::Gather' => '0',
                                       'Moose' => '0',
                                       'Moose::Role' => '0',
                                       'MooseX::Getopt::Dashes' => '0',

@@ -1,5 +1,5 @@
 package WebService::Braintree::ValidationErrorCollection;
-$WebService::Braintree::ValidationErrorCollection::VERSION = '0.9';
+$WebService::Braintree::ValidationErrorCollection::VERSION = '0.91';
 
 use Moose;
 use WebService::Braintree::Util;

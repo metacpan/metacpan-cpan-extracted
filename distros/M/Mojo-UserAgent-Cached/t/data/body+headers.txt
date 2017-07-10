@@ -1,0 +1,10 @@
+GET /body+headers.txt
+
+HTTP/1.1 200 OK
+X-Test: Works
+Lol: Bar
+Content-Type: lala
+
+test
+
+body

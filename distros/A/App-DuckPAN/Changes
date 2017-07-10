@@ -1,10 +1,24 @@
 ==================================================
-Changes from 1743-07-13 00:00:00 +0000 to present.
+Changes from 1743-09-23 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 1018 at 2017-04-26 17:13:40 +0000
+version 1019 at 2017-07-07 20:54:50 +0000
 -----------------------------------------
+
+  Change: bb5de8844017b86ebbe53a5e85826c64418e669b
+  Author: Zach Thompson <zachthompson@users.noreply.github.com>
+  Date : 2017-07-07 09:37:10 +0000
+
+    Merge pull request #389 from duckduckgo/zaahir/regex-bug-fix
+
+    Corrected regex for CamelCase package names 
+
+  Change: b2d9e78214acad5d0fdc379782a7401375777ed9
+  Author: Zaahir Moolla <moollaza@duckduckgo.com>
+  Date : 2017-07-07 09:33:28 +0000
+
+    Corrected regex for CamelCase package names 
 
   Change: 390d5779d46e1ca154b38ca2e308a1ea04ae1216
   Author: Zach Thompson <zachthompson@users.noreply.github.com>

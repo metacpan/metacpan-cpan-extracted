@@ -3,6 +3,7 @@ abstract: 'Facilitates the creation and modification of PDF files'
 author:
   - 'Steve Simms <steve@deefs.net>'
 build_requires:
+  Test::Exception: '0'
   Test::Memory::Cycle: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -19,5 +20,5 @@ requires:
   perl: v5.8.5
 resources:
   repository: git://github.com/ssimms/pdfapi2.git
-version: '2.032'
+version: '2.033'
 x_serialization_backend: 'YAML::Tiny version 1.69'

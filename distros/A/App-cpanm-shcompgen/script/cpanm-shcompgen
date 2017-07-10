@@ -1,0 +1,98 @@
+#!perl
+
+# NO_PERINCI_CMDLINE_SCRIPT
+# FRAGMENT id=shcompgen-hint command=_cpanm
+
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.001'; # VERSION
+
+use strict;
+use warnings;
+use File::Which;
+
+my $cpanm_path = which("cpanm") or die "Can't find cpanm in PATH\n";
+
+my @cmd = (
+    $^X, "-MModule::Load::In::INIT=App::cpanminus::script::Patch::RunShcompgen=-warn_target_loaded;0",
+    $cpanm_path,
+    @ARGV,
+);
+
+print "cpanm-shcompgen: exec: ".join(" ", @cmd), "\n" if $ENV{DEBUG};
+exec @cmd;
+
+# ABSTRACT: Install modules from CPAN (and activate shell completion)
+# PODNAME: cpanm-shcompgen
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpanm-shcompgen - Install modules from CPAN (and activate shell completion)
+
+=head1 VERSION
+
+This document describes version 0.001 of cpanm-shcompgen (from Perl distribution App-cpanm-shcompgen), released on 2017-07-08.
+
+=head1 SYNOPSIS
+
+Use like you would use L<cpanm>:
+
+ % cpanm-shcompgen -n Some::Module ...
+
+To alias it as C<cpanm> in your shell, e.g. in bash:
+
+ alias cpanm=cpanm-shcompgen
+
+=head1 DESCRIPTION
+
+L<cpanm-shcompgen> is a simple wrapper over L<cpanm>. This command:
+
+ % cpanm-shcompgen -n App::PMUtils
+
+is equivalent to:
+
+ % perl -MModule::Load::In::INIT=App::cpanminus::script::Patch::RunShcompgen cpanm -n App::PMUtils
+
+That is, it will cause B<cpanm> to execute L<shcompgen> (C<shcomgen generate
+...>) for all the installed scripts in the distribution. This means, shell tab
+completion will be activated immediately after installation.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-cpanm-shcompgen>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-cpanm-shcompgen>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanm-shcompgen>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<cpanm>
+
+L<shcompgen>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

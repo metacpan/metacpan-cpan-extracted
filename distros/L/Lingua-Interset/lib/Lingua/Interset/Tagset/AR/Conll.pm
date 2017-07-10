@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::AR::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -74,9 +74,9 @@ sub _create_atoms
             # interjection
             'I' => ['pos' => 'int'],
             # abbreviation
-            'Y' => ['abbr' => 'abbr'],
+            'Y' => ['abbr' => 'yes'],
             # typo
-            'T' => ['typo' => 'typo'],
+            'T' => ['typo' => 'yes'],
             # punctuation (not used in UMH subcorpus)
             'G' => ['pos' => 'punc'],
             # non-alphabetic (also used for punctuation in UMH subcorpus)
@@ -88,8 +88,8 @@ sub _create_atoms
         },
         'encode_map' =>
 
-            { 'abbr' => { 'abbr' => 'Y',
-                          '@'    => { 'typo' => { 'typo' => 'T',
+            { 'abbr' => { 'yes'  => 'Y',
+                          '@'    => { 'typo' => { 'yes' => 'T',
                                                   '@'    => { 'numtype' => { ''  => { 'pos' => { 'noun' => { 'prontype' => { ''    => { 'nountype' => { 'prop' => 'Z',
                                                                                                                                                         '@'    => 'N' }},
                                                                                                                              'dem' => 'SD',
@@ -525,7 +525,7 @@ Lingua::Interset::Tagset::AR::Conll - Driver for the Arabic tagset of the CoNLL 
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

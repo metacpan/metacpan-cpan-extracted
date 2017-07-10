@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/plicease/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
   repository: git://github.com/plicease/Alien-Build.git
-version: '0.52'
+version: '0.55'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'

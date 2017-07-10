@@ -1,0 +1,4 @@
+name = "Mojo-Log-Colored"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

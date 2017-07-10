@@ -6,7 +6,7 @@ my $b = Module::Build->new
   dist_abstract => 'Edit data in xml format',
   license       => 'perl',
   requires      => {Carp=>0, POSIX=>0, Data::Table::Text=>0, Carp=>0, XML::Parser=>0},
-  create_readme =>  1,
+  create_readme =>  0,
   perl          => '5.16.0',
  );
 

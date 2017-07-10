@@ -9,7 +9,6 @@ use IO::File;
 use IO::Handle;
 use IO::Pipe;
 use POSIX qw(strftime);
-use File::Path qw(remove_tree);
 use Path::Tiny;
 use Test::LWP::UserAgent;
 use utf8;
@@ -221,7 +220,7 @@ note("reading operations demo01 (valid bag)");
     is $bagit->path , 'bags/demo01' , 'path';
     is $bagit->version , '0.97', 'version';
     is $bagit->encoding , 'UTF-8' , 'encoding';
-    like $bagit->size , qr/\d+.\d+ KB/ , 'size';
+    like $bagit->size , qr/[0-9]+.[0-9]+ KB/ , 'size';
     is $bagit->payload_oxum , '92877.1' , 'payload_oxum';
 
     is $bagit->get_info('Bag-Size') , '90.8 KB' , 'Bag-Size info';
@@ -271,7 +270,7 @@ note("reading operations demo02 (invalid bag)");
     is $bagit->path , 'bags/demo02' , 'path';
     is $bagit->version , '0.97', 'version';
     is $bagit->encoding , 'UTF-8' , 'encoding';
-    like $bagit->size , qr/\d+.\d+ KB/ , 'size';
+    like $bagit->size , qr/[0-9]+.[0-9]+ KB/ , 'size';
     is $bagit->payload_oxum , '0.2' , 'payload_oxum';
 
     is $bagit->get_info('Bag-Size') , '39.6 KB' , 'Bag-Size info';
@@ -538,7 +537,7 @@ sub remove_path {
     # Stupid chdir trick to make remove_tree work
     chdir("lib");
     if (-d "../$path") {
-       remove_tree("../$path");
+       path("../$path")->remove_tree;
     }
     chdir("..");
 }

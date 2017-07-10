@@ -4,7 +4,7 @@
       "Copyright (C) 2013-2016 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -19,6 +19,7 @@
             "Test::Compile" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
+            "Test::Number::Delta" : "0",
             "Test::Pod" : "0",
             "Text::CSV" : "0"
          }
@@ -51,15 +52,15 @@
    "provides" : {
       "Travel::Status::DE::IRIS" : {
          "file" : "lib/Travel/Status/DE/IRIS.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Travel::Status::DE::IRIS::Result" : {
          "file" : "lib/Travel/Status/DE/IRIS/Result.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       },
       "Travel::Status::DE::IRIS::Stations" : {
          "file" : "lib/Travel/Status/DE/IRIS/Stations.pm",
-         "version" : "1.15"
+         "version" : "1.16"
       }
    },
    "release_status" : "stable",
@@ -71,6 +72,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-IRIS"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

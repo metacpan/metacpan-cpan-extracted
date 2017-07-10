@@ -1,5 +1,5 @@
 package WebService::Braintree::Util;
-$WebService::Braintree::Util::VERSION = '0.9';
+$WebService::Braintree::Util::VERSION = '0.91';
 use strict;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );

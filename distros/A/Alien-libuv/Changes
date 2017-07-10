@@ -1,5 +1,10 @@
 Revision history for Alien-libuv
 
+0.005     2017-07-08
+  - Updated the requirements to include Alien::m4
+  - Update requirements of Alien::libtool, automake, and autoconf for some
+    corrections
+
 0.004     2017-06-29
   - Ensure we're at least using libuv v1.0.0. Prior versions of libuv handled
     errors differently, causing problems for XS modules needing to deal with

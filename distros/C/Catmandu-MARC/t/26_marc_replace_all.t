@@ -32,4 +32,18 @@ use Catmandu::Fix;
     ], q|fix: marc_replace_all('630a','Active','Silly')|;
 }
 
+
+#---
+{
+	my $fixer = Catmandu::Fix->new(fixes => [q|marc_replace_all('630','(Active)','{$1}')|,q|marc_map('630a','test.$append')|]);
+	my $importer = Catmandu::Importer::MARC->new( file => 't/camel.mrc', type => "ISO" );
+	my $record = $fixer->fix($importer->first);
+
+	is_deeply $record->{test}, [
+        '{Active} server pages.' ,
+        '{Active}X.'
+    ], q|fix: marc_replace_all('630a','Active','{Active}')|;
+}
+
+
 done_testing;

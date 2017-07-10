@@ -1,5 +1,5 @@
 package WebService::Braintree::ValidationError;
-$WebService::Braintree::ValidationError::VERSION = '0.9';
+$WebService::Braintree::ValidationError::VERSION = '0.91';
 use Moose;
 
 has 'attribute' => (is => 'ro');

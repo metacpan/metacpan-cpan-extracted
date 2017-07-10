@@ -6,12 +6,12 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Fetch transfer interface for AnyEvent::FTP objects
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 sub xfer
 {
   my($self, $fh, $local) = @_;
-  
+
   my $handle = $self->handle($fh);
 
   $handle->on_read(sub {
@@ -35,13 +35,13 @@ sub push_command
   my $cv = $self->{client}->push_command(
     @_,
   );
-  
+
   $cv->cb(sub {
     eval { $cv->recv };
     my $err = $@;
     $self->{cv}->croak($err) if $err;
   });
-  
+
   $self->on_eof(sub {
     $cv->cb(sub {
       my $res = eval { $cv->recv };
@@ -64,7 +64,7 @@ AnyEvent::FTP::Client::Role::ListTransfer - Fetch transfer interface for AnyEven
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 AUTHOR
 
@@ -75,6 +75,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,18 @@
 Changelog for Catmandu-MAB2
 
+0.19  2017-07-09 15:05:56 CEST
+ - fix version number of required dependency
+
+0.18  2017-07-09 13:08:05 CEST
+ - set required version of Catmandu::SRU
+
+0.17  2017-07-08 19:35:40 CEST
+ - get XML as string
+
+0.16  2017-07-06 17:33:02 CEST
+ - set perl v5.14.0 as minimum version
+ - add MYMETA.* files
+
 0.15  2017-06-30 17:26:58 CEST
  - Delete perl-5.12 from .travis.yml due to Dist::Zilla build fails
  - Update and fix .travis.yml

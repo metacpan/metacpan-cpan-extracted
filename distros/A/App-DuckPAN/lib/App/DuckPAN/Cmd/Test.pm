@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Test;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Command for running the tests of this library
-$App::DuckPAN::Cmd::Test::VERSION = '1018';
+$App::DuckPAN::Cmd::Test::VERSION = '1019';
 use MooX;
 with qw( App::DuckPAN::Cmd );
 
@@ -98,7 +98,7 @@ App::DuckPAN::Cmd::Test - Command for running the tests of this library
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

@@ -1,0 +1,8 @@
+In order to run these tests you need a file named 'sandbox_config.json' in the current directory.
+The file is formatted thusly:
+
+{
+  "public_key": "xxx",
+  "merchant_id": "xxx",
+  "private_key": "xxx"
+}

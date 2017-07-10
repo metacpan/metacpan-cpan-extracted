@@ -3,11 +3,11 @@ use warnings;
 use lib 't/lib';
 use Test::More;
 
-use Parent;
+use Mother;
 use Child;
 use Grandchild;
 
-use I::Parent;
+use I::Mother;
 use I::Child;
 use I::Grandchild;
 
@@ -20,7 +20,7 @@ use End;
 use WindowsNewlines;
 
 my @want = (
-  Parent     => { a => \"1\n",   b => \"2\n",  c => \"3\n" },
+  Mother     => { a => \"1\n",   b => \"2\n",  c => \"3\n" },
   Child      => {                b => \"22\n", c => \"33\n", d => \"44\n" },
   Grandchild => { a => \"111\n",                             d => \q{}    },
 );
@@ -47,27 +47,27 @@ for (my $i = 0; $i < @want; $i += 2) {
 # The classes that do not begin with I:: are non-inheriting, so we do not
 # expect to see (for example) the parent's "b" section propagated to the
 # grandchild. -- rjbs, 2010-01-27
-is_deeply(Parent    ->section_data('a'), \"1\n",   "Parent's a");
-is_deeply(Parent    ->section_data('b'), \"2\n",   "Parent's b");
+is_deeply(Mother    ->section_data('a'), \"1\n",   "Mother's a");
+is_deeply(Mother    ->section_data('b'), \"2\n",   "Mother's b");
 is_deeply(Grandchild->section_data('a'), \"111\n", "Grandchild's a");
 is_deeply(Grandchild->section_data('b'), undef,   "Grandchild's b (none)");
 
 is_deeply(
-  [ sort Parent->section_data_names ],
+  [ sort Mother->section_data_names ],
   [ qw(a b c) ],
-  "Parent section data names",
+  "Mother section data names",
 );
 
 is_deeply(
-  [ sort Parent->local_section_data_names ],
+  [ sort Mother->local_section_data_names ],
   [ qw(a b c) ],
-  "Parent local section data names",
+  "Mother local section data names",
 );
 
 is_deeply(
-  [ sort Parent->merged_section_data_names ],
+  [ sort Mother->merged_section_data_names ],
   [ qw(a b c) ],
-  "Parent merged section data names",
+  "Mother merged section data names",
 );
 
 is_deeply(
@@ -88,27 +88,27 @@ is_deeply(
   "Child merged section data names",
 );
 
-is_deeply(I::Parent    ->section_data('a'), \"1\n",   "I::Parent's a");
-is_deeply(I::Parent    ->section_data('b'), \"2\n",   "I::Parent's b");
+is_deeply(I::Mother    ->section_data('a'), \"1\n",   "I::Mother's a");
+is_deeply(I::Mother    ->section_data('b'), \"2\n",   "I::Mother's b");
 is_deeply(I::Grandchild->section_data('a'), \"111\n", "I::Grandchild's a");
 is_deeply(I::Grandchild->section_data('b'), \"22\n",  "I::Grandchild's b (via Child)");
 
 is_deeply(
-  [ sort I::Parent->section_data_names ],
+  [ sort I::Mother->section_data_names ],
   [ qw(a b c) ],
-  "I::Parent section data names",
+  "I::Mother section data names",
 );
 
 is_deeply(
-  [ sort I::Parent->local_section_data_names ],
+  [ sort I::Mother->local_section_data_names ],
   [ qw(a b c) ],
-  "I::Parent local section data names",
+  "I::Mother local section data names",
 );
 
 is_deeply(
-  [ sort I::Parent->merged_section_data_names ],
+  [ sort I::Mother->merged_section_data_names ],
   [ qw(a b c) ],
-  "I::Parent merged section data names",
+  "I::Mother merged section data names",
 );
 
 is_deeply(

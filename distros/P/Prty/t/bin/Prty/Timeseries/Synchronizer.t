@@ -222,6 +222,12 @@ sub test_rows : Test(2) {
         [qw/1970-01-01+00:00:50 10 49.5 50 0 45 54 3.02765035409749 3.03/],
         [qw/1970-01-01+00:01:00 5 57 59 1 55 59 1.58113883008419 1.58/],
     );
+
+    # Fix: CPAN Testers
+    for my $row (@$rowA) {
+        $row->[7] = sprintf '%.14f',$row->[7];
+    }
+
     $self->isDeeply($rowA,\@expectedRows);
 }
 
@@ -261,6 +267,13 @@ sub test_rows_geoPosition : Test(2) {
     my @expectedRows = (
         [qw/1970-01-01+00:00:00 38.9224184710314 -82.0561504698106 63 3/],
     );
+
+    # Fix: CPAN Testers
+    for my $row (@$rowA) {
+        $row->[1] = sprintf '%.13f',$row->[1];
+        $row->[2] = sprintf '%.13f',$row->[2];
+    }
+
     $self->isDeeply($rowA,\@expectedRows);
 }
 

@@ -6,7 +6,7 @@
                                                 |___/ 
 
 
-This is the README for Text::Fuzzy version 0.25.
+This is the README for Text::Fuzzy version 0.26.
 
 Text::Fuzzy is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -36,9 +36,12 @@ Unicode), treating each Unicode character as a single entity.
     use utf8;
     my $tf = Text::Fuzzy->new ('あいうえお☺');
     print $tf->distance ('うえお☺'), "\n";
-    # prints "2".
-    
 
+produces output
+
+    2
+
+(This example is included as "unicode.pl" in the distribution.)
 
 The default edit distance is the Levenshtein one, which counts each
 addition ("cat" -> "cart"), substitution ("cat" -> "cut"), and
@@ -82,11 +85,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Text::Fuzzy
 
-To install the module from the source file, Text-Fuzzy-0.25.tar.gz, follow
+To install the module from the source file, Text-Fuzzy-0.26.tar.gz, follow
 this sequence of commands:
 
-    tar xfz Text-Fuzzy-0.25.tar.gz
-    cd Text-Fuzzy-0.25
+    tar xfz Text-Fuzzy-0.26.tar.gz
+    cd Text-Fuzzy-0.26
     perl Makefile.PL
     make
     make install
@@ -111,6 +114,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Wed Dec  7 11:27:14 2016.
+This README was written on Mon Jul 10 17:20:45 2017.
 
 -----------------------------------------------------------------------------

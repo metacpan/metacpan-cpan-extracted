@@ -2,7 +2,7 @@ package SVG::XML;
 use strict;
 use warnings;
 
-our $VERSION = '2.77';
+our $VERSION = '2.78';
 
 =pod
 
@@ -76,7 +76,7 @@ sub xmlescp {
     }
 
     # Per suggestion from Adam Schneider
-    $s =~ s/([\200-\377])/' &    #'.ord($1).';'/ge;
+    $s =~ s/([\200-\377])/'&#'.ord($1).';'/ge;
 
     return $s;
 }

@@ -1,0 +1,47 @@
+---
+abstract: 'tool to convert between various formats and encodings'
+author:
+  - 'brian m. carlson <sandals@crustytoothpaste.net>'
+build_requires:
+  File::Find: '0'
+  IO::Scalar: '0'
+  MIME::QuotedPrint: '0'
+  Perl::Critic: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Muter
+recommends:
+  MIME::Base32: '0'
+requires:
+  Digest::MD5: '0'
+  Digest::SHA: '0'
+  Digest::SHA3: '0'
+  Encode: '0'
+  File::Spec: '0'
+  File::stat: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  List::Util: '0'
+  MIME::Base32: '1.0'
+  MIME::Base64: '3.11'
+  bytes: '0'
+  experimental: '0'
+  perl: '5.010001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bk2204/muter/issues
+  homepage: https://github.com/bk2204/muter
+  repository: https://github.com/bk2204/muter.git
+version: '0.002000'
+x_serialization_backend: 'YAML::Tiny version 1.70'

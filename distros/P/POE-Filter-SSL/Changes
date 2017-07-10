@@ -115,3 +115,5 @@ Revision history for POE-Filter-SSL
 0.31	30.06.2017
 	OpenSSL 1.1.0
 
+0.32  02.07.2017
+	Net::SSleay has removed support for SSL_CTX_set_tmp_rsa_callback and SSL_set_tmp_rsa_callback, included in XS now

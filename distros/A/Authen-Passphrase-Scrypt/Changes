@@ -1,4 +1,10 @@
 Revision history for Perl extension Authen::Passphrase::Scrypt.
 
+0.001001 2017-07-08T11:45+01:00
+ - Fix compilation error on glibc < 2.17.
+   clock_gettime requires -lrt on glibc < 2.17. It is used in
+   scryptenc_cpuperf.o. The fix is to no longer link that object file
+   since Authen::Passphrase::Scrypt does not use it.
+
 0.001 2017-07-01T00:16+03:00
  - Initial release

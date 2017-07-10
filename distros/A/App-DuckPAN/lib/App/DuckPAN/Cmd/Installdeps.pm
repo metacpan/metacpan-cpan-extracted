@@ -1,7 +1,7 @@
 package App::DuckPAN::Cmd::Installdeps;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Regular way to install requirements with tests
-$App::DuckPAN::Cmd::Installdeps::VERSION = '1018';
+$App::DuckPAN::Cmd::Installdeps::VERSION = '1019';
 use Moo;
 with qw( App::DuckPAN::Cmd );
 
@@ -33,7 +33,7 @@ App::DuckPAN::Cmd::Installdeps - Regular way to install requirements with tests
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

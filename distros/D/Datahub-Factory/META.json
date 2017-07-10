@@ -42,6 +42,7 @@
          "requires" : {
             "App::Cmd" : "0",
             "Catmandu" : "1.0304",
+            "Catmandu::Importer::XML" : "0",
             "Catmandu::LIDO" : "0",
             "Catmandu::OAI" : "0",
             "Catmandu::Solr" : "0",
@@ -83,11 +84,12 @@
          "web" : "https://github.com/thedatahub/Datahub-Factory"
       }
    },
-   "version" : "1.3",
+   "version" : "1.4",
    "x_contributors" : [
       "Matthias Vandermaesen <matthias@colada.be>",
-      "Pieter De Praetere <pieter.de.praetere@helptux.be>"
+      "Pieter De Praetere <pieter.de.praetere@helptux.be>",
+      "Yogendra Sharma <eh.yogendra@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

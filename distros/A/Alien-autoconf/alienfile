@@ -6,6 +6,8 @@ share {
   requires 'Alien::m4' => '0.11';
   requires 'Alien::MSYS' => '0.08' if $^O eq 'MSWin32';
 
+  meta->prop->{env}->{PERL} = $^X unless $^O eq 'MSWin32';
+
   plugin Download => (
     url => 'ftp://ftp.gnu.org/gnu/autoconf',
     filter => qr/^autoconf-.*\.tar\.gz$/,

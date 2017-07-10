@@ -1,5 +1,15 @@
 Revision history for Alien-Hunspell
 
+0.10      2017-07-07 03:22:40 -0400
+
+0.09_02   2017-06-27 15:14:41 -0400
+  - Enable disabled test t/xs.t
+
+0.09_01   2017-06-27 15:10:56 -0400
+  - migrate to Alien::Build
+  - build from latest production source when building from source
+  - numerous build fixes for OS X, FreeBSD, Strawberry
+
 0.08      2017-02-12 16:13:14 -0500
   - Upgrade hunspell to 1.3.4
   - Switch from sourceforge to github as the source

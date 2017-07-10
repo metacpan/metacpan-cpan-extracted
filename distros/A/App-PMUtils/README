@@ -1,26 +1,199 @@
-SYNOPSIS
+NAME
+    App::PMUtils - Command-line utilities related to Perl modules
 
+VERSION
+    This document describes version 0.70 of App::PMUtils (from Perl
+    distribution App-PMUtils), released on 2017-07-08.
+
+SYNOPSIS
     This distribution provides the following command-line utilities related
     to Perl modules:
 
-    #INSERT_EXECS_LIST
+    *   module-dir
+
+    *   pmbin
+
+    *   pmcat
+
+    *   pmchkver
+
+    *   pmcore
+
+    *   pmcost
+
+    *   pmdir
+
+    *   pmdoc
+
+    *   pmedit
+
+    *   pmhtml
+
+    *   pminfo
+
+    *   pmless
+
+    *   pmlines
+
+    *   pmlist
+
+    *   pmman
+
+    *   pmminversion
+
+    *   pmpath
+
+    *   pmstripper
+
+    *   pmuninst
+
+    *   pmversion
+
+    *   pmxs
+
+    *   podlist
+
+    *   podpath
+
+    *   pwd2mod
+
+    *   rel2mod
 
     The main purpose of these utilities is tab completion.
 
+FUNCTIONS
+  pmdir
+    Usage:
+
+     pmdir(%args) -> [status, msg, result, meta]
+
+    Get directory of locally installed Perl module/prefix.
+
+    This is basically a shortcut for:
+
+     % pmpath -Pd MODULE_OR_PREFIX_NAME
+
+    Sometimes I forgot that pmpath has a "-d" option, and often intuitively
+    look for a pmdir command.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   abs => *bool*
+
+        Absolutify each path.
+
+    *   module* => *array[perl::modname]*
+
+    *   pm => *int* (default: 1)
+
+    *   pmc => *int* (default: 0)
+
+    *   pod => *int* (default: 0)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  pmpath
+    Usage:
+
+     pmpath(%args) -> [status, msg, result, meta]
+
+    Get path to locally installed Perl module.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   abs => *bool*
+
+        Absolutify each path.
+
+    *   all => *bool*
+
+        Return all found files for each module instead of the first one.
+
+    *   dir => *bool*
+
+        Show directory instead of path.
+
+        Also, will return "." if not found, so you can conveniently do this
+        on a Unix shell:
+
+         % cd C<pmpath -Pd Moose>
+
+        and it won't change directory if the module doesn't exist.
+
+    *   module* => *array[perl::modname]*
+
+    *   pm => *int* (default: 1)
+
+    *   pmc => *int* (default: 0)
+
+    *   pod => *int* (default: 0)
+
+    *   prefix => *int* (default: 0)
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  rel2mod
+    Usage:
+
+     rel2mod(%args) -> any
+
+    Convert release name (e.g. Foo-Bar-1.23.tar.gz) to module name
+    (Foo::Bar).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   releases* => *array[str]*
+
+    Return value: (any)
+
 FAQ
-
- What is the purpose of this distribution? Haven't other similar utilities
- existed?
-
+  What is the purpose of this distribution? Haven't other similar utilities existed?
     For example, mpath from Module::Path distribution is similar to pmpath
     in App::PMUtils, and mversion from Module::Version distribution is
     similar to pmversion from App::PMUtils distribution, and so on.
 
-    True. The main point of these utilities is shell tab completion, to
-    save typing.
+    True. The main point of these utilities is shell tab completion, to save
+    typing.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PMUtils>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-PMUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PMUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Below is the list of distributions that provide CLI utilities for
     various purposes, with the focus on providing shell tab completion
     feature.
@@ -42,4 +215,14 @@ SEE ALSO
     App::ProgUtils, utilities related to programs.
 
     App::WeaverUtils, utilities related to Pod::Weaver.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

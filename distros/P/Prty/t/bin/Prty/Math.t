@@ -95,8 +95,10 @@ sub test_geoMidpoint_with_weight : Test(2) {
         [41.8781136,-87.6297982,730.5],
         [33.7489954,-84.3879824,365.25],
     ]);
-    $self->is($latitude,40.1156886102644);
-    $self->is($longitude,-80.2996028062865);
+
+    # Fix: CPAN Testers
+    $self->floatIs($latitude,40.1156886102644);
+    $self->floatIs($longitude,-80.2996028062865);
 }
 
 # -----------------------------------------------------------------------------
@@ -109,8 +111,10 @@ sub test_geoMidpoint_without_weight : Test(2) {
         [41.8781136,-87.6297982],
         [33.7489954,-84.3879824],
     ]);
-    $self->is($latitude,38.9224184710314);
-    $self->is($longitude,-82.0561504698106);
+
+    # Fix: CPAN Testers
+    $self->floatIs($latitude,38.9224184710314);
+    $self->floatIs($longitude,-82.0561504698106);
 }
 
 # -----------------------------------------------------------------------------
@@ -158,22 +162,22 @@ sub test_geoToDegree : Test(7) {
     my $self = shift;
 
     my $val = Prty::Math->geoToDegree(50,6,44);
-    $self->is(sprintf('%.5f',$val),50.11222);
+    $self->floatIs($val,50.11222);
 
     $val = Prty::Math->geoToDegree(50,6,44);
-    $self->is(sprintf('%.5f',$val),50.11222);
+    $self->floatIs($val,50.11222);
 
     $val = Prty::Math->geoToDegree(50,6,44,'N');
-    $self->is(sprintf('%.5f',$val),50.11222);
+    $self->floatIs($val,50.11222);
 
     $val = Prty::Math->geoToDegree(50,6,44,'S');
-    $self->is(sprintf('%.5f',$val),-50.11222);
+    $self->floatIs($val,-50.11222);
 
     $val = Prty::Math->geoToDegree(50,6,44,'E');
-    $self->is(sprintf('%.5f',$val),50.11222);
+    $self->floatIs($val,50.11222);
 
     $val = Prty::Math->geoToDegree(50,6,44,'W');
-    $self->is(sprintf('%.5f',$val),-50.11222);
+    $self->floatIs($val,-50.11222);
 
     eval { Prty::Math->geoToDegree(50,6,44,'X') };
     $self->like($@,qr/MATH-00001/);

@@ -87,7 +87,9 @@ sub run {
       $class->_global_option_processing_params);
 
   # Setup logging
-  setup_logging($global_opts->{'log_level'}, $global_opts->{'log_output'});
+  if (exists $global_opts->{'log_level'}) {
+    setup_logging($global_opts->{'log_level'}, $global_opts->{'log_output'});
+  }
 
   my $self = ref $class ? $class : $class->new;
   $self->set_global_options($global_opts);

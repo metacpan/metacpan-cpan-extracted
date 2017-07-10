@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Printer-ESCPOS-PDF,
-version 0.001:
+version 0.003:
 
   a hacky drop-in replacement for redirect Printer::ESCPOS output to a PDF file instead of a printer
 

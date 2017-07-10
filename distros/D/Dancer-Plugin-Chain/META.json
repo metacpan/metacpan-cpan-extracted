@@ -1,10 +1,10 @@
 {
    "abstract" : "Chained actions for Dancer",
    "author" : [
-      "Yanick Champoux <yanick@babyl.dyndns.org>"
+      "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -14,37 +14,40 @@
    },
    "name" : "Dancer-Plugin-Chain",
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.3601"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "version" : "0.9901"
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Dancer" : "0",
             "Dancer::Plugin" : "0",
+            "List::Util" : "0",
             "Moose" : "0",
+            "Ref::Util" : "0",
+            "overload" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
             "Dancer::Test" : "0",
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0",
             "perl" : "5.006"
          }
       }
@@ -52,29 +55,26 @@
    "provides" : {
       "Dancer::Plugin::Chain" : {
          "file" : "lib/Dancer/Plugin/Chain.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-dancer-plugin-chain at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Plugin-Chain"
+         "web" : "https://github.com/yanick/Dancer-Plugin-Chain/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Dancer-Plugin-Chain/",
+      "homepage" : "https://github.com/yanick/Dancer-Plugin-Chain",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yanick/Dancer-Plugin-Chain.git",
          "web" : "https://github.com/yanick/Dancer-Plugin-Chain"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.1.1",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
-   "x_contributors" : [
-      "Yanick Champoux <yanick@cpan.org>"
-   ]
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

@@ -7,7 +7,7 @@ build_requires:
   Alien::Build::MM: '0.40'
   Config: '0'
   ExtUtils::MakeMaker: '6.52'
-  Test2::Suite: '0.000060'
+  Test2::V0: '0.000060'
   Test::Alien: '0'
   Test::More: '0.94'
   perl: '5.006'
@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien-xz/issues
   homepage: https://metacpan.org/pod/Alien::xz
   repository: git://github.com/plicease/Alien-xz.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'YAML::Tiny version 1.70'

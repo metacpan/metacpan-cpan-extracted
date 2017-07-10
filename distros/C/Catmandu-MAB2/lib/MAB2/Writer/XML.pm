@@ -1,6 +1,6 @@
 package MAB2::Writer::XML;
 
-our $VERSION = '0.15';
+our $VERSION = '0.19';
 
 use strict;
 use Moo;

@@ -1,0 +1,11 @@
+Revision history for Perl extension Mojo-Log-Colored
+
+0.02 2017-07-09T11:56:49Z
+
+    - require at least Mojolicious 5.00 because the logger changed its internals at that point
+    - make it work on Windows
+
+0.01 2017-07-08T01:07:31Z
+
+    - original version
+

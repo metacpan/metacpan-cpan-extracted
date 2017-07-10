@@ -57,7 +57,7 @@ __PACKAGE__->meta->make_immutable;
 
 package Paws;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Moose;
 use MooseX::ClassAttribute;
@@ -294,6 +294,8 @@ L<Paws::CUR>
 
 L<Paws::DataPipeline>
 
+L<Paws::DAX>
+
 L<Paws::DeviceFarm>
 
 L<Paws::DirectConnect>
@@ -405,6 +407,8 @@ L<Paws::S3>
 L<Paws::SDB>
 
 L<Paws::ServiceCatalog>
+
+L<Paws::SES>
 
 L<Paws::SES>
 
@@ -759,6 +763,8 @@ meis for contributing Paws::Credential::Explicit
 sven-schubert for contributing fixes to RestXML services
 
 SeptamusNonovant for fixing paginators in non-callback mode
+
+gadgetjunkie for contributing the ECS credential provider
 
 
 =cut

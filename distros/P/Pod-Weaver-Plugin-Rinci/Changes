@@ -1,3 +1,12 @@
+0.77    2017-07-07 (PERLANCAR)
+
+	- [Bugfix] Forgot to pass -Ilib when generating POD for
+	  Perinci::CmdLine-based scripts (which includes executing the
+	  script to dump the Perinci::CmdLine object).
+
+	- [dist] Enable static install.
+
+
 0.76    2017-01-20 (PERLANCAR)
 
         - [internal] Revert from using Require::Hook::DzilBuild to using 'local

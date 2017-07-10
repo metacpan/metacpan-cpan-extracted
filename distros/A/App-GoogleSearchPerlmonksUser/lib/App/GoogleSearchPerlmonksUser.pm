@@ -1,12 +1,12 @@
 package App::GoogleSearchPerlmonksUser;
 
-our $DATE = '2016-01-19'; # DATE
-our $VERSION = '0.01'; # VERSION
+our $DATE = '2017-07-08'; # DATE
+our $VERSION = '0.02'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 our %SPEC;
 
@@ -78,7 +78,7 @@ App::GoogleSearchPerlmonksUser - Search Google for user mentions in perlmonks.or
 
 =head1 VERSION
 
-This document describes version 0.01 of App::GoogleSearchPerlmonksUser (from Perl distribution App-GoogleSearchPerlmonksUser), released on 2016-01-19.
+This document describes version 0.02 of App::GoogleSearchPerlmonksUser (from Perl distribution App-GoogleSearchPerlmonksUser), released on 2017-07-08.
 
 =head1 SYNOPSIS
 
@@ -87,7 +87,11 @@ Use the included script L<google-search-perlmonks-user>.
 =head1 FUNCTIONS
 
 
-=head2 google_search_perlmonks_user(%args) -> [status, msg, result, meta]
+=head2 google_search_perlmonks_user
+
+Usage:
+
+ google_search_perlmonks_user(%args) -> [status, msg, result, meta]
 
 Search Google for user mentions in perlmonks.org.
 
@@ -95,7 +99,7 @@ Basically a shortcut for launching Google search for a user (specifically, user
 mentions in discussion threads) in C<perlmonks.org> site, with some unwanted
 pages excluded.
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -138,7 +142,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

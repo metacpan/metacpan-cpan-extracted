@@ -1,5 +1,5 @@
 package App::MultiModule::Core;
-$App::MultiModule::Core::VERSION = '1.143160';
+$App::MultiModule::Core::VERSION = '1.171870';
 use strict;use warnings;
 use POE;
 use Storable;

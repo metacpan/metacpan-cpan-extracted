@@ -1,3 +1,13 @@
+0.014   2017-07-07 (PERLANCAR)
+
+	- Replace recommendation that mentions DZP:GenShellCompletion with
+	  cpanm-shcompgen.
+
+	- Accept 'libs' option to pass to Perinci::CmdLine::Dump.
+
+	- [dist] Enable static install.
+
+
 0.013   2017-06-08 (PERLANCAR)
 
 	- [ux] Consistency in formatting for headings 'Configuration for

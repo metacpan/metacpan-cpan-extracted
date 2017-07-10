@@ -46,12 +46,12 @@ my $meta = {
                         test => { requires => { "Test::Exception" => 0, "Test::More" => 0.88 } },
                       },
   "provides"       => {
-                        "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => 1.02 },
-                        "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => 1.02 },
-                        "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => 1.02 },
+                        "Types::Namespace" => { file => "lib/Types/Namespace.pm", version => 1.04 },
+                        "URI::Namespace" => { file => "lib/URI/Namespace.pm", version => 1.04 },
+                        "URI::NamespaceMap" => { file => "lib/URI/NamespaceMap.pm", version => 1.04 },
                         "URI::NamespaceMap::ReservedLocalParts" => {
                           file => "lib/URI/NamespaceMap/ReservedLocalParts.pm",
-                          version => 1.02,
+                          version => 1.04,
                         },
                       },
   "release_status" => "stable",
@@ -65,7 +65,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/URI-NamespaceMap/project",
                       },
-  "version"        => 1.02,
+  "version"        => 1.04,
   "x_contributors" => [
                         "Dorian Taylor <dorian\@cpan.org>",
                         "Toby Inkster (TOBYINK) <tobyink\@cpan.org>",

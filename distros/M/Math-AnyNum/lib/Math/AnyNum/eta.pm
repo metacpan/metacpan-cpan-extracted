@@ -13,7 +13,8 @@ sub __eta__ {
     my $r = Math::MPFR::Rmpfr_init2($PREC);
 
     # Special case for eta(1) = log(2)
-    if (Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
+    if (    Math::MPFR::Rmpfr_integer_p($x)
+        and Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
         Math::MPFR::Rmpfr_const_log2($r, $ROUND);
         return $r;
     }

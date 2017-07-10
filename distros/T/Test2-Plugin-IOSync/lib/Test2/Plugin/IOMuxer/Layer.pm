@@ -22,7 +22,7 @@ BEGIN {
 
 use Time::HiRes qw/time/;
 
-our $VERSION = '0.000007';
+our $VERSION = '0.000009';
 
 use Test2::Plugin::OpenFixPerlIO;
 use IO::Handle;
@@ -30,40 +30,119 @@ use IO::Handle;
 our %MUXED;
 our %MUX_FILES;
 
+sub name { 'other' }
+
 sub PUSHED {
     my ($class, $mode, $handle) = @_;
     $handle->autoflush(1);
-    bless {}, $class;
+    bless {buffer => [], handle => $handle, count => 0}, $class;
 }
 
+sub FLUSH {
+    my $self = shift;
+    my ($handle) = @_;
+    $handle->flush;
+}
+
+my $DEPTH = 0;
 sub WRITE {
     my ($self, $buffer, $handle) = @_;
 
-    if ($self->{DIED}) {
+    my $count = ++$self->{count};
+
+    if ($self->{DIED} || $DEPTH) {
         print $handle $buffer;
         return length($buffer);
     }
 
-    my $ok = eval {
-        my $time = time;
+    $DEPTH++;
+
+    my $ok1 = eval {
+        my $time   = time;
         my $fileno = fileno($handle);
 
-        my $json = encode_json({stamp => $time, fileno => $fileno, buffer => $buffer});
-        my $mh = $MUX_FILES{$MUXED{$fileno}};
-        print $mh $json, "\n";
+        my @parts = split /(\n)/, $buffer;
+        unshift @parts => '' if @parts == 1 && $parts[0] eq "\n";
+        push @parts => undef if @parts % 2;
+        my %parts = @parts;
+        for my $part (@parts) {
+            next unless defined $part;
+            next if $part eq "\n";
+
+            my $about = {stamp => $time, fileno => $fileno, name => $self->name, buffer => $part, write_no => $count};
+
+            # Time to flush
+            if ($parts{$part}) {
+                $about->{buffer} .= $parts{$part}; # Put the \n back
+
+                my $out;
+                if (@{$self->{buffer}}) {
+                    push @{$self->{buffer}} => $about;
+                    $out = {
+                        parts => $self->{buffer},
+                        %$about,
+                        buffer => join '' => map { $_->{buffer} } @{$self->{buffer}},
+                    };
+
+                    # Reset the buffer
+                    $self->{buffer} = [];
+                }
+                else {    # Easy
+                    $out = $about;
+                }
+
+                my $json = encode_json($out);
+                my $mh   = $MUX_FILES{$MUXED{$fileno}};
+                print $mh $json, "\n";
+            }
+            else {
+                push @{$self->{buffer}} => $about;
+            }
+        }
 
         1;
     };
-    my $err = $@;
+    my $err1 = $@;
 
-    print $handle $buffer;
+    my $ok2 = eval { print $handle $buffer };
+    my $err2 = $@;
 
-    unless ($ok) {
+    $DEPTH--;
+
+    unless ($ok1 && $ok2) {
         $self->{DIED}++;
-        die $err;
+
+        die $err2 if $ok1;
+        die $err1 if $ok2;
+
+        warn $err2;
+        die $err1;
     }
 
     return length($buffer);
+}
+
+sub DESTROY {
+    my $self = shift;
+    my $handle = $self->{handle} or return;
+    my $buffer = $self->{buffer} or return;
+    return unless @$buffer;
+
+    my $fileno = fileno($handle);
+
+    my $out = {
+        parts    => $self->{buffer},
+        stamp    => time,
+        fileno   => $fileno,
+        name     => $self->name,
+        write_no => ++$self->{count},
+        DESTROY  => 1,
+        buffer   => join '' => map { $_->{buffer} } @$buffer,
+    };
+
+    my $json = encode_json($out);
+    my $mh = $MUX_FILES{$MUXED{$fileno}};
+    print $mh $json, "\n";
 }
 
 1;

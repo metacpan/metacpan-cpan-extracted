@@ -1,5 +1,5 @@
 package WebService::Braintree::Transaction::PaymentInstrumentType;
-$WebService::Braintree::Transaction::PaymentInstrumentType::VERSION = '0.9';
+$WebService::Braintree::Transaction::PaymentInstrumentType::VERSION = '0.91';
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Exporter;

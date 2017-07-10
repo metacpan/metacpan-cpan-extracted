@@ -1,5 +1,5 @@
 package WebService::Braintree::WebhookNotification;
-$WebService::Braintree::WebhookNotification::VERSION = '0.9';
+$WebService::Braintree::WebhookNotification::VERSION = '0.91';
 
 use WebService::Braintree::WebhookNotification::Kind;
 use Moose;

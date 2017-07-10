@@ -44,11 +44,11 @@ sub test_checkError : Test(2) {
     # $self->like($@,qr/CMD-00001/,
     #     'checkError: Kommando konnte nicht gestartet werden';
 
-    system('/bin/true');
+    system('true'); # Fix: CPAN Testers
     eval { Prty::Shell->checkError($?,$!) };
     $self->ok(!$@,'checkError: Kommando erfolgreich ausgeführt');
 
-    system('/bin/false');
+    system('false'); # Fix: CPAN Testers
     eval { Prty::Shell->checkError($?,$!) };
     $self->like($@,qr/CMD-00002/,'checkError: Kommando endete mit Fehler');
 }

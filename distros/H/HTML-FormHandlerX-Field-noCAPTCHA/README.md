@@ -18,7 +18,7 @@ Example [Catalyst](https://metacpan.org/pod/Catalyst) controller:
 
         my $form = YourApp::HTML::Forms::YourForm->new({ctx => $c});
         my $params = $c->request->body_parameters;
-        if($form->process($c->req->body_paramseters) {
+        if($form->process($c->req->body_parameters) {
                 ## Do something with the form.
         } else {
                 ## Redisplay form and ask to try again.
@@ -29,7 +29,7 @@ Example [Catalyst](https://metacpan.org/pod/Catalyst) config:
         __PACKAGE__->config(
                 'HTML::FormHandlerX::Field::noCAPTCHA' => {
                         site_key   => '[YOUR SITE KEY]',
-                        secret_key => '[YOUR SECRET KEY]-IaHaF3jRN4j340MkGLNw6tcDu',
+                        secret_key => '[YOUR SECRET KEY]',
                 },
         );
 
@@ -90,17 +90,15 @@ The following modules or resources may be of interest.
 [HTML::FormHandler](https://metacpan.org/pod/HTML::FormHandler)
 [Captcha::noCAPTCHA](https://metacpan.org/pod/Captcha::noCAPTCHA)
 
-See it in action at [https://www.httpuptime.com](https://www.httpuptime.com)
-
 # AUTHOR
 
 Chuck Larson `<clarson@cpan.org>`
 
 # COPYRIGHT & LICENSE
 
-Copyright 2015, Chuck Larson `<chuck+github@endcapsoftwware.com>`
+Copyright 2017, Chuck Larson `<chuck+github@endcapsoftwware.com>`
 
-This projects work sponsered by End Cap Software, LLC.
+This projects work sponsored by End Cap Software, LLC.
 [http://www.endcapsoftware.com](http://www.endcapsoftware.com)
 
 Original work by John Napiorkowski `<jjnapiork@cpan.org>`

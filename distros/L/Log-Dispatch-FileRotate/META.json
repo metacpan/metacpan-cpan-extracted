@@ -42,7 +42,6 @@
          "requires" : {
             "POSIX" : "0",
             "Path::Tiny" : "0.018",
-            "Socket" : "0",
             "Test::More" : "0.88",
             "Test::Warn" : "0",
             "warnings" : "0"
@@ -62,7 +61,7 @@
          "web" : "https://github.com/mschout/perl-log-dispatch-filerotate"
       }
    },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

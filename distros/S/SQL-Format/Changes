@@ -1,5 +1,8 @@
 Revision history for Perl extension SQL::Format
 
+0.18 2017-07-09T11:02:13Z
+    - Fixed test on 5.26
+
 0.17 2017-06-22T11:11:13Z
     - #4 Fixed empty WHERE condition
 

@@ -1,4 +1,65 @@
-SYNOPSIS
+NAME
+    App::GoogleSearchPerlIRCLogs - Search Google for stuffs in Perl IRC logs
 
+VERSION
+    This document describes version 0.02 of App::GoogleSearchPerlIRCLogs
+    (from Perl distribution App-GoogleSearchPerlIRCLogs), released on
+    2017-07-08.
+
+SYNOPSIS
     Use the included script google-search-perl-irc-logs.
+
+FUNCTIONS
+  google_search_perl_irc_logs
+    Usage:
+
+     google_search_perl_irc_logs(%args) -> [status, msg, result, meta]
+
+    Search Google for stuffs in Perl IRC logs.
+
+    Currently searching with "site:irclog.perlgeek.org".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   query* => *array[str]*
+
+    *   year => *int*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-GoogleSearchPerlIRCLogs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-GoogleSearchPerlIRCLogs>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-GoogleSearchPerlI
+    RCLogs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

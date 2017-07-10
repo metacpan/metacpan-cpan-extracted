@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 package Lab::Bus::LinuxGPIB;
-$Lab::Bus::LinuxGPIB::VERSION = '3.552';
+$Lab::Bus::LinuxGPIB::VERSION = '3.553';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);

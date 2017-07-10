@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/google-search-perlmonks-user'
+    'script/google-search-perlmonks-user'
 );
 
 # no fake home requested

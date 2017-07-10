@@ -1,3 +1,8 @@
+0.012  2017-07-07
+   - Added example on using the exception hook
+   - Fixed configuration file example, with comments on their own lines.
+   - Make exception hook to be called if no token is present.
+
 0.011  2017-07-05
    - Fixed 0.010 module version.
 

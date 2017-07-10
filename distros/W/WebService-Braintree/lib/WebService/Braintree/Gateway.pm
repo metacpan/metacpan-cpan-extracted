@@ -1,5 +1,5 @@
 package WebService::Braintree::Gateway;
-$WebService::Braintree::Gateway::VERSION = '0.9';
+$WebService::Braintree::Gateway::VERSION = '0.91';
 
 use WebService::Braintree::AddressGateway;
 use WebService::Braintree::ClientTokenGateway;
@@ -8,6 +8,7 @@ use WebService::Braintree::CreditCardVerificationGateway;
 use WebService::Braintree::CustomerGateway;
 use WebService::Braintree::MerchantAccountGateway;
 use WebService::Braintree::PaymentMethodGateway;
+use WebService::Braintree::PaymentMethodNonceGateway;
 use WebService::Braintree::PayPalAccountGateway;
 use WebService::Braintree::SettlementBatchSummaryGateway;
 use WebService::Braintree::SubscriptionGateway;
@@ -54,6 +55,11 @@ has 'payment_method' => (is => 'ro', lazy => 1, default => sub {
                              my $self = shift;
                              WebService::Braintree::PaymentMethodGateway->new(gateway => $self);
                          });
+
+has 'payment_method_nonce' => (is => 'ro', lazy => 1, default => sub {
+                                   my $self = shift;
+                                   WebService::Braintree::PaymentMethodNonceGateway->new(gateway => $self);
+                               });
 
 has 'paypal_account' => (is => 'ro', lazy => 1, default => sub {
                              my $self = shift;

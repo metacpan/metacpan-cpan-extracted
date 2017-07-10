@@ -5876,6 +5876,8 @@ in its own section.
 @c See also @ref{Australian Stock Exchange}, and @ref{New Zealand Stock
 @c Exchange}, which use Yahoo, and are described in their own sections.
 
+@c @url{https://help.yahoo.com/kb/SLN2310.html}
+
 @quotation
 @multitable {Suffix} {Mmmmmmmmmm} {MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM}
 @headitem Suffix @tab Country @tab Exchange

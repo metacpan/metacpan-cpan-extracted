@@ -1,8 +1,9 @@
 use strict;
 use warnings;
+use lib 't/lib';
+use Util;
 use Test::More;
 use SQL::Format;
-use t::Util;
 
 subtest 'scalar' => sub {
     my $got = SQL::Format::_quote('foo');

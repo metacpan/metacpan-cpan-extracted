@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::SK::Snk;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -69,27 +69,27 @@ sub _create_atoms
             # interjection / interjekcia (fíha, bác, bums, dokelu, ahoj, cveng, plesk)
             'J' => ['pos' => 'int'],
             # reflexive pronoun/particle / reflexívum (sa, si)
-            'R' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'reflex'],
+            'R' => ['pos' => 'noun', 'prontype' => 'prs', 'reflex' => 'yes'],
             # conditional morpheme / kondicionálová morféma (by)
             'Y' => ['pos' => 'verb', 'verbtype' => 'aux', 'mood' => 'cnd'],
             # abbreviation / abreviácie, značky (km, kg, atď., H2O, SND)
-            'W' => ['abbr' => 'abbr'],
+            'W' => ['abbr' => 'yes'],
             # punctuation / interpunkcia (., !, (, ), +)
             'Z' => ['pos' => 'punc'],
             # unidentifiable part of speech / neurčiteľný slovný druh (bielo(-čierny), New (York))
-            ###!!! We could use 'hyph' => 'hyph' but this class also contains completely different token types (New from New York).
-            'Q' => ['hyph' => 'hyph'],
+            ###!!! We could use 'hyph' => 'yes' but this class also contains completely different token types (New from New York).
+            'Q' => ['hyph' => 'yes'],
             # non-word element / neslovný element (XXXX, -------)
             '#' => [],
             # citation in foreign language / citátový výraz (šaj pes dovakeras, take it easy!, náměstí)
-            '%' => ['foreign' => 'foreign'],
+            '%' => ['foreign' => 'yes'],
             # digit / číslica (8, 14000, 3 (razy))
             '0' => ['pos' => 'num', 'numform' => 'digit']
         },
         'encode_map' =>
         {
             'pos' => { 'noun' => { 'prontype' => { ''  => 'S',
-                                                   '@' => { 'reflex' => { 'reflex' => 'R',
+                                                   '@' => { 'reflex' => { 'yes' => 'R',
                                                                           '@'      => 'P' }}}},
                        'adj'  => 'A',
                        'num'  => { 'numform' => { 'digit' => '0',
@@ -104,9 +104,9 @@ sub _create_atoms
                        'part' => 'T',
                        'int'  => 'J',
                        'punc' => 'Z',
-                       '@'    => { 'hyph' => { 'hyph' => 'Q',
-                                               '@'    => { 'abbr' => { 'abbr' => 'W',
-                                                                       '@'    => { 'foreign' => { 'foreign' => '%' }}}}}}}
+                       '@'    => { 'hyph' => { 'yes' => 'Q',
+                                               '@'    => { 'abbr' => { 'yes' => 'W',
+                                                                       '@'    => { 'foreign' => { 'yes' => '%' }}}}}}}
         }
     );
     # MORPHOLOGICAL PART OF SPEECH ####################
@@ -354,7 +354,7 @@ sub _create_atoms
         'simple_decode_map' =>
         {
             # chybný zápis (papeirníctvo, zhrzený)
-            ':q' => 'typo'
+            ':q' => 'yes'
         }
     );
     # MERGED ATOM TO DECODE ANY FEATURE VALUE ####################
@@ -1963,7 +1963,7 @@ Lingua::Interset::Tagset::SK::Snk - Driver for the tags of the Slovak National C
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

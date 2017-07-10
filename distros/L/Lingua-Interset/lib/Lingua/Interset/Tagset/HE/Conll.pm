@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::HE::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -64,7 +64,7 @@ sub _create_atoms
             'BN' => ['pos' => 'adj|verb', 'verbform' => 'part'],
             # Beinoni Form with a possessive suffix
             # היבשוי
-            'BN_S_PP' => ['pos' => 'adj|verb', 'verbform' => 'part', 'poss' => 'poss'],
+            'BN_S_PP' => ['pos' => 'adj|verb', 'verbform' => 'part', 'poss' => 'yes'],
             # Construct-state Beinoni Form
             # עבטמ, הברמ, תלזוא, יליחנמ, יכומ
             'BNT' => ['pos' => 'adj|verb', 'verbform' => 'part', 'definite' => 'cons'],
@@ -135,7 +135,7 @@ sub _create_atoms
             'NNP' => ['pos' => 'noun', 'nountype' => 'prop'],
             # Noun with a possessive suffix
             # ותומ, וירבד, וייח, ופוס, ומש
-            'NN_S_PP' => ['pos' => 'noun', 'poss' => 'poss'],
+            'NN_S_PP' => ['pos' => 'noun', 'poss' => 'yes'],
             # Construct-state nouns
             # ידי, תעדוו
             'NNT' => ['pos' => 'noun', 'definite' => 'cons'],
@@ -146,7 +146,7 @@ sub _create_atoms
             'P' => ['pos' => 'part', 'other' => {'parttype' => 'prefix'}],
             # Possessive
             # לש
-            'POS' => ['pos' => 'part', 'poss' => 'poss'],
+            'POS' => ['pos' => 'part', 'poss' => 'yes'],
             # Prefix-Prepositions
             # ב, ל, מ, כ, שכ
             'PREPOSITION' => ['pos' => 'adp', 'adpostype' => 'prep'],
@@ -228,7 +228,7 @@ sub _create_atoms
         },
         'encode_map' =>
         {
-            'pos' => { 'noun' => { 'prontype' => { ''    => { 'poss' => { 'poss' => 'NN_S_PP',
+            'pos' => { 'noun' => { 'prontype' => { ''    => { 'poss' => { 'yes' => 'NN_S_PP',
                                                               '@' => { 'nountype' => { 'prop' => 'NNP',
                                                                        '@' => { 'definite' => { 'cons' => 'NNT',
                                                                                 '@' => { 'other/nountype' => { 'title' => 'TTL',
@@ -250,7 +250,7 @@ sub _create_atoms
                        # There are two ways of tagging participles:
                        # BN (or BN_S_PP or BNT) part of speech ... we decode it as 'adj|verb'.
                        # VB part of speech, BEINONI feature ... we decode it as 'verb'.
-                       'adj|verb' => { 'poss' => { 'poss' => 'BN_S_PP',
+                       'adj|verb' => { 'poss' => { 'yes' => 'BN_S_PP',
                                                    '@'    => { 'definite' => { 'cons' => 'BNT',
                                                                                '@'    => 'BN' }}}},
                        'verb' => { 'verbtype' => { 'cop' => { 'verbform' => { 'inf' => 'COP-TOINFINITIVE',
@@ -269,7 +269,7 @@ sub _create_atoms
                                                                                '@'   => 'CC' }}}},
                        'adp|conj'  => 'IN',
                        'adp'  => 'PREPOSITION',
-                       'part' => { 'poss' => { 'poss' => 'POS',
+                       'part' => { 'poss' => { 'yes' => 'POS',
                                                '@'    => { 'case' => { 'nom' => 'S_ANP',
                                                                        '@'   => { 'prontype' => { 'prs' => 'S_PRN',
                                                                                                   '@'   => { 'other/parttype' => { 'prefix' => 'P',
@@ -1054,7 +1054,7 @@ Lingua::Interset::Tagset::HE::Conll - Driver for the Hebrew tagset.
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

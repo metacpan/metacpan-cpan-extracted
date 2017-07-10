@@ -4,7 +4,7 @@ use base qw/Prty::Sdoc::Node/;
 use strict;
 use warnings;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Prty::TextFile;
 use Prty::OrderedHash;
@@ -217,6 +217,11 @@ sub dump {
     }
     elsif ($format eq 'pod') {
         if ($itemType eq '[]') {
+            if ($label =~ /^\d+$/) {
+                # Vermeidung des Test::Pod-Fehlers:
+                # Expected text after =item, not a number
+                $label = "Z<>$label";
+            }
             return "=item $label\n\n$childs";
         }
         elsif ($itemType eq '#') {
@@ -253,7 +258,7 @@ sub dump {
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

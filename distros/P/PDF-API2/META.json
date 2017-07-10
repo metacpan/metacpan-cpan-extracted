@@ -33,6 +33,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::Memory::Cycle" : "0"
          }
       }
@@ -45,7 +46,7 @@
          "web" : "https://github.com/ssimms/pdfapi2"
       }
    },
-   "version" : "2.032",
+   "version" : "2.033",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

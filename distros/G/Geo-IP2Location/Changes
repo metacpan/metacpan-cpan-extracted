@@ -1,6 +1,10 @@
 Revision history for Perl extension Geo::IP2Location.
 
-8.04  Wed Jul 13 12:00:00 2016
+8.04  Sat Jul 08 12:00:00 2017
+      Fifteenth release under the Geo::IP2Location
+      Fixed bug in POD
+
+8.03  Wed Jul 13 12:00:00 2016
       Fourteenth release under the Geo::IP2Location
       Fixed bug in function "bytes2int" due to bigint
 

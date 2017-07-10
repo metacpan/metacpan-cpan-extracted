@@ -3,12 +3,27 @@ package RPi::WiringPi::Constant;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 require Exporter;
 use base qw( Exporter );
 our @EXPORT_OK = ();
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
+
+use constant {
+    PWM_MODE_MS => 0,
+    PWM_MODE_BAL => 1,
+};
+
+{ # PWM modes
+    my @const = qw(
+        PWM_MODE_MS
+        PWM_MODE_BAL
+    );
+
+    push @EXPORT_OK, @const;
+    $EXPORT_TAGS{pwm_mode} = \@const;
+}
 
 use constant {
     INPUT => 0,
@@ -213,6 +228,13 @@ Internal pin pull up/down resistor state.
     LOW  => 0,
     ON   => 1,
     OFF  => 0,
+
+=head2 :pwm_mode
+
+The modes the PWM can be set to.
+
+    PWM_MODE_MS  => 0,
+    PWM_MODE_BAL => 1,
 
 =head2 :interrupt
 

@@ -4,7 +4,7 @@
 # Connection class for Lab::Bus::MODBUS_RS232
 #
 package Lab::Connection::MODBUS_RS232;
-$Lab::Connection::MODBUS_RS232::VERSION = '3.552';
+$Lab::Connection::MODBUS_RS232::VERSION = '3.553';
 use strict;
 use Scalar::Util qw(weaken);
 use Time::HiRes qw (usleep sleep);

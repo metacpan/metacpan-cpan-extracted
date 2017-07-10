@@ -12,7 +12,7 @@
 #
 
 package Text::AutoCSV;
-$Text::AutoCSV::VERSION = '1.1.7';
+$Text::AutoCSV::VERSION = '1.1.8';
 my $PKG = "Text::AutoCSV";
 
 use strict;
@@ -731,6 +731,7 @@ sub new {
 			quote_char => {type => SCALAR, optional => 1},
 			escape_char => {type => SCALAR, optional => 1},
 			has_headers => {type => BOOLEAN, default => 1, optional => 1},
+			out_has_headers => {type => UNDEF | BOOLEAN, default => undef, optional => 1},
 			fields_ar => {type => ARRAYREF, optional => 1},
 			fields_hr => {type => HASHREF, optional => 1},
 			fields_column_names => {type => ARRAYREF, optional => 1},
@@ -2871,17 +2872,30 @@ sub reset_next_record_hr {
 	return $self;
 }
 
+sub _create_internal_column_name_from_its_number {
+	return sprintf("__%04i__", $_[0]);
+}
+
 sub _ar_to_hr {
 	my $self = shift;
 
 	validate_pos(@_, {type => ARRAYREF});
 
 	my ($ar) = @_;
+	my $last_elem_index = scalar(@{$ar}) - 1;
 
 	my $nr = $self->{_named_fields};
 	my %h;
+	my %n_seen;
 	for (keys %{$nr}) {
 		$h{$_} = $ar->[$nr->{$_}];
+		undef $n_seen{$nr->{$_}};
+	}
+	for my $i (0..$last_elem_index) {
+		if (!exists($n_seen{$i})) {
+			my $k = _create_internal_column_name_from_its_number($i);
+			$h{$k} = $ar->[$i] if !exists $h{$k};
+		}
 	}
 
 	lock_keys(%h) if $self->{croak_if_error};
@@ -3134,8 +3148,16 @@ sub write {
 
 	my $write_filter_hr = _get_def($self->{out_filter}, $self->{write_filter_hr});
 
-	if ($self->{has_headers}) {
-		my $ar = $self->{_headers};
+	if (($self->{has_headers} and
+				!(defined($self->{out_has_headers}) and !$self->{out_has_headers}))
+			or $self->{out_has_headers}) {
+		my $ar = [ ];
+		if ($self->{has_headers}) {
+			$ar = $self->{_headers};
+		} else {
+			my $nf = $self->{_named_fields};
+			$ar->[$nf->{$_}] = $_ for (keys %{$nf});
+		}
 
 		if (exists $self->{_out_headers}) {
 			my $h = $self->{_out_headers};
@@ -3406,7 +3428,7 @@ sub _get_hash_and_projector {
 		};
 	}
 
-		# Add trim in the projector function list
+		# Add remove_accents in the projector function list
 	push @projectors, sub { return remove_accents(shift); } if $opt_ignacc;
 
 	my $projector = sub {
@@ -3556,7 +3578,7 @@ Text::AutoCSV - helper module to automate the use of Text::CSV
 
 =head1 VERSION
 
-version 1.1.7
+version 1.1.8
 
 =head1 SYNOPSIS
 
@@ -4101,6 +4123,26 @@ does not have this attribute set.
 Example:
 
 	my $csv = Text::AutoCSV->new(in_file => 'in.csv', out_file => 'out.csv', out_always_quote => 1);
+
+=item out_has_headers
+
+If true, when writing output, write a header line on first line.
+
+If false, when writing output, don't write a header line on first line.
+
+Value by default: same as has_headers attribute
+
+Example 1
+
+Read standard input and write to standard output, removing the header line.
+
+	Text::AutoCSV->new(out_has_headers => 0)->write();
+
+Example 2
+
+Read standard input and write to standard output, adding a header line.
+
+	Text::AutoCSV->new(fields_column_names => ['MYCOL1', 'MYCOL2'], out_has_headers => 1)->write();
 
 =item no_undef
 

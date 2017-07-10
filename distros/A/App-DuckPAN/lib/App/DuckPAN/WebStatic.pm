@@ -1,7 +1,7 @@
 package App::DuckPAN::WebStatic;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Webserver for duckpan static
-$App::DuckPAN::WebStatic::VERSION = '1018';
+$App::DuckPAN::WebStatic::VERSION = '1019';
 use Moo;
 use HTTP::Request;
 use Plack::Request;
@@ -109,7 +109,7 @@ App::DuckPAN::WebStatic - Webserver for duckpan static
 
 =head1 VERSION
 
-version 1018
+version 1019
 
 =head1 AUTHOR
 

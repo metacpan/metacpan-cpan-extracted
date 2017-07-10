@@ -1,5 +1,5 @@
 package Lab::XPRESS::Sweep::LogBlock;
-$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.552';
+$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.553';
 use Role::Tiny;
 requires qw/LOG write_LOG/;
 

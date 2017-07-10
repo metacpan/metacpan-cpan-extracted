@@ -1,0 +1,6 @@
+Starting fuzzy searches over 213341 lines.
+ウオソウコ nearest is ウッソウ (distance 2)
+Nothing like 'アイウエオカキクケコバビブベボハヒフヘホ' was found within 10 edits.
+アルベルトアインシュタイン nearest is リヒテンシュタイン (distance 7)
+バババブ nearest is バオバブ (distance 1)
+バババブアルベルト nearest is ヒルベルト (distance 5)

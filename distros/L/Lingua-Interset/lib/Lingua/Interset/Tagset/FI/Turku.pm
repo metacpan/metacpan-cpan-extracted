@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::FI::Turku;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -105,8 +105,8 @@ sub _create_atoms
                        'conj' => 'C',
                        'int'  => 'INTJ',
                        'punc' => 'PUNCT',
-                       '@'    => { 'abbr' => { 'abbr' => '', # ABBR will be added by another atom.
-                                               '@'    => { 'foreign' => { 'foreign' => '', # FORGN will be added by another atom.
+                       '@'    => { 'abbr' => { 'yes' => '', # ABBR will be added by another atom.
+                                               '@'    => { 'foreign' => { 'yes' => '', # FORGN will be added by another atom.
                                                                           # Participles (PCP1) sometimes occur without explicit indication whether they should be considered verbs or adjectives.
                                                                           # Examples: jatkuvalla = continuous (jatkua = continue); käyttävällä = using (käyttää = use)
                                                                           '@'       => { 'verbform' => { 'part' => '',
@@ -122,7 +122,7 @@ sub _create_atoms
         'intfeature' => 'abbr',
         'simple_decode_map' =>
         {
-            'ABBR' => 'abbr'
+            'ABBR' => 'yes'
         }
     );
     # FOREIGN WORD ####################
@@ -132,7 +132,7 @@ sub _create_atoms
         'intfeature' => 'foreign',
         'simple_decode_map' =>
         {
-            'FORGN' => 'foreign'
+            'FORGN' => 'yes'
         }
     );
     # PROPER NAME ####################
@@ -161,7 +161,7 @@ sub _create_atoms
             # It happens solely with the lemma "toinen" = "other" and the result translates as "each other" (lit. "my other", "your other", ...)
             'Q' => ['prontype' => 'ind'],
             # REFL/Q = reflexive quantifying pronoun (itseään = sám = self)
-            'REFL/Q' => ['prontype' => 'ind', 'reflex' => 'reflex'],
+            'REFL/Q' => ['prontype' => 'ind', 'reflex' => 'yes'],
             # PERS = personal pronoun (meidät = us)
             # minä = I, sinä = you, hän = he/she, me = we, te = you, he = they
             'PERS' => ['prontype' => 'prs'],
@@ -183,7 +183,7 @@ sub _create_atoms
         {
             'prontype' => { 'prs' => 'PERS',
                             'dem' => 'DEM',
-                            'ind' => { 'reflex' => { 'reflex' => 'REFL/Q',
+                            'ind' => { 'reflex' => { 'yes' => 'REFL/Q',
                                                      '@'      => 'Q' }},
                             'int' => { 'pos' => { 'adv' => 'INTERR',
                                                   'adj' => 'INTERR',
@@ -345,15 +345,15 @@ sub _create_atoms
         'decode_map' =>
         {
             # 1st person singular (my) (tyttäreni = my daughter)
-            '1SG' => ['poss' => 'poss', 'possperson' => '1', 'possnumber' => 'sing'],
+            '1SG' => ['poss' => 'yes', 'possperson' => '1', 'possnumber' => 'sing'],
             # 2nd person singular (your) (tyttäresi)
-            '2SG' => ['poss' => 'poss', 'possperson' => '2', 'possnumber' => 'sing'],
+            '2SG' => ['poss' => 'yes', 'possperson' => '2', 'possnumber' => 'sing'],
             # 3rd person singular or plural (his, her, its, their) (tyttärensä)
-            '3'   => ['poss' => 'poss', 'possperson' => '3'],
+            '3'   => ['poss' => 'yes', 'possperson' => '3'],
             # 1st person plural (our) (tyttäremme)
-            '1PL' => ['poss' => 'poss', 'possperson' => '1', 'possnumber' => 'plur'],
+            '1PL' => ['poss' => 'yes', 'possperson' => '1', 'possnumber' => 'plur'],
             # 2nd person plural (your) (tyttärenne)
-            '2PL' => ['poss' => 'poss', 'possperson' => '2', 'possnumber' => 'plur']
+            '2PL' => ['poss' => 'yes', 'possperson' => '2', 'possnumber' => 'plur']
         },
         'encode_map' =>
         {
@@ -593,7 +593,7 @@ sub _create_atoms
         'intfeature' => 'hyph',
         'simple_decode_map' =>
         {
-            'TrunCo' => 'hyph'
+            'TrunCo' => 'yes'
         }
     );
     # UNKNOWN FEATURES ####################
@@ -7657,7 +7657,7 @@ Lingua::Interset::Tagset::FI::Turku - Driver for the Finnish tagset from the Tur
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

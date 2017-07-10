@@ -1,5 +1,5 @@
 package WebService::Braintree::Validations;
-$WebService::Braintree::Validations::VERSION = '0.9';
+$WebService::Braintree::Validations::VERSION = '0.91';
 use strict;
 
 use WebService::Braintree::Util;

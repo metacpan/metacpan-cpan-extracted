@@ -3,9 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
-
 #include <inttypes.h>
-
 
 #include "spvm_compiler.h"
 #include "spvm_array.h"
@@ -32,6 +30,12 @@
 #include "spvm_extention.h"
 #include "spvm_extention_bind.h"
 
+
+
+
+
+
+
 const char* const SPVM_OP_C_CODE_NAMES[] = {
   "IF",
   "ELSIF",
@@ -45,7 +49,7 @@ const char* const SPVM_OP_C_CODE_NAMES[] = {
   "NAME",
   "PACKAGE",
   "MY_VAR",
-  "MY_VAR_PROCESS",
+  "MY_VAR_ASSIGN",
   "FIELD",
   "SUB",
   "ENUM",
@@ -106,18 +110,9 @@ const char* const SPVM_OP_C_CODE_NAMES[] = {
   "DEFAULT",
   "SWITCH_CONDITION",
   "VOID",
-  "TRY",
-  "CATCH",
-  "DEC_REF_COUNT",
-  "INC_REF_COUNT",
-  "FORMAL_ARGS",
+  "EVAL",
   "BLOCK_END",
-  "RETURN_PROCESS",
-  "LEAVE_SCOPE",
-  "DIE_PROCESS",
-  "STORE",
-  "LAST_PROCESS",
-  "NEXT_PROCESS",
+  "EXCEPTION_VAR",
 };
 
 SPVM_OP* SPVM_OP_new_op_use_from_package_name(SPVM_COMPILER* compiler, const char* package_name, const char* file, int32_t line) {
@@ -137,7 +132,6 @@ SPVM_OP* SPVM_OP_new_op_constant_int(SPVM_COMPILER* compiler, int32_t value, con
   constant->code = SPVM_CONSTANT_C_CODE_INT;
   constant->uv.long_value = value;
   constant->type = SPVM_HASH_search(compiler->type_symtable, "int", strlen("int"));
-  constant->type = SPVM_HASH_search(compiler->type_symtable, "int", strlen("int"));
   
   op_constant->uv.constant = constant;
   
@@ -150,7 +144,6 @@ SPVM_OP* SPVM_OP_new_op_constant_long(SPVM_COMPILER* compiler, int64_t value, co
   
   constant->code = SPVM_CONSTANT_C_CODE_LONG;
   constant->uv.long_value = value;
-  constant->type = SPVM_HASH_search(compiler->type_symtable, "long", strlen("long"));
   constant->type = SPVM_HASH_search(compiler->type_symtable, "long", strlen("long"));
   
   op_constant->uv.constant = constant;
@@ -165,7 +158,6 @@ SPVM_OP* SPVM_OP_new_op_constant_float(SPVM_COMPILER* compiler, float value, con
   constant->code = SPVM_CONSTANT_C_CODE_FLOAT;
   constant->uv.float_value = value;
   constant->type = SPVM_HASH_search(compiler->type_symtable, "float", strlen("float"));
-  constant->type = SPVM_HASH_search(compiler->type_symtable, "float", strlen("float"));
   
   op_constant->uv.constant = constant;
   
@@ -178,7 +170,6 @@ SPVM_OP* SPVM_OP_new_op_constant_double(SPVM_COMPILER* compiler, double value, c
   
   constant->code = SPVM_CONSTANT_C_CODE_DOUBLE;
   constant->uv.double_value = value;
-  constant->type = SPVM_HASH_search(compiler->type_symtable, "double", strlen("double"));
   constant->type = SPVM_HASH_search(compiler->type_symtable, "double", strlen("double"));
   
   op_constant->uv.constant = constant;
@@ -216,35 +207,24 @@ SPVM_OP* SPVM_OP_get_op_block_from_op_sub(SPVM_COMPILER* compiler, SPVM_OP* op_s
   }
 }
 
-SPVM_OP* SPVM_OP_build_try_catch(SPVM_COMPILER* compiler, SPVM_OP* op_try, SPVM_OP* op_try_block, SPVM_OP* op_catch, SPVM_OP* op_var, SPVM_OP* op_catch_block) {
+SPVM_OP* SPVM_OP_build_eval(SPVM_COMPILER* compiler, SPVM_OP* op_eval, SPVM_OP* op_eval_block) {
   
-  // Create op_my_var from op_var
-  SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, op_var->file, op_var->line);
-  op_type->uv.type = SPVM_HASH_search(compiler->type_symtable, "byte[]", strlen("byte[]"));
-  SPVM_MY_VAR* my_var = SPVM_MY_VAR_new(compiler);
-  SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NAME, op_var->file, op_var->line);
-  op_name->uv.name = op_var->uv.var->op_name->uv.name;
-  my_var->op_name = op_name;
-  my_var->op_type = op_type;
-  SPVM_OP* op_my_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR, op_var->file, op_var->line);
-  op_my_var->uv.my_var = my_var;
+  // Set exception to undef at first of eval block
+  SPVM_OP* op_exception_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_EXCEPTION_VAR, op_eval_block->file, op_eval_block->line);
+  SPVM_OP* op_undef = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_UNDEF, op_eval_block->file, op_eval_block->line);
+  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_eval_block->file, op_eval_block->line);
+  SPVM_OP_sibling_splice(compiler, op_assign, op_assign->last, 0, op_exception_var);
+  SPVM_OP_sibling_splice(compiler, op_assign, op_assign->last, 0, op_undef);
   
-  // Create op store
-  SPVM_OP* op_store = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_STORE, op_var->file, op_var->line);
-  SPVM_OP_sibling_splice(compiler, op_store, op_store->last, 0, op_my_var);
+  SPVM_OP* op_list_statement = op_eval_block->first;
+  SPVM_OP_sibling_splice(compiler, op_list_statement, op_list_statement->first, 0, op_assign);
   
-  // insert var declaration into catch block top
-  SPVM_OP_sibling_splice(compiler, op_catch_block->first, op_catch_block->first->first, 0, op_store);
+  SPVM_OP_sibling_splice(compiler, op_eval, op_eval->last, 0, op_eval_block);
   
-  // try block
-  op_try_block->flag |= SPVM_OP_C_FLAG_BLOCK_TRY;
+  // eval block
+  op_eval_block->flag |= SPVM_OP_C_FLAG_BLOCK_EVAL;
   
-  // Add block
-  SPVM_OP_sibling_splice(compiler, op_try, op_try->last, 0, op_try_block);
-  SPVM_OP_sibling_splice(compiler, op_try, op_try->last, 0, op_catch);
-  SPVM_OP_sibling_splice(compiler, op_try, op_try->last, 0, op_catch_block);
-  
-  return op_try;
+  return op_eval;
 }
 
 SPVM_OP* SPVM_OP_build_switch_statement(SPVM_COMPILER* compiler, SPVM_OP* op_switch, SPVM_OP* op_term_condition, SPVM_OP* op_block) {
@@ -336,7 +316,7 @@ SPVM_OP* SPVM_OP_build_while_statement(SPVM_COMPILER* compiler, SPVM_OP* op_WHIL
   return op_loop;
 }
 
-SPVM_OP* SPVM_OP_build_if_statement(SPVM_COMPILER* compiler, SPVM_OP* op_if, SPVM_OP* op_term, SPVM_OP* op_block_if, SPVM_OP* op_block_else) {
+SPVM_OP* SPVM_OP_build_if_statement(SPVM_COMPILER* compiler, SPVM_OP* op_if, SPVM_OP* op_term, SPVM_OP* op_block_else, SPVM_OP* op_block_if) {
   
   if (op_if->code == SPVM_OP_C_CODE_ELSIF) {
     op_if->code = SPVM_OP_C_CODE_IF;
@@ -476,6 +456,10 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
       if (var->op_my_var->uv.my_var->op_type) {
         type = var->op_my_var->uv.my_var->op_type->uv.type;
       }
+      break;
+    }
+    case SPVM_OP_C_CODE_EXCEPTION_VAR: {
+      type = SPVM_HASH_search(compiler->type_symtable, "byte[]", strlen("byte[]"));
       break;
     }
     case SPVM_OP_C_CODE_MY_VAR: {
@@ -955,7 +939,7 @@ SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op
 SPVM_OP* SPVM_OP_build_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_my_var, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_term) {
   
   // Stab
-  SPVM_OP* op_my_var_process = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR_PROCESS, op_my_var->file, op_my_var->line);
+  SPVM_OP* op_my_var_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR_ASSIGN, op_my_var->file, op_my_var->line);
   
   // Create my var information
   SPVM_MY_VAR* my_var = SPVM_MY_VAR_new(compiler);
@@ -970,7 +954,7 @@ SPVM_OP* SPVM_OP_build_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_my_var, SPVM_
   op_my_var->uv.my_var = my_var;
   
   // Add my_var op
-  SPVM_OP_sibling_splice(compiler, op_my_var_process, NULL, 0, op_my_var);
+  SPVM_OP_sibling_splice(compiler, op_my_var_assign, NULL, 0, op_my_var);
   
   // Assign
   if (op_term) {
@@ -981,10 +965,10 @@ SPVM_OP* SPVM_OP_build_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_my_var, SPVM_
     SPVM_OP_sibling_splice(compiler, op_assign, NULL, 0, op_var);
     SPVM_OP_sibling_splice(compiler, op_assign, op_var, 0, op_term);
     
-    SPVM_OP_sibling_splice(compiler, op_my_var_process, op_my_var, 0, op_assign);
+    SPVM_OP_sibling_splice(compiler, op_my_var_assign, op_my_var_assign->last, 0, op_assign);
     
-    // Type assumption
-    my_var->op_term_assumption = op_term;
+    // Type inference
+    my_var->op_term_type_inference = op_term;
   }
   
   // Type is none
@@ -992,7 +976,7 @@ SPVM_OP* SPVM_OP_build_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_my_var, SPVM_
     SPVM_yyerror_format(compiler, "\"my %s\" can't detect type at %s line %d\n", my_var->op_name->uv.name, op_my_var->file, op_my_var->line);
   }
   
-  return op_my_var_process;
+  return op_my_var_assign;
 }
 
 SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_name_field, SPVM_OP* op_type) {
@@ -1055,24 +1039,30 @@ SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op
       SPVM_ARRAY_push(sub->op_args, op_arg->first);
     }
   }
+
+  // Native my vars is same as arguments
+  if (sub->is_native) {
+    SPVM_OP* op_arg = op_args->first;
+    while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
+      SPVM_ARRAY_push(sub->op_my_vars, op_arg->first);
+    }
+  }
   
-  // Add my declaration to top of block
+  // Add my declaration to first of block
   if (op_block) {
     SPVM_OP* op_list_statement = op_block->first;
-    SPVM_OP* op_formal_args = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_FORMAL_ARGS, op_list_statement->file, op_list_statement->line);
     {
       int32_t i;
-      for (i = 0; i < sub->op_args->length; i++) {
+      for (i = sub->op_args->length - 1; i >= 0; i--) {
         SPVM_OP* op_arg = SPVM_ARRAY_fetch(sub->op_args, i);
         SPVM_OP* op_my_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR, op_arg->file, op_arg->line);
         op_my_var->uv.my_var = op_arg->uv.my_var;
-        SPVM_OP* op_my_var_parent = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR_PROCESS, op_arg->file, op_arg->line);
-        SPVM_OP_sibling_splice(compiler, op_my_var_parent, op_my_var_parent->last, 0, op_my_var);
+        SPVM_OP* op_my_var_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR_ASSIGN, op_arg->file, op_arg->line);
+        SPVM_OP_sibling_splice(compiler, op_my_var_assign, op_my_var_assign->last, 0, op_my_var);
         
-        SPVM_OP_sibling_splice(compiler, op_formal_args, op_formal_args->first, 0, op_my_var_parent);
+        SPVM_OP_sibling_splice(compiler, op_list_statement, op_list_statement->first, 0, op_my_var_assign);
       }
     }
-    SPVM_OP_sibling_splice(compiler, op_list_statement, op_list_statement->first, 0, op_formal_args);
   }
   
   // return type
@@ -1211,58 +1201,38 @@ SPVM_OP* SPVM_OP_build_type_name(SPVM_COMPILER* compiler, SPVM_OP* op_name) {
 
 SPVM_OP* SPVM_OP_build_return(SPVM_COMPILER* compiler, SPVM_OP* op_return, SPVM_OP* op_term) {
   
-  SPVM_OP* op_sub_end_process = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_RETURN_PROCESS, op_return->file, op_return->line);
-  
-  SPVM_OP* op_leave_scope = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_LEAVE_SCOPE, op_return->file, op_return->line);
-  
   if (op_term) {
     SPVM_OP_sibling_splice(compiler, op_return, NULL, 0, op_term);
   }
   
-  SPVM_OP_sibling_splice(compiler, op_sub_end_process, op_sub_end_process->last, 0, op_leave_scope);
-  SPVM_OP_sibling_splice(compiler, op_sub_end_process, op_sub_end_process->last, 0, op_return);
-  
-  return op_sub_end_process;
+  return op_return;
 }
 
 SPVM_OP* SPVM_OP_build_die(SPVM_COMPILER* compiler, SPVM_OP* op_die, SPVM_OP* op_term) {
   
-  SPVM_OP* op_die_process = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_DIE_PROCESS, op_die->file, op_die->line);
-  
-  SPVM_OP* op_leave_scope = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_LEAVE_SCOPE, op_die->file, op_die->line);
-  
-  if (op_term) {
-    SPVM_OP_sibling_splice(compiler, op_die, NULL, 0, op_term);
+  if (!op_term) {
+    // Default error message
+    SPVM_OP* op_constant = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_CONSTANT, op_die->file, op_die->line);
+    SPVM_CONSTANT* constant = SPVM_CONSTANT_new(compiler);
+    constant->code = SPVM_CONSTANT_C_CODE_STRING;
+    constant->uv.string_value = "Error";
+    constant->type = SPVM_HASH_search(compiler->type_symtable, "byte[]", strlen("byte[]"));
+    op_constant->uv.constant = constant;
+    
+    op_term = op_constant;
   }
   
-  SPVM_OP_sibling_splice(compiler, op_die_process, op_die_process->last, 0, op_leave_scope);
-  SPVM_OP_sibling_splice(compiler, op_die_process, op_die_process->last, 0, op_die);
+  // Exception variable
+  SPVM_OP* op_exception_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_EXCEPTION_VAR, op_term->file, op_term->line);
   
-  return op_die_process;
-}
-
-SPVM_OP* SPVM_OP_build_last(SPVM_COMPILER* compiler, SPVM_OP* op_last) {
+  // Assign
+  SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_term->file, op_term->line);
+  SPVM_OP_sibling_splice(compiler, op_assign, op_assign->last, 0, op_exception_var);
+  SPVM_OP_sibling_splice(compiler, op_assign, op_assign->last, 0, op_term);
   
-  SPVM_OP* op_last_process = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_LAST_PROCESS, op_last->file, op_last->line);
+  SPVM_OP_sibling_splice(compiler, op_die, NULL, 0, op_assign);
   
-  SPVM_OP* op_leave_scope = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_LEAVE_SCOPE, op_last->file, op_last->line);
-  
-  SPVM_OP_sibling_splice(compiler, op_last_process, op_last_process->last, 0, op_leave_scope);
-  SPVM_OP_sibling_splice(compiler, op_last_process, op_last_process->last, 0, op_last);
-  
-  return op_last_process;
-}
-
-SPVM_OP* SPVM_OP_build_next(SPVM_COMPILER* compiler, SPVM_OP* op_next) {
-  
-  SPVM_OP* op_next_process = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEXT_PROCESS, op_next->file, op_next->line);
-  
-  SPVM_OP* op_leave_scope = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_LEAVE_SCOPE, op_next->file, op_next->line);
-  
-  SPVM_OP_sibling_splice(compiler, op_next_process, op_next_process->last, 0, op_leave_scope);
-  SPVM_OP_sibling_splice(compiler, op_next_process, op_next_process->last, 0, op_next);
-  
-  return op_next_process;
+  return op_die;
 }
 
 SPVM_OP* SPVM_OP_build_type_array(SPVM_COMPILER* compiler, SPVM_OP* op_type, SPVM_OP* op_term_length) {

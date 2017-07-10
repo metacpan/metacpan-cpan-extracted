@@ -1,6 +1,126 @@
-SYNOPSIS
+NAME
+    App::pmpatcher - Apply a set of module patches on your Perl installation
 
+VERSION
+    This document describes version 0.06 of App::pmpatcher (from Perl
+    distribution App-pmpatcher), released on 2017-07-07.
+
+SYNOPSIS
     See pmpatcher CLI.
 
 DESCRIPTION
+FUNCTIONS
+  pmpatcher
+    Usage:
+
+     pmpatcher(%args) -> [status, msg, result, meta]
+
+    Apply a set of module patches on your Perl installation.
+
+    You might have a set of patches that you want to apply on Perl modules
+    on all your Perl installation. For example, currently as of this writing
+    I have this on my "patches" directory:
+
+     pm-OrePAN-Archive-0.08-support_no_index_file.patch
+     pm-Pod-Elemental-PerlMunger-0.200002-DATA_encoding_fix.patch
+
+    These patches might be pending merge by the module maintainer, or are of
+    private nature so might never be merged, or of any other nature.
+    Applying module patches to an installation is a lightweight alternative
+    to creating a fork for each of these modules.
+
+    This utility helps you making the process of applying these patches more
+    convenient. Basically this utility just locates all the target modules
+    and feeds all of these patches to the "patch" program.
+
+    To use this utility, first of all you need to gather all your module
+    patches in a single directory (see "patches_dir" option). Also, you need
+    to make sure that all your "*.patch" files match this name pattern:
+
+     pm-<MODULE-NAME-DASH-SEPARATED>-<VERSION>-<TOPIC>.patch
+
+    Then, to apply all the patches, you just call:
+
+     % pmpatcher --patches-dir ~/patches
+
+    (Or, you might also want to put "patches_dir=/path/to/patches" into
+    "~/pmpatcher.conf" to save you from having to type the option
+    repeatedly.)
+
+    Example result:
+
+     % pmpatcher
+     +--------------------------------------------------------------+--------+---------+
+     | item_id                                                      | status | message |
+     +--------------------------------------------------------------+--------+---------+
+     | pm-OrePAN-Archive-0.08-support_no_index_file.patch           | 200    | Applied |
+     | pm-Pod-Elemental-PerlMunger-0.200002-DATA_encoding_fix.patch | 200    | Applied |
+     +--------------------------------------------------------------+--------+---------+
+
+    If you try to run it again, you might get:
+
+     % pmpatcher
+     +--------------------------------------------------------------+--------+-----------------+
+     | item_id                                                      | status | message         |
+     +--------------------------------------------------------------+--------+-----------------+
+     | pm-OrePAN-Archive-0.08-support_no_index_file.patch           | 304    | Already applied |
+     | pm-Pod-Elemental-PerlMunger-0.200002-DATA_encoding_fix.patch | 304    | Already applied |
+     +--------------------------------------------------------------+--------+-----------------+
+
+    There's also a "--dry-run" and a "-R" ("--reverse") option, just like
+    "patch".
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   patches_dir* => *str*
+
+    *   reverse => *bool*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-pmpatcher>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-pmpatcher>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-pmpatcher>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    progpatcher.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -8,7 +8,7 @@ use Moo;
 extends 'AnyEvent::FTP::Client::Site::Base';
 
 # ABSTRACT: Site specific commands for Microsoft FTP Service
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 # TODO add a test for this
@@ -28,7 +28,7 @@ AnyEvent::FTP::Client::Site::Microsoft - Site specific commands for Microsoft FT
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -37,21 +37,21 @@ version 0.09
  $client->connect('ftp://iisserver')->cb(sub {
    # toggle dir style
    $client->site->microsoft->dirstyle->cb(sub {
-   
+
      $client->list->cb(sub {
        my $list = shift
        # $list is in first style.
-       
+
        $client->site->microsoft->dirstyle->cb(sub {
-       
+
          $client->list->cb(sub {
            my $list = shift;
            # list is in second style.
          });
-       
+
        });
      });
-   
+
    });
  });
 
@@ -74,6 +74,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

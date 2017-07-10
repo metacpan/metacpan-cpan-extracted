@@ -6,10 +6,14 @@ use Alien::Build::Plugin;
 use Text::ParseWords qw( shellwords );
 
 # ABSTRACT: Add dependencies to library and header search path
-our $VERSION = '0.52'; # VERSION
+our $VERSION = '0.55'; # VERSION
 
 
 has aliens => {};
+
+
+has public_I => 0;
+has public_l => 0;
 
 sub init
 {
@@ -17,6 +21,11 @@ sub init
   
   $meta->add_requires('configure' => 'Alien::Build::Plugin::Build::SearchDep' => '0.35');
   $meta->add_requires('share'     => 'Env::ShellWords' => 0.01);
+  
+  if($self->public_I || $self->public_l)
+  {
+    $meta->add_requires('configure' => 'Alien::Build::Plugin::Build::SearchDep' => '0.53');
+  }
   
   my @aliens;
   if(ref($self->aliens) eq 'HASH')
@@ -34,14 +43,17 @@ sub init
     build => sub {
       my($orig, $build) = @_;
       
-      local $ENV{CFLAGS} = $ENV{CFLAGS};
-      local $ENV{LDFLAGS} = $ENV{LDFLAGS};
+      local $ENV{CFLAGS}   = $ENV{CFLAGS};
+      local $ENV{CXXFLAGS} = $ENV{CXXFLAGS};
+      local $ENV{LDFLAGS}  = $ENV{LDFLAGS};
       
-      tie my @CFLAGS,  'Env::ShellWords', 'CFLAGS';
-      tie my @LDFLAGS, 'Env::ShellWords', 'LDFLAGS';
+      tie my @CFLAGS,   'Env::ShellWords', 'CFLAGS';
+      tie my @CXXFLAGS, 'Env::ShellWords', 'CXXFLAGS';
+      tie my @LDFLAGS,  'Env::ShellWords', 'LDFLAGS';
       
-      my $cflags = [];
+      my $cflags  = $build->install_prop->{plugin_build_searchdep_cflags}  = [];
       my $ldflags = $build->install_prop->{plugin_build_searchdep_ldflags} = [];
+      my $libs    = $build->install_prop->{plugin_build_searchdep_libs}    = [];
       
       foreach my $other (@aliens)
       {
@@ -59,9 +71,11 @@ sub init
         }
         unshift @$cflags,  grep /^-I/, shellwords($other_cflags);
         unshift @$ldflags, grep /^-L/, shellwords($other_libs);
+        unshift @$libs,    grep /^-l/, shellwords($other_libs);
       }
       
       unshift @CFLAGS, @$cflags;
+      unshift @CXXFLAGS, @$cflags;
       unshift @LDFLAGS, @$ldflags;
       
       $orig->($build);
@@ -73,8 +87,20 @@ sub init
     gather_share => sub {
       my($build) = @_;
       
+      if($self->public_l)
+      {
+        $build->runtime_prop->{$_} = join(' ', @{ $build->install_prop->{plugin_build_searchdep_libs} }) . ' ' . $build->runtime_prop->{$_}
+          for qw( libs libs_static );
+      }
+      
       $build->runtime_prop->{$_} = join(' ', @{ $build->install_prop->{plugin_build_searchdep_ldflags} }) . ' ' . $build->runtime_prop->{$_}
         for qw( libs libs_static );
+
+      if($self->public_I)
+      {
+        $build->runtime_prop->{$_} = join(' ', @{ $build->install_prop->{plugin_build_searchdep_cflags} }) . ' ' . $build->runtime_prop->{$_}
+          for qw( cflags cflags_static );
+      }
     },
   );
 }
@@ -93,7 +119,7 @@ Alien::Build::Plugin::Build::SearchDep - Add dependencies to library and header 
 
 =head1 VERSION
 
-version 0.52
+version 0.55
 
 =head1 SYNOPSIS
 
@@ -114,6 +140,14 @@ them (like autoconf) can pick them up.
 
 Either a list reference or hash reference of the other aliens.  If a hash reference
 then the keys are the class names and the values are the versions of those classes.
+
+=head2 public_I
+
+Include the C<-I> flags when setting the runtime cflags property.
+
+=head2 public_l
+
+Include the C<-l> flags when setting the runtime libs property.
 
 =head1 AUTHOR
 

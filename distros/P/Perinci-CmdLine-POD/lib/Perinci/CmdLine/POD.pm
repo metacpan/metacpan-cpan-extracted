@@ -1,7 +1,7 @@
 package Perinci::CmdLine::POD;
 
-our $DATE = '2017-06-08'; # DATE
-our $VERSION = '0.013'; # VERSION
+our $DATE = '2017-07-07'; # DATE
+our $VERSION = '0.014'; # VERSION
 
 use 5.010001;
 use strict;
@@ -116,6 +116,10 @@ _
             summary => 'Path to script',
             schema => 'filename*',
             tags => ['category:script-source'],
+        },
+        libs => {
+            summary => 'Extra libraries to pass to perl via -I',
+            schema => ['array*', of=>'dirname*'],
         },
 
         url => {
@@ -249,6 +253,7 @@ sub gen_pod_for_pericmd_script {
         require Perinci::CmdLine::Dump;
         $dump_res = Perinci::CmdLine::Dump::dump_pericmd_script(
             filename => $args{script},
+            libs => $args{libs},
         );
         return $dump_res unless $dump_res->[0] == 200;
         $cli = $dump_res->[2];
@@ -444,9 +449,9 @@ sub gen_pod_for_pericmd_script {
                             # execute script and get its output
                             if (defined $args{script}) {
                                 my $cmdline = $eg->{cmdline};
-                                $cmdline =~ s/\[\[prog\]\]/shell_quote($^X, "-Ilib", $args{script})/e;
+                                $cmdline =~ s/\[\[prog\]\]/shell_quote($^X, (map {"-I$_"} @{ $args{libs} || [] }), $args{script})/e;
                                 system(
-                                    {shell => 0, capture_stdout => \$fres},
+                                    {log=>1, shell => 0, capture_stdout => \$fres},
                                     "bash", "-c", $cmdline);
                                 if ($?) {
                                     die sprintf("Example #%d (subcommand %s): cmdline %s: failed: %s", $eg->{_i}, $eg->{_sc_name}, $cmdline, explain_child_error());
@@ -724,12 +729,8 @@ in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
 recognize tab completion for the command. Or, you can also directly execute the
 line above in your shell to activate immediately.
 
-It is recommended, however, that you install L<shcompgen> which allows you to
-activate completion scripts for several kinds of scripts on multiple shells.
-Some CPAN distributions (those that are built with
-L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
-completion for their included scripts (using L<shcompgen>) at installation time,
-so you can immediately have tab completion.
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
 
 $h2 tcsh
 
@@ -977,7 +978,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.013 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-06-08.
+This document describes version 0.014 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2017-07-07.
 
 =head1 SYNOPSIS
 
@@ -1050,6 +1051,10 @@ Whether to generate POD for subcommands.
 If you want to generate separate POD/manpage for each subcommand, you can use
 this option for the main CLI POD, then generate each subcommand's POD with the
 C<--gen-subcommand=SUBCOMMAND_NAME> option.
+
+=item * B<libs> => I<array[dirname]>
+
+Extra libraries to pass to perl via -I.
 
 =item * B<per_arg_json> => I<bool> (default: 1)
 

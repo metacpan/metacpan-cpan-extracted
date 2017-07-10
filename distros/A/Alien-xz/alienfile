@@ -10,7 +10,7 @@ plugin 'Probe::CommandLine' => (
 share {
 
   plugin Download => (
-    url     => 'http://tukaani.org/xz/',
+    url     => 'https://tukaani.org/xz/',
     version => qr/^xz-([0-9\.]+)\.tar\.gz$/,
   );
 

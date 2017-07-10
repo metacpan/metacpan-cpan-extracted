@@ -1,0 +1,6 @@
+name = "SQL-Format"
+badges = ["travis"]
+authority="cpan:XAICRON"
+
+module_maker="ModuleBuildTiny"
+

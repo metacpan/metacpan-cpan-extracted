@@ -5,7 +5,7 @@ use warnings;
 
 package Net::Fritz::Error;
 # ABSTRACT: wraps any error from the L<Net::Fritz> modules
-$Net::Fritz::Error::VERSION = 'v0.0.7';
+$Net::Fritz::Error::VERSION = 'v0.0.8';
 
 # TODO: use a global configuration option to make every call to
 #       Net::Fritz::Error->new an immediately fatal error?
@@ -52,7 +52,7 @@ Net::Fritz::Error - wraps any error from the L<Net::Fritz> modules
 
 =head1 VERSION
 
-version v0.0.7
+version v0.0.8
 
 =head1 SYNOPSIS
 

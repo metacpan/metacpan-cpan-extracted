@@ -1,0 +1,1007 @@
+kd@hooloovoo ~/braintree-perl $ prove -lv t/sandbox/
+t/sandbox/address.t .......................... 
+    # Subtest: create
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 1 - create
+    # Subtest: Create without customer ID
+    ok 1
+    1..1
+ok 2 - Create without customer ID
+    # Subtest: Create without any fields
+    ok 1
+    ok 2 - has at least one error on address
+    ok 3 - Address error
+    1..3
+ok 3 - Create without any fields
+    # Subtest: with a customer
+        # Subtest: find
+        ok 1
+        1..1
+    ok 1 - find
+        # Subtest: not found
+        ok 1 - Catches Not Found
+        1..1
+    ok 2 - not found
+        # Subtest: Update
+        ok 1
+        ok 2
+        1..2
+    ok 3 - Update
+        # Subtest: Update non-existant
+        ok 1
+        1..1
+    ok 4 - Update non-existant
+        # Subtest: delete existing
+        ok 1
+        ok 2
+        1..2
+    ok 5 - delete existing
+    1..5
+ok 4 - with a customer
+1..4
+ok
+t/sandbox/client_token.t ..................... 
+    # Subtest: Generate a fingerprint that the gateway accepts
+    ok 1 - result returns no errors
+    1..1
+ok 1 - Generate a fingerprint that the gateway accepts
+    # Subtest: it allows a client token version to be specified
+    ok 1
+    1..1
+ok 2 - it allows a client token version to be specified
+    # Subtest: it can pass verify card
+    ok 1
+    ok 2
+    1..2
+ok 3 - it can pass verify card
+    # Subtest: it can pass make default
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 4 - it can pass make default
+    # Subtest: it defaults to version 2
+    ok 1
+    1..1
+ok 5 - it defaults to version 2
+    # Subtest: it can pass fail_on_duplicate_payment_method card
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 6 - it can pass fail_on_duplicate_payment_method card
+    # Subtest: client token accepts merchant account id
+    ok 1
+    1..1
+ok 7 - client token accepts merchant account id
+1..7
+ok
+t/sandbox/configuration.t .................... 
+    # Subtest: default integration configuration
+    ok 1
+    ok 2
+    1..2
+ok 1 - default integration configuration
+    # Subtest: configuration two
+    ok 1
+    1..1
+ok 2 - configuration two
+1..2
+ok
+t/sandbox/credit_card.t ...................... 
+    # Subtest: Create with S2S
+    ok 1 - result returns no errors
+    ok 2 - sets credit card number
+    ok 3
+    ok 4
+    ok 5
+    1..5
+ok 1 - Create with S2S
+    # Subtest: create with credit card nonce
+    ok 1
+    ok 2
+    1..2
+ok 2 - create with credit card nonce
+    # Subtest: Create with security params
+    ok 1 - result returns no errors
+    1..1
+ok 3 - Create with security params
+    # Subtest: Failure Cases
+    ok 1
+    ok 2 - Customer not found
+    1..2
+ok 4 - Failure Cases
+    # Subtest: Create with Fail on Duplicate Payment Method
+    ok 1
+    ok 2
+    1..2
+ok 5 - Create with Fail on Duplicate Payment Method
+    # Subtest: Create with Billing Address
+    ok 1 - result returns no errors
+    ok 2 - sets address attributes
+    ok 3
+    ok 4
+    1..4
+ok 6 - Create with Billing Address
+    # Subtest: delete
+        # Subtest: existing card
+        ok 1
+        1..1
+    ok 1 - existing card
+        # Subtest: not found
+        ok 1
+        1..1
+    ok 2 - not found
+    1..2
+ok 7 - delete
+    # Subtest: find
+        # Subtest: card exists
+        ok 1
+        ok 2
+        1..2
+    ok 1 - card exists
+        # Subtest: card does not exist
+        ok 1
+        1..1
+    ok 2 - card does not exist
+    1..2
+ok 8 - find
+    # Subtest: from_nonce
+        # Subtest: returns the payment method for the provided nonce
+        ok 1
+        1..1
+    ok 1 - returns the payment method for the provided nonce
+        # Subtest: fails if nonce is empty
+        ok 1
+        1..1
+    ok 2 - fails if nonce is empty
+        # Subtest: fails if nonce points to a shared card
+        ok 1
+        1..1
+    ok 3 - fails if nonce points to a shared card
+        # Subtest: fails if nonce is locked
+        ok 1
+        ok 2
+        ok 3
+        1..3
+    ok 4 - fails if nonce is locked
+        # Subtest: fails if nonce is already consumed
+        ok 1
+        1..1
+    ok 5 - fails if nonce is already consumed
+    1..5
+ok 9 - from_nonce
+    # Subtest: update
+        # Subtest: existing card
+        ok 1 - returns no errors
+        ok 2 - sets new credit card number
+        1..2
+    ok 1 - existing card
+        # Subtest: not found
+        ok 1
+        1..1
+    ok 2 - not found
+    1..2
+ok 10 - update
+    # Subtest: debit
+    ok 1
+    1..1
+ok 11 - debit
+    # Subtest: payroll
+    ok 1
+    1..1
+ok 12 - payroll
+    # Subtest: healthcare
+    ok 1
+    1..1
+ok 13 - healthcare
+    # Subtest: commercial
+    ok 1
+    1..1
+ok 14 - commercial
+    # Subtest: durbin_regulated
+    ok 1
+    1..1
+ok 15 - durbin_regulated
+    # Subtest: prepaid
+    ok 1
+    1..1
+ok 16 - prepaid
+    # Subtest: issuing_bank
+    ok 1
+    1..1
+ok 17 - issuing_bank
+    # Subtest: country_of_issuance
+    ok 1
+    1..1
+ok 18 - country_of_issuance
+    # Subtest: card with negative card type indentifiers
+    ok 1
+    ok 2
+    ok 3
+    ok 4
+    ok 5
+    ok 6
+    1..6
+ok 19 - card with negative card type indentifiers
+    # Subtest: card without card type identifiers
+    ok 1
+    ok 2
+    ok 3
+    ok 4
+    ok 5
+    ok 6
+    ok 7
+    ok 8
+    1..8
+ok 20 - card without card type identifiers
+    # Subtest: Venmo Sdk Payment Method Code
+    ok 1
+    ok 2
+    ok 3
+    ok 4
+    1..4
+ok 21 - Venmo Sdk Payment Method Code
+    # Subtest: Invalid Venmo Sdk Payment Method Code
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 22 - Invalid Venmo Sdk Payment Method Code
+    # Subtest: Valid Venmo Sdk Session
+    ok 1
+    ok 2
+    1..2
+ok 23 - Valid Venmo Sdk Session
+    # Subtest: Invalid Venmo Sdk Session
+    ok 1
+    ok 2
+    1..2
+ok 24 - Invalid Venmo Sdk Session
+1..24
+ok
+t/sandbox/credit_card_verification.t ......... 
+    # Subtest: card verification is returned by result objects
+    ok 1
+    ok 2
+    1..2
+ok 1 - card verification is returned by result objects
+    # Subtest: finds credit card verification
+    ok 1
+    1..1
+ok 2 - finds credit card verification
+    # Subtest: Card Type Indicators
+    ok 1
+    ok 2
+    ok 3
+    ok 4
+    ok 5
+    ok 6
+    ok 7
+    ok 8
+    ok 9
+    1..9
+ok 3 - Card Type Indicators
+1..3
+ok
+t/sandbox/credit_card_verification_search.t .. 
+    # Subtest: Searches text and partial match and equality fields
+    ok 1
+    ok 2
+    ok 3
+    ok 4
+    ok 5
+    ok 6
+    1..6
+ok 1 - Searches text and partial match and equality fields
+    # Subtest: Searches multiple value fields
+    ok 1
+    ok 2
+    ok 3
+    ok 4
+    1..4
+ok 2 - Searches multiple value fields
+    # Subtest: Searches fail on invalid credit card types
+    ok 1
+    1..1
+ok 3 - Searches fail on invalid credit card types
+    # Subtest: Searches range fields
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 4 - Searches range fields
+1..4
+ok
+t/sandbox/customer.t ......................... 
+    # Subtest: Create:S2S
+        # Subtest: simple
+        ok 1 - customer s2s create successful
+        ok 2 - sets customer attributes (first name)
+        ok 3 - customer id != blank
+        1..3
+    ok 1 - simple
+        # Subtest: with CC and billing address
+        ok 1 - customer s2s complex create successful
+        ok 2 - sets customer attributes (first name)
+        ok 3 - sets deeply nested attributes
+        ok 4
+        ok 5
+        1..5
+    ok 2 - with CC and billing address
+        # Subtest: with venmo sdk payment method code
+        ok 1
+        ok 2
+        1..2
+    ok 3 - with venmo sdk payment method code
+        # Subtest: with credit card nonce
+        ok 1
+        ok 2
+        1..2
+    ok 4 - with credit card nonce
+        # Subtest: with paypal payment method nonce
+        ok 1
+        ok 2
+        ok 3
+        1..3
+    ok 5 - with paypal payment method nonce
+        # Subtest: with venmo sdk session
+        ok 1
+        ok 2
+        1..2
+    ok 6 - with venmo sdk session
+        # Subtest: with security params
+        ok 1
+        1..1
+    ok 7 - with security params
+        # Subtest: with invalid attributes
+        1..0 # SKIP pending
+    ok 8 # skip pending
+    1..8
+ok 1 - Create:S2S
+    # Subtest: delete
+        # Subtest: existing customer
+        ok 1 - customer delete success
+        1..1
+    ok 1 - existing customer
+        # Subtest: customer doesn't exist
+        ok 1 - throws NotFoundError if customer doesn't exist
+        1..1
+    ok 2 - customer doesn't exist
+    1..2
+ok 2 - delete
+    # Subtest: find
+        # Subtest: existing customer
+        ok 1 - finds the correct customer
+        ok 2 - gets customer details (First name)
+        1..2
+    ok 1 - existing customer
+        # Subtest: doesn't exist
+        ok 1 - throws NotFoundError if customer doesn't exist
+        1..1
+    ok 2 - doesn't exist
+    1..2
+ok 3 - find
+    # Subtest: update
+        # Subtest: existing simple customer
+        ok 1
+        ok 2 - updates attribute correctly
+        1..2
+    ok 1 - existing simple customer
+        # Subtest: add CC/address details existing simple customer
+        ok 1
+        ok 2 - sets deeply nested attributes
+        1..2
+    ok 2 - add CC/address details existing simple customer
+        # Subtest: update existing customer CC/Address details
+        ok 1
+        ok 2 - set credit card properly
+        1..2
+    ok 3 - update existing customer CC/Address details
+        # Subtest: update existing customer billing address details
+        ok 1 - update billing address
+        ok 2 - update billing street address
+        1..2
+    ok 4 - update existing customer billing address details
+        # Subtest: doesn't exist
+        ok 1 - throws error if customer doesn't exist
+        1..1
+    ok 5 - doesn't exist
+        # Subtest: invalid params
+        ok 1 - throws arg error
+        1..1
+    ok 6 - invalid params
+        # Subtest: update accepts payment method nonce
+        ok 1
+        ok 2
+        ok 3
+        1..3
+    ok 7 - update accepts payment method nonce
+    1..7
+ok 4 - update
+    # Subtest: Search
+        # Subtest: search on paypal account email
+        ok 1
+        1..1
+    ok 1 - search on paypal account email
+    1..1
+ok 5 - Search
+1..5
+ok
+t/sandbox/customer_search.t .................. 
+ok 1 - customer created successfully
+    # Subtest: find customer with all matching fields
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 2 - find customer with all matching fields
+    # Subtest: can find duplicate credit cards given payment method token
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 3 - can find duplicate credit cards given payment method token
+    # Subtest: can search on text fields
+    ok 1
+    ok 2
+    1..2
+ok 4 - can search on text fields
+    # Subtest: can search on credit card number (partial match)
+    ok 1
+    ok 2
+    1..2
+ok 5 - can search on credit card number (partial match)
+    # Subtest: can search on ids (multiple values)
+    ok 1
+    ok 2
+    1..2
+ok 6 - can search on ids (multiple values)
+    # Subtest: can search on created_at (range field)
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 7 - can search on created_at (range field)
+    # Subtest: can search on address (text field)
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 8 - can search on address (text field)
+    # Subtest: gets all customers
+    ok 1
+    1..1
+ok 9 - gets all customers
+1..9
+ok
+t/sandbox/disbursement.t ..................... 
+    # Subtest: Transactions
+        # Subtest: retrieves transactions associated with the disbursement
+        ok 1
+        # Child (retrieves transactions associated with the disbursement) exited without calling finalize()
+    not ok 1 - retrieves transactions associated with the disbursement
+    
+    #   Failed test 'retrieves transactions associated with the disbursement'
+    #   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+Can't call method "id" on an undefined value at t/sandbox/disbursement.t line 31.
+    # Child (Transactions) exited without calling finalize()
+not ok 1 - Transactions
+
+#   Failed test 'Transactions'
+#   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+# Tests were run but no plan was declared and done_testing() was not seen.
+# Looks like your test exited with 255 just after 1.
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Failed 1/1 subtests 
+t/sandbox/merchant_account.t ................. 
+    # Subtest: Successful Create with deprecated parameters
+    not ok 1
+    
+    #   Failed test at t/sandbox/merchant_account.t line 77.
+Can't call method "status" on an undefined value at t/sandbox/merchant_account.t line 78.
+    # Child (Successful Create with deprecated parameters) exited without calling finalize()
+not ok 1 - Successful Create with deprecated parameters
+
+#   Failed test 'Successful Create with deprecated parameters'
+#   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+# Tests were run but no plan was declared and done_testing() was not seen.
+# Looks like your test exited with 255 just after 1.
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Failed 1/1 subtests 
+t/sandbox/payment_method.t ................... 
+    # Subtest: Create
+        # Subtest: it creates a paypal account method with a future payment nonce
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+        ok 5
+        1..5
+    ok 1 - it creates a paypal account method with a future payment nonce
+        # Subtest: it creates a credit card payment method with a nonce
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+        1..4
+    ok 2 - it creates a credit card payment method with a nonce
+        # Subtest: it creates a payment method with a fake apple pay nonce
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+        ok 5
+        ok 6
+        ok 7
+        ok 8
+        ok 9
+        1..9
+    ok 3 - it creates a payment method with a fake apple pay nonce
+        # Subtest: create paypal account with one-time nonce fails
+        ok 1
+        ok 2
+        ok 3
+        1..3
+    ok 4 - create paypal account with one-time nonce fails
+        # Subtest: create can make default and set token
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+        ok 5
+        1..5
+    ok 5 - create can make default and set token
+        # Subtest: it doesn't return an error if credit card options are present for a paypal nonce
+        ok 1
+        1..1
+    ok 6 - it doesn't return an error if credit card options are present for a paypal nonce
+        # Subtest: it respects verify_card and verification_merchant_account_id when included outside of the nonce
+        ok 1
+        # Child (it respects verify_card and verification_merchant_account_id when included outside of the nonce) exited without calling finalize()
+    not ok 7 - it respects verify_card and verification_merchant_account_id when included outside of the nonce
+    
+    #   Failed test 'it respects verify_card and verification_merchant_account_id when included outside of the nonce'
+    #   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+Single parameters to new() must be a HASH ref at constructor MODULE::CreditCardVerification::new (defined at lib/WebService/Braintree/CreditCardVerification.pm line 41) line 11
+	MODULE::CreditCardVerification::new('MODULE::CreditCardVerification', undef) called at lib/WebService/Braintree/Result.pm line 92
+	MODULE::Result::credit_card_verification('MODULE::Result=HASH(0x43d3830)') called at t/sandbox/payment_method.t line 148
+	main::__ANON__ at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 261
+	Test::Builder::__ANON__ at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 266
+	eval {...} at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 266
+	Test::Builder::subtest('Test::Builder=HASH(0x1242010)', 'it respects verify_card and verification_merchant_account_id when included outside of the nonce', 'CODE(0x37d75a8)') called at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/More.pm line 771
+	Test::More::subtest('it respects verify_card and verification_merchant_account_id when included outside of the nonce', 'CODE(0x37d75a8)') called at t/sandbox/payment_method.t line 152
+	main::__ANON__ at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 261
+	Test::Builder::__ANON__ at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 266
+	eval {...} at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 266
+	Test::Builder::subtest('Test::Builder=HASH(0x1242010)', 'Create', 'CODE(0x36bb730)') called at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/More.pm line 771
+	Test::More::subtest('Create', 'CODE(0x36bb730)') called at t/sandbox/payment_method.t line 370
+    # Child (Create) exited without calling finalize()
+not ok 1 - Create
+
+#   Failed test 'Create'
+#   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+# Tests were run but no plan was declared and done_testing() was not seen.
+# Looks like your test exited with 255 just after 1.
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Failed 1/1 subtests 
+t/sandbox/paypal_account.t ................... Smartmatch is experimental at t/sandbox/paypal_account.t line 152.
+Smartmatch is experimental at t/sandbox/paypal_account.t line 153.
+
+    # Subtest: Find
+        # Subtest: it returns paypal accounts by token
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+        ok 5
+        ok 6
+        ok 7
+        ok 8
+        ok 9
+        1..9
+    ok 1 - it returns paypal accounts by token
+        # Subtest: it raises a not-found error for an unknown token
+        ok 1
+        1..1
+    ok 2 - it raises a not-found error for an unknown token
+        # Subtest: it raises a not-found error for a credit card token
+        ok 1
+        1..1
+    ok 3 - it raises a not-found error for a credit card token
+    1..3
+ok 1 - Find
+    # Subtest: Delete
+        # Subtest: returns paypal account by token
+        ok 1
+        ok 2
+        1..2
+    ok 1 - returns paypal account by token
+        # Subtest: raises a NotFoundError for unknown token
+        ok 1
+        1..1
+    ok 2 - raises a NotFoundError for unknown token
+    1..2
+ok 2 - Delete
+    # Subtest: Update
+        # Subtest: can update token
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+        1..4
+    ok 1 - can update token
+        # Subtest: can make default
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+        ok 5
+        1..5
+    ok 2 - can make default
+    1..2
+ok 3 - Update
+    # Subtest: it returns subscriptions associated with a paypal account
+    ok 1
+Can't call method "id" on an undefined value at t/sandbox/paypal_account.t line 152.
+    # Child (it returns subscriptions associated with a paypal account) exited without calling finalize()
+not ok 4 - it returns subscriptions associated with a paypal account
+
+#   Failed test 'it returns subscriptions associated with a paypal account'
+#   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+# Tests were run but no plan was declared and done_testing() was not seen.
+# Looks like your test exited with 2 just after 4.
+Dubious, test returned 2 (wstat 512, 0x200)
+Failed 1/4 subtests 
+t/sandbox/settlement_batch_summary.t ......... 
+    # Subtest: returns an empty collection if there is no data
+    ok 1
+    ok 2
+    1..2
+ok 1 - returns an empty collection if there is no data
+    # Subtest: returns an error if the result cannot be parsed
+    ok 1
+    ok 2
+    1..2
+ok 2 - returns an error if the result cannot be parsed
+    # Subtest: returns transactions settled on a given day
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 3 - returns transactions settled on a given day
+    # Subtest: returns transactions grouped by custom field
+Can't call method "id" on an undefined value at t/lib/WebService/Braintree/TestHelper.pm line 106.
+    # Child (returns transactions grouped by custom field) exited without calling finalize()
+not ok 4 - returns transactions grouped by custom field
+
+#   Failed test 'returns transactions grouped by custom field'
+#   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+# Tests were run but no plan was declared and done_testing() was not seen.
+# Looks like your test exited with 2 just after 4.
+Dubious, test returned 2 (wstat 512, 0x200)
+Failed 1/4 subtests 
+t/sandbox/subscription.t ..................... 
+    # Subtest: create without trial
+    not ok 1
+    
+    #   Failed test at t/sandbox/subscription.t line 13.
+Can't call method "id" on an undefined value at t/sandbox/subscription.t line 14.
+    # Child (create without trial) exited without calling finalize()
+not ok 1 - create without trial
+
+#   Failed test 'create without trial'
+#   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+# Tests were run but no plan was declared and done_testing() was not seen.
+# Looks like your test exited with 2 just after 1.
+Dubious, test returned 2 (wstat 512, 0x200)
+Failed 1/1 subtests 
+t/sandbox/subscription_search.t .............. 
+    # Subtest: id (equality)
+Can't call method "id" on an undefined value at t/sandbox/subscription_search.t line 30.
+    # Child (id (equality)) exited without calling finalize()
+not ok 1 - id (equality)
+
+#   Failed test 'id (equality)'
+#   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+# Tests were run but no plan was declared and done_testing() was not seen.
+# Looks like your test exited with 2 just after 1.
+Dubious, test returned 2 (wstat 512, 0x200)
+Failed 1/1 subtests 
+t/sandbox/transaction.t ...................... 
+    # Subtest: Successful Transactions
+AuthorizationError at lib/WebService/Braintree/HTTP.pm line 61.
+	MODULE::HTTP::check_response_code(MODULE::HTTP=HASH(0x363cb78), 403) called at lib/WebService/Braintree/HTTP.pm line 48
+	MODULE::HTTP::make_request(MODULE::HTTP=HASH(0x363cb78), "/transactions/", HASH(0x362f6a8), "POST") called at lib/WebService/Braintree/HTTP.pm line 13
+	MODULE::HTTP::post(MODULE::HTTP=HASH(0x363cb78), "/transactions/", HASH(0x362f6a8)) called at lib/WebService/Braintree/Role/MakeRequest.pm line 6
+	MODULE::Role::MakeRequest::_make_request(MODULE::TransactionGateway=HASH(0x362e8e0), "/transactions/", "post", HASH(0x362f6a8)) called at lib/WebService/Braintree/TransactionGateway.pm line 14
+	MODULE::TransactionGateway::create(MODULE::TransactionGateway=HASH(0x362e8e0), HASH(0x101e9c0)) called at lib/WebService/Braintree/Transaction.pm line 62
+	MODULE::Transaction::create("MODULE::Transaction", HASH(0x101e9c0), "credit") called at lib/WebService/Braintree/Transaction.pm line 37
+	MODULE::Transaction::credit("MODULE::Transaction", HASH(0x101e9c0)) called at t/sandbox/transaction.t line 34
+	main::__ANON__() called at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 261
+	Test::Builder::__ANON__() called at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 266
+	eval {...} called at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 266
+	Test::Builder::subtest(Test::Builder=HASH(0x1094000), "Successful Transactions", CODE(0x100a328)) called at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/More.pm line 771
+	Test::More::subtest("Successful Transactions", CODE(0x100a328)) called at t/sandbox/transaction.t line 44
+    # Child (Successful Transactions) exited without calling finalize()
+not ok 1 - Successful Transactions
+
+#   Failed test 'Successful Transactions'
+#   at /home/kd/perl5/perlbrew/perls/perl-5.22.0/lib/5.22.0/Test/Builder.pm line 279.
+# Tests were run but no plan was declared and done_testing() was not seen.
+# Looks like your test exited with 255 just after 1.
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Failed 1/1 subtests 
+t/sandbox/transaction_search.t ............... 
+    # Subtest: throws exception
+    ok 1
+    1..1
+ok 1 - throws exception
+    # Subtest: doesn't return duplicate ids in paginated searches
+    ok 1
+    1..1
+ok 2 - doesn't return duplicate ids in paginated searches
+    # Subtest: find transaction with all matching equality fields
+    ok 1
+    ok 2
+    ok 3
+    1..3
+ok 3 - find transaction with all matching equality fields
+    # Subtest: results 'first'
+        # Subtest: when empty
+        ok 1
+        ok 2
+        ok 3
+        1..3
+    ok 1 - when empty
+        # Subtest: one result
+        ok 1
+        ok 2
+        1..2
+    ok 2 - one result
+        # Subtest: multiple results
+        ok 1
+        ok 2
+        ok 3
+        ok 4
+        ok 5
+        1..5
+    ok 3 - multiple results
+    1..3
+ok 4 - results 'first'
+    # Subtest: result 'each'
+        # Subtest: when empty
+        ok 1
+        ok 2
+        ok 3
+        1..3
+    ok 1 - when empty
+        # Subtest: when one
+        ok 1
+        ok 2
+        1..2
+    ok 2 - when one
+        # Subtest: multiple results
+        ok 1
+        ok 2
+        ok 3
+        1..3
+    ok 3 - multiple results
+    1..3
+ok 5 - result 'each'
+    # Subtest: credit_card_card_type - multiple value field
+    ok 1
+    ok 2
+    1..2
+ok 6 - credit_card_card_type - multiple value field
+    # Subtest: credit_card_card_type - multiple value field - passing invalid credit_card_card_type
+    ok 1
+    1..1
+ok 7 - credit_card_card_type - multiple value field - passing invalid credit_card_card_type
+    # Subtest: status - multiple value field - passing invalid status
+    ok 1
+    1..1
+ok 8 - status - multiple value field - passing invalid status
+    # Subtest: status - multiple value field
+    ok 1
+    ok 2
+    1..2
+ok 9 - status - multiple value field
+    # Subtest: source - multiple value field - passing invalid source
+    ok 1
+    1..1
+ok 10 - source - multiple value field - passing invalid source
+    # Subtest: source - multiple value field
+    ok 1
+    ok 2
+    1..2
+ok 11 - source - multiple value field
+    # Subtest: type - multiple value field - passing invalid type
+    ok 1
+    1..1
+ok 12 - type - multiple value field - passing invalid type
+    # Subtest: type - multiple value field
+    ok 1
+    ok 2
+    1..2
+ok 13 - type - multiple value field
+    # Subtest: credit card number - partial match
+    ok 1
+    1..1
+ok 14 - credit card number - partial match
+    # Subtest: amount - range
+    ok 1
+    ok 2
+    1..2
+ok 15 - amount - range
+    # Subtest: disbursement_date - range - max and min
+    not ok 1
+    
+    #   Failed test at t/sandbox/transaction_search.t line 267.
+    not ok 2
+    
+    #   Failed test at t/sandbox/transaction_search.t line 268.
+    #          got: '0'
+    #     expected: '1'
+    1..2
+    # Looks like you failed 2 tests of 2.
+not ok 16 - disbursement_date - range - max and min
+
+#   Failed test 'disbursement_date - range - max and min'
+#   at t/sandbox/transaction_search.t line 269.
+    # Subtest: disbursement_date - range - is
+    not ok 1
+    
+    #   Failed test at t/sandbox/transaction_search.t line 278.
+    not ok 2
+    
+    #   Failed test at t/sandbox/transaction_search.t line 279.
+    #          got: '0'
+    #     expected: '1'
+    1..2
+    # Looks like you failed 2 tests of 2.
+not ok 17 - disbursement_date - range - is
+
+#   Failed test 'disbursement_date - range - is'
+#   at t/sandbox/transaction_search.t line 280.
+    # Subtest: dispute_date - range - max and min
+    not ok 1
+    
+    #   Failed test at t/sandbox/transaction_search.t line 290.
+    not ok 2
+    
+    #   Failed test at t/sandbox/transaction_search.t line 291.
+    #          got: '0'
+    #     expected: '1'
+    1..2
+    # Looks like you failed 2 tests of 2.
+not ok 18 - dispute_date - range - max and min
+
+#   Failed test 'dispute_date - range - max and min'
+#   at t/sandbox/transaction_search.t line 292.
+    # Subtest: dispute_date - range - is
+    not ok 1
+    
+    #   Failed test at t/sandbox/transaction_search.t line 301.
+    not ok 2
+    
+    #   Failed test at t/sandbox/transaction_search.t line 302.
+    #          got: '0'
+    #     expected: '1'
+    1..2
+    # Looks like you failed 2 tests of 2.
+not ok 19 - dispute_date - range - is
+
+#   Failed test 'dispute_date - range - is'
+#   at t/sandbox/transaction_search.t line 303.
+    # Subtest: merchant_account_id
+        # Subtest: bogus id
+        ok 1
+        1..1
+    ok 1 - bogus id
+        # Subtest: valid id
+        ok 1
+        1..1
+    ok 2 - valid id
+        # Subtest: mix of valid and invalid ids
+        ok 1
+        1..1
+    ok 3 - mix of valid and invalid ids
+    1..3
+ok 20 - merchant_account_id
+    # Subtest: paypal
+        # Subtest: search on paypal fields
+        ok 1
+        1..1
+    ok 1 - search on paypal fields
+    1..1
+ok 21 - paypal
+    # Subtest: all
+    ok 1
+    1..1
+ok 22 - all
+1..22
+# Looks like you failed 4 tests of 22.
+Dubious, test returned 4 (wstat 1024, 0x400)
+Failed 4/22 subtests 
+t/sandbox/transparent_redirect.t ............. 
+    # Subtest: gets the right transaction data
+    ok 1
+    ok 2 - type should be sale
+    ok 3 - amount should be 50.00
+    1..3
+ok 1 - gets the right transaction data
+    # Subtest: create customer data
+    ok 1
+    ok 2
+    ok 3 - First name is accepted
+    ok 4 - Last name is accepted
+    1..4
+ok 2 - create customer data
+    # Subtest: update customer
+    ok 1
+    ok 2 - changes customer first name
+    ok 3 - changes customer last name
+    1..3
+ok 3 - update customer
+    # Subtest: credit card data
+        # Subtest: results
+        ok 1
+        ok 2 - sets card \#
+        ok 3 - sets expiration date
+        1..3
+    ok 1 - results
+        # Subtest: update existing
+        ok 1
+        ok 2 - Card number was updated
+        ok 3 - Card exp month was updated
+        1..3
+    ok 2 - update existing
+    1..2
+ok 4 - credit card data
+1..4
+ok
+
+Test Summary Report
+-------------------
+t/sandbox/disbursement.t                   (Wstat: 65280 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 255
+  Parse errors: No plan found in TAP output
+t/sandbox/merchant_account.t               (Wstat: 65280 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 255
+  Parse errors: No plan found in TAP output
+t/sandbox/payment_method.t                 (Wstat: 65280 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 255
+  Parse errors: No plan found in TAP output
+t/sandbox/paypal_account.t                 (Wstat: 512 Tests: 4 Failed: 1)
+  Failed test:  4
+  Non-zero exit status: 2
+  Parse errors: No plan found in TAP output
+t/sandbox/settlement_batch_summary.t       (Wstat: 512 Tests: 4 Failed: 1)
+  Failed test:  4
+  Non-zero exit status: 2
+  Parse errors: No plan found in TAP output
+t/sandbox/subscription.t                   (Wstat: 512 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 2
+  Parse errors: No plan found in TAP output
+t/sandbox/subscription_search.t            (Wstat: 512 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 2
+  Parse errors: No plan found in TAP output
+t/sandbox/transaction.t                    (Wstat: 65280 Tests: 1 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 255
+  Parse errors: No plan found in TAP output
+t/sandbox/transaction_search.t             (Wstat: 1024 Tests: 22 Failed: 4)
+  Failed tests:  16-19
+  Non-zero exit status: 4
+Files=18, Tests=98, 938 wallclock secs ( 0.22 usr  0.01 sys + 216.01 cusr  1.14 csys = 217.38 CPU)
+Result: FAIL
+kd@hooloovoo ~/braintree-perl $ 

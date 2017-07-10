@@ -173,7 +173,7 @@ This is probably overkill - but occasionally the scheduler takes longer than we 
 
 =cut
 
-sub submit_to_scheduler {
+sub submit_to_scheduler   {
     my $self           = shift;
     my $submit_command = shift;
 

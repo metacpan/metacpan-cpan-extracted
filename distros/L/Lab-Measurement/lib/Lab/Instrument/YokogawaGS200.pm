@@ -1,5 +1,5 @@
 package Lab::Instrument::YokogawaGS200;
-$Lab::Instrument::YokogawaGS200::VERSION = '3.552';
+$Lab::Instrument::YokogawaGS200::VERSION = '3.553';
 use strict;
 use warnings;
 use 5.010;

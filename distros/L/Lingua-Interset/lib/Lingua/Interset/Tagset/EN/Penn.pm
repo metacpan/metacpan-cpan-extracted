@@ -7,7 +7,7 @@
 package Lingua::Interset::Tagset::EN::Penn;
 use strict;
 use warnings;
-our $VERSION = '3.004';
+our $VERSION = '3.005';
 
 use utf8;
 use open ':utf8';
@@ -75,7 +75,7 @@ around BUILDARGS => sub
         # "common postmodifiers of biomedical entities such as genes" (Blitzer, McDonald, Pereira, Proc of EMNLP 2006, Sydney)
         # Example 1: "anti-CYP2E1-IgG" is tokenized and tagged as "anti/AFX -/HYPH CYP2E1-IgG/NN".
         # Example 2: "mono- and diglycerides" is tokenized and tagged as "mono/AFX -/HYPH and/CC di/AFX glycerides/NNS".
-        'AFX'   => ['pos' => 'adj',  'hyph' => 'hyph'],
+        'AFX'   => ['pos' => 'adj',  'hyph' => 'yes'],
         # coordinating conjunction
         # examples: and, or
         'CC'    => ['pos' => 'conj', 'conjtype' => 'coor'],
@@ -90,7 +90,7 @@ around BUILDARGS => sub
         'EX'    => ['pos' => 'adv', 'advtype' => 'ex'],
         # foreign word
         # examples: kašpárek
-        'FW'    => ['foreign' => 'foreign'],
+        'FW'    => ['foreign' => 'yes'],
         # This tag is new in PennBioIE. In older data hyphens are tagged ":".
         # hyphen
         # example: -
@@ -132,13 +132,13 @@ around BUILDARGS => sub
         'PDT'   => ['pos' => 'adj', 'adjtype' => 'pdt', 'prontype' => 'prn'],
         # possessive ending
         # examples: 's
-        'POS'   => ['pos' => 'part', 'poss' => 'poss'],
+        'POS'   => ['pos' => 'part', 'poss' => 'yes'],
         # personal pronoun
         # examples: I, you, he, she, it, we, they
         'PRP'   => ['pos' => 'noun', 'prontype' => 'prs'],
         # possessive pronoun
         # examples: my, your, his, her, its, our, their
-        'PRP$'  => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'poss'],
+        'PRP$'  => ['pos' => 'adj', 'prontype' => 'prs', 'poss' => 'yes'],
         # adverb
         # examples: here, tomorrow, easily
         'RB'    => ['pos' => 'adv', 'degree' => 'pos'],
@@ -192,7 +192,7 @@ around BUILDARGS => sub
         'WP'    => ['pos' => 'noun', 'prontype' => 'int|rel'],
         # possessive wh-pronoun
         # examples: whose
-        'WP$'   => ['pos' => 'adj', 'poss' => 'poss', 'prontype' => 'int|rel'],
+        'WP$'   => ['pos' => 'adj', 'poss' => 'yes', 'prontype' => 'int|rel'],
         # wh-adverb
         # examples: where, when, how
         'WRB'   => ['pos' => 'adv', 'prontype' => 'int|rel'],
@@ -200,16 +200,16 @@ around BUILDARGS => sub
     # Construct encode_map in the form expected by Atom.
     my %em =
     (
-        'hyph' => { 'hyph' => 'AFX',
-                              '@'    => { 'prontype' => { 'rel' => { 'poss' => { 'poss' => 'WP$',
+        'hyph' => { 'yes' => 'AFX',
+                              '@'    => { 'prontype' => { 'rel' => { 'poss' => { 'yes' => 'WP$',
                                                                                  '@'    => { 'pos' => { 'adv' => 'WRB',
                                                                                                         'adj' => 'WDT',
                                                                                                         '@'   => 'WP' }}}},
-                                                          'int' => { 'poss' => { 'poss' => 'WP$',
+                                                          'int' => { 'poss' => { 'yes' => 'WP$',
                                                                                  '@'    => { 'pos' => { 'adv' => 'WRB',
                                                                                                         'adj' => 'WDT',
                                                                                                         '@'   => 'WP' }}}},
-                                                          'prs' => { 'poss' => { 'poss' => 'PRP$',
+                                                          'prs' => { 'poss' => { 'yes' => 'PRP$',
                                                                                  '@'    => 'PRP' }},
                                                           '@'   => { 'pos' => { 'noun' => { 'nountype' => { 'prop' => { 'number' => { 'plur' => 'NNPS',
                                                                                                                                       '@'    => 'NNP' }},
@@ -240,7 +240,7 @@ around BUILDARGS => sub
                                                                                 'adp'  => 'IN',
                                                                                 'conj' => { 'conjtype' => { 'sub' => 'IN',
                                                                                                             '@'   => 'CC' }},
-                                                                                'part' => { 'poss' => { 'poss' => 'POS',
+                                                                                'part' => { 'poss' => { 'yes' => 'POS',
                                                                                                         '@'    => { 'verbform' => { 'inf' => 'TO',
                                                                                                                                     '@'   => { 'parttype' => { 'inf' => 'TO',
                                                                                                                                                                '@'   => 'RP' }}}}}},
@@ -260,7 +260,7 @@ around BUILDARGS => sub
                                                                                 'sym'  => { 'other/symtype' => { 'currency'   => '$',
                                                                                                                  'numbersign' => "\#",
                                                                                                                  '@'          => 'SYM' }},
-                                                                                '@'    => { 'foreign' => { 'foreign' => 'FW',
+                                                                                '@'    => { 'foreign' => { 'yes' => 'FW',
                                                                                                            '@'       => 'NIL' }}}}}}}
     );
     # Now add the references to the attribute hash.
@@ -303,7 +303,7 @@ Lingua::Interset::Tagset::EN::Penn - Driver for the tagset of the Penn Treebank.
 
 =head1 VERSION
 
-version 3.004
+version 3.005
 
 =head1 SYNOPSIS
 

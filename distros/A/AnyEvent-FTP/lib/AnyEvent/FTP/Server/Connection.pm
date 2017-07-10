@@ -7,7 +7,7 @@ use Moo;
 use AnyEvent::FTP::Request;
 
 # ABSTRACT: FTP Server connection class
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 with 'AnyEvent::FTP::Role::Event';
 
@@ -37,9 +37,9 @@ sub process_request
   my($self, $line) = @_;
 
   my $raw = $line;
-  
+
   $self->emit(request => $raw);
-  
+
   $line =~ s/\015?\012//g;
 
   if($line =~ s/^([A-Z]{1,4})\s?//i)
@@ -50,7 +50,7 @@ sub process_request
   {
     $self->context->invalid_syntax($self, $raw);
   }
-  
+
   $self;
 }
 
@@ -82,7 +82,7 @@ AnyEvent::FTP::Server::Connection - FTP Server connection class
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 METHODS
 
@@ -117,6 +117,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -6,7 +6,7 @@ use 5.010;
 use Moo::Role;
 
 # ABSTRACT: Role for old archaic FTP server commands
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 has syst => (
@@ -59,19 +59,19 @@ AnyEvent::FTP::Server::Role::Old - Role for old archaic FTP server commands
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
 Create a context:
 
  package AnyEvent::FTP::Server::Context::MyContext;
- 
+
  use Moo;
- 
+
  extends 'AnyEvent::FTP::Server::Context';
  with 'AnyEvent::FTP::Server::Role::Old';
- 
+
  1;
 
 Use archaic FTP commands:
@@ -132,6 +132,8 @@ Contributors:
 Ryo Okamoto
 
 Shlomi Fish
+
+José Joaquín Atria
 
 =head1 COPYRIGHT AND LICENSE
 

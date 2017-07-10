@@ -1,5 +1,5 @@
 package Lab::Data::Analysis::TekTDS;
-$Lab::Data::Analysis::TekTDS::VERSION = '3.552';
+$Lab::Data::Analysis::TekTDS::VERSION = '3.553';
 use 5.006;
 use strict;
 use warnings;

@@ -1,5 +1,5 @@
 package WebService::Braintree::Customer;
-$WebService::Braintree::Customer::VERSION = '0.9';
+$WebService::Braintree::Customer::VERSION = '0.91';
 use Moose;
 extends 'WebService::Braintree::ResultObject';
 

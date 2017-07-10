@@ -22,6 +22,15 @@ DESCRIPTION
 
     Requires wiringPi to be installed.
 
+TIMING WITHIN A LOOP
+    This software does no timing whatsoever; it operates as fast as your
+    device will allow it.
+
+    This often causes odd results. It's recommended that if you put your
+    checks within a loop, to sleep for at least two milliseconds (`0.02').
+    You can use `select(undef, undef, undef, 0.02);', or `usleep()' from
+    Time::HiRes.
+
 VOLTAGE DIVIDER
     The HC-SR04 sensor requires 5V input, and that is returned back to a Pi
     GPIO pin from the `ECHO' output on the sensor. The GPIO on the Pi can
@@ -30,6 +39,51 @@ VOLTAGE DIVIDER
 
     Here's a diagram showing how to create a voltage divider with a 1k and a
     2k Ohm resistor to lower the `ECHO' voltage output down to a safe
-    ~3.29V. In this case, `TRIG' is connected to GPIO 18, and `ECHO' is
-    connected to GPIO 23.
+    ~3.29V. In this case, `TRIG' is connected to GPIO 23, and `ECHO' is
+    connected to GPIO 24.
+
+METHODS
+  new
+    Instantiates and returns a new RPi::HCSR04 object.
+
+    Parameters:
+
+        $trig
+
+    Mandatory: Integer, the GPIO pin number of the Raspberry Pi that the
+    `TRIG' pin is connected to.
+
+        $echo
+
+    Mandatory: Integer, the GPIO pin number of the Raspberry Pi that the
+    `ECHO' pin is connected to.
+
+  inch
+    Returns a floating point number containing the distance in inches. Takes
+    no parameters.
+
+  cm
+    Returns a floating point number containing the distance in centemetres.
+    Takes no parameters.
+
+  raw
+    Returns an integer representing the return from the sensor in raw
+    original form. Takes no parameters.
+
+REQUIREMENTS
+    * wiringPi must be installed.
+    * You must regulate the voltage from the `ECHO' pin down to a safe 3.3V
+    from the 5V input. See VOLTAGE DIVIDER for details.
+
+AUTHOR
+    Steve Bertrand, `<steveb at cpan.org>'
+
+LICENSE AND COPYRIGHT
+    Copyright 2017 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
 

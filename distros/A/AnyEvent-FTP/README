@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.09
+    version 0.10
 
 SYNOPSIS
 
@@ -49,6 +49,20 @@ DESCRIPTION
     verified to work with it, at least at one point. However, I no longer
     have access to that server.
 
+BUNDLED FILES
+
+    This distribution comes bundled with ls from the old Perl Power Tools
+    <https://metacpan.org/release/ppt> project. This is only used on
+    MSWin32 if this command is not found in the path, as it is frequently
+    not available on that platform
+
+    The Perl implementation of ls was written by Mark Leighton Fisher of
+    Thomson Consumer Electronics, fisherm@tce.com.
+
+    That program is free and open software. You may use, modify,
+    distribute, and sell it program (and any modified variants) in any way
+    you wish, provided you do not restrict others from doing the same.
+
 SEE ALSO
 
       * AnyEvent::FTP::Client
@@ -90,6 +104,8 @@ AUTHOR
     Ryo Okamoto
 
     Shlomi Fish
+
+    José Joaquín Atria
 
 COPYRIGHT AND LICENSE
 

@@ -1,6 +1,7 @@
 Changes
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
 inc/Module/Install/MakeMaker.pm
 inc/Module/Install/Metadata.pm
 inc/Module/Install/ReadmeFromPod.pm
@@ -8,6 +9,7 @@ lib/Set/SegmentTree.pm
 lib/Set/SegmentTree/Builder.pm
 lib/Set/SegmentTree/node.pm
 lib/Set/SegmentTree/ValueLookup.pm
+Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 META.yml

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xml:base="http://example.com"  xmlns:dc="http://purl.org/dc/elements/1.1/">
+<channel>
+ <title>CHANNEL TITLE</title>
+ <link>http://example.com/channel-link</link>
+ <description></description>
+ <language>no</language>
+<item>
+ <title>ARTICLE TITLE</title>
+ <link>http://example.com/article-title</link>
+ <description>ARTICLE DESC</description>
+ <pubDate>Thu, 21 Mar 2013 16:54:18 +0200</pubDate>
+ <dc:creator>AFP</dc:creator>
+ <guid isPermaLink="false">rt5934yhrt78ty34q</guid>
+</item>
+</channel>
+</rss>

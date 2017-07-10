@@ -1,6 +1,6 @@
 package Catmandu::Importer::SRU::Parser::mabxml;
 
-our $VERSION = '0.15';
+our $VERSION = '0.19';
 
 use Moo;
 use MAB2::Parser::XML;
@@ -9,7 +9,7 @@ use Encode;
 sub parse {
     my ( $self, $record ) = @_;
 
-    my $xml = $record->{recordData};
+    my $xml = $record->{recordData}->toString();
     my $parser = MAB2::Parser::XML->new( $xml ); 
     return $parser->next();
 }

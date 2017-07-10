@@ -1,8 +1,150 @@
-SYNOPSIS
+NAME
+    Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI
+    script
 
+VERSION
+    This document describes version 0.014 of Perinci::CmdLine::POD (from
+    Perl distribution Perinci-CmdLine-POD), released on 2017-07-07.
+
+SYNOPSIS
     Please see the included CLI script gen-pod-for-pericmd-script.
 
-SEE ALSO
+FUNCTIONS
+  gen_pod_for_pericmd_script
+    Usage:
 
+     gen_pod_for_pericmd_script(%args) -> [status, msg, result, meta]
+
+    Generate POD for Perinci::CmdLine-based CLI script.
+
+    This utility can accept either a path to a Perinci::CmdLine-based CLI
+    script, upon which the arguments to Perinci::CmdLine constructor will be
+    extracted using a script dumper (Perinci::CmdLine::Dump), or a set of
+    arguments to specify Perinci::CmdLine constructor arguments directly
+    (e.g. "url", "summary", "subcommands", etc).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   common_opts => *hash*
+
+        Set `common_opts` attribute, see Perinci::CmdLine::Base.
+
+    *   completer_script => *str*
+
+        Script name for shell completion.
+
+        A special value of ":self" means this script can complete itself.
+
+        Without specifying this option, the COMPLETION POD section will not
+        be generated.
+
+    *   config_dirs => *array[dirname]*
+
+        Set `config_dirs` attribute, see Perinci::CmdLine::Base.
+
+    *   config_filename => *str|array[str]|array[hash]*
+
+        Set `config_filename` attribute, see Perinci::CmdLine::Base.
+
+    *   default_subcommand => *str*
+
+        Set `default_subcommand` attribute, see Perinci::CmdLine::Base.
+
+    *   env_name => *str*
+
+        Set `env_name` attribute, see Perinci::CmdLine::Base.
+
+    *   gen_subcommand => *str*
+
+        Only generate POD for this subcommand.
+
+        See "--gen-subcommands".
+
+    *   gen_subcommands => *bool* (default: 1)
+
+        Whether to generate POD for subcommands.
+
+        If you want to generate separate POD/manpage for each subcommand,
+        you can use this option for the main CLI POD, then generate each
+        subcommand's POD with the "--gen-subcommand=SUBCOMMAND_NAME" option.
+
+    *   libs => *array[dirname]*
+
+        Extra libraries to pass to perl via -I.
+
+    *   per_arg_json => *bool* (default: 1)
+
+        Set `per_arg_json` attribute, see Perinci::CmdLine::Base.
+
+    *   per_arg_yaml => *bool* (default: 1)
+
+        Set `per_arg_yaml` attribute, see Perinci::CmdLine::Base.
+
+    *   program_name => *str*
+
+        Set `program_name` attribute, see Perinci::CmdLine::Base.
+
+    *   read_config => *bool* (default: 1)
+
+        Set `read_config` attribute, see Perinci::CmdLine::Base.
+
+    *   read_env => *bool* (default: 1)
+
+        Set `read_env` attribute, see Perinci::CmdLine::Base.
+
+    *   script => *filename*
+
+        Path to script.
+
+    *   subcommands => *hash*
+
+        Set `subcommands` attribute, see Perinci::CmdLine::Base.
+
+    *   summary => *str*
+
+        Set `summary` attribute, see Perinci::CmdLine::Base.
+
+    *   url => *str*
+
+        Set `url` attribute, see Perinci::CmdLine::Base for more details.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-POD>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-POD>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-POD>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::CmdLine
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

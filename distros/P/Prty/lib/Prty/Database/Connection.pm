@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.113;
+our $VERSION = 1.117;
 
 use Prty::Sql;
 use Prty::Object;
@@ -1105,7 +1105,7 @@ sub lockTable {
 
 # -----------------------------------------------------------------------------
 
-=head2 SQL Excecution
+=head2 SQL Execution
 
 =head3 sql() - Führe SQL-Statement aus
 
@@ -1128,25 +1128,25 @@ auf dieses Objekt zurück.
 Fetche Datensätze in Chunks von $n Sätzen. Diese Option hat aktuell
 nur bei PostgreSQL und -fetchMode 1 oder 2 eine Bedeutung.
 
-=item -fetchMode => 0|1|2 (Default: 1)
+=item -fetchMode => 0 | 1 | 2 (Default: 1)
 
 Der Parameter hat nur im Falle PostgreSQL eine Auswirkung. Siehe
 auch Abschnitt L</"SELECT mit PostgreSQL">.
 
 =over 4
 
-=item 0
+=item Z<>0
 
 Normaler DBI::Pg-Fetchmodus, d.h. die gesamte Ergebnismenge wird
 zum Client transferiert, bevor dieser den ersten Datensatz erhält.
 Dieser Modus ist für große Datenmengen schlecht geeignet.
 
-=item 1
+=item Z<>1
 
 Die Datensätze werden in Chunks von -chunkSize Sätzen gefetcht.
 Dies ist der Default-Modus.
 
-=item 2
+=item Z<>2
 
 Wie 1, wobei zusätzlich eine eigene Connection für die Selektion
 geöffnet wird. Dies ist notwendig, wenn während der
@@ -1898,19 +1898,19 @@ Default Datensatz-Klasse. Im Falle von -raw=>1 ist
 
 =over 4
 
-=item 0
+=item Z<>0
 
 Es muss genau ein Datensatz getroffen werden.
 
-=item 1
+=item Z<>1
 
 Es darf 0 oder 1 Datensatz getroffen werden.
 
-=item 2
+=item Z<>2
 
 Es muss mindestens ein Datensatz getroffen werden.
 
-=item 3
+=item Z<>3
 
 Es dürfen beliebig viele Datensätze getroffen werden.
 
@@ -4175,7 +4175,7 @@ Von Perl aus auf die Access-Datenbank zugreifen:
 
 =head1 VERSION
 
-1.113
+1.117
 
 =head1 AUTHOR
 

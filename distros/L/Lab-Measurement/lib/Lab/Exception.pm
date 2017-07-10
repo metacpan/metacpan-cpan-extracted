@@ -1,7 +1,7 @@
-#!/usr/bin/perl -w
-
 package Lab::Exception;
-$Lab::Exception::VERSION = '3.552';
+#DistZilla: +PodWeaver
+#ABSTRACT: Exception handling classes
+$Lab::Exception::VERSION = '3.553';
 #
 # un/comment the following BEGIN clause to slap in the custom base class above
 #
@@ -161,24 +161,31 @@ use Exception::Class (
 
 1;
 
+__END__
+
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Lab::Exception - exception handling classes
+Lab::Exception - Exception handling classes
 
-=head1 METHODS
+=head1 VERSION
 
-This section is still missing.
+version 3.553
 
-=head1 AUTHOR/COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
- Copyright     2011      Florian Olbrich
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
 
-This library is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
+  Copyright 2011       Andreas K. Huettel, Florian Olbrich
+            2012       Alois Dirnaichner, Andreas K. Huettel, Florian Olbrich, Hermann Kraus
+            2014       Andreas K. Huettel
+            2016       Simon Reinhardt
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

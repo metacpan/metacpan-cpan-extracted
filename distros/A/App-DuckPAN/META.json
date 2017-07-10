@@ -125,7 +125,7 @@
          "web" : "https://github.com/duckduckgo/p5-app-duckpan"
       }
    },
-   "version" : "1018",
+   "version" : "1019",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.016003"
@@ -431,7 +431,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1018",
+                  "tag" : "1019",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },
@@ -530,7 +530,7 @@
       "zilla" : {
          "class" : "Dist::Zilla::Dist::Builder",
          "config" : {
-            "is_trial" : "0"
+            "is_trial" : 0
          },
          "version" : "6.009"
       }

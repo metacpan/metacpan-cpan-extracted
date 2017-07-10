@@ -19,11 +19,12 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Encode' => '1.98',
                                         'JSON::MaybeXS' => '0',
-                                        'MIME::Base64' => '0'
+                                        'MIME::Base64' => '0',
+                                        'Text::CSV' => '0'
                                       },
                       'requires' => {
+                                      'Encode' => '1.98',
                                       'Future' => '0.35',
                                       'List::UtilsBy' => '0.10',
                                       'Log::Any' => '1.045',
