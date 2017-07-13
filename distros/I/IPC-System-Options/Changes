@@ -1,3 +1,13 @@
+0.32    2017-07-10 (PERLANCAR)
+
+	- No functional changes from last dev release.
+
+
+0.31_001 2017-06-20 (PERLANCAR)
+
+        - Switch from Log::Any to Log::ger.
+
+
 0.31    2017-04-09 (PERLANCAR)
 
 	- No functional changes.

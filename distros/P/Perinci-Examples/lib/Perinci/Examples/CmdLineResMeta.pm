@@ -1,7 +1,7 @@
 package Perinci::Examples::CmdLineResMeta;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010;
 use strict;
@@ -88,12 +88,16 @@ Perinci::Examples::CmdLineResMeta - Functions in this package contains cmdline.*
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::CmdLineResMeta (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::CmdLineResMeta (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 FUNCTIONS
 
 
-=head2 default_format() -> [status, msg, result, meta]
+=head2 default_format
+
+Usage:
+
+ default_format() -> [status, msg, result, meta]
 
 Set cmdline.default_format json.
 
@@ -113,7 +117,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 exit_code() -> [status, msg, result, meta]
+=head2 exit_code
+
+Usage:
+
+ exit_code() -> [status, msg, result, meta]
 
 Returns cmdline exit code 7, even though status is 200.
 
@@ -133,7 +141,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 is_palindrome(%args) -> [status, msg, result, meta]
+=head2 is_palindrome
+
+Usage:
+
+ is_palindrome(%args) -> [status, msg, result, meta]
 
 Return true if string is palindrome.
 
@@ -159,7 +171,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 result() -> [status, msg, result, meta]
+=head2 result
+
+Usage:
+
+ result() -> [status, msg, result, meta]
 
 Returns false, but cmdline.result the string "false".
 
@@ -179,7 +195,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 skip_format() -> [status, msg, result, meta]
+=head2 skip_format
+
+Usage:
+
+ skip_format() -> [status, msg, result, meta]
 
 Set cmdline.skip_format => 1.
 
@@ -220,7 +240,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

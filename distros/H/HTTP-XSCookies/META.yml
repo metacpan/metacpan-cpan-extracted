@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Fast XS cookie mangling for Perl'
 author:
   - 'Gonzalo Diethelm (gonzus@cpan.org)'
 build_requires:
@@ -24,5 +24,5 @@ requires:
   perl: '5.008009'
 resources:
   repository: https://github.com/gonzus/http-xscookies
-version: '0.000007'
+version: '0.000009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

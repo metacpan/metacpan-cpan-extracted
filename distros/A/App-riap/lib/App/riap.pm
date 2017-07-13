@@ -1,14 +1,14 @@
 package App::riap;
 
-our $DATE = '2016-08-18'; # DATE
-our $VERSION = '0.36'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.37'; # VERSION
 
 use 5.010001;
 use strict;
 use utf8;
 use warnings;
 #use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use parent qw(Term::Shell);
 
@@ -304,7 +304,7 @@ sub load_settings {
     {
         last unless $filename;
         last unless (-e $filename);
-        $log->tracef("Loading settings from %s ...", $filename);
+        log_trace("Loading settings from %s ...", $filename);
         my $res = Config::IOD::Reader->new->read_file($filename);
         last unless $res->{GLOBAL};
         for (sort keys %{$res->{GLOBAL}}) {
@@ -332,7 +332,7 @@ sub load_history {
         my $filename = $self->history_filename;
         return unless $filename;
         if (-r $filename) {
-            $log->tracef("Loading history from %s ...", $filename);
+            log_trace("Loading history from %s ...", $filename);
             open(my $fh, '<', $filename)
                 or die "Can't open history file $filename: $!\n";
             chomp(my @history = <$fh>);
@@ -348,10 +348,10 @@ sub save_history {
     if ($self->{term}->Features->{getHistory}) {
         my $filename = $self->history_filename;
         unless ($filename) {
-            $log->warnf("Skipped saving history since filename not defined");
+            log_warn("Skipped saving history since filename not defined");
             return;
         }
-        $log->tracef("Saving history to %s ...", $filename);
+        log_trace("Saving history to %s ...", $filename);
         open(my $fh, '>', $filename)
             or die "Can't open history file $filename for writing: $!\n";
         print $fh "$_\n" for grep { length } $self->{term}->GetHistory;
@@ -661,7 +661,7 @@ sub _install_cmds {
     no strict 'refs';
     for my $cmd (sort keys %App::riap::Commands::SPEC) {
         next unless $cmd =~ /\A\w+\z/; # only functions
-        $log->trace("Installing command $cmd ...");
+        log_trace("Installing command $cmd ...");
         my $meta = $App::riap::Commands::SPEC{$cmd};
         my $code = \&{"App::riap::Commands::$cmd"};
 
@@ -745,7 +745,7 @@ App::riap - Riap command-line client shell
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =head1 SYNOPSIS
 
@@ -769,7 +769,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,12 @@
 package Sub::NoRepeat;
 
-our $DATE = '2015-11-07'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Fcntl qw(:DEFAULT :flock);
 use Time::Local;
@@ -295,7 +295,7 @@ sub norepeat {
     }
 
     unless ($should_run) {
-        $log->debug("norepeat: skipped repeated execution");
+        log_debug("norepeat: skipped repeated execution");
         return;
     }
 
@@ -332,7 +332,7 @@ Sub::NoRepeat - Call a subroutine or run a command, but not repeatedly
 
 =head1 VERSION
 
-This document describes version 0.03 of Sub::NoRepeat (from Perl distribution Sub-NoRepeat), released on 2015-11-07.
+This document describes version 0.04 of Sub::NoRepeat (from Perl distribution Sub-NoRepeat), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -367,10 +367,24 @@ This document describes version 0.03 of Sub::NoRepeat (from Perl distribution Su
 This module is a generalization of the concept of L<App::norepeat> and possibly
 will supersede it in the future.
 
+=head1 DATA FILE
+
+Data file is a line-oriented text file, using labeled tab-separated value format
+(L<http://ltsv.org/>). Each row contains these labels: C<time> (a timestamp
+either in the format of UTC ISO8601C<YYYY-MM-DDTHH:MM:SSZ>, local ISO8601
+C<YYYY-MM-DDTHH:MM:SS>, or Unix timestamp), C<key> (tabs and newlines will be
+converted to spaces).
+
+The rows are assumed to be sorted chronologically (increasing time).
+
 =head1 FUNCTIONS
 
 
-=head2 norepeat(%args) -> any
+=head2 norepeat
+
+Usage:
+
+ norepeat(%args) -> any
 
 Call a subroutine or run a command, but not repeatedly.
 
@@ -457,25 +471,6 @@ When comparing, local times will be used.
 
 Return value:  (any)
 
-=head1 DATA FILE
-
-Data file is a line-oriented text file, using labeled tab-separated value format
-(L<http://ltsv.org/>). Each row contains these labels: C<time> (a timestamp
-either in the format of UTC ISO8601C<YYYY-MM-DDTHH:MM:SSZ>, local ISO8601
-C<YYYY-MM-DDTHH:MM:SS>, or Unix timestamp), C<key> (tabs and newlines will be
-converted to spaces).
-
-The rows are assumed to be sorted chronologically (increasing time).
-
-=head1 SEE ALSO
-
-L<App::norepeat>, the CLI version.
-
-Unix cron facility for periodic/scheduling of execution.
-
-Related: modules to limit the number of program instances that can run at a
-single time: L<Proc::Govern>, L<Sys::RunAlone>.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Sub-NoRepeat>.
@@ -492,13 +487,22 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<App::norepeat>, the CLI version.
+
+Unix cron facility for periodic/scheduling of execution.
+
+Related: modules to limit the number of program instances that can run at a
+single time: L<Proc::Govern>, L<Sys::RunAlone>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

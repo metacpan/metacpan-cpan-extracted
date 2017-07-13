@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <unistd.h>
+#include <stdlib.h>
 #include "gmem.h"
 
 int gmem_unused = 0;
@@ -131,7 +131,7 @@ int gmem_strnew(const char* file,
   if (len <= 0) {
     len = strlen(src) + 1;
   }
-  _GMEM_NEW(*tgt, char*, len);
+  _GMEM_NEW(*tgt, char, len);
   memcpy(*tgt, src, len);
   gmem_new_called(file, line, *tgt, len, 1);
   return len;
@@ -150,7 +150,7 @@ int gmem_strdel(const char* file,
     len = strlen(*str) + 1;
   }
   gmem_del_called(file, line, *str, len, 1);
-  _GMEM_DEL(*str, char*, len);
+  _GMEM_DEL(*str, char, len);
   *str = 0;
   return len;
 }

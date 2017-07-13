@@ -1,12 +1,12 @@
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Log::Any::Adapter::LogWindow;
 # ABSTRACT: Log::Any adapter that directs messages to the log window component
-$Renard::Curie::Log::Any::Adapter::LogWindow::VERSION = '0.002';
+$Renard::Curie::Log::Any::Adapter::LogWindow::VERSION = '0.003';
 # These methods are generated for all Log::Any adapters
 
 use Moo;
 
-use Renard::Curie::Types qw(InstanceOf);
+use Renard::Incunabula::Common::Types qw(InstanceOf);
 use Log::Any::Adapter::Util ();
 
 extends 'Log::Any::Adapter::Base';
@@ -50,7 +50,7 @@ Renard::Curie::Log::Any::Adapter::LogWindow - Log::Any adapter that directs mess
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 EXTENDS
 

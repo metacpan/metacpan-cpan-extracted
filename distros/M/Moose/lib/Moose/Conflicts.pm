@@ -27,7 +27,7 @@ use Dist::CheckConflicts
         'MooseX::AlwaysCoerce' => '0.13',
         'MooseX::App' => '1.22',
         'MooseX::Attribute::Deflator' => '2.1.7',
-        'MooseX::Attribute::Dependent' => '1.1.0',
+        'MooseX::Attribute::Dependent' => '1.1.3',
         'MooseX::Attribute::Prototype' => '0.10',
         'MooseX::AttributeHelpers' => '0.22',
         'MooseX::AttributeIndexes' => '1.0.0',

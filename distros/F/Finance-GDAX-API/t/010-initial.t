@@ -10,7 +10,7 @@ BEGIN {
     use_ok('Finance::GDAX::API');
 }
 
-my $quote = Finance::GDAX::API::Quote->new;
+my $quote = Finance::GDAX::API::Quote->new(debug => 0);
 isa_ok($quote, 'Finance::GDAX::API::Quote');
 
 ok $quote->product('BTC-USD'), 'Can set quote product';
@@ -38,6 +38,8 @@ can_ok $req, 'signature';
 can_ok $req, 'body_json';
 can_ok $req, 'external_secret';
 can_ok $req, 'save_secrets_to_environment';
+
+$req->debug(0);
 
 my $ts = $req->timestamp;
 ok(($ts > 1000 && $ts <= time), 'request timestamp appears sane');
@@ -68,7 +70,7 @@ is($req->key, $key, 'external_secret key read ok');
 is($req->secret, $sec, 'external_secret secret read ok');
 is($req->passphrase, $pas, 'external_secret passphrase read ok');
 
-if (%ENV{AUTHOR_TESTING}) {
+if ($ENV{"AUTHOR_TESTING"}) {
     my $tmp2 = File::Temp->new(UNLINK => 0);
     print $tmp2 <<"EOB";
 #!/usr/bin/env perl

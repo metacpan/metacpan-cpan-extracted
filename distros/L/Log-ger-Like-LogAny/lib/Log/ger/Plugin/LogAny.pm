@@ -1,7 +1,7 @@
 package Log::ger::Plugin::LogAny;
 
-our $DATE = '2017-06-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-12'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -12,6 +12,15 @@ sub get_hooks {
     my %conf = @_;
 
     return {
+        create_formatter => [
+            __PACKAGE__, 50,
+            sub {
+                my $formatter = sub {
+                    return join " ", @_;
+                };
+                return [$formatter, 0, 'join'];
+            },
+        ],
         create_routine_names => [
             __PACKAGE__, 50,
             sub {
@@ -20,13 +29,13 @@ sub get_hooks {
                 my $levels = [keys %Log::ger::Levels];
 
                 return [{
-                    log_subs    => [map { ["log_$_", $_], ["log_${_}f", $_] }
+                    log_subs    => [map { ["log_$_", $_, "join"], ["log_${_}f", $_, "default"] }
                                         @$levels],
                     is_subs     => [map { ["log_is_$_", $_] } @$levels],
-                    log_methods => [map { ["$_", $_], ["${_}f", $_] }
+                    log_methods => [map { ["$_", $_, "join"], ["${_}f", $_, "default"] }
                                         @$levels],
                     is_methods  => [map { ["is_$_", $_] } @$levels],
-                }];
+                }, 1];
             }],
     };
 }
@@ -46,26 +55,13 @@ Log::ger::Plugin::LogAny - Plugin to mimic Log::Any
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
- use Log::ger::Plugin 'LogAny';
- use Log::ger;
-
- log_warn "blah ...";
+Use from L<Log::ger::Like::LogAny>.
 
 =head1 DESCRIPTION
-
-This plugin does the following:
-
-=over
-
-=item * create log methods like Log::Any
-
-In addition to debug(), trace(), etc al also create debugf(), tracef(), et al.
-
-=back
 
 =for Pod::Coverage ^(.+)$
 

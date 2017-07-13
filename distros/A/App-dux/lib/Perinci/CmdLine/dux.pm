@@ -1,10 +1,10 @@
 package Perinci::CmdLine::dux;
 
-our $DATE = '2016-04-27'; # DATE
-our $VERSION = '1.52'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '1.53'; # VERSION
 
 use 5.010;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo;
 #extends 'Perinci::CmdLine';
 extends 'Perinci::CmdLine::Lite';
@@ -95,7 +95,7 @@ sub hook_display_result {
         # we only set 'out' for action=call, not for other actions
         my $i = 0;
         while (~~(@$x) > 0) {
-            $log->tracef("[pericmd] Running hook_format_row ...") unless $i;
+            log_trace("[pericmd] Running hook_format_row ...") unless $i;
             $i++;
             print $self->hook_format_row($r, shift(@$x));
         }
@@ -119,7 +119,7 @@ Perinci::CmdLine::dux - Perinci::CmdLine subclass for dux cli
 
 =head1 VERSION
 
-This document describes version 1.52 of Perinci::CmdLine::dux (from Perl distribution App-dux), released on 2016-04-27.
+This document describes version 1.53 of Perinci::CmdLine::dux (from Perl distribution App-dux), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -137,7 +137,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-dux>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-dux>.
+Source repository is at L<https://github.com/perlancar/perl-App-dux>.
 
 =head1 BUGS
 
@@ -157,7 +157,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

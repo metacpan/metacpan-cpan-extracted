@@ -532,6 +532,7 @@ my @files = (
     't/bugs/augment_recursion_bug.t',
     't/bugs/coerce_without_coercion.t',
     't/bugs/constructor_object_overload.t',
+    't/bugs/create_anon_mkopt.t',
     't/bugs/create_anon_recursion.t',
     't/bugs/create_anon_role_pass.t',
     't/bugs/delete_sub_stash.t',

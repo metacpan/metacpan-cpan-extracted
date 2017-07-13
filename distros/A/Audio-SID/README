@@ -1,4 +1,4 @@
-Audio::SID version 3.11
+Audio::SID version 4.01
 =======================
 
 This module is designed to handle SID files (usually bearing a .sid
@@ -6,23 +6,25 @@ extension), which are music player and data routines converted from the
 Commodore-64 computer with an additional informational header prepended. For
 further details about the exact file format, see description of all SID
 fields in the included SID_file_format.txt file. For information about SID
-tunes in general, see the excellent SIDPLAY homepage at:
+tunes in general, see the following links:
 
-http://www.geocities.com/SiliconValley/Lakes/5147/
+http://www.hvsc.c64.org/
 
-For SID v2NG documentation:
+Technical description of the C64's SID chip:
 
-http://sidplay2.sourceforge.net
+https://www.c64-wiki.com/wiki/SID
 
 You can find literally thousands of SID tunes in the High Voltage SID
 Collection at:
 
 http://www.hvsc.c64.org
 
-This module can handle both version 1 and version 2/2NG SID files. (Version 2
-files are simply v2NG files where v2NG specific fields are set 0.) The module
-was designed primarily to make it easier to look at and change the SID header
-fields, so many of the methods are geared towards that.
+This module can handle PSID version 1, PSID version 2/2NG/3/4 and RSID files.
+(Version 2+ files are simply v2NG files where v2NG specific fields are set to 0,
+RSID (RealSID) files are PSID v2NG files with the magicID set to 'RSID' and
+with some additional restrictions on certain field values.) The module was
+designed primarily to make it easier to look at and change the SID header
+fields, so many of the member functions are geared towards that.
 
 INSTALLATION
 
@@ -33,12 +35,6 @@ To install this module type the following:
    make install
    make test
 
-COPYRIGHT AND LICENCE
+CONTACT
 
-The module is provided as is. If you find bugs in it, please report them to me
-immediately.
-
-This module is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-LaLa (LaLa@C64.org)
+LaLa (LaLa-AT-C64.org)

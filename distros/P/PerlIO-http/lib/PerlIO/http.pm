@@ -1,5 +1,5 @@
 package PerlIO::http;
-$PerlIO::http::VERSION = '0.003';
+$PerlIO::http::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ PerlIO::http - HTTP filehandles
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

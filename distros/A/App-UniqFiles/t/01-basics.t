@@ -7,18 +7,18 @@ use warnings;
 use Test::More 0.98;
 
 use File::chdir;
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Temp qw(tempdir);
 use App::UniqFiles qw(uniq_files);
 
 my $dir = tempdir( CLEANUP => 1 );
 $CWD = $dir;
 
-write_file("f1", "a");
-write_file("f2", "a");
-write_file("f3", "c");
-write_file("f4", "aa");
-write_file("f5", "a");
+write_text("f1", "a");
+write_text("f2", "a");
+write_text("f3", "c");
+write_text("f4", "aa");
+write_text("f5", "a");
 # glob only returns f1??
 #my @f = glob <f*>;
 #diag explain \@f;

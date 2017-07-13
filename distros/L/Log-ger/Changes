@@ -1,3 +1,33 @@
+0.016   2017-07-13 (PERLANCAR)
+
+	- Reduce startup overhead by splitting some parts of Log::ger to
+	  Log::ger::Heavy. When user loads modules that have 'use Log::ger', but
+	  never adds any outputs (which is a pretty common case when user just
+	  uses a module without setting up any logging), then we can cheat by
+	  skipping init_target() and just installs the null, default-named
+	  logging routines. So we split the part that does real init_target() to
+	  Log::ger::Heavy, similar to how Carp & Carp::Heavy was split. This
+	  reduces startup overhead significantly. When user loads Log::ger::Util
+	  (e.g. to run set_plugin()) or when some hooks are added, then we load
+	  Log::ger::Heavy.
+
+
+0.015   2017-07-12 (PERLANCAR)
+
+	- [Bugfix] Used the wrong key to get per-object hooks.
+
+
+0.014   2017-07-11 (PERLANCAR)
+
+	- Pass 'formatters' and 'layouter' arguments to
+	  before_install_routines hook.
+
+
+0.013   2017-07-11 (PERLANCAR)
+
+	- Allow multiple formatters.
+
+
 0.012   2017-07-02 (PERLANCAR)
 
 	- [optimize] init_target: Reuse multilevel log routine from hook

@@ -1,22 +1,11 @@
 use File::HomeDir::Test;
-use Test2::Bundle::Extended;
-use Alien::Build;
+use Test2::V0;
+use Test::Alien::Build;
 use Alien::Build::Plugin::Fetch::Cache;
 use File::chdir;
 use File::Temp qw( tempdir );
 use Path::Tiny qw( path );
 use Capture::Tiny qw( capture_merged );
-
-delete $ENV{$_} for qw( ALIEN_INSTALL_TYPE ALIEN_BUILD_PRELOAD );
-
-sub alienfile
-{
-  my($str) = @_;
-  my(undef, $filename, $line) = caller;
-  $str = '# line '. $line . ' "' . $filename . qq("\n) . $str;
-  path('alienfile')->spew($str);
-  return;
-}
 
 subtest 'basic' => sub {
   
@@ -24,7 +13,7 @@ subtest 'basic' => sub {
 
   $ENV{ALIEN_BUILD_PRELOAD} = 'Fetch::Cache';
 
-  alienfile q{
+  my $build = alienfile_ok q{
     use alienfile;
     use File::Temp qw( tempdir );
     use Path::Tiny qw( path );
@@ -78,9 +67,6 @@ subtest 'basic' => sub {
     };
   };
   
-  my $build = Alien::Build->load('alienfile');
-  isa_ok $build, 'Alien::Build';
-
   my $fetch = sub 
   {
     my($url) = @_;

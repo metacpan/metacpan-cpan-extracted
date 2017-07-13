@@ -1,11 +1,18 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::EnsureDepakable - Make sure that distribution is
+    "depakable"
 
+VERSION
+    This document describes version 0.004 of
+    Dist::Zilla::Plugin::EnsureDepakable (from Perl distribution
+    Dist-Zilla-Plugin-EnsureDepakable), released on 2017-07-10.
+
+SYNOPSIS
     In dist.ini:
 
      [EnsureDepakable]
 
 DESCRIPTION
-
     This plugin helps make sure that you do not add a (direct, or indirect)
     dependency to a non-core XS module, so that all your distribution's
     modules can be use-d by a script that wants to be packed so it can be
@@ -14,16 +21,38 @@ DESCRIPTION
     See Module::Depakable for more details on the meaning of "depakable".
 
 ENVIRONMENT
-
- DZIL_ENSUREDEPAKABLE_SKIP => bool
-
+  DZIL_ENSUREDEPAKABLE_SKIP => bool
     Can be set to 1 to skip checking depakable.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-EnsureDepakable>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-EnsureDepakable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Ens
+    ureDepakable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     App::depak
 
     Module::Depakable, depakable
 
     Dist::Zilla::Plugin::Depak
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

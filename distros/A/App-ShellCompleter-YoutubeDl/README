@@ -1,8 +1,39 @@
-SYNOPSIS
+NAME
+    App::ShellCompleter::YoutubeDl - Shell completion for youtube-dl
 
+VERSION
+    This document describes version 0.11 of App::ShellCompleter::YoutubeDl
+    (from Perl distribution App-ShellCompleter-YoutubeDl), released on
+    2017-07-10.
+
+SYNOPSIS
     See _youtube-dl included in this distribution.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ShellCompleter-YoutubeDl>.
 
-    youtube-dl, https://rg3.github.io/youtube-dl/
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ShellCompleter-YoutubeDl>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-Yo
+    utubeDl>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    youtube-dl, <https://rg3.github.io/youtube-dl/>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

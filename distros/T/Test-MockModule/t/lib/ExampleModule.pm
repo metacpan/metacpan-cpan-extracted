@@ -13,4 +13,8 @@ sub param {
 	return;
 }
 
+sub cookie {
+    return 'choc-chip';
+}
+
 1;

@@ -1,8 +1,7 @@
 use Test2::V0;
+use Test::Alien::Build;
 use Alien::Build::Plugin::Fetch::Local;
 use Alien::Build::Util qw( _dump );
-use lib 't/lib';
-use MyTest;
 use Path::Tiny qw( path );
 
 subtest 'basic' => sub {

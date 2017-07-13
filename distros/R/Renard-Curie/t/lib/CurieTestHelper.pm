@@ -1,6 +1,6 @@
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 package CurieTestHelper;
-use Renard::Curie::Types qw(CodeRef InstanceOf Maybe PositiveInt DocumentModel Dir Tuple);
+use Renard::Incunabula::Common::Types qw(CodeRef InstanceOf Maybe PositiveInt DocumentModel Dir Tuple);
 
 =func test_data_directory
 
@@ -26,7 +26,7 @@ classmethod test_data_directory() :ReturnType(Dir) {
 
   CurieTestHelper->create_cairo_document
 
-Returns a L<Renard::Curie::Model::Document::CairoImageSurface> which can be
+Returns a L<Renard::Incunabula::Format::Cairo::ImageSurface::Document> which can be
 used for testing.
 
 The pages have the colors:
@@ -42,19 +42,20 @@ The pages have the colors:
 * black
 
 =cut
-classmethod create_cairo_document() {
-	require Renard::Curie::Model::Document::CairoImageSurface;
+classmethod create_cairo_document( :$repeat = 1, :$width = 5000, :$height = 5000 ) {
+	require Renard::Incunabula::Format::Cairo::ImageSurface::Document;
 	require Cairo;
 
 	my $colors = [
-		[ 1, 0, 0 ],
-		[ 0, 1, 0 ],
-		[ 0, 0, 1 ],
-		[ 0, 0, 0 ],
+		(
+			[ 1, 0, 0 ],
+			[ 0, 1, 0 ],
+			[ 0, 0, 1 ],
+			[ 0, 0, 0 ],
+		) x ( $repeat )
 	];
 
 	my @surfaces = map {
-		my ($width, $height) = (5000, 5000);
 		my $surface = Cairo::ImageSurface->create(
 			'rgb24', $width, $height
 		);
@@ -68,7 +69,7 @@ classmethod create_cairo_document() {
 		$surface;
 	} @$colors;
 
-	my $cairo_doc = Renard::Curie::Model::Document::CairoImageSurface->new(
+	my $cairo_doc = Renard::Incunabula::Format::Cairo::ImageSurface::Document->new(
 		image_surfaces => \@surfaces,
 	);
 }
@@ -150,7 +151,7 @@ classmethod refresh_gui( (Maybe[PositiveInt]) :$delay = ) {
   CurieTestHelper->create_app_with_document($document)
 
 
-Creates a C<Renard::Curie::App> with a C<Renard::Curie::Model::Document> C<$document> opened.
+Creates a C<Renard::Curie::App> with a C<Renard::Incunabula::Document> C<$document> opened.
 
 Returns two objects in a list
 
@@ -174,17 +175,21 @@ document passed in C<$document>.
 =cut
 classmethod create_app_with_document( (DocumentModel) $document )
 		:ReturnType( list => Tuple[InstanceOf['Renard::Curie::App'], InstanceOf['Renard::Curie::Component::PageDrawingArea']] ) {
-	require Renard::Curie::App;
+	my $c = $class->get_app_container;
+	my $app = $c->app;
+	$c->view_manager->current_document( $document );
 
-	my $app = Renard::Curie::App->new;
-	$app->open_document( $document );
+	my $page_component = $c->main_window->page_document_component;
 
-	my $page_component = $app->page_document_component;
-
-	$app->window->show_all;
+	$c->main_window->window->show_all;
 	$class->refresh_gui;
 
 	($app, $page_component);
+}
+
+classmethod get_app_container() :ReturnType(InstanceOf['Renard::Curie::Container::App']) {
+	require Renard::Curie::Container::App;
+	Renard::Curie::Container::App->new;
 }
 
 1;

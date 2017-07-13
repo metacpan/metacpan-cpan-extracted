@@ -6,7 +6,7 @@ use warnings;
 
 use Cwd qw(abs_path);
 use File::chdir;
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Spec;
 use Test::More 0.98;
 
@@ -38,7 +38,7 @@ subtest l_abs_path => sub {
     local $CWD = $dir;
 
     mkdir("tmp");
-    write_file("tmp/file", "");
+    write_text("tmp/file", "");
     symlink("file", "tmp/symfile");
     symlink("$dir/tmp", "tmp/symdir");
     symlink("not_exists", "tmp/symnef"); # non-existing file
@@ -63,10 +63,10 @@ subtest dir_empty => sub {
     mkdir "empty", 0755;
 
     mkdir "hasfiles", 0755;
-    write_file("hasfiles/1", "");
+    write_text("hasfiles/1", "");
 
     mkdir "hasdotfiles", 0755;
-    write_file("hasdotfiles/.1", "");
+    write_text("hasdotfiles/.1", "");
 
     mkdir "hasdotdirs", 0755;
     mkdir "hasdotdirs/.1";

@@ -10,6 +10,7 @@ my @files = (
     'lib/WebService/MinFraud.pm',
     'lib/WebService/MinFraud/Client.pm',
     'lib/WebService/MinFraud/Data/Rx/Type/CCToken.pm',
+    'lib/WebService/MinFraud/Data/Rx/Type/CustomInputs.pm',
     'lib/WebService/MinFraud/Data/Rx/Type/DateTime/RFC3339.pm',
     'lib/WebService/MinFraud/Data/Rx/Type/Enum.pm',
     'lib/WebService/MinFraud/Data/Rx/Type/Hex32.pm',

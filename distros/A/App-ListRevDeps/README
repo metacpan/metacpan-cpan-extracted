@@ -1,21 +1,92 @@
-SYNOPSIS
+NAME
+    App::ListRevDeps - List reverse dependencies of a Perl module
 
+VERSION
+    This document describes version 0.16 of App::ListRevDeps (from Perl
+    distribution App-ListRevDeps), released on 2017-07-10.
+
+SYNOPSIS
      # Use via list-rev-deps CLI script
 
 DESCRIPTION
+    Currently uses MetaCPAN API and also scrapes the MetaCPAN website and by
+    default caches results for 24 hours.
 
-    Currently uses MetaCPAN API and also scrapes the MetaCPAN website and
-    by default caches results for 24 hours.
+FUNCTIONS
+  list_rev_deps
+    Usage:
+
+     list_rev_deps(%args) -> [status, msg, result, meta]
+
+    List reverse dependencies of a Perl module.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cache => *bool* (default: 1)
+
+        Whether to cache API results for some time, for performance.
+
+    *   exclude_re => *str*
+
+        Specify dist pattern to exclude.
+
+    *   level => *int* (default: 1)
+
+        Specify how many levels up to check (-1 means unlimited).
+
+    *   module* => *array*
+
+        Perl module(s) to check.
+
+    *   raw => *bool* (default: 0)
+
+        Return raw result.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
 
 ENVIRONMENT
+    *   LOG_API_RESPONSE (bool)
 
-      * LOG_API_RESPONSE (bool)
+        If enabled, will log raw API response (at trace level).
 
-      If enabled, will log raw API response (at trace level).
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ListRevDeps>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ListRevDeps>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListRevDeps>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     App::lcpan indexes CPAN Meta information from releases in your local
     CPAN mirror, and allows you to query dependencies and reverse
     dependencies information from the index.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

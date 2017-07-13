@@ -1,0 +1,28 @@
+NAME
+
+    CHI::Driver::Cache::RedisDB - CHI Driver for Cache::RedisDB
+
+SYNOPSIS
+
+      CHI->new(driver => 'Cache::RedisDB');
+
+DESCRIPTION
+
+    CHI::Driver::Cache::RedisDB is a simple wrapper around Cache::RedisDB
+    to provide the common CHI interface.
+
+AUTHOR
+
+    Matt Miller <matt@inspire.com>
+
+COPYRIGHT
+
+    Copyright 2017- Matt Miller
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+

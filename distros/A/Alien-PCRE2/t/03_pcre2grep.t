@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-our $VERSION = 0.011_000;
+our $VERSION = 0.013_000;
 
 use Test::More tests => 12;
 use File::Spec;
@@ -11,10 +11,19 @@ use English qw(-no_match_vars);  # for $OSNAME
 #use Data::Dumper;  # DEBUG
 
 use_ok('Alien::PCRE2');
-my $pcre2_bin_dir = Alien::PCRE2->bin_dir();
-#print {*STDERR} "\n\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $pcre2_bin_dir = '}, $pcre2_bin_dir, q{'}, "\n\n";
-#unshift @PATH, Alien::PCRE2->bin_dir;
-unshift @PATH, $pcre2_bin_dir;
+my $pcre2_bin_dirs = [ Alien::PCRE2->bin_dir() ];
+#print {*STDERR} "\n\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $pcre2_bin_dirs = '}, Dumper($pcre2_bin_dirs), q{'}, "\n\n";
+unshift @PATH, @{ $pcre2_bin_dirs };
+
+# SKIP TESTS, already done in t/02
+# test pcre2 directory permissions
+#foreach my $pcre2_bin_dir (@{$pcre2_bin_dirs}) {
+#    ok(defined $pcre2_bin_dir, 'Alien::PCRE2->bin_dir() element is defined');
+#    isnt($pcre2_bin_dir, q{}, 'Alien::PCRE2->bin_dir() element is not empty');
+#    ok(-e $pcre2_bin_dir, 'Alien::PCRE2->bin_dir() element exists');
+#    ok(-r $pcre2_bin_dir, 'Alien::PCRE2->bin_dir() element is readable');
+#    ok(-d $pcre2_bin_dir, 'Alien::PCRE2->bin_dir() element is a directory');
+#}
 
 # check if `pcre2grep` can be run, if so get path to binary executable
 my $pcre2_path = undef;

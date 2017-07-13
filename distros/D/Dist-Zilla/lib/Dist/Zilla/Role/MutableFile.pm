@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::MutableFile 6.009;
+package Dist::Zilla::Role::MutableFile 6.010;
 # ABSTRACT: something that can act like a file with changeable contents
 
 use Moose::Role;
@@ -135,7 +135,7 @@ Dist::Zilla::Role::MutableFile - something that can act like a file with changea
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 DESCRIPTION
 

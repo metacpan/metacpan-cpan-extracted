@@ -3,28 +3,30 @@ abstract: 'Load/save bitmap from/to PDL (via FreeImage library)'
 author:
   - 'KMX <kmx@cpan.org>'
 build_requires:
-  Alien::FreeImage: 0.011
-  File::Temp: 0
-  PDL: 2.006
-  Test::More: 0
-  Test::Number::Delta: 1.06
+  Alien::FreeImage: '1.000'
+  File::Temp: '0'
+  PDL: '2.006'
+  Test::More: '0'
+  Test::Number::Delta: '1.06'
 configure_requires:
-  Alien::FreeImage: 0.011
-  PDL: 2.006
+  Alien::FreeImage: '1.000'
+  PDL: '2.006'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.133380'
+generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PDL-IO-Image
 no_index:
   directory:
     - t
     - inc
 requires:
-  Alien::FreeImage: 0.011
-  PDL: 2.006
+  Alien::FreeImage: '0.011'
+  PDL: '2.006'
 resources:
+  bugtracker: https://github.com/kmx/pdl-io-image/issues
   repository: https://github.com/kmx/pdl-io-image
-version: 0.004
+version: '1.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

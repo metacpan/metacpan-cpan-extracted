@@ -1,14 +1,70 @@
-DESCRIPTION
+NAME
+    App::OrgUtils - Some utilities for Org documents
 
+VERSION
+    This document describes version 0.46 of App::OrgUtils (from Perl
+    distribution App-OrgUtils), released on 2017-07-10.
+
+DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
     documents; some originally created as examples/demos for Org::Parser.
     The following are the included scripts:
 
-    #INSERT_EXECS_LIST
+    *   count-done-org-todos
+
+    *   count-org-todos
+
+    *   count-undone-org-todos
+
+    *   dump-org-structure
+
+    *   list-org-anniversaries
+
+    *   list-org-headlines
+
+    *   list-org-priorities
+
+    *   list-org-tags
+
+    *   list-org-todo-states
+
+    *   list-org-todos
+
+    *   move-done-todos
+
+    *   org2html
+
+    *   org2html-wp
+
+    *   stat-org-document
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-OrgUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-OrgUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Org::Parser
 
     orgsel in App::orgsel
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

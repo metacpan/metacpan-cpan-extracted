@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-XSRFBlock
 
+0.0.12    2017-07-13 06:35:46-04:00 America/New_York
+ - Refactor internals to make extensible (PR #17)
+ - dzil: use Git::Contributors instead of ContributorsFromGit (PR #18)
+
 0.0.11    2015-09-07 16:44:57+00:00 UTC
 
  - Allow coderefs in token (pull-request #16)

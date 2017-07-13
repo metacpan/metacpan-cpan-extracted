@@ -1,12 +1,12 @@
 package File::RsyBak;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '0.31'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.32'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::chdir;
 
@@ -205,7 +205,7 @@ sub backup {
         or return [500, "Can't find rsync in PATH"];
 
     unless (-d $target->{abs_path}) {
-        $log->debugf("Creating target directory %s ...", $target->{abs_path});
+        log_debug("Creating target directory %s ...", $target->{abs_path});
         File::Path::make_path($target->{abs_path})
             or return [500, "Error: Can't create target directory ".
                 "$target->{abs_path}: $!"];
@@ -234,7 +234,7 @@ sub _backup {
     require String::ShellQuote; String::ShellQuote->import;
 
     my ($sources, $target, $opts) = @_;
-    $log->infof("Starting backup %s ==> %s ...",
+    log_info("Starting backup %s ==> %s ...",
                 [map {$_->{raw}} @$sources], $target);
     my $cmd;
     $cmd = join(
@@ -243,7 +243,7 @@ sub _backup {
         ($opts->{extra_rsync_opts} ? map { shell_quote($_), " " }
              @{$opts->{extra_rsync_opts}} : ()),
         "-a --del --force --ignore-errors --ignore-existing ",
-        ($log->is_debug ? "-v " : ""),
+        (log_is_debug() ? "-v " : ""),
         ((-e "$target->{abs_path}/current") ?
              "--link-dest ".shell_quote("$target->{abs_path}/current")." "
                  : ""),
@@ -251,10 +251,10 @@ sub _backup {
                 @$sources),
         shell_quote("$target->{abs_path}/.tmp/"),
     );
-    $log->debug("Running rsync ...");
-    $log->trace("system(): $cmd");
+    log_debug("Running rsync ...");
+    log_trace("system(): $cmd");
     system $cmd;
-    $log->warn("rsync didn't succeed ($?)".
+    log_warn("rsync didn't succeed ($?)".
                    ", please recheck") if $?;
 
     # but continue anyway, half backups are better than nothing
@@ -265,24 +265,24 @@ sub _backup {
         my $tstamp = POSIX::strftime(
             "%Y-%m-%d\@%H:%M:%S+00",
             gmtime( $st[9] || time() )); # timestamp might not exist yet
-        $log->debug("rename $target->{abs_path}/current ==> ".
+        log_debug("rename $target->{abs_path}/current ==> ".
                         "hist.$tstamp ...");
         unless (rename "$target->{abs_path}/current",
                 "$target->{abs_path}/hist.$tstamp") {
-            $log->warn("Failed renaming $target->{abs_path}/current ==> ".
+            log_warn("Failed renaming $target->{abs_path}/current ==> ".
                          "hist.$tstamp: $!");
         }
-        $log->debug("touch $tspath ...");
+        log_debug("touch $tspath ...");
         system "touch ".shell_quote($tspath);
     }
 
-    $log->debug("rename $target->{abs_path}/.tmp ==> current ...");
+    log_debug("rename $target->{abs_path}/.tmp ==> current ...");
     unless (rename "$target->{abs_path}/.tmp",
             "$target->{abs_path}/current") {
-        $log->warn("Failed renaming $target->{abs_path}/.tmp ==> current: $!");
+        log_warn("Failed renaming $target->{abs_path}/.tmp ==> current: $!");
     }
 
-    $log->infof("Finished backup %s ==> %s", $sources, $target);
+    log_info("Finished backup %s ==> %s", $sources, $target);
 }
 
 sub _rotate {
@@ -290,7 +290,7 @@ sub _rotate {
     require Time::Local;
 
     my ($target, $histories) = @_;
-    $log->infof("Rotating backup histories in %s (%s) ...",
+    log_info("Rotating backup histories in %s (%s) ...",
                 $target, $histories);
 
     local $CWD = $target; # throws exception when failed
@@ -304,7 +304,7 @@ sub _rotate {
         my $moved             = 0;
 
         if ($n > 0) {
-            $log->debug("Only keeping $n level-$level histories ...");
+            log_debug("Only keeping $n level-$level histories ...");
             my @f = reverse sort grep { !/\.tmp$/ } glob "$prefix.*";
             #untaint for @f;
             my $any_tagged = (grep {/t$/} @f) ? 1 : 0;
@@ -313,20 +313,20 @@ sub _rotate {
                 my $f2 = "$prefix_next_level.$st";
                 if (!$is_highest_level &&
                         !$moved && ($tagged || !$any_tagged)) {
-                    $log->debug("Moving history level: $f -> $f2");
+                    log_debug("Moving history level: $f -> $f2");
                     rename $f, $f2;
                     $moved++;
                     if ($f ne $f[0]) {
                         rename $f[0], "$f[0]t";
                     }
                 } else {
-                    $log->debug("Removing history: $f ...");
+                    log_debug("Removing history: $f ...");
                     system "nice -n19 rm -rf " . shell_quote($f);
                 }
             }
         } else {
             $n = -$n;
-            $log->debug("Only keeping $n day(s) of level-$level histories ...");
+            log_debug("Only keeping $n day(s) of level-$level histories ...");
             my @f = reverse sort grep { !/\.tmp$/ } glob "$prefix.*";
             my $any_tagged = ( grep {/t$/} @f ) ? 1 : 0;
             for my $f (@f) {
@@ -336,25 +336,25 @@ sub _rotate {
                 $st =~ /(\d\d\d\d)-(\d\d)-(\d\d)\@(\d\d):(\d\d):(\d\d)\+00/;
                 $t = Time::Local::timegm($6, $5, $4, $3, $2 - 1, $1) if $1;
                 unless ($st && $t) {
-                    $log->warn("Wrong format of history, ignored: $f");
+                    log_warn("Wrong format of history, ignored: $f");
                     next;
                 }
                 if ($t > $now) {
-                    $log->warn("History in the future, ignored: $f");
+                    log_warn("History in the future, ignored: $f");
                     next;
                 }
                 my $delta = ($now - $t) / 86400;
                 if ($delta > $n) {
                     if (!$is_highest_level &&
                             !$moved && ( $tagged || !$any_tagged)) {
-                        $log->debug("Moving history level: $f -> $f2");
+                        log_debug("Moving history level: $f -> $f2");
                         rename $f, $f2;
                         $moved++;
                         if ($f ne $f[0]) {
                             rename $f[0], "$f[0]t";
                         }
                     } else {
-                        $log->debug("Removing history: $f ...");
+                        log_debug("Removing history: $f ...");
                         system "nice -n19 rm -rf " . shell_quote($f);
                     }
                 }
@@ -378,7 +378,7 @@ File::RsyBak - Backup files/directories with histories, using rsync
 
 =head1 VERSION
 
-This document describes version 0.31 of File::RsyBak (from Perl distribution File-RsyBak), released on 2017-02-03.
+This document describes version 0.32 of File::RsyBak (from Perl distribution File-RsyBak), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -588,7 +588,11 @@ TARGET/hist3.<timestamp85> comes along.
 =head1 FUNCTIONS
 
 
-=head2 backup(%args) -> [status, msg, result, meta]
+=head2 backup
+
+Usage:
+
+ backup(%args) -> [status, msg, result, meta]
 
 Backup files/directories with histories, using rsync.
 
@@ -768,7 +772,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

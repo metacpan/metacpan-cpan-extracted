@@ -1,0 +1,111 @@
+NAME
+    Bencher::Scenario::RandomLineModules - Benchmark modules which pick
+    random line(s) from a file
+
+VERSION
+    This document describes version 0.05 of
+    Bencher::Scenario::RandomLineModules (from Perl distribution
+    Bencher-Scenario-RandomLineModules), released on 2017-07-10.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m RandomLineModules
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m RandomLineModules
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    File::Random::Pick 0.02
+
+    File::RandomLine 0.20
+
+BENCHMARK PARTICIPANTS
+    *   File::Random::Pick::random_line (perl_code)
+
+        Function call template:
+
+         File::Random::Pick::random_line(<filename>)
+
+    *   File::RandomLine (perl_code)
+
+        Code template:
+
+         my $rl = File::RandomLine->new(<filename>); $rl->next
+
+BENCHMARK DATASETS
+    *   1k_line
+
+    *   10k_line
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.26.0*, CPU: *Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+    (4 cores)*, OS: *GNU/Linux Debian version 8.0*, OS kernel: *Linux
+    version 3.16.0-4-amd64*.
+
+    Benchmark with default options ("bencher -m RandomLineModules"):
+
+     #table1#
+     +---------------------------------+----------+-----------+-----------+------------+---------+---------+
+     | participant                     | dataset  | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+     +---------------------------------+----------+-----------+-----------+------------+---------+---------+
+     | File::Random::Pick::random_line | 10k_line |       500 |     2     |        1   | 4.6e-06 |      21 |
+     | File::Random::Pick::random_line | 1k_line  |      4800 |     0.21  |        9.6 | 2.1e-07 |      20 |
+     | File::RandomLine                | 10k_line |     61000 |     0.016 |      120   | 2.7e-08 |      20 |
+     | File::RandomLine                | 1k_line  |     62000 |     0.016 |      120   | 2.3e-08 |      27 |
+     +---------------------------------+----------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m RandomLineModules
+    --module-startup"):
+
+     #table2#
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+     | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+     | File::RandomLine    | 0.83                         | 4.2                | 20             |      15   |                    9.6 |        1   |   3e-05 |      20 |
+     | File::Random::Pick  | 1.6                          | 5.1                | 23             |       8.7 |                    3.3 |        1.7 | 3.1e-05 |      20 |
+     | perl -e1 (baseline) | 0.93                         | 4.4                | 20             |       5.4 |                    0   |        2.8 | 1.8e-05 |      20 |
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-RandomLineModules>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-RandomLineModules>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Rand
+    omLineModules>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

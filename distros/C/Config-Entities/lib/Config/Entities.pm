@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Config::Entities;
-$Config::Entities::VERSION = '1.06';
+$Config::Entities::VERSION = '1.07';
 # ABSTRACT: An multi-level overridable perl based configuration module
 # PODNAME: Config::Entities
 
@@ -85,7 +85,7 @@ sub get_entity {
     if ($coordinate) {
         foreach my $coordinate_part ( split( /\./, $coordinate ) ) {
             my $child = $result[0]->{$coordinate_part};
-            return if ( !$child );
+            return if ( !defined($child) );
             unshift( @result, $child );
         }
     }
@@ -276,7 +276,7 @@ Config::Entities - An multi-level overridable perl based configuration module
 
 =head1 VERSION
 
-version 1.06
+version 1.07
 
 =head1 SYNOPSIS
 

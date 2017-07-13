@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,24 +15,26 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 1ed4ad5b8b8aaef6ab6f526a99f93c5cec3398ea AUTHOR_PLEDGE
-SHA1 c3e41de6dadef7322c2a9101461a22b06b55ea8b Build.PL
-SHA1 dd57e6a6eeec2dbd591cfb776235fa6d00ac465d CONTRIBUTORS
-SHA1 97319da94a3e16602a388c338a8c4992e9a800ef Changes
-SHA1 190bd684dda30feb4c0f02de7fbbd7b034bafd81 INSTALL
-SHA1 4635555632db4eb10b992acc94a499271d2044ef LICENSE
-SHA1 4a199e7d6e17a05e399886770fbf7389202d5b9d MANIFEST
-SHA1 20c94da664efe862f084b653e636ab65ed658f60 META.json
-SHA1 0f2f227572d207479ccd8724e5f94fedb3b3fb8e META.yml
-SHA1 86a862194a7fa73ee45154b3846aab6a9f2f57bc README
-SHA1 8ad6a0f57ecf4e81004dd0620f55034df18555cd README.mkdn
-SHA1 834f1086bc640d6e63cae621cf81570b8aa39c2b inc/Devel/AssertOS.pm
-SHA1 7e51a16a32d50e21e4603ce1865ad28676c88515 inc/Devel/AssertOS/MSWin32.pm
-SHA1 66351fdd4353b5147e2d42f4500414a489a14d93 inc/Devel/CheckOS.pm
-SHA1 ce275fd2116798f76d1b97753e738306ded40e26 lib/Dancer/Template/Mustache.pm
-SHA1 9a8293adc8aa8dd6ea29327e20aa5d515f733cd2 t/000-report-versions-tiny.t
+SHA1 4fb5aa315ae6bb2283a9722beee52f4e2918b598 CONTRIBUTORS
+SHA1 3167b5c94b665a1577780cf76521988ef46ce6db Changes
+SHA1 e1cde29997e6a1c0ffdb54be4617d7a3c33e4578 INSTALL
+SHA1 426b16ed49739015352d84235a848c8026fa20ff LICENSE
+SHA1 febfb2bd43558ad04f5e7842de4e150e9d6acc15 MANIFEST
+SHA1 b1084b7ba1a50686f83ea55be1114cc929d2dd60 META.json
+SHA1 533f579522d299c2d4351c96a36e60f933c20679 META.yml
+SHA1 7e81f3c713578ead43c4c00d9237fb33886c23a4 Makefile.PL
+SHA1 06b41c2ad7bc7535674d8390267250877455f066 README.mkdn
+SHA1 05adb412e2009108e197898ba3a29245ac54e0f7 cpanfile
+SHA1 3370025acc684d924a207afd523e0ac41e879cc9 doap.xml
+SHA1 1b7d4632976d250956d49d509b30bdd2ac5f48e5 inc/Devel/AssertOS.pm
+SHA1 2050c7f1cff1c952edc8d8461520c55df17591d3 inc/Devel/AssertOS/MSWin32.pm
+SHA1 52dcb8b2b98363d1e1fdebd5e193bc12c57c220a inc/Devel/CheckOS.pm
+SHA1 6c6b2e4305c507dd494eb64514827c1807a2d651 lib/Dancer/Template/Mustache.pm
+SHA1 db449bf809e67895a6a5953e1f58a3a93d10fe71 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 ba0c4dfa2bf1af7b20939f171269289cf0004655 t/01-basic.t
-SHA1 095546e592df5e9c95f205ee4dfb24f485886181 t/app.t
-SHA1 5156d43756dafdf2343f9458b6a6efbab1abd248 t/layout.t
+SHA1 a19916a80d18cdc00708ae16f89a51e05b319d97 t/app.t
+SHA1 ecdba311fbc6def5902c01bb65e3b88e34da19a7 t/layout.t
 SHA1 23421fba5d90a9b56e4b7ccab14d684f89f66a03 t/views/basic.mustache
 SHA1 9ae22869553bb63a4f4133b33d9b0e315b842f7e t/views/goatee.mustache
 SHA1 4c586efa9940e7e4819f4048e2f7fe456776383e t/views/index.mustache
@@ -41,9 +43,8 @@ SHA1 33eb4e977d09a819a874bd807a63c799d1519caa t/views/layouts/face.mustache
 SHA1 d7f17cb3b128fabcfe922ef26545dc70af200bb4 t/views/partial.mustache
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlPvspAACgkQ34Hwf+GwC4ybvQCg8qBWoicn015dYXW4b9J8GBnh
-n8UAoND+oWQ3SoQ9xsAEAc2zX5JqLXVV
-=2GVK
+iEYEARECAAYFAllml5QACgkQ34Hwf+GwC4zpQACbBa/0KI+KdP78yhVJXl2qMxcZ
+oyQAoMkC4NJ0wtFY0KRQSM68bUtfmxVW
+=r5JD
 -----END PGP SIGNATURE-----

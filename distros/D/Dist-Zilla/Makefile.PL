@@ -119,10 +119,9 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::File::ShareDir" => 0,
     "Test::More" => "0.96",
-    "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "6.009",
+  "VERSION" => "6.010",
   "test" => {
     "TESTS" => "t/*.t t/commands/*.t t/diagnostics/*.t t/plugins/*.t"
   }
@@ -211,7 +210,6 @@ my %FallbackPrereqs = (
   "Try::Tiny" => 0,
   "YAML::Tiny" => 0,
   "autodie" => 0,
-  "if" => 0,
   "lib" => 0,
   "namespace::autoclean" => 0,
   "parent" => 0,

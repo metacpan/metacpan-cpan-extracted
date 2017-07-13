@@ -1,13 +1,13 @@
 package DBIx::Diff::Schema;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use List::Util qw(first);
 
@@ -146,8 +146,8 @@ sub _diff_table_schema {
     my @columns1 = _list_columns($dbh1, $table1);
     my @columns2 = _list_columns($dbh2, $table2);
 
-    $log->tracef("columns1: %s ...", \@columns1);
-    $log->tracef("columns2: %s ...", \@columns2);
+    log_trace("columns1: %s ...", \@columns1);
+    log_trace("columns2: %s ...", \@columns2);
 
     my (@added, @deleted, %modified);
     for my $c1 (@columns1) {
@@ -205,10 +205,10 @@ _
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub diff_table_schema {
-    my $dbh1    = shift; no warnings ('void');require Scalar::Util;my $_sahv_dpath = []; my $arg_err; ((defined($dbh1)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh1)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type object"),0)); if ($arg_err) { die "diff_table_schema(): " . "Invalid argument value for dbh1: $arg_err" } # VALIDATE_ARG
-    my $dbh2    = shift; ((defined($dbh2)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh2)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type object"),0)); if ($arg_err) { die "diff_table_schema(): " . "Invalid argument value for dbh2: $arg_err" } # VALIDATE_ARG
-    my $table1  = shift; ((defined($table1)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((!ref($table1)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type text"),0)); if ($arg_err) { die "diff_table_schema(): " . "Invalid argument value for table1: $arg_err" } # VALIDATE_ARG
-    my $table2  = shift // $table1; ((defined($table2)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((!ref($table2)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type text"),0)); if ($arg_err) { die "diff_table_schema(): " . "Invalid argument value for table2: $arg_err" } # VALIDATE_ARG
+    my $dbh1    = shift; no warnings ('void');require Scalar::Util;my $arg_err; ((defined($dbh1)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh1)) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { die "diff_table_schema(): " . "Invalid argument value for dbh1: $arg_err" } # VALIDATE_ARG
+    my $dbh2    = shift; no warnings ('void');((defined($dbh2)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh2)) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { die "diff_table_schema(): " . "Invalid argument value for dbh2: $arg_err" } # VALIDATE_ARG
+    my $table1  = shift; no warnings ('void');((defined($table1)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($table1)) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { die "diff_table_schema(): " . "Invalid argument value for table1: $arg_err" } # VALIDATE_ARG
+    my $table2  = shift // $table1; no warnings ('void');((defined($table2)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($table2)) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { die "diff_table_schema(): " . "Invalid argument value for table2: $arg_err" } # VALIDATE_ARG
 
     #$log->tracef("Comparing table %s vs %s ...", $table1, $table2);
 
@@ -282,14 +282,14 @@ _
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub diff_db_schema {
-    my $dbh1 = shift; no warnings ('void');require Scalar::Util;my $_sahv_dpath = []; my $arg_err; ((defined($dbh1)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh1)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type object"),0)); if ($arg_err) { die "diff_db_schema(): " . "Invalid argument value for dbh1: $arg_err" } # VALIDATE_ARG
-    my $dbh2 = shift; ((defined($dbh2)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh2)) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type object"),0)); if ($arg_err) { die "diff_db_schema(): " . "Invalid argument value for dbh2: $arg_err" } # VALIDATE_ARG
+    my $dbh1 = shift; no warnings ('void');require Scalar::Util;my $arg_err; ((defined($dbh1)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh1)) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { die "diff_db_schema(): " . "Invalid argument value for dbh1: $arg_err" } # VALIDATE_ARG
+    my $dbh2 = shift; no warnings ('void');((defined($dbh2)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::blessed($dbh2)) ? 1 : (($arg_err //= "Not of type object"),0)); if ($arg_err) { die "diff_db_schema(): " . "Invalid argument value for dbh2: $arg_err" } # VALIDATE_ARG
 
     my @tables1 = _list_tables($dbh1);
     my @tables2 = _list_tables($dbh2);
 
-    $log->tracef("tables1: %s ...", \@tables1);
-    $log->tracef("tables2: %s ...", \@tables2);
+    log_trace("tables1: %s ...", \@tables1);
+    log_trace("tables2: %s ...", \@tables2);
 
     my (@added, @deleted, %modified);
     for (@tables1) {
@@ -353,7 +353,7 @@ DBIx::Diff::Schema - Compare schema of two DBI databases
 
 =head1 VERSION
 
-This document describes version 0.07 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2015-09-03.
+This document describes version 0.08 of DBIx::Diff::Schema (from Perl distribution DBIx-Diff-Schema), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -377,7 +377,11 @@ Currently only tested on Postgres and SQLite.
 =head1 FUNCTIONS
 
 
-=head2 db_schema_eq($dbh1, $dbh2) -> any
+=head2 db_schema_eq
+
+Usage:
+
+ db_schema_eq($dbh1, $dbh2) -> any
 
 Return true if two DBI databases have the same schema.
 
@@ -386,15 +390,17 @@ This is basically just a shortcut for:
  my $res = diff_db_schema(...);
  !%$res;
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<dbh1>* => I<obj>
+=item * B<$dbh1>* => I<obj>
 
 DBI database handle for the first database.
 
-=item * B<dbh2>* => I<obj>
+=item * B<$dbh2>* => I<obj>
 
 DBI database handle for the second database.
 
@@ -403,7 +409,11 @@ DBI database handle for the second database.
 Return value:  (any)
 
 
-=head2 diff_db_schema($dbh1, $dbh2) -> any
+=head2 diff_db_schema
+
+Usage:
+
+ diff_db_schema($dbh1, $dbh2) -> any
 
 Compare schemas of two DBI databases.
 
@@ -433,15 +443,17 @@ database handles and this function will return a hash:
      },
  }
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<dbh1>* => I<obj>
+=item * B<$dbh1>* => I<obj>
 
 DBI database handle for the first database.
 
-=item * B<dbh2>* => I<obj>
+=item * B<$dbh2>* => I<obj>
 
 DBI database handle for the second database.
 
@@ -450,7 +462,11 @@ DBI database handle for the second database.
 Return value:  (any)
 
 
-=head2 diff_table_schema($dbh1, $dbh2, $table1, $table2) -> any
+=head2 diff_table_schema
+
+Usage:
+
+ diff_table_schema($dbh1, $dbh2, $table1, $table2) -> any
 
 Compare schema of two DBI tables.
 
@@ -469,23 +485,25 @@ handles along with table name and this function will return a hash:
      },
  }
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<dbh1>* => I<obj>
+=item * B<$dbh1>* => I<obj>
 
 DBI database handle for the first database.
 
-=item * B<dbh2>* => I<obj>
+=item * B<$dbh2>* => I<obj>
 
 DBI database handle for the second database.
 
-=item * B<table1>* => I<str>
+=item * B<$table1>* => I<str>
 
 Table name.
 
-=item * B<table2> => I<str>
+=item * B<$table2> => I<str>
 
 Second table name (assumed to be the same as first table name if unspecified).
 
@@ -494,7 +512,11 @@ Second table name (assumed to be the same as first table name if unspecified).
 Return value:  (any)
 
 
-=head2 table_schema_eq($dbh1, $dbh2, $table1, $table2) -> any
+=head2 table_schema_eq
+
+Usage:
+
+ table_schema_eq($dbh1, $dbh2, $table1, $table2) -> any
 
 Return true if two DBI tables have the same schema.
 
@@ -503,33 +525,31 @@ This is basically just a shortcut for:
  my $res = diff_table_schema(...);
  !%res;
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<dbh1>* => I<obj>
+=item * B<$dbh1>* => I<obj>
 
 DBI database handle for the first database.
 
-=item * B<dbh2>* => I<obj>
+=item * B<$dbh2>* => I<obj>
 
 DBI database handle for the second database.
 
-=item * B<table1>* => I<str>
+=item * B<$table1>* => I<str>
 
 Table name.
 
-=item * B<table2> => I<str>
+=item * B<$table2> => I<str>
 
 Second table name (assumed to be the same as first table name if unspecified).
 
 =back
 
 Return value:  (any)
-
-=head1 SEE ALSO
-
-L<DBIx::Compare> to compare database contents.
 
 =head1 HOMEPAGE
 
@@ -547,13 +567,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<DBIx::Compare> to compare database contents.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

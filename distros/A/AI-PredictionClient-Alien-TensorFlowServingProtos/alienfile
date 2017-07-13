@@ -1,0 +1,56 @@
+use alienfile;
+use File::Copy;
+use File::Copy::Recursive qw(dircopy dirmove);
+use Archive::Extract;
+
+use Alien::Google::GRPC;
+use Env qw( @PATH );
+unshift @PATH, Alien::Google::GRPC->bin_dir;
+
+meta_prop->{my_libs}    = Alien::Google::GRPC->libs;
+meta_prop->{my_cflags}  = Alien::Google::GRPC->cflags;
+
+probe sub {
+  return 'share';
+};
+ 
+share {
+  download sub {
+                  # The alien automagic obfuscates the actions taking place.
+                  # Use some work arounds to make this work.
+                  my $download_from_location = $ENV{'PWD'}; 
+                  my $download_to_location = qx(pwd); 
+                  chomp $download_to_location; 
+                  dircopy( $download_from_location . '/alien_packages'
+                        , $download_to_location);
+               };
+
+  extract sub {
+    my($build) = @_;
+     my $tarball = $build->install_prop->{download} . '/third_party/tensorflowserving_protofiles.tgz';
+     my $ae = Archive::Extract->new( archive => $tarball );
+     $ae->extract;
+
+                  my $additional_files = $build->install_prop->{download} . '/tds';
+                  dirmove($additional_files, './tensorflowserving_pb/tds');
+                  move('./tensorflowserving_pb/Makefile', './tensorflowserving_pb/stray_makefile');
+                  move('./tensorflowserving_pb/tds/Makefile', './tensorflowserving_pb/');
+               };
+
+  build [
+    [ 'prefix=%{.install.prefix} '
+    . 'CPPFLAGS="%{.meta.my_cflags}" '
+    . 'LDFLAGS="%{.meta.my_libs}" '
+    . ' %{make}' ],
+    [ 'prefix=%{.install.prefix} %{make} install' ],
+  ];
+};
+ 
+gather [
+  # Trust the force.
+  # Automagic will rewrite your path.
+  [ 'echo "3.0"', \'%{.runtime.version}' ],
+  [ 'echo "-L%{.install.prefix}/lib -ltensorflow_serving_protos_so"', \'%{.runtime.libs}'    ],
+  [ 'echo "-I%{.install.prefix}/include"', \'%{.runtime.cflags}'    ],
+];
+

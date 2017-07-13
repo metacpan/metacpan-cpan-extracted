@@ -10,7 +10,7 @@ use Data::Section { installer => method_installer }, -setup;
 use Dist::Zilla::MintingProfile::Author::Plicease;
 
 # ABSTRACT: add author only release tests to xt/release
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.20'; # VERSION
 
 
 with 'Dist::Zilla::Role::FileGatherer';
@@ -39,6 +39,12 @@ has _diag_content => (
   is      => 'rw',
   isa     => 'Str',
   default => '',
+);
+
+has test2_v0 => (
+  is      => 'ro',
+  isa     => 'Int',
+  default => 0,
 );
 
 sub gather_files
@@ -73,7 +79,7 @@ sub before_build
   : dir(Dist::Zilla::MintingProfile::Author::Plicease->profile_dir)->subdir(qw( default skel xt release ));
 
   my $diag = dir($self->zilla->root)->file(qw( t 00_diag.t ));
-  my $content = $source->parent->parent->file('t', '00_diag.t')->absolute->slurp;
+  my $content = $source->parent->parent->file('t', $self->test2_v0 ? '00_xdiag.t' : '00_diag.t' )->absolute->slurp;
   $content =~ s{## PREAMBLE ##}{join "\n", map { s/^\| //; $_ } @{ $self->diag_preamble }}e;
   $self->_diag_content($content);
 }
@@ -133,6 +139,7 @@ sub setup_installer
   $code .= '$modules{$_} = $_ for qw(' . "\n";
   $code .= join "\n", map { "  $_" } sort keys %list;
   $code .= "\n);\n";
+  $code .= "eval q{ require Test::Tester; };" if $list{'Test::Builder'} && $list{'Test::Tester'};
   
   my($file) = grep { $_->name eq 't/00_diag.t' } @{ $self->zilla->files };
 
@@ -177,7 +184,7 @@ Dist::Zilla::Plugin::Author::Plicease::Tests - add author only release tests to 
 
 =head1 VERSION
 
-version 2.16
+version 2.20
 
 =head1 SYNOPSIS
 
@@ -230,6 +237,7 @@ chdir(File::Spec->catdir($FindBin::Bin, File::Spec->updir, File::Spec->updir));
 unshift @Test::Strict::MODULES_ENABLING_STRICT,
   'ozo',
   'Test2::Bundle::SIPS',
+  'Test2::V0',
   'Test2::Bundle::Extended';
 note "enabling strict = $_" for @Test::Strict::MODULES_ENABLING_STRICT;
 

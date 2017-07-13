@@ -1,13 +1,13 @@
 package Perinci::Sub::Gen::AccessTable::DBI;
 
-our $DATE = '2016-02-24'; # DATE
-our $VERSION = '0.17'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.18'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Function::Fallback::CoreOrPP qw(clone);
 use Locale::TextDomain::UTF8 'Perinci-Sub-Gen-AccessTable-DBI';
@@ -91,7 +91,7 @@ sub gen_read_dbi_table_func {
 
         my ($db) = $dbh->get_info(17);
         unless ($db =~ /\A(SQLite|mysql|Pg)\z/) {
-            $log->warnf("$label Database is not supported: %s", $db);
+            log_warn("$label Database is not supported: %s", $db);
         }
 
         # function to quote identifier, e.g. `col` or "col"
@@ -188,7 +188,7 @@ sub gen_read_dbi_table_func {
             (@orders ? " ORDER BY ".join(",", @orders) : ""),
             $limit,
         );
-        $log->tracef("$label SQL=%s", $sql);
+        log_trace("$label SQL=%s", $sql);
 
         my $sth = $dbh->prepare($sql);
         $sth->execute or die "Can't query: ".$sth->errstr;
@@ -219,7 +219,7 @@ Perinci::Sub::Gen::AccessTable::DBI - Generate function (and its metadata) to re
 
 =head1 VERSION
 
-This document describes version 0.17 of Perinci::Sub::Gen::AccessTable::DBI (from Perl distribution Perinci-Sub-Gen-AccessTable-DBI), released on 2016-02-24.
+This document describes version 0.18 of Perinci::Sub::Gen::AccessTable::DBI (from Perl distribution Perinci-Sub-Gen-AccessTable-DBI), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -326,7 +326,11 @@ It is often not a good idea to expose your database schema directly as API.
 =head1 FUNCTIONS
 
 
-=head2 gen_read_dbi_table_func(%args) -> [status, msg, result, meta]
+=head2 gen_read_dbi_table_func
+
+Usage:
+
+ gen_read_dbi_table_func(%args) -> [status, msg, result, meta]
 
 Generate function (and its metadata) to read DBI table.
 
@@ -585,7 +589,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

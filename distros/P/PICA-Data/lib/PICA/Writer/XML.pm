@@ -2,7 +2,7 @@ package PICA::Writer::XML;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Scalar::Util qw(reftype);
 
@@ -10,13 +10,13 @@ use parent 'PICA::Writer::Base';
 
 sub new {
     my $self = PICA::Writer::Base::new(@_);
+    $self->{fh}->print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     $self->start if $self->{start} // 1;
     $self;
 }
 
 sub start {
     my $fh = $_[0]->{fh};
-    $fh->print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     $fh->print("<collection xlmns=\"info:srw/schema/5/picaXML-v1.0\">\n");
 }
 

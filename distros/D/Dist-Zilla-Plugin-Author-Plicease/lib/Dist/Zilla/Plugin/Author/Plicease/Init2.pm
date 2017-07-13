@@ -9,7 +9,7 @@ use JSON::PP qw( encode_json );
 use Encode qw( encode_utf8 );
 
 # ABSTRACT: Dist::Zilla initialization tasks for Plicease
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.20'; # VERSION
 
 
 with 'Dist::Zilla::Role::AfterMint';
@@ -39,7 +39,7 @@ has include_tests => (
   isa     => 'Int',
   lazy    => 1,
   default => sub {
-    shift->chrome->prompt_yn("include release tests?");
+    1,
   },
 );
 
@@ -57,6 +57,7 @@ sub make_module
                           qq{} ,
                           qq{use strict;} ,
                           qq{use warnings;} ,
+                          qq{use 5.008001;} ,
                           qq{} ,
                           qq{# ABSTRACT: $abstract} ,
                           qq{# VERSION} ,
@@ -79,6 +80,33 @@ sub gather_files
   $self->gather_file_gitattributes($arg);
   $self->gather_file_travis_yml($arg);
   $self->gather_file_appveyor_yml($arg);
+  $self->gather_file_author_yml($arg);
+}
+
+sub gather_file_author_yml
+{
+  my($self, $arg) = @_;
+  
+  my $file = Dist::Zilla::File::InMemory->new({
+    name    => 'author.yml',
+    content => join("\n", q{---},
+                          q{pod_spelling_system:},
+                          q{  skip: 0},
+                          q{  # list of words that are spelled correctly},
+                          q{  # (regardless of what spell check thinks)},
+                          q{  # or stuff that I like to spell incorrectly},
+                          q{  # intentionally},
+                          q{  stopwords: []},
+                          q{},
+                          q{pod_coverage:},
+                          q{  skip: 0},
+                          q{  # format is "Class#method" or "Class",regex allowed},
+                          q{  # for either Class or method.},
+                          q{  private: []},
+    ),
+  });
+
+  $self->add_file($file);
 }
 
 sub gather_file_travis_yml
@@ -97,7 +125,7 @@ sub gather_file_travis_yml
                           q{  - dzil listdeps   --missing | cpanm -n},
                           q{},
                           q{perl:},
-                          (map { "  - \"5.$_\""} qw( 14 16 18 20 22 24 )),
+                          (map { "  - \"5.$_\""} qw( 14 16 18 20 22 24 26 )),
                           q{},
                           q{script:},
                           q{  - dzil test -v},
@@ -219,15 +247,48 @@ sub gather_files_tests
 
   my $use_t_file = Dist::Zilla::File::InMemory->new({
     name => 't/01_use.t',
-    content => join("\n", q{use strict;},
-                          q{use warnings;},
-                          q{use Test::More tests => 1;},
+    content => join("\n", q{use Test2::V0;},
+                          q{sub require_ok ($);},
                           q{},
-                          qq{use_ok '$name';},
+                          q{require_ok '} . $name . q{';},
+                          q{},
+                          q{done_testing;},
+                          q{},
+                          q{sub require_ok ($)},
+                          '{',
+                          q{  # special case of when I really do want require_ok.},
+                          q{  # I just want a test that checks that the modules},
+                          q{  # will compile okay.  I won't be trying to use them.},
+                          q{  my($mod) = @_;},
+                          q{  my $ctx = context();},
+                          q{  eval qq{ require $mod };},
+                          q{  my $error = $@;},
+                          q{  my $ok = !$error;},
+                          q{  $ctx->ok($ok, "require $mod");},
+                          q{  $ctx->diag("error: $error") if $error ne '';},
+                          q{  $ctx->release;},
+                          '}',
     ),
   });
   
   $self->add_file($use_t_file);
+
+  my $test_name = lc $name;
+  $test_name =~ s{::}{_}g;
+  $test_name = "t/$test_name.t";
+  
+  my $main_test = Dist::Zilla::File::InMemory->new({
+    name => $test_name,
+    content => join("\n", q{use Test2::V0;},
+                          q{use } . $name . q{;},
+                          q{},
+                          q{ok 1, 'todo';},
+                          q{},
+                          q{done_testing},
+    ),
+  });
+  
+  $self->add_file($main_test);
 }
 
 sub gather_file_gitignore
@@ -344,7 +405,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.16
+version 2.20
 
 =head1 DESCRIPTION
 

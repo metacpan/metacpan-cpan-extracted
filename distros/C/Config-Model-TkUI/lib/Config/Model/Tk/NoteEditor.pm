@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::NoteEditor;
-$Config::Model::Tk::NoteEditor::VERSION = '1.362';
+$Config::Model::Tk::NoteEditor::VERSION = '1.363';
 use strict;
 use warnings;
 use Carp;
@@ -50,6 +50,7 @@ sub Populate {
     my $label  = 'Edit Note';
     my $status = $label;
     my $note_w;
+    my $cme_font = delete $args->{-font};
 
     my $save_cb = sub { $obj->annotation( $note_w->Contents ); $status = $label; };
     my $del_cb = sub {
@@ -82,6 +83,10 @@ sub Populate {
     $note_w->Contents( $obj->annotation );
     $note_w->bind( '<KeyPress>', $updated_cb );
     $note_w->bind( '<Button-2>', $updated_cb );
+
+    $cw->ConfigSpecs(-font => [['SELF','DESCENDANTS'], 'font','Font', $cme_font ],);
+
+    $cw->SUPER::Populate($args);
 }
 
 1;

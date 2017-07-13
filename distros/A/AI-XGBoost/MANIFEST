@@ -13,6 +13,7 @@ examples/capi.pl
 examples/capi_dump_model.pl
 examples/capi_raw.pl
 examples/featmap.txt
+examples/iris.pl
 lib/AI/XGBoost.pm
 lib/AI/XGBoost/Booster.pm
 lib/AI/XGBoost/CAPI.pm

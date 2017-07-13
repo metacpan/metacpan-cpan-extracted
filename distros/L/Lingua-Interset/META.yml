@@ -30,4 +30,4 @@ resources:
   bugtracker: https://github.com/dan-zeman/interset/issues
   homepage: http://ufal.mff.cuni.cz/interset
   repository: https://github.com/dan-zeman/interset
-version: '3.005'
+version: '3.006'

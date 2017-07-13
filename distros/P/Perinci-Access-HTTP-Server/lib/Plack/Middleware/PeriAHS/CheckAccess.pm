@@ -3,7 +3,7 @@ package Plack::Middleware::PeriAHS::CheckAccess;
 use 5.010;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 
 use parent qw(Plack::Middleware);
 use Plack::Util::Accessor qw(
@@ -19,7 +19,7 @@ use Plack::Util::PeriAHS qw(errpage);
 use SHARYANTO::Array::Util qw(match_array_or_regex);
 use URI::Split qw(uri_split);
 
-our $VERSION = '0.60'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 sub prepare_app {
     my $self = shift;
@@ -29,7 +29,7 @@ sub prepare_app {
 }
 
 sub call {
-    $log->tracef("=> PeriAHS::CheckAccess middleware");
+    log_trace("=> PeriAHS::CheckAccess middleware");
 
     my ($self, $env) = @_;
 
@@ -90,7 +90,7 @@ Plack::Middleware::PeriAHS::CheckAccess - Deny access based on some criteria
 
 =head1 VERSION
 
-This document describes version 0.60 of Plack::Middleware::PeriAHS::CheckAccess (from Perl distribution Perinci-Access-HTTP-Server), released on 2016-03-16.
+This document describes version 0.61 of Plack::Middleware::PeriAHS::CheckAccess (from Perl distribution Perinci-Access-HTTP-Server), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -145,7 +145,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-HTTP-Server>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-HTTP-Server>.
 
 =head1 BUGS
 
@@ -161,7 +161,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

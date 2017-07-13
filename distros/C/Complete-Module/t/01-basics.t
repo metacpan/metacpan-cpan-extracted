@@ -20,21 +20,21 @@ my $dir = tempdir(CLEANUP => 1);
 
     $CWD = $prefix;
 
-    write_file("Foo.pm", "");
+    write_text("Foo.pm", "");
     mkdir("Foo");
     mkdir("Bar");
     mkdir("Bar/M1");
     mkdir("Bar/M2");
-    write_file("Bar/Mod3.pm", "");
-    write_file("Baz.pm", "");
+    write_text("Bar/Mod3.pm", "");
+    write_text("Baz.pm", "");
 
     mkdir("Type");
-    write_file("Type/T1.pm", "");
-    write_file("Type/T1.pmc", "");
-    write_file("Type/T1.pod", "");
-    write_file("Type/T2.pm", "");
-    write_file("Type/T3.pmc", "");
-    write_file("Type/T4.pod", "");
+    write_text("Type/T1.pm", "");
+    write_text("Type/T1.pmc", "");
+    write_text("Type/T1.pod", "");
+    write_text("Type/T2.pm", "");
+    write_text("Type/T3.pmc", "");
+    write_text("Type/T4.pod", "");
     mkdir("Type/T5");
 }
 

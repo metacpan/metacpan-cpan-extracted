@@ -15,7 +15,6 @@ use Pcore -const, -export,
     CONST => [qw[$DATA_ENC_B64 $DATA_ENC_HEX $DATA_ENC_B85 $DATA_COMPRESS_ZLIB $DATA_CIPHER_DES]],
     TYPE  => [qw[$DATA_TYPE_PERL $DATA_TYPE_JSON $DATA_TYPE_CBOR $DATA_TYPE_YAML $DATA_TYPE_XML $DATA_TYPE_INI]],
   };
-use Pcore::Util::Data::I18N;
 use Pcore::Util::Text qw[decode_utf8 encode_utf8 escape_scalar];
 use Pcore::Util::List qw[pairs];
 use Sort::Naturally qw[nsort];
@@ -348,9 +347,6 @@ sub decode_data ( $type, @ ) {
 package $ns;
 
 use Pcore -config;
-no warnings qw[redefine];
-
-local *i18n = sub { return Pcore::Util::Data::I18N->new( { args => [ \@_ ] } ) };
 
 $data_ref->$*
 CODE
@@ -743,16 +739,16 @@ sub to_xor ( $buf, $mask ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 50                   | * Subroutine "encode_data" with high complexity score (35)                                                     |
-## |      | 255                  | * Subroutine "decode_data" with high complexity score (33)                                                     |
+## |      | 49                   | * Subroutine "encode_data" with high complexity score (35)                                                     |
+## |      | 254                  | * Subroutine "decode_data" with high complexity score (33)                                                     |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 631, 683, 691        | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 627, 679, 687        | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 589                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 585                  | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 729                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 725                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 247, 729, 731        | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
+## |    1 | 246, 725, 727        | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

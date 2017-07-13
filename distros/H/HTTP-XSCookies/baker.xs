@@ -4,9 +4,19 @@
 #include "XSUB.h"
 #include "ppport.h"
 
-#include <strings.h>
+#include <string.h>
 #include "buffer.h"
 #include "cookie.h"
+
+#if defined(_WIN32) || defined(_WIN64)
+#define snprintf    _snprintf
+#define vsnprintf   _vsnprintf
+#define strcasecmp  _stricmp
+#define strncasecmp _strnicmp
+#else
+#include <strings.h>
+#endif
+
 
 /*
  * Possible field names in a cookie.

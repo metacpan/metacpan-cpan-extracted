@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+# show color separations
+
+use strict;
+use warnings;
+
+use PDF::Builder;
+use PDF::Builder::Util;
+use POSIX;
+use Math::Trig;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my $cx = 50;
+my $cy = 50;
+my $cr = 15;
+my $cs = 32;
+my $ang = 30;
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+$pdf->mediabox(595,842);
+
+my $fnt = $pdf->corefont('Verdana-Bold');
+
+    my $page = $pdf->page();
+    my $gfx = $page->gfx();
+    my $text = $page->text();
+    
+    $text->linewidth(0);
+    $text->render(2);
+
+    $text->textlabel(300,750, $fnt,20, 'Separation Colorspace(s)', -color=>'#000', -hscale=>125, -center=>1);
+
+    $text->strokecolor('#000');
+    # colored section
+    my $y = 0;
+    foreach my $csn (qw( Red %0ff0 Green %f0f0 Blue %ff00 Cyan %f000 Magenta %0f00 Yellow %00f0 )) {
+        my $csp = $pdf->colorspace_separation($csn, $csn);
+        # row labels on left
+        $text->textlabel($cx,$cy+($y*$cs)+14, $fnt,8, $csn, -color=>'#000', -hscale=>85, -right=>1);
+	# 16 circles L to R 0..1
+        foreach my $x (0 .. 0xf) {
+            $gfx->fillcolor($csp, sprintf('%0.4f',$x/0xf));
+            $gfx->circle($cx+($x+1)*$cs,$cy+($y+0.5)*$cs, $cr);
+            $gfx->fillstroke();
+            $text->textlabel($cx+($x+1)*$cs,$cy+($y+0.5)*$cs-2, $fnt,8, sprintf('%0.4f',$x/0xf), -color=>'#000', -hscale=>85, -center=>1);
+        }
+        $y++;
+    }
+
+    # gray ('All') row
+    my $csp = $pdf->colorspace_separation('All', '#000');
+    $text->textlabel($cx,$cy+($y*$cs)+14, $fnt,8, 'All', -color=>'#000', -hscale=>85, -right=>1);
+    foreach my $x (0 .. 0xf) {
+        $gfx->fillcolor($csp, sprintf('%0.4f',$x/0xf));
+        $gfx->circle($cx+($x+1)*$cs,$cy+($y+0.5)*$cs, $cr);
+        $gfx->fillstroke();
+        $text->textlabel($cx+($x+1)*$cs,$cy+($y+0.5)*$cs-2, $fnt,8, sprintf('%0.4f',$x/0xf), -color=>'#000', -strokecolor=>'#FFF', -hscale=>85, -center=>1);
+    }
+    $y++;
+
+    # 'None' row
+    $csp = $pdf->colorspace_separation('None', '#000');
+    $text->textlabel($cx,$cy+($y*$cs)+14, $fnt,8, 'None', -color=>'#000', -hscale=>85, -right=>1);
+    foreach my $x (0 .. 0xf) {
+        $gfx->fillcolor($csp, sprintf('%0.4f',$x/0xf));
+        $gfx->circle($cx+($x+1)*$cs,$cy+($y+0.5)*$cs, $cr);
+        $gfx->fillstroke();
+        $text->textlabel($cx+($x+1)*$cs,$cy+($y+0.5)*$cs-2, $fnt,8, sprintf('%0.4f',$x/0xf), -color=>'#000', -hscale=>85, -center=>1);
+    }
+    $y++;
+
+    delete $gfx->{'Filter'};
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__

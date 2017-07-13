@@ -1,7 +1,7 @@
 package IPC::System::Options;
 
-our $DATE = '2017-04-09'; # DATE
-our $VERSION = '0.31'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.32'; # VERSION
 
 use strict;
 use warnings;
@@ -70,7 +70,10 @@ sub _system_or_readpipe_or_run {
     my $os_error = "";
     my $extra_error;
 
-    $log ||= do { require Log::Any::IfLOG; Log::Any::IfLOG->get_logger } if $opts->{log};
+    if ($opts->{log}) {
+        require Log::ger;
+        Log::ger->import;
+    }
 
     my $cwd;
     if ($opts->{chdir}) {
@@ -141,15 +144,16 @@ sub _system_or_readpipe_or_run {
 
         if ($opts->{log} || $opts->{dry_run}) {
             if ($opts->{log}) {
-                my $meth;
+                no strict 'refs';
+                my $routine;
                 my $label = "";
                 if ($opts->{dry_run}) {
                     $label = "[DRY RUN] ";
-                    $meth = "infof";
+                    $routine = "log_info";
                 } else {
-                    $meth = "tracef";
+                    $routine = "log_trace";
                 }
-                $log->$meth("%ssystem(%s), env=%s", $label, \@args, \%set_env);
+                $routine->("%ssystem(%s), env=%s", $label, \@args, \%set_env);
             } else {
                 warn "[DRY RUN] system(".join(", ", @args).")\n";
             }
@@ -183,15 +187,16 @@ sub _system_or_readpipe_or_run {
 
         if ($opts->{log} || $opts->{dry_run}) {
             if ($opts->{log}) {
-                my $meth;
+                no strict 'refs';
+                my $routine;
                 my $label = "";
                 if ($opts->{dry_run}) {
                     $label = "[DRY RUN] ";
-                    $meth = "infof";
+                    $routine = "log_info";
                 } else {
-                    $meth = "tracef";
+                    $routine = "log_trace";
                 }
-                $log->$meth("%sreadpipe(%s), env=%s", $label, $cmd, \%set_env);
+                $routine->("%sreadpipe(%s), env=%s", $label, $cmd, \%set_env);
             } else {
                 warn "[DRY RUN] readpipe($cmd)\n";
             }
@@ -235,10 +240,10 @@ sub _system_or_readpipe_or_run {
                     }
                 }
             }
-            $log->tracef("result of readpipe(): %s (%d bytes)",
-                         defined($res_show) ? $res_show : $res,
-                         defined($res_show) ?
-                             $opts->{max_log_output} : length($res))
+            log_trace("result of readpipe(): %s (%d bytes)",
+                      defined($res_show) ? $res_show : $res,
+                      defined($res_show) ?
+                          $opts->{max_log_output} : length($res))
                 unless $exit_code;
         }
 
@@ -246,16 +251,17 @@ sub _system_or_readpipe_or_run {
 
         if ($opts->{log} || $opts->{dry_run}) {
             if ($opts->{log}) {
-                my $meth;
+                no strict 'refs';
+                my $routine;
                 my $label = "";
                 if ($opts->{dry_run}) {
                     $label = "[DRY RUN] ";
-                    $meth = "infof";
+                    $routine = "log_info";
                 } else {
-                    $meth = "tracef";
+                    $routine = "log_trace";
                 }
-                $log->$meth("%srun(%s), env=%s", $label,
-                            join(", ", @args), \%set_env);
+                $routine->("%srun(%s), env=%s", $label,
+                           join(", ", @args), \%set_env);
             } else {
                 warn "[DRY RUN] run(".join(", ", @args).")\n";
             }
@@ -331,7 +337,7 @@ sub _system_or_readpipe_or_run {
                      ", captured merged: <<" .
                      (defined ${$opts->{capture_merged}} ? ${$opts->{capture_merged}} : ''). ">>" : ""),
             );
-            $log->error($msg) if $opts->{log};
+            log_error($msg) if $opts->{log};
             die $msg if $opt_die;
         }
     }
@@ -373,7 +379,7 @@ IPC::System::Options - Perl's system() and readpipe/qx replacement, with options
 
 =head1 VERSION
 
-This document describes version 0.31 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2017-04-09.
+This document describes version 0.32 of IPC::System::Options (from Perl distribution IPC-System-Options), released on 2017-07-10.
 
 =head1 SYNOPSIS
 

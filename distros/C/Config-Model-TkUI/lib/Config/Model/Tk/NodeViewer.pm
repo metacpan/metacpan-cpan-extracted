@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::NodeViewer;
-$Config::Model::Tk::NodeViewer::VERSION = '1.362';
+$Config::Model::Tk::NodeViewer::VERSION = '1.363';
 use strict;
 use warnings;
 use Carp;
@@ -37,6 +37,7 @@ sub Populate {
     my $node = $cw->{node} = delete $args->{-item}
         || die "NodeViewer: no -item, got ", keys %$args;
     my $path = delete $args->{-path};
+    my $cme_font = delete $args->{-font};
 
     $cw->add_header( View => $node )->pack(@fx);
 
@@ -76,6 +77,8 @@ sub Populate {
 
     $cw->add_info_button()->pack( @fxe1, -side => 'left' );
     $cw->add_editor_button($path)->pack( @fxe1, -side => 'right' );
+
+    $cw->ConfigSpecs(-font => [['SELF','DESCENDANTS'], 'font','Font', $cme_font ],);
 
     $cw->SUPER::Populate($args);
 }

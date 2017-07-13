@@ -212,6 +212,17 @@ sub task_run {
     my $tid      = shift or confess "usage: task_run(project,*task,parameters)";
     my @args     = @_; 
 
+    my $cli_args;
+
+    my $i=0;
+    for my $a (@args) {
+      if ($a eq '--') {
+        delete $args[$i];
+        $cli_args = join ' ', delete @args[$i .. $#args];
+        last;
+      }
+      $i++;
+    }
 
     my $verbose_mode     = 0; 
     my $noexec_mode      = 0;
@@ -269,7 +280,7 @@ sub task_run {
 
     my $spj = plugin_meta($pdir);
     
-    my $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=local/lib/perl5:\$PERL5LIB && ";
+    my $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=local/lib/perl5:\$PERL5LIB && export PYTHONPATH=python-lib:\$PYTHONPATH && ";
 
     if ($spj->{plugin_type} eq 'outthentic'){
       $cmd.="  strun --root ./ --task '[task] ".($task_set->{task_desc})."'"
@@ -338,6 +349,8 @@ sub task_run {
     $cmd.= " --cwd $cwd_arg" if $cwd_arg;
     $cmd.= " --story $story_arg" if $story_arg;
     $cmd.= " --args-file $args_file_arg" if $args_file_arg;
+
+    $cmd.= " -- $cli_args" if $cli_args;
 
     if ($cron_mode) {
         my $repo_file = sparrow_root.'/cache/report-'.$project.'-'.$tid.'-'.$$.'.txt';

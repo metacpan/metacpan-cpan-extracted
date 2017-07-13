@@ -6,7 +6,7 @@ use 5.010;
 use strict;
 use warnings;
 use FindBin '$Bin';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use lib $Bin, "$Bin/t";
 
 use Test::More 0.96;
@@ -391,14 +391,14 @@ test_gen(
                   fields=>[qw/f/],
                   code=>sub {
                       my ($r, $v, $opts) = @_;
-                      $log->tracef("inside cf1, r=%s, v=%s", $r, $v);
+                      log_trace("inside cf1, r=%s, v=%s", $r, $v);
                       $r->{f} >= $v*2;
                   }},
             cf2=>{meta=>{schema=>['int*'=>{default=>1}]},
                   fields=>[qw/i/],
                   code=>sub {
                       my ($r, $v, $opts) = @_;
-                      $log->tracef("inside cf1, r=%s, v=%s", $r, $v);
+                      log_trace("inside cf1, r=%s, v=%s", $r, $v);
                       $r->{i} > $v;
                   }},
         }

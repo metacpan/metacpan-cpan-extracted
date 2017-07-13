@@ -55,7 +55,7 @@
          "web" : "https://github.com/ambs/Dancer2-Plugin-JWT"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

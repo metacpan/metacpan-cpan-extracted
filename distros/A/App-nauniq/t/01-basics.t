@@ -6,7 +6,7 @@ use warnings;
 use FindBin;
 
 use File::chdir;
-use File::Slurp::Tiny qw(read_file write_file);
+use File::Slurper qw(read_text write_text);
 use File::Temp qw(tempdir);
 use IPC::Cmd qw(run_forked);
 use String::ShellQuote;
@@ -26,8 +26,8 @@ $CWD = $tmpdir;
 
 # convention: all input files are named if*, output files of*
 
-write_file("if1", lines(1, 2, 3));
-write_file("if2", lines(1, 2, 3, 3, 2, 4));
+write_text("if1", lines(1, 2, 3));
+write_text("if2", lines(1, 2, 3, 3, 2, 4));
 
 subtest "no options" => sub {
     test_nauniq(
@@ -160,7 +160,7 @@ subtest "option: --forget-pattern" => sub {
 
 subtest "option: --append" => sub {
     for my $opt (qw/--append/) {
-        write_file("af1", lines(1, 2, 3));
+        write_text("af1", lines(1, 2, 3));
         test_nauniq(
             args    => [$opt, "-", "af1"],
             input   => lines(1, 2, 2, 3, 4, 1),
@@ -172,7 +172,7 @@ subtest "option: --append" => sub {
 
 subtest "option: -a" => sub {
     for my $opts (["-a"], ["--append", "--read-output"]) {
-        write_file("af1", lines(1, 2, 3));
+        write_text("af1", lines(1, 2, 3));
         test_nauniq(
             args    => [@$opts, "-", "af1"],
             input   => lines(1, 2, 2, 3, 4, 1),
@@ -217,7 +217,7 @@ sub test_nauniq {
         my $cmd = join(
             " ",
             map {shell_quote($_)}
-                ($^X, "$FindBin::Bin/../bin/nauniq", @progargs));
+                ($^X, "$FindBin::Bin/../script/nauniq", @progargs));
         note "cmd: $cmd";
         my $res = run_forked($cmd, \%runopts);
 
@@ -235,7 +235,7 @@ sub test_nauniq {
         if (defined $args{outfile}) {
             if (ok((-f $args{outfile}), "output file exists")) {
                 if (defined $args{outfile_content}) {
-                    is(read_file($args{outfile}), $args{outfile_content},
+                    is(read_text($args{outfile}), $args{outfile_content},
                        "output file content");
                 }
             }

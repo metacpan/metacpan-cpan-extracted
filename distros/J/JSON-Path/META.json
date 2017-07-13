@@ -1,72 +1,104 @@
 {
    "abstract" : "search nested hashref/arrayref structures using JSONPath",
    "author" : [
-      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+      "Kit Peters <kit.peters@broadbean.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.013, CPAN::Meta::Converter version 2.120921",
-   "keywords" : [],
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "mit"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "JSON-Path",
-   "no_index" : {
-      "directory" : [
-         "eg",
-         "examples",
-         "inc",
-         "t",
-         "xt"
-      ]
-   },
-   "optional_features" : {},
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.17"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOL" : "0",
+            "Test::HasVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::RDF::DOAP::Version" : "0",
+            "Test::Tabs" : "0",
+            "XT::Util" : "0"
          }
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Carp::Assert" : "0",
+            "Exporter" : "0",
+            "Exporter::Easy" : "0",
             "Exporter::Tiny" : "0",
-            "JSON" : "2.00",
-            "LV" : "0"
+            "JSON::MaybeXS" : "0",
+            "LV" : "0",
+            "Readonly" : "0",
+            "Safe" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Sys::Hostname" : "0",
+            "Try::Tiny" : "0",
+            "base" : "0",
+            "overload" : "0",
+            "perl" : "5.016",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.61"
+            "JSON" : "0",
+            "Test2::V0" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Tie::IxHash" : "0",
+            "perl" : "5.016"
          }
       }
    },
    "provides" : {
       "JSON::Path" : {
          "file" : "lib/JSON/Path.pm",
-         "version" : "0.205"
+         "version" : "0.310"
+      },
+      "JSON::Path::Constants" : {
+         "file" : "lib/JSON/Path/Constants.pm",
+         "version" : "0.310"
+      },
+      "JSON::Path::Evaluator" : {
+         "file" : "lib/JSON/Path/Evaluator.pm",
+         "version" : "0.310"
       },
       "JSON::Path::Helper" : {
          "file" : "lib/JSON/Path.pm",
-         "version" : "0.205"
+         "version" : "0.310"
+      },
+      "JSON::Path::Tokenizer" : {
+         "file" : "lib/JSON/Path/Tokenizer.pm",
+         "version" : "0.310"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/JSON-Path/project",
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=JSON-Path"
+         "web" : "https://github.com/popefelix/p5-json-path/issues"
       },
-      "homepage" : "https://metacpan.org/release/JSON-Path",
-      "license" : [
-         "http://www.opensource.org/licenses/mit-license.php"
-      ],
+      "homepage" : "https://github.com/popefelix/p5-json-path",
       "repository" : {
          "type" : "git",
-         "web" : "https://github.com/tobyink/p5-json-path"
+         "url" : "https://github.com/popefelix/p5-json-path.git",
+         "web" : "https://github.com/popefelix/p5-json-path"
       }
    },
-   "version" : "0.205"
+   "version" : "0.310",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
+

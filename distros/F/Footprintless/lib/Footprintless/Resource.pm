@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Resource;
-$Footprintless::Resource::VERSION = '1.24';
+$Footprintless::Resource::VERSION = '1.25';
 # ABSTRACT: A resource provided by a provider
 # PODNAME: Footprintless::Resource
 
@@ -34,7 +34,7 @@ Footprintless::Resource - A resource provided by a provider
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 DESCRIPTION
 

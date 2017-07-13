@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Resource::Maven;
-$Footprintless::Resource::Maven::VERSION = '1.24';
+$Footprintless::Resource::Maven::VERSION = '1.25';
 # ABSTRACT: A resource described by Maven artifact
 # PODNAME: Footprintless::Resource::Maven
 
@@ -33,7 +33,7 @@ Footprintless::Resource::Maven - A resource described by Maven artifact
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 CONSTRUCTORS
 

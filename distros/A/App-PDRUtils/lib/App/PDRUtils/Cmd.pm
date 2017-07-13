@@ -1,7 +1,7 @@
 package App::PDRUtils::Cmd;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 use strict;
@@ -71,7 +71,7 @@ App::PDRUtils::Cmd - Common stuffs for App::PDRUtils::*Cmd::*
 
 =head1 VERSION
 
-This document describes version 0.10 of App::PDRUtils::Cmd (from Perl distribution App-PDRUtils), released on 2017-07-03.
+This document describes version 0.11 of App::PDRUtils::Cmd (from Perl distribution App-PDRUtils), released on 2017-07-10.
 
 =head1 HOMEPAGE
 

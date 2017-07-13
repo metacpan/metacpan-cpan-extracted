@@ -16,6 +16,7 @@ meta-spec:
   version: '1.4'
 name: AI-XGBoost
 requires:
+  Carp: '0'
   Exception::Class: '0'
   Exporter::Easy: '0'
   FFI::Platypus: '0'
@@ -30,5 +31,5 @@ resources:
   bugtracker: https://github.com/pablrod/p5-AI-XGBoost/issues
   homepage: https://github.com/pablrod/p5-AI-XGBoost
   repository: https://github.com/pablrod/p5-AI-XGBoost.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.69'

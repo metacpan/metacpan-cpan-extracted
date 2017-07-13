@@ -42,6 +42,7 @@ requires:
   Math::Expression: '0'
   Math::Units: '0'
   Time::Crontab: '0'
+  Try::Tiny: '0'
   YAML::XS: '0'
   perl: '5.012'
   strict: '0'
@@ -50,5 +51,5 @@ resources:
   bugtracker: https://github.com/gryphonshafer/Bot-IRC/issues
   homepage: https://github.com/gryphonshafer/Bot-IRC
   repository: https://github.com/gryphonshafer/Bot-IRC.git
-version: '1.15'
+version: '1.16'
 x_serialization_backend: 'YAML::Tiny version 1.70'

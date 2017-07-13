@@ -26,7 +26,13 @@ my $swagger_types = {
     'EnableHTTPCompression' => 'boolean',
     'RefreshChartCache' => 'boolean',
     'SortNames' => 'boolean',
+    'SaveFormat' => 'string',
+    'CalculateFormula' => 'boolean',
+    'CheckFontCompatibility' => 'boolean',
+    'Compliance' => 'string',
+    'OnePagePerSheet' => 'boolean',   
     'ValidateMergedAreas' => 'boolean'
+
 };
 
 my $attribute_map = {
@@ -36,6 +42,11 @@ my $attribute_map = {
     'EnableHTTPCompression' => 'EnableHTTPCompression',
     'RefreshChartCache' => 'RefreshChartCache',
     'SortNames' => 'SortNames',
+    'SaveFormat' => 'SaveFormat',
+    'CalculateFormula' => 'CalculateFormula',
+    'CheckFontCompatibility' => 'CheckFontCompatibility',
+    'Compliance' => 'Compliance',
+    'OnePagePerSheet' => 'OnePagePerSheet',  
     'ValidateMergedAreas' => 'ValidateMergedAreas'
 };
 
@@ -55,6 +66,16 @@ sub new {
         'RefreshChartCache' => $args{'RefreshChartCache'}, 
         #
         'SortNames' => $args{'SortNames'}, 
+        #
+	'SaveFormat' => $args{'SaveFormat'}, 
+        #
+	'CalculateFormula' => $args{'CalculateFormula'}, 
+        #
+	'CheckFontCompatibility' => $args{'CheckFontCompatibility'}, 
+        #
+	'Compliance' => $args{'Compliance'}, 
+        #
+	'OnePagePerSheet' => $args{'OnePagePerSheet'}, 
         #
         'ValidateMergedAreas' => $args{'ValidateMergedAreas'}
     }; 

@@ -3,12 +3,13 @@ package DBIx::dbMan::Extension::MacroWorks;
 use strict;
 use base 'DBIx::dbMan::Extension';
 use Text::FormatTable;
+use File::Spec;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 1;
 
-sub IDENTIFICATION { return "000001-000086-000003"; }
+sub IDENTIFICATION { return "000001-000086-000004"; }
 
 sub preference { return 0; }
 
@@ -41,12 +42,28 @@ sub load_macros {
 
 	my @macros = ();
 
-	if (open F,$obj->macrofile) {
-		while (<F>) {
-			chomp;
-			push @macros,$_ if m#^s/(.+)/(.*)/[gei]?#;
+	my @files = ();
+
+	if ( -d $obj->macrofile ) {
+		if (opendir D, $obj->macrofile) {
+			while (my $file = readdir D) {
+				next if $file=~ /^\./;
+				push @files, File::Spec->catfile( $obj->macrofile, $file );
+			}
+			closedir D;
 		}
-		close F;
+	} else {
+		push @files, $obj->macrofile;
+	}
+
+	for my $file (@files) {
+		if (open F, $file) {
+			while (<F>) {
+				chomp;
+				push @macros,$_ if m#^s/(.+)/(.*)/[gei]?#;
+			}
+			close F;
+		}
 	}
 
 	$obj->{-mempool}->set(macros => \@macros);

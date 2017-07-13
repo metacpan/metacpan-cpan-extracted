@@ -1,0 +1,30 @@
+NAME
+    Log::ger::Manual - Manual for Log::ger
+
+VERSION
+    version 0.015001
+
+DESCRIPTION
+    See the following documentation pages:
+
+    *   Log::ger::Manual::FAQ
+
+    *   Log::ger::Manual::ForLog4perl
+
+    *   Log::ger::Manual::ForLogAny
+
+    *   Log::ger::Manual::ForLogContextual
+
+    *   Log::ger::Manual::ForLogDispatch
+
+    *   Log::ger::Manual::Internals
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

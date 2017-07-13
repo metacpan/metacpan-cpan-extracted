@@ -1,0 +1,31 @@
+---
+abstract: 'Alien::Build plugin to prompt a user before making external download'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::Mock: '0.000060'
+  Test2::V0: '0.000060'
+  Test::Alien::Build: '0'
+  Test::Exit: '0.11'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Build-Plugin-Fetch-PromptBeforeDownload
+requires:
+  Alien::Build: '0.57'
+  Alien::Build::Plugin: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/Alien-Build-Plugin-Fetch-PromptBeforeDownload/issues
+  homepage: https://metacpan.org/pod/Alien::Build::Plugin::Fetch::PromptBeforeDownload
+  repository: git://github.com/plicease/Alien-Build-Plugin-Fetch-PromptBeforeDownload.git
+version: '0.57'
+x_serialization_backend: 'YAML::Tiny version 1.70'

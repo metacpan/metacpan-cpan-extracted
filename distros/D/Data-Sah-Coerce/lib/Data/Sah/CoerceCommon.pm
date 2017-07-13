@@ -1,7 +1,7 @@
 package Data::Sah::CoerceCommon;
 
-our $DATE = '2017-03-14'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -283,7 +283,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.021 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2017-03-14.
+This document describes version 0.023 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2017-07-10.
 
 =head1 FUNCTIONS
 

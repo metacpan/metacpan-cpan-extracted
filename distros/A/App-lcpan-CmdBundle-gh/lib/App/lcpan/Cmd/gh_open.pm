@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::gh_open;
 
-our $DATE = '2017-01-23'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 require App::lcpan::Cmd::dist_meta;
@@ -75,7 +75,7 @@ App::lcpan::Cmd::gh_open - Open the GitHub project page of a module/dist
 
 =head1 VERSION
 
-This document describes version 0.003 of App::lcpan::Cmd::gh_open (from Perl distribution App-lcpan-CmdBundle-gh), released on 2017-01-23.
+This document describes version 0.004 of App::lcpan::Cmd::gh_open (from Perl distribution App-lcpan-CmdBundle-gh), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -84,7 +84,11 @@ This module handles the L<lcpan> subcommand C<gh-open>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Open the GitHub project page of a module/dist.
 

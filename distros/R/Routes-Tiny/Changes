@@ -1,5 +1,13 @@
 Revision history for perl module Routes::Tiny
 
+0.21 2017-07-12T08:21:05Z
+
+ - strict_case option added (Dmitry Smal)
+
+0.2 2017-07-09T20:05:02Z
+
+ - method sugar for pattern building (Alexander Batyrshin)
+
 0.19 2017-01-27T18:28:27Z
 
  - default_method parameter (dshadow)

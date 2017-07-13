@@ -9,7 +9,7 @@ use lib "$Bin/lib";
 use Digest::MD5 qw(md5_hex);
 use File::chdir;
 use File::Path qw(remove_tree);
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Temp qw(tempdir);
 use Setup::File;
 use Test::More 0.98;
@@ -32,7 +32,7 @@ test_tx_action(
     tmpdir      => $tmpdir,
     f           => 'Setup::File::rmfile',
     args        => {path=>"p"},
-    reset_state => sub { remove_tree "p"; write_file("p", "") },
+    reset_state => sub { remove_tree "p"; write_text("p", "") },
 );
 
 test_tx_action(
@@ -40,7 +40,7 @@ test_tx_action(
     tmpdir      => $tmpdir,
     f           => 'Setup::File::rmfile',
     args        => {path=>"p"},
-    reset_state => sub { remove_tree "p"; write_file "p", "" },
+    reset_state => sub { remove_tree "p"; write_text "p", "" },
 );
 
 test_tx_action(
@@ -50,7 +50,7 @@ test_tx_action(
     args        => {path=>"p", orig_content=>"foo"},
     reset_state => sub {
         remove_tree "p";
-        write_file("p", "foo");
+        write_text("p", "foo");
     },
 );
 
@@ -61,7 +61,7 @@ test_tx_action(
     args        => {path=>"p", orig_content=>"foo"},
     reset_state => sub {
         remove_tree "p";
-        write_file("p", "bar");
+        write_text("p", "bar");
     },
     status      => 331,
 );
@@ -74,7 +74,7 @@ test_tx_action(
     confirm     => 1,
     reset_state => sub {
         remove_tree "p";
-        write_file("p", "bar");
+        write_text("p", "bar");
     },
 );
 
@@ -85,7 +85,7 @@ test_tx_action(
     args        => {path=>"p", orig_content_md5=>md5_hex("foo")},
     reset_state => sub {
         remove_tree "p";
-        write_file("p", "foo");
+        write_text("p", "foo");
     },
 );
 
@@ -96,7 +96,7 @@ test_tx_action(
     args        => {path=>"p", orig_content_md5=>md5_hex("foo")},
     reset_state => sub {
         remove_tree "p";
-        write_file("p", "bar");
+        write_text("p", "bar");
     },
     status      => 331,
 );
@@ -109,7 +109,7 @@ test_tx_action(
     confirm     => 1,
     reset_state => sub {
         remove_tree "p";
-        write_file("p", "bar");
+        write_text("p", "bar");
     },
 );
 
@@ -124,7 +124,7 @@ subtest "symlink tests" => sub {
         args        => {path=>"s"},
         reset_state => sub {
             remove_tree "p"; unlink "s";
-            write_file("p", ""); symlink "p", "s";
+            write_text("p", ""); symlink "p", "s";
         },
         status      => 412,
     );
@@ -136,7 +136,7 @@ subtest "symlink tests" => sub {
         args        => {path=>"s", allow_symlink=>1},
         reset_state => sub {
             remove_tree "p"; unlink "s";
-            write_file("p", ""); symlink "p", "s";
+            write_text("p", ""); symlink "p", "s";
         },
     );
 

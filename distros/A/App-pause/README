@@ -1,10 +1,38 @@
-DESCRIPTION
+NAME
+    App::pause - A CLI for PAUSE
 
+VERSION
+    This document describes version 0.63 of App::pause (from Perl
+    distribution App-pause), released on 2017-07-10.
+
+DESCRIPTION
     See included script pause.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-pause>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-pause>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     WWW::PAUSE::Simple
 
     pause
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

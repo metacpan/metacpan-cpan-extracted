@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,8 +39,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::Build" : "0.06",
+            "Alien::Build" : "0.57",
+            "Digest::MD5" : "0",
             "File::HomeDir" : "1.00",
+            "Number::Bytes::Human" : "0",
             "Path::Tiny" : "0.100",
             "Sereal" : "3.015",
             "URI" : "1.71",
@@ -49,11 +51,11 @@
       },
       "test" : {
          "requires" : {
-            "Alien::Build" : "0.06",
             "Capture::Tiny" : "0",
             "File::chdir" : "0",
-            "Test2::Suite" : "0.000060",
-            "Test::More" : "0.94",
+            "Test2::V0" : "0.000060",
+            "Test::Alien::Build" : "0",
+            "Test::Script" : "0",
             "perl" : "5.010"
          }
       }
@@ -68,9 +70,10 @@
          "type" : "git",
          "url" : "git://github.com/plicease/Alien-Build-Plugin-Fetch-Cache.git",
          "web" : "https://github.com/plicease/Alien-Build-Plugin-Fetch-Cache"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

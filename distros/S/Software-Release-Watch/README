@@ -1,19 +1,199 @@
-SYNOPSIS
+NAME
+    Software::Release::Watch - Watch latest software releases
 
+VERSION
+    This document describes version 0.05 of Software::Release::Watch (from
+    Perl distribution Software-Release-Watch), released on 2017-07-10.
+
+SYNOPSIS
      use Software::Release::Watch qw(
          list_software
          list_software_releases
      );
-    
+
      my $res;
      $res = list_software();
      $res = list_software_releases(software_id=>'wordpress');
 
+FUNCTIONS
+  list_software
+    Usage:
+
+     list_software(%args) -> [status, msg, result, meta]
+
+    REPLACE ME.
+
+    REPLACE ME
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   id => *str*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.contains => *str*
+
+        Only return records where the 'id' field contains specified text.
+
+    *   id.in => *array[str]*
+
+        Only return records where the 'id' field is in the specified values.
+
+    *   id.is => *str*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.isnt => *str*
+
+        Only return records where the 'id' field does not equal specified
+        value.
+
+    *   id.max => *str*
+
+        Only return records where the 'id' field is less than or equal to
+        specified value.
+
+    *   id.min => *str*
+
+        Only return records where the 'id' field is greater than or equal to
+        specified value.
+
+    *   id.not_contains => *str*
+
+        Only return records where the 'id' field does not contain specified
+        text.
+
+    *   id.not_in => *array[str]*
+
+        Only return records where the 'id' field is not in the specified
+        values.
+
+    *   id.xmax => *str*
+
+        Only return records where the 'id' field is less than specified
+        value.
+
+    *   id.xmin => *str*
+
+        Only return records where the 'id' field is greater than specified
+        value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_software_releases
+    Usage:
+
+     list_software_releases(%args) -> [status, msg, result, meta]
+
+    List software releases.
+
+    Statuses:
+
+    *   541 - transient network failure
+
+    *   542 - permanent network failure (e.g. server returns 404 page)
+
+    *   543 - parsing failure (permanent)
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   software_id* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Software-Release-Watch>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Software-Release-Watch>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Software-Release-Watc
+    h>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Software::Catalog
 
-    Software::Release::Watch::* modules.
+    "Software::Release::Watch::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

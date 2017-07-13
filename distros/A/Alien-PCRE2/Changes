@@ -1,5 +1,14 @@
 Revision history for Alien::PCRE2.
 
+0.008000 2017-07-13
+
+    - Require Alien::Build v0.60 For Bug Fixes
+
+0.007000 2017-07-12
+
+    - Test Suite, Fix Errors On System Install Mode
+    - Test Suite, Enable XS Tests (Thanks plicease)
+
 0.006000 2017-07-02
 
     - Build Process, Disable Shared Libs

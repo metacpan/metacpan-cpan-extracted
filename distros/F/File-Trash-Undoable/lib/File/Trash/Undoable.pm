@@ -1,12 +1,12 @@
 package File::Trash::Undoable;
 
-our $DATE = '2016-12-28'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.22'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::MoreUtil qw(l_abs_path);
 use File::Trash::FreeDesktop;
@@ -66,14 +66,14 @@ sub trash {
                 unshift @undo, [untrash => {path=>$path, suffix=>$suffix}];
             }
             if (@undo) {
-                $log->info("(DRY) Trashing $path ...") if $dry_run;
+                log_info("(DRY) Trashing $path ...") if $dry_run;
                 return [200, "File/dir $path should be trashed",
                         undef, {undo_actions=>\@undo}];
             } else {
                 return [304, "File/dir $path already does not exist"];
             }
         } elsif ($tx_action eq 'fix_state') {
-            $log->info("Trashing $path ...");
+            log_info("Trashing $path ...");
             my $tfile;
             eval { $tfile = $trash->trash({suffix=>$suffix}, $path) };
             return $@ ? [500, "trash() failed: $@"] : [200, "OK", $tfile];
@@ -88,7 +88,7 @@ sub trash {
             unshift @undo, [untrash => {path=>$path, suffix=>$suffix}];
         }
         if (@undo) {
-            $log->info("(DRY) Trashing $path (suffix $suffix) ...") if $dry_run;
+            log_info("(DRY) Trashing $path (suffix $suffix) ...") if $dry_run;
             return [200, "", undef, {do_actions=>\@do, undo_actions=>\@undo}];
         } else {
             return [304, "File/dir $path already does not exist"];
@@ -144,12 +144,12 @@ sub untrash {
             search_path=>$apath, suffix=>$suffix});
         return [412, "File/dir $path0 does not exist in trash"] unless @res;
         unshift @undo, [trash => {path => $apath, suffix=>$suffix}];
-        $log->info("(DRY) Untrashing $path0 ...") if $dry_run;
+        log_info("(DRY) Untrashing $path0 ...") if $dry_run;
         return [200, "File/dir $path0 should be untrashed",
                 undef, {undo_actions=>\@undo}];
 
     } elsif ($tx_action eq 'fix_state') {
-        $log->info("Untrashing $path0 ...");
+        log_info("Untrashing $path0 ...");
         eval { $trash->recover({suffix=>$suffix}, $apath) };
         return $@ ? [500, "untrash() failed: $@"] : [200, "OK"];
     }
@@ -195,7 +195,7 @@ sub trash_files {
         my $orig = $_;
         $_ = l_abs_path($_);
         $_ or return [400, "Can't convert to absolute path: $orig"];
-        $log->infof("(DRY) Trashing %s ...", $orig) if $dry_run;
+        log_info("(DRY) Trashing %s ...", $orig) if $dry_run;
         push    @do  , [trash   => {path=>$_}];
         unshift @undo, [untrash => {path=>$_, mtime=>$st[9]}];
     }
@@ -243,7 +243,7 @@ File::Trash::Undoable - Trash files, with undo/redo capability
 
 =head1 VERSION
 
-This document describes version 0.21 of File::Trash::Undoable (from Perl distribution File-Trash-Undoable), released on 2016-12-28.
+This document describes version 0.22 of File::Trash::Undoable (from Perl distribution File-Trash-Undoable), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -259,7 +259,11 @@ Screenshots:
 =head1 FUNCTIONS
 
 
-=head2 empty_trash() -> [status, msg, result, meta]
+=head2 empty_trash
+
+Usage:
+
+ empty_trash() -> [status, msg, result, meta]
 
 Empty trash.
 
@@ -279,7 +283,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_trash_contents() -> [status, msg, result, meta]
+=head2 list_trash_contents
+
+Usage:
+
+ list_trash_contents() -> [status, msg, result, meta]
 
 List contents of trash directory.
 
@@ -299,7 +307,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 trash(%args) -> [status, msg, result, meta]
+=head2 trash
+
+Usage:
+
+ trash(%args) -> [status, msg, result, meta]
 
 Trash a file.
 
@@ -360,7 +372,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 trash_files(%args) -> [status, msg, result, meta]
+=head2 trash_files
+
+Usage:
+
+ trash_files(%args) -> [status, msg, result, meta]
 
 Trash files (with undo support).
 
@@ -419,7 +435,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 untrash(%args) -> [status, msg, result, meta]
+=head2 untrash
+
+Usage:
+
+ untrash(%args) -> [status, msg, result, meta]
 
 Untrash a file.
 
@@ -488,7 +508,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-Trash
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-File-Trash-Undoable>.
+Source repository is at L<https://github.com/perlancar/perl-File-Trash-Undoable>.
 
 =head1 BUGS
 
@@ -524,7 +544,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

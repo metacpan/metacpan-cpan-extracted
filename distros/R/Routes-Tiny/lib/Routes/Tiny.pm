@@ -7,7 +7,7 @@ require Carp;
 require Scalar::Util;
 use Routes::Tiny::Pattern;
 
-our $VERSION = 0.19;
+our $VERSION = 0.21;
 
 sub new {
     my $class = shift;
@@ -17,6 +17,7 @@ sub new {
     bless $self, $class;
 
     $self->{strict_trailing_slash} = $params{strict_trailing_slash};
+    $self->{strict_case} = $params{strict_case};
     $self->{default_method} = $params{default_method};
 
     $self->{parent_pattern}        = undef;
@@ -24,21 +25,16 @@ sub new {
     $self->{names}                 = {};
     $self->{strict_trailing_slash} = 1
       unless defined $self->{strict_trailing_slash};
+    $self->{strict_case} = 1
+      unless defined $self->{strict_case};
 
     return $self;
 }
 
 sub add_route {
     my $self = shift;
-    my ($pattern, @args) = @_;
 
-    $pattern = $self->_build_pattern(
-        strict_trailing_slash => $self->{strict_trailing_slash},
-        default_method		  => $self->{default_method},
-        routes                => $self,
-        pattern               => $pattern,
-        @args
-    );
+    my $pattern = $self->_build_pattern(@_);
 
     push @{$self->{patterns}}, $pattern;
 
@@ -99,7 +95,31 @@ sub _register_pattern_name {
     }
 }
 
-sub _build_pattern { shift; return Routes::Tiny::Pattern->new(@_) }
+sub _build_pattern {
+    my $self = shift;
+
+    if (@_ % 2) {
+        unshift(@_, 'pattern');
+    } else {
+        my $method  = shift;
+        my $pattern = shift;
+
+        if ($method =~ /^(GET|HEAD|POST|PUT|DELETE|TRACE|OPTIONS|CONNECT|PATCH)$/i) {
+            unshift(@_, pattern => $pattern);
+            unshift(@_, method  => $method);
+        } else {
+            Carp::croak("Unknown pattern http method '$_[0]'");
+        }
+    }
+
+    return Routes::Tiny::Pattern->new(
+        strict_trailing_slash => $self->{strict_trailing_slash},
+        strict_case           => $self->{strict_case},
+        default_method        => $self->{default_method},
+        routes                => $self,
+        @_
+    )
+}
 
 1;
 __END__
@@ -137,6 +157,7 @@ Routes::Tiny - Routes
     my $captures_hashref = $match->captures;
 
     # Matching with method
+    $routes->add_route('/hello/world', method => 'GET');
     my $match = $routes->match('/hello/world', method => 'GET');
 
     # Subroutes
@@ -215,14 +236,20 @@ It is possible to specify a globbing placeholder.
 
 It is possible to pass arguments to the match object AS IS.
 
-=head2 C<Path building>
+=head2 C<Matching with methods>
 
-    $routes->add_route('/articles/:id', name => 'article');
+    # Exact HTTP method definition
+    $routes->add_route('/articles', method => 'GET', defaults => {action => 'list'});
 
-    $path = $routes->build_path('article', id => 123);
-    # $path is '/articles/123'
+    # Sweeter method definition
+    # METHOD => PATTERN should go as first parameters to add_route()
+    $routes->add_route(PUT => '/articles', defaults => {action => 'create'});
 
-It is possible to reconstruct a path from route's name and parameters.
+    $match = $routes->match('/articles', method => 'GET');
+    # $m->captures is {action => 'list'}
+
+    $match = $routes->match('/articles', method => 'PUT');
+    # $m->captures is {action => 'create'}
 
 =head2 C<Subroutes>
 
@@ -250,6 +277,15 @@ Parent routes mounts names of children routes, so it's possible to buil path
     $path = $routes->build_path('comments', type => 'articles', id => 123, page => 5);
     # $path is '/articles/123/comments/5/'
 
+=head2 C<Path building>
+
+    $routes->add_route('/articles/:id', name => 'article');
+
+    $path = $routes->build_path('article', id => 123);
+    # $path is '/articles/123'
+
+It is possible to reconstruct a path from route's name and parameters.
+
 =head1 WARNINGS
 
 =head2 C<Trailing slash issue>
@@ -265,6 +301,20 @@ Trailing slash is important.
 If you don't want this behaviour pass C<strict_trailing_slash> to the constructor:
 
     my $routes = Routes::Tiny->new(strict_trailing_slash => 0);
+
+=head2 C<Case sensitivity>
+
+Routes::Tiny is case sensitive by default (since 0.20).
+
+It means that
+
+    $routes->add_route('/admin/');
+
+will NOT match both C</admin/> and C</ADMIN/>.
+
+If you don't want this behaviour pass C<strict_case> to the constructor:
+
+    my $routes = Routes::Tiny->new(strict_case => 0);
 
 =head1 METHODS
 

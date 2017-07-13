@@ -51,6 +51,7 @@ lib/Pcore/App/API/Auth/Cache.pm
 lib/Pcore/App/API/Auth/Request.pm
 lib/Pcore/App/API/Backend.pm
 lib/Pcore/App/API/Backend/Local.pm
+lib/Pcore/App/API/Backend/Local/pgsql.pm
 lib/Pcore/App/API/Backend/Local/sqlite.pm
 lib/Pcore/App/API/Backend/Local/sqlite/App.pm
 lib/Pcore/App/API/Backend/Local/sqlite/AppInstance.pm
@@ -89,8 +90,8 @@ lib/Pcore/Core/Exception.pm
 lib/Pcore/Core/Exception/Object.pm
 lib/Pcore/Core/Exporter.pm
 lib/Pcore/Core/Guard.pm
-lib/Pcore/Core/I18N.pm
 lib/Pcore/Core/Inline.pm
+lib/Pcore/Core/L10N.pm
 lib/Pcore/Core/PerlIOviaWinUniCon.pm
 lib/Pcore/Core/Types.pm
 lib/Pcore/Dist.pm
@@ -148,7 +149,6 @@ lib/Pcore/Util/Class.pm
 lib/Pcore/Util/Config.pm
 lib/Pcore/Util/Config/INI.pm
 lib/Pcore/Util/Data.pm
-lib/Pcore/Util/Data/I18N.pm
 lib/Pcore/Util/Date.pm
 lib/Pcore/Util/Date/Strptime.pm
 lib/Pcore/Util/Digest.pm
@@ -221,10 +221,6 @@ share/data/web2.ini
 share/dist-id.json
 share/dist.perl
 share/docker.json
-share/i18n/en_US.mo
-share/i18n/en_US.po
-share/i18n/ru_RU.mo
-share/i18n/ru_RU.po
 share/pcore/dist/CHANGES
 share/pcore/dist/TODO.txt
 share/pcore/dist/bin/main.pl
@@ -233,7 +229,8 @@ share/pcore/dist/cpanfile
 share/pcore/dist/lib/Build.PL
 share/pcore/dist/lib/_MainModule.pm
 share/pcore/dist/share/_dist.perl
-share/pcore/dist/share/i18n/README.md
+share/pcore/dist/share/l10n/README.md
+share/pcore/dist/share/l10n/l10n.pot
 share/pcore/dist/share/tmpl/README.md
 share/pcore/dist/t/001.t
 share/pcore/dist/t/README.md

@@ -1,7 +1,6 @@
 use Test2::V0;
+use Test::Alien::Build;
 use Alien::Build::Plugin::Download::Negotiate;
-use lib 't/lib';
-use MyTest;
 use Path::Tiny;
 use Capture::Tiny qw( capture_merged );
 use Alien::Build::Util qw( _dump );
@@ -92,6 +91,16 @@ subtest 'get the version' => sub {
   };
   
   is($build->runtime_prop->{version}, '1.00');
+  
+  my $filename = $build->install_prop->{download};
+  
+  ok(-f $filename, "tarball downloaded");
+  note "filename = $filename";
+  
+  my $orig = path('corpus/dist/foo-1.00.tar.gz');
+  my $new  = path($filename);
+  
+  is($new->slurp, $orig->slurp, 'content of file is the same');
 
 };
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Tester 6.009;
+package Dist::Zilla::App::Tester 6.010;
 # ABSTRACT: testing library for Dist::Zilla::App
 
 use parent 'App::Cmd::Tester::CaptureExternal';
@@ -43,7 +43,7 @@ sub test_dzil {
 }
 
 {
-  package Dist::Zilla::App::Tester::Result 6.009;
+  package Dist::Zilla::App::Tester::Result 6.010;
 
   BEGIN { our @ISA = qw(App::Cmd::Tester::Result); }
 
@@ -126,7 +126,7 @@ Dist::Zilla::App::Tester - testing library for Dist::Zilla::App
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 DESCRIPTION
 

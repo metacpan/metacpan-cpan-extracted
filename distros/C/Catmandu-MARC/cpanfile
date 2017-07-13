@@ -12,7 +12,7 @@ on 'test', sub {
 };
 
 requires 'Carp', '0';
-requires 'Catmandu', '>=1.0601';
+requires 'Catmandu', '>=1.0602';
 requires 'JSON::XS', '2.3';
 requires 'YAML::XS', '0.34';
 requires 'List::Util', '0';

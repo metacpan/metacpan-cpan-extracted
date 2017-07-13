@@ -4,7 +4,7 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 my %mocked;
 sub new {
@@ -72,6 +72,11 @@ sub mock {
 		TRACE("Installing mocked $sub_name");
 		_replace_sub($sub_name, $code);
 	}
+}
+
+sub noop {
+    my $self = shift;
+    $self->mock($_,1) for @_;
 }
 
 sub original {
@@ -185,7 +190,7 @@ Test::MockModule - Override subroutines in a module for unit testing
 	use Foo;
 	use Test::MockModule;
 	{
-		my $mock = Test::MockModule('Foo');
+		my $mock = Test::MockModule->new('Foo');
 		$mock->mock(foo => sub { print "Foo!\n"; });
 
 		my $foo = Foo->new();
@@ -326,6 +331,14 @@ C<unmock()> in one go.
 Restores all the subroutines in the package that were mocked. This is
 automatically called when all C<Test::MockObject> objects for the given package
 go out of scope.
+
+=item noop($subroutine [, ...])
+
+Given a list of subroutine names, mocks each of them with a no-op subroutine. Handy
+for mocking methods you want to ignore!
+
+    # Neuter a list of methods in one go
+    $module->noop('purge', 'updated');
 
 =back
 

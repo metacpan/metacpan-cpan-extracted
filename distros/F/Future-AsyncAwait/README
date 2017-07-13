@@ -79,6 +79,11 @@ DESCRIPTION
     early, returning a pending future instance, it is only allowed inside
     async-marked subs.
 
+    The converse is not true; just because a function is marked as async
+    does not require it to make use of the await expression. It is still
+    useful to turn the result of that function into a future, entirely
+    without awaiting on any itself.
+
 EARLY-VERSION WARNING
 
     WARNING: The actual semantics in this module are in an early state of

@@ -10,10 +10,10 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
-our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi );
+our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log );
 
 
 sub requires
@@ -282,6 +282,12 @@ sub meta_prop
 }
 
 
+sub log
+{
+  unshift @_, 'Alien::Build';
+  goto &Alien::Build::log;
+}
+
 sub import
 {
   strict->import;
@@ -303,7 +309,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 0.55
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -626,6 +632,12 @@ Get the meta_prop hash reference.
  my $meta = meta;
 
 Returns the meta object for your L<alienfile>.
+
+=head2 log
+
+ log($message);
+
+Prints the given log to stdout.
 
 =head1 SEE ALSO
 

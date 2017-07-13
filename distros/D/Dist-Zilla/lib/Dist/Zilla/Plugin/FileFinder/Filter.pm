@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FileFinder::Filter 6.009;
+package Dist::Zilla::Plugin::FileFinder::Filter 6.010;
 # ABSTRACT: filter matches from other FileFinders
 
 use Moose;
@@ -103,7 +103,7 @@ Dist::Zilla::Plugin::FileFinder::Filter - filter matches from other FileFinders
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package Perinci::Examples::Stream;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010;
 use strict;
@@ -368,7 +368,7 @@ Perinci::Examples::Stream - Examples for streaming input/output
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::Stream (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::Stream (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -378,7 +378,11 @@ This package contains functions that demonstrate streaming input/output.
 =head1 FUNCTIONS
 
 
-=head2 count_ints(%args) -> [status, msg, result, meta]
+=head2 count_ints
+
+Usage:
+
+ count_ints(%args) -> [status, msg, result, meta]
 
 This function accepts a stream of integers and return the number of integers input.
 
@@ -406,7 +410,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 count_lines(%args) -> [status, msg, result, meta]
+=head2 count_lines
+
+Usage:
+
+ count_lines(%args) -> [status, msg, result, meta]
 
 Count number of lines in the input.
 
@@ -434,7 +442,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 count_words(%args) -> [status, msg, result, meta]
+=head2 count_words
+
+Usage:
+
+ count_words(%args) -> [status, msg, result, meta]
 
 This function receives a stream of words and return the number of words.
 
@@ -462,7 +474,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 produce_hashes(%args) -> [status, msg, result, meta]
+=head2 produce_hashes
+
+Usage:
+
+ produce_hashes(%args) -> [status, msg, result, meta]
 
 This function produces a stream of hashes.
 
@@ -492,7 +508,11 @@ that contains extra information.
 Return value:  (array[hash])
 
 
-=head2 produce_ints(%args) -> [status, msg, result, meta]
+=head2 produce_ints
+
+Usage:
+
+ produce_ints(%args) -> [status, msg, result, meta]
 
 This function produces a stream of integers, starting from 1.
 
@@ -522,7 +542,11 @@ that contains extra information.
 Return value:  (array[int])
 
 
-=head2 produce_words(%args) -> [status, msg, result, meta]
+=head2 produce_words
+
+Usage:
+
+ produce_words(%args) -> [status, msg, result, meta]
 
 This function produces a stream of random words.
 
@@ -552,7 +576,11 @@ that contains extra information.
 Return value:  (array[str])
 
 
-=head2 produce_words_err(%args) -> [status, msg, result, meta]
+=head2 produce_words_err
+
+Usage:
+
+ produce_words_err(%args) -> [status, msg, result, meta]
 
 Like `produce_words()`, but 1 in every 10 words will be a non-word (which fails the result schema).
 
@@ -582,7 +610,11 @@ that contains extra information.
 Return value:  (array[str])
 
 
-=head2 square_nums(%args) -> [status, msg, result, meta]
+=head2 square_nums
+
+Usage:
+
+ square_nums(%args) -> [status, msg, result, meta]
 
 This function squares its stream input.
 
@@ -608,7 +640,11 @@ that contains extra information.
 Return value:  (array[float])
 
 
-=head2 square_nums_from_file(%args) -> [status, msg, result, meta]
+=head2 square_nums_from_file
+
+Usage:
+
+ square_nums_from_file(%args) -> [status, msg, result, meta]
 
 This function squares its stream input.
 
@@ -634,7 +670,11 @@ that contains extra information.
 Return value:  (array[float])
 
 
-=head2 square_nums_from_stdin(%args) -> [status, msg, result, meta]
+=head2 square_nums_from_stdin
+
+Usage:
+
+ square_nums_from_stdin(%args) -> [status, msg, result, meta]
 
 This function squares its stream input.
 
@@ -660,7 +700,11 @@ that contains extra information.
 Return value:  (array[float])
 
 
-=head2 square_nums_from_stdin_or_file(%args) -> [status, msg, result, meta]
+=head2 square_nums_from_stdin_or_file
+
+Usage:
+
+ square_nums_from_stdin_or_file(%args) -> [status, msg, result, meta]
 
 This function squares its stream input.
 
@@ -686,7 +730,11 @@ that contains extra information.
 Return value:  (array[float])
 
 
-=head2 wc(%args) -> [status, msg, result, meta]
+=head2 wc
+
+Usage:
+
+ wc(%args) -> [status, msg, result, meta]
 
 Count the number of lines/words/characters of input, like the "wc" command.
 
@@ -712,7 +760,11 @@ that contains extra information.
 Return value:  (hash)
 
 
-=head2 wc_keys(%args) -> [status, msg, result, meta]
+=head2 wc_keys
+
+Usage:
+
+ wc_keys(%args) -> [status, msg, result, meta]
 
 Count the number of keys of each hash.
 
@@ -762,7 +814,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

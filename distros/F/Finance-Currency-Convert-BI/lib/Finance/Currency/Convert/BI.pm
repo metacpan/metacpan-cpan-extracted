@@ -1,12 +1,12 @@
 package Finance::Currency::Convert::BI;
 
-our $DATE = '2016-07-29'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use DateTime::Format::Indonesian;
 use Parse::Number::ID qw(parse_number_id);
@@ -87,7 +87,7 @@ Finance::Currency::Convert::BI - Get/convert currencies from website of Indonesi
 
 =head1 VERSION
 
-This document describes version 0.03 of Finance::Currency::Convert::BI (from Perl distribution Finance-Currency-Convert-BI), released on 2016-07-29.
+This document describes version 0.04 of Finance::Currency::Convert::BI (from Perl distribution Finance-Currency-Convert-BI), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,11 @@ B<EARLY RELEASE>.
 =head1 FUNCTIONS
 
 
-=head2 get_jisdor_rates(%args) -> [status, msg, result, meta]
+=head2 get_jisdor_rates
+
+Usage:
+
+ get_jisdor_rates(%args) -> [status, msg, result, meta]
 
 Get JISDOR USD-IDR rates.
 
@@ -155,7 +159,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

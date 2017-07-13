@@ -1,0 +1,71 @@
+NAME
+    Log::ger::Like::Log4perl - Mimic Log::Log4perl
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     use Log::ger::Like::Log4perl;
+
+     sub mysub {
+         DEBUG "Entering mysub ...";
+         ...
+     }
+
+     my $log = Log::ger::Like::Log4perl->get_logger;
+
+     $log->log($WARN, "Blah ...");
+     $log->logdie("Blah ...");
+     $log->logwarn("Blah ...");
+     $log->error_die("Blah ...");
+     $log->error_warn("Blah ...");
+
+     $log->logcarp("Blah ...");
+     $log->logcluck("Blah ...");
+     $log->logcroak("Blah ...");
+     $log->logconfess("Blah ...");
+
+DESCRIPTION
+    This module does the following to mimic Log::Log4perl to a certain
+    extent:
+
+    *   Log4perl-like formatting
+
+         $log->warn("a", "b", sub { "c", "d" })
+
+        will format the message as "abcd".
+
+    *   Uppercase subroutine names
+
+        This module provides uppercase subroutine names: TRACE, DEBUG, INFO,
+        ERROR, WARN, FATAL like what you get when you "use Log::Log4perl
+        ':easy'" instead of the Log::ger default log_trace(), log_debug(),
+        log_info(), log_warn(), log_error(), log_fatal().
+
+        It also provides LOGDIE and LOGWARN.
+
+    *   Export level constants
+
+        It exports the log level values: $TRACE, $DEBUG, $INFO, $WARN,
+        $ERROR, $FATAL.
+
+    *   Additional logging methods
+
+        It provides additional log methods: log(), logdie(), logwarn(),
+        error_warn(), error_die(), logcarp(), logcluck(), logcroak(),
+        logconfess() like you would get in Log4perl.
+
+SEE ALSO
+    Log::ger
+
+    Log::Log4perl and Log::Log4perl::Tiny
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

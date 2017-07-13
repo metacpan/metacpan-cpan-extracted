@@ -18,8 +18,7 @@ our $AUTOLOAD;
 sub puke(@);
 sub belch(@);
 
-our $VERSION='0.1001';
-our $VERSION='0.1001';
+our $VERSION='0.1002';
 
 # let an Abstract object keep its own stacks of clauses
 # rather than clearing an existing Abstract object, get
@@ -395,6 +394,9 @@ an expression in L<SQL::Abstract> style. (The parser is a complete
 reimplementation, so some idioms in that style may not result in
 exactly the same productions.)
 
+For details on writing expressions, see
+L<Neo4j::Cypher::Abstract::Peeler/"Expressing Expressions">.
+
 =head2 Parameters
 
 Parameters in Cypher are named, and given as alphanumeric tokens
@@ -518,13 +520,17 @@ Render the Cypher statement as a string. Overloads C<"">.
 
 =head1 SEE ALSO
 
-L<REST::Neo4p>, L<DBD::Neo4p>, L<SQL::Abstract>
+L<Neo4j::Cypher::Pattern>, L<Neo4j::Cypher::Abstract::Peeler/"Expressing Expressions">, L<REST::Neo4p>, L<DBD::Neo4p>, L<SQL::Abstract>
 
 =head1 AUTHOR
 
  Mark A. Jensen
  CPAN: MAJENSEN
  majensen -at- cpan -dot- org
+
+=head1 LICENSE
+
+This software is provided for use under the terms of Perl itself.
 
 =head1 COPYRIGHT
 

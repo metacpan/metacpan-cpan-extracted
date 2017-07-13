@@ -1,0 +1,26 @@
+---
+abstract: 'Lint an xml file using xmllint'
+author:
+  - philiprbrenan@gmail.com
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Edit-Xml-Lint
+provides:
+  Data::Edit::Xml::Lint:
+    file: lib/Data/Edit/Xml/Lint.pm
+    version: '2017.714'
+requires:
+  Carp: '0'
+  Data::Table::Text: '0'
+  POSIX: '0'
+  XML::Parser: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '2017.714'

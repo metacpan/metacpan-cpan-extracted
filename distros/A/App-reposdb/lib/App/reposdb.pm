@@ -1,12 +1,12 @@
 package App::reposdb;
 
-our $DATE = '2016-06-15'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 our %SPEC;
 
@@ -419,7 +419,7 @@ App::reposdb - Manipulate repos.db
 
 =head1 VERSION
 
-This document describes version 0.004 of App::reposdb (from Perl distribution App-reposdb), released on 2016-06-15.
+This document describes version 0.005 of App::reposdb (from Perl distribution App-reposdb), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -439,7 +439,11 @@ C<repos.db> is faster than having to C<git status> or even stat() each repositor
 =head1 FUNCTIONS
 
 
-=head2 add_repo_tag(%args) -> [status, msg, result, meta]
+=head2 add_repo_tag
+
+Usage:
+
+ add_repo_tag(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -467,7 +471,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_repos(%args) -> [status, msg, result, meta]
+=head2 list_repos
+
+Usage:
+
+ list_repos(%args) -> [status, msg, result, meta]
 
 List repositories registered in repos.db.
 
@@ -501,7 +509,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 remove_all_repo_tags(%args) -> [status, msg, result, meta]
+=head2 remove_all_repo_tags
+
+Usage:
+
+ remove_all_repo_tags(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -527,7 +539,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 remove_repo_tag(%args) -> [status, msg, result, meta]
+=head2 remove_repo_tag
+
+Usage:
+
+ remove_repo_tag(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -555,7 +571,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 touch_repo(%args) -> [status, msg, result, meta]
+=head2 touch_repo
+
+Usage:
+
+ touch_repo(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -610,7 +630,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

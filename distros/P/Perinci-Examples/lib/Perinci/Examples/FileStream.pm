@@ -1,7 +1,7 @@
 package Perinci::Examples::FileStream;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010;
 use strict;
@@ -49,7 +49,7 @@ are translated into HTTP chunks.
 _
 };
 sub read_file {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::str;my $arg_err; if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
 
     my $path = $args{path};
     (-f $path) or return [404, "No such file '$path'"];
@@ -90,7 +90,7 @@ _
     },
 };
 sub write_file {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::buf;my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');require Data::Sah::Compiler::perl::TH::str;if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
 
     my $path = $args{path};
 
@@ -126,7 +126,7 @@ _
     },
 };
 sub append_file {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::buf;my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');require Data::Sah::Compiler::perl::TH::str;if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
 
     my $path = $args{path};
 
@@ -162,7 +162,7 @@ Perinci::Examples::FileStream - Examples for reading/writing files (using stream
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::FileStream (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::FileStream (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -179,7 +179,11 @@ instead of streaming.
 =head1 FUNCTIONS
 
 
-=head2 append_file(%args) -> [status, msg, result, meta]
+=head2 append_file
+
+Usage:
+
+ append_file(%args) -> [status, msg, result, meta]
 
 This is like C<write_file()> except that it appends instead of overwrites
 existing file.
@@ -208,7 +212,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 read_file(%args) -> [status, msg, result, meta]
+=head2 read_file
+
+Usage:
+
+ read_file(%args) -> [status, msg, result, meta]
 
 This function demonstrate output streaming of bytes.
 
@@ -242,7 +250,11 @@ that contains extra information.
 Return value:  (buf)
 
 
-=head2 write_file(%args) -> [status, msg, result, meta]
+=head2 write_file
+
+Usage:
+
+ write_file(%args) -> [status, msg, result, meta]
 
 This function demonstrates input streaming of bytes.
 
@@ -307,7 +319,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

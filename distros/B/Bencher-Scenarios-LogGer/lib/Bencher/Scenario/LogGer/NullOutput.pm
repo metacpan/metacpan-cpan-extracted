@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::NullOutput;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -95,7 +95,7 @@ Bencher::Scenario::LogGer::NullOutput - Benchmark Log::ger logging speed with th
 
 =head1 VERSION
 
-This document describes version 0.009 of Bencher::Scenario::LogGer::NullOutput (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-02.
+This document describes version 0.010 of Bencher::Scenario::LogGer::NullOutput (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
 
 =head1 SYNOPSIS
 
@@ -121,11 +121,11 @@ L<Log::Log4perl> 1.47
 
 L<Log::Log4perl::Tiny> 1.4.0
 
-L<Log::ger> 0.012
+L<Log::ger> 0.016
 
-L<Log::ger::Plugin::MultilevelLog> 0.012
+L<Log::ger::Plugin::MultilevelLog> 0.016
 
-L<Log::ger::Plugin::OptAway> 0.003
+L<Log::ger::Plugin::OptAway> 0.004
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -244,23 +244,23 @@ Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2
 Benchmark with default options (C<< bencher -m LogGer::NullOutput >>):
 
  #table1#
- +------------------------------------------+-----------+-----------+------------+-----------+---------+
- | participant                              | rate (/s) | time (ms) | vs_slowest |  errors   | samples |
- +------------------------------------------+-----------+-----------+------------+-----------+---------+
- | Log::Log4perl::Tiny-1mil_trace           |     0.842 |      1190 |       1    |   0.00025 |       6 |
- | Log::Any-null_adapter-1mil_log_trace     |     1.43  |       700 |       1.7  |   0.00036 |       6 |
- | Log::Fast-1mil_is_debug                  |     2.03  |       492 |       2.41 |   0.00019 |       6 |
- | Log::Any-null_adapter-1mil_is_trace      |     2.4   |       410 |       2.9  |   0.00054 |       6 |
- | Log::Any-no_adapter-1mil_is_trace        |     2.5   |       410 |       2.9  |   0.00059 |       6 |
- | Log::Log4perl-easy-1mil_trace            |     3.28  |       305 |       3.89 |   0.00024 |       8 |
- | Log::Any-no_adapter-1mil_log_trace       |     6.6   |       150 |       7.8  |   0.00035 |       6 |
- | Log::Fast-1mil_DEBUG                     |     6.8   |       150 |       8.1  |   0.00019 |       8 |
- | Log::ger+LGP:MutilevelLog-1mil_log_trace |     9.7   |       100 |      11    |   0.00038 |       7 |
- | Log::ger+LGP:MutilevelLog-1mil_log_6     |     9.7   |       100 |      11    |   0.00014 |       6 |
- | Log::ger-1mil_log_is_trace               |     9.98  |       100 |      11.8  | 8.9e-05   |       6 |
- | Log::ger-1mil_log_trace                  |    10     |       100 |      12    |   0.0004  |       7 |
- | Log::ger+LGP:OptAway-1mil_log_trace      |    22     |        45 |      26    |   0.00023 |       6 |
- +------------------------------------------+-----------+-----------+------------+-----------+---------+
+ +------------------------------------------+-----------+-----------+------------+---------+---------+
+ | participant                              | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+ +------------------------------------------+-----------+-----------+------------+---------+---------+
+ | Log::Log4perl::Tiny-1mil_trace           |     0.792 |      1260 |       1    | 0.00066 |       6 |
+ | Log::Any-null_adapter-1mil_log_trace     |     1.3   |       760 |       1.7  | 0.0012  |       6 |
+ | Log::Fast-1mil_is_debug                  |     1.9   |       520 |       2.4  | 0.0015  |       6 |
+ | Log::Any-no_adapter-1mil_is_trace        |     2     |       500 |       3    | 0.0075  |       6 |
+ | Log::Any-null_adapter-1mil_is_trace      |     2.3   |       440 |       2.9  | 0.00099 |       8 |
+ | Log::Log4perl-easy-1mil_trace            |     3.1   |       323 |       3.92 | 0.00029 |       6 |
+ | Log::Any-no_adapter-1mil_log_trace       |     6.1   |       160 |       7.7  | 0.00057 |       6 |
+ | Log::Fast-1mil_DEBUG                     |     6.5   |       150 |       8.2  | 0.00041 |       6 |
+ | Log::ger+LGP:MutilevelLog-1mil_log_6     |     8     |       100 |      10    | 0.0013  |       6 |
+ | Log::ger+LGP:MutilevelLog-1mil_log_trace |     8.8   |       110 |      11    | 0.001   |       8 |
+ | Log::ger-1mil_log_trace                  |    10     |        97 |      13    | 0.00028 |       6 |
+ | Log::ger-1mil_log_is_trace               |    11     |        92 |      14    | 0.00028 |       6 |
+ | Log::ger+LGP:OptAway-1mil_log_trace      |    21     |        49 |      26    | 0.00032 |       6 |
+ +------------------------------------------+-----------+-----------+------------+---------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.

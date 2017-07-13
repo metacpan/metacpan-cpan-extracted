@@ -1,5 +1,11 @@
 use strict;
 use warnings;
-use Test::More tests => 1;
+use Test::More;
 
-require_ok 'Alien::libuv';
+use Alien::libuv;
+
+diag "Install type: ".Alien::libuv->install_type;
+
+pass 'OK';
+
+done_testing();

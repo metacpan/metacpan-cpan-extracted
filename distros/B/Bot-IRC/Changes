@@ -1,5 +1,9 @@
 Revision history for Bot::IRC
 
+1.16      2017-07-11 17:05:59-04:00 America/New_York
+        - Add Try::Tiny blocks for most evals and include headers in error
+          messages to provide a little more context on errors
+
 1.15      2017-06-28 19:30:42-04:00 America/New_York
         - Improve bot's ability to be addressed and respond
         - Fix bug that would throw undef hash ref error for missing vars() vars

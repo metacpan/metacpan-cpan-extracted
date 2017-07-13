@@ -7,7 +7,7 @@ use warnings;
 
 use Math::Expression;
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -43,7 +43,7 @@ Bot::IRC::Math - Bot::IRC evaluate math expressions and return results
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 

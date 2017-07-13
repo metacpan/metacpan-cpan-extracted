@@ -1,0 +1,104 @@
+# This file acts as the project's changelog.
+
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix my:      <http://purl.org/NET/cpan-uri/dist/JSON-Path/> .
+
+my:v_0-080_00
+	a               :Version ;
+	dc:issued       "2010-07-28"^^xsd:date ;
+	:revision       "0.080_00"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.080_00.tar.gz> ;
+	rdfs:label      "Ported from PHP."@en .
+
+my:v_0-080_01
+	a               :Version ;
+	dc:issued       "2010-07-29"^^xsd:date ;
+	:revision       "0.080_01"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.080_01.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-080_00 ;
+		dcs:item   [ rdfs:label "Fix license metadata in distribution."@en ; a dcs:Bugfix ]
+		] .
+
+my:v_0-100
+	a               :Version ;
+	dc:issued       "2010-08-25"^^xsd:date ;
+	:revision       "0.100"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.100.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-080_01 ;
+		dcs:item   [ rdfs:label "Support for JSON::JOM."@en ; a dcs:Update ] ;
+		dcs:item   [ rdfs:label "Minor documentation improvements."@en ] ;
+		] .
+
+my:v_0-101
+	a               :Version ;
+	dc:issued       "2011-09-29"^^xsd:date ;
+	:revision       "0.101"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.101.tar.gz> ;
+	dcs:changeset [
+		dcs:versus my:v_0-100 ;
+		dcs:item   [ rdfs:label "Fix retrieval of zeroth array element."@en ; a dcs:Bugfix ] ;
+		dcs:item   [ rdfs:label "Add more test cases."@en ; a dcs:Packaging ] ;
+		] .
+
+my:project :release my:v_0-080_00, my:v_0-080_01, my:v_0-100, my:v_0-101.
+
+# Pretdsl below here...
+
+`JSON-Path 0.200 cpan:TOBYINK`
+	issued  2012-09-12;
+	changeset [
+		item "Switch from Error.pm exceptions to Carp::croak."^^Update;
+		item "Drop dependency on common::sense."^^Packaging;
+		item "Modernize."^^Packaging;
+	].
+
+`JSON-Path 0.201 cpan:TOBYINK`
+	issued  2012-09-12;
+	changeset [
+		item "Remove remaining `use Error` in test suite."^^Bugfix;
+	].
+
+`JSON-Path 0.202 cpan:TOBYINK`
+	issued  2012-10-12;
+	changeset [
+		item "`value` method."^^Addition;
+		item "`map` method."^^Addition;
+		item "`get` and `set` methods."^^Addition;
+		item "`jpath`, `jpath1` and `jpath_map` functions."^^Addition;
+	].
+
+`JSON-Path 0.203 cpan:TOBYINK`
+	issued  2012-10-12;
+	changeset [
+		item "Minor corrections to pod."^^Documentation;
+	].
+
+`JSON-Path 0.204 cpan:TOBYINK`
+	issued  2013-02-14;
+	changeset [
+		item "Corrections to lvalue documentation."^^Documentation;
+		item "Add documentation to test suite."^^Documentation;
+		item [
+			a          dcs:Bugfix;
+			label      "Fix `set` method which was broken in some circumstances.";
+			dcs:fixes  RT#83249;
+			dcs:thanks [ a foaf:Person; foaf:name "Mitsuhiro Nakamura" ];
+		];
+	].
+
+`JSON-Path 0.205 cpan:TOBYINK`
+	issued  2013-11-02;
+	changeset [
+		item "Use Dist::Inkt."^^Packaging;
+		item "Use LV instead of lvalue.pm."^^Change;
+		item "Use Exporter::Tiny instead of Sub::Exporter."^^Change;
+		item [
+			a          dcs:Bugfix;
+			label      "Fix problem using JSON::Path with Devel::ptkdb.";
+			dcs:fixes  RT#89393;
+			dcs:thanks [ a foaf:Person; foaf:name "Henri-Damien Laurent" ];
+		];
+	].
+

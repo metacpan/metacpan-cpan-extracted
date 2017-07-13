@@ -22,14 +22,14 @@ no_index:
 provides:
   App::Music::ChordPro::Wx:
     file: lib/App/Music/ChordPro/Wx.pm
-    version: '0.74'
+    version: '0.79'
   wxchordpro:
     file: script/wxchordpro
-    version: '0.74'
+    version: '0.79'
 requires:
-  App::Music::ChordPro: '0.70'
+  App::Music::ChordPro: '0.79'
   Wx: '0.9912'
 resources:
   homepage: http://www.chordpro.org
-version: '0.74'
+version: '0.79'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Base';
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 has marc_path      => (fix_arg => 1);
 has path           => (fix_arg => 1);
@@ -33,7 +33,7 @@ sub emit {
                             '-pluck'         => $self->pluck  // 0 ,
                             '-nested_arrays' => $self->nested_arrays // 0 ,
                             '-value'         => $self->value ,
-                            '-force_array'   => ($key =~ /^(\$.*|\d+)$/) ? 1 : 0
+                            '-force_array'   => ($key =~ /^(\$.*|[0-9]+)$/) ? 1 : 0
                         });
 
     my $var           = $fixer->var;
@@ -43,10 +43,10 @@ sub emit {
     my $perl = "";
     $perl .= $fixer->emit_declare_vars($current_value, "[]");
     $perl .=<<EOF;
-if (my ${result} = ${marc}->marc_map(
+if (defined(my ${result} = ${marc}->marc_map(
             ${var},
             ${marc_path},
-            ${marc_opt}) ) {
+            ${marc_opt})) ) {
     ${result} = ref(${result}) ? ${result} : [${result}];
     for ${current_value} (\@{${result}}) {
 EOF

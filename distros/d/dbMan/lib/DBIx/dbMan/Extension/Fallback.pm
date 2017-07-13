@@ -21,7 +21,7 @@ sub handle_action {
 	# Not handled command
 	if ($action{action} eq 'COMMAND') {
 		$action{action} = 'OUTPUT';
-		$action{output} = "Unknown command.\n";
+		$action{output} = "Unknown command (".$action{cmd}.").\n";
 		delete $action{processed};
 	} elsif (not $action{action}) {	# internal - incorrect handling of action
 		$obj->{-interface}->print("INTERNAL: Action not correctly handled by some extension!\n");

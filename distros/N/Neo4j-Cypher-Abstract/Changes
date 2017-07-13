@@ -1,4 +1,6 @@
 Revision history for Perl module Neo4j::Cypher::Abstract
+0.1002 2017-07-11
+    - Improve (slightly) POD
 0.1001 2017-07-08
     - Enforce List::Util version 1.33+
 0.1000 2017-05-28

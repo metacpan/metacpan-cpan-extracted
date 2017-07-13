@@ -7,7 +7,7 @@ use Test::More 0.96;
 
 use File::chdir;
 use File::Path qw(remove_tree);
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Temp qw(tempdir);
 use Setup::File::Symlink qw(setup_symlink);
 use Test::Perinci::Tx::Manager qw(test_tx_action);
@@ -71,7 +71,7 @@ test_tx_action(
     name          => "replace file",
     tmpdir        => $tmpdir,
     reset_state   => sub {
-        remove_tree "s"; write_file "s", "";
+        remove_tree "s"; write_text "s", "";
     },
     f             => "Setup::File::Symlink::setup_symlink",
     args          => {symlink=>"$tmpdir/s", target=>"/t2", replace_file=>1},
@@ -80,7 +80,7 @@ test_tx_action(
     name          => "do not replace file",
     tmpdir        => $tmpdir,
     reset_state   => sub {
-        remove_tree "s"; write_file "s", "";
+        remove_tree "s"; write_text "s", "";
     },
     f             => "Setup::File::Symlink::setup_symlink",
     args          => {symlink=>"$tmpdir/s", target=>"/t2"},
@@ -90,7 +90,7 @@ test_tx_action(
     name          => "replace dir",
     tmpdir        => $tmpdir,
     reset_state   => sub {
-        remove_tree "s"; mkdir "s"; write_file "s/f", "";
+        remove_tree "s"; mkdir "s"; write_text "s/f", "";
     },
     f             => "Setup::File::Symlink::setup_symlink",
     args          => {symlink=>"$tmpdir/s", target=>"/t2", replace_dir=>1},
@@ -99,7 +99,7 @@ test_tx_action(
     name          => "do not replace dir",
     tmpdir        => $tmpdir,
     reset_state   => sub {
-        remove_tree "s"; mkdir "s"; write_file "s/f", "";
+        remove_tree "s"; mkdir "s"; write_text "s/f", "";
     },
     f             => "Setup::File::Symlink::setup_symlink",
     args          => {symlink=>"$tmpdir/s", target=>"/t2"},
@@ -135,7 +135,7 @@ test_tx_action(
     name          => "unfixable: should_exist=0, exists (file)",
     tmpdir        => $tmpdir,
     reset_state   => sub {
-        remove_tree "s"; write_file "s", "";
+        remove_tree "s"; write_text "s", "";
     },
     f             => "Setup::File::Symlink::setup_symlink",
     args          => {symlink=>"$tmpdir/s", should_exist=>0},
@@ -145,7 +145,7 @@ test_tx_action(
     name          => "fixable: should_exist=0, exists (file) -> removed",
     tmpdir        => $tmpdir,
     reset_state   => sub {
-        remove_tree "s"; write_file "s", "";
+        remove_tree "s"; write_text "s", "";
     },
     f             => "Setup::File::Symlink::setup_symlink",
     args          => {symlink=>"$tmpdir/s", should_exist=>0, replace_file=>1},

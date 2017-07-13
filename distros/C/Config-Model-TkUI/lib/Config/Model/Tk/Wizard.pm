@@ -9,7 +9,7 @@
 #
 
 package Config::Model::Tk::Wizard;
-$Config::Model::Tk::Wizard::VERSION = '1.362';
+$Config::Model::Tk::Wizard::VERSION = '1.363';
 use strict;
 use warnings;
 use Carp;
@@ -51,7 +51,7 @@ sub Populate {
             or croak "Missing $parm arg\n";
     }
 
-    foreach my $parm (qw/-from_widget -stop_on_important -store_cb -show_cb -end_cb/) {
+    foreach my $parm (qw/-from_widget -stop_on_important -store_cb -show_cb -end_cb -font/) {
         my $attr = $parm;
         $attr =~ s/^-//;
         $cw->{$attr} = delete $args->{$parm};
@@ -67,26 +67,29 @@ sub Populate {
 
     $cw->Label(
         -text => "Configuration of " . $cw->{root}->config_class_name,
-        -font => [ -size => 20 ],
     )->pack;
 
     my $ed = $cw->{ed_frame} = $cw->Frame->pack(qw/-pady 0 -fill both -expand 1 -anchor n/);
     $cw->{ed_frame}->packPropagate(0);
 
     $args->{-title} = $title;
-    $cw->SUPER::Populate($args);
 
     $cw->Advertise( ed_frame => $ed, );
 
     $cw->ConfigSpecs(
+        -font => [['SELF','DESCENDANTS'], 'font','Font', $cw->{font} ],
 
         #-background => ['DESCENDANTS', 'background', 'Background', $background],
         #-selectbackground => [$hlist, 'selectBackground', 'SelectBackground',
         #                      $selectbackground],
         -width  => [ $ed, undef, undef, 600 ],
         -height => [ $ed, undef, undef, 400 ],
-        DEFAULT => [$ed] );
+        DEFAULT => [$ed]
+    );
 
+    $cw->{font} //= $cw->cget('-font');
+
+    $cw->SUPER::Populate($args);
 }
 
 sub save {
@@ -107,6 +110,7 @@ sub leaf_cb {
     $cw->{ed_w} = $cw->{ed_frame}->ConfigModelLeafEditor(
         -item     => $leaf_object,
         -store_cb => $cw->{store_cb},
+        -font     => $cw->{font},
     )->pack(@fbe1);
 }
 
@@ -120,6 +124,7 @@ sub list_element_cb {
     $cw->{ed_w} = $cw->{ed_frame}->ConfigModelListEditor(
         -item     => $obj,
         -store_cb => $cw->{store_cb},
+        -font     => $cw->{font},
     )->pack(@fbe1);
 }
 
@@ -133,6 +138,7 @@ sub hash_element_cb {
     $cw->{ed_w} = $cw->{ed_frame}->ConfigModelHashEditor(
         -item     => $obj,
         -store_cb => $cw->{store_cb},
+        -font     => $cw->{font},
     )->pack(@fbe1);
 }
 
@@ -146,6 +152,7 @@ sub check_list_element_cb {
     $cw->{ed_w} = $cw->{ed_frame}->ConfigModelCheckListEditor(
         -item     => $obj,
         -store_cb => $cw->{store_cb},
+        -font     => $cw->{font},
     )->pack(@fbe1);
 }
 
@@ -160,20 +167,25 @@ sub prepare_wizard {
     my $edf = $cw->{ed_frame};
 
     my $textw =
-        $edf->ROText( qw/-relief flat -wrap word -height 8/, -font => [ -family => 'Arial' ] );
+        $edf->ROText( qw/-relief flat -wrap word -height 8/, -font => $cw->{font});
     $textw->insert( end => $text );
     $textw->pack( qw/-side top -anchor n/, @fxe1 );
 
     my $stop_on_warn = 0;
-    $edf->Checkbutton( -text => 'stop on warning', -variable => \$stop_on_warn )
+    $edf->Checkbutton( -text => 'stop on warning', -variable => \$stop_on_warn , -font => $cw->{font})
         ->pack(qw/-side top -anchor w/);
 
     $edf->Button(
         -text    => 'OK',
-        -command => sub { $cw->start_wizard($stop_on_warn) } )->pack(qw/-side right -anchor e/);
+        -font => $cw->{font},
+        -command => sub { $cw->start_wizard($stop_on_warn) }
+    )->pack(qw/-side right -anchor e/);
+
     $edf->Button(
         -text    => 'cancel',
-        -command => sub { $cw->destroy_wizard() } )->pack(qw/-side left -anchor w/);
+        -font => $cw->{font},
+        -command => sub { $cw->destroy_wizard() }
+    )->pack(qw/-side left -anchor w/);
 }
 
 sub start_wizard {
@@ -184,6 +196,7 @@ sub start_wizard {
 
     my $back = $button_f->Button(
         -text    => 'Back',
+        -font => $cw->{font},
         -command => sub {
             $cw->{keep_wiz_editor} = 0;
             $cw->{ed_w}->store if $cw->{ed_w}->can('store');
@@ -193,6 +206,7 @@ sub start_wizard {
 
     my $stop = $button_f->Button(
         -text    => 'Store and stop',
+        -font => $cw->{font},
         -command => sub {
             $cw->{ed_w}->store if $cw->{ed_w}->can('store');
             $cw->{keep_wiz_editor} = 0;
@@ -202,6 +216,7 @@ sub start_wizard {
 
     my $quit = $button_f->Button(
         -text    => 'quit wizard',
+        -font => $cw->{font},
         -command => sub {
             $cw->{keep_wiz_editor} = 0;
             $cw->{wizard}->bail_out;
@@ -210,6 +225,7 @@ sub start_wizard {
 
     my $forw = $button_f->Button(
         -text    => 'Next',
+        -font => $cw->{font},
         -command => sub {
             $cw->{keep_wiz_editor} = 0;
             $cw->{ed_w}->store if $cw->{ed_w}->can('store');

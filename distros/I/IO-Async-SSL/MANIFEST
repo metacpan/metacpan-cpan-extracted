@@ -22,5 +22,6 @@ t/11listen-openssl.t
 t/11listen-socat.t
 t/20stream.t
 t/99pod.t
+t/dhparam.pem
 t/privkey.pem
 t/server.pem

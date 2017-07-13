@@ -1,0 +1,71 @@
+{
+   "abstract" : "Probe for GnuWin32 packages using the Windows registry",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Build-Plugin-Probe-GnuWin32",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build" : "0.57",
+            "Alien::Build::Plugin" : "0",
+            "Capture::Tiny" : "0",
+            "Module::Load" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Alien-Build-Plugin-Probe-GnuWin32/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Alien::Build::Plugin::Probe::GnuWin32",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Alien-Build-Plugin-Probe-GnuWin32.git",
+         "web" : "https://github.com/plicease/Alien-Build-Plugin-Probe-GnuWin32"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
+   },
+   "version" : "0.59",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::bencher;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to Bencher
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::bencher - More lcpan subcommands related to Bencher
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::CmdBundle::bencher (from Perl distribution App-lcpan-CmdBundle-bencher), released on 2017-01-25.
+This document describes version 0.002 of App::lcpan::CmdBundle::bencher (from Perl distribution App-lcpan-CmdBundle-bencher), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -28,9 +28,9 @@ This bundle provides the following lcpan subcommands:
 
 =over
 
-=item * L<lcpan bencher-scenario-mods|App::lcpan::Cmd::bencher_scenario_mods>
-
 =item * L<lcpan bencher-scenarios-for-mod|App::lcpan::Cmd::bencher_scenarios_for_mod>
+
+=item * L<lcpan bencher-scenario-mods|App::lcpan::Cmd::bencher_scenario_mods>
 
 =item * L<lcpan bencher-benched-mods|App::lcpan::Cmd::bencher_benched_mods>
 

@@ -70,7 +70,7 @@ use Moo;
 use Catmandu::Importer::MARC::Decoder;
 use MARC::File::XML (BinaryEncoding => 'UTF-8', DefaultEncoding => 'UTF-8', RecordFormat => 'MARC21');
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 with 'Catmandu::Importer';
 
@@ -88,7 +88,7 @@ sub generator {
 
     # MARC::File doesn't provide support for inline files
     $file = $self->decoder->fake_marc_file($self->fh,'MARC::File::XML') unless $file;
-    
+
     sub  {
       $self->decoder->decode($file->next(),$self->id);
     }

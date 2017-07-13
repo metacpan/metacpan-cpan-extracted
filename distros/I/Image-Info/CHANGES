@@ -1,5 +1,19 @@
 Revision history for Image::Info
 
+2017-07-12  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.41
+
+    Stable release with the change in 1.40_50
+
+    Additionally more diagnostics in t/string.t
+
+2017-06-30  Slaven Rezic  <slaven@rezic.de>
+
+    Release 1.40_50
+
+    Support iTXt chunks in PNGs (RT #122285) (by Nicholas Clark)
+
 2017-03-21  Slaven Rezic  <slaven@rezic.de>
 
     Release 1.40

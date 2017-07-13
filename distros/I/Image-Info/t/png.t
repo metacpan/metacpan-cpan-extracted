@@ -7,7 +7,7 @@ use strict;
 
 BEGIN
    {
-   plan tests => 19;
+   plan tests => 22;
    chdir 't' if -d 't';
    use lib '../lib';
    use_ok ("Image::Info") or die($@);
@@ -60,3 +60,28 @@ SKIP:
 	   die ("Couldn't read ztxt.png: $!");
        is ($i->{comment}, "some image comment\n", 'ztxt comment');
     }
+
+#############################################################################
+# itxt tests
+SKIP:
+    {
+       skip 'Need Encode for this itxt test', 2
+	   if !eval { require Encode; 1 };
+
+       # test files generated with pngcrush, which actually honours the spec:
+       $i = image_info("../img/itxt.png") ||
+	   die ("Couldn't read itxt.png: $!");
+       is ($i->{Comment}, "\x{1F42A}", 'itxt comment');
+       # keywords such as Comment are case sensitive.
+
+       skip 'Need Compress::Zlib for this itxt test', 2
+	   if !eval { require Compress::Zlib; 1 };
+
+       $i = image_info("../img/itxt2.png") ||
+	   die ("Couldn't read itxt2.png: $!");
+       is ($i->{Comment}, "Perl Rules", 'compressed itxt comment');
+
+       $i = image_info("../img/itxt3.png") ||
+	   die ("Couldn't read itxt3.png: $!");
+       is ($i->{Comment}, "\x{2E18}Success\x{203D}", 'compressed itxt comment');
+   }

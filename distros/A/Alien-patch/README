@@ -4,14 +4,14 @@ NAME
 
 VERSION
 
-    version 0.11
+    version 0.12
 
 SYNOPSIS
 
      use Alien::patch ();
      use Env qw( @PATH );
      
-     unshift @ENV, Alien::patch->bin_dir;
+     unshift @PATH, Alien::patch->bin_dir;
      my $patch = Alien::patch->exe;
      system "$patch -p1 < foo.patch";
 
@@ -83,7 +83,11 @@ CAVEATS
 
 AUTHOR
 
-    Graham Ollis <plicease@cpan.org>
+    Author: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Zakariyya Mughal
 
 COPYRIGHT AND LICENSE
 

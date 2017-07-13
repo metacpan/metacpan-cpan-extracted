@@ -5,8 +5,7 @@ use strict;
 use warnings;
 use overload '""' => 'as_string';
 
-our $VERSION = '0.1001';
-our $VERSION = '0.1001';
+our $VERSION = '0.1002';
 our @EXPORT_OK = qw/pattern ptn/;
 
 sub puke(@);
@@ -247,7 +246,7 @@ render the Cypher pattern
 
 In C<Neo4j::Cypher::Pattern>, we do
 
- $p = Neo4j::Cypher::Pattern->new()->N('b',{name=>'Slate')
+ $p = Neo4j::Cypher::Pattern->new()->N('b',{name=>'Slate'})
       ->R('<:WORKS_FOR')->N('a',{name => 'Fred'})
       ->R(':KNOWS>')->N('c',{name=>'Barney'});
  print "$p\n"; # "" is overloaded by $p->as_string()
@@ -266,7 +265,8 @@ In pattern productions, values for properties will be quoted by
 default with single quotes (single quotes that are present will be
 escaped) unless the values are numeric.
 
-To prevent quoting Cypher statement list variable names (for example), make the name an argument to the pattern I<constructor>:
+To prevent quoting Cypher statement list variable names (for example),
+make the name an argument to the pattern I<constructor>:
 
  ptn('event')->N('y')->R("<:IN")->N('e:Event'=> { id => 'event.id' });
 
@@ -334,6 +334,10 @@ L<Neo4j::Cypher::Abstract>
  Mark A. Jensen
  CPAN: MAJENSEN
  majensen -at- cpan -dot- org
+
+=head1 LICENSE
+
+This software is provided for use under the terms of Perl itself.
 
 =head1 COPYRIGHT
 

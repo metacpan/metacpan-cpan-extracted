@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic::Role::Help;
 
-our $DATE = '2016-12-15'; # DATE
-our $VERSION = '1.73'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '1.74'; # VERSION
 
 # split here just so it's more organized
 
@@ -515,7 +515,7 @@ Perinci::CmdLine::Classic::Role::Help - Help-related routines
 
 =head1 VERSION
 
-This document describes version 1.73 of Perinci::CmdLine::Classic::Role::Help (from Perl distribution Perinci-CmdLine-Classic), released on 2016-12-15.
+This document describes version 1.74 of Perinci::CmdLine::Classic::Role::Help (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-10.
 
 =for Pod::Coverage ^(.+)$
 
@@ -552,7 +552,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

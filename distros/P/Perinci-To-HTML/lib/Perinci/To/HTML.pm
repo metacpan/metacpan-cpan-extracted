@@ -1,10 +1,10 @@
 package Perinci::To::HTML;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo;
 
 use Locale::TextDomain::UTF8 'Perinci-To-HTML';
@@ -213,7 +213,7 @@ Perinci::To::HTML - Generate HTML documentation from Rinci package metadata
 
 =head1 VERSION
 
-This document describes version 0.04 of Perinci::To::HTML (from Perl distribution Perinci-To-HTML), released on 2015-09-04.
+This document describes version 0.05 of Perinci::To::HTML (from Perl distribution Perinci-To-HTML), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -243,7 +243,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

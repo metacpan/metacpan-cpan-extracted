@@ -1,11 +1,11 @@
 package Text::ANSITable;
 
-our $DATE = '2016-03-11'; # DATE
-our $VERSION = '0.48'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.49'; # VERSION
 
 use 5.010001;
 use Carp;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo;
 use experimental 'smartmatch';
 
@@ -1671,7 +1671,7 @@ Text::ANSITable - Create nice formatted tables using extended ASCII and ANSI col
 
 =head1 VERSION
 
-This document describes version 0.48 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2016-03-11.
+This document describes version 0.49 of Text::ANSITable (from Perl distribution Text-ANSITable), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -2039,10 +2039,13 @@ value for this style setting will be passed to L<Data::Unixish::Apply>'s
 C<apply()>, as the C<functions> argument. So it should be a single string (like
 C<date>) or an array (like C<< ['date', ['centerpad', {width=>20}]] >>).
 
-See L<Data::Unixish> or install L<App::dux> and then run C<dux -l> to see what
-functions are available. Functions of interest to formatting data include:
-C<bool>, C<num>, C<sprintf>, C<sprintfn>, C<wrap>, C<ANSI::*> (in
-L<Data::Unixish::ANSI>), (among others).
+L<Data::Unixish::Apply> is an optional prerequisite, so you will need to install
+it separately if you need this feature.
+
+To see what functions are available, install L<App::dux> and then run C<dux -l>.
+Functions of interest to formatting data include: C<bool>, C<num>, C<sprintf>,
+C<sprintfn>, C<wrap>, C<ANSI::*> (in L<Data::Unixish::ANSI> distribution),
+(among others).
 
 =head1 CONDITIONAL STYLES
 
@@ -2927,7 +2930,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

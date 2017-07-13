@@ -3,7 +3,6 @@
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
 
 use FindBin '$Bin';
 use lib $Bin, "$Bin/t";

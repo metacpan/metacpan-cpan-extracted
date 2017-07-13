@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::SessionFactory;
 # ABSTRACT: Role for session factories
-$Dancer2::Core::Role::SessionFactory::VERSION = '0.205000';
+$Dancer2::Core::Role::SessionFactory::VERSION = '0.205001';
 use Moo::Role;
 with 'Dancer2::Core::Role::Engine';
 
@@ -11,6 +11,7 @@ use Digest::SHA 'sha1';
 use List::Util 'shuffle';
 use MIME::Base64 'encode_base64url';
 use Module::Runtime 'require_module';
+use Ref::Util qw< is_ref is_arrayref is_hashref >;
 
 sub hook_aliases { +{} }
 sub supported_hooks {
@@ -163,7 +164,7 @@ sub retrieve {
     my %args = ( id => $id, );
 
     $args{data} = $data
-      if $data and ref $data eq 'HASH';
+      if $data and is_hashref($data);
 
     $args{expires} = $self->cookie_duration
       if $self->has_cookie_duration;
@@ -235,7 +236,7 @@ sub cookie {
     my ( $self, %params ) = @_;
     my $session = $params{session};
     croak "cookie() requires a valid 'session' parameter"
-      unless ref($session) && $session->isa("Dancer2::Core::Session");
+      unless is_ref($session) && $session->isa("Dancer2::Core::Session");
 
     my %cookie = (
         value     => $session->id,
@@ -262,7 +263,7 @@ sub sessions {
     my $sessions = $self->_sessions;
 
     croak "_sessions() should return an array ref"
-      if ref($sessions) ne ref( [] );
+      unless is_arrayref($sessions);
 
     return $sessions;
 }
@@ -281,7 +282,7 @@ Dancer2::Core::Role::SessionFactory - Role for session factories
 
 =head1 VERSION
 
-version 0.205000
+version 0.205001
 
 =head1 DESCRIPTION
 
@@ -475,7 +476,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexis Sukrieh.
+This software is copyright (c) 2017 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

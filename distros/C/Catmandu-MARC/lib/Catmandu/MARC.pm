@@ -15,7 +15,7 @@ memoize('compile_marc_path');
 memoize('parse_marc_spec');
 memoize('_get_index_range');
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 sub marc_map {
     my $self      = $_[0];
@@ -349,7 +349,7 @@ sub marc_set {
         $value = $last;
     }
 
-    my $context = $self->compile_marc_path($marc_path, subfield_wildcard => 1);
+    my $context = $self->compile_marc_path($marc_path, subfield_default => 1);
 
     confess "invalid marc path" unless $context;
 
@@ -983,7 +983,7 @@ sub compile_marc_path {
     my ($field,$field_regex,$ind1,$ind2,
         $subfield,$subfield_regex,$from,$to,$len,$is_regex_field);
 
-    my $MARC_PATH_REGEX = qr/(\S{1,3})(\[([^,])?,?([^,])?\])?([\$_a-z0-9^]+)?(\/(\d+)(-(\d+))?)?/;
+    my $MARC_PATH_REGEX = qr/(\S{1,3})(\[([^,])?,?([^,])?\])?([\$_a-z0-9^]+)?(\/([0-9]+)(-([0-9]+))?)?/;
     if ($marc_path =~ $MARC_PATH_REGEX) {
         $field          = $1;
         $ind1           = $3;
@@ -997,7 +997,7 @@ sub compile_marc_path {
             }
         }
         elsif ($opts{subfield_default}) {
-            $subfield = $field =~ /^0|LDR/ ? '_' : 'a';
+            $subfield = $field =~ /^0|LDR|FMT/ ? '_' : 'a';
         }
         elsif ($opts{subfield_wildcard}) {
             $subfield = '[a-z0-9_]';
@@ -1043,6 +1043,7 @@ sub marc_copy {
     my $data       = $_[1];
     my $marc_path  = $_[2];
     my $marc_value = $_[3];
+    my $is_cut     = $_[4];
 
     # $_[2] : marc_path
     my $context = ref($marc_path) ? $marc_path : $self->compile_marc_path($_[2], subfield_wildcard => 0);
@@ -1054,24 +1055,32 @@ sub marc_copy {
 
     return wantarray ? () : undef unless (defined $record && ref($record) eq 'ARRAY');
 
+    # When is_cut is on, we need to create a new record containing the remaining fields
+    my @new_record = ();
+
     my $fields = [];
 
     for my $field (@$record) {
         my ($tag, $ind1, $ind2, @subfields) = @$field;
 
-        next if (
+        if (
             ($context->{is_regex_field} == 0 && $tag ne $context->{field} )
             ||
             ($context->{is_regex_field} == 1 && $tag !~ $context->{field_regex} )
-        );
+        ) {
+            push @new_record , $field if $is_cut;
+            next;
+        }
 
         if (defined $context->{ind1}) {
             if (!defined $ind1 || $ind1 ne $context->{ind1}) {
+                push @new_record , $field if $is_cut;
                 next;
             }
         }
         if (defined $context->{ind2}) {
             if (!defined $ind2 || $ind2 ne $context->{ind2}) {
+                push @new_record , $field if $is_cut;
                 next;
             }
         }
@@ -1088,7 +1097,11 @@ sub marc_copy {
                     }
                 }
             }
-            next unless $found;
+
+            unless ($found) {
+                push @new_record , $field if $is_cut;
+                next;
+            }
         }
         else {
             if (defined($marc_value)) {
@@ -1099,7 +1112,10 @@ sub marc_copy {
 
                 my $string = join "", @sf;
 
-                next unless ($string =~ /$marc_value/);
+                unless ($string =~ /$marc_value/) {
+                    push @new_record , $field if $is_cut;
+                    next;
+                }
             }
         }
 
@@ -1133,6 +1149,10 @@ sub marc_copy {
         }
 
         push(@$fields, $f);
+    }
+
+    if ($is_cut) {
+        $data->{record} = \@new_record;
     }
 
     [$fields];
@@ -1347,6 +1367,8 @@ Catmandu::MARC - Catmandu modules for working with MARC data
 =item * L<Catmandu::Fix::marc_set>
 
 =item * L<Catmandu::Fix::marc_copy>
+
+=item * L<Catmandu::Fix::marc_cut>
 
 =item * L<Catmandu::Fix::marc_paste>
 

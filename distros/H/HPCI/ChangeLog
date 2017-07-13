@@ -1,3 +1,8 @@
+0.53 - added file_system_delay attribute to allow shared file system to have a
+       delay before a change made on another node is sure to be visible
+	 - use this delay when checking that required output files have been
+	   update
+
 0.52 - script file was being generated before all of the stage roles had been
        loaded
      - fixed some tests

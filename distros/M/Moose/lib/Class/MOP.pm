@@ -1,5 +1,5 @@
 package Class::MOP;
-our $VERSION = '2.2005';
+our $VERSION = '2.2006';
 
 use strict;
 use warnings;
@@ -796,7 +796,7 @@ Class::MOP - A Meta Object Protocol for Perl 5
 
 =head1 VERSION
 
-version 2.2005
+version 2.2006
 
 =head1 DESCRIPTION
 
@@ -1118,8 +1118,6 @@ L<http://citeseer.ist.psu.edu/37617.html>
 =item The Perl 6 MetaModel work in the Pugs project
 
 =over 4
-
-=item L<http://svn.openfoundry.org/pugs/misc/Perl-MetaModel/>
 
 =item L<http://github.com/perl6/p5-modules/tree/master/Perl6-ObjectSpace/>
 

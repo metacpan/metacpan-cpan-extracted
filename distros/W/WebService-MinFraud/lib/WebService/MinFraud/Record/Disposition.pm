@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::Disposition;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
 use Types::UUID;
 use WebService::MinFraud::Types qw( Str );
@@ -36,7 +36,7 @@ WebService::MinFraud::Record::Disposition - The disposition for the request as s
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SYNOPSIS
 

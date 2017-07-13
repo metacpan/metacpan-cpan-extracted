@@ -12,10 +12,10 @@ if (!which("rsync")) {
     plan skip_all => "Can't find rsync";
 }
 
-use File::Temp     qw(tempdir);
-use File::Which    qw(which);
-use File::RsyBak   qw(backup);
-use File::Slurp::Tiny qw(write_file);
+use File::Temp    qw(tempdir);
+use File::Which   qw(which);
+use File::RsyBak  qw(backup);
+use File::Slurper qw(write_text);
 use String::ShellQuote;
 
 my $tmpdir = tempdir(CLEANUP => 1);
@@ -113,12 +113,12 @@ sub prepare_source {
     mkdir "src1";
     mkdir "src1/dir1";
     mkdir "src1/dir1/dir2";
-    write_file("src1/file1", "test1");
-    write_file("src1/dir1/file2", "test2");
-    write_file("src1/dir1/dir2/file3", "test3");
+    write_text("src1/file1", "test1");
+    write_text("src1/dir1/file2", "test2");
+    write_text("src1/dir1/dir2/file3", "test3");
 
     mkdir "src2";
-    write_file("src2/file1", "TEST1");
+    write_text("src2/file1", "TEST1");
 }
 
 sub delete_source {

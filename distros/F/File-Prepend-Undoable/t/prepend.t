@@ -9,7 +9,7 @@ use lib $Bin, "$Bin/t";
 
 use File::chdir;
 use File::Path qw(remove_tree);
-use File::Slurp::Tiny qw(read_file write_file);
+use File::Slurper qw(read_text write_text);
 use File::Temp qw(tempdir);
 use File::Prepend::Undoable;
 use Test::More 0.98;
@@ -57,7 +57,7 @@ test_tx_action(
     args          => {path=>"p", string=>"foo"},
     reset_state   => sub {
         remove_tree "p";
-        write_file "p", "foo bar";
+        write_text "p", "foo bar";
     },
     status        => 304,
 );
@@ -68,20 +68,20 @@ test_tx_action(
     args          => {path=>"p", string=>"foo"},
     reset_state   => sub {
         remove_tree "p";
-        write_file "p", "bar";
+        write_text "p", "bar";
         chmod 0614, "p";
     },
     after_do      => sub {
         my @st = stat "p";
         ok( (-f _), "file exists");
         is($st[2] & 07777, 0614, "file mode");
-        is(scalar(read_file "p"), "foobar", "string prepended");
+        is(read_text("p"), "foobar", "string prepended");
     },
     after_undo    => sub {
         my @st = stat "p";
         ok( (-f _), "file exists");
         is($st[2] & 07777, 0614, "file mode");
-        is(scalar(read_file "p"), "bar", "file content is restored");
+        is(read_text("p"), "bar", "file content is restored");
     },
 );
 

@@ -6,7 +6,6 @@ use warnings;
 
 use DBI;
 use DBIx::FunctionalAPI;
-use File::Slurp::Tiny;
 use File::Write::Rotate;
 use Perinci::Access::Base::Patch::PeriAHS;
 use Plack::Builder;

@@ -31,7 +31,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "2017.704"
+         "version" : "2017.714"
       }
    },
    "release_status" : "stable",
@@ -40,5 +40,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2017.704"
+   "version" : "2017.714"
 }

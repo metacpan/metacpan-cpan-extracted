@@ -4,11 +4,15 @@ use 5.008007;
 use strict;
 use warnings;
 
-use SPVM::Data;
+use SPVM::BaseObject;
+use SPVM::Object;
+use SPVM::ArrayObject;
 
 use Carp 'croak';
 
-our $VERSION = '0.0213';
+my $INT_MAX = 2147483647;
+
+our $VERSION = '0.0218';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
@@ -35,6 +39,150 @@ CHECK {
   
   # Free compiler
   free_compiler();
+}
+
+sub byte_array {
+  my $elements = shift;
+  
+  if (ref $elements ne 'ARRAY') {
+    croak "Argument must be array reference";
+  }
+  
+  my $length = @$elements;
+  
+  my $array_object = SPVM::ArrayObject->malloc_byte_array($length);
+  
+  $array_object->set_byte_array_elements($elements);
+  
+  return $array_object;
+}
+
+sub byte_array_len {
+  my $length = shift;
+  
+  my $array_object = SPVM::ArrayObject->malloc_byte_array($length);
+  
+  return $array_object;
+}
+
+sub short_array {
+  my $elements = shift;
+  
+  if (ref $elements ne 'ARRAY') {
+    croak "Argument must be array reference";
+  }
+  
+  my $length = @$elements;
+  
+  my $array_object = SPVM::ArrayObject->malloc_short_array($length);
+  
+  $array_object->set_short_array_elements($elements);
+  
+  return $array_object;
+}
+
+sub short_array_len {
+  my $length = shift;
+  
+  my $array_object = SPVM::ArrayObject->malloc_short_array($length);
+  
+  return $array_object;
+}
+
+sub int_array {
+  my $elements = shift;
+  
+  if (ref $elements ne 'ARRAY') {
+    croak "Argument must be array reference";
+  }
+  
+  my $length = @$elements;
+  
+  my $array_object = SPVM::ArrayObject->malloc_int_array($length);
+  
+  $array_object->set_int_array_elements($elements);
+  
+  return $array_object;
+}
+
+sub int_array_len {
+  my $length = shift;
+  
+  my $array_object = SPVM::ArrayObject->malloc_int_array($length);
+  
+  return $array_object;
+}
+
+sub long_array {
+  my $elements = shift;
+  
+  if (ref $elements ne 'ARRAY') {
+    croak "Argument must be array reference";
+  }
+  
+  my $length = @$elements;
+  
+  my $array_object = SPVM::ArrayObject->malloc_long_array($length);
+  
+  $array_object->set_long_array_elements($elements);
+  
+  return $array_object;
+}
+
+sub long_array_len {
+  my $length = shift;
+  
+  my $array_object = SPVM::ArrayObject->malloc_long_array($length);
+  
+  return $array_object;
+}
+
+sub float_array {
+  my $elements = shift;
+  
+  if (ref $elements ne 'ARRAY') {
+    croak "Argument must be array reference";
+  }
+  
+  my $length = @$elements;
+  
+  my $array_object = SPVM::ArrayObject->malloc_float_array($length);
+  
+  $array_object->set_float_array_elements($elements);
+  
+  return $array_object;
+}
+
+sub float_array_len {
+  my $length = shift;
+  
+  my $array_object = SPVM::ArrayObject->malloc_float_array($length);
+  
+  return $array_object;
+}
+
+sub double_array {
+  my $elements = shift;
+  
+  if (ref $elements ne 'ARRAY') {
+    croak "Argument must be array reference";
+  }
+  
+  my $length = @$elements;
+  
+  my $array_object = SPVM::ArrayObject->malloc_double_array($length);
+  
+  $array_object->set_double_array_elements($elements);
+  
+  return $array_object;
+}
+
+sub double_array_len {
+  my $length = shift;
+  
+  my $array_object = SPVM::ArrayObject->malloc_double_array($length);
+  
+  return $array_object;
 }
 
 sub import {
@@ -183,6 +331,16 @@ Declaration
   my $value : long;
   my $value : float;
   my $value : double;
+
+=head3 String type
+
+String type is string.
+
+This is same as byte[] at internal data structure.
+
+Declaration
+
+  my $string : string;
 
 =head3 Reference type
 
@@ -384,6 +542,46 @@ Absolute name is combination of package name and subroutine name, or package nam
 =head2 Limitation
 
 Object can't have object and array of object.
+
+If I have idea to implement weaken reference and implement weaken reference, this limitation is removed.
+
+=head2 FUNCTIONS
+
+=head2 byte_array
+
+Create byte array object
+
+  my $array_object = SPVM::byte_array([1, 2, 3]);
+
+=head2 short_array
+
+Create short array object
+
+  my $array_object = SPVM::short_array([1, 2, 3]);
+
+=head2 int_array
+
+Create int array object
+
+  my $array_object = SPVM::int_array([1, 2, 3]);
+
+=head2 long_array
+
+Create long array object
+
+  my $array_object = SPVM::long_array([1, 2, 3]);
+
+=head2 float_array
+
+Create float array object
+
+  my $array_object = SPVM::float_array([1, 2, 3]);
+
+=head2 double_array
+
+Create double array object
+
+  my $array_object = SPVM::double_array([1, 2, 3]);
 
 =head2 FAQ
 

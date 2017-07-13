@@ -1,13 +1,13 @@
 package Unix::Passwd::File;
 
-our $DATE = '2016-10-07'; # DATE
-our $VERSION = '0.23'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.24'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+#use Log::ger;
 
 use File::Flock::Retry;
 use List::Util qw(max first);
@@ -1936,7 +1936,7 @@ Unix::Passwd::File - Manipulate /etc/{passwd,shadow,group,gshadow} entries
 
 =head1 VERSION
 
-This document describes version 0.23 of Unix::Passwd::File (from Perl distribution Unix-Passwd-File), released on 2016-10-07.
+This document describes version 0.24 of Unix::Passwd::File (from Perl distribution Unix-Passwd-File), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -2009,7 +2009,11 @@ No caching is done so you should do your own if you need to.
 =head1 FUNCTIONS
 
 
-=head2 add_delete_user_groups(%args) -> [status, msg, result, meta]
+=head2 add_delete_user_groups
+
+Usage:
+
+ add_delete_user_groups(%args) -> [status, msg, result, meta]
 
 Add or delete user from one or several groups.
 
@@ -2061,7 +2065,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 add_group(%args) -> [status, msg, result, meta]
+=head2 add_group
+
+Usage:
+
+ add_group(%args) -> [status, msg, result, meta]
 
 Add a new group.
 
@@ -2122,7 +2130,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 add_user(%args) -> [status, msg, result, meta]
+=head2 add_user
+
+Usage:
+
+ add_user(%args) -> [status, msg, result, meta]
 
 Add a new user.
 
@@ -2246,7 +2258,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 add_user_to_group(%args) -> [status, msg, result, meta]
+=head2 add_user_to_group
+
+Usage:
+
+ add_user_to_group(%args) -> [status, msg, result, meta]
 
 Add user to a group.
 
@@ -2278,7 +2294,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 delete_group(%args) -> [status, msg, result, meta]
+=head2 delete_group
+
+Usage:
+
+ delete_group(%args) -> [status, msg, result, meta]
 
 Delete a group.
 
@@ -2315,7 +2335,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 delete_user(%args) -> [status, msg, result, meta]
+=head2 delete_user
+
+Usage:
+
+ delete_user(%args) -> [status, msg, result, meta]
 
 Delete a user.
 
@@ -2352,7 +2376,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 delete_user_from_group(%args) -> [status, msg, result, meta]
+=head2 delete_user_from_group
+
+Usage:
+
+ delete_user_from_group(%args) -> [status, msg, result, meta]
 
 Delete user from a group.
 
@@ -2384,7 +2412,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_group(%args) -> [status, msg, result, meta]
+=head2 get_group
+
+Usage:
+
+ get_group(%args) -> [status, msg, result, meta]
 
 Get group details by group name or gid.
 
@@ -2428,7 +2460,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_max_gid(%args) -> [status, msg, result, meta]
+=head2 get_max_gid
+
+Usage:
+
+ get_max_gid(%args) -> [status, msg, result, meta]
 
 Get maximum GID used.
 
@@ -2456,7 +2492,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_max_uid(%args) -> [status, msg, result, meta]
+=head2 get_max_uid
+
+Usage:
+
+ get_max_uid(%args) -> [status, msg, result, meta]
 
 Get maximum UID used.
 
@@ -2484,7 +2524,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_user(%args) -> [status, msg, result, meta]
+=head2 get_user
+
+Usage:
+
+ get_user(%args) -> [status, msg, result, meta]
 
 Get user details by username or uid.
 
@@ -2528,7 +2572,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_user_groups(%args) -> [status, msg, result, meta]
+=head2 get_user_groups
+
+Usage:
+
+ get_user_groups(%args) -> [status, msg, result, meta]
 
 Return groups which the user belongs to.
 
@@ -2571,7 +2619,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 group_exists(%args) -> bool
+=head2 group_exists
+
+Usage:
+
+ group_exists(%args) -> bool
 
 Check whether group exists.
 
@@ -2594,7 +2646,11 @@ Specify location of passwd files.
 Return value:  (bool)
 
 
-=head2 is_member(%args) -> bool
+=head2 is_member
+
+Usage:
+
+ is_member(%args) -> bool
 
 Check whether user is member of a group.
 
@@ -2617,7 +2673,11 @@ Specify location of passwd files.
 Return value:  (bool)
 
 
-=head2 list_groups(%args) -> [status, msg, result, meta]
+=head2 list_groups
+
+Usage:
+
+ list_groups(%args) -> [status, msg, result, meta]
 
 List Unix groups in group file.
 
@@ -2658,7 +2718,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_users(%args) -> [status, msg, result, meta]
+=head2 list_users
+
+Usage:
+
+ list_users(%args) -> [status, msg, result, meta]
 
 List Unix users in passwd file.
 
@@ -2699,7 +2763,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_users_and_groups(%args) -> [status, msg, result, meta]
+=head2 list_users_and_groups
+
+Usage:
+
+ list_users_and_groups(%args) -> [status, msg, result, meta]
 
 List Unix users and groups in passwd/group files.
 
@@ -2739,7 +2807,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 modify_group(%args) -> [status, msg, result, meta]
+=head2 modify_group
+
+Usage:
+
+ modify_group(%args) -> [status, msg, result, meta]
 
 Modify an existing group.
 
@@ -2801,7 +2873,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 modify_user(%args) -> [status, msg, result, meta]
+=head2 modify_user
+
+Usage:
+
+ modify_user(%args) -> [status, msg, result, meta]
 
 Modify an existing user.
 
@@ -2891,7 +2967,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 set_user_groups(%args) -> [status, msg, result, meta]
+=head2 set_user_groups
+
+Usage:
+
+ set_user_groups(%args) -> [status, msg, result, meta]
 
 Set the groups that a user is member of.
 
@@ -2927,7 +3007,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 set_user_password(%args) -> [status, msg, result, meta]
+=head2 set_user_password
+
+Usage:
+
+ set_user_password(%args) -> [status, msg, result, meta]
 
 Set user's password.
 
@@ -2966,7 +3050,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 user_exists(%args) -> bool
+=head2 user_exists
+
+Usage:
+
+ user_exists(%args) -> bool
 
 Check whether user exists.
 
@@ -3053,7 +3141,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

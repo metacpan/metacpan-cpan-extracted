@@ -18,22 +18,18 @@ Perinci::Access::Manual::FAQ - FAQs
 
 =head1 VERSION
 
-This document describes version 0.44 of Perinci::Access::Manual::FAQ (from Perl distribution Perinci-Access), released on 2015-12-17.
+This document describes version 0.45 of Perinci::Access::Manual::FAQ (from Perl distribution Perinci-Access), released on 2017-07-10.
 
 =head1 FAQ
 
 =head2 How do I debug my program?
 
-Most P::A libraries use L<Log::Any>, so you can see the logs they produce by any
-Log::Any consumer.
+Most P::A libraries use L<Log::ger>, so you can see the logs they produce by any
+Log::ger output.
 
 =head2 How about Riap client/server library in other languages?
 
 In PHP, take a look at Phinci.
-
-=head1 SEE ALSO
-
-L<Perinci::CmdLine::Manual>
 
 =head1 HOMEPAGE
 
@@ -51,13 +47,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Manual>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

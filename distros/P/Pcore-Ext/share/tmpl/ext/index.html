@@ -11,38 +11,7 @@
 : }
 
     <script type="text/javascript">
-
-: if $ext.overrides {
-        <: $ext.overrides | raw :>
-
-: }
-        Ext.Loader.setConfig({
-            enabled: true,
-            disableCaching: false,
-            paths: <: $ext.loader_path | raw :>
-        });
-
-        Ext.onReady(function() {
-            Ext.ariaWarn = Ext.emptyFn;
-
-: if $ext.static_classes {
-            // static classes
-            <: $ext.static_classes | raw :>
-
-: }
-: if $ext.api_map {
-            Ext.direct.Manager.addProvider(<: $ext.api_map | raw :>);
-
-: }
-            Ext.application({
-                extend: 'Ext.app.Application',
-                requires: ['<: $ext.viewport_class :>'],
-                name: '<: $ext.app_namespace :>',
-                appFolder: '.',
-                glyphFontFamily: 'FontAwesome',
-                mainView: '<: $ext.viewport_class :>',
-            });
-        });
+        <: $ext_app_js | raw :>;
     </script>
 </head>
 <body>

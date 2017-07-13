@@ -4,13 +4,13 @@
       "KMX <kmx@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4203",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Alien-FreeImage",
    "no_index" : {
@@ -51,14 +51,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Alien-FreeImage"
+         "web" : "https://github.com/kmx/alien-freeimage/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/kmx/alien-freeimage"
+         "url" : "https://github.com/kmx/alien-freeimage"
       }
    },
-   "version" : "0.011"
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

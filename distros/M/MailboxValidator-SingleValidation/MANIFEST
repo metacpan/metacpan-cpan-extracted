@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/MailboxValidator/SingleValidation.pm
+META.yml
+META.json
+README

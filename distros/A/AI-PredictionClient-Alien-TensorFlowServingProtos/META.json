@@ -1,0 +1,70 @@
+{
+   "abstract" : "Builds C++ client library for TensorFlow Serving.",
+   "author" : [
+      "Tom Stall <stall@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AI-PredictionClient-Alien-TensorFlowServingProtos",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.40",
+            "Alien::Build::MM" : "0.40",
+            "Alien::Google::GRPC" : "0",
+            "Archive::Extract" : "0",
+            "Env" : "0",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "0.40",
+            "Alien::Build::MM" : "0.40",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "Alien::Google::GRPC" : "0",
+            "base" : "0",
+            "perl" : "5.01",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/mountaintom/AI-PredictionClient-Alien-TensorFlowServingProtos",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mountaintom/AI-PredictionClient-Alien-TensorFlowServingProtos.git",
+         "web" : "https://github.com/mountaintom/AI-PredictionClient-Alien-TensorFlowServingProtos"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

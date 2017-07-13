@@ -1,12 +1,12 @@
 package Data::Sah::FormatJS;
 
-our $DATE = '2016-06-17'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Sah::FormatCommon;
 use IPC::System::Options;
@@ -46,7 +46,7 @@ sub gen_formatter {
     );
 
     if ($Log_Formatter_Code) {
-        $log->tracef("Formatter code (gen args: %s): %s", \%args, $code);
+        log_trace("Formatter code (gen args: %s): %s", \%args, $code);
     }
 
     return $code if $args{source};
@@ -92,7 +92,7 @@ Data::Sah::FormatJS - Generate formatter code
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::FormatJS (from Perl distribution Data-Sah-Format), released on 2016-06-17.
+This document describes version 0.003 of Data::Sah::FormatJS (from Perl distribution Data-Sah-Format), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -110,16 +110,20 @@ formatting modules.
 =head2 $Log_Formatter_Code => bool (default: from ENV or 0)
 
 If set to true, will log the generated formatter code (currently using
-L<Log::Any> at trace level). To see the log message, e.g. to the screen, you can
+L<Log::ger> at trace level). To see the log message, e.g. to the screen, you can
 use something like:
 
- % TRACE=1 perl -MLog::Any::Adapter=Screen -MData::Sah::FormatJS=gen_formatter \
-     -E'my $c = gen_formatter(...)'
+ % TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
+     -MData::Sah::FormatJS=gen_formatter -E'my $c = gen_formatter(...)'
 
 =head1 FUNCTIONS
 
 
-=head2 gen_formatter() -> any
+=head2 gen_formatter
+
+Usage:
+
+ gen_formatter() -> any
 
 Generate formatter code.
 
@@ -164,7 +168,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

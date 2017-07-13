@@ -1,7 +1,7 @@
 package Data::Sah::Coerce::perl::date::obj_DateTime;
 
-our $DATE = '2017-03-14'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use 5.010001;
 use strict;
@@ -61,7 +61,7 @@ Data::Sah::Coerce::perl::date::obj_DateTime - Coerce date from DateTime object
 
 =head1 VERSION
 
-This document describes version 0.021 of Data::Sah::Coerce::perl::date::obj_DateTime (from Perl distribution Data-Sah-Coerce), released on 2017-03-14.
+This document describes version 0.023 of Data::Sah::Coerce::perl::date::obj_DateTime (from Perl distribution Data-Sah-Coerce), released on 2017-07-10.
 
 =for Pod::Coverage ^(meta|coerce)$
 

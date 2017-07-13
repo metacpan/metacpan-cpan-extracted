@@ -51,7 +51,8 @@ do { my $x = {
                     },
        'test' => {
                    'recommends' => {
-                                     'CPAN::Meta' => '2.120900'
+                                     'CPAN::Meta' => '2.120900',
+                                     'FFI::Platypus' => '0'
                                    },
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '6.52',

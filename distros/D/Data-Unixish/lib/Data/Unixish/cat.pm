@@ -8,7 +8,7 @@ use warnings;
 
 use Data::Unixish::Util qw(%common_args);
 
-our $VERSION = '1.55'; # VERSION
+our $VERSION = '1.56'; # VERSION
 
 our %SPEC;
 
@@ -50,7 +50,7 @@ Data::Unixish::cat - Pass input unchanged
 
 =head1 VERSION
 
-This document describes version 1.55 of Data::Unixish::cat (from Perl distribution Data-Unixish), released on 2016-03-16.
+This document describes version 1.56 of Data::Unixish::cat (from Perl distribution Data-Unixish), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,11 @@ In command line:
 =head1 FUNCTIONS
 
 
-=head2 cat(%args) -> [status, msg, result, meta]
+=head2 cat
+
+Usage:
+
+ cat(%args) -> [status, msg, result, meta]
 
 Pass input unchanged.
 
@@ -106,7 +110,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Unixi
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Unixish>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Unixish>.
 
 =head1 BUGS
 
@@ -126,7 +130,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

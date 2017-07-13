@@ -4,7 +4,7 @@ package WebService::MinFraud::Types;
 use strict;
 use warnings;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
 use Sub::Quote qw( quote_sub );
 
@@ -100,7 +100,7 @@ WebService::MinFraud::Types - Custom types for the MaxMind minFraud service
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SUPPORT
 

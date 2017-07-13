@@ -2,23 +2,23 @@ requires "Alien::Base" => "0.038";
 requires "perl" => "5.006";
 
 on 'build' => sub {
-  requires "Alien::Build" => "0.27";
-  requires "Alien::Build::MM" => "0.25";
+  requires "Alien::Build" => "0.32";
+  requires "Alien::Build::MM" => "0.32";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "File::chdir" => "0";
 };
 
 on 'test' => sub {
   requires "Capture::Tiny" => "0";
-  requires "Test2::Suite" => "0.000060";
+  requires "Test2::V0" => "0.000060";
   requires "Test::Alien" => "0";
   requires "Test::More" => "0.94";
   requires "perl" => "5.006";
 };
 
 on 'configure' => sub {
-  requires "Alien::Build" => "0.27";
-  requires "Alien::Build::MM" => "0.25";
+  requires "Alien::Build" => "0.32";
+  requires "Alien::Build::MM" => "0.32";
   requires "ExtUtils::MakeMaker" => "6.52";
   requires "IPC::Cmd" => "0";
   requires "perl" => "5.006";

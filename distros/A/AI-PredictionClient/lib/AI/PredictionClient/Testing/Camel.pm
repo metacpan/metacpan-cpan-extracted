@@ -1,0 +1,183 @@
+use strict;
+use warnings;
+package AI::PredictionClient::Testing::Camel;
+$AI::PredictionClient::Testing::Camel::VERSION = '0.01';
+# ABSTRACT: Provides a camel image for testing  in various formats 
+use 5.010;
+use MIME::Base64 qw( encode_base64 decode_base64 );
+use Moo;
+
+my $camel_jpeg_b64;
+my $camel_png_b64;
+
+has camel_jpeg_ref => (
+  is      => 'lazy',
+  builder => 1,
+);
+
+sub _build_camel_jpeg_ref {
+  my $self = $_[0];
+  return \decode_base64(${ $self->camel_jpeg_b64_ref });
+}
+
+has camel_png_ref => (
+  is      => 'lazy',
+  builder => 1,
+);
+
+sub _build_camel_png_ref {
+  my $self = $_[0];
+  return \decode_base64(${ $self->camel_png_b64_ref });
+}
+
+has camel_jpeg_b64_ref => (
+  is      => 'ro',
+  default => sub { \$camel_jpeg_b64 },
+);
+
+has camel_png_b64_ref => (
+  is      => 'ro',
+  default => sub { \$camel_png_b64 },
+);
+
+$camel_jpeg_b64
+  = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkS
+Ew8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJ
+CQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy
+MjIyMjIyMjIyMjIyMjL/wAARCABAAEADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEA
+AAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIh
+MUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6
+Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZ
+mqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx
+8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREA
+AgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAV
+YnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hp
+anN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPE
+xcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD3
+yWWOCMySuqIvVmOAKzJfEulQsym6BZRkgKeB61c1DT4NStvIuN+wMGBRypBHuK4f
+V9DOm6lHCs7SWtwhIMiguMHlS3cciubEVKlNc0UrG1GEJu0nqd9bzLc20c6qyrIo
+YBuuDUlZPhq6F1oFqc/NEvlMO4K8fywfxq5e6jbWCgzyYY/dRRlm+gFbKa5VJszc
+XzcpaoriZdfk1C5dnLRwKcJCDjj1bHU/oP1qbTvEMlpciCVZJbZuhzlk/PqPb8q5
+1jKblY1eHmlc7Cio4Z4riISwuHQ9CKkrrMArG8S2Ut1p6y26b5rd94QDJdcYZR+H
+8q2aKmcVOLiyoycXdHnGmX15ZSSS6bMhhlxuVhuXI74yCD2qUzz3byXs0/mOw2se
+gGD0A7V1d/4Z0zUJWlkhaKZvvSQsUJPqexNcD4iK+HWuLCL7RPGv3GZgzZKgjPQd
+c/mK8qtRqU42bujup1IVJaLU3ooYfLBIAJ5qncyxxOBH98nA7VnWy61PYQSjSLth
+JGrqyAEEEZHQ0r6HrqsmoXsAtraFgShYM7Z4HAz0JHU1j7ObXwml4p6s1tN1h9D1
+VIZ332ty2H/6Ztjhv8f/AK1d7Xluk4n8T6Zay4eJ1kZ9w6gxtx+o/I16Foc5uNFt
+ZC247NufXBx/Su/BTbjZ/wBf1c5cTFJ3RoUUUV3HKFcQlv8A2w2u3LxBgbd0VTz8
+3VfxGxfyFdbqF/Dp1o08zgYHyqTgsfQVQ0IRWfh5LlyAHVriRh3zzn8gPyrColOa
+jfa7NYNxi2L4WkMnh21BGAm6NRn+FWIH6AVp3NvHd20lvKMpIu01keE5EfQ1SPG2
+OR1GDkcnd/WruraiunWZbrM/yxKO7U4SSpJy2sKSftGl3OFh097WaTVImD3dhMqs
+COCmNoP4ndkehHpz6Bp/kHT7d7aIRQyIJFQDGA3P9axr2yh0rwldpKR5kiZlcnOX
+bA6+g4H4VtWG3+zrbaML5S4GMcYFZ0Kfs3byLqz51csUUUV1GBXnsbW5ffPbxSNt
+25ZQTj0p0tpbzW4t5YI3hGAI2UFeOnFTUUrId2RQW8NrF5dvEkSZJ2ouBk1HLp9n
+NcLPLaxPMpBV2QEgjpg1ZoostguyG5tLa8QJcwRzKDkB1BANSqqooVQAoGAB0Apa
+KLdRXP/Z';
+
+$camel_png_b64
+  = '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';
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+AI::PredictionClient::Testing::Camel - Provides a camel image for testing  in various formats 
+
+=head1 VERSION
+
+version 0.01
+
+=head1 AUTHOR
+
+Tom Stall <stall@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Tom Stall.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

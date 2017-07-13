@@ -1,0 +1,70 @@
+{
+   "abstract" : "Retrieve PDF image and text data via MuPDF's mutool",
+   "author" : [
+      "Project Renard"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Renard-Incunabula-MuPDF-mutool",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::More" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::MuPDF" : "0.007",
+            "Capture::Tiny" : "0",
+            "Function::Parameters" : "0",
+            "Log::Any" : "0",
+            "Path::Tiny" : "0",
+            "Renard::Incunabula::Common::Setup" : "0",
+            "XML::Simple" : "0",
+            "constant" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::DPath" : "0",
+            "Renard::Incunabula::Devel::TestHelper" : "0",
+            "Test::Most" : "0",
+            "lib" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool.git",
+         "web" : "https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

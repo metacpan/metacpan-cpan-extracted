@@ -1,10 +1,10 @@
 package Software::Release::Watch::ExtractInfo::Filename;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo::Role;
 
 #my @archive_exts = qw(tar.gz tar.bz2 tar zip rar);
@@ -18,7 +18,7 @@ sub extract_info {
     my ($sel, $fn) = @_;
 
     unless ($fn =~ /\A(.+)-([0-9].+)\z/) {
-        $log->warnf("Can't parse filename: %s", $fn);
+        log_warn("Can't parse filename: %s", $fn);
         return;
     }
 
@@ -40,7 +40,7 @@ Software::Release::Watch::ExtractInfo::Filename - Parse releases from name like 
 
 =head1 VERSION
 
-This document describes version 0.04 of Software::Release::Watch::ExtractInfo::Filename (from Perl distribution Software-Release-Watch), released on 2015-09-04.
+This document describes version 0.05 of Software::Release::Watch::ExtractInfo::Filename (from Perl distribution Software-Release-Watch), released on 2017-07-10.
 
 =for Pod::Coverage extract_info
 
@@ -66,7 +66,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

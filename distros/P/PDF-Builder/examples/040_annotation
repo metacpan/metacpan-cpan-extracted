@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+
+# demonstrate open and closed annotations. the icons can be dragged elsewhere,
+# and it seems to be possible to post to a closed annotation. if you make any
+# posts (replies), you will be prompted to save the document before leaving.
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+use PDF::Builder::Util;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+
+my $f1 = $pdf->corefont('Helvetica', -encode=>'latin1'); # unused
+my $f2 = $pdf->corefont('Helvetica-Bold', -encode=>'latin1'); # page heading
+
+my $page = $pdf->page();
+$page->mediabox(595,842);
+
+# just some random text near the top of the page
+my $gfx = $page->gfx();
+my $text = $page->text();
+$text->textlabel(50,700, $f2,20, 'Hello World!', -color=>'red');
+
+# draw a grid with 50pt blocks to see where rectangles are
+$gfx->strokecolor("#CCC");
+for (my $i=0; $i<=300; $i+=50) {
+  $gfx->poly(0,$i, 300,$i);
+  $text->textlabel(315,$i, $f2,10, $i);
+
+  $gfx->poly($i,0, $i,300);
+  $text->textlabel($i,315, $f2,10, $i);
+}
+$gfx->stroke();
+
+# open note (annotation) that can be replied to multiple times by users
+# active area is supposed to be 100x100 at 0,0 (LL), but it seems to be little 
+# larger than the visible icon! BTW, the icon can be dragged and dropped.
+my $ant = $page->annotation();
+$ant->text("This is an open note.\nnext line", -rect=>[0,0, 100,100], -open=>1);
+
+# closed note (annotation) that still can be replied to multiple times by users
+# active area is supposed to be 100x100 at 100,100 (LL), but it seems to be 
+# little larger than the visible icon! BTW, the icon can be dragged and dropped.
+$ant = $page->annotation();
+$ant->text('This is an closed note', -rect=>[100,100, 200,200]);
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__

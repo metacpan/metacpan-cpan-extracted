@@ -18,12 +18,27 @@ my $dump_config   = 0;
 my $nocolor       = 0;
 my $task_name     = '';
 my $story_path;
-my $match_l = $ENV{'match_l'} || 200;
+my $match_l = $ENV{'OUTTHENTIC_MATCH'} || 200;
 my $ini_file_path;
 my $yaml_file_path;
 my $json_file_path;
 my @runtime_params;
 my $args_file;
+
+our $cli_args;
+
+BEGIN { 
+  my $i=0;  
+  for my $a (@ARGV) {
+    if ($a eq '--') {
+      delete $ARGV[$i];
+      $cli_args = join ' ', delete @ARGV[$i .. $#ARGV];
+      last;
+    }
+    $i++;
+  }  
+
+}
 
 GetOptions (
 
@@ -49,10 +64,10 @@ GetOptions (
 
 $nocolor ||= $ENV{SPARROW_NO_COLOR};
 
-my $test_root_dir = $ENV{SPARROW_ROOT} ? "$ENV{SPARROW_ROOT}/tmp/".$$ : "$ENV{HOME}/.outthentic/tmp/".$$;
+my $cache_root_dir = $ENV{SPARROW_ROOT} ? "$ENV{SPARROW_ROOT}/tmp/".$$ : "$ENV{HOME}/.outthentic/tmp/".$$;
 
-remove_tree($test_root_dir);
-make_path($test_root_dir);
+remove_tree($cache_root_dir);
+make_path($cache_root_dir);
 
 $project_root_dir =  File::Spec->rel2abs($project_root_dir);
 
@@ -77,15 +92,25 @@ sub wanted {
 
     my $story_type = shift;
 
-    if ($file eq 'story.check' or $file eq 'meta.txt' ) {
+    if ($file =~ /^story\.(bash|pl|pm|rb|py)$/ or $file =~ /^hook\.(bash|pl|rb|py)$/ ) {
+
+        return if $file=~/^hook\./ and -e "$File::Find::dir/story.pl";
+        return if $file=~/^hook\./ and -e "$File::Find::dir/story.bash";
+        return if $file=~/^hook\./ and -e "$File::Find::dir/story.rb";
+        return if $file=~/^hook\./ and -e "$File::Find::dir/story.py";
+
+        return if $file eq 'story.pm' and -e "$File::Find::dir/story.pl";
+        return if $file eq 'story.pm' and -e "$File::Find::dir/story.bash";
+        return if $file eq 'story.pm' and -e "$File::Find::dir/story.rb";
+        return if $file eq 'story.pm' and -e "$File::Find::dir/story.py";
 
         return if $seen{$File::Find::name};
 
         my $story_dir = $File::Find::dir;
 
-        make_path("$test_root_dir/$story_dir");
+        make_path("$cache_root_dir/$story_dir");
 
-        my $tfile = "$test_root_dir/$story_dir/sparrow.pl";
+        my $tfile = "$cache_root_dir/$story_dir/sparrow.pl";
 
         open F, ">", $tfile or die $!;
     
@@ -101,14 +126,18 @@ sub wanted {
     
         print F "set_prop( cwd => q{$cwd} );\n";
         print F "set_prop( project_root_dir => q{$project_root_dir} );\n";
-        print F "set_prop( test_root_dir    => q{$test_root_dir} );\n";
+        print F "set_prop( cache_root_dir    => q{$cache_root_dir} );\n";
         print F "set_prop( ini_file_path    => q{$ini_file_path} );\n"    if $ini_file_path;
         print F "set_prop( yaml_file_path   => q{$yaml_file_path} );\n"  if $yaml_file_path;
         print F "set_prop( json_file_path   => q{$json_file_path} );\n"  if $json_file_path;
     
         print F "set_prop( story => q{$File::Find::dir} );\n";
         print F "set_prop( story_dir => q{$File::Find::dir} );\n";
-        print F "set_prop( story_check_file => q{$File::Find::dir/story.check} );\n";
+        if (-e "$File::Find::dir/story.check"){
+          print F "set_prop( story_check_file => q{$File::Find::dir/story.check} );\n";
+        } else {
+          print F "set_prop( story_check_file => '' );\n";
+        }
         print F "set_prop( story_type => q{$story_type} );\n";
         print F "set_prop( format => q{$format} );\n";
 
@@ -118,6 +147,7 @@ sub wanted {
         print F "set_prop( runtime_params => q{".(join ':::', @runtime_params)."} );\n";
         print F "set_prop( args_file => q{$args_file} );\n";
         print F "set_prop( task_name => '$task_name' );\n";
+        print F "set_prop( cli_args => q{$cli_args} );\n";
 
         print F "\nset_story();\n\n";
         print F "\npopulate_config();\n\n";
@@ -131,11 +161,8 @@ sub wanted {
             print F "apply_story_vars();\n";
         }
 
-        if ($file eq 'meta.txt'){
-          print F "set_prop( is_meta => 1 );\n";
+        if (-e "$File::Find::dir/meta.txt"){
           print F "print_meta();\n\n" unless $format eq 'concise';
-        }else{
-          print F "set_prop( is_meta => 0 );\n";
         }
 
         if ( -e "$File::Find::dir/story.pm" ){
@@ -150,10 +177,10 @@ sub wanted {
             print F "eval { do_bash_hook('$File::Find::dir/hook.bash') }; our \$STATUS=0, die \"bash hook error: \$@\" if \$@ ;\n\n";
         }
 
-        unless ($file eq 'meta.txt'){
-
-          print F "eval { generate_asserts(q{$File::Find::dir/story.check}) }; die \"asserts error: \$@\" if \$@ ;\n\n";
-
+        if (-e "$File::Find::dir/story.check"){
+          print F "eval { run_and_check(q{$File::Find::dir/story.check}) }; die \"asserts error: \$@\" if \$@ ;\n\n";
+        } else {
+          print F "eval { run_and_check() }; die \"asserts error: \$@\" if \$@ ;\n\n";
         }
 
         print F 'end_of_story();',"\n\n";
@@ -173,16 +200,16 @@ my $exit_code;
 
 if ($story_path){
 
-    my $strun_cmd = "perl $test_root_dir$project_root_dir/$story_path/sparrow.pl";
+    my $strun_cmd = "perl $cache_root_dir$project_root_dir/$story_path/sparrow.pl";
     $st = (system($strun_cmd)==0);
     $exit_code = sprintf "%d", $? >> 8;
 }else{
-    my $strun_cmd = "perl $test_root_dir$project_root_dir/sparrow.pl";
+    my $strun_cmd = "perl $cache_root_dir$project_root_dir/sparrow.pl";
     $st = (system($strun_cmd)==0);
     $exit_code = sprintf "%d", $? >> 8;
 }
 
-system("rm -rf $test_root_dir") if $purge_cache;
+system("rm -rf $cache_root_dir") if $purge_cache;
 
 unless ( $dump_config ) { # do not check story status in case we only dump config data
   #warn "state: $st";

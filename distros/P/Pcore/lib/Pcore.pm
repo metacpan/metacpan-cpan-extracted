@@ -1,4 +1,4 @@
-package Pcore v0.42.1;
+package Pcore v0.43.2;
 
 use v5.26.0;
 use common::header;
@@ -16,6 +16,7 @@ our $EXPORT_PRAGMA = {
     embedded => 0,    # run in embedded mode
     export   => 1,    # install standart import method
     inline   => 0,    # package use Inline
+    l10n     => 1,    # register package L10N domain
     result   => 0,    # export Pcore::Util::Result qw[result]
     role     => 0,    # package is a Moo role
     rpc      => 0,    # run class as RPC server
@@ -119,13 +120,11 @@ sub import {
     # export header
     common::header->import;
 
-    # export P sub to avoid indirect calls, export i18n
+    # export P sub to avoid indirect calls
     {
         no strict qw[refs];
 
         *{"$caller\::P"} = $P;
-
-        *{"$caller\::i18n"} = \&i18n;
 
         # flush the cache exactly once if we make any direct symbol table changes
         # mro::method_changed_in($caller);
@@ -135,6 +134,15 @@ sub import {
     Pcore::Core::Const->import( -caller => $caller );
 
     if ( !$import->{pragma}->{config} ) {
+
+        # process -l10n pragma
+        if ( $import->{pragma}->{l10n} ) {
+            state $L10N_INIT = !!require Pcore::Core::L10N;
+
+            Pcore::Core::L10N->import( -caller => $caller );
+
+            Pcore::Core::L10N::register_package_domain( $caller, $import->{pragma}->{l10n} );
+        }
 
         # export "dump"
         Pcore::Core::Dump->import( -caller => $caller );
@@ -470,6 +478,13 @@ sub _CORE_RUN {
     return;
 }
 
+# L10N
+sub set_locale ( $self, $locale = undef ) {
+    state $L10N_INIT = !!require Pcore::Core::L10N;
+
+    return Pcore::Core::L10N::set_locale($locale);
+}
+
 # AUTOLOAD
 sub AUTOLOAD ( $self, @ ) {    ## no critic qw[ClassHierarchies::ProhibitAutoloading]
     my $util = our $AUTOLOAD =~ s/\A.*:://smr;
@@ -522,13 +537,6 @@ PERL
     }
 
     goto &{$util};
-}
-
-# I18N
-sub i18n {
-    state $init = !!require Pcore::Core::I18N;
-
-    return &Pcore::Core::I18N::i18n;    ## no critic qw[Subroutines::ProhibitAmpersandSigils]
 }
 
 sub init_demolish ( $self, $class ) {
@@ -636,25 +644,25 @@ sub sendlog ( $self, $key, $title, $data = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 64                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (21)                    |
+## |    3 | 65                   | Subroutines::ProhibitExcessComplexity - Subroutine "import" with high complexity score (22)                    |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 85                   | Variables::ProtectPrivateVars - Private variable used                                                          |
+## |    3 | 86                   | Variables::ProtectPrivateVars - Private variable used                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 245                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
+## |    3 | 253                  | BuiltinFunctions::ProhibitComplexMappings - Map blocks should have a single statement                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 320                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
-## |      | 440                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
+## |      | 328                  | * Private subroutine/method '_apply_roles' declared but not used                                               |
+## |      | 448                  | * Private subroutine/method '_CORE_RUN' declared but not used                                                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 352, 381, 384, 388,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
-## |      | 422, 425, 430, 433,  |                                                                                                                |
-## |      | 458, 477, 620        |                                                                                                                |
+## |    3 | 360, 389, 392, 396,  | ErrorHandling::RequireCarping - "die" used instead of "croak"                                                  |
+## |      | 430, 433, 438, 441,  |                                                                                                                |
+## |      | 466, 492, 628        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 546                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 554                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 255                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 263                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 356                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
+## |    1 | 364                  | InputOutput::RequireCheckedSyscalls - Return value of flagged function ignored - say                           |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

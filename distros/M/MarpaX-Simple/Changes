@@ -1,4 +1,11 @@
-Revision history for MarpaX-Simple
+0.07    2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace File::Slurp::Tiny with File::Slurper.
+
+	- Replace Log::Any with Log::ger.
+
 
 0.06    2015-09-03 (PERLANCAR)
 

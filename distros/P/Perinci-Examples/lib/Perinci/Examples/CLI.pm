@@ -1,7 +1,7 @@
 package Perinci::Examples::CLI;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010001;
 use strict;
@@ -323,7 +323,7 @@ Perinci::Examples::CLI - Example for CLI help/usage generation
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::CLI (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -336,7 +336,11 @@ section).
 =head1 FUNCTIONS
 
 
-=head2 demo_cli_opts(%args) -> [status, msg, result, meta]
+=head2 demo_cli_opts
+
+Usage:
+
+ demo_cli_opts(%args) -> [status, msg, result, meta]
 
 Summary for `demo_cli_opts`.
 
@@ -378,11 +382,11 @@ Result:
    {
      logs => [
                {
-                 file    => "/home/u1/perl5/perlbrew/perls/perl-5.24.0/lib/site_perl/5.24.0/Perinci/Access/Schemeless.pm",
+                 file    => "/home/s1/perl5/perlbrew/perls/perl-5.26.0/lib/site_perl/5.26.0/Perinci/Access/Schemeless.pm",
                  func    => "Perinci::Access::Schemeless::action_call",
                  line    => 494,
                  package => "Perinci::Access::Schemeless",
-                 time    => 1484190742,
+                 time    => 1499762835,
                  type    => "create",
                },
              ],
@@ -530,7 +534,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 demo_cli_opts_shorter(%args) -> [status, msg, result, meta]
+=head2 demo_cli_opts_shorter
+
+Usage:
+
+ demo_cli_opts_shorter(%args) -> [status, msg, result, meta]
 
 Function summary.
 
@@ -605,7 +613,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

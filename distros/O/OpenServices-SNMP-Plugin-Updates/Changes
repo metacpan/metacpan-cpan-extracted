@@ -1,8 +1,5 @@
 Revision history for OpenServices-SNMP-Plugin-Updates
 
-1.0.1   2017-01-16
-        Fix update detection with more than one whitespace in names.
-
 1.0.0   2017-01-09
         No further changes, just bump version number to supersede 0.05.
 

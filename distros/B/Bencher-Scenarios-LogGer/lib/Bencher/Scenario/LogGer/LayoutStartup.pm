@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::LayoutStartup;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ Bencher::Scenario::LogGer::LayoutStartup
 
 =head1 VERSION
 
-This document describes version 0.009 of Bencher::Scenario::LogGer::LayoutStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-02.
+This document describes version 0.010 of Bencher::Scenario::LogGer::LayoutStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
 
 =head1 SYNOPSIS
 
@@ -118,15 +118,15 @@ Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2
 Benchmark with default options (C<< bencher -m LogGer::LayoutStartup >>):
 
  #table1#
- +--------------+-----------+-----------+------------+---------+---------+
- | participant  | rate (/s) | time (ms) | vs_slowest |  errors | samples |
- +--------------+-----------+-----------+------------+---------+---------+
- | load-JSON    |      65   |     15    |       1    | 5.1e-05 |      20 |
- | load-YAML    |      65   |     15.4  |       1.01 | 7.4e-06 |      20 |
- | load-LTSV    |      67   |     15    |       1    | 2.1e-05 |      20 |
- | load-Pattern |      68.5 |     14.6  |       1.06 | 6.5e-06 |      20 |
- | baseline     |     209   |      4.78 |       3.24 | 4.1e-06 |      22 |
- +--------------+-----------+-----------+------------+---------+---------+
+ +--------------+-----------+-----------+------------+----------+---------+
+ | participant  | rate (/s) | time (ms) | vs_slowest |  errors  | samples |
+ +--------------+-----------+-----------+------------+----------+---------+
+ | load-JSON    |      60   |      17   |       1    | 5.3e-05  |      20 |
+ | load-YAML    |      61   |      16   |       1    |   4e-05  |      20 |
+ | load-LTSV    |      62   |      16   |       1    |   0.0001 |      20 |
+ | load-Pattern |      64.9 |      15.4 |       1.08 | 8.9e-06  |      20 |
+ | baseline     |     160   |       6.3 |       2.6  | 2.4e-05  |      20 |
+ +--------------+-----------+-----------+------------+----------+---------+
 
 
 Benchmark module startup overhead (C<< bencher -m LogGer::LayoutStartup --module-startup >>):
@@ -135,11 +135,11 @@ Benchmark module startup overhead (C<< bencher -m LogGer::LayoutStartup --module
  +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
  | participant               | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Layout::JSON    | 1.8                          | 5.3                | 21             |      16   |                   11.1 |       1    | 3.3e-05 |      20 |
- | Log::ger::Layout::YAML    | 1.85                         | 5.31               | 21             |      15.5 |                   10.6 |       1.03 | 1.4e-05 |      21 |
- | Log::ger::Layout::LTSV    | 1.81                         | 5.27               | 21             |      14.9 |                   10   |       1.06 | 9.8e-06 |      20 |
- | Log::ger::Layout::Pattern | 1.8                          | 5.26               | 21             |      14.8 |                    9.9 |       1.07 | 8.5e-06 |      20 |
- | perl -e1 (baseline)       | 0.82                         | 4.1                | 16             |       4.9 |                    0   |       3.3  | 7.2e-06 |      20 |
+ | Log::ger::Layout::JSON    | 1.6                          | 5                  | 21             |      17   |                   10.2 |       1    | 5.7e-05 |      20 |
+ | Log::ger::Layout::YAML    | 1.6                          | 5.02               | 20.7           |      16.3 |                    9.5 |       1.02 | 4.7e-06 |      20 |
+ | Log::ger::Layout::Pattern | 1.6                          | 5                  | 21             |      16   |                    9.2 |       1    | 6.9e-05 |      20 |
+ | Log::ger::Layout::LTSV    | 1.6                          | 4.9                | 21             |      16   |                    9.2 |       1.1  | 2.4e-05 |      20 |
+ | perl -e1 (baseline)       | 0.82                         | 4.1                | 16             |       6.8 |                    0   |       2.4  | 2.9e-05 |      20 |
  +---------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 

@@ -7,7 +7,7 @@ use warnings;
 # For use autodie qw( :all ) elsewhere
 use IPC::System::Simple ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 1;
 
@@ -25,12 +25,12 @@ App::CISetup - Command line tools to generate and update Travis and AppVeyor con
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 
-This distro includes two command-line tools, L<update-travis-yml.pl> and
-L<update-appveyor-yml.pl>. They update Travis and AppVeyor YAML config files
+This distro includes two command-line tools, L<setup-travis-yml.pl> and
+L<setup-appveyor-yml.pl>. They update Travis and AppVeyor YAML config files
 with some opinionated defaults. See the docs for the respective scripts for
 more details.
 
@@ -52,11 +52,21 @@ Dave Rolsky <autarch@urth.org>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Mark Fowler
+=for stopwords Mark Fowler Zak B. Elep
+
+=over 4
+
+=item *
 
 Mark Fowler <mfowler@maxmind.com>
+
+=item *
+
+Zak B. Elep <zakame@zakame.net>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

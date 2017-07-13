@@ -1,3 +1,24 @@
+0.015001 2017-07-12 (PERLANCAR)
+
+	- [doc] Link to other pod's from the main module.
+
+
+0.015   2017-07-12 (PERLANCAR)
+
+        - Update to Log::ger 0.015 (latest).
+
+        - Internals: Add section about the details of init process.
+
+        - Add more FAQ items.
+
+        - Fixes.
+
+
+0.013   2017-07-11 (PERLANCAR)
+
+	- Update to Log::ger 0.013 (multiple formatters).
+
+
 0.012   2017-07-03 (PERLANCAR)
 
         - Set prereq version Log::ger to 0.012.

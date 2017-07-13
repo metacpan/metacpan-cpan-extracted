@@ -1,0 +1,3 @@
+requires 'Renard::Incunabula',
+	git => 'https://github.com/project-renard/p5-Renard-Incunabula.git',
+	branch => 'master';

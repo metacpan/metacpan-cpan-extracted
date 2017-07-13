@@ -1,12 +1,12 @@
 package Parse::PhoneNumber::ID;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.15'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.16'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Function::Fallback::CoreOrPP qw(clone);
 use Perinci::Sub::Util qw(gen_modified_sub);
@@ -533,7 +533,7 @@ sub extract_id_phones {
     my $level = $args{level} // 5;
     my $defac = $args{default_area_code};
 
-    $log->tracef("text = %s", $text);
+    log_trace("text = %s", $text);
 
     my %nums;  # normalized num => {_level=>..., _order=>..., raw=>..., ...}
 
@@ -622,7 +622,7 @@ sub extract_id_phones {
         };
         my $oldtext = $text;
         $text =~ s/((?:\d\s){4,}\d)/$_remove_spaces->($1)/seg;
-        $log->tracef("Preprocess text: remove spaces: %s", $text)
+        log_trace("Preprocess text: remove spaces: %s", $text)
             if $oldtext ne $text;
     }
 
@@ -638,7 +638,7 @@ sub extract_id_phones {
         };
         my $oldtext = $text;
         $text =~ s/((?:[0-9$lets](?:\s+|-|\.)?){5,})/$_replace_lets->($1)/eg;
-        $log->tracef("Preprocess text: letters->digits: %s", $text)
+        log_trace("Preprocess text: letters->digits: %s", $text)
             if $oldtext ne $text;
     }
 
@@ -826,7 +826,7 @@ sub extract_id_phones {
     }
 
     for (keys %nums) { $nums{$_}{standard} = $_ }
-    $log->tracef("\\%%nums = %s", \%nums);
+    log_trace("\\%%nums = %s", \%nums);
 
     # if we are told to extract only N max_numbers, use the lower level ones and
     # the ones at the end (they are more likely to be numbers, in the case of
@@ -851,7 +851,7 @@ sub extract_id_phones {
         _add_info($num);
     }
 
-    $log->tracef("\\\@nums = %s", \@nums);
+    log_trace("\\\@nums = %s", \@nums);
 
     \@nums;
 }
@@ -882,7 +882,7 @@ sub _remove_text {
     for (@$strs) {
         $$textref =~ s/\Q$_\E//;
     }
-    $log->tracef("removed match, text = %s", $$textref)
+    log_trace("removed match, text = %s", $$textref)
         if $$textref ne $oldtext;
 }
 
@@ -983,7 +983,7 @@ Parse::PhoneNumber::ID - Parse Indonesian phone numbers
 
 =head1 VERSION
 
-This document describes version 0.15 of Parse::PhoneNumber::ID (from Perl distribution Parse-PhoneNumber-ID), released on 2015-09-03.
+This document describes version 0.16 of Parse::PhoneNumber::ID (from Perl distribution Parse-PhoneNumber-ID), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -1018,14 +1018,14 @@ To extract more than one numbers in a text:
  say "There are ", scalar(@$phones), "phone number(s) found in text";
  for (@$phones) { say $_->{pretty} }
 
-=head1 SEE ALSO
-
-L<Parse::PhoneNumber>
-
 =head1 FUNCTIONS
 
 
-=head2 extract_id_phones(%args) -> any
+=head2 extract_id_phones
+
+Usage:
+
+ extract_id_phones(%args) -> any
 
 Extract phone number(s) from text.
 
@@ -1040,6 +1040,8 @@ Indonesian language, but should be quite suitable for any other normal text.
 
 Non-Indonesian phone numbers (e.g. +65 12 3456 7890) will still be extracted,
 but without any other detailed information other than country code.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -1073,7 +1075,11 @@ Text containing phone numbers to extract from.
 Return value:  (any)
 
 
-=head2 parse_id_phone(%args) -> any
+=head2 parse_id_phone
+
+Usage:
+
+ parse_id_phone(%args) -> any
 
 Alias for extract_id_phones(..., max_numbers=>1)->[0].
 
@@ -1088,6 +1094,8 @@ Indonesian language, but should be quite suitable for any other normal text.
 
 Non-Indonesian phone numbers (e.g. +65 12 3456 7890) will still be extracted,
 but without any other detailed information other than country code.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -1134,13 +1142,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Parse::PhoneNumber>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

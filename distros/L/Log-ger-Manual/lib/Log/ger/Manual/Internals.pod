@@ -18,7 +18,7 @@ Log::ger::Manual::Internals - Log::ger internals
 
 =head1 VERSION
 
-version 0.012
+version 0.015001
 
 =head1 DESCRIPTION
 
@@ -27,10 +27,10 @@ When an importer package does this:
  use Log::ger;
 
 Basically all Log::ger does is construct logging routines and install them to
-importer's package (target), e.g. L<log_warn>, L<log_debug>, L<log_is_debug> and
+importer's package (target), e.g. C<log_warn>, C<log_debug>, C<log_is_debug> and
 so on. Log::ger also records the target name. When a reinit is requested (e.g.
 due to a change of log level or outputs), Log::ger will again construct logging
-routines and install them to each target, replacing the old routines.
+routines and install them to each target, replacing the old ones.
 
 In addition to installing routines to a package, Log::ger can also target a hash
 or an object (which is basically the same as installing to a package, but the
@@ -42,7 +42,7 @@ subroutines, i.e. they expect the first argument to be the object).
 =head2 Formatter
 
 A routine that takes arguments supplied by the user to the logger routine (e.g.
-C<< log_warn("blah", $args, ...) >> and converts it to the message (usually
+C<< log_warn("blah %s", $args, ...) >> and converts it to the message (usually
 string) that is sent to the output (or the layouter, if there is one).
 
 =head2 Output
@@ -70,7 +70,8 @@ A Perl module that supplies hooks.
 
 =head2 Init
 
-The process of constructing logger routines and installing them to targets.
+The process of constructing logger routines and installing them to targets. See
+L</"INIT"> for more details about the process.
 
 =head2 Logger routine
 
@@ -102,13 +103,15 @@ one hook per phase.
 
 A hook routine is passed a hash argument and is expected to return an array:
 
- [$result, $flow_control]
+ [$result, $flow_control, ...]
 
 By default each hook will be executed in order of its priority. C<$flow_control>
 can be set to 1 by a hook to stop immediately after this hook instead of
 continuing to the next. Some phases will nevertheless stop after the first hook
 that returns non-undef C<$result>. A hook that returns undef is effectively
 declining and causing Log::ger to move to the next hook in the chain.
+
+Some phases might return extra elements.
 
 Aguments received by hook: C<target> (str, can be C<package> if installing to a
 package, or C<hash> or C<object>), C<target_arg> (str, when C<target> is
@@ -128,6 +131,13 @@ Available phases:
 Used to construct formatter routine, which will be called with arguments from
 the user when she calls the logging routines.
 
+It should return:
+
+ [\&formatter, $flow_control, $formatter_name]
+
+C<$formatter_name> is optional and defaults to C<default>, which is the default
+formatter used for all logging routines.
+
 =item * create_layouter
 
 Used to construct layouter routine, which will be called with arguments C<<
@@ -140,19 +150,22 @@ or to Log::ger's import(), C<$lnum> is numeric level, C<$lname> is string level.
 Used to construct routine names. Hook must return this (all keys are optional):
 
  [{
-   log_subs      => [ [NAME, STR_LEVEL], ... ],
-   log_methods   => [ [NAME, STR_LEVEL], ... ],
+   log_subs      => [ [NAME, STR_LEVEL, FMT_NAME], ... ],
+   log_methods   => [ [NAME, STR_LEVEL, FMT_NAME], ... ],
 
-   is_subs       => [ [NAME, STR_LEVEL], ... ],
-   is_methods    => [ [NAME, STR_LEVEL], ... ],
+   is_subs       => [ [NAME, STR_LEVEL, FMT_NAME], ... ],
+   is_methods    => [ [NAME, STR_LEVEL, FMT_NAME], ... ],
 
-   logml_subs    => [ [NAME, undef    ], ... ],
-   logml_methods => [ [NAME, undef    ], ... ],
- }]
+   logml_subs    => [ [NAME, undef    , FMT_NAME], ... ],
+   logml_methods => [ [NAME, undef    , FMT_NAME], ... ],
+ }, ...]
 
 Where C<log_subs> and C<log_methods> are names of per-level log routines,
 C<is_subs> an C<is_methods> are names of per-level level detection routines,
 C<logml_subs> and C<logml_methods> are names of multiple-level log routines.
+
+C<FMT_NAME> is optional and defaults to C<default> (the default formatter
+routine).
 
 =item * create_log_routine
 
@@ -179,7 +192,11 @@ on C<create_routine_names> phase). Extra arguments received by hooks: C<name>
 
 =item * before_install_routines
 
-Extra arguments received by hooks: C<routines> which is in the form of:
+Extra arguments received by hooks: C<routines> (array of routines to install),
+C<formatters> (hashref of formatter routines, if any), C<layouter> (layouter
+routine, if any).
+
+C<routine> is in the form of:
 
  [
    [$coderef, $name, $numlevel, $type],
@@ -197,6 +214,52 @@ Extra arguments received by hooks: C<routines>.
 
 Aside from the global hooks, there are also per-target hooks, which are stored
 in C<%Per_Package_Hooks>, C<%Per_Hash_Hooks>, C<%Per_Object_Hooks>.
+
+=head1 INIT
+
+This section describes what C<init_target()>, which is the routine used to
+initialize a target, does.
+
+First, hooks in the C<create_formatter> phase are run. This will collect one or
+more formatters. In the most common case, only the C<default> formatter will be
+constructed. In some cases, like L<Log::ger::Like::LogAny>, we want to use
+different formatters for method like C<warn> and C<debug> (arguments simply
+joined by space) and for methods like C<warnf> and C<debugf> (sprintf-style with
+data structure dumping, the default formatter used by Log::ger).
+
+Next, hooks in the C<create_layouter> phase are run. This will create a layouter
+(multiple layouters I<might> be supported in the future, but for now we only use
+one layouter per target).
+
+Next, hooks in the C<create_routine_names> phase are run. This will produce a
+list of subroutine/method names to create, along with what formatter to use for
+each (the default is C<default>). Plugins that want to mimic other interfaces
+like L<Log::ger::Like::LogAny> or L<Log::ger::Like::Log4perl> will want to add
+their hook here to provide names other than Log::ger's default. For example,
+Log4perl has uppercase subroutine names like C<WARN> or C<DEBUG>.
+
+There are two types of routines that are created, logging routines (like
+C<log_warn>, C<log_debug>) and level detection routines, also called the "is"
+routines (like C<log_is_warn>, C<log_is_debug>). Logging routines in turn can be
+reguler, per-level routines or multilevel routines that accept numeric level as
+the first argument.
+
+Next, the logger routines are created by running the C<create_log_routine> and
+C<create_logml_routine> hooks, for each log level. The code from the hooks
+(usually from output plugins) are then combined with the formatter and layouter
+to form the final routine ready to be installed.
+
+Likewise, the log level detection routines are created by running the
+C<create_is_routine> hooks for each log level.
+
+Before installing the routines, we give a chance to plugins to do stuffs in the
+C<before_install_routines> phase. Some plugins use this phase to, e.g. fixup
+prototypes.
+
+After installing the routines, we likewise give a chance to plugins to do stuffs
+in the C<after_install_routines> phase. Some plugins like
+L<Log::ger::Plugin::OptAway> this phase to actually replace the routines that
+are not needed with a no-op.
 
 =head1 TARGETS
 

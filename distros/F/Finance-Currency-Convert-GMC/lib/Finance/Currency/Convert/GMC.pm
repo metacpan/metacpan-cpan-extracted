@@ -1,12 +1,12 @@
 package Finance::Currency::Convert::GMC;
 
-our $DATE = '2016-10-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(get_currencies convert_currency);
@@ -186,7 +186,7 @@ Finance::Currency::Convert::GMC - Convert currency using GMC (Golden Money Chang
 
 =head1 VERSION
 
-This document describes version 0.002 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2016-10-14.
+This document describes version 0.003 of Finance::Currency::Convert::GMC (from Perl distribution Finance-Currency-Convert-GMC), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -207,7 +207,11 @@ available.
 =head1 FUNCTIONS
 
 
-=head2 convert_currency($n, $from, $to, $which) -> any
+=head2 convert_currency
+
+Usage:
+
+ convert_currency($n, $from, $to, $which) -> any
 
 Convert currency using GMC.
 
@@ -244,7 +248,11 @@ Select which rate to use (default is `sell`).
 Return value:  (any)
 
 
-=head2 get_currencies() -> [status, msg, result, meta]
+=head2 get_currencies
+
+Usage:
+
+ get_currencies() -> [status, msg, result, meta]
 
 Extract data from GMC page.
 
@@ -292,7 +300,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

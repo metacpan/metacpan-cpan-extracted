@@ -35,13 +35,13 @@ RC = windres
 PERL=perl
 
 # Define the ´copy´ command.
-CP     = $(PERL) -MExtUtils::Command -e cp --
+CP = $(PERL) -MExtUtils::Command -e cp --
 
-# Define the mkpath´ command.
+# Define the ´mkdir´ command.
 MKPATH = $(PERL) -MExtUtils::Command -e mkpath --
 
 # Define the ´remove´ command.
-RM_F   = $(PERL) -MExtUtils::Command -e rm_f --
+RM_F = $(PERL) -MExtUtils::Command -e rm_f --
 
 # Define additional libraries needed.
 # libstdc++ is included by default with MinGW, however for
@@ -75,7 +75,7 @@ RCFLAGS ?= -DNDEBUG
 LDFLAGS ?= -s -shared -static -Wl,-soname,$(SOLIBNAME) $(WIN32_LDFLAGS)
 DLLTOOLFLAGS ?= --add-stdcall-underscore
 
-TARGET = freeimage
+TARGET = FreeImage
 STATICLIB = lib$(TARGET).a
 SHAREDLIB = $(TARGET).dll
 IMPORTLIB = $(TARGET).lib

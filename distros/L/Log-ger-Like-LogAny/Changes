@@ -1,3 +1,16 @@
+0.003   2017-07-12 (PERLANCAR)
+
+        - [Bugfix] By default set the LogAny plugin to apply to the log object
+          only to avoid disrupting other targets.
+
+        - [ux] Provide convenience by making Log::Any->get_logger work.
+
+
+0.002   2017-07-11 (PERLANCAR)
+
+	- Support multiple argument in $log->warn("a", "b", ...).
+
+
 0.001   2017-06-24 (PERLANCAR)
 
         - First release.

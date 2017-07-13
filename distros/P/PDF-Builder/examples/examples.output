@@ -1,0 +1,263 @@
+What to expect to see while running the examples/ Perl code, and what to expect
+to see when the resulting PDFs are displayed.
+
+011_open_update
+  011_open_update.BASE.pdf 
+   1 pg: Hello World!
+  011_open_update.UPDATED.pdf 
+   add pg 2: Hello World! (2)
+  011_open_update.STRING.pdf
+   add pg 3: Hello World! (3), pg 4: Hello World! (4)
+
+012_pages
+  012_pages.pdf
+   8 pages labeled 1 to 8, then page 9 inserted between 1 and 2,
+      giving 1 9 2 3 4 5 6 7 8
+
+020_corefonts  (020_corefonts.NAME.latin1.pdf)
+ Helvetica -- latin1 
+  020_corefonts.Helvetica.latin1.pdf
+   2 pages 16x16 char grid
+ Helvetica-Oblique -- latin1  
+   2 pages 16x16 char grid
+ Helvetica-Bold -- latin1  
+   2 pages 16x16 char grid
+ Helvetica-BoldOblique -- latin1  
+   2 pages 16x16 char grid
+ Courier -- latin1  
+   2 pages 16x16 char grid
+ Courier-Oblique -- latin1  
+   2 pages 16x16 char grid
+ Courier-Bold -- latin1  
+   2 pages 16x16 char grid
+ Courier-BoldOblique -- latin1  
+   2 pages 16x16 char grid
+ Times-Roman -- latin1  
+   2 pages 16x16 char grid
+ Times-Italic -- latin1  
+   2 pages 16x16 char grid
+ Times-Bold -- latin1  
+   2 pages 16x16 char grid
+ Times-BoldItalic -- latin1  
+   2 pages 16x16 char grid
+ Symbol -- latin1  
+   1 page 16x16 char grid
+ ZapfDingbats -- latin1  
+   1 page 16x16 char grid
+ bankgothic -- latin1  
+   2 pages 16x16 char grid
+ georgia -- latin1  
+   3 pages 16x16 char grid
+ georgiaitalic -- latin1 
+   3 pages 16x16 char grid
+ georgiabold -- latin1 
+   3 pages 16x16 char grid
+ georgiabolditalic -- latin1 
+   3 pages 16x16 char grid
+ trebuchet -- latin1 
+   2 pages 16x16 char grid
+ trebuchetbold -- latin1 
+   2 pages 16x16 char grid
+ trebuchetbolditalic -- latin1 
+   2 pages 16x16 char grid
+ trebuchetitalic -- latin1 
+   2 pages 16x16 char grid
+ verdana -- latin1 
+   3 pages 16x16 char grid
+ verdanaitalic -- latin1 
+   3 pages 16x16 char grid
+ verdanabold -- latin1 
+   3 pages 16x16 char grid
+ verdanabolditalic -- latin1 
+   3 pages 16x16 char grid
+ wingdings -- latin1 
+   1 page 16x16 char grid
+ webdings -- latin1 
+   1 page 16x16 char grid
+
+020_textrise
+  020_textrise.pdf
+   1 page  examples of +/-5, 10, 20 points up and down
+
+020_textunderline
+  020_textunderline.pdf  
+   1 page showing color, angle, single/multiple underline
+
+021_synfonts  
+  021_synfonts.NAME.pdf "1 font" = one page with 16x16 char grid
+  4 pages of variants per "font" (slant, oblique, bold, small caps) 
+ Times-Roman 
+  021_synfonts.Times-Roman.pdf
+   2 fonts x 4 variants
+ Times-Italic 2x4
+ Times-Bold 2x4
+ Times-BoldItalic 2x4
+ Courier 2x4
+ Courier-Oblique 2x4
+ Courier-Bold 2x4
+ Courier-BoldOblique 2x4
+ Helvetica 2x4
+ Helvetica-Oblique 2x4
+ Helvetica-Bold 2x4
+ Helvetica-BoldOblique 2x4
+ Symbol 1x4
+ ZapfDingbats 1x4
+ bankgothic 2x4
+ georgia 3x4
+ georgiaitalic 3x4
+ georgiabold 3x4
+ georgiabolditalic 3x4
+ trebuchet 2x4
+ trebuchetbold 2x4
+ trebuchetbolditalic 2x4
+ trebuchetitalic 2x4
+ verdana 3x4
+ verdanaitalic 3x4
+ verdanabold 3x4
+ verdanabolditalic 3x4
+ wingdings 1x4
+ webdings 1x4
+
+022_truefonts  times.ttf (sample input)
+ times
+  022_truefonts.times.pdf
+   24 pages x 16x16 grid + one page sample text
+
+022_truefonts_diacrits_utf8  tahoma.ttf (sample input)
+ tahoma
+  022_truefonts_diacrits_utf8.tahoma.pdf  
+   1 page x 16x16 grid + 1 page with sample diacritic spanning 3 letters
+
+023_cjkfonts   (requires installation of CJK font package by Adobe Reader)
+ Ming  Ming-Bold Ming-Italic Ming-BoldItalic
+  023_cjkfonts.Ming*.pdf
+   127 pages 15x10 char grid + 1 page Latin text
+ Song  Song-Bold Song-Italic Song-BoldItalic
+  023_cjkfonts.Song*.pdf
+   194 pages 15x10 char grid + 1 page Latin text 
+   includes some rotated Latin text
+ MyungJo  MyungJo-Bold MyungJo-Italic MyungJo-BoldItalic
+  023_cjkfonts.MyungJo*.pdf
+   123 pages 15x10 char grid + 1 page Latin text
+   includes rotated Latin text
+ KozMin  KozMin-Bold KozMin-Italic KozMin-BoldItalic
+  023_cjkfonts.KozMin*.pdf
+   103 pages 15x10 char grid + 1 page Latin text
+ KozGo  KozGo-Bold KozGo-Italic KozGo-BoldItalic
+  023_cjkfonts.KozGo*.pdf
+   103 pages 15x10 char grid + 1 page Latin text
+
+024_bdffonts  codec.bdf  (sample input)   BUGGY!
+  024_pdffonts.codec.pdf
+   190 pages 1 bitmapped char each, 1 page 16x16 char grid
+
+025_unifonts
+ (fails with error messages about a bad UTF-8 character)
+
+026_unifont2
+  026_unifont2.pdf
+   9 pages of labeled UTF character grids (16x16)
+
+027_winfont 
+ (fails with no output -- unable to find Windows fonts in registry)
+
+030_colorspecs
+  030_colorspaces.pdf
+ RGB colorspace (16 pages)   16x16 colored dots 0..Fx0..F with x constant per pg
+ RGB colorspace with Gamma 2.2 (16 pages)    same layout
+ CMYK colorspace (16 pages)   16x16 colored dots 0..Fx0..F0 with x constant/page
+ L*a*b colorspace (16 pages)   16x16 colored dots x0..F0..F with x constant/page
+ named colors (RGB colorspace)  3 pages 16x16 colored dots, alphabetical order
+
+031_color_hsv
+  031_color_hsv.pdf 
+   7 pages circular colored dots, subset of total &hhssvv set
+
+032_separation
+  032_separation.pdf
+   1 page colored dots 14 models x 16 levels
+
+040_annotation
+  040_annotation.pdf 
+   1 page two annotations, one open (R/W), one closed (R/O)
+   you will be prompted by Reader to save changes (if wrote to open)
+
+050_pagelabels
+  050_pagelabels.pdf
+   26 pages with a variety of thumbnail labels in Reader
+
+060_transparency
+  060_transparency.pdf
+   2 pages, each one method of transparency/opacity,
+   with opaque red and 40% transparent black text
+
+BarCode.pl
+  BarCode.pdf
+   1 page x 11 barcodes, NOT VERIFIED AS CORRECT
+
+Content.pl
+  Content.pdf
+   pg 1: 6 ex. coordinate transforms, 1 line width, 1 line cap, 1 flatness,
+         3 line joins
+   pg 2: 6 mitered joins effect of miterlimit=4, 1 line dash, 
+         1 hline/vline/line/poly,
+         1 single and multiple rect(), 1 two examples rectxy(), 
+         1 circle @ 3 radii, 1 ellipse @ 3 sets of radii
+   pg 3: 1 arc @ 3 sets of radii, 1 pie w/ one slice removed, 1 curve,
+         1 spline, 5 bogen examples, 1 fill with two winding rules, 1 fillstroke
+         with two winding rules
+   pg 4: 3 clip examples, 1 image, 2 formimage with different scaling,
+         1 charspace examples, 1 wordspace examples, 1 hscale examples,
+         1 leading examples, 2 render example sets
+   pg 5: 1 rise() examples, 1 cr() examples, 1 nl() examples, 1 textpos() usage,
+         1 underline and indent examples, 1 advancewidth() example, 1 text()
+
+ContentText.pl   
+  ContentText.pdf
+   pg 1: text_left (= text), 4 lines separately that overflow
+         text_justified, 4 lines separately, one very squeezed
+         text_fill_left, single string splits to fill, LJ
+         text_fill = text_fill_left
+         text_fill_center, single string split to fill, centered
+         text_fill_right, single string split to fill, RJ
+         text_fill_justified, single string split to fill, each line justified
+           same, but explicitly centered last line
+           same, but explicitly right justified last line
+         paragraph (single string split, default left justify)
+           same, but indent 1.5em (no change to splitting)
+   pg 2:   same, but outdent 1.5em (different splitting)
+         paragraph, single string split, justified
+           same, but indent 1.5em (no change to splitting)
+           same, but outdent 1.5em (different splitting)
+         paragraph, single string split, RJ
+           same, plus 2.5em indent (different splitting)
+           same, plus 2em indent (different splitting)
+         paragraph, single string split, centered
+   pg 3: 3 calls to section to fill three columns, paragraphs marked by newline
+             can't see where paragraphs start (except previous line short)
+   pg 4:   same, with 10pt interparagraph gap
+             see paragraphs separated by vertical gap
+   pg 5:   same, except 2em indent instead of gap
+             see paragraphs start with indent
+   pg 6:   same, except 2em outdent instead of gap
+             paragraphs start at left margin. note shorter lines make for more
+             of third column filled
+   pg 7: 3 calls for 3 columns, justified with 2em indent
+           paragraphs marked by first line indentations
+   pg 8:   same, add 5pt vertical gap between paragraphs
+             two ways to see separation of paragraphs
+   pg 9: show use of textlabel() options. shows dot for starting x,y point,
+           with default (left), right, centered justification. show text at
+           45 degree angles, single and triple underline. show auto underline,             extra word and character spacing, condensed text (hscale), and 
+           render mode 1 (outline/stroke only)
+   pg 10: Latin-1 text, default text fill (left justified), no hyphenation
+            same, but allow hyphenation (soft and hard hyphens, happens to only
+              split at soft)
+            same, but large indent to force different hyphenation points, 
+              which are the two hard hyphens and one soft hyphen
+          UTF-8 text (SHYs only difference), no hyphenation
+            same, allow hyphenation, same as Latin-1
+            same, large indent, same as Latin-1
+          crazy long URL-style text, default left justify, splits at
+            camelCase, punctuation, letter runs, slashes
+            same, but outdented to force splits at different points

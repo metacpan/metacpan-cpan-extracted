@@ -1,0 +1,23 @@
+use Test2::Require::Module 'Acme::Alien::DontPanic' => '0.026';
+use Test2::V0;
+use Test::Alien::CanCompile;
+use Test::Alien;
+
+alien_ok 'Acme::Alien::DontPanic';
+ffi_ok { symbols => ['answer'] } , with_subtest {
+  my($ffi) = @_;
+  is $ffi->function('answer' => [] => 'int')->call(), 42, 'answer is 42';
+};
+
+done_testing;
+
+__DATA__
+
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+#include <libdontpanic.h>
+
+MODULE = Acme PACKAGE = Acme
+
+int answer();

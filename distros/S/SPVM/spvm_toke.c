@@ -113,7 +113,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               }
               if (!fh) {
                 if (op_use) {
-                  fprintf(stderr, "Can't locate SVPM/%s.spvm @INC (@INC contains:", op_name_package->uv.name);
+                  fprintf(stderr, "Can't locate SPVM/%s.spvm @INC (@INC contains:", op_name_package->uv.name);
                   {
                     int32_t i;
                     for (i = 0; i < include_pathes_length; i++) {
@@ -587,7 +587,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         SPVM_CONSTANT* constant = SPVM_CONSTANT_new(compiler);
         constant->code = SPVM_CONSTANT_C_CODE_STRING;
         constant->uv.string_value = str;
-        constant->type = SPVM_HASH_search(compiler->type_symtable, "byte[]", strlen("byte[]"));
+        constant->type = SPVM_HASH_search(compiler->type_symtable, "string", strlen("string"));
         op_constant->uv.constant = constant;
         
         yylvalp->opval = op_constant;
@@ -714,13 +714,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           }
           // int
           else if (constant->code == SPVM_CONSTANT_C_CODE_INT) {
-            int64_t num;
+            uint64_t num;
             errno = 0;
             if (num_str[0] == '0' && num_str[1] == 'x') {
-              num = strtoul(num_str, &end, 16);
+              num = strtoull(num_str, &end, 16);
             }
             else {
-              num = strtol(num_str, &end, 10);
+              num = strtoull(num_str, &end, 10);
             }
             if (*end != '\0') {
               fprintf(stderr, "Invalid int literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
@@ -730,18 +730,18 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               fprintf(stderr, "Number literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            constant->uv.long_value = (int32_t)num;
+            constant->tmp_ulong_value = num;
             constant->type = SPVM_HASH_search(compiler->type_symtable, "int", strlen("int"));
           }
           // long
           else if (constant->code == SPVM_CONSTANT_C_CODE_LONG) {
-            int64_t num;
+            uint64_t num;
             errno = 0;
             if (num_str[0] == '0' && num_str[1] == 'x') {
-              num = strtoul(num_str, &end, 16);
+              num = strtoull(num_str, &end, 16);
             }
             else {
-              num = strtol(num_str, &end, 10);
+              num = strtoull(num_str, &end, 10);
             }
             if (*end != '\0') {
               fprintf(stderr, "Invalid long literal %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
@@ -751,7 +751,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               fprintf(stderr, "Number literal out of range %s at %s line %" PRId32 "\n", num_str, compiler->cur_file, compiler->cur_line);
               exit(EXIT_FAILURE);
             }
-            constant->uv.long_value = num;
+            constant->tmp_ulong_value = num;
             constant->type = SPVM_HASH_search(compiler->type_symtable, "long", strlen("long"));
           }
           
@@ -788,7 +788,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           
           // Keyname
           if (strcmp(keyword, "my") == 0) {
-            yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_MY_VAR);
+            yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_MY);
             return MY;
           }
           else if (strcmp(keyword, "has") == 0) {

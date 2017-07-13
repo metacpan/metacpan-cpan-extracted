@@ -1,6 +1,6 @@
 package Pcore::Util::Random;
 
-use Pcore -export => { ALL => [qw[random_bytes]] };
+use Pcore -export => { ALL => [qw[random_bytes random_bytes_hex]] };
 use Net::SSLeay qw[];
 
 our $PASSWORD_LENGTH = 16;
@@ -8,7 +8,8 @@ our $PASSWORD_LENGTH = 16;
 my $PASSWORD_SYMBOLS = [ 0 .. 9, 'a' .. 'z', 'A' .. 'Z', qw[! @ $ % ^ & *], q[#] ];
 my $_PASSWORD_RANGE = [ map { $PASSWORD_SYMBOLS->[ $_ % $PASSWORD_SYMBOLS->@* ] } 0x00 .. 0xFF ];
 
-*random_bytes = \&bytes;
+*random_bytes     = \&bytes;
+*random_bytes_hex = \&bytes_hex;
 
 sub bytes ($len) {
     Net::SSLeay::RAND_bytes( my $buf, $len );

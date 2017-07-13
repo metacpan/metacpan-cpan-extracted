@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::test 6.009;
+package Dist::Zilla::App::Command::test 6.010;
 # ABSTRACT: test your dist
 
 use Dist::Zilla::App -command;
@@ -100,7 +100,7 @@ Dist::Zilla::App::Command::test - test your dist
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 SYNOPSIS
 

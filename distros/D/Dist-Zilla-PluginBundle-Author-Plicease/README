@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.16
+    version 2.20
 
 SYNOPSIS
 
@@ -80,7 +80,10 @@ DESCRIPTION
      format = %-9v %{yyyy-MM-dd HH:mm:ss Z}d
      
      [AutoPrereqs]
+     
      [OurPkgVersion]
+     underscore_eval_version = 1
+     
      [MetaJSON]
      
      [Git::Check]

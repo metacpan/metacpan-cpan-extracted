@@ -1,32 +1,39 @@
-SYNOPSIS
+NAME
+    IPC::System::Options - Perl's system() and readpipe/qx replacement, with
+    options
 
+VERSION
+    This document describes version 0.32 of IPC::System::Options (from Perl
+    distribution IPC-System-Options), released on 2017-07-10.
+
+SYNOPSIS
      use IPC::System::Options qw(system readpipe run);
-    
+
      # use exactly like system()
      system(...);
-    
+
      # use exactly like readpipe() (a.k.a. qx a.k.a. `` a.k.a. the backtick operator)
      my $res = readpipe(...);
      $res = `...`;
-    
+
      # but these functions accept an optional hash first argument to specify options
      system({...}, ...);
      readpipe({...}, ...);
-    
+
      # run without shell, even though there is only one argument
      system({shell=>0}, "ls");
      system({shell=>0}, "ls -lR"); # will fail, as there is no 'ls -lR' binary
-    
+
      # force shell, even though there are multiple arguments (arguments will be
      # quoted for you, including proper quoting on Win32)
      system({shell=>1}, "ls", "-lR");
-    
+
      # set LC_ALL/LANGUAGE/LANG environment variable
      $res = readpipe({lang=>"de_DE.UTF-8"}, "df");
-    
+
      # log using Log::Any, die on failure
      system({log=>1, die=>1}, "blah", ...);
-    
+
      # chdir first before running program (and chdir back afterwards)
      system({chdir => "/tmp", die => 1}, "some-program");
 
@@ -34,199 +41,220 @@ SYNOPSIS
 
      use IPC::System::Options 'system', 'readpipe', -log=>1, -die=>1;
 
-    run() is like system() but uses IPC::Run's run() instead of system():
+    "run()" is like "system()" but uses IPC::Run's "run()" instead of
+    "system()":
 
      run('ls');
-    
+
      # also accepts an optional hash first argument. some additional options that
      # run() accepts: stdin.
      run({capture_stdout => \$stdout, capture_stderr => \$stderr}, 'ls', '-l');
 
 DESCRIPTION
-
 FUNCTIONS
+  system([ \%opts ], @args)
+    Just like perl's "system()" except that it accepts an optional hash
+    first argument to specify options. Currently known options:
 
- system([ \%opts ], @args)
+    *   shell => bool
 
-    Just like perl's system() except that it accepts an optional hash first
-    argument to specify options. Currently known options:
+        Can be set to 0 to always avoid invoking the shell. The default is
+        to use the shell under certain conditions, like perl's "system()".
+        But unlike perl's "system()", you can force shell usage even though
+        you pass multiple arguments (in which case, the arguments will be
+        quoted for you, including proper quoting on Win32).
 
-      * shell => bool
+    *   lang => str
 
-      Can be set to 0 to always avoid invoking the shell. The default is to
-      use the shell under certain conditions, like perl's system(). But
-      unlike perl's system(), you can force shell usage even though you
-      pass multiple arguments (in which case, the arguments will be quoted
-      for you, including proper quoting on Win32).
+        Temporarily set locale-related environment variables: "LC_ALL" (this
+        is the highest precedence, even higher than the other "LC_*"
+        variables including "LC_MESSAGES"), "LANGUAGE" (this is used in
+        Linux, with precedence higher than "LANG" but lower than "LC_*"),
+        and "LANG".
 
-      * lang => str
+        Of course you can set the environment variables manually (or use the
+        "env" option), this option is just for convenience.
 
-      Temporarily set locale-related environment variables: LC_ALL (this is
-      the highest precedence, even higher than the other LC_* variables
-      including LC_MESSAGES), LANGUAGE (this is used in Linux, with
-      precedence higher than LANG but lower than LC_*), and LANG.
+    *   env => hashref
 
-      Of course you can set the environment variables manually (or use the
-      env option), this option is just for convenience.
+        Temporarily set environment variables.
 
-      * env => hashref
+    *   log => bool
 
-      Temporarily set environment variables.
+        If set to true, then will log invocation as well as return/result
+        value. Will log using Log::Any at the "trace" level.
 
-      * log => bool
+    *   die => bool
 
-      If set to true, then will log invocation as well as return/result
-      value. Will log using Log::Any at the trace level.
+        If set to true, will die on failure.
 
-      * die => bool
+    *   capture_stdout => scalarref
 
-      If set to true, will die on failure.
+        Capture stdout using Capture::Tiny.
 
-      * capture_stdout => scalarref
+    *   capture_stderr => scalarref
 
-      Capture stdout using Capture::Tiny.
+        Capture stderr using Capture::Tiny.
 
-      * capture_stderr => scalarref
+    *   capture_merged => scalarref
 
-      Capture stderr using Capture::Tiny.
+        Capture stdout and stderr in a single variable using Capture::Tiny's
+        "capture_merged".
 
-      * capture_merged => scalarref
+    *   chdir => str
 
-      Capture stdout and stderr in a single variable using Capture::Tiny's
-      capture_merged.
+        Attempt to change to specified directory first and change back to
+        the original directory after the command has been run. This is a
+        convenient option so you can do this kind of task in a single call:
 
-      * chdir => str
+         {
+             my $cwd = getcwd();
+             chdir $dir or die;
+             system(...);
+             chdir $cwd or die;
+         }
 
-      Attempt to change to specified directory first and change back to the
-      original directory after the command has been run. This is a
-      convenient option so you can do this kind of task in a single call:
+        If the attempt to chdir before command execution fails, will die if
+        "die" option is set to true. Otherwise, $! (OS error) will be set to
+        the "chdir()" error and to minimize surprise $? (child exit code)
+        will also be set to non-zero value (-1) even though at this point no
+        child process has been run.
 
-       {
-           my $cwd = getcwd();
-           chdir $dir or die;
-           system(...);
-           chdir $cwd or die;
-       }
+        If the attempt to chdir back (after command execution) fails, will
+        die if "die" option is set to true. Otherwise, $! will be set to the
+        "chdir()" error and $? will be set to -1 only if $? is zero. So if
+        the command fails, $? will contain the exit code of the command.
 
-      If the attempt to chdir before command execution fails, will die if
-      die option is set to true. Otherwise, $! (OS error) will be set to
-      the chdir() error and to minimize surprise $? (child exit code) will
-      also be set to non-zero value (-1) even though at this point no child
-      process has been run.
+    *   dry_run => bool
 
-      If the attempt to chdir back (after command execution) fails, will
-      die if die option is set to true. Otherwise, $! will be set to the
-      chdir() error and $? will be set to -1 only if $? is zero. So if the
-      command fails, $? will contain the exit code of the command.
+        If set to true, then will only display what would be executed to
+        STDERR (or log at "warn" level, if "log" option is true) instead of
+        actually executing the command.
 
-      * dry_run => bool
+        Will set $? (child exit code) to 0.
 
-      If set to true, then will only display what would be executed to
-      STDERR (or log at warn level, if log option is true) instead of
-      actually executing the command.
+        An example of how this option can be used:
 
-      Will set $? (child exit code) to 0.
+         system({ dry_run => $ENV{DRY_RUN} }, ...);
 
-      An example of how this option can be used:
+        This will allow you to run script in dry-run mode by setting
+        environment variable.
 
-       system({ dry_run => $ENV{DRY_RUN} }, ...);
-
-      This will allow you to run script in dry-run mode by setting
-      environment variable.
-
- readpipe([ \%opts ], @args)
-
-    Just like perl's readpipe() (a.k.a. qx() a.k.a. `` a.k.a. the backtick
-    operator) except that it accepts an optional hash first argument to
-    specify options. And it can accept multiple arguments (in which case,
-    the arguments will be quoted for you, including proper quoting on
-    Win32).
+  readpipe([ \%opts ], @args)
+    Just like perl's "readpipe()" (a.k.a. "qx()" a.k.a. `` a.k.a. the
+    backtick operator) except that it accepts an optional hash first
+    argument to specify options. And it can accept multiple arguments (in
+    which case, the arguments will be quoted for you, including proper
+    quoting on Win32).
 
     Known options:
 
-      * lang => str
+    *   lang => str
 
-      See option documentation in system().
+        See option documentation in "system()".
 
-      * env => hash
+    *   env => hash
 
-      See option documentation in system().
+        See option documentation in "system()".
 
-      * log => bool
+    *   log => bool
 
-      See option documentation in system().
+        See option documentation in "system()".
 
-      * die => bool
+    *   die => bool
 
-      See option documentation in system().
+        See option documentation in "system()".
 
-      * capture_stdout => scalarref
+    *   capture_stdout => scalarref
 
-      See option documentation in system().
+        See option documentation in "system()".
 
-      * capture_stderr => scalarref
+    *   capture_stderr => scalarref
 
-      See option documentation in system().
+        See option documentation in "system()".
 
-      * capture_merged => scalarref
+    *   capture_merged => scalarref
 
-      See option documentation in system().
+        See option documentation in "system()".
 
-      * max_log_output => int
+    *   max_log_output => int
 
-      If set, will limit result length being logged. It's a good idea to
-      set this (e.g. to 1024) if you expect some command to return large
-      output.
+        If set, will limit result length being logged. It's a good idea to
+        set this (e.g. to 1024) if you expect some command to return large
+        output.
 
-      * chdir => str
+    *   chdir => str
 
-      See option documentation in system().
+        See option documentation in "system()".
 
-      * dry_run => bool
+    *   dry_run => bool
 
-      See option documentation in system().
+        See option documentation in "system()".
 
- run([ \%opts ], @args)
+  run([ \%opts ], @args)
+    Like "system()", but uses IPC::Run's "run()". Known options:
 
-    Like system(), but uses IPC::Run's run(). Known options:
+    *   lang => str
 
-      * lang => str
+        See option documentation in "system()".
 
-      See option documentation in system().
+    *   env => hash
 
-      * env => hash
+        See option documentation in "system()".
 
-      See option documentation in system().
+    *   log => bool
 
-      * log => bool
+        See option documentation in "system()".
 
-      See option documentation in system().
+    *   die => bool
 
-      * die => bool
+        See option documentation in "system()".
 
-      See option documentation in system().
+    *   capture_stdout => scalarref
 
-      * capture_stdout => scalarref
+        See option documentation in "system()".
 
-      See option documentation in system().
+    *   capture_stderr => scalarref
 
-      * capture_stderr => scalarref
+        See option documentation in "system()".
 
-      See option documentation in system().
+    *   capture_merged => scalarref
 
-      * capture_merged => scalarref
+        See option documentation in "system()".
 
-      See option documentation in system().
+    *   stdin => scalar
 
-      * stdin => scalar
+        Supply standard input.
 
-      Supply standard input.
+    *   chdir => str
 
-      * chdir => str
+        See option documentation in "system()".
 
-      See option documentation in system().
+    *   dry_run => bool
 
-      * dry_run => bool
+        See option documentation in "system()".
 
-      See option documentation in system().
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/IPC-System-Options>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-IPC-System-Options>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=IPC-System-Options>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::FA::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.005';
+our $VERSION = '3.006';
 
 use utf8;
 use open ':utf8';
@@ -231,7 +231,7 @@ sub _create_atoms
             # rafteam = I have gone; raftei = you have gone; rafte = he has gone; rafteim = we have gone; rafteid = you have gone; rafteand = they have gone
             # Án ketáb rá čand bár xwándeam. = I have read that book several times.
             # Treebank examples: krde ast = he has been; krde = he has been; ámde ast = he has come
-            'GN'    => ['verbform' => 'fin', 'mood' => 'ind', 'tense' => 'nar', 'aspect' => 'perf'],
+            'GN'    => ['verbform' => 'fin', 'mood' => 'ind', 'tense' => 'past', 'evident' => 'nfh', 'aspect' => 'perf'],
             # Precedent past (indicative pluperfect)
             # xorde budäm = I had eaten
             # past participle of main verb + past simple of auxiliary budan (to be)
@@ -252,7 +252,7 @@ sub _create_atoms
             # mirafteam; miraftei; mirafte; mirafteim; mirafteid; mirafteand
             # Engelisi mixwánde? = Has she been studying English?
             # Treebank examples: míkrde ast = he has been, he have had; mídánste = he knew; míkrde = he did
-            'GNES'  => ['verbform' => 'fin', 'mood' => 'ind', 'tense' => 'nar', 'aspect' => 'imp'],
+            'GNES'  => ['verbform' => 'fin', 'mood' => 'ind', 'tense' => 'past', 'evident' => 'nfh', 'aspect' => 'imp'],
             # Precedent imperfect (indicative imperfective pluperfect)
             # mixorde budäm = I had been eating
             # mi + past participle of main verb + past simple of auxiliary budan (to be)
@@ -315,16 +315,14 @@ sub _create_atoms
                         'sub' => { 'tense' => { 'pres' => 'HEL',
                                                 'past' => { 'aspect' => { 'imp' => 'GESEL',
                                                                           '@'   => 'GEL' }},
-                                                'nar'  => { 'aspect' => { 'imp' => 'GESEL',
-                                                                          '@'   => 'GEL' }},
                                                 'pqp'  => { 'aspect' => { 'imp' => 'GBESE',
                                                                           '@'   => 'GBEL' }}}},
                         '@'   => { 'tense' => { 'fut'  => 'AY',
                                                 'pres' => 'H',
-                                                'past' => { 'aspect' => { 'imp'  => 'GES',
-                                                                          '@'    => 'GS' }},
-                                                'nar'  => { 'aspect' => { 'imp'  => 'GNES',
-                                                                          '@'    => 'GN' }},
+                                                'past' => { 'evident' => { 'nfh' => { 'aspect' => { 'imp' => 'GNES',
+                                                                                                    '@'   => 'GN' }},
+                                                                           '@'   => { 'aspect' => { 'imp' => 'GES',
+                                                                                                    '@'   => 'GS' }}}},
                                                 'pqp'  => { 'aspect' => { 'imp'  => 'GBES',
                                                                           '@'    => 'GB' }}}}}
         }
@@ -706,7 +704,7 @@ Lingua::Interset::Tagset::FA::Conll - Driver for the tagset of the Persian Depen
 
 =head1 VERSION
 
-version 3.005
+version 3.006
 
 =head1 SYNOPSIS
 

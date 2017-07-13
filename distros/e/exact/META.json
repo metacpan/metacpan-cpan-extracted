@@ -16,8 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "perl" : "v5.16.0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -40,7 +39,7 @@
             "IO::Handle" : "0",
             "feature" : "0",
             "mro" : "0",
-            "perl" : "v5.16.0",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -50,10 +49,9 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
-            "blib" : "1.01",
-            "perl" : "v5.16.0"
+            "blib" : "1.01"
          }
       }
    },
@@ -69,7 +67,7 @@
          "web" : "https://github.com/gryphonshafer/exact"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

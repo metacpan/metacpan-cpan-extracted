@@ -19,7 +19,7 @@ my %module_build_args = (
     "Milan Sorm <sorm\@is4u.cz>"
   ],
   "dist_name" => "Pod-Weaver-Section-Requires",
-  "dist_version" => "0.02",
+  "dist_version" => "0.03",
   "license" => "perl",
   "module_name" => "Pod::Weaver::Section::Requires",
   "recursive_test_files" => 1,

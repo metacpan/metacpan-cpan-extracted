@@ -1,4 +1,5 @@
-use Test::Most;
+use Test::More tests => 3;
+use Test::Exception;
 
 use exact qw( nobundle switch state );
 
@@ -15,5 +16,3 @@ lives_ok( sub {
 }, 'switch' );
 
 lives_ok( sub { state $x }, 'state' );
-
-done_testing;

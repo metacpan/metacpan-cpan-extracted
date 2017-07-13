@@ -4,6 +4,10 @@
 #include <time.h>
 #include "date.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+#define gmtime_r(x, y) gmtime_s(y, x)
+#endif
+
 /* length of a string like "Sun, 08-Jan-2006 13:56:17 GMT"]" */
 #define DATE_FORMAT_LEN 29
 

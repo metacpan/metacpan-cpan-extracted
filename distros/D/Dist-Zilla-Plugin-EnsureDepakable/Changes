@@ -1,4 +1,8 @@
-Revision history for Dist-Zilla-Plugin-EnsureDepakable
+0.004   2017-07-10 (PERLANCAR)
+
+	- Switch from (ab)using InstallTool phase to using AfterBuild phase
+	  to do our stuffs, to be compatible with DZP:StaticInstall.
+
 
 0.003   2016-10-22 (PERLANCAR)
 

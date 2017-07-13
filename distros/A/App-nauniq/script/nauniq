@@ -1,0 +1,319 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+our $VERSION = '0.10'; # VERSION
+
+my %Opts = (
+    append         => 0,
+    check_chars    => -1,
+    forget_pattern => undef,
+    ignore_case    => 0,
+    md5            => 0,
+    num_entries    => -1,
+    read_output    => 0,
+    show_unique    => 1,
+    show_repeated  => 0,
+    skip_chars     => 0,
+);
+
+sub parse_cmdline {
+    my $res = GetOptions(
+        'repeated|d'       =>
+            sub { $Opts{show_unique} = 0; $Opts{show_repeated} = 1 },
+        'ignore-case|i'    => \$Opts{ignore_case},
+        'num-entries=i'    => \$Opts{num_entries},
+        'skip-chars|s=i'   => \$Opts{skip_chars},
+        'unique|u'         =>
+            sub { $Opts{show_unique} = 1; $Opts{show_repeated} = 0 },
+        'check-chars|w=i'  => \$Opts{check_chars},
+        'a'                => sub {
+            $Opts{append} = 1; $Opts{read_output} = 1;
+        },
+        'append'           => \$Opts{append},
+        'forget-pattern=s' => sub {
+            my ($cbobj, $val) = @_;
+            eval { $val = $Opts{ignore_case} ? qr/$val/i : qr/$val/ };
+            if ($@) {
+                warn "Invalid regex pattern in --forget-pattern: $@\n"; exit 99;
+            }
+            $Opts{forget_pattern} = $val;
+        },
+        'md5'              => \$Opts{md5},
+        'read-output'      => \$Opts{read_output},
+        'help|h'           => sub {
+            print <<USAGE;
+Usage:
+  nauniq [OPTIONS]... [INPUT [OUTPUT]]
+  nauniq --help
+Options:
+  --repeated, -d
+  --ignore-case, -i
+  --num-entries=N, -n
+  --skip-chars=N, -s
+  --unique, -u
+  --check-chars=N, -w
+  --append
+  --read-output
+  -a
+  --md5
+  --forget-pattern=S
+For more details, see the manpage/documentation.
+USAGE
+            exit 0;
+        },
+    );
+    exit 99 if !$res;
+}
+
+sub run {
+    my $ifh; # input handle
+    if (@ARGV) {
+        my $fname = shift @ARGV;
+        if ($fname eq '-') {
+            $ifh = *STDIN;
+        } else {
+            open $ifh, "<", $fname or die "Can't open input file $fname: $!\n";
+        }
+    } else {
+        $ifh = *STDIN;
+    }
+
+    my $phase = 2;
+    my $ofh; # output handle
+    if (@ARGV) {
+        my $fname = shift @ARGV;
+        if ($fname eq '-') {
+            $ofh = *STDOUT;
+        } else {
+            open $ofh,
+                ($Opts{read_output} ? "+" : "") . ($Opts{append} ? ">>" : ">"),
+                    $fname
+                or die "Can't open output file $fname: $!\n";
+            if ($Opts{read_output}) {
+                seek $ofh, 0, 0;
+                $phase = 1;
+            }
+        }
+    } else {
+        $ofh = *STDOUT;
+    }
+
+    my ($line, $memkey);
+    my %mem;
+    my $sub_reset_mem = sub {
+        if ($Opts{num_entries} > 0) {
+            require Tie::Cache;
+            tie %mem, 'Tie::Cache', $Opts{num_entries};
+        } else {
+            %mem = ();
+        }
+    };
+    $sub_reset_mem->();
+    require Digest::MD5 if $Opts{md5};
+    no warnings; # we want to shut up 'substr outside of string'
+    while (1) {
+        if ($phase == 1) {
+            # phase 1 is just reading the output file
+            $line = <$ofh>;
+            if (!$line) {
+                $phase = 2;
+                next;
+            }
+        } else {
+            $line = <$ifh>;
+            if (!$line) {
+                last;
+            }
+        }
+        if ($Opts{forget_pattern} && $line =~ $Opts{forget_pattern}) {
+            $sub_reset_mem->();
+        }
+
+        $memkey = $Opts{check_chars} > 0 ?
+            substr($line, $Opts{skip_chars}, $Opts{check_chars}) :
+                substr($line, $Opts{skip_chars});
+        $memkey = lc($memkey) if $Opts{ignore_case};
+        $memkey = Digest::MD5::md5($memkey) if $Opts{md5};
+
+        if ($phase == 2) {
+            if ($mem{$memkey}) {
+                print $ofh $line if $Opts{show_repeated};
+            } else {
+                print $ofh $line if $Opts{show_unique};
+            }
+        }
+
+        $mem{$memkey} = 1;
+    }
+}
+
+# MAIN
+
+parse_cmdline();
+run();
+
+1;
+# ABSTRACT: Non-adjacent uniq
+# PODNAME: nauniq
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+nauniq - Non-adjacent uniq
+
+=head1 VERSION
+
+This document describes version 0.10 of nauniq (from Perl distribution App-nauniq), released on 2017-07-11.
+
+=head1 SYNOPSIS
+
+ nauniq [OPTION]... [INPUT [OUTPUT]]
+
+=head1 DESCRIPTION
+
+C<nauniq> is similar to the Unix command C<uniq> but detects repeated lines even
+if they are not adjacent. To do this, C<nauniq> must remember the lines being
+fed to it. It's basically a glorified form of something like these:
+
+ % awk '!mem[$0]++' INPUT
+ % perl -ne'print unless $mem{$_}++' INPUT
+
+There are options to control memory usage: option to only remember a certain
+number of unique lines, option to remember a certain number of characters for
+each line, and option to only remember the MD5 hash (instead of the content) of
+each line. There are also other options like append, forget, and so on.
+
+=head1 EXIT CODES
+
+0 on success.
+
+255 on I/O error.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=over
+
+=item * --repeated, -d
+
+Print only duplicate lines. The opposite of C<--unique>.
+
+=item * --ignore-case, -i
+
+Ignore case.
+
+=item * --num-entries=N
+
+Number of unique entries to remember. The default is -1 (unlimited). This option
+is to control memory usage, but the consequence is that lines that are too far
+apart will be forgotten.
+
+=item * --skip-chars=N, -s
+
+Number of characters from the beginning of line to skip when checking
+uniqueness.
+
+=item * --unique, -u
+
+Print only unique lines. This is the default. The opposite of C<--repeated>.
+
+=item * --check-chars=N, -w
+
+The amount of characters to check for uniqueness. The default is -1 (check all
+characters in a line).
+
+=item * --append
+
+Open output file in append mode. See also C<-a>.
+
+=item * -a
+
+Equivalent to C<--append --read-output>.
+
+=item * --forget-pattern=S
+
+This is an alternative to C<--num-entries>. Instead of instructing C<nauniq> to
+remember only a fixed number of entries, you can specify a regex pattern to
+trigger the forgetting the lines. An example use-case of this is when you have a
+file like this:
+
+ * entries for 2014-03-13
+ foo
+ bar
+ baz
+ * entries for 2014-03-14
+ foo
+ baz
+
+and you want unique lines for each day (in which you'll specify
+C<--forget-pattern '^\*'>).
+
+=item * --md5
+
+Remember the MD5 hash instead of the actual characters of the line. Might be
+useful to reduce memory usage if the lines are long.
+
+=item * --read-output
+
+Whether to read output file first. This option works only with C<--append> and
+is usually used via C<-a> to append lines to file if they do not exist yet in
+the file.
+
+=back
+
+=head1 FAQ
+
+=head2 How do I append lines to a file only if they do not exist in the file?
+
+You cannot do this with C<uniq>:
+
+ % ( cat FILE ; produce-lines ) | uniq - FILE
+ % ( cat FILE ; produce-lines ) | uniq >> FILE
+
+as it will clobber the file first. But you can do this with C<nauniq>:
+
+ % produce-lines | nauniq -a - FILE
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-nauniq>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-nauniq>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-nauniq>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<uniq>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.362';
+$Config::Model::TkUI::VERSION = '1.363';
 use 5.10.1;
 use strict;
 use warnings;
@@ -21,6 +21,9 @@ use vars qw/$icon_path $error_img $warn_img/;
 use subs qw/menu_struct/;
 use Scalar::Util qw/weaken/;
 use Log::Log4perl 1.11;
+use Path::Tiny;
+use YAML qw/LoadFile DumpFile/;
+use File::HomeDir;
 
 use Pod::POM;
 use Pod::POM::View::Text;
@@ -31,6 +34,7 @@ use Tk::Photo;
 use Tk::PNG;    # required for Tk::Photo to be able to load pngs
 use Tk::DialogBox;
 use Tk::Adjuster;
+use Tk::FontDialog;
 
 use Tk::Pod;
 use Tk::Pod::Text;    # for findpod
@@ -82,13 +86,39 @@ sub Tk::Error {
 
 use warnings "redefine";
 
+my $default_config = {
+    font => { -family =>  'DejaVu Sans', qw/-size -13 -weight normal/ }
+};
+
+my $main_window;
+my $config_path = path(File::HomeDir->my_home)->child('.cme/config/');
+my $config_file = $config_path->child('tkui.yml');
+
+$config_path -> mkpath;
+
+my $config = $config_file->is_file ? LoadFile($config_file) : $default_config ;
+
+# Tk::CmdLine::SetArguments( -font => $config->{font} ) ;
+
 sub ClassInit {
     my ( $class, $mw ) = @_;
-
+    $main_window = $mw;
     # ClassInit is often used to define bindings and/or other
     # resources shared by all instances, e.g., images.
 
     # cw->Advertise(name=>$widget);
+}
+
+sub set_font {
+    my $cw = shift;
+
+    my $font = $main_window->FontDialog->Show;
+    if (defined $font) {
+        $main_window->RefontTree(-font => $font);
+        $config->{font} = {$font->actual} ;
+        $cw->ConfigSpecs( -font => ['DESCENDANTS', 'font','Font', $font ]);
+        DumpFile($config_file->stringify, $config);
+    }
 }
 
 sub Populate {
@@ -180,6 +210,11 @@ sub Populate {
     ];
     $menubar->cascade( -label => 'Edit', -menuitems => $edit_items );
 
+    my $option_items = [
+        [ command => 'Font',  '-command', sub { $cw->set_font(); } ],
+    ];
+    $menubar->cascade( -label => 'Options', -menuitems => $option_items );
+
     # create frame for location entry
     my $loc_frame =
         $cw->Frame( -relief => 'sunken', -borderwidth => 1 )->pack( -pady => 0, -fill => 'x' );
@@ -270,7 +305,6 @@ sub Populate {
     # create frame for message
     my $msg_label = $cw->Label(
         -textvariable => \$cw->{message},
-        -font => '-*-Helvetica-normal-R-Normal-*-*-120-*-*-*-*-*-*',
         -relief => 'sunken',
         -borderwidth => 1,
         -anchor =>'w',
@@ -281,7 +315,7 @@ sub Populate {
     $cw->SUPER::Populate($args);
 
     $cw->ConfigSpecs(
-
+        -font       => ['DESCENDANTS', 'font','Font', $config->{font} ],
         #-background => ['DESCENDANTS', 'background', 'Background', $background],
         #-selectbackground => [$hlist, 'selectBackground', 'SelectBackground',
         #                      $selectbackground],
@@ -1113,8 +1147,13 @@ sub create_element_widget {
     $cw->{editor} = $e_frame->$widget(
         -item => $obj,
         -path => $tree_path,
-        @store
+        -font => $config->{font},
+        @store,
     );
+
+    my $font = $cw->cget('-font');
+    $cw->{editor}->ConfigSpecs( -font => ['DESCENDANTS', 'font','Font', $font ]);
+
     $cw->{editor}->pack( -expand => 1, -fill => 'both' );
     return $cw->{editor};
 }
@@ -1215,9 +1254,11 @@ sub setup_wizard {
 
     # when wizard is run, there's no need to update editor window in
     # main widget
+    my $font = $cw->cget('-font');
     return $cw->ConfigModelWizard(
         -root   => $cw->{root},
         -end_cb => $end_sub,
+        -font => $font,
     );
 }
 
@@ -1393,6 +1434,11 @@ in the hash element.
 =back
 
 =back
+
+=head2 Font size and big screens
+
+Font type and size can be adjusted using menu: "Options -> Font" menu. This setup is saved in file
+C<~/.cme/config/tkui.yml>.
 
 =head2 Search
 

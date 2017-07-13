@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::CheckListViewer;
-$Config::Model::Tk::CheckListViewer::VERSION = '1.362';
+$Config::Model::Tk::CheckListViewer::VERSION = '1.363';
 use strict;
 use warnings;
 use Carp;
@@ -38,6 +38,7 @@ sub Populate {
         || die "CheckListViewer: no -item, got ", keys %$args;
     my $path = delete $args->{-path}
         || die "CheckListViewer: no -path, got ", keys %$args;
+    my $cme_font = delete $args->{-font};
 
     my $inst = $leaf->instance;
 
@@ -70,6 +71,7 @@ sub Populate {
     $cw->add_editor_button($path)->pack( @fxe1, -side => 'right' );
 
     $cw->ConfigSpecs(
+        -font => [['SELF','DESCENDANTS'], 'font','Font', $cme_font ],
 
         #-fill   => [ qw/SELF fill Fill both/],
         #-expand => [ qw/SELF expand Expand 1/],

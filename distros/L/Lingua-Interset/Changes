@@ -1,4 +1,26 @@
-3.005
+3.006
+
+Features:
+* Feature 'case': added values 'equ' and 'cmp', newly defined in UD v2.
+* Feature 'degree': added value 'equ', newly defined in UD v2.
+* Feature 'definite': added value 'spec', newly defined in UD v2.
+* Feature 'number': added values 'count', 'tri', 'pauc', 'grpa', 'grpl' and
+  'inv', newly defined in UD v2.
+* Feature 'mood': added values 'prp' and 'adm', newly defined in UD v2.
+* Feature 'aspect': added values 'hab' and 'iter', newly defined in UD v2.
+* Feature 'voice': added values 'antip', 'dir' and 'inv', newly defined in UD
+  v2.
+* Feature 'person': added values '0' and '4', newly defined in UD v2.
+* Feature 'tense': removed value 'nar'; in UD v2, it should be encoded as the
+  past tense + the non-firsthand evidentiality feature.
+* Added feature 'evident', newly defined in UD v2.
+
+Interface:
+* Added the is_...() methods for the new feature values.
+
+
+
+3.005     2017-07-08 22:05:24+02:00 Europe/Prague
 
 Features:
 * In line with Universal Dependencies, the single-value features' value is no

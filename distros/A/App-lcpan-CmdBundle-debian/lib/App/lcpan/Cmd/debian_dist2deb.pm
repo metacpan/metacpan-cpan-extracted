@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::debian_dist2deb;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -41,19 +41,19 @@ _
         },
         exists_on_debian => {
             summary => 'Only output debs which exist on Debian repository',
-            'summary.alt.bool.neg' => 'Only output debs which do not exist on Debian repository',
+            'summary.alt.bool.not' => 'Only output debs which do not exist on Debian repository',
             schema => 'bool*',
             tags => ['category:filtering'],
         },
         exists_on_cpan => {
             summary => 'Only output debs which exist in database',
-            'summary.alt.bool.neg' => 'Only output debs which do not exist in database',
+            'summary.alt.bool.not' => 'Only output debs which do not exist in database',
             schema => 'bool*',
             tags => ['category:filtering'],
         },
         needs_update => {
             summary => 'Only output debs which has smaller version than its CPAN counterpart',
-            'summary.alt.bool.neg' => 'Only output debs which has the same version as its CPAN counterpart',
+            'summary.alt.bool.not' => 'Only output debs which has the same version as its CPAN counterpart',
             schema => 'bool*',
             tags => ['category:filtering'],
         },
@@ -139,7 +139,7 @@ App::lcpan::Cmd::debian_dist2deb - Show Debian package name/version for a dist
 
 =head1 VERSION
 
-This document describes version 0.006 of App::lcpan::Cmd::debian_dist2deb (from Perl distribution App-lcpan-CmdBundle-debian), released on 2017-01-20.
+This document describes version 0.007 of App::lcpan::Cmd::debian_dist2deb (from Perl distribution App-lcpan-CmdBundle-debian), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -218,7 +218,11 @@ This module handles the L<lcpan> subcommand C<debian-dist2deb>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Show Debian package name/version for a dist.
 

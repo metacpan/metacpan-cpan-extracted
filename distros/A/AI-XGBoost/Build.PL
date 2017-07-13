@@ -18,11 +18,12 @@ my %module_build_args = (
     "Pablo Rodr\x{ed}guez Gonz\x{e1}lez <pablo.rodriguez.gonzalez\@gmail.com>"
   ],
   "dist_name" => "AI-XGBoost",
-  "dist_version" => "0.005",
+  "dist_version" => "0.006",
   "license" => "apache",
   "module_name" => "AI::XGBoost",
   "recursive_test_files" => 1,
   "requires" => {
+    "Carp" => 0,
     "Exception::Class" => 0,
     "Exporter::Easy" => 0,
     "FFI::Platypus" => 0,

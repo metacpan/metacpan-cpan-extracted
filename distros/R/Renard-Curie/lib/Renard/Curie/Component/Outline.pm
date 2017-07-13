@@ -1,12 +1,23 @@
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::Outline;
 # ABSTRACT: Component that provides a list of headings for navigating
-$Renard::Curie::Component::Outline::VERSION = '0.002';
+$Renard::Curie::Component::Outline::VERSION = '0.003';
 use Moo;
-use Glib::Object::Subclass 'Gtk3::Revealer';
+use Renard::Incunabula::Frontend::Gtk3::Helper;
 use Glib 'TRUE', 'FALSE';
-use Renard::Curie::Types qw(InstanceOf PageNumber);
-use Function::Parameters;
+use Renard::Incunabula::Common::Types qw(InstanceOf PageNumber);
+
+has _gtk_widget => (
+	is => 'lazy',
+	handles => [qw(set get_reveal_child set_reveal_child set_transition_type add)],
+);
+method _build__gtk_widget() { Gtk3::Revealer->new };
+
+has view_manager => (
+	is => 'ro',
+	required => 1,
+	isa => InstanceOf['Renard::Curie::ViewModel::ViewManager'],
+);
 
 has tree_view => (
 	is => 'rw',
@@ -18,10 +29,6 @@ has model => (
 	trigger => 1, # _trigger_model
 	isa => InstanceOf['Gtk3::TreeStore'],
 );
-
-classmethod FOREIGNBUILDARGS(@) {
-	return ();
-}
 
 method BUILD(@) {
 	my $frame = Gtk3::Frame->new('Outline');
@@ -54,11 +61,14 @@ method BUILD(@) {
 	$scrolled_window->add( $self->tree_view );
 	$frame->add( $scrolled_window );
 	$self->add( $frame );
-	$self->reveal( FALSE );
+
+	Glib::Timeout->add(0, sub {
+		$self->reveal( FALSE );
+	});
 }
 
 method update( $doc ) {
-	return unless $doc->DOES('Renard::Curie::Model::Document::Role::Outlineable');
+	return unless $doc->DOES('Renard::Incunabula::Document::Role::Outlineable');
 	$self->model( $doc->outline->tree_store );
 }
 
@@ -68,23 +78,16 @@ method _trigger_model($new_model) {
 
 callback on_tree_view_row_activate_cb( $tree_view, $path, $column, $self ) {
 	# NOTE : This needs more error checking.
-
-	my $pd = $self->app->page_document_component;
-
 	my $iter = $self->model->get_iter( $path );
 	my $page_num = $self->model->get_value($iter, 1);
 
-	PageNumber->check($page_num) and $pd->current_page_number( $page_num );
+	PageNumber->check($page_num) and $self->view_manager->current_view->page_number( $page_num );
 }
 
 method reveal( $should_reveal ) {
 	$self->set( 'hexpand' => $should_reveal );
 	$self->set_reveal_child( $should_reveal );
 }
-
-with qw(
-	Renard::Curie::Component::Role::HasParentApp
-);
 
 1;
 
@@ -100,33 +103,21 @@ Renard::Curie::Component::Outline - Component that provides a list of headings f
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 EXTENDS
 
 =over 4
 
-=item * L<Glib::Object::Subclass>
-
 =item * L<Moo::Object>
-
-=item * L<Gtk3::Revealer>
-
-=item * L<Glib::Object::_Unregistered::AtkImplementorIface>
-
-=item * L<Gtk3::Buildable>
-
-=back
-
-=head1 CONSUMES
-
-=over 4
-
-=item * L<Renard::Curie::Component::Role::HasParentApp>
 
 =back
 
 =head1 ATTRIBUTES
+
+=head2 view_manager
+
+The view manager model for this application.
 
 =head2 tree_view
 
@@ -137,14 +128,6 @@ The L<Gtk3::TreeView> component that displays the interactive tree.
 The L<Gtk3::TreeStore> that holds tree data of heading text and page numbers.
 
 When set, triggers an update to the model for L</tree_view>.
-
-=head1 CLASS METHODS
-
-=head2 FOREIGNBUILDARGS
-
-  classmethod FOREIGNBUILDARGS(@)
-
-Builds the L<Gtk3::Revealer> super-class.
 
 =head1 METHODS
 

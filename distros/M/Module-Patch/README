@@ -1,33 +1,39 @@
-SYNOPSIS
+NAME
+    Module::Patch - Patch package with a set of patches
 
+VERSION
+    This document describes version 0.25 of Module::Patch (from Perl
+    distribution Module-Patch), released on 2017-07-10.
+
+SYNOPSIS
     To use Module::Patch directly:
 
      # patching DBI modules so that calls are logged
-    
+
      use Module::Patch qw(patch_package);
-     use Log::Any '$log';
+     use Log::ger;
      my $handle = patch_package(['DBI', 'DBI::st', 'DBI::db'], [
          {action=>'wrap', mod_version=>':all', sub_name=>':public', code=>sub {
              my $ctx = shift;
-    
-             $log->tracef("Entering %s(%s) ...", $ctx->{orig_name}, \@_);
+
+             log_trace("Entering %s(%s) ...", $ctx->{orig_name}, \@_);
              my $res;
              if (wantarray) { $res=[$ctx->{orig}->(@_)] } else { $res=$ctx->{orig}->(@_) }
-             $log->tracef("Returned from %s", $ctx->{orig_name});
+             log_trace("Returned from %s", $ctx->{orig_name});
              if (wantarray) { return @$res } else { return $res }
          }},
      ]);
-    
+
      # restore original
      undef $handle;
 
     To create a patch module by subclassing Module::Patch:
 
      # in your patch module
-    
+
      package Some::Module::Patch::YourCategory;
      use parent qw(Module::Patch);
-    
+
      sub patch_data {
          return {
              v => 3,
@@ -44,185 +50,202 @@ SYNOPSIS
          };
      }
      1;
-    
+
      # using your patch module
-    
+
      use Some::Module::Patch::YourCategory
          -force => 1, # optional, force patch even if target version does not match
          -config => {a=>10, b=>20}, # optional, set config value
      ;
-    
+
      # accessing per-patch-module config data
-    
+
      print $Some::Module::Patch::YourCategory::config->{a}; # 10
      print $Some::Module::Patch::YourCategory::config->{c}; # 3, default value
-    
+
      # unpatch, restore original subroutines
      no Some::Module::Patch::YourCategory;
 
 DESCRIPTION
-
     Module::Patch is basically a convenient way to define and bundle a set
     of patches. Actual patching is done by Monkey::Patch::Action, which
     provides lexically scoped patching.
 
     There are two ways to use this module:
 
-      * subclass it
+    *   subclass it
 
-      This is used for convenient bundling of patches. You create a patch
-      module (a module that monkey-patches other module by
-      adding/replacing/wrapping/deleting subroutines of target module) by
-      subclassing Module::Patch and providing the patches specification in
-      patch_data() method.
+        This is used for convenient bundling of patches. You create a *patch
+        module* (a module that monkey-patches other module by
+        adding/replacing/wrapping/deleting subroutines of target module) by
+        subclassing Module::Patch and providing the patches specification in
+        patch_data() method.
 
-      Patch module should be named Some::Module::Patch::YourCategory.
-      YourCategory should be a keyword or phrase (verb + obj) that
-      describes what the patch does. For example,
-      HTTP::Daemon::Patch::IPv6, LWP::UserAgent::Patch::LogResponse.
+        Patch module should be named *Some::Module*::Patch::*YourCategory*.
+        *YourCategory* should be a keyword or phrase (verb + obj) that
+        describes what the patch does. For example,
+        HTTP::Daemon::Patch::IPv6, LWP::UserAgent::Patch::LogResponse.
 
-      Patch module should be use()'d, or require()'d + import()'ed instead
-      of just require()'d, because the patching is done in import().
+        Patch module should be use()'d, or require()'d + import()'ed instead
+        of just require()'d, because the patching is done in import().
 
-      * require/import it directly
+    *   require/import it directly
 
-      Module::Patch provides patch_package which is the actual routine to
-      do the patching.
+        Module::Patch provides patch_package which is the actual routine to
+        do the patching.
+
+PATCH DATA SPECIFICATION
+    Patch data must be stored in "patch_data()" subroutine. It must be a
+    DefHash (i.e. a regular Perl hash) with the following known properties:
+
+    *   v => int
+
+        Must be 3 (current version).
+
+    *   patches => array
+
+        Will be passed to "patch_package()".
+
+    *   config => hash
+
+        A hash of name and config specifications. Config specification is
+        another DefHash and can contain the following properties: "schema"
+        (a Sah schema), "default" (default value).
+
+    *   after_read_config => coderef
+
+        A hook to run after patch module is imported and configuration has
+        been read.
+
+    *   before_patch => coderef
+
+    *   after_patch => coderef
+
+    *   before_unpatch => coderef
+
+    *   after_unpatch => coderef
 
 FUNCTIONS
-
- import()
-
+  import()
     If imported directly, will export @exports as arguments and export
     requested symbols.
 
     If imported from subclass, will take %opts as arguments and run
     patch_package() on caller package. %opts include:
 
-      * -load_target => BOOL (default 1)
+    *   -load_target => BOOL (default 1)
 
-      Load target modules. Set to 0 if package is already defined in other
-      files and cannot be require()-ed.
+        Load target modules. Set to 0 if package is already defined in other
+        files and cannot be require()-ed.
 
-      * -warn_target_loaded => BOOL (default 1)
+    *   -warn_target_loaded => BOOL (default 1)
 
-      If set to false, do not warn if target modules are loaded before the
-      patch module. By default, it warns to prevent users making the
-      mistake of importing subroutines from target modules before they are
-      patched.
+        If set to false, do not warn if target modules are loaded before the
+        patch module. By default, it warns to prevent users making the
+        mistake of importing subroutines from target modules before they are
+        patched.
 
-      * -force => BOOL
+    *   -force => BOOL
 
-      Will be passed to patch_package's \%opts.
+        Will be passed to patch_package's \%opts.
 
- patch_package($package, $patches_spec, \%opts) => HANDLE
-
+  patch_package($package, $patches_spec, \%opts) => HANDLE
     Patch target package $package with a set of patches.
 
     $patches_spec is an arrayref containing a series of patches
     specifications. Each patch specification is a hashref containing these
-    keys: action (string, required; either 'wrap', 'add', 'replace',
-    'add_or_replace', 'delete'), mod_version (string/regex or array of
+    keys: "action" (string, required; either 'wrap', 'add', 'replace',
+    'add_or_replace', 'delete'), "mod_version" (string/regex or array of
     string/regex, can be ':all' to mean all versions; optional; defaults to
-    ':all'). sub_name (string/regex or array of string/regex, subroutine(s)
-    to patch, can be ':all' to mean all subroutine, ':public' to mean all
-    public subroutines [those not prefixed by _], ':private' to mean all
-    private), code (coderef, not required if action is 'delete').
+    ':all'). "sub_name" (string/regex or array of string/regex,
+    subroutine(s) to patch, can be ':all' to mean all subroutine, ':public'
+    to mean all public subroutines [those not prefixed by "_"], ':private'
+    to mean all private), "code" (coderef, not required if "action" is
+    'delete').
 
-    Die if there is conflict with other patch modules, for example if
-    target module has been patched 'delete' and another patch wants to
-    'wrap' it.
+    Die if there is conflict with other patch modules, for example if target
+    module has been patched 'delete' and another patch wants to 'wrap' it.
 
     Known options:
 
-      * force => BOOL (default 0)
+    *   force => BOOL (default 0)
 
-      Force patching even if target module version does not match. The
-      default is to warn and skip patching.
-
-PATCH DATA SPECIFICATION
-
-    Patch data must be stored in patch_data() subroutine. It must be a
-    DefHash (i.e. a regular Perl hash) with the following known properties:
-
-      * v => int
-
-      Must be 3 (current version).
-
-      * patches => array
-
-      Will be passed to patch_package().
-
-      * config => hash
-
-      A hash of name and config specifications. Config specification is
-      another DefHash and can contain the following properties: schema (a
-      Sah schema), default (default value).
-
-      * after_read_config => coderef
-
-      A hook to run after patch module is imported and configuration has
-      been read.
-
-      * before_patch => coderef
-
-      * after_patch => coderef
-
-      * before_unpatch => coderef
-
-      * after_unpatch => coderef
+        Force patching even if target module version does not match. The
+        default is to warn and skip patching.
 
 FAQ
-
- This module does not work! The target module does not get patched!
-
+  This module does not work! The target module does not get patched!
     It probably does. Some of the common mistakes are:
 
-      * Not storing the handle
+    *   Not storing the handle
 
-      You do this:
+        You do this:
 
-       patch_package(...);
+         patch_package(...);
 
-      instead of this:
+        instead of this:
 
-       my $handle = patch_package(...);
+         my $handle = patch_package(...);
 
-      Since the handle is used to revert the patch, if you do not store
-      $handle, you are basically patching and immediately reverting the
-      patch.
+        Since the handle is used to revert the patch, if you do not store
+        $handle, you are basically patching and immediately reverting the
+        patch.
 
-      * Importing before patching
+    *   Importing before patching
 
-      If Target::Module exports symbols, and you patch one of the default
-      exports, the users need to patch before importing. Otherwise he/she
-      will get the unpatched version. For example, this won't work:
+        If "Target::Module" exports symbols, and you patch one of the
+        default exports, the users need to patch before importing. Otherwise
+        he/she will get the unpatched version. For example, this won't work:
 
-       use Target::Module; # by default export foo
-       use Target::Module::Patch::Foo; # patches foo
-      
-       foo(); # user gets the unpatched version
+         use Target::Module; # by default export foo
+         use Target::Module::Patch::Foo; # patches foo
 
-      While this does:
+         foo(); # user gets the unpatched version
 
-       use Target::Module::Patch::Foo; # patches foo
-       use Target::Module; # by default export foo
-      
-       foo(); # user gets the patched version
+        While this does:
 
-      Since 0.16, Module::Patch already warns this (unless -load_target or
-      -warn_target_loaded is set to false).
+         use Target::Module::Patch::Foo; # patches foo
+         use Target::Module; # by default export foo
+
+         foo(); # user gets the patched version
+
+        Since 0.16, Module::Patch already warns this (unless "-load_target"
+        or "-warn_target_loaded" is set to false).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-Patch>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-Patch>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Patch>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Monkey::Patch::Action
 
     Pod::Weaver::Plugin::ModulePatch
 
-    Some examples of patch modules that use Module::Patch by subclassing
-    it: Net::HTTP::Methods::Patch::LogRequest,
+    Some examples of patch modules that use Module::Patch by subclassing it:
+    Net::HTTP::Methods::Patch::LogRequest,
     LWP::UserAgent::Patch::HTTPSHardTimeout.
 
     Some examples of modules that use Module::Patch directly:
     Log::Any::For::Class.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,12 +1,12 @@
 package Data::Sah::Compiler::Prog;
 
-our $DATE = '2016-09-14'; # DATE
-our $VERSION = '0.87'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.88'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use Mo qw(build default);
 extends 'Data::Sah::Compiler';
@@ -246,8 +246,8 @@ sub expr_validator_sub {
         $code = $self->expr_block($code);
     }
 
-    if ($log_result && $log->is_trace) {
-        $log->tracef("validator code:\n%s",
+    if ($log_result && log_is_trace()) {
+        log_trace("validator code:\n%s",
                      ($ENV{LINENUM} // 1) ?
                          Data::Sah::Compiler::__linenum($code) :
                            $code);
@@ -870,7 +870,7 @@ Data::Sah::Compiler::Prog - Base class for programming language compilers
 
 =head1 VERSION
 
-This document describes version 0.87 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2016-09-14.
+This document describes version 0.88 of Data::Sah::Compiler::Prog (from Perl distribution Data-Sah), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -1194,7 +1194,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

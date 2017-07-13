@@ -13,7 +13,7 @@ use IO::Async::SSL;
 
 use POSIX qw( WEXITSTATUS );
 
-system( "openssl --help >/dev/null 2>&1" ) == 0 or
+system( "openssl help >/dev/null 2>&1" ) == 0 or
    plan skip_all => "no openssl";
 
 my $loop = IO::Async::Loop->new;

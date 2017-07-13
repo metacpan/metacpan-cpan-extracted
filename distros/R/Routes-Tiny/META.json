@@ -4,9 +4,9 @@
       "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.9",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
-      "unknown"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -50,7 +50,7 @@
    "provides" : {
       "Routes::Tiny" : {
          "file" : "lib/Routes/Tiny.pm",
-         "version" : "0.19"
+         "version" : "0.21"
       },
       "Routes::Tiny::Match" : {
          "file" : "lib/Routes/Tiny/Match.pm"
@@ -70,15 +70,14 @@
          "web" : "https://github.com/vti/routes-tiny"
       }
    },
-   "version" : "0.19",
+   "version" : "0.21",
    "x_contributors" : [
-      "Sergey Zasenko <d3fin3@gmail.com>",
-      "Dmitry Smal <mialinx@gmail.com>",
-      "Dinar Sabitov <lolall@yandex.ru>",
-      "Jonathan R. Warden <john.warden@gmail.com>",
       "Alexander Batyrshin <0x62ash@gmail.com>",
-      "vti <vti@clarive.com>",
+      "Dinar Sabitov <lolall@yandex.ru>",
+      "Dmitry Smal <mialinx@gmail.com>",
+      "Jonathan R. Warden <john.warden@gmail.com>",
       "Konstantin Cherednichenko <dshadowukraine@gmail.com>",
+      "Sergey Zasenko <d3fin3@gmail.com>",
       "vti <viacheslav.t@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01"

@@ -1,12 +1,13 @@
 package Log::ger::Util;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '0.016'; # VERSION
 
 use strict;
 use warnings;
 
 require Log::ger;
+require Log::ger::Heavy;
 
 sub _dump {
     unless ($Log::ger::_dumper) {
@@ -68,10 +69,10 @@ sub _action_on_hooks {
     if ($target eq 'package') {
         $hooks = ($Log::ger::Per_Package_Hooks{$target_arg}{$phase} ||= []);
     } elsif ($target eq 'object') {
-        my ($addr) = $target_arg =~ /\(0x(\w+)/;
+        my ($addr) = $target_arg =~ $Log::ger::re_addr;
         $hooks = ($Log::ger::Per_Object_Hooks{$addr}{$phase} ||= []);
     } elsif ($target eq 'hash') {
-        my ($addr) = $target_arg =~ /\(0x(\w+)/;
+        my ($addr) = $target_arg =~ $Log::ger::re_addr;
         $hooks = ($Log::ger::Per_Hash_Hooks{$addr}{$phase} ||= []);
     }
 
@@ -148,6 +149,47 @@ sub restore_per_target_hooks {
     _action_on_hooks('restore', $target, $target_arg, $phase, $saved);
 }
 
+sub reinit_target {
+    my ($target, $target_arg) = @_;
+
+    # adds target if not already exists
+    Log::ger::add_target($target, $target_arg, {}, 0);
+
+    if ($target eq 'package') {
+        my $init_args = $Log::ger::Package_Targets{$target_arg};
+        Log::ger::init_target(package => $target_arg, $init_args);
+    } elsif ($target eq 'object') {
+        my ($obj_addr) = $target_arg =~ $Log::ger::re_addr
+            or die "Invalid object '$target_arg': not a reference";
+        my $v = $Log::ger::Object_Targets{$obj_addr}
+            or die "Unknown object target '$target_arg'";
+        Log::ger::init_target(object => $v->[0], $v->[1]);
+    } elsif ($target eq 'hash') {
+        my ($hash_addr) = $target_arg =~ $Log::ger::re_addr
+            or die "Invalid hashref '$target_arg': not a reference";
+        my $v = $Log::ger::Hash_Targets{$hash_addr}
+            or die "Unknown hash target '$target_arg'";
+        Log::ger::init_target(hash => $v->[0], $v->[1]);
+    } else {
+        die "Unknown target '$target'";
+    }
+}
+
+sub reinit_all_targets {
+    for my $pkg (keys %Log::ger::Package_Targets) {
+        Log::ger::init_target(
+            package => $pkg, $Log::ger::Package_Targets{$pkg});
+    }
+    for my $k (keys %Log::ger::Object_Targets) {
+        my ($obj, $init_args) = @{ $Log::ger::Object_Targets{$k} };
+        Log::ger::init_target(object => $obj, $init_args);
+    }
+    for my $k (keys %Log::ger::Hash_Targets) {
+        my ($hash, $init_args) = @{ $Log::ger::Hash_Targets{$k} };
+        Log::ger::init_target(hash => $hash, $init_args);
+    }
+}
+
 sub set_plugin {
     no strict 'refs';
 
@@ -186,47 +228,6 @@ sub set_plugin {
     }
 }
 
-sub reinit_target {
-    my ($target, $target_arg) = @_;
-
-    # adds target if not already exists
-    Log::ger::add_target($target, $target_arg, {}, 0);
-
-    if ($target eq 'package') {
-        my $init_args = $Log::ger::Package_Targets{$target_arg};
-        Log::ger::init_target(package => $target_arg, $init_args);
-    } elsif ($target eq 'object') {
-        my ($obj_addr) = $target_arg =~ /\(0x(\w+)/
-            or die "Invalid object '$target_arg': not a reference";
-        my $v = $Log::ger::Object_Targets{$obj_addr}
-            or die "Unknown object target '$target_arg'";
-        Log::ger::init_target(object => $v->[0], $v->[1]);
-    } elsif ($target eq 'hash') {
-        my ($hash_addr) = $target_arg =~ /\(0x(\w+)/
-            or die "Invalid hashref '$target_arg': not a reference";
-        my $v = $Log::ger::Hash_Targets{$hash_addr}
-            or die "Unknown hash target '$target_arg'";
-        Log::ger::init_target(hash => $v->[0], $v->[1]);
-    } else {
-        die "Unknown target '$target'";
-    }
-}
-
-sub reinit_all_targets {
-    for my $pkg (keys %Log::ger::Package_Targets) {
-        Log::ger::init_target(
-            package => $pkg, $Log::ger::Package_Targets{$pkg});
-    }
-    for my $k (keys %Log::ger::Object_Targets) {
-        my ($obj, $init_args) = @{ $Log::ger::Object_Targets{$k} };
-        Log::ger::init_target(object => $obj, $init_args);
-    }
-    for my $k (keys %Log::ger::Hash_Targets) {
-        my ($hash, $init_args) = @{ $Log::ger::Hash_Targets{$k} };
-        Log::ger::init_target(hash => $hash, $init_args);
-    }
-}
-
 1;
 # ABSTRACT: Utility routines for Log::ger
 
@@ -242,7 +243,7 @@ Log::ger::Util - Utility routines for Log::ger
 
 =head1 VERSION
 
-version 0.012
+version 0.016
 
 =head1 DESCRIPTION
 

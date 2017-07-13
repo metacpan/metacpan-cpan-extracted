@@ -1,6 +1,6 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0;
+
+sub require_ok ($);
 
 require_ok 'alienfile';
 require_ok 'Alien::Build';
@@ -16,7 +16,6 @@ require_ok 'Alien::Build::Plugin::Fetch::LWP';
 require_ok 'Alien::Build::Plugin::Fetch::HTTPTiny';
 require_ok 'Alien::Build::Plugin::Fetch::NetFTP';
 require_ok 'Alien::Build::Plugin::Fetch::Local';
-require_ok 'Alien::Build::Plugin::Fetch::PromptBeforeDownload';
 require_ok 'Alien::Build::Plugin::Decode::HTML';
 require_ok 'Alien::Build::Plugin::Decode::DirListing';
 require_ok 'Alien::Build::Plugin::Decode::DirListingFtpcopy';
@@ -33,7 +32,6 @@ require_ok 'Alien::Build::Plugin::Extract::ArchiveTar';
 require_ok 'Alien::Build::Plugin::Extract::ArchiveZip';
 require_ok 'Alien::Build::Plugin::Extract::Negotiate';
 require_ok 'Alien::Build::Plugin::Probe::CBuilder';
-require_ok 'Alien::Build::Plugin::Probe::GnuWin32';
 require_ok 'Alien::Build::Plugin::Probe::CommandLine';
 require_ok 'Alien::Build::Plugin::Core::Setup';
 require_ok 'Alien::Build::Plugin::Core::Download';
@@ -43,5 +41,26 @@ require_ok 'Alien::Build::Plugin::Core::FFI';
 require_ok 'Alien::Build::Plugin::Gather::IsolateDynamic';
 require_ok 'Alien::Build::Util';
 require_ok 'Alien::Build::Util::Win32::RegistryDump';
+require_ok 'Test::Alien';
+require_ok 'Test::Alien::Build';
+require_ok 'Test::Alien::CanCompile';
+require_ok 'Test::Alien::CanPlatypus';
+require_ok 'Test::Alien::Run';
+require_ok 'Test::Alien::Synthetic';
 
 done_testing;
+
+sub require_ok ($)
+{
+  # special case of when I really do want require_ok.
+  # I just want a test that checks that the modules
+  # will compile okay.  I won't be trying to use them.
+  my($mod) = @_;
+  my $ctx = context();
+  eval qq{ require $mod };
+  my $error = $@;
+  my $ok = !$error;
+  $ctx->ok($ok, "require $mod");
+  $ctx->diag("error: $error") if $error ne '';
+  $ctx->release;
+}

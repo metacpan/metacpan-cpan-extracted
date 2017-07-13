@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::InvalidEntityException;
-$Footprintless::InvalidEntityException::VERSION = '1.24';
+$Footprintless::InvalidEntityException::VERSION = '1.25';
 # ABSTRACT: An exception thrown when an entity is invalid for the context it is being used in
 # PODNAME: Footprintless::InvalidEntityException
 
@@ -67,7 +67,7 @@ Footprintless::InvalidEntityException - An exception thrown when an entity is in
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 DESCRIPTION
 

@@ -1,12 +1,12 @@
 package Plack::Middleware::PeriAHS::Respond;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.60'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.61'; # VERSION
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
-use Log::Any '$log';
+use Log::ger;
 
 use parent qw(Plack::Middleware);
 use Plack::Util::Accessor qw(
@@ -17,7 +17,8 @@ use Plack::Util::Accessor qw(
 
 use Perinci::AccessUtil qw(insert_riap_stuffs_to_res);
 use Data::Clean::JSON;
-use Log::Any::Adapter;
+use Log::ger::Output;
+use Log::ger::Util;
 use Perinci::Result::Format 0.31;
 use Scalar::Util qw(blessed);
 use Time::HiRes qw(gettimeofday);
@@ -63,7 +64,7 @@ sub format_result {
     for ($fmt, "json") { # fallback to json if unknown format
         $formatter = $Perinci::Result::Format::Formats{$_};
         if ($formatter) {
-            $log->tracef("formatting result using %s", $formatter);
+            log_trace("formatting result using %s", $formatter);
             $fmt = $_;
             last;
         }
@@ -128,7 +129,7 @@ sub format_result {
 my %str_levels = qw(1 critical 2 error 3 warning 4 info 5 debug 6 trace);
 
 sub call {
-    $log->tracef("=> PeriAHS::Respond middleware");
+    log_trace("=> PeriAHS::Respond middleware");
 
     my ($self, $env) = @_;
 
@@ -152,27 +153,28 @@ sub call {
                 200, ["Content-Type" => "text/plain",
                       "X-Riap-V" => "1.1.22",
                       "X-Riap-Logging" => 1]]);
-            Log::Any::Adapter->set(
-                {lexically=>\my $lex},
+            my $saved = Log::ger::Util::save_hooks('create_logml_routine');
+            Log::ger::Output->set(
                 "Callback",
-                min_level => $str_levels{$loglvl} // 'warning',
                 logging_cb => sub {
-                    my ($method, $self, $format, @params) = @_;
-                    my $msg0 = join(
+                    my ($ctx, $numlvl, $msg) = @_;
+                    my $strlevel = Log::ger::Util::string_level($numlvl);
+                    my $fmsg0 = join(
                         "",
-                        "[$method][", scalar(localtime), "] $format\n",
+                        "[$strlevel][", scalar(localtime), "] $msg\n",
                     );
-                    my $msg = join(
+                    my $fmsg = join(
                         "",
-                        "l", length($msg0), " ",
-                        $msg0);
-                    $writer->write($msg);
+                        "l", length($fmsg0), " ",
+                        $fmsg0);
+                    $writer->write($fmsg);
                 },
             );
             {
                 local $rreq->{args}{-env} = $env if $self->{pass_psgi_env};
                 $rres = $pa->request($rreq->{action} => $rreq->{uri}, $rreq);
             }
+            Log::ger::Util::restore_hooks('create_logml_routine', $saved);
         } else {
             {
                 local $rreq->{args}{-env} = $env if $self->{pass_psgi_env};
@@ -212,7 +214,7 @@ Plack::Middleware::PeriAHS::Respond - Send Riap request to Riap server and send 
 
 =head1 VERSION
 
-This document describes version 0.60 of Plack::Middleware::PeriAHS::Respond (from Perl distribution Perinci-Access-HTTP-Server), released on 2016-03-16.
+This document describes version 0.61 of Plack::Middleware::PeriAHS::Respond (from Perl distribution Perinci-Access-HTTP-Server), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -311,7 +313,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Ac
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Access-HTTP-Server>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Access-HTTP-Server>.
 
 =head1 BUGS
 
@@ -327,7 +329,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

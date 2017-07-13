@@ -4,22 +4,24 @@ Dancer::Template::Mustache - Wrapper for the Mustache template system
 
 # VERSION
 
-version 0.3.0
+version 1.0.1
 
 # SYNOPSIS
 
-     # in config.yml
-    template: mustache
+```perl
+ # in config.yml
+template: mustache
 
-    # in the app
-    get '/style/:style' => sub {
-        template 'style' => {
-            style => param('style')
-        };
+# in the app
+get '/style/:style' => sub {
+    template 'style' => {
+        style => param('style')
     };
+};
 
-    # in views/style.mustache
-    That's a nice, manly {{style}} mustache you have there!
+# in views/style.mustache
+That's a nice, manly {{style}} mustache you have there!
+```
 
 # DESCRIPTION
 
@@ -31,13 +33,18 @@ Partials are supported, as are layouts. For layouts, the content of the inner
 template is sent via the usual _content_ template variable. So a typical 
 mustached layout would look like:
 
-    <body>
-    {{ content }}
-    </body>
+```
+<body>
+{{{ content }}}
+</body>
+```
 
 # SEE ALSO
 
 The Mustache templating system: [http://mustache.github.com/](http://mustache.github.com/)
+
+[Dancer::Template::Handlebars](https://metacpan.org/pod/Dancer::Template::Handlebars) - Dancer support for Handlebars, a templating system
+that is a superset of Mustache.
 
 # AUTHOR
 
@@ -45,7 +52,7 @@ Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/y
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2017, 2014, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

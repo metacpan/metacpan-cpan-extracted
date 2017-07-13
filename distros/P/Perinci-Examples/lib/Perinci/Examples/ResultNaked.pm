@@ -1,7 +1,7 @@
 package Perinci::Examples::ResultNaked;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010001;
 use strict;
@@ -76,7 +76,7 @@ Perinci::Examples::ResultNaked - Demonstrate `result_naked` property
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::ResultNaked (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::ResultNaked (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -94,7 +94,11 @@ The functions in this package can test:
 =head1 FUNCTIONS
 
 
-=head2 result_naked(%args) -> any
+=head2 result_naked
+
+Usage:
+
+ result_naked(%args) -> any
 
 This function does not return enveloped result.
 
@@ -104,11 +108,11 @@ Examples:
 
 =item * Without the optional arg3:
 
- result_naked(arg1 => "abc", arg2 => 10); # -> ["arg2", 10, "arg1", "abc"]
+ result_naked(arg1 => "abc", arg2 => 10); # -> ["arg1", "abc", "arg2", 10]
 
 =item * With the optional arg3:
 
- result_naked(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg2", 20, "arg3", 0.5, "arg1", "def"]
+ result_naked(arg1 => "def", arg2 => 20, arg3 => 0.5); # -> ["arg3", 0.5, "arg1", "def", "arg2", 20]
 
 =back
 
@@ -129,7 +133,11 @@ Arguments ('*' denotes required arguments):
 Return value:  (any)
 
 
-=head2 result_not_naked(%args) -> [status, msg, result, meta]
+=head2 result_not_naked
+
+Usage:
+
+ result_not_naked(%args) -> [status, msg, result, meta]
 
 This is the default.
 
@@ -139,7 +147,7 @@ Examples:
 
 =item * Without the optional arg3:
 
- result_not_naked(arg1 => "abc", arg2 => 10); # -> [200, "OK", ["arg1", "abc", "arg2", 10], {}]
+ result_not_naked(arg1 => "abc", arg2 => 10); # -> [200, "OK", ["arg2", 10, "arg1", "abc"], {}]
 
 =item * With the optional arg3:
 
@@ -198,7 +206,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

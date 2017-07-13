@@ -1,17 +1,17 @@
 package Data::Clean;
 
-our $DATE = '2017-01-14'; # DATE
-our $VERSION = '0.48'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.49'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 sub new {
     my ($class, %opts) = @_;
     my $self = bless {_opts=>\%opts}, $class;
-    $log->tracef("Cleanser options: %s", \%opts);
+    log_trace("Cleanser options: %s", \%opts);
 
     my $cd = $self->_generate_cleanser_code;
     for my $mod (keys %{ $cd->{modules} }) {
@@ -250,9 +250,9 @@ sub _generate_cleanser_code {
 
     my $code = join("", @code).";";
 
-    if ($ENV{LOG_CLEANSER_CODE} && $log->is_trace) {
+    if ($ENV{LOG_CLEANSER_CODE} && log_is_trace()) {
         require String::LineNumber;
-        $log->tracef("Cleanser code:\n%s",
+        log_trace("Cleanser code:\n%s",
                      $ENV{LINENUM} // 1 ?
                          String::LineNumber::linenum($code) : $code);
     }
@@ -291,7 +291,7 @@ Data::Clean - Clean data structure
 
 =head1 VERSION
 
-This document describes version 0.48 of Data::Clean (from Perl distribution Data-Clean), released on 2017-01-14.
+This document describes version 0.49 of Data::Clean (from Perl distribution Data-Clean), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -504,7 +504,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

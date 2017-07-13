@@ -17,8 +17,9 @@ my $pal16  = (random(3, 16) * 16)->byte;        # BITMAP bpp=4
 my $pix16  = (random(17, 23) * 16)->byte;
 
 my @pdls = (
-     (random(17, 23, 4) * 10000 - 5000)->float, # RGBAF
-     (random(17, 23, 3) * 10000 - 5000)->float, # RGBF
+#XXX-FIXME  (random(17, 23, 4) * 10000 - 5000)->float, # RGBAF
+#XXX-FIXME  (random(17, 23, 3) * 10000 - 5000)->float, # RGBF
+
      (random(17, 23, 4) * 65536)->ushort,       # RGBA16
      (random(17, 23, 3) * 65536)->ushort,       # RGB16
      (random(17, 23, 4) * 256)->byte,           # BITMAP bpp=32

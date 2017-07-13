@@ -219,10 +219,11 @@ void afp_destructor(void *cache)
 static
 bool reset_combination(Permute *self, AV *av, UV r) {
     UV n;
+    COMBINATION *c = NULL;
     if ((n = av_len(av) + 1) == 0) 
         return 0;
 
-    COMBINATION *c = init_combination(n, r, av);
+    c = init_combination(n, r, av);
     /* PerlIO_stdoutf("passed init_combination()\n"); */
     if (c == NULL) {
         warn("Unable to initialize combination");
@@ -542,10 +543,12 @@ SV* array_sv;
     for (x = c->len; x >= 0; x--)
         c->tmparea[x]  = malloc(c->len * sizeof **(c->tmparea));
     
-    dMULTICALL;
-    PUSH_MULTICALL(callback);
-    SAVEDESTRUCTOR(afp_destructor, c);
-    permute_engine(c->array, AvARRAY(c->array), 0, c->len, 
-        c->tmparea, multicall_cop);
-    POP_MULTICALL;
+    {
+        dMULTICALL;
+        PUSH_MULTICALL(callback);
+        SAVEDESTRUCTOR(afp_destructor, c);
+        permute_engine(c->array, AvARRAY(c->array), 0, c->len, 
+            c->tmparea, multicall_cop);
+        POP_MULTICALL;
+    }
 }

@@ -1,3 +1,19 @@
+v0.43.2 2017-07-13T08:22:22Z
+ - No issues on bugtracker were closed since the last release
+ - api role order sql method now accepts array
+
+v0.43.1 2017-07-12T21:02:10Z
+ - No issues on bugtracker were closed since the last release
+ - prototypes added to uuid functions
+
+v0.43.0 2017-07-11T13:13:45Z
+ - No issues on bugtracker were closed since the last release
+ - api auth pgsql backend proto added
+ - make uuid rfc compatible
+ - is_uuid_str renamed to looks_like_uuid
+ - api role helper functions for parse sql filters and sorters
+ - i18n renamed to l10n
+
 v0.42.1 2017-07-03T12:38:22Z
  - No issues on bugtracker were closed since the last release
  - http switch to GET request on 302 redirect

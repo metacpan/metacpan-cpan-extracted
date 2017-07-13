@@ -18,15 +18,18 @@ Log::ger::Manual::ForLog4perl - Log::ger for Log::Log4perl users
 
 =head1 VERSION
 
-version 0.012
+version 0.015001
 
 =head1 WHY LOG::LOG4PERL
 
 Log4perl is a port of Log4j, a logging library for Java. It's mature (first
-release is in 2002, Log4j is even older), featureful, and quite performant. You
-can send logs to multiple outputs, decorate (layout) the message with various
-extra information, and filter by level and category. Different outputs can be
-applied different filters. You can define your own logging levels.
+release is in 2002, Log4j is even older), featureful, and quite performant.
+Log4perl influenced other logging libraries in Perl, at least in some aspects,
+including L<Log::Any>.
+
+You can send logs to multiple outputs, decorate (layout) the message with
+various extra information, and filter by level and category. Different outputs
+can be applied different filters. You can define your own logging levels.
 
 For logging in modules, you can avoid specifying level/output and just start
 logging:
@@ -46,8 +49,6 @@ abovementioned features. See L<Benchmark::Scenarios::LogGer> for more
 benchmarks. This makes Log::ger more suitable when you want to add logging to
 modules instead of application as Log::ger creates minimum impact to your module
 users.
-
-Log4perl influenced other logging libraries in Perl, at least in some aspects.
 
 IMO, Log::Log4perl is not very Perlish, which is understandable since it is a
 port of a Java library. With Perl you can configure and accomplish stuffs in a

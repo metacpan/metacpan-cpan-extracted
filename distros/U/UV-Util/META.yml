@@ -3,7 +3,7 @@ abstract: 'Some utility functions from libUV.'
 author:
   - 'Chase Whitener <capoeirab@cpan.org>'
 build_requires:
-  Alien::libuv: '0.004'
+  Alien::libuv: '0.006'
   Config: '0'
   ExtUtils::MakeMaker: '7.12'
   File::Spec: '0'
@@ -29,9 +29,9 @@ no_index:
 provides:
   UV::Util:
     file: lib/UV/Util.pm
-    version: '0.007'
+    version: '0.008'
 requires:
-  Alien::libuv: '0.004'
+  Alien::libuv: '0.006'
   Exporter: '5.57'
   XSLoader: '0.14'
   perl: '5.008001'
@@ -41,10 +41,10 @@ resources:
   bugtracker: https://github.com/genio/p5-UV-Util/issues
   homepage: https://github.com/genio/p5-UV-Util
   repository: https://github.com/genio/p5-UV-Util.git
-version: '0.007'
+version: '0.008'
 x_Dist_Zilla:
   perl:
-    version: '5.024001'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
@@ -228,7 +228,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -251,7 +251,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           repo_root: .
       name: '@Git/Check'
       version: '2.042'
@@ -268,7 +268,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -281,11 +281,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.007
+          tag: v0.008
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -299,7 +299,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: '2.11.0 (Apple Git-81)'
+          git_version: 2.11.0
           repo_root: .
       name: '@Git/Push'
       version: '2.042'

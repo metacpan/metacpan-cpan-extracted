@@ -1,5 +1,8 @@
 Revision history for Perl module Template::Resolver
 
+1.07 2017-07-10
+    - FIX: Undef returned when get_entity argument points to a falsey value. #1
+
 1.06 2016-03-28
     - Extended Config::Entities::inherit to allow for spec based inheritance
 

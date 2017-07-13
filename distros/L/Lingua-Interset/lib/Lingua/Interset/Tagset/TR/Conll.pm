@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::TR::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.005';
+our $VERSION = '3.006';
 
 use utf8;
 use open ':utf8';
@@ -369,7 +369,7 @@ sub _create_atoms
             # Pos|Fut|Past|A3sg examples: olacaktı (would), öğrenecekti (would learn), yapacaktı (would make), ölecekti, sokacaktı
             'Fut'      => ['tense' => 'fut'],
             'FutPast'  => ['tense' => 'fut|past'],
-            'FutNarr'  => ['tense' => 'fut|nar'],
+            'FutNarr'  => ['tense' => 'fut', 'evident' => 'nfh'],
             # Pos|Past|A3sg examples: dedi (said), oldu (was), söyledi (said), geldi (came), sordu (asked)
             # Pos|Prog1|Past|A3sg examples: geliyordu (was coming), oturuyordu (was sitting), bakıyordu, oluyordu, titriyordu
             'Past'     => ['tense' => 'past'],
@@ -382,8 +382,8 @@ sub _create_atoms
             # hence it is used when the fact of a past event, as such, is not important;
             # in particular, the inferential past is used when one did not actually witness the past event.
             # A newspaper will generally use the di-past, because it is authoritative.
-            'Narr'     => ['tense' => 'nar'],
-            'NarrPast' => ['tense' => 'nar|past'],
+            'Narr'     => ['tense' => 'past', 'evident' => 'nfh'],
+            'NarrPast' => ['tense' => 'past', 'evident' => 'fh|nfh'],
             # Pos|Aor|A3sg examples: olur (will), gerekir (must), yeter (is enough), alır (takes), gelir (income)
             # Pos|Aor|Narr|A3sg examples: olurmuş (bustled), inanırmış, severmiş (loved), yaşarmış (lived), bitermiş
             # Pos|Aor|Past|A3sg examples: olurdu (would), otururdu (sat), yapardı (would), bilirdi (knew), derdi (used to say)
@@ -394,19 +394,19 @@ sub _create_atoms
             # English has habitual past: "I used to visit him frequently."
             'Aor'      => ['tense' => 'aor'],
             'AorPast'  => ['tense' => 'aor|past'],
-            'AorNarr'  => ['tense' => 'aor|nar']
+            'AorNarr'  => ['tense' => 'aor', 'evident' => 'nfh']
         },
         'encode_map' =>
         {
-            'tense' => { 'aor'       => 'Aor',
-                         'aor|nar'   => 'AorNarr',
+            'tense' => { 'aor'       => { 'evident' => { 'nfh' => 'AorNarr',
+                                                         '@'   => 'Aor' }},
                          'aor|past'  => 'AorPast',
-                         'fut'       => 'Fut',
-                         'fut|nar'   => 'FutNarr',
+                         'fut'       => { 'evident' => { 'nfh' => 'FutNarr',
+                                                         '@'   => 'Fut' }},
                          'fut|past'  => 'FutPast',
-                         'nar'       => 'Narr',
-                         'nar|past'  => 'NarrPast',
-                         'past'      => 'Past',
+                         'past'      => { 'evident' => { 'fh|nfh' => 'NarrPast',
+                                                         'nfh'    => 'Narr',
+                                                         '@'      => 'Past' }},
                          'pres'      => 'Pres' }
         }
     );
@@ -1771,7 +1771,7 @@ Lingua::Interset::Tagset::TR::Conll - Driver for the Turkish tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.005
+version 3.006
 
 =head1 SYNOPSIS
 

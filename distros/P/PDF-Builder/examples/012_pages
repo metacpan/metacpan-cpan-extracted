@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+my $font = $pdf->corefont('Arial-Bold');
+
+# input: empty page. writes current page number on it (total number of pages)
+# uses global $pdf to get number of pages
+sub mark {
+    my ($page) = @_;
+
+    my $t = $page->text();
+
+    $t->font($font, 20);
+    $t->translate(20, 700);
+    $t->text($pdf->pages());
+}
+
+# create pages 1 - 8
+for (1..8) {
+    mark($pdf->page());
+}
+
+# create ninth page, inserted before old page 2
+mark($pdf->page(2));
+
+$pdf->saveas("$0.pdf");
+
+__END__

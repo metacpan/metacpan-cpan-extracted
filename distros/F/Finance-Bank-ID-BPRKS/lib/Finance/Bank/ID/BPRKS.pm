@@ -1,12 +1,12 @@
 package Finance::Bank::ID::BPRKS;
 
-our $DATE = '2015-12-16'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.06'; # VERSION
 
 use 5.010001;
 use Moo;
 use DateTime;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Parse::Number::ID qw(parse_number_id);
 
@@ -450,7 +450,7 @@ Finance::Bank::ID::BPRKS - Check your BPR KS accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.05 of Finance::Bank::ID::BPRKS (from Perl distribution Finance-Bank-ID-BPRKS), released on 2015-12-16.
+This document describes version 0.06 of Finance::Bank::ID::BPRKS (from Perl distribution Finance-Bank-ID-BPRKS), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -750,7 +750,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -6,7 +6,7 @@ use Term::Size;
 use Term::ReadKey;
 use base 'DBIx::dbMan::Interface';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 1;
 
@@ -14,6 +14,9 @@ sub init {
 	my $obj = shift;
 
 	$obj->SUPER::init(@_);
+
+    $SIG{ INT } = sub { die 'Catched signal INT'; };
+
 	eval {
 		require Term::ReadLine;
 	};
@@ -54,7 +57,8 @@ sub get_command {
 
 	my $cmd = '';
 	if ($obj->{readline}) {
-		$cmd = $obj->{readline}->readline($obj->{-lang}->str($obj->get_prompt()));
+		$cmd = eval { $obj->{readline}->readline($obj->{-lang}->str($obj->get_prompt())); };
+        return '' if $@ =~ /^Catched signal INT/;
 		unless (defined $cmd) { $cmd = 'QUIT';  $obj->print("\n"); } 
 		$obj->{history}->add($cmd);
 	} else {

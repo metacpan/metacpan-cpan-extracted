@@ -35,7 +35,7 @@ use Test::More tests => 4;
     };
 }
 
-use Dancer::Test 'MyApp';
+use Dancer::Test;
 
 response_content_like [ GET => '/' ], qr/Welcome manly mustached man/, 
     "template file found";

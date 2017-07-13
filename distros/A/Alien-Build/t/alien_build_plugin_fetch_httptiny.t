@@ -1,7 +1,7 @@
 use Test2::V0;
+use Test::Alien::Build;
 use Alien::Build::Plugin::Fetch::HTTPTiny;
 use lib 't/lib';
-use MyTest;
 use Path::Tiny qw( path );
 use MyTest::HTTP;
 use Alien::Build::Util qw( _dump );
@@ -10,7 +10,8 @@ subtest 'updates requires' => sub {
 
   my $plugin = Alien::Build::Plugin::Fetch::HTTPTiny->new( url => 'http://example.test/' );
 
-  my($build,$meta) = build_blank_alien_build;
+  my $build = alienfile filename => 'corpus/blank/alienfile';
+  my $meta = $build->meta;
   
   $plugin->init($meta);
   
@@ -30,7 +31,8 @@ subtest 'fetch' => sub {
 
   my $plugin = Alien::Build::Plugin::Fetch::HTTPTiny->new( url => "$url" );
 
-  my($build,$meta) = build_blank_alien_build;
+  my $build = alienfile filename => 'corpus/blank/alienfile';
+  my $meta = $build->meta;
 
   $plugin->init($meta);
   eval { $build->load_requires('share') };

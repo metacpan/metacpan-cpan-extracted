@@ -13,7 +13,7 @@ use File::Slurp;
 use AsposeCellsCloud::ApiClient;
 use AsposeCellsCloud::Configuration;
 
-my $VERSION = '1.02';
+my $VERSION = '1.0.3';
 
 sub new {
     my $class   = shift;
@@ -744,6 +744,7 @@ sub PostAutofitWorkbookRows {
 # @param String $name  (required)
 # @param String $storage  (optional)
 # @param String $folder  (optional)
+# @param CalculationOptions $body (required)
 # @return SaaSposeResponse
 #
 sub PostWorkbookCalculateFormula {
@@ -755,6 +756,10 @@ sub PostWorkbookCalculateFormula {
       croak("Missing the required parameter 'name' when calling PostWorkbookCalculateFormula");
     }
     
+# verify the required parameter 'body' is set
+    unless (exists $args{'body'}) {
+      croak("Missing the required parameter 'body' when calling PostWorkbookCalculateFormula");
+    }
 
     # parse inputs
     my $_resource_path = '/cells/{name}/calculateformula/?appSid={appSid}&amp;storage={storage}&amp;folder={folder}';
@@ -795,7 +800,10 @@ sub PostWorkbookCalculateFormula {
     
     
     my $_body_data;
-	
+
+	if ( exists $args{'body'}) {
+        $_body_data = $args{'body'};
+}
     
     
 
@@ -3228,6 +3236,101 @@ sub GetWorkSheetWithFormat {
 	}    
 	
 	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# GetWorksheetAutoFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return WorksheetResponse
+#
+sub GetWorksheetAutoFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling GetWorksheetAutoFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling GetWorksheetAutoFilter");
+    }
+    
+    
+    
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/?appSid={appSid}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/octet-stream');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}# query params    
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'WorksheetResponse', $response->header('content-type'));
     return $_response_object;
     
 }
@@ -5810,6 +5913,309 @@ sub PostWorksheetMerge {
     }else{
 		$_resource_path    =~ s/[?&]totalColumns.*?(?=&|\?|$)//g;
 	}# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'SaaSposeResponse', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PostWorksheetAutoFilterRefresh
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return SaaSposeResponse
+#
+sub PostWorksheetAutoFilterRefresh {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PostWorksheetAutoFilterRefresh");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PostWorksheetAutoFilterRefresh");
+    }  
+        
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/refresh/?appSid={appSid}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'SaaSposeResponse', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PostWorksheetMatchNonBlanks
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param Integer $fieldIndex  (required)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return SaaSposeResponse
+#
+sub PostWorksheetMatchNonBlanks {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PostWorksheetMatchNonBlanks");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PostWorksheetMatchNonBlanks");
+    }  
+    
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PostWorksheetMatchNonBlanks");
+    }    
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/matchNonBlanks/?appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'SaaSposeResponse', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PostWorksheetMatchBlanks
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param Integer $fieldIndex  (required)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return SaaSposeResponse
+#
+sub PostWorksheetMatchBlanks {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PostWorksheetMatchBlanks");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PostWorksheetMatchBlanks");
+    }  
+    
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PostWorksheetMatchBlanks");
+    }    
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/matchBlanks/?appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}
+# query params
     if ( exists $args{'storage'}) {        		
 		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
     }else{
@@ -8706,6 +9112,1391 @@ sub PutWorksheetAddChart {
     
 }
 #
+# PutWorksheetFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $range  (required)
+# @param Integer $fieldIndex  (required)
+# @param String $criteria  (required)
+# @param Boolean $matchBlanks  (optional)
+# @param Boolean $refresh  (optional)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub PutWorksheetFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PutWorksheetFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PutWorksheetFilter");
+    }
+    
+    # verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling PutWorksheetFilter");
+    }
+    
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PutWorksheetFilter");
+    }
+
+# verify the required parameter 'criteria' is set
+    unless (exists $args{'criteria'}) {
+      croak("Missing the required parameter 'criteria' when calling PutWorksheetFilter");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/filter/?appSid={appSid}&amp;range={range}&amp;fieldIndex={fieldIndex}&amp;criteria={criteria}&amp;matchBlanks={matchBlanks}&amp;refresh={refresh}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'range'}) {        		
+		$_resource_path =~ s/\Q{range}\E/$args{'range'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]range.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'criteria'}) {        		
+		$_resource_path =~ s/\Q{criteria}\E/$args{'criteria'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]criteria.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'matchBlanks'}) {        		
+		$_resource_path =~ s/\Q{matchBlanks}\E/$args{'matchBlanks'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]matchBlanks.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'refresh'}) {        		
+		$_resource_path =~ s/\Q{refresh}\E/$args{'refresh'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]refresh.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PutWorksheetColorFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $range  (required)
+# @param Integer $fieldIndex  (required)
+# @param ColorFilterRequest  $body  (required)
+# @param Boolean $matchBlanks  (optional)
+# @param Boolean $refresh  (optional)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub PutWorksheetColorFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PutWorksheetColorFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PutWorksheetColorFilter");
+    }
+    
+    # verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling PutWorksheetColorFilter");
+    }
+    
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PutWorksheetColorFilter");
+    }
+
+# verify the required parameter 'body' is set
+    unless (exists $args{'body'}) {
+      croak("Missing the required parameter 'body' when calling PutWorksheetColorFilter");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/colorFilter/?appSid={appSid}&amp;range={range}&amp;fieldIndex={fieldIndex}&amp;matchBlanks={matchBlanks}&amp;refresh={refresh}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'range'}) {        		
+		$_resource_path =~ s/\Q{range}\E/$args{'range'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]range.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'matchBlanks'}) {        		
+		$_resource_path =~ s/\Q{matchBlanks}\E/$args{'matchBlanks'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]matchBlanks.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'refresh'}) {        		
+		$_resource_path =~ s/\Q{refresh}\E/$args{'refresh'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]refresh.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+ # body params
+    if ( exists $args{'body'}) {
+        $_body_data = $args{'body'};
+    }
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PutWorksheetDateFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $range (required)
+# @param Integer $fieldIndex  (required)
+# @param String $dateTimeGroupingType (required)
+# @param Integer $year  (optional)
+# @param Integer $month  (optional)
+# @param Integer $day  (optional)
+# @param Integer $hour  (optional)
+# @param Integer $minute  (optional)
+# @param Integer $second  (optional)
+# @param Boolean $matchBlanks  (optional)
+# @param Boolean $refresh  (optional)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub PutWorksheetDateFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PutWorksheetDateFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PutWorksheetDateFilter");
+    }    
+    
+# verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling PutWorksheetDateFilter");
+    }
+
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PutWorksheetDateFilter");
+    }
+
+# verify the required parameter 'dateTimeGroupingType' is set
+    unless (exists $args{'dateTimeGroupingType'}) {
+      croak("Missing the required parameter 'dateTimeGroupingType' when calling PutWorksheetDateFilter");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/dateFilter/?range={range}&amp;appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;dateTimeGroupingType={dateTimeGroupingType}&amp;year={year}&amp;month={month}&amp;day={day}&amp;hour={hour}&amp;minute={minute}&amp;second={second}&amp;matchBlanks={matchBlanks}&amp;refresh={refresh}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}
+	# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'range'}) {        		
+		$_resource_path =~ s/\Q{range}\E/$args{'range'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]range.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'matchBlanks'}) {        		
+		$_resource_path =~ s/\Q{matchBlanks}\E/$args{'matchBlanks'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]matchBlanks.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'refresh'}) {        		
+		$_resource_path =~ s/\Q{refresh}\E/$args{'refresh'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]refresh.*?(?=&|\?|$)//g;
+	}	
+# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'dateTimeGroupingType'}) {        		
+		$_resource_path =~ s/\Q{dateTimeGroupingType}\E/$args{'dateTimeGroupingType'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]dateTimeGroupingType.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'year'}) {        		
+		$_resource_path =~ s/\Q{year}\E/$args{'year'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]year.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'month'}) {        		
+		$_resource_path =~ s/\Q{year}\E/$args{'month'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]month.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'day'}) {        		
+		$_resource_path =~ s/\Q{day}\E/$args{'day'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]day.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'hour'}) {        		
+		$_resource_path =~ s/\Q{hour}\E/$args{'hour'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]hour.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'minute'}) {        		
+		$_resource_path =~ s/\Q{minute}\E/$args{'minute'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]minute.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'second'}) {        		
+		$_resource_path =~ s/\Q{second}\E/$args{'second'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]second.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PutWorksheetCustomFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $range (required)
+# @param Integer $fieldIndex  (required)
+# @param String $operatorType1 (required)
+# @param String $criteria1  (required)
+# @param Boolean $isAnd  (optional)
+# @param String $operatorType2 (required)
+# @param String $criteria2  (optional)
+# @param Boolean $matchBlanks  (optional)
+# @param Boolean $refresh  (optional)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub PutWorksheetCustomFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PutWorksheetCustomFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PutWorksheetCustomFilter");
+    }    
+    
+# verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling PutWorksheetCustomFilter");
+    }
+
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PutWorksheetCustomFilter");
+    }
+
+# verify the required parameter 'operatorType1' is set
+    unless (exists $args{'operatorType1'}) {
+      croak("Missing the required parameter 'operatorType1' when calling PutWorksheetCustomFilter");
+    }
+# verify the required parameter 'criteria1' is set
+    unless (exists $args{'criteria1'}) {
+      croak("Missing the required parameter 'criteria1' when calling PutWorksheetCustomFilter");
+    }
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/custom/?range={range}&amp;appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;operatorType1={operatorType1}&amp;criteria1={criteria1}&amp;isAnd={isAnd}&amp;operatorType2={operatorType2}&amp;criteria2={criteria2}&amp;matchBlanks={matchBlanks}&amp;refresh={refresh}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}
+	# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'range'}) {        		
+		$_resource_path =~ s/\Q{range}\E/$args{'range'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]range.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'operatorType1'}) {        		
+		$_resource_path =~ s/\Q{operatorType1}\E/$args{'operatorType1'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]operatorType1.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'criteria1'}) {        		
+		$_resource_path =~ s/\Q{criteria1}\E/$args{'criteria1'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]criteria1.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'operatorType2'}) {        		
+		$_resource_path =~ s/\Q{operatorType2}\E/$args{'operatorType2'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]operatorType2.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'criteria2'}) {        		
+		$_resource_path =~ s/\Q{criteria2}\E/$args{'criteria2'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]criteria2.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'isAnd'}) {        		
+		$_resource_path =~ s/\Q{isAnd}\E/$args{'isAnd'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]isAnd.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'matchBlanks'}) {        		
+		$_resource_path =~ s/\Q{matchBlanks}\E/$args{'matchBlanks'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]matchBlanks.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'refresh'}) {        		
+		$_resource_path =~ s/\Q{refresh}\E/$args{'refresh'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]refresh.*?(?=&|\?|$)//g;
+	}	# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PutWorksheetDynamicFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $range (required)
+# @param Integer $fieldIndex  (required)
+# @param String $dynamicFilterType (required)
+# @param Boolean $matchBlanks  (optional)
+# @param Boolean $refresh  (optional)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub PutWorksheetDynamicFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PutWorksheetDynamicFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PutWorksheetDynamicFilter");
+    }    
+    
+# verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling PutWorksheetDynamicFilter");
+    }
+
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PutWorksheetDynamicFilter");
+    }
+
+# verify the required parameter 'dynamicFilterType' is set
+    unless (exists $args{'dynamicFilterType'}) {
+      croak("Missing the required parameter 'dynamicFilterType' when calling PutWorksheetDynamicFilter");
+    }
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/dynamicFilter/?range={range}&amp;appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;dynamicFilterType={dynamicFilterType}&amp;matchBlanks={matchBlanks}&amp;refresh={refresh}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}
+	# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'range'}) {        		
+		$_resource_path =~ s/\Q{range}\E/$args{'range'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]range.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'dynamicFilterType'}) {        		
+		$_resource_path =~ s/\Q{dynamicFilterType}\E/$args{'dynamicFilterType'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]dynamicFilterType.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'matchBlanks'}) {        		
+		$_resource_path =~ s/\Q{matchBlanks}\E/$args{'matchBlanks'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]matchBlanks.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'refresh'}) {        		
+		$_resource_path =~ s/\Q{refresh}\E/$args{'refresh'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]refresh.*?(?=&|\?|$)//g;
+	}	# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PutWorksheetFilterTop10
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $range (required)
+# @param Integer $fieldIndex  (required)
+# @param Boolean $isTop (required)
+# @param Integer $itemCount (required)
+# @param Boolean $isPercent (required)
+# @param Boolean $matchBlanks  (optional)
+# @param Boolean $refresh  (optional)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub PutWorksheetFilterTop10 {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PutWorksheetFilterTop10");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PutWorksheetFilterTop10");
+    }    
+    
+# verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling PutWorksheetFilterTop10");
+    }
+
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PutWorksheetFilterTop10");
+    }
+
+# verify the required parameter 'isTop' is set
+    unless (exists $args{'isTop'}) {
+      croak("Missing the required parameter 'isTop' when calling PutWorksheetFilterTop10");
+    }
+# verify the required parameter 'itemCount' is set
+    unless (exists $args{'itemCount'}) {
+      croak("Missing the required parameter 'itemCount' when calling PutWorksheetFilterTop10");
+    }
+# verify the required parameter 'isPercent' is set
+    unless (exists $args{'isPercent'}) {
+      croak("Missing the required parameter 'isPercent' when calling PutWorksheetFilterTop10");
+    }
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/filterTop10/?range={range}&amp;appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;isTop={isTop}&amp;itemCount={itemCount}&amp;isPercent={isPercent}&amp;matchBlanks={matchBlanks}&amp;refresh={refresh}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}
+	# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'range'}) {        		
+		$_resource_path =~ s/\Q{range}\E/$args{'range'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]range.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'isTop'}) {        		
+		$_resource_path =~ s/\Q{isTop}\E/$args{'isTop'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]isTop.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'itemCount'}) {        		
+		$_resource_path =~ s/\Q{itemCount}\E/$args{'itemCount'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]itemCount.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'isPercent'}) {        		
+		$_resource_path =~ s/\Q{isPercent}\E/$args{'isPercent'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]isPercent.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'matchBlanks'}) {        		
+		$_resource_path =~ s/\Q{matchBlanks}\E/$args{'matchBlanks'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]matchBlanks.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'refresh'}) {        		
+		$_resource_path =~ s/\Q{refresh}\E/$args{'refresh'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]refresh.*?(?=&|\?|$)//g;
+	}	# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# PutWorksheetIconFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param String $range (required)
+# @param Integer $fieldIndex  (required)
+# @param String $iconSetType  (required)
+# @param Integer $iconId (required)
+# @param Boolean $matchBlanks  (optional)
+# @param Boolean $refresh  (optional)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub PutWorksheetIconFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling PutWorksheetIconFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling PutWorksheetIconFilter");
+    }    
+    
+# verify the required parameter 'range' is set
+    unless (exists $args{'range'}) {
+      croak("Missing the required parameter 'range' when calling PutWorksheetIconFilter");
+    }
+
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling PutWorksheetIconFilter");
+    }
+
+# verify the required parameter 'iconSetType' is set
+    unless (exists $args{'iconSetType'}) {
+      croak("Missing the required parameter 'iconSetType' when calling PutWorksheetIconFilter");
+    }
+# verify the required parameter 'iconId' is set
+    unless (exists $args{'iconId'}) {
+      croak("Missing the required parameter 'iconId' when calling PutWorksheetIconFilter");
+    }
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/iconFilter/?range={range}&amp;appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;iconSetType={iconSetType}&amp;iconId={iconId}&amp;matchBlanks={matchBlanks}&amp;refresh={refresh}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'PUT';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}
+	# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'range'}) {        		
+		$_resource_path =~ s/\Q{range}\E/$args{'range'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]range.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'iconSetType'}) {        		
+		$_resource_path =~ s/\Q{iconSetType}\E/$args{'iconSetType'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]iconSetType.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'iconId'}) {        		
+		$_resource_path =~ s/\Q{iconId}\E/$args{'iconId'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]iconId.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'matchBlanks'}) {        		
+		$_resource_path =~ s/\Q{matchBlanks}\E/$args{'matchBlanks'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]matchBlanks.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'refresh'}) {        		
+		$_resource_path =~ s/\Q{refresh}\E/$args{'refresh'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]refresh.*?(?=&|\?|$)//g;
+	}	# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# DeleteWorksheetDateFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param Integer $fieldIndex  (required)
+# @param String $dateTimeGroupingType (required)
+# @param Integer $year  (optional)
+# @param Integer $month  (optional)
+# @param Integer $day  (optional)
+# @param Integer $hour  (optional)
+# @param Integer $minute  (optional)
+# @param Integer $second  (optional)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub DeleteWorksheetDateFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling DeleteWorksheetDateFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling DeleteWorksheetDateFilter");
+    }    
+    
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling DeleteWorksheetDateFilter");
+    }
+
+# verify the required parameter 'dateTimeGroupingType' is set
+    unless (exists $args{'dateTimeGroupingType'}) {
+      croak("Missing the required parameter 'dateTimeGroupingType' when calling DeleteWorksheetDateFilter");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/dateFilter/?appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;dateTimeGroupingType={dateTimeGroupingType}&amp;year={year}&amp;month={month}&amp;day={day}&amp;hour={hour}&amp;minute={minute}&amp;second={second}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}
+	# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}	
+# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'dateTimeGroupingType'}) {        		
+		$_resource_path =~ s/\Q{dateTimeGroupingType}\E/$args{'dateTimeGroupingType'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]dateTimeGroupingType.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'year'}) {        		
+		$_resource_path =~ s/\Q{year}\E/$args{'year'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]year.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'month'}) {        		
+		$_resource_path =~ s/\Q{year}\E/$args{'month'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]month.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'day'}) {        		
+		$_resource_path =~ s/\Q{day}\E/$args{'day'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]day.*?(?=&|\?|$)//g;
+	}
+
+# query params
+    if ( exists $args{'hour'}) {        		
+		$_resource_path =~ s/\Q{hour}\E/$args{'hour'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]hour.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'minute'}) {        		
+		$_resource_path =~ s/\Q{minute}\E/$args{'minute'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]minute.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'second'}) {        		
+		$_resource_path =~ s/\Q{second}\E/$args{'second'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]second.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}
+# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
+# DeleteWorksheetFilter
+#
+# 
+# 
+# @param String $name  (required)
+# @param String $sheetName  (required)
+# @param Integer $fieldIndex  (required)
+# @param String $criteria  (required)
+# @param String $storage  (optional)
+# @param String $folder  (optional)
+# @return ResponseMessage
+#
+sub DeleteWorksheetFilter {
+    my ($self, %args) = @_;
+
+    
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling DeleteWorksheetFilter");
+    }
+    
+    # verify the required parameter 'sheetName' is set
+    unless (exists $args{'sheetName'}) {
+      croak("Missing the required parameter 'sheetName' when calling DeleteWorksheetFilter");
+    } 
+    
+    
+# verify the required parameter 'fieldIndex' is set
+    unless (exists $args{'fieldIndex'}) {
+      croak("Missing the required parameter 'fieldIndex' when calling DeleteWorksheetFilter");
+    }
+
+
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/autoFilter/filter/?appSid={appSid}&amp;fieldIndex={fieldIndex}&amp;criteria={criteria}&amp;storage={storage}&amp;folder={folder}';
+    
+	$_resource_path =~ s/\Q&amp;\E/&/g;
+    $_resource_path =~ s/\Q\/?\E/?/g;
+    $_resource_path =~ s/\QtoFormat={toFormat}\E/format={format}/g;
+	$_resource_path =~ s/\Q{path}\E/{Path}/g;
+    
+    my $_method = 'DELETE';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/xml', 'application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'name'}) {        		
+		$_resource_path =~ s/\Q{name}\E/$args{'name'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]name.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'sheetName'}) {        		
+		$_resource_path =~ s/\Q{sheetName}\E/$args{'sheetName'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]sheetName.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'fieldIndex'}) {        		
+		$_resource_path =~ s/\Q{fieldIndex}\E/$args{'fieldIndex'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]fieldIndex.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'criteria'}) {        		
+		$_resource_path =~ s/\Q{criteria}\E/$args{'criteria'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]criteria.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'storage'}) {        		
+		$_resource_path =~ s/\Q{storage}\E/$args{'storage'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]storage.*?(?=&|\?|$)//g;
+	}# query params
+    if ( exists $args{'folder'}) {        		
+		$_resource_path =~ s/\Q{folder}\E/$args{'folder'}/g;
+    }else{
+		$_resource_path    =~ s/[?&]folder.*?(?=&|\?|$)//g;
+	}
+    
+    
+    my $_body_data;
+	
+    
+    
+
+    # authentication setting, if any
+    my $auth_settings = [];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+
+	if($AsposeCellsCloud::Configuration::debug){
+		print "\nResponse Content: ".$response->content;
+	}    
+	
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
+    return $_response_object;
+    
+}
+#
 # DeleteWorksheetDeleteChart
 #
 # 
@@ -8805,7 +10596,7 @@ sub DeleteWorksheetDeleteChart {
 		print "\nResponse Content: ".$response->content;
 	}    
 	
-	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ChartsResponse', $response->header('content-type'));
+	my $_response_object = $self->{api_client}->pre_deserialize($response->content, 'ResponseMessage', $response->header('content-type'));
     return $_response_object;
     
 }

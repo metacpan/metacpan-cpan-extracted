@@ -31,6 +31,7 @@ requires 'Plack', '1.0035';
 requires 'Plack::Middleware::FixMissingBodyInRedirect';
 requires 'Plack::Middleware::RemoveRedundantBody';
 requires 'POSIX';
+requires 'Ref::Util';
 requires 'Return::MultiLevel';
 requires 'Role::Tiny', '2.000000';
 requires 'Safe::Isa';
@@ -55,6 +56,8 @@ recommends 'Class::XSAccessor';
 recommends 'Cpanel::JSON::XS';
 recommends 'Crypt::URandom';
 recommends 'HTTP::XSCookies', '0.000007';
+# GH#1332 if old HTTP::XSCookies is installed we need to upgrade
+eval "require HTTP::XSCookies" && requires 'HTTP::XSCookies', '0.000007';
 recommends 'HTTP::XSHeaders';
 recommends 'Math::Random::ISAAC::XS';
 recommends 'MooX::TypeTiny';

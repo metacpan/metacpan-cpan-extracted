@@ -1,6 +1,8 @@
-package Pod::Weaver::Section::MooseExtends 0.01;
+package Pod::Weaver::Section::MooseExtends;
 # ABSTRACT: Add Pod::Weaver section with inherited classes (what I am extending) based on Moose OOP framework
-$Pod::Weaver::Section::MooseExtends::VERSION = '0.01';
+
+our $VERSION = '0.02';
+
 
 
 use strict;
@@ -97,7 +99,7 @@ Pod::Weaver::Section::MooseExtends - Add Pod::Weaver section with inherited clas
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -128,7 +130,7 @@ Milan Sorm <sorm@is4u.cz>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Milan Sorm.
+This software is copyright (c) 2014-2017 by Milan Sorm.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

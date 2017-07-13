@@ -1,6 +1,6 @@
 package Pcore::Ext::Class::Grid;
 
-use Pcore;
+use Pcore -l10n => 'Pcore-Ext';
 
 our $EXT_MAP = {    #
     statusbar => 'Ext.toolbar.Toolbar',
@@ -10,8 +10,8 @@ sub EXT_statusbar($ext) {
     return {
         mixins => ['Ext.util.StoreHolder'],
 
-        totalText  => 'Total {0} item(s)',
-        reloadText => 'Reload',
+        totalText  => l10n('Total {0}'),
+        reloadText => l10n('Reload'),
 
         defaultBindProperty => 'store',
 

@@ -54,10 +54,10 @@ default: all
 
 all: dist
 
-dist: FreeImage
-	cp *.a Dist
-	cp *.dylib Dist
-	cp Source/FreeImage.h Dist
+dist: $(STATICLIB) Source/FreeImage.h
+	mkdir -p $(DISTDIR)
+	cp $(STATICLIB) $(DISTDIR)
+	cp Source/FreeImage.h $(DISTDIR)
 
 FreeImage: $(STATICLIB) $(SHAREDLIB)
 

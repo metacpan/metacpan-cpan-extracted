@@ -1,7 +1,7 @@
 package Log::ger::Manual;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2017-07-12'; # DATE
+our $VERSION = '0.015001'; # VERSION
 
 1;
 # ABSTRACT: Manual for Log::ger
@@ -18,7 +18,27 @@ Log::ger::Manual - Manual for Log::ger
 
 =head1 VERSION
 
-version 0.012
+version 0.015001
+
+=head1 DESCRIPTION
+
+See the following documentation pages:
+
+=over
+
+=item * L<Log::ger::Manual::FAQ>
+
+=item * L<Log::ger::Manual::ForLog4perl>
+
+=item * L<Log::ger::Manual::ForLogAny>
+
+=item * L<Log::ger::Manual::ForLogContextual>
+
+=item * L<Log::ger::Manual::ForLogDispatch>
+
+=item * L<Log::ger::Manual::Internals>
+
+=back
 
 =head1 AUTHOR
 

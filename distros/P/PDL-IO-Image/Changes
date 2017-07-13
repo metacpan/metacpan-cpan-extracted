@@ -1,5 +1,8 @@
 Changes for PDL::IO::Image
 
+1.001   2017/07/11
+        - new Alien::FreeImage 1.x
+
 0.004   2014/12/15
         - new methods for color conversion:
             color_to_4bpp, color_to_8bpp, color_to_8bpp_grey,

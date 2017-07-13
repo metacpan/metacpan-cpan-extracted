@@ -1,12 +1,12 @@
 package PHPLive::Report;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require Exporter;
 our @ISA       = qw(Exporter);
@@ -147,7 +147,7 @@ sub gen_phplive_reports {
     my $sql;
     my $sth;
 
-    $log->debug("Parsing all transcripts ...");
+    log_debug("Parsing all transcripts ...");
     $sql = <<_;
 SELECT
   ces,
@@ -169,7 +169,7 @@ _
         $transcripts{$row->{ces}} = $res;
     }
 
-    $log->debug("Preparing chat reports ...");
+    log_debug("Preparing chat reports ...");
     my $sql_cr = <<_;
   COUNT(*) num_chats,
   ROUND(AVG(t.ended-t.created)/60, 1) avg_chat_duration,
@@ -194,7 +194,7 @@ _
         $res->{chat_report} = \@rows;
     }
 
-    $log->debug("Preparing per-department chat reports ...");
+    log_debug("Preparing per-department chat reports ...");
     $sql = <<_;
 SELECT
   t.deptID deptID,
@@ -222,7 +222,7 @@ _
         $res->{chat_report_by_dept} = \@rows;
     }
 
-    $log->debug("Preparing per-operator chat reports ...");
+    log_debug("Preparing per-operator chat reports ...");
     $sql = <<_;
 SELECT
   t.opID opID,
@@ -268,7 +268,7 @@ PHPLive::Report - Generate reports for PHP Live!
 
 =head1 VERSION
 
-This document describes version 0.06 of PHPLive::Report (from Perl distribution PHPLive-Report), released on 2015-09-04.
+This document describes version 0.07 of PHPLive::Report (from Perl distribution PHPLive-Report), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -284,9 +284,15 @@ for your PHP Live! installation.
 =head1 FUNCTIONS
 
 
-=head2 gen_phplive_reports(%args) -> any
+=head2 gen_phplive_reports
+
+Usage:
+
+ gen_phplive_reports(%args) -> any
 
 Generate reports for PHP Live!.
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -303,18 +309,24 @@ Arguments ('*' denotes required arguments):
 Return value:  (any)
 
 
-=head2 parse_phplive_transcript($transcript) -> any
+=head2 parse_phplive_transcript
+
+Usage:
+
+ parse_phplive_transcript($transcript) -> any
 
 The C<plain> column in C<p_transcripts> table stores the actual chat transcript.
 Entities characters like C<< E<lt> >> and C<< E<gt> >> are HTML-entities-escaped (becoming C<&lt;>
 and C<&gt;>). Multiple lines are squished together into a single line. No
 timestamp is recorded for each message.
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<transcript>* => I<str>
+=item * B<$transcript>* => I<str>
 
 =back
 
@@ -342,7 +354,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

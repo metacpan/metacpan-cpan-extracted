@@ -60,7 +60,7 @@
       },
       "AsposeBarCodeCloud::BarcodeApi" : {
          "file" : "lib/AsposeBarCodeCloud/BarcodeApi.pm",
-         "version" : "1.03"
+         "version" : "v1.0.3"
       },
       "AsposeBarCodeCloud::Configuration" : {
          "file" : "lib/AsposeBarCodeCloud/Configuration.pm"
@@ -150,6 +150,6 @@
          "http://www.opensource.org/licenses/mit-license.php"
       ]
    },
-   "version" : "1.03",
+   "version" : "v1.0.3",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

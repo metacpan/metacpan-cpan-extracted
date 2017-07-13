@@ -4,13 +4,13 @@
       "KMX <kmx@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDL-IO-Image",
    "no_index" : {
@@ -22,7 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::FreeImage" : "0.011",
+            "Alien::FreeImage" : "1.000",
             "File::Temp" : "0",
             "PDL" : "2.006",
             "Test::More" : "0",
@@ -31,7 +31,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::FreeImage" : "0.011",
+            "Alien::FreeImage" : "1.000",
             "PDL" : "2.006"
          }
       },
@@ -44,9 +44,13 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kmx/pdl-io-image/issues"
+      },
       "repository" : {
          "url" : "https://github.com/kmx/pdl-io-image"
       }
    },
-   "version" : "0.004"
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

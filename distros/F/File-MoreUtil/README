@@ -1,21 +1,24 @@
-SYNOPSIS
+NAME
+    File::MoreUtil - File-related utilities
 
+VERSION
+    This document describes version 0.61 of File::MoreUtil (from Perl
+    distribution File-MoreUtil), released on 2017-07-11.
+
+SYNOPSIS
      use File::MoreUtil qw(file_exists l_abs_path dir_empty);
-    
+
      print "file exists" if file_exists("/path/to/file/or/dir");
      print "absolute path = ", l_abs_path("foo");
      print "dir exists and is empty" if dir_empty("/path/to/dir");
 
 DESCRIPTION
-
 FUNCTIONS
-
     None are exported by default, but they are exportable.
 
- file_exists($path) => BOOL
-
+  file_exists($path) => BOOL
     This routine is just like the -e test, except that it assume symlinks
-    with non-existent target as existing. If sym is a symlink to a
+    with non-existent target as existing. If "sym" is a symlink to a
     non-existing target:
 
      -e "sym"             # false, Perl performs stat() which follows symlink
@@ -29,15 +32,14 @@ FUNCTIONS
 
      !(-l "sym") && (-e _) || (-l _)
 
- l_abs_path($path) => STR
-
+  l_abs_path($path) => STR
     Just like Cwd::abs_path(), except that it will not follow symlink if
     $path is symlink (but it will follow symlinks for the parent paths).
 
     Example:
 
      use Cwd qw(getcwd abs_path);
-    
+
      say getcwd();              # /home/steven
      # s is a symlink to /tmp/foo
      say abs_path("s");         # /tmp/foo
@@ -48,16 +50,38 @@ FUNCTIONS
 
     Mnemonic: l_abs_path -> abs_path is analogous to lstat -> stat.
 
-    Note: currently uses hardcoded / as path separator.
+    Note: currently uses hardcoded "/" as path separator.
 
- dir_empty($dir) => BOOL
-
+  dir_empty($dir) => BOOL
     Will return true if $dir exists and is empty.
 
 FAQ
-
- Where is file_empty()?
-
+  Where is file_empty()?
     For checking if some path exists, is a regular file, and is empty
-    (content is zero-length), you can simply use the -z filetest operator.
+    (content is zero-length), you can simply use the "-z" filetest operator.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-MoreUtil>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-SHARYANTO-File-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-MoreUtil>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

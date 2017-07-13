@@ -1,0 +1,145 @@
+These "examples" were only used for testing by a former maintainer, and thus 
+were removed from the official distribution (2.026). However, I feel that 
+they can provide some interesting examples of code, and thus should 
+continue to be provided.
+
+SOME OF THESE EXAMPLES DO NOT WORK (SEE NOTES). USE AT YOUR OWN RISK. THEY
+ARE NOT INTENDED TO BE OFFICIAL TEST CASES, NOR ARE THEY WELL DOCUMENTED OR
+NECESSARILY EVEN WELL WRITTEN. They are provided as examples of code, and some
+(e.g., listing of fonts) may even be useful to you.
+
+Run from parent of examples directory, e.g., perl examples/011_open_update.
+Creates output PDF files in examples directory (with exceptions as noted).
+
+Fixing these examples is a low priority task, but I will try to get to it over
+time. Meanwhile, fixes, suggestions, and even new (working!) examples from the 
+community are welcome.
+
+As of 2.025 (last version tested against)...
+(see bug 108987)
+tested against 3.003 April 2017
+tested against 3.004 July 2017
+
+=========== broken:
+
+ 024_bdffonts    this appears to want one Bitmap Distribution Format (.bdf).
+                 So far not good results... one character per page (good 
+                 bitmap), then the full chart only shows bounding boxes for 
+                 characters, and other problems. No idea what width of character
+                 signifies. I have used .bdf files from Chris Cannan's 1998 
+                 "codec" distribution. Note that this example used to be named 
+                 024_bmpfonts. Much work remains to be done, including fixes 
+                 to bdffonts handling. Does anyone still use BDF fonts? If not,
+                 perhaps we should just get rid of support for them.
+
+ 025_unifonts    get one message "Malformed UTF-8 character (fatal) at 
+                 025_unifonts line 95, <DATA> line 1." It seems to be reading 
+                 one of the font files in a list, and getting this error. No 
+                 output is produced. This appears to be a regular expression 
+                 substitution to remove CR and LF characters from the line 
+                 just read in from the file. The bad character is x93, 
+                 apparently from one of the Western fonts. The error happens on 
+                 KozGo-Italic + Georgia-Italic, first of 45 loops. All the 
+                 Western fonts have a U+0093 opening double quotation mark, 
+                 which is a Smart Quotes-like extension to true Latin-1. At 
+                 this point, I have no idea what was intended or what to try to 
+                 fix.
+
+                 U+0093 is normally (in Unicode) a control character (STS =
+                 Set Transmit State), while Smart Quotes x93 is an opening
+                 (left) double quote mark, U+201C. Someone needs to look at
+                 whether the supposed UTF-8 text being printed simply needs to
+                 be updated from 0093 to 201C, to make it real UTF-8.
+
+ 027_winfont     runs for a few seconds and ends without producing any output 
+                 file and no messages. The PDF::Builder::Win32->enumwinfonts()
+                 method is returning no fonts. See bug CTS 3.
+
+=========== successful (produced reasonable looking PDF, and no messages):
+
+ 011_open_update  BASE is one page Hello World!. UPDATED is two page, second
+                 page is new Hello World! (2). Internal string adds third page
+                 Hello World! (3). STRING PDF adds fourth page Hello World! (4).
+
+ 012_pages       output pages numbered 1, 9, 2 - 8 (generate pages 1 - 8,
+                 insert page 9 before 2)
+
+ 020_corefonts   latin1 encoding only (actually looks more like Windows-1252). 
+                 4 variants most faces
+                 one page per font name, not exactly sure what second page is
+                     (fnt->automap()), apparently some non-Latin-1 extensions
+                 command line list of core fonts to display, or entire list
+                 by default
+
+ 020_textrise    show a line of text with rise of +5 (superscript) and -5
+                 (subscript). Also +/- 10 and 20 units.
+
+ 020_textunderline  show off textlabel() call with angles, colors, and a
+                 variety of underlining.
+
+ 021_synfonts    .75 slant, 12 oblique, 4 bold, and small caps variants (where
+                 available) of the given core fonts, as available, for 29 core 
+                 fonts.
+
+ 022_truefonts   Given one or more TrueType (.ttf) font FILES on the command
+                 line, a PDF showing the characters, CID details, and some
+                 sample text is produced for each file. Note that unlike most
+                 of the other example programs, the resulting PDF(s) are in
+                 the directory you run the program from, not the examples/ 
+                 directory where 022_truefonts lives!
+
+ 022_truefonts_diacrits_utf8   similar to 022_truefonts in its inputs and
+                 outputs. times.ttf and tahoma.ttf (and presumably others)
+                 contain the U+0x0361 combining diacritic.
+
+ 023_cjkfonts    (MyungJo fonts only) the last several hundred characters (2 
+                 pages, rotated ASCII) get an undefined value returned by 
+                 $font->uniByCId($xo), and so end up being formatted U+0x???? 
+                 to avoid a fatal error. Presumably, rotated text should not
+                 have a Unicode number.
+                 The Lorem Ipsum text on the last page of some fonts (KozGo, 
+                 KozMin, MyungJo) appears to be using the fixed pitch variants
+                 of Latin alphabet, rather than proportional.
+
+ 026_unifont2    a selection of Unicode alphabets and symbols, in several
+                 font faces (Helvetica Bold, Times Roman, symbols). Note that
+                 glyph name is printed at an angle, due the the length.
+
+ 030_colorspecs  displays 16 pages each of RGB, RGB Gamma 2.2, CMYK, and L*a*b
+                 colorspaces, and almost 3 pages of named colors. 16 pages of
+                 256 colors each, except named colors. All are sorted from 
+                 lower left to upper right (opposite of font pages). Black 
+                 (K) = 0 for all CMYK entries, else it would have 256 pages.
+
+ 031_color_hsv   displays 7 page subset of HSV colorspace as color wheels.
+
+ 032_separation  show color separation (CMYK) grid.
+
+ 040_annotation  demonstrate open and closed annotations on a page. Some of
+                 the behavior seems a little unintuitive, so future corrections 
+		 may be in order. The "closed" note is only mouseover text,
+                 while the "open" permits appending of additional text. If you
+                 make a change to the open annotation, when you exit you will be                 prompted to save the changes (you don't have to, unless you
+                 want to open the PDF again and see your entry still there).
+
+ 050_pagelabels  all 26 pages show "Page Index=n" (0..25). The reader's 
+                 thumbnail display is labeled with the appropriate Roman
+                 Numerals, etc., and is NOT on the page itself. Note that each
+                 time the display format is changed, the page number resets to
+                 1 (I, i, A, a).
+
+ 060_transparency  show writing opaque and translucent text by two methods.
+
+=========== other example material:
+Note that these PDFs are in the directory you ran the programs from, not the
+examples/ directory.
+
+Content.pl       demonstrate Content.pm graphics and text calls, 5 pages.
+
+ContentText.pl   demonstrate Content-related text call, 10 pages.
+
+BarCode.pl       demonstrate the bar code library, 1 page.
+  mostly looks OK, but suspect some heavy bars are merging into their neighbors
+  and there may be other problems, so my advice is NOT to use the barcodes in
+  production code until they have been tested and verified.
+

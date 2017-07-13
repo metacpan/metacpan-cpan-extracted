@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::log::follow;
-$Footprintless::App::Command::log::follow::VERSION = '1.24';
+$Footprintless::App::Command::log::follow::VERSION = '1.25';
 # ABSTRACT: output the last part of a file and append as the file grows
 # PODNAME: Footprintless::App::Command::log::follow
 
@@ -51,7 +51,7 @@ Footprintless::App::Command::log::follow - output the last part of a file and ap
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 AUTHOR
 

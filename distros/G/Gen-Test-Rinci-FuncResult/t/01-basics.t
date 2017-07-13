@@ -7,7 +7,7 @@ use warnings;
 use FindBin '$Bin';
 
 use Capture::Tiny qw(capture);
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Temp qw(tempfile);
 use Test::More 0.98;
 
@@ -33,7 +33,7 @@ sub test_fail {
 
     my ($stdout, $stderr, $exit) = capture {
         my ($fh, $filename) = tempfile();
-        write_file($filename, qq(do "$Bin/template"; ).$code);
+        write_text($filename, qq(do "$Bin/template"; ).$code);
         system $^X, "-I$Bin/..", $filename;
     };
 

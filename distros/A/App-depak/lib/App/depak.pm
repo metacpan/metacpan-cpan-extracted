@@ -1,12 +1,12 @@
 package App::depak;
 
-our $DATE = '2016-08-02'; # DATE
-our $VERSION = '0.53'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.55'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 BEGIN { no warnings; $main::Log_Level = 'info' }
 
 use App::lcpan::Call qw(call_lcpan_script);
@@ -24,7 +24,7 @@ sub _trace {
 
     return if $self->{trace_method} eq 'none';
 
-    $log->debugf("  Tracing with method '%s' ...", $self->{trace_method});
+    log_debug("  Tracing with method '%s' ...", $self->{trace_method});
     my %traceargs = (
         method => $self->{trace_method},
         script => $self->{input_file},
@@ -39,7 +39,7 @@ sub _trace {
         ($self->{trace_extra_opts} ? %{$self->{trace_extra_opts}} : ()),
     );
 
-    $log->debugf("  tracepm args: %s", \%traceargs);
+    log_debug("  tracepm args: %s", \%traceargs);
     my $res = App::tracepm::tracepm(%traceargs);
     die "Can't trace: $res->[0] - $res->[1]\n" unless $res->[0] == 200;
     $self->{deps} = $res->[2];
@@ -67,12 +67,12 @@ sub _build_lib {
     my $deps = $self->{deps};
     for (@{$deps // []}) {
         next if $_->{is_core} && $self->{exclude_core};
-        $log->debugf("  Adding module: %s (traced)", $_->{module});
+        log_debug("  Adding module: %s (traced)", $_->{module});
         $mod_paths{$_->{module}} = undef;
     }
 
     if ($self->{include_prereq} && @{ $self->{include_prereq} }) {
-        $log->infof("Searching recursive prereqs to add into the pack: %s", $self->{include_prereq});
+        log_info("Searching recursive prereqs to add into the pack: %s", $self->{include_prereq});
         for my $prereq (@{ $self->{include_prereq} }) {
             my @mods = ($prereq);
             # find prereq's dependencies
@@ -86,30 +86,30 @@ sub _build_lib {
             $res = call_lcpan_script(argv=>["mods-from-same-dist", "--latest", "--detail", @mods]);
             die "Can't lcpan mods-from-same-dist: $res->[0] - $res->[1]" unless $res->[0] == 200;
             for my $entry (@{ $res->[2] }) {
-                $log->debugf("  Adding module: %s (include_prereq %s, dist %s)", $entry->{name}, $prereq, $entry->{dist});
+                log_debug("  Adding module: %s (include_prereq %s, dist %s)", $entry->{name}, $prereq, $entry->{dist});
                 $mod_paths{$entry->{name}} = undef;
             }
         }
     }
 
     for (@{ $self->{include_module} // [] }) {
-        $log->debugf("  Adding module: %s (included)", $_);
+        log_debug("  Adding module: %s (included)", $_);
         $mod_paths{$_} = undef;
     }
 
     for (@{ $self->{include_dist} // [] }) {
         my @distmods = Dist::Util::list_dist_modules($_);
         if (@distmods) {
-            $log->debugf("  Adding modules: %s (included dist)", join(", ", @distmods));
+            log_debug("  Adding modules: %s (included dist)", join(", ", @distmods));
             $mod_paths{$_} = undef for @distmods;
         } else {
-            $log->infof("  Adding module: %s (included dist, but can't find other modules)", $_);
+            log_info("  Adding module: %s (included dist, but can't find other modules)", $_);
             $mod_paths{$_} = undef;
         }
     }
 
     if (defined(my $file = $self->{include_list})) {
-        $log->debugf("  Adding modules listed in: %s", $file);
+        log_debug("  Adding modules listed in: %s", $file);
         open my($fh), "<", $file
             or die "Can't open modules list file '$file': $!\n";
         my $linenum = 0;
@@ -126,13 +126,13 @@ sub _build_lib {
             # special handling for scan_prereqs or dist.ini
             next if $mod eq 'perl';
 
-            $log->debugf("    Adding module: %s", $mod);
+            log_debug("    Adding module: %s", $mod);
             $mod_paths{$mod} = undef;
         }
     }
 
     for (@{ $self->{include_dir} // [] }) {
-        $log->debugf("  Adding modules found in: %s", $_);
+        log_debug("  Adding modules found in: %s", $_);
         local $CWD = $_;
         File::Find::find(
             sub {
@@ -141,7 +141,7 @@ sub _build_lib {
                 my $mod = $File::Find::dir eq '.' ? $_ : "$File::Find::dir/$_";
                 $mod =~ s!^\.[/\\]!!;
                 $mod =~ s![/\\]!::!g; $mod =~ s/\.pm$//i;
-                $log->debugf("    Adding module: %s", $mod);
+                log_debug("    Adding module: %s", $mod);
                 $mod_paths{$mod} = "$CWD/$_";
             }, ".",
         );
@@ -158,7 +158,7 @@ sub _build_lib {
         if ($self->{exclude_prereq} && @{ $self->{exclude_prereq} }) {
             if (!$excluded_prereqs) {
                 $excluded_prereqs = {};
-                $log->infof("Searching recursive prereqs to exclude from the pack: %s", $self->{exclude_prereq});
+                log_info("Searching recursive prereqs to exclude from the pack: %s", $self->{exclude_prereq});
                 for my $prereq (@{ $self->{exclude_prereq} }) {
                     my @mods = ($prereq);
                     # find prereq's dependencies
@@ -177,18 +177,18 @@ sub _build_lib {
                 }
             }
             if ($excluded_prereqs->{$mod}) {
-                $log->infof("Excluding %s: skipped by exclude_prereq %s", $mod, $excluded_prereqs->{$mod});
+                log_info("Excluding %s: skipped by exclude_prereq %s", $mod, $excluded_prereqs->{$mod});
                 next MOD_TO_FILTER;
             }
         }
 
         if ($self->{exclude_module} && $mod ~~ @{ $self->{exclude_module} }) {
-            $log->infof("Excluding %s: skipped", $mod);
+            log_info("Excluding %s: skipped", $mod);
             next MOD_TO_FILTER;
         }
         for (@{ $self->{exclude_pattern} // [] }) {
             if ($mod ~~ /$_/) {
-                $log->infof("Excluding %s: skipped by pattern %s", $mod, $_);
+                log_info("Excluding %s: skipped by pattern %s", $mod, $_);
                 next MOD_TO_FILTER;
             }
         }
@@ -200,14 +200,14 @@ sub _build_lib {
                 }
             }
             if ($mod ~~ @$excluded_distmods) {
-                $log->infof("Excluding %s (by dist): skipped", $mod);
+                log_info("Excluding %s (by dist): skipped", $mod);
                 next MOD_TO_FILTER;
             }
         }
         if (defined(my $file = $self->{exclude_list})) {
             if (!$excluded_list) {
                 $excluded_list = [];
-                $log->debugf("  Reading excludes listed in: %s", $file);
+                log_debug("  Reading excludes listed in: %s", $file);
                 open my($fh), "<", $file
                     or die "Can't open modules list file '$file': $!\n";
                 my $linenum = 0;
@@ -220,12 +220,12 @@ sub _build_lib {
                         next;
                     };
                     my $emod = $1;
-                    $log->debugf("    Adding excluded module: %s", $emod);
+                    log_debug("    Adding excluded module: %s", $emod);
                     push @$excluded_list, $emod;
                 }
             }
             if ($mod ~~ @$excluded_list) {
-                $log->infof("Excluding %s (by list): skipped", $mod);
+                log_info("Excluding %s (by list): skipped", $mod);
             }
         }
 
@@ -251,7 +251,7 @@ sub _build_lib {
         $mpath //= Module::Path::More::module_path(module=>$mod);
         unless (defined $mpath) {
             if ($self->{skip_not_found}) {
-                $log->infof("Path for module '%s' not found, skipped", $mod);
+                log_info("Path for module '%s' not found, skipped", $mod);
                 next MOD_TO_ADD;
             } else {
                 die "Can't find path for $mod\n";
@@ -278,31 +278,31 @@ sub _build_lib {
                     strip_log      => $self->{stripper_log},
                 );
             };
-            $log->debug("  Stripping $mpath --> $modp ...");
+            log_debug("  Stripping $mpath --> $modp ...");
             my $src = read_binary($mpath);
             my $stripped = $stripper->strip($src);
             write_binary("$tempdir/lib/$modp", $stripped);
         } elsif ($self->{strip}) {
             require Perl::Strip;
             my $strip = Perl::Strip->new;
-            $log->debug("  Stripping $mpath --> $modp ...");
+            log_debug("  Stripping $mpath --> $modp ...");
             my $src = read_binary($mpath);
             my $stripped = $strip->strip($src);
             write_binary("$tempdir/lib/$modp", $stripped);
         } elsif ($self->{squish}) {
-            $log->debug("  Squishing $mpath --> $modp ...");
+            log_debug("  Squishing $mpath --> $modp ...");
             require Perl::Squish;
             my $squish = Perl::Squish->new;
             $squish->file($mpath, "$tempdir/lib/$modp");
         } else {
-            $log->debug("  Copying $mpath --> $tempdir/lib/$modp ...");
+            log_debug("  Copying $mpath --> $tempdir/lib/$modp ...");
             File::Copy::copy($mpath, "$tempdir/lib/$modp");
         }
 
         $totfiles++;
         $totsize += (-s $mpath);
     }
-    $log->infof("  Added %d files (%.1f KB)", $totfiles, $totsize/1024);
+    log_info("  Added %d files (%.1f KB)", $totfiles, $totsize/1024);
 }
 
 sub _pack {
@@ -367,7 +367,7 @@ sub _pack {
     write_binary($self->{abs_output_file}, $res->[2]);
     chmod 0755, $self->{abs_output_file};
 
-    $log->infof("  Produced %s (%.1f KB)",
+    log_info("  Produced %s (%.1f KB)",
                 $self->{abs_output_file}, (-s $self->{abs_output_file})/1024);
 }
 
@@ -384,14 +384,14 @@ sub _test {
     my $i = 0;
     for my $case (@$cases) {
         $i++;
-        $log->debugf("  Test case %d/%d: %s ...", $i, ~~@$cases, $case->{args});
+        log_debug("  Test case %d/%d: %s ...", $i, ~~@$cases, $case->{args});
         my @cmd = ($^X);
         push @cmd, @{ $case->{perl_args} } if $case->{perl_args} && @{ $case->{perl_args} };
         push @cmd, $self->{abs_output_file}, @{ $case->{args} };
         my $exit;
         # log statement by IPC::System::Options' log=1 will be eaten by
         # Capture::Tiny, so we log here
-        $log->tracef("cmd: %s", \@cmd);
+        log_trace("cmd: %s", \@cmd);
         my $output = Capture::Tiny::capture_merged(
             sub {
                 IPC::System::Options::system({log=>0, shell=>0}, @cmd);
@@ -784,7 +784,7 @@ sub depak {
     $self->{skip_not_found} //= $self->{include_prereq} ? 1:0;
 
     my $tempdir = File::Temp::tempdir(CLEANUP => 0);
-    $log->debugf("Created tempdir %s", $tempdir);
+    log_debug("Created tempdir %s", $tempdir);
     $self->{tempdir} = $tempdir;
 
     # for convenience of completion in bash, we allow / to separate namespace.
@@ -803,7 +803,7 @@ sub depak {
 
     $self->{perl_version} //= $^V;
     $self->{perl_version} = version->parse($self->{perl_version});
-    $log->debugf("Will be targetting perl %s", $self->{perl_version});
+    log_debug("Will be targetting perl %s", $self->{perl_version});
 
     if ($self->{input_file} eq '-') {
         $self->{input_file_is_stdin} = 1;
@@ -833,20 +833,20 @@ sub depak {
         [500, "Can't find absolute path of output file '$self->{output_file}'"];
 
     unless ($self->{trace_method} eq 'none') {
-        $log->infof("Tracing dependencies ...");
+        log_info("Tracing dependencies ...");
         $self->_trace;
     }
 
-    $log->infof("Building lib/ ...");
+    log_info("Building lib/ ...");
     $self->_build_lib;
 
-    $log->infof("Packing ...");
+    log_info("Packing ...");
     $self->_pack;
 
     if ($self->{debug_keep_tempdir}) {
-        $log->infof("Keeping tempdir %s for debugging", $tempdir);
+        log_info("Keeping tempdir %s for debugging", $tempdir);
     } else {
-        $log->debugf("Deleting tempdir %s ...", $tempdir);
+        log_debug("Deleting tempdir %s ...", $tempdir);
         File::Path::remove_tree($tempdir);
     }
 
@@ -861,7 +861,7 @@ sub depak {
     }
 
     if ($self->{test}) {
-        $log->infof("Testing ...");
+        log_info("Testing ...");
         $self->_test;
     }
 
@@ -969,7 +969,7 @@ App::depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.53 of App::depak (from Perl distribution App-depak), released on 2016-08-02.
+This document describes version 0.55 of App::depak (from Perl distribution App-depak), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -980,7 +980,11 @@ See L<depak>.
 =head1 FUNCTIONS
 
 
-=head2 depak(%args) -> [status, msg, result, meta]
+=head2 depak
+
+Usage:
+
+ depak(%args) -> [status, msg, result, meta]
 
 Pack your dependencies onto your script file.
 
@@ -1250,7 +1254,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,13 +1,13 @@
 package Software::Release::Watch;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo;
 
-use Perinci::Sub::Gen::AccessTable 0.17 qw(gen_read_table_func);
+use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 use Software::Catalog;
 
 require Exporter;
@@ -110,7 +110,7 @@ _
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub list_software_releases {
-    my %args = @_; no warnings ('void');my $_sahv_dpath = []; my $arg_err; if (exists($args{'software_id'})) { ((defined($args{'software_id'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0)) && ((!ref($args{'software_id'})) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type text"),0)) && (($args{'software_id'} =~ qr((?:(?-)\A[a-z]([a-z0-9_])*\z))) ? 1 : (($arg_err //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Must match regex pattern qr(\\A[a-z]([a-z0-9_])*\\z)"),0)); if ($arg_err) { return [400, "Invalid argument value for software_id: $arg_err"] } }if (!exists($args{'software_id'})) { return [400, "Missing argument: software_id"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'software_id'})) { ((defined($args{'software_id'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'software_id'})) ? 1 : (($arg_err //= "Not of type text"),0)) && (($args{'software_id'} =~ qr((?:(?-)\A[a-z]([a-z0-9_])*\z))) ? 1 : (($arg_err //= "Must match regex pattern qr(\\A[a-z]([a-z0-9_])*\\z)"),0)); if ($arg_err) { return [400, "Invalid argument value for software_id: $arg_err"] } }if (!exists($args{'software_id'})) { return [400, "Missing argument: software_id"] } # VALIDATE_ARGS
     my $swid = $args{software_id};
 
     my $res;
@@ -154,7 +154,7 @@ Software::Release::Watch - Watch latest software releases
 
 =head1 VERSION
 
-This document describes version 0.04 of Software::Release::Watch (from Perl distribution Software-Release-Watch), released on 2015-09-04.
+This document describes version 0.05 of Software::Release::Watch (from Perl distribution Software-Release-Watch), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -169,22 +169,20 @@ This document describes version 0.04 of Software::Release::Watch (from Perl dist
 
 =for Pod::Coverage get_url mech
 
-=head1 FAQ
-
-=head1 SEE ALSO
-
-L<Software::Catalog>
-
-C<Software::Release::Watch::*> modules.
-
 =head1 FUNCTIONS
 
 
-=head2 list_software(%args) -> [status, msg, result, meta]
+=head2 list_software
+
+Usage:
+
+ list_software(%args) -> [status, msg, result, meta]
 
 REPLACE ME.
 
 REPLACE ME
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -260,7 +258,7 @@ Only return a certain number of records.
 
 Only return starting from the n'th record.
 
-=item * B<sort> => I<str>
+=item * B<sort> => I<array[str]>
 
 Order records according to certain field(s).
 
@@ -289,7 +287,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_software_releases(%args) -> [status, msg, result, meta]
+=head2 list_software_releases
+
+Usage:
+
+ list_software_releases(%args) -> [status, msg, result, meta]
 
 List software releases.
 
@@ -304,6 +306,8 @@ Statuses:
 =item * 543 - parsing failure (permanent)
 
 =back
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -324,6 +328,8 @@ that contains extra information.
 
 Return value:  (any)
 
+=head1 FAQ
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Software-Release-Watch>.
@@ -340,13 +346,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Software::Catalog>
+
+C<Software::Release::Watch::*> modules.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Deployment;
-$Footprintless::Deployment::VERSION = '1.24';
+$Footprintless::Deployment::VERSION = '1.25';
 # ABSTRACT: A deployment manager
 # PODNAME: Footprintless::Deployment
 
@@ -111,7 +111,7 @@ Footprintless::Deployment - A deployment manager
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 

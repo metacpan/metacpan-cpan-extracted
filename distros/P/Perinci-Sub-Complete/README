@@ -1,13 +1,473 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::Complete - Complete command-line argument using Rinci
+    metadata
 
+VERSION
+    This document describes version 0.92 of Perinci::Sub::Complete (from
+    Perl distribution Perinci-Sub-Complete), released on 2017-07-10.
+
+SYNOPSIS
     See Perinci::CmdLine or Perinci::CmdLine::Lite or App::riap which use
     this module.
 
 DESCRIPTION
+FUNCTIONS
+  complete_arg_elem
+    Usage:
+
+     complete_arg_elem(%args) -> array
+
+    Given argument name and function metadata, complete array element.
+
+    Will attempt to complete using the completion routine specified in the
+    argument specification (the "completion" property, or in the case of
+    "complete_arg_elem" function, the "element_completion" property), or if
+    that is not specified, from argument's schema using
+    "complete_from_schema".
+
+    Completion routine will get %args, with the following keys:
+
+    *   "word" (str, the word to be completed)
+
+    *   "arg" (str, the argument name which value is currently being
+        completed)
+
+    *   "index (int, only for the"complete_arg_elem` function, the index in
+        the argument array that is currently being completed, starts from 0)
+
+    *   "args" (hash, the argument hash to the function, so far)
+
+    as well as extra keys from "extras" (but these won't overwrite the above
+    standard keys).
+
+    Completion routine should return a completion answer structure
+    (described in Complete) which is either a hash or an array. The simplest
+    form of answer is just to return an array of strings. Completion routine
+    can also return undef to express declination.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arg* => *str*
+
+        Argument name.
+
+    *   args => *hash*
+
+        Collected arguments so far, will be passed to completion routines.
+
+    *   extras => *hash*
+
+        Add extra arguments to completion routine.
+
+        The keys from this "extras" hash will be merged into the final %args
+        passed to completion routines. Note that standard keys like "word",
+        "cword", and so on as described in the function description will not
+        be overwritten by this.
+
+    *   index => *str*
+
+        Index of element to complete.
+
+    *   meta* => *hash*
+
+        Rinci function metadata, must be normalized.
+
+    *   riap_client => *obj*
+
+        Optional, to perform complete_arg_val to the server.
+
+        When the argument spec in the Rinci metadata contains "completion"
+        key, this means there is custom completion code for that argument.
+        However, if retrieved from a remote server, sometimes the
+        "completion" key no longer contains the code (it has been cleansed
+        into a string). Moreover, the completion code needs to run on the
+        server.
+
+        If supplied this argument and te "riap_server_url" argument, the
+        function will try to request to the server (via Riap request
+        "complete_arg_val"). Otherwise, the function will just give
+        up/decline completing.
+
+    *   riap_server_url => *str*
+
+        Optional, to perform complete_arg_val to the server.
+
+        See the "riap_client" argument.
+
+    *   riap_uri => *str*
+
+        Optional, to perform complete_arg_val to the server.
+
+        See the "riap_client" argument.
+
+    *   word => *str* (default: "")
+
+        Word to be completed.
+
+    Return value: (array)
+
+  complete_arg_index
+    Usage:
+
+     complete_arg_index(%args) -> array
+
+    Given argument name and function metadata, complete arg element index.
+
+    This is only relevant for arguments which have "index_completion"
+    property set (currently only "hash" type arguments). When that property
+    is not set, will simply return undef.
+
+    Completion routine will get %args, with the following keys:
+
+    *   "word" (str, the word to be completed)
+
+    *   "arg" (str, the argument name which value is currently being
+        completed)
+
+    *   "args" (hash, the argument hash to the function, so far)
+
+    as well as extra keys from "extras" (but these won't overwrite the above
+    standard keys).
+
+    Completion routine should return a completion answer structure
+    (described in Complete) which is either a hash or an array. The simplest
+    form of answer is just to return an array of strings. Completion routine
+    can also return undef to express declination.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arg* => *str*
+
+        Argument name.
+
+    *   args => *hash*
+
+        Collected arguments so far, will be passed to completion routines.
+
+    *   extras => *hash*
+
+        Add extra arguments to completion routine.
+
+        The keys from this "extras" hash will be merged into the final %args
+        passed to completion routines. Note that standard keys like "word",
+        "cword", and so on as described in the function description will not
+        be overwritten by this.
+
+    *   meta* => *hash*
+
+        Rinci function metadata, must be normalized.
+
+    *   riap_client => *obj*
+
+        Optional, to perform complete_arg_val to the server.
+
+        When the argument spec in the Rinci metadata contains "completion"
+        key, this means there is custom completion code for that argument.
+        However, if retrieved from a remote server, sometimes the
+        "completion" key no longer contains the code (it has been cleansed
+        into a string). Moreover, the completion code needs to run on the
+        server.
+
+        If supplied this argument and te "riap_server_url" argument, the
+        function will try to request to the server (via Riap request
+        "complete_arg_val"). Otherwise, the function will just give
+        up/decline completing.
+
+    *   riap_server_url => *str*
+
+        Optional, to perform complete_arg_val to the server.
+
+        See the "riap_client" argument.
+
+    *   riap_uri => *str*
+
+        Optional, to perform complete_arg_val to the server.
+
+        See the "riap_client" argument.
+
+    *   word => *str* (default: "")
+
+        Word to be completed.
+
+    Return value: (array)
+
+  complete_arg_val
+    Usage:
+
+     complete_arg_val(%args) -> array
+
+    Given argument name and function metadata, complete value.
+
+    Will attempt to complete using the completion routine specified in the
+    argument specification (the "completion" property, or in the case of
+    "complete_arg_elem" function, the "element_completion" property), or if
+    that is not specified, from argument's schema using
+    "complete_from_schema".
+
+    Completion routine will get %args, with the following keys:
+
+    *   "word" (str, the word to be completed)
+
+    *   "arg" (str, the argument name which value is currently being
+        completed)
+
+    *   "index (int, only for the"complete_arg_elem` function, the index in
+        the argument array that is currently being completed, starts from 0)
+
+    *   "args" (hash, the argument hash to the function, so far)
+
+    as well as extra keys from "extras" (but these won't overwrite the above
+    standard keys).
+
+    Completion routine should return a completion answer structure
+    (described in Complete) which is either a hash or an array. The simplest
+    form of answer is just to return an array of strings. Completion routine
+    can also return undef to express declination.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   arg* => *str*
+
+        Argument name.
+
+    *   args => *hash*
+
+        Collected arguments so far, will be passed to completion routines.
+
+    *   extras => *hash*
+
+        Add extra arguments to completion routine.
+
+        The keys from this "extras" hash will be merged into the final %args
+        passed to completion routines. Note that standard keys like "word",
+        "cword", and so on as described in the function description will not
+        be overwritten by this.
+
+    *   meta* => *hash*
+
+        Rinci function metadata, must be normalized.
+
+    *   riap_client => *obj*
+
+        Optional, to perform complete_arg_val to the server.
+
+        When the argument spec in the Rinci metadata contains "completion"
+        key, this means there is custom completion code for that argument.
+        However, if retrieved from a remote server, sometimes the
+        "completion" key no longer contains the code (it has been cleansed
+        into a string). Moreover, the completion code needs to run on the
+        server.
+
+        If supplied this argument and te "riap_server_url" argument, the
+        function will try to request to the server (via Riap request
+        "complete_arg_val"). Otherwise, the function will just give
+        up/decline completing.
+
+    *   riap_server_url => *str*
+
+        Optional, to perform complete_arg_val to the server.
+
+        See the "riap_client" argument.
+
+    *   riap_uri => *str*
+
+        Optional, to perform complete_arg_val to the server.
+
+        See the "riap_client" argument.
+
+    *   word => *str* (default: "")
+
+        Word to be completed.
+
+    Return value: (array)
+
+  complete_cli_arg
+    Usage:
+
+     complete_cli_arg(%args) -> hash
+
+    Complete command-line argument using Rinci function metadata.
+
+    This routine uses Perinci::Sub::GetArgs::Argv to generate Getopt::Long
+    specification from arguments list in Rinci function metadata and common
+    options. Then, it will use Complete::Getopt::Long to complete option
+    names, option values, as well as arguments.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   common_opts => *hash*
+
+        Common options.
+
+        A hash where the values are hashes containing these keys: "getopt"
+        (Getopt::Long option specification), "handler" (Getopt::Long
+        handler). Will be passed to "get_args_from_argv()". Example:
+
+         {
+             help => {
+                 getopt  => 'help|h|?',
+                 handler => sub { ... },
+                 summary => 'Display help and exit',
+             },
+             version => {
+                 getopt  => 'version|v',
+                 handler => sub { ... },
+                 summary => 'Display version and exit',
+             },
+         }
+
+    *   completion => *code*
+
+        Supply custom completion routine.
+
+        If supplied, instead of the default completion routine, this code
+        will be called instead. Will receive all arguments that
+        Complete::Getopt::Long will pass, and additionally:
+
+        *   "arg" (str, the name of function argument)
+
+        *   "args" (hash, the function arguments formed so far)
+
+        *   "index" (int, if completing argument element value)
+
+    *   cword* => *int*
+
+        On which argument cursor is located (zero-based).
+
+    *   extras => *hash*
+
+        Add extra arguments to completion routine.
+
+        The keys from this "extras" hash will be merged into the final %args
+        passed to completion routines. Note that standard keys like "word",
+        "cword", and so on as described in the function description will not
+        be overwritten by this.
+
+    *   func_arg_starts_at => *int* (default: 0)
+
+        This is a (temporary?) workaround for Perinci::CmdLine. In an
+        application with subcommands (e.g. "cmd --verbose subcmd arg0 arg1
+        ..."), then "words" will still contain the subcommand name.
+        Positional function arguments then start at 1 not 0. This option
+        allows offsetting function arguments.
+
+    *   meta* => *hash*
+
+        Rinci function metadata.
+
+    *   per_arg_json => *bool*
+
+        Will be passed to Perinci::Sub::GetArgs::Argv.
+
+    *   per_arg_yaml => *bool*
+
+        Will be passed to Perinci::Sub::GetArgs::Argv.
+
+    *   riap_client => *obj*
+
+        Optional, to perform complete_arg_val to the server.
+
+        When the argument spec in the Rinci metadata contains "completion"
+        key, this means there is custom completion code for that argument.
+        However, if retrieved from a remote server, sometimes the
+        "completion" key no longer contains the code (it has been cleansed
+        into a string). Moreover, the completion code needs to run on the
+        server.
+
+        If supplied this argument and te "riap_server_url" argument, the
+        function will try to request to the server (via Riap request
+        "complete_arg_val"). Otherwise, the function will just give
+        up/decline completing.
+
+    *   riap_server_url => *str*
+
+        Optional, to perform complete_arg_val to the server.
+
+        See the "riap_client" argument.
+
+    *   riap_uri => *str*
+
+        Optional, to perform complete_arg_val to the server.
+
+        See the "riap_client" argument.
+
+    *   words* => *array[str]*
+
+        Command-line arguments.
+
+    Return value: (hash)
+
+    You can use "format_completion" function in Complete::Bash module to
+    format the result of this function for bash.
+
+  complete_from_schema
+    Usage:
+
+     complete_from_schema(%args) -> [status, msg, result, meta]
+
+    Complete a value from schema.
+
+    Employ some heuristics to complete a value from Sah schema. For example,
+    if schema is "[str => in => [qw/new open resolved rejected/]]", then we
+    can complete from the "in" clause. Or for something like "[int =>
+    between => [1, 20]]" we can complete using values from 1 to 20.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   schema* => *any*
+
+        Must be normalized.
+
+    *   word* => *str* (default: "")
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-Complete>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-Complete>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Complete>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Complete, Complete::Getopt::Long
 
     Perinci::CmdLine, Perinci::CmdLine::Lite, App::riap
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

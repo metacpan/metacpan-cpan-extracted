@@ -1,4 +1,9 @@
-Revision history for Perl-Stripper
+0.10    2017-07-11 (PERLANCAR)
+
+	- Support stripping Log::ger logging statements.
+
+	- Replace Log::Any with Log::ger.
+
 
 0.09    2015-08-18 (PERLANCAR)
 

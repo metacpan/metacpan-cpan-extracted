@@ -1,0 +1,8 @@
+Revision history for Alien-Build-Plugin-Probe-GnuWin32
+
+0.59      2017-07-12 21:13:41 -0400
+  - Added IRC information to dist meta
+  - bumping version to fix PAUSE mishap on my part
+
+0.57      2017-07-12 16:46:37 -0400
+  - Split off from Alien-Build at version 0.56_01

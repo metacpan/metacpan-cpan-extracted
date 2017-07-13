@@ -18,7 +18,7 @@ Perinci::Access::Manual::Examples - Collection of examples
 
 =head1 VERSION
 
-This document describes version 0.44 of Perinci::Access::Manual::Examples (from Perl distribution Perinci-Access), released on 2015-12-17.
+This document describes version 0.45 of Perinci::Access::Manual::Examples (from Perl distribution Perinci-Access), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -100,10 +100,6 @@ have to see it.
 
 =head2 (Server) Debugging
 
-=head1 SEE ALSO
-
-L<Perinci::CmdLine::Manual>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Access>.
@@ -120,13 +116,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Manual>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

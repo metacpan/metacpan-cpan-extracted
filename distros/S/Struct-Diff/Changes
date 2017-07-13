@@ -1,5 +1,10 @@
 Revision history for Struct-Diff
 
+0.89    2017-07-12
+        diff fixed for A/R hash subkeys with U subkeys present and noU opt
+        get rid of recursion in patch()
+        docs corrected, some cosmetic refactoring
+
 0.88    2017-06-17
         paths in list_diff() fixed for arrays in noU diffs
         rename dsplit => split_diff(), old name is deprecated (alias)

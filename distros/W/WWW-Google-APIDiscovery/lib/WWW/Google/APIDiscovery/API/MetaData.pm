@@ -1,6 +1,6 @@
 package WWW::Google::APIDiscovery::API::MetaData;
 
-$WWW::Google::APIDiscovery::API::MetaData::VERSION   = '0.23';
+$WWW::Google::APIDiscovery::API::MetaData::VERSION   = '0.24';
 $WWW::Google::APIDiscovery::API::MetaData::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ WWW::Google::APIDiscovery::API::MetaData - Placeholder for supported APIS Meta D
 
 =head1 VERSION
 
-Version 0.23
+Version 0.24
 
 =cut
 

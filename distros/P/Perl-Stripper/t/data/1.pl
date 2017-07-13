@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-use Log::Any::IfLOG qw($log);
+use Log::Any qw($log);
+use Log::ger;
 use vars qw($global $global3);
 
 # line comment
@@ -18,7 +19,9 @@ sub foo { # inline comment
     print "variables inside double quote: $lexical $global
     ";
     $log->info("Will not be stripped %s", $global);
+    log_info("Will not be stripped");
     $log -> debugf("Will be stripped %s", $lexical);
+    log_debug("Will be stripped");
     $log->trace("Will
 be
 stripped");
@@ -27,6 +30,10 @@ stripped");
         my $foo;
         $foo = 1;
         $log->warn("blah ...");
+    }
+    if (log_is_trace()) {
+        # this code will be removed under strip_log
+        my $bar;
     }
 }
 

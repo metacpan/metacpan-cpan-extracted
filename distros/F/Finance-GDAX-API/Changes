@@ -1,3 +1,15 @@
+commit 632944e83a40b9ad9f65e1026198723d2a225be9
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jul 13 01:08:00 2017 -0700
+
+    Changed a couple tests to use production site for testing time and getting valid products - since GDAX test site is unreliable and results in tests failing here. Also made change from in environment var for AUTHOR_TESTING flag
+
+commit 1d15d674ed06770ae46831ec8bf91a0aefb244e2
+Author: Mark Rushing <mark@orbislumen.net>
+Date:   Thu Jul 6 21:34:59 2017 -0700
+
+    updated docs for 0.04 release
+
 commit d073ea47384014bb02b0055aa5163eb2b64cfc35
 Author: Mark Rushing <mark@orbislumen.net>
 Date:   Thu Jul 6 21:30:14 2017 -0700

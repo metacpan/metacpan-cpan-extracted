@@ -1,12 +1,12 @@
 package Perinci::CmdLine::Classic;
 
-our $DATE = '2016-12-15'; # DATE
-our $VERSION = '1.73'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '1.74'; # VERSION
 
 use 5.010001;
 #use strict; # enabled by Moo
 #use warnings; # enabled by Moo
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Moo;
 use experimental 'smartmatch'; # must be after Moo
@@ -360,11 +360,11 @@ sub hook_after_get_meta {
             handler => sub {
                 my ($go, $val, $r) = @_;
                 if ($val) {
-                    $log->debugf("[pericmd] Dry-run mode is activated");
+                    log_debug("[pericmd] Dry-run mode is activated");
                     $r->{dry_run} = 1;
                     #$ENV{VERBOSE} = 1;
                 } else {
-                    $log->debugf("[pericmd] Dry-run mode is deactivated");
+                    log_debug("[pericmd] Dry-run mode is deactivated");
                     $r->{dry_run} = 0;
                 }
             },
@@ -465,7 +465,7 @@ sub _load_log_any_app {
     # not be loaded at all. yes, this means that this log message is printed
     # rather late and might not be the first message to be logged (see log
     # messages in run()) if user already loads Log::Any::App by herself.
-    $log->debugf("Program %s started with arguments: %s",
+    log_debug("Program %s started with arguments: %s",
                  $0, $r->{orig_argv});
 }
 
@@ -473,7 +473,7 @@ sub _load_log_any_app {
 sub hook_before_run {
     my ($self, $r) = @_;
 
-    $log->tracef("Start of CLI run");
+    log_trace("Start of CLI run");
 
     # save, for showing in history, among others
     $r->{orig_argv} = [@ARGV];
@@ -517,12 +517,12 @@ sub hook_format_result {
 
     my $fres;
     if ($res->[3]{is_stream}) {
-        $log->tracef("Result is a stream");
+        log_trace("Result is a stream");
         return undef;
     } elsif ($res->[3]{'x.hint.result_binary'} && $format =~ /text/) {
         $fres = $res->[2];
     } else {
-        $log->tracef("Formatting output with %s", $format);
+        log_trace("Formatting output with %s", $format);
         $fres = Perinci::Result::Format::format($res, $format, $r->{naked_res});
     }
 
@@ -730,7 +730,7 @@ sub action_call {
             call => $scd->{url},
             {args=>\%fargs, tx_id=>$tx_id, dry_run=>$dry_run});
     }
-    $log->tracef("call res=%s", $res);
+    log_trace("call res=%s", $res);
 
     # commit transaction (if using tx)
     if ($using_tx && $res->[0] =~ /\A(?:200|304)\z/) {
@@ -746,7 +746,7 @@ sub action_call {
 sub action_history {
     my ($self, $r) = @_;
     my $res = $self->riap_client->request(list_txs => "/", {detail=>1});
-    $log->tracef("list_txs res=%s", $res);
+    log_trace("list_txs res=%s", $res);
     return $res unless $res->[0] == 200;
     $res->[2] = [sort {($b->{tx_commit_time}//0) <=> ($a->{tx_commit_time}//0)}
                      @{$res->[2]}];
@@ -795,7 +795,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.73 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2016-12-15.
+This document describes version 1.74 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -1061,7 +1061,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -2,6 +2,1468 @@ package TestCase {
   has x : int;
   has y : int;
 
+  # byte array argument
+  sub call_sub_byte_array($nums : byte[]) : byte {
+    
+    my $total = (byte)0;
+    for (my $i = 0; $i < @$nums; $i++) {
+      $total = $total + $nums->[$i];
+    }
+    
+    return $total;
+  }
+  
+  # short array argument
+  sub call_sub_short_array($nums : short[]) : short {
+    
+    my $total = (short)0;
+    for (my $i = 0; $i < @$nums; $i++) {
+      $total = $total + $nums->[$i];
+    }
+    
+    return $total;
+  }
+  
+  # int array argument
+  sub call_sub_int_array($nums : int[]) : int {
+    
+    my $total = 0;
+    for (my $i = 0; $i < @$nums; $i++) {
+      $total = $total + $nums->[$i];
+    }
+    
+    return $total;
+  }
+
+  # long array argument
+  sub call_sub_long_array($nums : long[]) : long {
+    
+    my $total = (long)0;
+    for (my $i = 0; $i < @$nums; $i++) {
+      $total = $total + $nums->[$i];
+    }
+    
+    return $total;
+  }
+
+  # float array argument
+  sub call_sub_float_array($nums : float[]) : float {
+    
+    my $total = (float)0;
+    for (my $i = 0; $i < @$nums; $i++) {
+      $total = $total + $nums->[$i];
+    }
+    
+    return $total;
+  }
+
+  # double array argument
+  sub call_sub_double_array($nums : double[]) : double {
+    
+    my $total = (double)0;
+    for (my $i = 0; $i < @$nums; $i++) {
+      $total = $total + $nums->[$i];
+    }
+    
+    return $total;
+  }
+
+  # constant int
+  sub load_constant_int_min() : int {
+   # LOAD_CONSTANT
+    return -2147483647;
+  }
+  sub load_constant_int_m32769() : int {
+    # LOAD_CONSTANT
+    return -32769;
+  }
+  sub load_constant_int_m32768() : int {
+    # PUSH_SHORT_TO_INT
+    return -32768;
+  }
+  sub load_constant_int_m129() : int {
+    # PUSH_SHORT_TO_INT
+    return -129;
+  }
+  sub load_constant_int_m128() : int {
+    # PUSH_BYTE_TO_INT
+    return -128;
+  }
+  sub load_constant_int_m2() : int {
+    # PUSH_BYTE_TO_INT
+    return -2;
+  }
+  sub load_constant_int_m1() : int {
+    # CONSTANT_INT_M1
+    return -1;
+  }
+  sub load_constant_int_0() : int {
+    # CONSTANT_INT_0
+    return 0;
+  }
+  sub load_constant_int_1() : int {
+    # CONSTANT_INT_1
+    return 1;
+  }
+  sub load_constant_int_2() : int {
+    # CONSTANT_INT_2
+    return 2;
+  }
+  sub load_constant_int_3() : int {
+    # CONSTANT_INT_3
+    return 3;
+  }
+  sub load_constant_int_4() : int {
+    # CONSTANT_INT_4
+    return 4;
+  }
+  sub load_constant_int_5() : int {
+    # CONSTANT_INT_5
+    return 5;
+  }
+  sub load_constant_int_6() : int {
+    # PUSH_BYTE_TO_INT
+    return 6;
+  }
+  sub load_constant_int_127() : int {
+    # PUSH_BYTE_TO_INT
+    return 127;
+  }
+  sub load_constant_int_128() : int {
+    # PUSH_SHORT_TO_INT
+    return 128;
+  }
+  sub load_constant_int_32767() : int {
+    # PUSH_SHORT_TO_INT
+    return 32767;
+  }
+  sub load_constant_int_32768() : int {
+    # LOAD_CONSTANT
+    return 32768;
+  }
+  sub load_constant_int_max() : int {
+    # LOAD_CONSTANT
+    return 2147483647;
+  }
+
+  # constant long
+  sub load_constant_long_min() : long {
+   # LOAD_CONSTANT
+    return -9223372036854775808L;
+  }
+  sub load_constant_long_m32769() : long {
+    # LOAD_CONSTANT
+    return -32769L;
+  }
+  sub load_constant_long_m32768() : long {
+    # PUSH_SHORT_TO_LONG
+    return -32768L;
+  }
+  sub load_constant_long_m129() : long {
+    # PUSH_SHORT_TO_LONG
+    return -129L;
+  }
+  sub load_constant_long_m128() : long {
+    # PUSH_BYTE_TO_LONG
+    return -128L;
+  }
+  sub load_constant_long_m2() : long {
+    # PUSH_BYTE_TO_LONG
+    return -2L;
+  }
+  sub load_constant_long_m1() : long {
+    # CONSTANT_LONG_M1
+    return -1L;
+  }
+  sub load_constant_long_0() : long {
+    # CONSTANT_LONG_0
+    return 0L;
+  }
+  sub load_constant_long_1() : long {
+    # CONSTANT_LONG_1
+    return 1L;
+  }
+  sub load_constant_long_2() : long {
+    # CONSTANT_LONG_2
+    return 2L;
+  }
+  sub load_constant_long_3() : long {
+    # CONSTANT_LONG_3
+    return 3L;
+  }
+  sub load_constant_long_4() : long {
+    # CONSTANT_LONG_4
+    return 4L;
+  }
+  sub load_constant_long_5() : long {
+    # CONSTANT_LONG_5
+    return 5L;
+  }
+  sub load_constant_long_6() : long {
+    # PUSH_BYTE_TO_LONG
+    return 6L;
+  }
+  sub load_constant_long_127() : long {
+    # PUSH_BYTE_TO_LONG
+    return 127L;
+  }
+  sub load_constant_long_128() : long {
+    # PUSH_SHORT_TO_LONG
+    return 128L;
+  }
+  sub load_constant_long_32767() : long {
+    # PUSH_SHORT_TO_LONG
+    return 32767L;
+  }
+  sub load_constant_long_32768() : long {
+    # LOAD_CONSTANT2
+    return 32768L;
+  }
+  sub load_constant_long_max() : long {
+    # LOAD_CONSTANT2
+    return 9223372036854775807L;
+  }
+  
+  # constant float
+  sub load_constant_float_0() : float {
+    # CONSTANT_FLOAT_0
+    return 0.0f;
+  }
+  sub load_constant_float_1() : float {
+    # CONSTANT_FLOAT_1
+    return 1.0f;
+  }
+  sub load_constant_float_0_5() : float {
+    # LOAD_CONSTANT
+    return 0.5f;
+  }
+  
+  # constant double
+  sub load_constant_double_0() : double {
+    # CONSTANT_DOUBLE_0
+    return 0.0;
+  }
+  sub load_constant_double_1() : double {
+    # CONSTANT_DOUBLE_1
+    return 1.0;
+  }
+  sub load_constant_double_0_5() : double {
+    # LOAD_CONSTANT2
+    return 0.5;
+  }
+  
+  # call_sub
+  sub call_sub_args_int($var1 : int, $var2 : int, $var3 : int) : int {
+    if ($var1 == 1) {
+      if ($var2 == 2147483647) {
+        if ($var3 == -2147483647) {
+          return 1;
+        }
+      }
+    }
+    
+    return 0;
+  }
+  
+  sub call_sub_args_long($var1 : long, $var2 : long, $var3 : long) : int {
+    if ($var1 == 1L) {
+      if ($var2 == 9223372036854775807L) {
+        if ($var3 == -9223372036854775808L) {
+          return 1;
+        }
+      }
+    }
+    
+    return 0;
+  }
+  
+  # If
+  sub if_true_byte() : int {
+    if ((byte)1) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  sub if_true_short() : int {
+    if ((short)1) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
+  sub if_true_int() : int {
+    if (1) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  sub if_true_long() : int {
+    if (1L) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  sub if_true_float() : int {
+    if (1.0f) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  sub if_true_double() : int {
+    if (1.0) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
+  sub if_true_object() : int {
+    if (malloc TestCase) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
+  sub if_false_byte() : int {
+    if ((byte)0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  sub if_false_short() : int {
+    if ((short)0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  sub if_false_int() : int {
+    if (0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  sub if_false_long() : int {
+    if (0L) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  sub if_false_float() : int {
+    if (0.0f) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  sub if_false_double() : int {
+    if (0.0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  sub if_false_object() : int {
+    if (undef) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  sub if_else() : int {
+    if (0) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+    
+    return 0;
+  }
+
+  sub if_elsif() : int {
+    if (0) {
+      return 0;
+    }
+    elsif(1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+    
+    return 0;
+  }
+
+  sub if_elsif_2() : int {
+    if (0) {
+      return 0;
+    }
+    elsif(0) {
+      return 0;
+    }
+    elsif(1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+    
+    return 0;
+  }
+  
+  sub if_duplicate() : int {
+    
+    if (1) {
+      if (0) {
+        return 0;
+      }
+      elsif (1) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      return 0;
+    }
+  }
+
+  # If a == b
+  sub if_eq_byte_same () : int {
+    
+    if ((byte)3 == (byte)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_eq_byte_different () : int {
+    
+    if ((byte)3 == (byte)2) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_eq_short_same () : int {
+    
+    if ((short)3 == (short)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_eq_short_different () : int {
+    
+    if ((short)3 == (short)2) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_eq_int_same () : int {
+    
+    if ((int)3 == (int)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_eq_int_different () : int {
+    
+    if ((int)3 == (int)2) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_eq_long_same () : int {
+    
+    if ((long)3 == (long)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_eq_long_different () : int {
+    
+    if ((long)3 == (long)2) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_eq_float_same () : int {
+    
+    if (0.5f == 0.5f) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_eq_float_different () : int {
+    
+    if (0.5f == 0.25f) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_eq_double_same () : int {
+    
+    if (0.5 == 0.5) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_eq_double_different () : int {
+    
+    if (0.5 == 0.25) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_eq_object_same () : int {
+    
+    my $obj1 = malloc TestCase;
+    
+    if ($obj1 == $obj1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_eq_object_different () : int {
+    my $obj1 = malloc TestCase;
+    my $obj2 = malloc TestCase;
+    
+    if ($obj1 == $obj2) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  # If a != b
+  sub if_ne_byte_same () : int {
+    
+    if ((byte)3 != (byte)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_ne_byte_different () : int {
+    
+    if ((byte)3 != (byte)2) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_ne_short_same () : int {
+    
+    if ((short)3 != (short)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_ne_short_different () : int {
+    
+    if ((short)3 != (short)2) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_ne_int_same () : int {
+    
+    if ((int)3 != (int)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_ne_int_different () : int {
+    
+    if ((int)3 != (int)2) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_ne_long_same () : int {
+    
+    if ((long)3 != (long)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_ne_long_different () : int {
+    
+    if ((long)3 != (long)2) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_ne_float_same () : int {
+    
+    if (0.5f != 0.5f) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_ne_float_different () : int {
+    
+    if (0.5f != 0.25f) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_ne_double_same () : int {
+    
+    if (0.5 != 0.5) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_ne_double_different () : int {
+    
+    if (0.5 != 0.25) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_ne_object_same () : int {
+    
+    my $obj1 = malloc TestCase;
+    
+    if ($obj1 != $obj1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_ne_object_different () : int {
+    my $obj1 = malloc TestCase;
+    my $obj2 = malloc TestCase;
+    
+    if ($obj1 != $obj2) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  # If a > b
+  sub if_gt_byte_left_big () : int {
+    
+    if ((byte)3 > (byte)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_gt_byte_same () : int {
+    
+    if ((byte)3 > (byte)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_byte_right_big () : int {
+    
+    if ((byte)3 > (byte)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_short_left_big () : int {
+    
+    if ((short)3 > (short)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_gt_short_same () : int {
+    
+    if ((short)3 > (short)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_short_right_big () : int {
+    
+    if ((short)3 > (short)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_gt_int_left_big () : int {
+    
+    if (3 > 1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_gt_int_same () : int {
+    
+    if (3 > 3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_int_right_big () : int {
+    
+    if (3 > 4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_long_left_big () : int {
+    
+    if ((long)3 > (long)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_gt_long_same () : int {
+    
+    if ((long)3 > (long)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_long_right_big () : int {
+    
+    if ((long)3 > (long)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_float_left_big () : int {
+    
+    if ((float)3 > (float)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_gt_float_same () : int {
+    
+    if ((float)3 > (float)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_float_right_big () : int {
+    
+    if ((float)3 > (float)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_double_left_big () : int {
+    
+    if ((double)3 > (double)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_gt_double_same () : int {
+    
+    if ((double)3 > (double)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_gt_double_right_big () : int {
+    
+    if ((double)3 > (double)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  # If a >= b
+  sub if_ge_byte_left_big () : int {
+    
+    if ((byte)3 >= (byte)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_byte_same () : int {
+    
+    if ((byte)3 >= (byte)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_byte_right_big () : int {
+    
+    if ((byte)3 >= (byte)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_ge_short_left_big () : int {
+    
+    if ((short)3 >= (short)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_short_same () : int {
+    
+    if ((short)3 >= (short)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_short_right_big () : int {
+    
+    if ((short)3 >= (short)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+  
+  sub if_ge_int_left_big () : int {
+    
+    if (3 >= 1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_int_same () : int {
+    
+    if (3 >= 3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_int_right_big () : int {
+    
+    if (3 >= 4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_ge_long_left_big () : int {
+    
+    if ((long)3 >= (long)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_long_same () : int {
+    
+    if ((long)3 >= (long)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_long_right_big () : int {
+    
+    if ((long)3 >= (long)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_ge_float_left_big () : int {
+    
+    if ((float)3 >= (float)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_float_same () : int {
+    
+    if ((float)3 >= (float)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_float_right_big () : int {
+    
+    if ((float)3 >= (float)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_ge_double_left_big () : int {
+    
+    if ((double)3 >= (double)1) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_double_same () : int {
+    
+    if ((double)3 >= (double)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_ge_double_right_big () : int {
+    
+    if ((double)3 >= (double)4) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  # If a < b
+  sub if_lt_byte_left_big () : int {
+    
+    if ((byte)3 < (byte)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_byte_same () : int {
+    
+    if ((byte)3 < (byte)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_byte_right_big () : int {
+    
+    if ((byte)3 < (byte)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_lt_short_left_big () : int {
+    
+    if ((short)3 < (short)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_short_same () : int {
+    
+    if ((short)3 < (short)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_short_right_big () : int {
+    
+    if ((short)3 < (short)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_lt_int_left_big () : int {
+    
+    if (3 < 1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_int_same () : int {
+    
+    if (3 < 3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_int_right_big () : int {
+    
+    if (3 < 4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_lt_long_left_big () : int {
+    
+    if ((long)3 < (long)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_long_same () : int {
+    
+    if ((long)3 < (long)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_long_right_big () : int {
+    
+    if ((long)3 < (long)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_lt_float_left_big () : int {
+    
+    if ((float)3 < (float)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_float_same () : int {
+    
+    if ((float)3 < (float)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_float_right_big () : int {
+    
+    if ((float)3 < (float)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_lt_double_left_big () : int {
+    
+    if ((double)3 < (double)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_double_same () : int {
+    
+    if ((double)3 < (double)3) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_lt_double_right_big () : int {
+    
+    if ((double)3 < (double)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  # If a <= b
+  sub if_le_byte_left_big () : int {
+    
+    if ((byte)3 <= (byte)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_le_byte_same () : int {
+    
+    if ((byte)3 <= (byte)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_byte_right_big () : int {
+    
+    if ((byte)3 <= (byte)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_short_left_big () : int {
+    
+    if ((short)3 <= (short)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_le_short_same () : int {
+    
+    if ((short)3 <= (short)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_short_right_big () : int {
+    
+    if ((short)3 <= (short)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+  
+  sub if_le_int_left_big () : int {
+    
+    if (3 <= 1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_le_int_same () : int {
+    
+    if (3 <= 3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_int_right_big () : int {
+    
+    if (3 <= 4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_long_left_big () : int {
+    
+    if ((long)3 <= (long)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_le_long_same () : int {
+    
+    if ((long)3 <= (long)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_long_right_big () : int {
+    
+    if ((long)3 <= (long)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_float_left_big () : int {
+    
+    if ((float)3 <= (float)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_le_float_same () : int {
+    
+    if ((float)3 <= (float)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_float_right_big () : int {
+    
+    if ((float)3 <= (float)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_double_left_big () : int {
+    
+    if ((double)3 <= (double)1) {
+      return 0;
+    }
+    else {
+      return 1;
+    }
+  }
+
+  sub if_le_double_same () : int {
+    
+    if ((double)3 <= (double)3) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
+  sub if_le_double_right_big () : int {
+    
+    if ((double)3 <= (double)4) {
+      return 1;
+    }
+    else {
+      return 0;
+    }
+  }
+
   # Bit shift right logical
   sub bit_shift_right_logical_byte() : int {
     # 11000001 >>> 2
@@ -284,10 +1746,10 @@ package TestCase {
   sub bit_shift_left_long() : int {
     
     # 00000011 00000000 00000000 00000000 00000000 00000000 00000000 00000000 << 2
-    my $value = 0x3000000000000000 << 2;
+    my $value = 0x3000000000000000L << 2;
     
     # 00001100 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-    if ($value == 0xC000000000000000) {
+    if ($value == 0xC000000000000000L) {
       return 1;
     }
     else {
@@ -298,10 +1760,10 @@ package TestCase {
   sub bit_shift_left_long_max() : int {
     
     # 01000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000  << 1
-    my $value = 0x4000000000000000 << 1;
+    my $value = 0x4000000000000000L << 1;
     
     # 10000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-    if ($value == 0x8000000000000000) {
+    if ($value == 0x8000000000000000L) {
       return 1;
     }
     else {
@@ -312,10 +1774,10 @@ package TestCase {
   sub bit_shift_left_long_overflow() : int {
     
     # 10000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000  << 1
-    my $value = 0x8000000000000000 << 1;
+    my $value = 0x8000000000000000L << 1;
     
     # 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 
-    if ($value == 0) {
+    if ($value == 0L) {
       return 1;
     }
     else {
@@ -328,7 +1790,7 @@ package TestCase {
     
     my $nums = malloc int[3];
     my $len = @$nums;
-
+    
     return $len;
   }
 
@@ -414,36 +1876,5 @@ package TestCase {
     }
     
     return $total;
-  }
-  
-  # If
-  sub if_gt_int_left_big () : int {
-    
-    if (3 > 1) {
-      return 1;
-    }
-    else {
-      return 0;
-    }
-  }
-
-  sub if_gt_int_same () : int {
-    
-    if (3 > 3) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
-  }
-
-  sub if_gt_int_right_big () : int {
-    
-    if (3 > 4) {
-      return 0;
-    }
-    else {
-      return 1;
-    }
   }
 }

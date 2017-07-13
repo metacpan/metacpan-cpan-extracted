@@ -27,6 +27,8 @@ on 'test' => sub {
     requires 'Test::More' => '0.88';
     requires 'Test2::Suite';
     requires 'Test2::V0';
+
+    recommends 'FFI::Platypus';
 };
 
 on 'develop' => sub {

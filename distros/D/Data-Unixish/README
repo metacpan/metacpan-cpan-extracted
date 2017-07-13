@@ -1,11 +1,18 @@
-SYNOPSIS
+NAME
+    Data::Unixish - Implementation for Unixish, a data transformation
+    framework
 
+VERSION
+    This document describes version 1.56 of Data::Unixish (from Perl
+    distribution Data-Unixish), released on 2017-07-10.
+
+SYNOPSIS
      # the a/f/l/c prefix determines whether function accepts
      # arrayref/file(handle)/list/callback as input. the a/f/l/c suffix determines
      # whether function returns an array, a list, a filehandle, or calls a callback.
      # If filehandle is chosen as output, a child process is forked to process input
      # as requested.
-    
+
      use Data::Unixish qw(
                            aduxa cduxa fduxa lduxa
                            aduxc cduxc fduxc lduxc
@@ -13,67 +20,57 @@ SYNOPSIS
                            aduxl cduxl fduxl lduxl
                            siduxs
      ); # or you can use :all to export all functions
-    
+
      # apply function, without argument
      my @out = lduxl('sort', 7, 2, 4, 1);  # => (1, 2, 4, 7)
      my $out = lduxa('uc', "a", "b", "c"); # => ["A", "B", "C"]
      my $res = fduxl('wc', "file.txt");    # => "12\n234\n2093" # like wc's output
-    
+
      # apply function, with some arguments
      my $fh = fduxf([trunc => {width=>80, ansi=>1, mb=>1}], \*STDIN);
      say while <$fh>;
-    
+
      # apply function to a single item, function must be itemfunc
      my $res = duxitem(, $item);
-    
+
      # apply function to multiple items, function must be itemfunc
      my @res = aduxitem(, $item1, $item2, $item3);
 
 DESCRIPTION
-
     This distribution implements Unixish, a data transformation framework
     inspired by Unix toolbox philosophy.
 
 FUNCTIONS
-
     The functions are not exported by default. They can be exported
-    individually or altogether using export tag :all.
+    individually or altogether using export tag ":all".
 
- aduxa($func, \@input) => ARRAYREF
-
- aduxc($func, $callback, \@input)
-
- aduxf($func, \@input) => FILEHANDLE
-
- aduxl($func, \@input) => LIST (OR SCALAR)
-
-    The adux* functions accept an arrayref as input. $func is a string
+  aduxa($func, \@input) => ARRAYREF
+  aduxc($func, $callback, \@input)
+  aduxf($func, \@input) => FILEHANDLE
+  aduxl($func, \@input) => LIST (OR SCALAR)
+    The "adux*" functions accept an arrayref as input. $func is a string
     containing dux function name (if no arguments to the dux function is to
-    be supplied), or [$func, \%args] to supply arguments to the dux
+    be supplied), or "[$func, \%args]" to supply arguments to the dux
     function. Dux function name corresponds to module names
-    Data::Unixish::NAME without the prefix.
+    "Data::Unixish::NAME" without the prefix.
 
     The *duxc functions will call the callback repeatedly with every output
     item.
 
     The *duxf functions returns filehandle immediately. A child process is
-    forked, and dux function is run in the child process. You read output
-    as lines from the returned filehandle. (Currently not yet supported on
+    forked, and dux function is run in the child process. You read output as
+    lines from the returned filehandle. (Currently not yet supported on
     Windows due to no support for open '-|').
 
     The *duxl functions returns result as list. It can be evaluated in
     scalar to return only the first element of the list. However, the whole
     list will be calculated first. Use *duxf for streaming interface.
 
- cduxa($func, $icallback) => ARRAYREF
-
- cduxc($func, $icallback, $ocallback)
-
- cduxf($func, $icallback) => FILEHANDLE
-
- cduxl($func, $icallback) => LIST (OR SCALAR)
-
-    The cdux* functions accepts a callback ($icallback) to get input
+  cduxa($func, $icallback) => ARRAYREF
+  cduxc($func, $icallback, $ocallback)
+  cduxf($func, $icallback) => FILEHANDLE
+  cduxl($func, $icallback) => LIST (OR SCALAR)
+    The "cdux*" functions accepts a callback ($icallback) to get input
     elements from. Input callback function should return a list of one or
     more elements, or an empty list to signal end of stream.
 
@@ -88,70 +85,76 @@ FUNCTIONS
          }
      });
 
- fduxa($func, $file_or_handle, @args) => ARRAYREF
+  fduxa($func, $file_or_handle, @args) => ARRAYREF
+  fduxc($func, $callback, $file_or_handle, @args)
+  fduxf($func, $file_or_handle, @args) => FILEHANDLE
+  fduxl($func, $file_or_handle, @args) => LIST
+    The "fdux*" functions accepts filename or filehandle. @args is optional
+    and will be passed to Tie::File. Currently not yet supported on Windows.
 
- fduxc($func, $callback, $file_or_handle, @args)
+  lduxa($func, @input) => ARRAYREF
+  lduxc($func, $callback, @input)
+  lduxf($func, @input) => FILEHANDLE
+  lduxl($func, @input) => LIST
+    The "ldux*" functions accepts list as input.
 
- fduxf($func, $file_or_handle, @args) => FILEHANDLE
+  siduxs($func, $item) => $res
+  aiduxa($func, \@items) => ARRAYREF
+  aiduxl($func, \@items) => LIST
+  liduxa($func, @items) => ARRAYREF
+  liduxl($func, @items) => LIST
+    The "*idux*" functions apply dux function on single item(s). Only dux
+    functions tagged with "itemfunc" can be used. These functions can
+    operate on a single item and return a single result. Examples of
+    itemfunc functions are "uc", "lc", "sprintf". Examples of non-itemfunc
+    functions are "head", "tail", "wc".
 
- fduxl($func, $file_or_handle, @args) => LIST
-
-    The fdux* functions accepts filename or filehandle. @args is optional
-    and will be passed to Tie::File. Currently not yet supported on
-    Windows.
-
- lduxa($func, @input) => ARRAYREF
-
- lduxc($func, $callback, @input)
-
- lduxf($func, @input) => FILEHANDLE
-
- lduxl($func, @input) => LIST
-
-    The ldux* functions accepts list as input.
-
- siduxs($func, $item) => $res
-
- aiduxa($func, \@items) => ARRAYREF
-
- aiduxl($func, \@items) => LIST
-
- liduxa($func, @items) => ARRAYREF
-
- liduxl($func, @items) => LIST
-
-    The *idux* functions apply dux function on single item(s). Only dux
-    functions tagged with itemfunc can be used. These functions can operate
-    on a single item and return a single result. Examples of itemfunc
-    functions are uc, lc, sprintf. Examples of non-itemfunc functions are
-    head, tail, wc.
-
-    The *idux* functions can be useful if you want to call a dux function
+    The "*idux*" functions can be useful if you want to call a dux function
     from another dux function for each item. For example, see
-    Data::Unixish::condapply.
+    "Data::Unixish::condapply".
 
 FAQ
-
- I'm getting "Use of uninitialized value in push at lib/Data/Unixish/XXX.pm
- line XX." messages!
-
+  I'm getting "Use of uninitialized value in push at lib/Data/Unixish/XXX.pm line XX." messages!
     This looks like a bug in perl 5.10.1 or earlier. Try upgrading to perl
     5.12 or later.
 
- How do I use the diamond operator as input?
-
+  How do I use the diamond operator as input?
     You can use Tie::Diamond, e.g.:
 
      use Tie::Diamond;
      tie my(@in), "Tie::Diamond";
      my $out = aduxa($func, \@in);
 
-    Also see the dux command-line utility in the App::dux distribution
-    which allows you to access dux function from the command-line.
+    Also see the dux command-line utility in the App::dux distribution which
+    allows you to access dux function from the command-line.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Unixish>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Unixish>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Unixish>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Unixish
 
     dux script in App::dux
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

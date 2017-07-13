@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::FileGatherer 6.009;
+package Dist::Zilla::Role::FileGatherer 6.010;
 # ABSTRACT: something that gathers files into the distribution
 
 use Moose::Role;
@@ -34,7 +34,7 @@ Dist::Zilla::Role::FileGatherer - something that gathers files into the distribu
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 DESCRIPTION
 

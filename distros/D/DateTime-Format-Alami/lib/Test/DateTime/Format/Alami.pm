@@ -72,7 +72,7 @@ Test::DateTime::Format::Alami - Test DateTime::Format::Alami
 
 =head1 VERSION
 
-This document describes version 0.14 of Test::DateTime::Format::Alami (from Perl distribution DateTime-Format-Alami), released on 2017-04-25.
+This document describes version 0.16 of Test::DateTime::Format::Alami (from Perl distribution DateTime-Format-Alami), released on 2017-07-10.
 
 =head1 FUNCTIONS
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::deployment;
-$Footprintless::App::Command::deployment::VERSION = '1.24';
+$Footprintless::App::Command::deployment::VERSION = '1.25';
 # ABSTRACT: Performs an action on a deployment.
 # PODNAME: Footprintless::App::Command::deployment
 
@@ -35,7 +35,7 @@ Footprintless::App::Command::deployment - Performs an action on a deployment.
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 

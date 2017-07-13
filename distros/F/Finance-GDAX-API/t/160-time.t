@@ -11,7 +11,7 @@ BEGIN {
 my $time = new_ok('Finance::GDAX::API::Time');
 can_ok($time, 'get');
     
-$time->debug(1); # Make sure this is set to 1 or you'll use live data
+$time->debug(0); # We're using production system for this since no signing is required.
 
 ok (my $result = $time->get, 'can get current time');
 is (ref $result, 'HASH', 'get returns hash');

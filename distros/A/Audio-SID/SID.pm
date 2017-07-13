@@ -9,13 +9,18 @@ use FileHandle;
 use Digest::MD5;
 use Encode;
 
-$VERSION = "3.11";
+$VERSION = "4.01";
 
 # These are the recognized field names for a SID file. They must appear in
 # the order they appear in a SID file.
+# 'flags', 'startPage' and 'pageLength' is valid for v2 only.
+# 'secondSIDAddress' is valid for v3+ only, 'thirdSIDAddress' is valid for
+# v4+ only. In addition, these last two fields are replaced with 'reserved' for
+# v2 only.
 my (@SIDfieldNames) = qw(magicID version dataOffset loadAddress initAddress
-                          playAddress songs startSong speed title author
-                          released flags startPage pageLength reserved data);
+                         playAddress songs startSong speed title author
+                         released flags startPage pageLength secondSIDAddress
+                         thirdSIDAddress reserved data);
 
 # Additional data stored in the class that are not part of the SID file
 # format are: FILESIZE, FILENAME, and the implicit REAL_LOAD_ADDRESS.
@@ -30,6 +35,8 @@ my $PLAYSID_OFFSET   = 1; # Bit 1. (PSID v2NG only)
 my $C64BASIC_OFFSET  = 1; # Bit 1. (RSID only)
 my $CLOCK_OFFSET     = 2; # Bits 2-3.
 my $SIDMODEL_OFFSET  = 4; # Bits 4-5.
+my $SECOND_SIDMODEL_OFFSET = 6; # Bits 6-7.
+my $THIRD_SIDMODEL_OFFSET  = 8; # Bits 8-9.
 
 sub new {
     my $type = shift;
@@ -56,8 +63,8 @@ sub initialize() {
 
     # Initial SID data.
     $self->{SIDdata} = {
-        magicID => 'PSID',
-        version => 2,
+        magicID => 'RSID',
+        version => 4,
         dataOffset => 0x7C,
         loadAddress => 0,
         initAddress => 0,
@@ -71,7 +78,9 @@ sub initialize() {
         flags => 0,
         startPage => 0,
         pageLength => 0,
-        reserved => 0,
+        secondSIDAddress => 0,
+        thirdSIDAddress => 0,
+        reserved => undef,
         data => '',
     };
 
@@ -157,8 +166,8 @@ sub read {
 
     ($SID, $version, $dataOffset) = unpack ("A4nn", $hdr);
 
-    unless ( (($SID eq 'PSID') and (($version == 1) or ($version == 2))) or
-            (($SID eq 'RSID') and ($version == 2)) ) {
+    unless ( (($SID eq 'PSID') and (($version >= 1) and ($version <= 4))) or
+            (($SID eq 'RSID') and ($version >= 2) and ($version <=4)) ) {
         # Not a valid SID file recognized by this class.
 #        confess("File $filename is not a valid SID file");
         $self->initialize();
@@ -193,21 +202,65 @@ sub read {
     $hdrlength = 2*5+4+32*3;
     (@hdr) = unpack ("nnnnnNA32A32A32", substr($hdr,0,$hdrlength));
 
-    if ($version > 1) {
-        my @temphdr;
-        # SID v2 has 4 more fields.
-        (@temphdr) = unpack ("nCCn", substr($hdr,$hdrlength,2+1+1+2));
-        push (@hdr, @temphdr);
-        $hdrlength += 2+1+1+2;
-    }
-    else {
+    if ($version == 1) {
         # SID v1 doesn't have these fields.
         $self->{SIDdata}{flags} = undef;
         $self->{SIDdata}{startPage} = undef;
         $self->{SIDdata}{pageLength} = undef;
+        $self->{SIDdata}{secondSIDAddress} = undef;
+        $self->{SIDdata}{thirdSIDAddress} = undef;
         $self->{SIDdata}{reserved} = undef;
     }
+    
+    if ($version >= 2) {
+        # SID v2+ has 3 more fields.
 
+        my @temphdr;
+        (@temphdr) = unpack ("nCC", substr($hdr,$hdrlength,2+1+1));
+        push (@hdr, @temphdr);
+        $hdrlength += 2+1+1;
+        
+        if ($version == 2) {
+            # SID v2 doesn't have these fields.
+            $self->{SIDdata}{secondSIDAddress} = undef;
+            $self->{SIDdata}{thirdSIDAddress} = undef;
+            
+            # But it has this field (for backwards compatibility).
+            $self->{SIDdata}{reserved} = unpack("n",substr($hdr,$hdrlength,1));
+            $hdrlength += 2;
+        }
+    }
+    
+    if ($version >= 3) {
+        # SID v3+ has 1 more field.
+        my @temphdr;
+        (@temphdr) = unpack ("C", substr($hdr,$hdrlength,1));
+        push (@hdr, @temphdr);
+        $hdrlength += 1;
+
+        if ($version == 3) {
+            # SID v3 doesn't have these fields.
+            $self->{SIDdata}{thirdSIDAddress} = undef;
+
+            # But it has this field.
+            $self->{SIDdata}{reserved} = unpack("C",substr($hdr,$hdrlength,1));
+            $hdrlength += 1;
+        }
+    }
+
+    if ($version >= 4) {
+        # SID v4+ has 1 more field.
+        my @temphdr;
+        (@temphdr) = unpack ("C", substr($hdr,$hdrlength,1));
+        push (@hdr, @temphdr);
+        $hdrlength += 1;
+
+        if ($version == 4) {
+            # SID v4 doesn't have these fields.
+            $self->{SIDdata}{reserved} = undef;
+        }
+    }
+    
     # Store header info.
     for ($i=0; $i <= $#hdr; $i++) {
         $self->{SIDdata}{$SIDfieldNames[$i+3]} = $hdr[$i];
@@ -310,9 +363,25 @@ sub write {
 
     print $FH $output;
 
-    # SID version 2 has 4 more fields.
+    # SID version 2+ has 3 more fields.
     if ($self->{SIDdata}{version} > 1) {
-        $output = pack ("nCCn", ($self->{SIDdata}{flags}, $self->{SIDdata}{startPage}, $self->{SIDdata}{pageLength}, $self->{SIDdata}{reserved}));
+        $output = pack ("nCC", ($self->{SIDdata}{flags}, $self->{SIDdata}{startPage}, $self->{SIDdata}{pageLength}));
+        print $FH $output;
+    }
+    
+    if ($self->{SIDdata}{version} == 2) {
+        # SID version 2 has the 'reserved' field.
+        $output = pack ("n", ($self->{SIDdata}{reserved}));
+        print $FH $output;
+    }
+    elsif ($self->{SIDdata}{version} == 3) {
+        # SID version 3 has one more field.
+        $output = pack ("CC", ($self->{SIDdata}{secondSIDAddress}, $self->{SIDdata}{reserved}));
+        print $FH $output;
+    }
+    elsif ($self->{SIDdata}{version} == 4) {
+        # SID version 4 has two more fields.
+        $output = pack ("CC", ($self->{SIDdata}{secondSIDAddress}, $self->{SIDdata}{thirdSIDAddress}));
         print $FH $output;
     }
 
@@ -405,7 +474,12 @@ sub getSpeed($) {
         return undef;
     }
 
-    $songnumber = 32 if ($songnumber > 32);
+    if ($self->isPlaySIDSpecific()) {
+        $songnumber = $songnumber % 32;
+    }
+    else {
+        $songnumber = 32 if ($songnumber > 32);
+    }
 
     return (($self->{SIDdata}{speed} >> ($songnumber-1)) & 0x1);
 }
@@ -426,8 +500,12 @@ sub isMUSPlayerRequired {
 
 sub getPlaySID {
     my $self = shift;
+    
+    # All version 1 files are PlaySID specific.
+    return 1 if ($self->{SIDdata}{version} == 1);
 
-	# This is a PSID v2NG specific flag.
+    # Check the PlaySID specific flag.
+    
     return undef unless (defined($self->{SIDdata}{flags}));
     return undef if ($self->isRSID() );
 
@@ -449,7 +527,7 @@ sub isRSID {
 sub getC64BASIC {
     my $self = shift;
 
-	# This is an RSID specific flag.
+    # This is an RSID specific flag.
     return undef unless (defined($self->{SIDdata}{flags}));
     return undef unless ($self->isRSID() );
 
@@ -495,20 +573,32 @@ sub getClockByName {
 }
 
 sub getSIDModel {
-    my $self = shift;
+    my ($self, $sidNumber) = @_;
 
     return undef unless (defined($self->{SIDdata}{flags}));
+    
+    if (!defined($sidNumber) or ($sidNumber == 1)) {
+        return (($self->{SIDdata}{flags} >> $SIDMODEL_OFFSET) & 0x3);
+    }
+    elsif ($sidNumber == 2) {
+        return undef unless ($self->{SIDdata}{version} >= 3);
 
-    return (($self->{SIDdata}{flags} >> $SIDMODEL_OFFSET) & 0x3);
+        return (($self->{SIDdata}{flags} >> $SECOND_SIDMODEL_OFFSET) & 0x3);
+    }
+    elsif ($sidNumber == 3) {
+        return undef unless ($self->{SIDdata}{version} >= 4);
+
+        return (($self->{SIDdata}{flags} >> $THIRD_SIDMODEL_OFFSET) & 0x3);
+    }
 }
 
 sub getSIDModelByName {
-    my $self = shift;
+    my ($self, $sidNumber) = @_;
     my $SIDModel;
 
-    return undef unless (defined($self->{SIDdata}{flags}));
-
-    $SIDModel = $self->getSIDModel();
+    $SIDModel = $self->getSIDModel($sidNumber);
+    
+    return undef unless (defined($SIDModel));
 
     if ($SIDModel == 0) {
         $SIDModel = 'UNKNOWN';
@@ -526,6 +616,34 @@ sub getSIDModelByName {
     return $SIDModel;
 }
 
+sub getSIDAddress($) {
+    my ($self, $sidNumber) = @_;
+    my $SIDAddressMiddle;
+    my $fullSIDAddress;
+
+    if (!defined($sidNumber) or ($sidNumber == 1)) {
+        # Original SID is always at $D400. This is implied, it's not contained
+        # in SID file data at all - it's returned just for completeness.
+        $SIDAddressMiddle = 0x40;
+    }
+    elsif ($sidNumber == 2) {
+        # Second SID address is valid for v3+ only.
+        return undef unless $self->{SIDdata}{version} >= 3;
+        
+        $SIDAddressMiddle = $self->{SIDdata}{secondSIDAddress};
+    }
+    elsif ($sidNumber == 3) {
+        # Third SID address is valid for v4+ only.
+        return undef unless $self->{SIDdata}{version} >= 4;
+        
+        $SIDAddressMiddle = $self->{SIDdata}{thirdSIDAddress};
+    }
+    
+    $fullSIDAddress = 0xD000 + $SIDAddressMiddle * 0x10;
+    
+    return $fullSIDAddress;
+}
+
 # Notice that you have to pass in a hash (field-value pairs)!
 sub set(@) {
     my ($self, %SIDhash) = @_;
@@ -534,7 +652,7 @@ sub set(@) {
     my $i;
     my $version;
     my $offset;
-	my $changePSIDSpecific = 0;
+    my $changePSIDSpecific = 0;
 
     foreach $fieldname (keys %SIDhash) {
 
@@ -543,7 +661,7 @@ sub set(@) {
         $fieldname = "title" if ($fieldname =~ /^name$/);
 
         unless (grep(/^$fieldname$/, @SIDfieldNames)) {
-            confess ("No such fieldname: $fieldname");
+            confess ("Not a supported fieldname: $fieldname");
             next;
         }
 
@@ -555,14 +673,14 @@ sub set(@) {
                 next;
             }
 
-			if ($SIDhash{$fieldname} ne $self->{SIDdata}{magicID}) {
-				$changePSIDSpecific = 1;
-			}
+            if ($SIDhash{$fieldname} ne $self->{SIDdata}{magicID}) {
+                $changePSIDSpecific = 1;
+            }
         }
 
         if ($fieldname eq 'version') {
-            if (($SIDhash{$fieldname} != 1) and ($SIDhash{$fieldname} != 2)) {
-                confess ("Invalid SID version number '$version' - ignored");
+            if (($SIDhash{$fieldname} < 1) or ($SIDhash{$fieldname} > 4)) {
+                confess ("Invalid SID version number '$SIDhash{$fieldname}' - ignored");
                 next;
             }
         }
@@ -572,6 +690,20 @@ sub set(@) {
              ($fieldname eq 'startPage') or ($fieldname eq 'pageLength'))) {
 
             confess ("Can't change '$fieldname' when SID version is set to 1");
+            next;
+        }
+
+        if (($self->{SIDdata}{version} < 3) and
+            (($fieldname eq 'secondSIDAddress') or ($fieldname eq 'thirdSIDAddress'))) {
+
+            confess ("Can't change '$fieldname' when SID version is less than 3");
+            next;
+        }
+
+        if (($self->{SIDdata}{version} < 4) and
+            ($fieldname eq 'thirdSIDAddress')) {
+
+            confess ("Can't change '$fieldname' when SID version is less than 4");
             next;
         }
 
@@ -594,7 +726,7 @@ sub set(@) {
         $self->{SIDdata}{reserved} = undef;
         $self->{PADDING} = '';
     }
-    elsif ($self->{SIDdata}{version} == 2) {
+    elsif (($self->{SIDdata}{version} >= 2) and ($self->{SIDdata}{version} <= 4)) {
         # In PSID v2NG/RSID we allow dataOffset to be larger than 0x7C.
 
         $self->{PADDING} = '';
@@ -624,21 +756,37 @@ sub set(@) {
             $self->{SIDdata}{pageLength} = 0;
         }
 
-        unless (defined($self->{SIDdata}{reserved})) {
-            $self->{SIDdata}{reserved} = 0;
+        if (($self->{SIDdata}{version} == 2) or ($self->{SIDdata}{version} == 3)) {
+            unless (defined($self->{SIDdata}{reserved})) {
+                $self->{SIDdata}{reserved} = 0;
+            }
         }
 
-		if ($changePSIDSpecific) {
-			# Zero this flag only if 'flags' is not explicitly set at the same time.
-			if (!$SIDhash{'flags'}) {
-				if ($self->isRSID() ) {
-	            	$self->setC64BASIC(0);
-				}
-				else {
-	            	$self->setPlaySID(0);
-				}
-			}
-		}
+        if ($self->{SIDdata}{version} >= 3) {
+            unless (defined($self->{SIDdata}{secondSIDAddress})) {
+                $self->{SIDdata}{secondSIDAddress} = 0;
+            }
+            $self->{SIDdata}{thirdSIDAddress} = undef;
+        }
+
+        if ($self->{SIDdata}{version} >= 4) {
+            unless (defined($self->{SIDdata}{thirdSIDAddress})) {
+                $self->{SIDdata}{thirdSIDAddress} = 0;
+            }
+            $self->{SIDdata}{reserved} = undef;
+        }
+
+        if ($changePSIDSpecific) {
+            # Zero this flag only if 'flags' is not explicitly set at the same time.
+            if (!$SIDhash{'flags'}) {
+                if ($self->isRSID() ) {
+                    $self->setC64BASIC(0);
+                }
+                else {
+                    $self->setPlaySID(0);
+                }
+            }
+        }
 
         # RSID values are set in stone.
         if ($self->isRSID() ) {
@@ -653,10 +801,10 @@ sub set(@) {
                 $self->{SIDdata}{loadAddress} = 0;
             }
 
-			# initAddress must be 0 if the C64 BASIC flag is set.
-			if ($self->getC64BASIC() ) {
-				$self->{SIDdata}{initAddress} = 0;
-			}
+            # initAddress must be 0 if the C64 BASIC flag is set.
+            if ($self->getC64BASIC() ) {
+                $self->{SIDdata}{initAddress} = 0;
+            }
         }
     }
 
@@ -695,8 +843,14 @@ sub setSpeed($$) {
         return undef;
     }
 
-    $songnumber = 32 if ($songnumber > 32);
     $songnumber = 1 if ($songnumber < 1);
+
+    if (($self->{SIDdata}{version} == 1) or $self->isPlaySIDSpecific()) {
+        $songnumber = $songnumber % 32;
+    }
+    else {
+        $songnumber = 32 if ($songnumber > 32);
+    }
 
     # First, clear the bit in question.
     $self->{SIDdata}{speed} &= ~(0x1 << ($songnumber-1));
@@ -774,9 +928,9 @@ sub setC64BASIC($) {
     # Then set it.
     $self->{SIDdata}{flags} |= ($C64BASIC << $C64BASIC_OFFSET);
 
-	if ($C64BASIC) {
-		$self->{SIDdata}{initAddress} = 0;
-	}
+    if ($C64BASIC) {
+        $self->{SIDdata}{initAddress} = 0;
+    }
 }
 
 sub setClock($) {
@@ -828,7 +982,7 @@ sub setClockByName($) {
 }
 
 sub setSIDModel($) {
-    my ($self, $SIDModel) = @_;
+    my ($self, $SIDModel, $sidNumber) = @_;
 
     unless (defined($self->{SIDdata}{flags})) {
         confess ("Cannot set this field when SID version is 1!");
@@ -840,15 +994,36 @@ sub setSIDModel($) {
         return undef;
     }
 
-    # First, clear the bits in question.
-    $self->{SIDdata}{flags} &= ~(0x3 << $SIDMODEL_OFFSET);
+    if (!defined($sidNumber) or ($sidNumber == 1)) {
+        # First, clear the bits in question.
+        $self->{SIDdata}{flags} &= ~(0x3 << $SIDMODEL_OFFSET);
 
-    # Then set them.
-    $self->{SIDdata}{flags} |= ($SIDModel << $SIDMODEL_OFFSET);
+        # Then set them.
+        $self->{SIDdata}{flags} |= ($SIDModel << $SIDMODEL_OFFSET);
+    }
+    elsif ($sidNumber == 2) {
+        
+        return undef unless ($self->{SIDdata}{version} >= 3);
+        
+        # First, clear the bits in question.
+        $self->{SIDdata}{flags} &= ~(0x3 << $SECOND_SIDMODEL_OFFSET);
+
+        # Then set them.
+        $self->{SIDdata}{flags} |= ($SIDModel << $SECOND_SIDMODEL_OFFSET);
+    }
+    elsif ($sidNumber == 3) {
+        return undef unless ($self->{SIDdata}{version} >= 4);
+
+        # First, clear the bits in question.
+        $self->{SIDdata}{flags} &= ~(0x3 << $THIRD_SIDMODEL_OFFSET);
+
+        # Then set them.
+        $self->{SIDdata}{flags} |= ($SIDModel << $THIRD_SIDMODEL_OFFSET);
+    }
 }
 
 sub setSIDModelByName($) {
-    my ($self, $SIDModel) = @_;
+    my ($self, $SIDModel, $sidNumber) = @_;
 
     unless (defined($self->{SIDdata}{flags})) {
         confess ("Cannot set this field when SID version is 1!");
@@ -872,7 +1047,72 @@ sub setSIDModelByName($) {
         return undef;
     }
 
-    $self->setSIDModel($SIDModel);
+    return $self->setSIDModel($SIDModel, $sidNumber);
+}
+
+sub setSIDAddress($) {
+    my ($self, $sidNumber, $fullSIDAddress) = @_;
+    
+    if (!defined($sidNumber) or ($sidNumber < 2) or ($sidNumber > 3)) {
+        confess("Invalid SID number: '$sidNumber'!");
+        return undef;
+    }
+    
+    if (!defined($fullSIDAddress)) {
+        confess("SID address was not specified!");
+        return undef;
+    }
+    
+    if ( (($sidNumber == 2) and ($self->{SIDdata}{version} < 3)) or 
+         (($sidNumber == 3) and ($self->{SIDdata}{version} < 4))
+       ) {
+        confess("SID address for SID number '$sidNumber' is not allowed to be set when SID version is $self->{SIDdata}{version} !");
+        return undef;
+    }
+
+    if ($fullSIDAddress =~ /^\s*\$/) {
+        # Convert C64-style hex string to hex number.
+        $fullSIDAddress =~ s/^\s*\$//;
+        $fullSIDAddress = hex($fullSIDAddress);
+    }
+    elsif ($fullSIDAddress =~ /^\s*0x/) {
+        # Convert hex string to hex number.
+        $fullSIDAddress = hex($fullSIDAddress);
+    }
+
+    if (($fullSIDAddress < 0xD420) or ($fullSIDAddress > 0xE000) or
+        (($fullSIDAddress >= 0xD800) and ($fullSIDAddress < 0xDE00))) {
+        confess(sprintf("SID address of '\$%04X' for SID number '%d' is not in the allowed range!", $fullSIDAddress, $sidNumber));
+        return undef;
+    }
+    
+    my $middleSIDAddress = ($fullSIDAddress & 0x0FF0) >> 4;
+    
+    if (($middleSIDAddress % 2) != 0) {
+        confess(sprintf("The middle 2 digits of the SID address of '\$%04X' for SID number '%d' must be even!", $fullSIDAddress, $sidNumber));
+        return undef;
+    }
+    
+    if ($self->{SIDdata}{version} >= 4) {
+        if (($sidNumber == 2) and ($self->{SIDdata}{thirdSIDAddress} == $middleSIDAddress)) {
+            confess(sprintf("The SID address of '\$%04X' for SID number '%d' cannot be the same as for SID number 3!", $fullSIDAddress, $sidNumber));
+            return undef;
+        }
+
+        if (($sidNumber == 3) and ($self->{SIDdata}{secondSIDAddress} == $middleSIDAddress)) {
+            confess(sprintf("The SID address of '\$%04X' for SID number '%d' cannot be the same as for SID number 2!", $fullSIDAddress, $sidNumber));
+            return undef;
+        }
+    }
+    
+    # If everything checks out, we can finally set the value.
+    
+    if ($sidNumber == 2) {
+        $self->{SIDdata}{secondSIDAddress} = $middleSIDAddress;
+    }
+    elsif ($sidNumber == 3) {
+        $self->{SIDdata}{thirdSIDAddress} = $middleSIDAddress;
+    }
 }
 
 sub getFieldNames {
@@ -902,14 +1142,20 @@ sub getMD5 {
 
     my $speed = $self->{SIDdata}{speed};
 
-    for (my $i=0; $i < $songs; $i++) {
+    for (my $songNo = 1; $songNo <= $songs; $songNo++) {
         my $speedFlag;
-        if ( (($speed & (1 << $i)) != 0) or ($self->isRSID() ) ) {
+        if ($self->isRSID()) {
             $speedFlag = 60;
         }
         else {
-            $speedFlag = 0;
+            if ($self->getSpeed($songNo) == 1) {
+                $speedFlag = 60;
+            }
+            else {
+                $speedFlag = 0;
+            }
         }
+
         $md5->add(pack("C",$speedFlag));
     }
 
@@ -933,9 +1179,11 @@ sub validate {
     my $field;
     my $MUSPlayer;
     my $PlaySID;
-	my $C64BASIC;
+    my $C64BASIC;
     my $clock;
     my $SIDModel;
+    my $secondSIDModel;
+    my $thirdSIDModel;
 
     # Change to version v2.
     if ($self->{SIDdata}{version} < 2) {
@@ -955,7 +1203,7 @@ sub validate {
 
     # Sanity check the fields.
 
-    # Textual fields can't be longer than 31 chars.
+    # Textual fields can't be longer than 32 chars.
     foreach $field (qw(title author released)) {
 
         # Strip trailing whitespace.
@@ -967,15 +1215,15 @@ sub validate {
         # Take off any superfluous null-padding.
         $self->{SIDdata}{$field} =~ s/\x00+$//;
 
-        if (length($self->{SIDdata}{$field}) > 31) {
-            $self->{SIDdata}{$field} = substr($self->{SIDdata}{$field}, 0, 31);
-#            carp ("'$field' field was longer than 31 chars - chopped to 31");
+        if (length($self->{SIDdata}{$field}) > 32) {
+            $self->{SIDdata}{$field} = substr($self->{SIDdata}{$field}, 0, 32);
+#            carp ("'$field' field was longer than 32 chars - chopped to 32");
         }
     }
 
     # If this is an RSID, initAddress shouldn't be pointing to a ROM memory
     # area, or be outside the load range. Also, if the C64 BASIC flag is set,
-	# initAddress must be 0.
+    # initAddress must be 0.
 
     if ( ($self->isRSID() ) and
          ( ((($self->{SIDdata}{initAddress} > 0) and ($self->{SIDdata}{initAddress} < 0x07E8)) or
@@ -984,7 +1232,7 @@ sub validate {
              ($self->{SIDdata}{initAddress} < $self->getRealLoadAddress()) or
              ($self->{SIDdata}{initAddress} > ($self->getRealLoadAddress() + length($self->{SIDdata}{data}) - 3))
            ) or
-		   ($self->getC64BASIC() )
+           ($self->getC64BASIC() )
           )
        ) {
 
@@ -1010,15 +1258,10 @@ sub validate {
         $self->{SIDdata}{loadAddress} = 0;
 #        carp ("'loadAddress' was non-zero - set to 0");
     }
-    elsif (($self->isRSID() ) and
-           ($self->getRealLoadAddress() < 0x07E8) ) {
-
-        $self->{SIDdata}{data} = pack("v", 0x07E8) . substr($self->{SIDdata}{data}, 2);
-    }
 
     # If this is a PSID, initAddress shouldn't be outside the load range.
 
-    if ( ($self->isRSID() ) and
+    if ( (!$self->isRSID() ) and
          (($self->{SIDdata}{initAddress} < $self->getRealLoadAddress()) or
           ($self->{SIDdata}{initAddress} > ($self->getRealLoadAddress() + length($self->{SIDdata}{data}) - 3))
          )
@@ -1064,20 +1307,20 @@ sub validate {
     }
 
     unless ($self->isRSID() ) {
-    	# Only the relevant fields in 'speed' will be set.
-    	my $tempSpeed = 0;
-    	my $maxSongs = $self->{SIDdata}{songs};
+        # Only the relevant fields in 'speed' will be set.
+        my $tempSpeed = 0;
+        my $maxSongs = $self->{SIDdata}{songs};
 
-	    # There are only 32 bits in speed.
-	    if ($maxSongs > 32) {
-    	    $maxSongs = 32;
-    	}
+        # There are only 32 bits in speed.
+        if ($maxSongs > 32) {
+            $maxSongs = 32;
+        }
 
-	    for (my $i=0; $i < $maxSongs; $i++) {
-    	    $tempSpeed += ($self->{SIDdata}{speed} & (1 << $i));
-    	}
-    	$self->{SIDdata}{speed} = $tempSpeed;
-	}
+        for (my $i=0; $i < $maxSongs; $i++) {
+            $tempSpeed += ($self->{SIDdata}{speed} & (1 << $i));
+        }
+        $self->{SIDdata}{speed} = $tempSpeed;
+    }
 
     unless (defined($self->{SIDdata}{flags})) {
         $self->{SIDdata}{flags} = 0;
@@ -1087,26 +1330,40 @@ sub validate {
         $MUSPlayer = $self->isMUSPlayerRequired();
         $clock = $self->getClock();
         $SIDModel = $self->getSIDModel();
+        $secondSIDModel = $self->getSIDModel(2);
+        $thirdSIDModel = $self->getSIDModel(3);
 
-		unless ($self->isRSID() ) {
-        	$PlaySID = $self->isPlaySIDSpecific();
-		}
-		else {
-        	$C64BASIC = $self->isC64BASIC();
-		}
+        unless ($self->isRSID() ) {
+            $PlaySID = $self->isPlaySIDSpecific();
+        }
+        else {
+            $C64BASIC = $self->isC64BASIC();
+        }
 
         $self->{SIDdata}{flags} = 0;
 
         $self->setMUSPlayer($MUSPlayer);
         $self->setClock($clock);
         $self->setSIDModel($SIDModel);
+        
+        if ($self->{SIDdata}{version} >= 3) {
+            if (defined($secondSIDModel)) {
+                $self->setSIDModel($secondSIDModel, 2);
+            }
+        }
 
-		unless ($self->isRSID() ) {
-	        $self->setPlaySID($PlaySID);
-		}
-		else {
-	        $self->setC64BASIC($C64BASIC);
-		}
+        if ($self->{SIDdata}{version} >= 4) {
+            if (defined($thirdSIDModel)) {
+                $self->setSIDModel($thirdSIDModel, 3);
+            }
+        }
+
+        unless ($self->isRSID() ) {
+            $self->setPlaySID($PlaySID);
+        }
+        else {
+            $self->setC64BASIC($C64BASIC);
+        }
     }
 
     if (($self->{SIDdata}{startPage} == 0) or ($self->{SIDdata}{startPage} == 0xFF)) {
@@ -1119,34 +1376,37 @@ sub validate {
         $self->{SIDdata}{pageLength} = 1;
     }
 
-    # Reloc info must not overlap or encompass the ROM/IO and
-    # reserved memory areas.
+    if ($self->isRSID() ) {
 
-    # Is startPage within the ROM or reserved memory areas?
-    if ( (($self->{SIDdata}{startPage} >= 0xA0) and ($self->{SIDdata}{startPage} < 0xC0)) or
-         (($self->{SIDdata}{startPage} >= 0xD0) and ($self->{SIDdata}{startPage} < 0xFF)) or
-         (($self->{SIDdata}{startPage} > 0x00) and ($self->{SIDdata}{startPage} < 0x04)) ) {
+        # Reloc info must not overlap or encompass the ROM/IO and
+        # reserved memory areas.
 
-         $self->{SIDdata}{startPage} = 0xFF;
-         $self->{SIDdata}{pageLength} = 0x00;
+        # Is startPage within the ROM or reserved memory areas?
+        if ( (($self->{SIDdata}{startPage} >= 0xA0) and ($self->{SIDdata}{startPage} < 0xC0)) or
+             (($self->{SIDdata}{startPage} >= 0xD0) and ($self->{SIDdata}{startPage} < 0xFF)) or
+             (($self->{SIDdata}{startPage} > 0x00) and ($self->{SIDdata}{startPage} < 0x04)) ) {
+
+             $self->{SIDdata}{startPage} = 0xFF;
+             $self->{SIDdata}{pageLength} = 0x00;
+        }
+
+        # Is the end of the relocation range within the ROM or reserved memory areas?
+        if ( (( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 >= 0xA000) and ( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 < 0xC000)) or
+             (( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 >= 0xD000) and ( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 <= 0xFFFF)) or
+             (( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 > 0x0000) and  ( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 < 0x0400)) ) {
+
+             $self->{SIDdata}{startPage} = 0xFF;
+             $self->{SIDdata}{pageLength} = 0x00;
+        }
+
+        # Does the relocation range encompass a ROM area?
+        if ( ($self->{SIDdata}{startPage} < 0xA0) and (($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 >= 0xC000) ) {
+
+             $self->{SIDdata}{startPage} = 0xFF;
+             $self->{SIDdata}{pageLength} = 0x00;
+        }
     }
-
-    # Is the end of the relocation range within the ROM or reserved memory areas?
-    if ( (( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 >= 0xA000) and ( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 < 0xC000)) or
-         (( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 >= 0xD000) and ( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 <= 0xFFFF)) or
-         (( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 > 0x0000) and  ( ($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 < 0x0400)) ) {
-
-         $self->{SIDdata}{startPage} = 0xFF;
-         $self->{SIDdata}{pageLength} = 0x00;
-    }
-
-    # Does the relocation range encompass a ROM area?
-    if ( ($self->{SIDdata}{startPage} < 0xA0) and (($self->{SIDdata}{startPage} << 8) + ($self->{SIDdata}{pageLength} << 8) - 1 >= 0xC000) ) {
-
-         $self->{SIDdata}{startPage} = 0xFF;
-         $self->{SIDdata}{pageLength} = 0x00;
-    }
-
+    
     # Relocation range must not overlap or encompass the load range.
 
     if ( (($self->{SIDdata}{startPage} << 8) >= $self->getRealLoadAddress()) and
@@ -1175,6 +1435,38 @@ sub validate {
 
     $self->{SIDdata}{reserved} = 0;
 
+    if ($self->{SIDdata}{version} >= 3) {
+       # The secondSIDAddress field is valid only for v3+.
+        my $secondSIDAddress = $self->getSIDAddress(2);
+
+        if ($secondSIDAddress) {
+            # This function will also validate the value.
+            my $result = $self->setSIDAddress(2, $secondSIDAddress);
+            
+            if (!$result) {
+                # Value validation failed, set SID address to 0.
+                $self->setSIDAddress(2, 0);
+            }
+        }
+    }
+
+    if ($self->{SIDdata}{version} >= 4) {
+       # The thirdSIDAddress field is valid only for v4+.
+        my $thirdSIDAddress = $self->getSIDAddress(3);
+
+        if ($thirdSIDAddress) {
+            # This function will also validate the value.
+            my $result = $self->setSIDAddress(3, $thirdSIDAddress);
+            
+            if (!$result) {
+                # Value validation failed, set SID address to 0.
+                $self->setSIDAddress(3, 0);
+            }
+        }
+        
+        $self->{SIDdata}{reserved} = undef;
+    }
+
     # The preferred way is to have no padding between the v2 header and the
     # C64 data.
     if ($self->{PADDING}) {
@@ -1195,7 +1487,7 @@ __END__
 
 =head1 NAME
 
-Audio:PSID - Perl module to handle SID files (Commodore-64 music files).
+Audio::SID - Perl module to handle SID files (Commodore-64 music files).
 
 =head1 SYNOPSIS
 
@@ -1217,32 +1509,24 @@ Audio:PSID - Perl module to handle SID files (Commodore-64 music files).
     @array = $mySID->getFieldNames();
     print "Fieldnames = " . join(' ', @array) . "\n";
 
+=head1 AUTHOR
+
+LaLa (Imre Olajos)
+
 =head1 DESCRIPTION
 
 This module is designed to handle SID files (usually bearing a .sid
 extension), which are music player and data routines converted from the
 Commodore-64 computer with an additional informational header prepended. For
 further details about the exact file format, see description of all SID
-fields in the SID_file_format.txt file included in the module package. For
-information about SID tunes in general, see the excellent SIDPLAY homepage at:
+fields in the SID_file_format.txt file included in the module package.
 
-B<http://www.geocities.com/SiliconValley/Lakes/5147/>
-
-For PSID v2NG documentation:
-
-B<http://sidplay2.sourceforge.net>
-
-You can find literally thousands of SID tunes in the High Voltage SID
-Collection at:
-
-B<http://www.hvsc.c64.org>
-
-This module can handle PSID version 1, PSID version 2/2NG and RSID files.
-(Version 2 files are simply v2NG files where v2NG specific fields are set 0,
+This module can handle PSID version 1, PSID version 2/2NG/3/4 and RSID files.
+(Version 2+ files are simply v2NG files where v2NG specific fields are set to 0,
 RSID (RealSID) files are PSID v2NG files with the I<magicID> set to 'RSID' and
 with some additional restrictions on certain field values.) The module was
 designed primarily to make it easier to look at and change the SID header
-fields, so many of the member function are geared towards that. Use
+fields, so many of the member functions are geared towards that. Use
 $OBJECT->I<getFieldNames>() to find out the exact names of the fields
 currently recognized by this module. Please note that B<fieldnames are
 case-sensitive>!
@@ -1275,29 +1559,31 @@ returns undef.
 
 Initializes the object with default SID data as follows:
 
-    magicID => 'PSID',
-    version => 2,
+    magicID => 'RSID',
+    version => 4,
     dataOffset => 0x7C,
     songs => 1,
     startSong => 1,
     title => '<?>',
     author => '<?>',
     released => '20?? <?>',
+    reserved => undef,
     data => '',
 
 Every other SID field (I<loadAddress>, I<initAddress>, I<playAddress>,
-I<speed>, I<flags>, I<startPage>, I<pageLength> and I<reserved>) is set to 0.
-I<FILENAME> is set to '' and the filesize is set to 0x7C.
+I<speed>, I<flags>, I<startPage>, I<pageLength>, I<secondSIDAddress> and
+I<thirdSIDAddress>) is set to 0. I<FILENAME> is set to '' and the filesize is
+set to 0x7C.
 
-=item B<PACKAGE>->B<read>()
+=item B<$OBJECT>->B<read>()
 
 B<Usage:>
 
-B<PACKAGE>->B<read>(SCALAR) or
-B<PACKAGE>->B<read>('-filename' => SCALAR) or
-B<PACKAGE>->B<read>(FILEHANDLE) or
-B<PACKAGE>->B<read>('-filehandle' => FILEHANDLE) or
-B<PACKAGE>->B<read>('-filedata' => SCALAR)
+B<$OBJECT>->B<read>(SCALAR) or
+B<$OBJECT>->B<read>('-filename' => SCALAR) or
+B<$OBJECT>->B<read>(FILEHANDLE) or
+B<$OBJECT>->B<read>('-filehandle' => FILEHANDLE) or
+B<$OBJECT>->B<read>('-filedata' => SCALAR)
 
 If SCALAR or FILEHANDLE is specified (with or without a name-value pair), an
 attempt is made to open the given file. If SCALAR is specified with
@@ -1313,20 +1599,20 @@ I<FILENAME> will not be modified!
 
 If the file turns out to be an invalid SID file, the module is initialized
 with default data and B<read>() returns an undef. Valid SID files must have
-the ASCII string 'PSID' or 'RSID' as their first 4 bytes, and either 0x0001 or
-0x0002 as the next 2 bytes in big-endian format.
+the ASCII string 'PSID' or 'RSID' as their first 4 bytes, and either 0x0001,
+0x0002, 0x0003 or 0x0004 as the next 2 bytes in big-endian format.
 
 If the given file is a PSID version 1 file, the fields of I<flags>,
 I<startPage>, I<pageLength> and I<reserved> are set to undef.
 
-=item B<PACKAGE>->B<write>()
+=item B<$OBJECT>->B<write>()
 
 B<Usage:>
 
-B<PACKAGE>->B<write>(SCALAR) or
-B<PACKAGE>->B<write>('-filename' => SCALAR) or
-B<PACKAGE>->B<write>(FILEHANDLE) or
-B<PACKAGE>->B<write>('-filehandle' => FILEHANDLE)
+B<$OBJECT>->B<write>(SCALAR) or
+B<$OBJECT>->B<write>('-filename' => SCALAR) or
+B<$OBJECT>->B<write>(FILEHANDLE) or
+B<$OBJECT>->B<write>('-filehandle' => FILEHANDLE)
 
 Writes the SID file given by the filename SCALAR or by FILEHANDLE to disk. If
 neither SCALAR nor FILEHANDLE is specified (with or without a name-value
@@ -1335,12 +1621,12 @@ file. If that is not set, either, B<write>() returns an undef. Note that
 SCALAR and FILEHANDLE here can be different than the value of I<FILENAME>! If
 SCALAR is defined, it will not overwrite the filename stored in I<FILENAME>.
 
-I<write> will create a version 1 or version 2/2NG SID file depending on the
+I<write> will create a version 1 or version 2/2NG/3/4 SID file depending on the
 value of the I<version> field, and an RSID file if the I<magicID> is set to
 'RSID', regardless of whether the other fields are set correctly or not, or
 even whether they are undef'd or not. However, if
 $OBJECT->I<alwaysValidateWrite>(1) was called beforehand, I<write> will always
-write a validated PSID v2NG or RSID SID file. See below.
+write a validated PSID or RSID SID file. See I<validate>.
 
 =item B<$OBJECT>->B<get>([SCALAR])
 
@@ -1365,9 +1651,9 @@ Returns the current I<FILENAME> stored in the object.
 
 Returns the total size of the SID file that would be written by
 $OBJECT->I<write>() if it was called right now. This means that if you read in
-a version 1 file and changed the I<version> field to 2 without actually saving
-the file, the size returned here will reflect the size of how big the version
-2 file would be.
+a version 1 file and changed the I<version> field to 2+ without actually
+saving the file, the size returned here will reflect the size of how big the
+version 2+ file would be.
 
 =item B<$OBJECT>->B<getRealLoadAddress>()
 
@@ -1383,10 +1669,16 @@ specified, returns the speed of song #1. Speed can be either 0 (indicating a
 vertical blank interrupt (50Hz PAL, 60Hz NTSC)), or 1 (indicating CIA 1 timer
 interrupt (default is 60Hz)).
 
+For PlaySID specific files the corresponding bit of I<speed> from SCALAR modulo
+32 is returned ("wraparound" behavior for songs > 32).
+
+For all other files if SCALAR > 32, then bit #31 (MSB) of the I<speed> field is
+returned ("pegged at 32" behavior for songs > 32).
+
 =item B<$OBJECT>->B<getMUSPlayer>()
 
 Returns the value of the 'MUSPlayer' bit of the I<flags> field if I<flags> is
-specified (i.e. when I<version> is 2), or undef otherwise. The returned value
+specified (i.e. when I<version> is 2+), or undef otherwise. The returned value
 is either 0 (indicating a built-in music player) or 1 (indicating that I<data>
 is a Compute!'s Sidplayer MUS data and the music player must be merged).
 
@@ -1397,9 +1689,10 @@ This is an alias for $OBJECT->I<getMUSPlayer>().
 =item B<$OBJECT>->B<getPlaySID>()
 
 Returns the value of the 'psidSpecific' bit of the I<flags> field if I<flags>
-is specified (i.e. when I<version> is 2) and the I<magicID> is 'PSID', or
-undef otherwise. The returned value is either 0 (indicating that I<data> is
-Commodore-64 compatible) or 1 (indicating that I<data> is PlaySID specific).
+is specified (i.e. when I<version> is 2+) and the I<magicID> is 'PSID';
+returns 1 if I<version> is 1; undef otherwise. The returned value is either 0
+(indicating that I<data> is Commodore-64 compatible) or 1 (indicating that
+I<data> is PlaySID specific).
 
 =item B<$OBJECT>->B<isPlaySIDSpecific>()
 
@@ -1412,7 +1705,7 @@ Returns 'true' if the I<magicID> is 'RSID', 'false' otherwise.
 =item B<$OBJECT>->B<getC64BASIC>()
 
 Returns the value of the 'C64BASIC' bit of the I<flags> field if I<flags>
-is specified (i.e. when I<version> is 2) and the I<magicID> is 'RSID', or
+is specified (i.e. when I<version> is 2+) and the I<magicID> is 'RSID', or
 undef otherwise. The returned value is either 1 (indicating that I<data>
 has a BASIC executable portion, or 0 otherwise.
 
@@ -1423,26 +1716,56 @@ This is an alias for $OBJECT->I<getC64BASIC>().
 =item B<$OBJECT>->B<getClock>()
 
 Returns the value of the 'clock' (video standard) bits of the I<flags> field
-if I<flags> is specified (i.e. when I<version> is 2), or undef otherwise. The
+if I<flags> is specified (i.e. when I<version> is 2+), or undef otherwise. The
 returned value is one of 0 (UNKNOWN), 1 (PAL), 2 (NTSC) or 3 (EITHER).
 
 =item B<$OBJECT>->B<getClockByName>()
 
 Returns the textual value of the 'clock' (video standard) bits of the I<flags>
-field if I<flags> is specified (i.e. when I<version> is 2), or undef
+field if I<flags> is specified (i.e. when I<version> is 2+), or undef
 otherwise. The textual value will be one of UNKNOWN, PAL, NTSC or EITHER.
 
-=item B<$OBJECT>->B<getSIDModel>()
+=item B<$OBJECT>->B<getSIDModel>([SCALAR])
 
 Returns the value of the 'sidModel' bits of the I<flags> field if I<flags> is
-specified (i.e. when I<version> is 2), or undef otherwise. The returned value
+specified (i.e. when I<version> is 2+), or undef otherwise. The returned value
 is one of 0 (UNKNOWN), 1 (6581), 2 (8580) or 3 (EITHER).
 
-=item B<$OBJECT>->B<getSIDModelByName>()
+If SCALAR is defined and it's 1, it behaves as above. If SCALAR is 2 and
+I<version> is 3 or larger, it returns the 'sidModel' bits of the I<flags> field
+for the second SID, or undef otherwise. If SCALAR is 3 and I<version> is 4 or
+larger, it returns the 'sidModel' bits of the I<flags> field for the third SID,
+or undef otherwise.
+
+=item B<$OBJECT>->B<getSIDModelByName>([SCALAR])
 
 Returns the textual value of the 'sidModel' bits of the I<flags> field if
-I<flags> is specified (i.e. when I<version> is 2), or undef otherwise. The
+I<flags> is specified (i.e. when I<version> is 2+), or undef otherwise. The
 textual value will be one of UNKNOWN, 6581, 8580 or EITHER.
+
+If SCALAR is defined and it's 1, it behaves as above. If SCALAR is 2 and
+I<version> is 3 or larger, it returns the textual value of the 'sidModel' bits
+of the I<flags> field for the second SID, or undef otherwise. If SCALAR is 3
+and I<version> is 4 or larger, it returns the textual value of the 'sidModel'
+bits of the I<flags> field for the third SID, or undef otherwise.
+
+=item B<$OBJECT>->B<getSIDAddress>([SCALAR])
+
+Returns the integer value of the SID address for SID number SCALAR.
+
+NOTE: This returns the full address value, not just the value of the middle 2
+digits of the address (which is what's actually stored in the
+<secondSIDAddress> and I<thirdSIDAddress> fields)!
+
+If SCALAR is 1, it always returns 0xD400, as that was the fixed memory mapped
+address of the C64's SID chip. This is not a value stored in SID files - it's
+implied and is returned here just for the sake of completeness.
+
+If SCALAR is 2 and I<version> is 3 or greater, it returns the address for the
+second SID chip, undef otherwise.
+
+If SCALAR is 3 and I<version> is 4 or greater, it returns the address for the
+third SID chip, undef otherwise.
 
 =item B<$OBJECT>->B<set>(field => value [, field => value, ...] )
 
@@ -1451,10 +1774,8 @@ I<field> to have I<value>.
 
 If you try to set a field that is unrecognized, that particular field-value
 pair will be ignored. Trying to set the I<version> field to anything other
-than 1 or 2 will result in criminal prosecution, expulsion, and possibly
-death... Actually, it won't harm you, but the invalid value will be ignored.
-The same is true for the I<magicID> field if you try to set it to anything
-else but 'PSID' or 'RSID'.
+than 1, 2, 3 or 4, the invalid value will be ignored. The same is true for the
+I<magicID> field if you try to set it to anything else but 'PSID' or 'RSID'.
 
 Whenever the version number is changed to 1, the I<flags>, I<startPage>,
 I<pageLength> and I<reserved> fields are automatically set to be undef'd, the
@@ -1462,6 +1783,9 @@ I<magicID> is set to 'PSID' and the I<dataOffset> field is set to 0x0076.
 
 Whenever the version number is changed to 2, the I<flags>, I<startPage>,
 I<pageLength> and I<reserved> fields are zeroed out if they are not set, yet.
+If the version number is changed to 3, the I<secondSIDAddress> field will also
+be set to 0. If the version number is changed to 4, the I<thirdSIDAddress>
+field will also be set to 0 and I<reserved> will be set to undef.
 
 Whenever the I<magicID> is changed from 'RSID' to 'PSID' or vice versa and
 I<flags> is not specified at the same time, the I<psidSpecific> field for
@@ -1473,9 +1797,9 @@ field is also set to 0. If I<loadAddress> was non-zero before, its value is
 prepended to I<data>.
 
 If you try to set I<magicID>, I<flags>, I<startPage>, I<pageLength> or
-I<reserved> when I<version> is not 2, the values will be ignored. Trying to
+I<reserved> when I<version> is not 2+, the values will be ignored. Trying to
 set I<dataOffset> when I<version> is 1 will always reset its value to 0x0076,
-and I<dataOffset> can't be set to lower than 0x007C if I<version> is 2. You
+and I<dataOffset> can't be set to lower than 0x007C if I<version> is 2+. You
 can set it higher, though, in which case either the relevant portion of the
 original extra padding bytes between the SID header and the I<data> will be
 preserved, or additional 0x00 bytes will be added between the SID header and
@@ -1507,10 +1831,18 @@ SCALAR2 can be either 0 (indicating a vertical blank interrupt (50Hz PAL, 60Hz
 NTSC)), or 1 (indicating CIA 1 timer interrupt (default is 60Hz)). An undef is
 returned if neither was specified.
 
+For PlaySID specific files if SCALAR1 is greater than 32, the SCALAR1 module 32
+bit of the I<speed> field will be set, overwriting whatever value was in that
+bit before ("wraparound" behavior for songs > 32).
+
+For all other files if SCALAR1 is greater than 32, then bit #31 (MSB) of the
+I<speed> flag will be set, overwriting whatever value was in that bit before
+("pegged at 32" behavior for songs > 32).
+
 =item B<$OBJECT>->B<setMUSPlayer>(SCALAR)
 
 Changes the value of the 'MUSPlayer' bit of the I<flags> field to SCALAR if
-I<flags> is specified (i.e. when I<version> is 2), returns an undef otherwise.
+I<flags> is specified (i.e. when I<version> is 2+), returns an undef otherwise.
 SCALAR must be either 0 (indicating a built-in music player) or 1 (indicating
 that I<data> is a Compute!'s Sidplayer MUS data and the music player must be
 merged).
@@ -1518,14 +1850,17 @@ merged).
 =item B<$OBJECT>->B<setPlaySID>(SCALAR)
 
 Changes the value of the 'psidSpecific' bit of the I<flags> field to SCALAR if
-I<flags> is specified (i.e. when I<version> is 2) and the I<magicID> is 'PSID',
+I<flags> is specified (i.e. when I<version> is 2+) and the I<magicID> is 'PSID',
 returns an undef otherwise. SCALAR must be either 0 (indicating that I<data>
 is Commodore-64 compatible) or 1 (indicating that I<data> is PlaySID specific).
+
+Note that it is not possible to set v1 files to be PlaySID specific - it's
+implied that all v1 files are PlaySID specific.
 
 =item B<$OBJECT>->B<setC64BASIC>(SCALAR)
 
 Changes the value of the 'C64BASIC' bit of the I<flags> field to SCALAR if
-I<flags> is specified (i.e. when I<version> is 2) and the I<magicID> is 'RSID',
+I<flags> is specified (i.e. when I<version> is 2+) and the I<magicID> is 'RSID',
 returns an undef otherwise. SCALAR must be either 1 (indicating that I<data>
 has a C64 BASIC executable portion) or 0 otherwise. Setting this flag to 1
 also sets the I<initAddress> field to 0.
@@ -1533,30 +1868,65 @@ also sets the I<initAddress> field to 0.
 =item B<$OBJECT>->B<setClock>(SCALAR)
 
 Changes the value of the 'clock' (video standard) bits of the I<flags> field
-to SCALAR if I<flags> is specified (i.e. when I<version> is 2), returns an
+to SCALAR if I<flags> is specified (i.e. when I<version> is 2+), returns an
 undef otherwise. SCALAR must be one of 0 (UNKNOWN), 1 (PAL), 2 (NTSC) or 3
 (EITHER).
 
 =item B<$OBJECT>->B<setClockByName>(SCALAR)
 
 Changes the value of the 'clock' (video standard) bits of the I<flags> field
-if I<flags> is specified (i.e. when I<version> is 2), returns an undef
+if I<flags> is specified (i.e. when I<version> is 2+), returns an undef
 otherwise. SCALAR must be be one of UNKNOWN, NONE, NEITHER (all 3 indicating
 UNKNOWN), PAL, NTSC or ANY, BOTH, EITHER (all 3 indicating EITHER) and is
 case-insensitive.
 
-=item B<$OBJECT>->B<setSIDModel>(SCALAR)
+=item B<$OBJECT>->B<setSIDModel>(SCALAR1, [SCALAR2])
 
 Changes the value of the 'sidModel' bits of the I<flags> field if I<flags> is
-specified (i.e. when I<version> is 2), returns an undef otherwise. SCALAR must
-be one of 0 (UNKNOWN), 1 (6581), 2 (8580) or 3 (EITHER).
+specified (i.e. when I<version> is 2+), returns an undef otherwise. SCALAR1
+must be one of 0 (UNKNOWN), 1 (6581), 2 (8580) or 3 (EITHER).
 
-=item B<$OBJECT>->B<setSIDModelByName>(SCALAR)
+If SCALAR2 is defined and it's 1, it behaves as above. If SCALAR2 is 2 and
+I<version> is 3 or larger, it sets the 'sidModel' bits of the I<flags> field
+for the second SID, returns an undef otherwise. If SCALAR2 is 3 and I<version>
+is 4 or larger, it sets the 'sidModel' bits of the I<flags> field for the third
+SID, returns an undef otherwise.
+
+=item B<$OBJECT>->B<setSIDModelByName>(SCALAR1, [SCALAR2])
 
 Changes the value of the 'sidModel' bits of the I<flags> field if I<flags> is
-specified (i.e. when I<version> is 2), returns an undef otherwise. SCALAR must
-be be one of UNKNOWN, NONE, NEITHER (all 3 indicating UNKNOWN), 6581, 8580 or
-ANY, BOTH, EITHER (all 3 indicating EITHER) and is case-insensitive.
+specified (i.e. when I<version> is 2+), returns an undef otherwise. SCALAR1
+must be be one of UNKNOWN, NONE, NEITHER (all 3 indicating UNKNOWN), 6581, 8580
+or ANY, BOTH, EITHER (all 3 indicating EITHER) and is case-insensitive.
+
+If SCALAR2 is defined and it's 1, it behaves as above. If SCALAR2 is 2 and
+I<version> is 3 or larger, it sets the 'sidModel' bits of the I<flags> field
+for the second SID, returns an undef otherwise. If SCALAR2 is 3 and I<version>
+is 4 or larger, it sets the 'sidModel' bits of the I<flags> field for the third
+SID, returns an undef otherwise.
+
+=item B<$OBJECT>->B<setSIDAddress>(SCALAR1, SCALAR2)
+
+Changes the value of the I<secondSIDAddress> or I<thirdSIDAddress> fields to
+SCALAR2 "intelligently", because SCALAR2 is expected to be the full address
+value.
+
+NOTE: If you want to set the values of the I<secondSIDAddress> or
+I<thirdSIDAddress> fields directly (with just the value of the middle 2 digits
+of the address), call I<set> instead.
+
+If SCALAR1 is 1 ("original" C64 SID) or SCALAR1 is id greater than 3, it
+returns an undef. If SCALAR1 is 2 and the I<version> field is less than 3, it
+returns an undef. If SCALAR1 is 3 and the I<version> field is less than 4, it
+returns an undef. If SCALAR2 is undefined, it returns an undef.
+
+SCALAR2 has to be in the range of 0xD420-0xD7E00 or 0xDE00-0xDFE0. In addition,
+the middle 2 digits of the address have to be even (e.g. 0xDB<60>0 is good,
+0xDB<61>0 is not).
+
+If I<version> is 4, then the addresses of the I<secondSIDAddress> and
+I<thirdSIDAddress> fields will not be allowed to be the same - an undef is
+returned if that would be the case.
 
 =item B<$OBJECT>->B<getFieldNames>()
 
@@ -1564,9 +1934,10 @@ Returns an array that contains the SID fieldnames recognized by this module,
 regardless of the SID version number. All fieldnames are taken from the
 standard SID file format specification, but do B<not> include those fields
 that are themselves contained in another field, namely any field that is
-inside the I<flags> field. The fieldname I<FILENAME> is also B<not> returned
-here, since that is considered to be a descriptive parameter of the SID file
-and is not part of the SID specification.
+inside the I<flags> field. The fieldnames I<FILENAME>, I<FILESZIE> and
+I<PADDING> are also B<not> returned here, since those are considered to be
+descriptive parameters of the SID file and are not part of the SID
+specification.
 
 =item B<$OBJECT>->B<getMD5>([SCALAR])
 
@@ -1592,20 +1963,22 @@ this is also the default behavior.
 =item B<$OBJECT>->B<validate>()
 
 Regardless of how the SID fields were populated, this operation will update
-the stored SID data to comply with the latest SID version (PSID v2NG or RSID).
-Thus, it changes the SID I<version> to 2, and it will also change the other
-fields so that they take on their prefered values. Operations done by this
+the stored SID data to comply with the latest SID version (PSID or RSID v2+).
+Thus, it may change the SID I<version> field, and it may also change the other
+fields so that they take on their preferred values. Operations done by this
 member function include (but are not limited to):
 
 =over 4
 
 =item *
 
-setting the I<version> field to 2,
+setting the I<version> field to 2 if I<version> was 1 before (untouched
+otherwise),
 
 =item *
 
-if the I<magicID> is 'RSID', setting the I<playAddress> and I<speed> fields,
+if the I<magicID> is 'RSID', setting the I<playAddress> and I<speed> fields to
+0,
 
 =item *
 
@@ -1614,7 +1987,7 @@ setting the I<dataOffset> to 0x007C,
 =item *
 
 chopping the textual fields of I<title>, I<author> and I<released> to their
-maximum length of 31 characters,
+maximum length of 32 characters,
 
 =item *
 
@@ -1623,23 +1996,15 @@ I<released> to ISO 8859-1 ASCII bytes (i.e. NOT Unicode),
 
 =item *
 
-changing the I<initAddress> to a valid non-zero value,
-
-=item *
-
 if the I<magicID> is 'RSID', changing the I<initAddress> to zero if it is
 pointing to a ROM/IO area ($0000-$07E8, $A000-$BFFF or $D000-$FFFF), or if
-the I<C64BASIC> flag is set to 1,
+the I<C64BASIC> flag is set to 1, and changing the I<initAddress> to zero if
+it is outside the load range of the data and the I<magicID> is 'PSID',
 
 =item *
 
 changing the I<loadAddress> to 0 if it is non-zero (and also prepending the
 I<data> with the non-zero I<loadAddress>)
-
-=item *
-
-changing the actual load address to $07E8 if it is less than $07E8 and the
-I<magicID> is RSID,
 
 =item *
 
@@ -1670,7 +2035,8 @@ set before, and setting the rest to 0,
 =item *
 
 setting only the recognized bits in I<flags>, namely 'MUSPlayer',
-'psidSpecific', 'clock' and 'sidModel' (bits 0-5), and setting the rest to 0,
+'psidSpecific', 'clock', 'sidModel', 'second sidModel' (version 3+ only), and
+'third sidModel' (bits 0-9) (version 4+ only), and setting the rest to 0,
 
 =item *
 
@@ -1684,9 +2050,15 @@ the C64 data,
 
 =item *
 
-setting the I<startPage> to 0xFF and the I<pageLength> to 0 if the relocation
-range indicated by these two fields overlaps or encompasses the ROMs
-($A000-$BFFF and $D000-$FFFF) or reserved memory ($0000-$03FF) areas,
+setting the I<startPage> to 0xFF and the I<pageLength> to 0 if the I<magicID>
+is 'RSID' and the relocation range indicated by these two fields overlaps or
+encompasses the ROMs ($A000-$BFFF and $D000-$FFFF) or reserved memory
+($0000-$03FF) areas,
+
+=item *
+
+setting the I<secondSIDAddress> and I<thirdSIDAddress> fields according to the
+rules described for the I<setSIDAddress> function,
 
 =item *
 
@@ -1696,7 +2068,8 @@ of the SID header, i.e. larger than 0x007C),
 
 =item *
 
-setting the I<reserved> field to 0,
+setting the I<reserved> field to 0 if I<version> is less than 4, and setting it
+to undef if I<version> is 4+,
 
 =back
 
@@ -1715,8 +2088,7 @@ More or less in order of perceived priority, from most urgent to least urgent.
 
 =item *
 
-Add Stefano's SID player engine recognizer code. Didn't somebody else have
-something like this, too?
+Add Stefano's SID player engine recognizer code.
 
 =item *
 
@@ -1724,38 +2096,55 @@ Overload '=' so two objects can be assigned to each other?
 
 =back
 
-=head1 COPYRIGHT
+=head1 LICENSE
 
-This library is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+MIT License
 
-Audio::SID Perl module - Copyright (C) 1999, 2005 LaLa <LaLa@C64.org>
+Copyright 2017 LaLa (Imre Olajos)
 
-(Thanks to Adam Lorentzon for showing me how to extract binary data from SID
-files! :-)
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 SID MD5 calculation - Copyright (C) 2001 Michael Schwendt <sidplay@geocities.com>
 
+Thanks to Adam Lorentzon for showing me how to extract binary data from SID
+files! :-)
+
 =head1 VERSION
 
-Version v3.11, released to CPAN on Aug 14, 2005.
+Version v4.01, released to CPAN on July 12, 2017.
 
 First version (then called Audio::PSID) created on June 11, 1999.
 
 =head1 SEE ALSO
 
-the SIDPLAY homepage for the PSID file format documentation:
+The SID file format specification:
 
-B<http://www.geocities.com/SiliconValley/Lakes/5147/>
+B<http://www.hvsc.c64.org/download/C64Music/DOCUMENTS/SID_file_format.txt/>
 
-the SIDPLAY2 homepage for documents about the PSID v2NG extensions:
+Technical description of the C64's SID chip:
 
-B<http://sidplay2.sourceforge.net>
+B<https://www.c64-wiki.com/wiki/SID>
 
-the High Voltage SID Collection, the most comprehensive archive of SID tunes
-for SID files:
+The High Voltage SID Collection, the most comprehensive archive of SID tunes:
 
 B<http://www.hvsc.c64.org>
+
+Dependencies:
 
 L<Digest::MD5>
 

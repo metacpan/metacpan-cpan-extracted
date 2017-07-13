@@ -11,8 +11,6 @@ html/login.js
 html/README.txt
 html/wtest.js
 lib/Yote/Server.pm
-lib/Yote/Server/Acct.pm
-lib/Yote/Server/App.pm
 lib/Yote/Server/ListContainer.pm
 lib/Yote/Server/ModperlOperator.pm
 Makefile.PL

@@ -1,5 +1,8 @@
 Revision history for Alien-Build-MB
 
+0.03      2017-07-12 16:45:46 -0400
+  - Set perl_module_version runtime property
+
 0.02      2017-03-29 14:29:08 -0400
   - Respect meta->{arch}
   - cleanup _alien directory for distclean

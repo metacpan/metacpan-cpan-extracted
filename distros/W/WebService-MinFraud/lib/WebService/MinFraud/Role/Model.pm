@@ -3,7 +3,7 @@ package WebService::MinFraud::Role::Model;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
 use Sub::Quote qw( quote_sub );
 use Types::Standard qw( HashRef );
@@ -100,7 +100,7 @@ WebService::MinFraud::Role::Model - A role for storing there original response i
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SUPPORT
 

@@ -5,7 +5,7 @@ use warnings;
 use Complete::Module qw(complete_module);
 use Complete::Path;
 use Complete::Util qw(arrayify_answer);
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Temp qw(tempdir);
 use Filesys::Cap qw(fs_is_cs);
 use Test::More 0.98;

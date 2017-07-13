@@ -22,7 +22,8 @@
       },
       "develop" : {
          "requires" : {
-            "Test::Kwalitee" : "1.21"
+            "Test::Kwalitee" : "1.21",
+            "Test::Perl::Critic" : "0"
          }
       },
       "runtime" : {
@@ -64,7 +65,7 @@
          "web" : "https://github.com/Jayceh/Business-OnlinePayment-DLocal"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_contributors" : [
       "Jason Terry <jterry@bluehost.com>"
    ],

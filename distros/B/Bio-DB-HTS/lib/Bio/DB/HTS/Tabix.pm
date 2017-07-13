@@ -21,7 +21,7 @@ package Bio::DB::HTS::Tabix;
 
 use Bio::DB::HTS;
 use Bio::DB::HTS::Tabix::Iterator;
-$Bio::DB::HTS::Tabix::VERSION = '2.8';
+$Bio::DB::HTS::Tabix::VERSION = '2.9';
 use strict;
 use warnings;
 
@@ -135,11 +135,6 @@ sub header_array {
 #free up memory allocated in XS code
 sub close {
     my $self = shift;
-
-    if ( $self->{_htsfile} ) {
-        Bio::DB::HTSfile::close($self->{_htsfile});
-        delete $self->{_htsfile};
-    }
 
     if ( $self->{_tabix_index} ) {
         tbx_close($self->{_tabix_index});

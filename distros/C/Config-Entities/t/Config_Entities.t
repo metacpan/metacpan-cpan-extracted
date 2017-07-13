@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 17;
+use Test::More tests => 18;
 
 BEGIN { use_ok('Config::Entities') }
 
@@ -13,6 +13,9 @@ use File::Spec;
 my $test_dir = dirname( File::Spec->rel2abs($0) );
 
 my ( $entities, $hashref );
+$entities = Config::Entities->new( { entity => { empty_string => '' } } );
+is( $entities->get_entity('empty_string'), '', 'empty string' );
+
 ok( $entities = Config::Entities->new(), 'no entities dirs' );
 
 is_deeply(

@@ -7,7 +7,7 @@ use warnings;
 use FindBin '$Bin';
 use lib $Bin, "$Bin/t";
 
-use File::Slurp::Tiny qw(read_file);
+use File::Slurper qw(read_text);
 use Test::More 0.98;
 require "testlib.pl";
 
@@ -18,7 +18,7 @@ test_to_vcf(
         default_country => "ID",
     },
     status => 200,
-    result => scalar read_file("$Bin/data/1.vcf"),
+    result => read_text("$Bin/data/1.vcf"),
 );
 
 done_testing();

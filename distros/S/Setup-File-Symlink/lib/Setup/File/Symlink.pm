@@ -1,12 +1,12 @@
 package Setup::File::Symlink;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.28'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.29'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::Trash::Undoable;
 
@@ -75,14 +75,14 @@ sub rmsym {
             }];
         }
         if (@undo) {
-            $log->info("(DRY) Deleting symlink $path ...") if $dry_run;
+            log_info("(DRY) Deleting symlink $path ...") if $dry_run;
             return [200, "Symlink $path should be removed", undef,
                     {undo_actions=>\@undo}];
         } else {
             return [304, "Symlink $path already does not exist"];
         }
     } elsif ($tx_action eq 'fix_state') {
-        $log->info("Deleting symlink $path ...");
+        log_info("Deleting symlink $path ...");
         if (unlink $path) {
             return [200, "OK"];
         } else {
@@ -141,7 +141,7 @@ sub ln_s {
             unshift @undo, ['rmsym', {path => $symlink}];
         }
         if (@undo) {
-        $log->info("(DRY) Creating symlink $symlink -> $target ...")
+        log_info("(DRY) Creating symlink $symlink -> $target ...")
             if $dry_run;
         return [200, "Symlink $symlink needs to be created", undef,
                 {undo_actions=>\@undo}];
@@ -149,7 +149,7 @@ sub ln_s {
             return [304, "Symlink $symlink already exists"];
         }
     } elsif ($tx_action eq 'fix_state') {
-        $log->info("Creating symlink $symlink -> $target ...");
+        log_info("Creating symlink $symlink -> $target ...");
         if (symlink $target, $symlink) {
             return [200, "Fixed"];
         } else {
@@ -279,7 +279,7 @@ sub setup_symlink {
                 return [412, "Must replace file $symlink with symlink ".
                             "but instructed not to"];
             }
-            $log->info("(DRY) Replacing file/dir $symlink with symlink ...")
+            log_info("(DRY) Replacing file/dir $symlink with symlink ...")
                 if $dry_run;
             push @do, (
                 ["File::Trash::Undoable::trash",
@@ -296,7 +296,7 @@ sub setup_symlink {
                 return [412, "Must replace symlink $symlink ".
                             "but instructed not to"];
             }
-            $log->info("(DRY) Replacing symlink $symlink ...") if $dry_run;
+            log_info("(DRY) Replacing symlink $symlink ...") if $dry_run;
             push @do, (
                 [rmsym => {path=>$symlink}],
                 [ln_s  => {symlink=>$symlink, target=>$target}],
@@ -310,7 +310,7 @@ sub setup_symlink {
                 return [412, "Must create symlink $symlink ".
                             "but instructed not to"];
             }
-            $log->info("(DRY) Creating symlink $symlink ...") if $dry_run;
+            log_info("(DRY) Creating symlink $symlink ...") if $dry_run;
             push @do, (
                 ["ln_s", {symlink=>$symlink, target=>$target}],
             );
@@ -325,7 +325,7 @@ sub setup_symlink {
             if $is_dir && !$replace_dir;
         return [412, "Must delete file $symlink but instructed not to"]
             if !$is_sym && !$is_dir && !$replace_file;
-        $log->info("(DRY) Removing symlink $symlink ...") if $dry_run;
+        log_info("(DRY) Removing symlink $symlink ...") if $dry_run;
         push    @do  , ["File::Trash::Undoable::trash",
                         {path=>$symlink, suffix=>$suffix}];
         unshift @undo, ["File::Trash::Undoable::untrash",
@@ -354,24 +354,24 @@ Setup::File::Symlink - Setup symlink (existence, target)
 
 =head1 VERSION
 
-This document describes version 0.28 of Setup::File::Symlink (from Perl distribution Setup-File-Symlink), released on 2015-09-04.
-
-=head1 SEE ALSO
-
-L<Setup>
-
-L<Setup::File>
+This document describes version 0.29 of Setup::File::Symlink (from Perl distribution Setup-File-Symlink), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 ln_s(%args) -> [status, msg, result, meta]
+=head2 ln_s
+
+Usage:
+
+ ln_s(%args) -> [status, msg, result, meta]
 
 Create symlink.
 
 Fixed state: C<symlink> exists and points to C<target>.
 
 Fixable state: C<symlink> doesn't exist.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -428,7 +428,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 rmsym(%args) -> [status, msg, result, meta]
+=head2 rmsym
+
+Usage:
+
+ rmsym(%args) -> [status, msg, result, meta]
 
 Delete symlink.
 
@@ -438,6 +442,8 @@ Fixed state: C<path> doesn't exist.
 
 Fixable state: C<path> exists, is a symlink, (and if C<target> is defined, points
 to C<target>).
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -492,7 +498,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 setup_symlink(%args) -> [status, msg, result, meta]
+=head2 setup_symlink
+
+Usage:
+
+ setup_symlink(%args) -> [status, msg, result, meta]
 
 Setup symlink (existence, target).
 
@@ -507,6 +517,8 @@ symlink/file/dir if it was replaced during do.
 When C<< should_exist=E<gt>0 >>: On do, will remove symlink if it exists (and
 C<replace_symlink> is true). If C<replace_file>/C<replace_dir> is true, will also
 remove file/dir. On undo, will restore deleted symlink/file/dir.
+
+This function is not exported by default, but exportable.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -608,13 +620,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Setup>
+
+L<Setup::File>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

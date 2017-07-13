@@ -1,10 +1,41 @@
-SYNOPSIS
+NAME
+    App::ShellCompleter::cpanm - Shell completion for cpanm
 
+VERSION
+    This document describes version 0.19 of App::ShellCompleter::cpanm (from
+    Perl distribution App-ShellCompleter-cpanm), released on 2017-07-10.
+
+SYNOPSIS
     See _cpanm included in this distribution.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ShellCompleter-cpanm>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-BashCompleter-cpanm>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-cp
+    anm>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Bash::Completion::Plugins::cpanm, which focuses on completing module
     name remotely using MetaCPAN API. This module, on the other hand,
-    focuses on completing cpanm command-line options.
+    focuses on completing "cpanm" command-line options.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+
+# dumps a bitmap distribution format (.bdf) font
+
+use strict;
+use warnings;
+
+use PDF::Builder;
+use PDF::Builder::Util;
+use File::Basename;
+use PDF::Builder::Resource::Font::BdFont;
+use Data::Dumper;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed stream
+
+die "Require one BDFont file on command line.\n" if !scalar @ARGV;
+die "Requested BDFont file $ARGV[0] not found.\n" if !-e $ARGV[0];
+
+my $data = PDF::Builder::Resource::Font::BdFont->readBDF($ARGV[0]);
+
+#print Dumper($data);
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+
+# loop through characters in font file. ONE PAGE per character!!
+foreach my $char (@{$data->{'char2'}}) {
+    my $page = $pdf->page();
+    $page->mediabox('A4'); # 595,842
+
+    my $gfx = $page->gfx();
+    print "C: $char->{'NAME'} ($char->{'ENCODING'})\n";
+    my @bbx = @{$char->{'BBX'}};
+
+    if (!defined $char->{'hex'}) {
+        # must be a space. give it a hex pattern to avoid error message
+        $char->{'hex'} = '0000';
+    }
+    my $stream = pack('H*',$char->{'hex'});
+    
+    my $y = $bbx[1];
+    next unless $y;
+    my $x = 8*length($stream)/$y;
+
+    my $img = qq|q $x 0 0 $y 50 50 cm
+BI
+/Interpolate false/Decode [1 0]/H $y/W $x/BPC 1/CS/G
+ID $stream
+EI 
+Q|;
+
+    $gfx->add($img);
+    delete $gfx->{'Filter'};
+} # loop through characters in font file that was read in
+
+my $sx = 33;  # cell width
+my $sy = 45;  # cell height
+my $fx = 20;  # ascender max
+
+my $f1 = $pdf->corefont('Helvetica');
+
+my $font = $pdf->bdfont($ARGV[0]);
+
+my $page = $pdf->page();
+$page->mediabox(595,842);
+
+my $gfx = $page->gfx();
+
+my $txt = $page->text();
+$txt->strokecolor('#000');
+$txt->fillcolor('#000');
+$txt->font($font, $fx);
+
+my $txt2 = $page->text();
+
+# title of font names
+$txt2->translate(50,800);
+$txt2->font($f1, 15);
+$txt2->text("font='".$font->fontname()." / ".$font->name()."'");
+
+# compact text for 4 lines beneath each cell
+$txt2->font($f1, 5);
+$txt2->hscale(80);
+
+# underline or cell bottom pts below baseline (<0) to clear descenders
+my $u = $font->underlineposition()*$fx/1000;
+
+# loop character group (row) from low to high
+foreach my $yp (0..15) {
+    my $y = 15 - $yp; # row position grows high to low (top to bottom)
+    print STDERR ".";
+    # loop column left to right
+    foreach my $x (0..15) {
+	my $ci = $yp*16 + $x;
+	my $c  = chr($ci);
+        $txt->translate(50+($sx*$x),50+($sy*$y)); # character position
+        $txt->text($c); # the character itself, in bitmapped font
+	 # unfortunately, is a solid block for now 
+
+        my $wx = $font->width($c)*$fx;  # character width in ? units
+	my $wxs = $wx/$fx*1.5;  # desired on-screen width in pixels
+
+	# draw lt blue character cell: width of character, full des/asc height
+        $gfx->strokecolor('lightblue');
+        $gfx->move(50+($sx*$x),50+($sy*$y)+$fx);     # UL corner
+        $gfx->line(50+($sx*$x),50+($sy*$y)+$u);      # LL corner
+        $gfx->line(50+($sx*$x)+$wxs,50+($sy*$y)+$u);  # LR corner
+        $gfx->line(50+($sx*$x)+$wxs,50+($sy*$y)+$fx); # UR corner
+        $gfx->close();
+        $gfx->stroke();
+
+        $gfx->strokecolor('gray');  # baseline
+        $gfx->move(50+($sx*$x),50+($sy*$y));
+        $gfx->line(50+($sx*$x)+$wxs,50+($sy*$y));
+        $gfx->stroke();
+
+        $txt2->translate(50+($sx*$x)+2,50+($sy*$y)-9);
+        $txt2->text($ci);  # decimal character number
+        $txt2->translate(50+($sx*$x)+2,50+($sy*$y)-14);
+	# Unicode number (16 bit)
+        if (defined $font->uniByEnc($ci)) {
+            $txt2->text(sprintf('U=0x%04X',$font->uniByEnc($ci)));
+	} else {
+            $txt2->text('U=0x????');
+	}
+        $txt2->translate(50+($sx*$x)+2,50+($sy*$y)-19);
+        $txt2->text($font->glyphByEnc($ci)); # glyph name
+        $txt2->translate(50+($sx*$x)+2,50+($sy*$y)-24);
+        $txt2->text(sprintf('wx=%d',$font->wxByEnc($ci)));  # glyph width
+    } # column loop (x)
+} # row loop (yp/y)
+
+delete $gfx->{'Filter'};
+delete $txt->{'Filter'};
+delete $txt2->{'Filter'};
+$pdf->{'pdf'}->{' version'} = 4;
+my $myName = basename($ARGV[0]);
+$myName =~ s/\.bdf$//i;  # trim off extension
+$pdf->saveas("$0.$myName.pdf");
+
+$pdf->end();
+
+
+__END__

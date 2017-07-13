@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::metacpan_author;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -59,7 +59,7 @@ App::lcpan::Cmd::metacpan_author - Open author page on MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::metacpan_author (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2017-01-20.
+This document describes version 0.003 of App::lcpan::Cmd::metacpan_author (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,11 @@ This module handles the L<lcpan> subcommand C<metacpan-author>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Open author page on MetaCPAN.
 

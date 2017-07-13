@@ -1,0 +1,296 @@
+#!perl
+
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.006'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+my $Config;
+my ($Cwd, $Repo_Dir, $Repo_Name);
+
+sub read_config {
+    #require PERLANCAR::File::HomeDir;
+
+    for my $dir ("$ENV{HOME}/.config", $ENV{HOME}, "/etc") {
+        my $file = "$dir/gitwrap.conf";
+        if (-f $file) {
+            require Config::IOD::Reader;
+            $Config = Config::IOD::Reader->new->read_file($file);
+            return;
+        }
+    }
+    $Config = {};
+}
+
+sub run_cmds {
+    require Cwd;
+    require IPC::System::Options;
+
+    my ($cmds) = @_;
+
+    unless ($Cwd) {
+        $Cwd = Cwd::getcwd();
+
+      FIND_REPO_TOP_LEVEL_DIR:
+        {
+            my $cwd = $Cwd;
+            while (1) {
+                if (-d ".git") {
+                    $Repo_Dir = $cwd;
+                    ($Repo_Name = $Repo_Dir) =~ s!.+/!!;
+                    last;
+                }
+                chdir ".." or last;
+                $cwd =~ s!(.+)/.+!$1! or last;
+            }
+        }
+    }
+
+    my %env;
+    $env{GIT_REPO_NAME} = $Repo_Name;
+
+    chdir $Repo_Dir if defined($Repo_Dir);
+    for my $cmd (@$cmds) {
+        IPC::System::Options::system({env=>\%env, log=>1, die=>1}, $cmd);
+    }
+    chdir $Cwd if defined($Repo_Dir);
+}
+
+sub do_stuffs {
+    my $cmds;
+
+    $cmds = $Config->{GLOBAL}{before_commit_cmd};
+    $cmds = [$cmds] if defined $cmds && ref $cmds ne 'ARRAY';
+    if ($cmds && @ARGV && $ARGV[0] eq 'commit') {
+        log_info(
+            "gitwrap: Running command(s) specified in before_commit_cmd");
+        run_cmds($cmds);
+    }
+
+    $cmds = $Config->{GLOBAL}{before_status_cmd};
+    $cmds = [$cmds] if defined $cmds && ref $cmds ne 'ARRAY';
+    if ($cmds && @ARGV && $ARGV[0] eq 'status') {
+        log_info(
+            "gitwrap: Running command(s) specified in before_status_cmd");
+        run_cmds($cmds);
+    }
+}
+
+
+sub exec_git {
+    my @cmd = ($Config->{GLOBAL}{git_path} // 'git', @ARGV);
+    log_info("gitwrap: Executing git: %s", \@cmd);
+    exec {$cmd[0]} @cmd;
+}
+
+### main
+
+log_info("gitwrap: start");
+read_config;
+do_stuffs;
+exec_git;
+
+# ABSTRACT: Git wrapper script
+# PODNAME: gitwrap
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gitwrap - Git wrapper script
+
+=head1 VERSION
+
+This document describes version 0.006 of gitwrap (from Perl distribution App-gitwrap), released on 2017-07-10.
+
+=head1 SYNOPSIS
+
+Use like you would C<git>:
+
+ % gitwrap commit -m ...
+ ...
+
+To use the name C<git>, in your Unix shell:
+
+ alias git=gitwrap
+
+then this will call C<gitwrap> instead.
+
+ % git commit -m ...
+ ...
+
+=head1 DESCRIPTION
+
+C<gitwrap> is a script that will eventually exec() the C<git> binary. But before
+it does that, it can do some things first.
+
+It will first search for configuration file F<gitwrap.conf> in one of these
+locations: F<~/.config>, F<~>, or F</etc>. It then will execute various commands
+as described in the configuration. See L</"CONFIGURATION">.
+
+It will then call the git binary as specified in the configuration C<git_path>
+or just use C<git>.
+
+Some examples of how I use this script:
+
+=over
+
+=item * Fix user and email dynamically before commit
+
+Suppose that instead of putting the user/email manually on each C<.git/config>,
+you want to set/fix user and email dynamically using a set of rules right before
+commit.
+
+Doing this in C<pre-commit> hook is too late as C<git> already decides the
+user/email, so if you use C<pre-commit> hook for this the best you can do is fix
+user/email then exit non-zero so the commit is aborted. Then you commit again.
+
+With this wrapper, this extra step is unnecessary. You can set
+C<before_commit_cmd> in F<gitwrap.conf> to the command necessary to munge the
+user/email in C<.git/config>, for example:
+
+ before_commit_cmd = perl -e'($user, $email) = ...; system "git", "config", "user.name", $user; system "git", "config", "user.email", $email'
+
+or, if you already have a C<pre-commit> hook that does this, you can call the
+pre-commit hook instead.
+
+ before_commit_cmd = ".git/hooks/pre-commit; exit 0"
+
+The difference is that even if the hook exits non-zero, gitwrap will continue
+executing git (due to C<exit 0> clause). But if the hook fails again during
+actual pre-commit phase in git, the commit will be aborted.
+
+=item * Touch last commit/status timestamp
+
+I update a record in a database whenever a repository is committed into or
+status-ed. The first can be done with a C<post-commit> hook, but for the second
+there is no hook provided by git. I do this to speed up or prioritize
+repositories that are more recently modified/accessed in L<Git::Bunch>: When
+there are hundreds/thousand+ git repositories in a gitbunch, and only a few of
+them need to be synchronized, using these timestamps can dramatically shorten
+the amount of time to determine which repositories need to be included, because
+we avoid having to 'git status' every single repository.
+
+To do this, in F<gitwrap.conf>:
+
+ before_commit_cmd = reposdb touch --commit-time
+ before_status_cmd = reposdb touch --status-time
+
+Note: see also L<reposdb>.
+
+=item * Setup hooks
+
+Sometimes I copy repositories to other computers simply by using C<cp> or
+C<rsync>. I also have scripts in C<.git/hooks/> directory inside the repository
+as symlinks to the actual scripts. When copying to other computers, the paths
+are not exactly alike so the symlinks get broken. We can use
+C<before_commit_cmd> or other C<before*cmd> to correct these symlinks first.
+
+=back
+
+=head1 CONFIGURATION
+
+=head2 git_path
+
+=head2 before_commit_cmd
+
+Command to run before C<git commit>. Can be specified multiple times. Will abort
+execution if any of the commands fails.
+
+=head2 before_status_cmd
+
+Command to run before C<git status>. Can be specified multiple times. Will abort
+execution if any of the commands fails.
+
+=head1 FAQ
+
+=head2 Truncated command?
+
+I put this configuration:
+
+ before_commit_cmd = perl -e'foo; bar; if ($baz eq "qux") { ... }'
+
+but when I run git, I get:
+
+ sh: 1: Syntax error: Unterminated quoted string
+ system(perl -e'foo) failed: 512 (exited with code 2) at ...
+
+Why is the command truncated?
+
+Answer: the configuration (in L<IOD> format) regards semicolon (C<;>) and hash
+character (C<#>) as a comment starter, including after the parameter value. To
+see quickly how a configuration file gets loaded, you can use L<dump-iod>
+utility which will display the configuration as JSON data, e.g.:
+
+ % dump-iod ~/gitwrap.conf
+ {
+   "GLOBAL" : {
+     "before_commit_cmd" : "perl -e'foo"
+   }
+ }
+
+To prevent this, you can use JSON string: you quote the whole parameter value in
+a double quote (and escape the double quotes inside with bacslashes). Example:
+
+ before_commit_cmd = "perl -e'foo; bar; if ($baz eq \"qux\") { ... }'"
+
+So now your configuration will become (in JSON):
+
+ {
+    "GLOBAL" : {
+      "before_commit_cmd" : "perl -e'foo; bar; if ($baz eq \"qux\") { ... }'"
+    }
+ }
+
+=head2 Continuing after error?
+
+I want to execute a command in C<before_commit_cmd> (or C<before_status_cmd>,
+etc) but I want to continue even though the command exits with a non-zero
+status. How do I do that?
+
+Answer:
+
+ before_commit_cmd = "your-command; exit 0"
+
+Remember to quote the parameter value with a double quote (see previous FAQ
+entry for more details).
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-gitwrap>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-gitwrap>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-gitwrap>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<git>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

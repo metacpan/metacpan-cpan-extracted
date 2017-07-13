@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::rt;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to rt.cpan.org
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::rt - More lcpan subcommands related to rt.cpan.org
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::CmdBundle::rt (from Perl distribution App-lcpan-CmdBundle-rt), released on 2017-02-03.
+This document describes version 0.003 of App::lcpan::CmdBundle::rt (from Perl distribution App-lcpan-CmdBundle-rt), released on 2017-07-10.
 
 =head1 SYNOPSIS
 

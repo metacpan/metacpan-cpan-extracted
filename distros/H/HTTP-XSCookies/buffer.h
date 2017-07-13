@@ -66,7 +66,7 @@ typedef struct Buffer {
                 target *= BUFFER_SIZE_FACTOR; \
             } \
             (buffer)->size = target; \
-            GMEM_NEW((buffer)->data, char*, target); \
+            GMEM_NEW((buffer)->data, char, target); \
         } else { \
             (buffer)->size = sizeof((buffer)->fixed); \
             (buffer)->data = (buffer)->fixed; \
@@ -78,7 +78,7 @@ typedef struct Buffer {
     do { \
         if ((buffer)->data && \
             (buffer)->data != (buffer)->fixed) { \
-            GMEM_DEL((buffer)->data, char*, (buffer)->size); \
+            GMEM_DEL((buffer)->data, char, (buffer)->size); \
         } \
         buffer_zero(buffer); \
     } while (0)
@@ -172,10 +172,10 @@ typedef struct Buffer {
                 target *= BUFFER_SIZE_FACTOR; \
             } \
             if ((buffer)->data == (buffer)->fixed) { \
-                GMEM_NEW((buffer)->data, char*, target); \
+                GMEM_NEW((buffer)->data, char, target); \
                 memcpy((buffer)->data, (buffer)->fixed, (buffer)->size); \
             } else { \
-                GMEM_REALLOC((buffer)->data, char*, (buffer)->size, target); \
+                GMEM_REALLOC((buffer)->data, char, (buffer)->size, target); \
             } \
             (buffer)->size = target; \
         } \

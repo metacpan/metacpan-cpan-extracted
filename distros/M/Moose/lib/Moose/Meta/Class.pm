@@ -1,5 +1,5 @@
 package Moose::Meta::Class;
-our $VERSION = '2.2005';
+our $VERSION = '2.2006';
 
 use strict;
 use warnings;
@@ -106,7 +106,9 @@ sub _anon_cache_key {
 
     my $roles = Data::OptList::mkopt(($options{roles} || []), {
         moniker  => 'role',
-        val_test => sub { ref($_[0]) eq 'HASH' },
+        name_test => sub {
+            ! ref $_[0] or blessed($_[0]) && $_[0]->isa('Moose::Meta::Role')
+        },
     });
 
     my @role_keys;
@@ -812,7 +814,7 @@ Moose::Meta::Class - The Moose metaclass
 
 =head1 VERSION
 
-version 2.2005
+version 2.2006
 
 =head1 DESCRIPTION
 

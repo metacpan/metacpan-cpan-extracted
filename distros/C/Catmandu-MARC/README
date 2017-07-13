@@ -64,6 +64,8 @@ MODULES
 
       * Catmandu::Fix::marc_copy
 
+      * Catmandu::Fix::marc_cut
+
       * Catmandu::Fix::marc_paste
 
       * Catmandu::Fix::Bind::marc_each

@@ -1,5 +1,108 @@
-BENCHMARK NOTES
+NAME
+    Bencher::Scenario::DigestMD5 - Benchmark Digest::MD5 against md5sum
+    utility
 
-    Since they are both implemented in C, the speeds of both are roughly
-    the same.
+VERSION
+    This document describes version 0.004 of Bencher::Scenario::DigestMD5
+    (from Perl distribution Bencher-Scenario-DigestMD5), released on
+    2017-07-10.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m DigestMD5
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m DigestMD5
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Digest::MD5 2.55
+
+BENCHMARK PARTICIPANTS
+    *   md5sum (perl_code)
+
+        Code template:
+
+         my $cmd = "md5sum ".String::ShellQuote::shell_quote(<filename>); my $res = `$cmd`; $res =~ s/\s.+//s; $res
+
+    *   Digest::MD5 (perl_code)
+
+        Code template:
+
+         my $ctx = Digest::MD5->new; open my $fh, "<", <filename>; $ctx->addfile($fh); $ctx->hexdigest
+
+BENCHMARK DATASETS
+    *   30M_file
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.26.0*, CPU: *Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+    (4 cores)*, OS: *GNU/Linux Debian version 8.0*, OS kernel: *Linux
+    version 3.16.0-4-amd64*.
+
+    Benchmark with default options ("bencher -m DigestMD5"):
+
+     #table1#
+     +-------------+-----------+-----------+------------+---------+---------+
+     | participant | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+     +-------------+-----------+-----------+------------+---------+---------+
+     | Digest::MD5 |        15 |      66.8 |          1 | 3.6e-05 |       6 |
+     | md5sum      |        15 |      66.7 |          1 | 2.6e-05 |       6 |
+     +-------------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m DigestMD5
+    --module-startup"):
+
+     #table2#
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+     | participant         | proc_private_dirty_size (kB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+     | Digest::MD5         | 1116                         | 4.5                | 22             |      10   |                    4.7 |        1   |   6e-05 |       7 |
+     | perl -e1 (baseline) | 1056                         | 4.5                | 20             |       5.3 |                    0   |        1.9 | 5.3e-05 |       7 |
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+BENCHMARK NOTES
+    Since they are both implemented in C, the speeds of both are roughly the
+    same.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-DigestMD5>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-DigestMD5>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Dige
+    stMD5>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

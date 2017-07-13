@@ -1,7 +1,13 @@
-SYNOPSIS
+NAME
+    Perl::Stripper - Yet another PPI-based Perl source code stripper
 
+VERSION
+    This document describes version 0.10 of Perl::Stripper (from Perl
+    distribution Perl-Stripper), released on 2017-07-11.
+
+SYNOPSIS
      use Perl::Stripper;
-    
+
      my $stripper = Perl::Stripper->new(
          #maintain_linum => 1, # the default, keep line numbers unchanged
          #strip_ws       => 1, # the default, strip extra whitespace
@@ -12,87 +18,79 @@ SYNOPSIS
      $stripped = $stripper->strip($perl);
 
 DESCRIPTION
-
     This module is yet another PPI-based Perl source code stripper. Its
-    focus is on costumization and stripping significant information from
+    focus is on costumization and stripping meaningful information from
     source code.
 
 ATTRIBUTES
-
- maintain_linum => BOOL (default: 1)
-
+  maintain_linum => BOOL (default: 1)
     If set to true, stripper will try to maintain line numbers so they do
     not change between the unstripped and the stripped version. This is
     useful for debugging.
 
     Respected by other settings.
 
- strip_ws => BOOL (default: 1)
-
+  strip_ws => BOOL (default: 1)
     Strip extra whitespace, like indentation, padding, even non-significant
-    newlines. Under maintain_linum, will not strip newlines.
+    newlines. Under "maintain_linum", will not strip newlines.
 
     Not yet implemented.
 
- strip_comment => BOOL (default: 1) | CODE
-
-    If set to true, will strip comments. Under maintain_linum will replace
+  strip_comment => BOOL (default: 1) | CODE
+    If set to true, will strip comments. Under "maintain_linum" will replace
     comment lines with blank lines.
 
-    Shebang line (e.g. #!/usr/bin/perl, located at the beginning of script)
-    will not be stripped.
+    Shebang line (e.g. "#!/usr/bin/perl", located at the beginning of
+    script) will not be stripped.
 
     Can also be set to a coderef. Code will be given the PPI comment token
-    object and expected to modify the object (e.g. using set_content()
+    object and expected to modify the object (e.g. using "set_content()"
     method). See PPI::Token::Comment for more details. Some usage ideas:
     translate comment, replace comment with gibberish, etc.
 
- strip_log => BOOL (default: 1)
+  strip_log => BOOL (default: 1)
+    If set to true, will strip log statements. Useful for removing debugging
+    information. Currently supports Log::Any and Log::ger and only looks for
+    the following statements:
 
-    If set to true, will strip log statements. Useful for removing
-    debugging information. Currently Log::Any-specific and only looks for
-    the default logger $log. These will be stripped:
+     $log->LEVEL(...);
+     $log->LEVELf(...);
+     log_LEVEL(...);
+     if ($log->is_LEVEL) { ... }
+     if (log_is_LEVEL()) { ... }
 
-     $log->METHOD(...);
-     $log->METHODf(...);
-     if ($log->is_METHOD) { ... }
-
-    Not all methods are stripped. See stripped_log_levels.
+    Not all methods are stripped. See "stripped_log_levels".
 
     Can also be set to a coderef. Code will be given the PPI::Statement
     object and expected to modify it.
 
- stripped_log_levels => ARRAY_OF_STR (default: ['debug', 'trace'])
+    These are currently not stripped:
 
-    Log levels to strip. By default, only debug and trace are stripped.
-    Levels info and up are considered important for users (instead of for
+     if (something && $log->is_LEVEL) { ... }
+
+  stripped_log_levels => ARRAY_OF_STR (default: ['debug', 'trace'])
+    Log levels to strip. By default, only "debug" and "trace" are stripped.
+    Levels "info" and up are considered important for users (instead of for
     developers only).
 
- strip_pod => BOOL (default: 1)
-
-    If set to true, will strip POD. Under maintain_linum will replace POD
+  strip_pod => BOOL (default: 1)
+    If set to true, will strip POD. Under "maintain_linum" will replace POD
     with blank lines.
 
     Can also be set to a coderef. Code will be given the PPI POD token
-    object and expected to modify the object (e.g. using set_content()
+    object and expected to modify the object (e.g. using "set_content()"
     method). See PPI::Token::Pod for more details.Some usage ideas:
-    translate POD, convert POD to Markdown, replace POD with gibberish,
-    etc.
+    translate POD, convert POD to Markdown, replace POD with gibberish, etc.
 
 METHODS
-
- new(%attrs) => OBJ
-
+  new(%attrs) => OBJ
     Constructor.
 
- $stripper->strip($perl) => STR
-
+  $stripper->strip($perl) => STR
     Strip Perl source code. Return the stripped source code.
 
 FAQ
-
- What is the use of this module?
-
+  What is the use of this module?
     This module can be used to remove debugging information (logging
     statements, conditional code) from source code.
 
@@ -106,13 +104,11 @@ FAQ
     For compressing source code (reducing source code size), you can try
     Perl::Squish or Perl::Strip.
 
- But isn't hiding/protecting source code immoral/unethical/ungrateful?
+  But isn't hiding/protecting source code immoral/unethical/ungrateful?
+    Discussing hiding/protecting source code in general is really beyond the
+    scope of this module's documentation. Please consult elsewhere.
 
-    Discussing hiding/protecting source code in general is really beyond
-    the scope of this module's documentation. Please consult elsewhere.
-
- How about obfuscating by encoding Perl code?
-
+  How about obfuscating by encoding Perl code?
     For example, changing:
 
      foo();
@@ -123,35 +119,56 @@ FAQ
      $src = base64_decode(...); # optionally multiple rounds
      eval $src;
 
-    This does not really remove significant (meaningful) parts of a source
-    code, so I am not very interested in this approach. You can send a
-    patch if you want.
+    This does not really remove meaningful parts of a source code, so I am
+    not very interested in this approach. You can send a patch if you want.
 
- How about changing string into hexadecimal characters? How about ...?
-
+  How about changing string into hexadecimal characters? How about ...?
     Other examples similar in spirit would be adding extra parentheses to
     expressions, changing constant numbers into mathematical expressions.
 
-    Again, this does not remove significant (meaningful) parts of a source
-    code (instead, they just transform stuffs). The effect can be reversed
-    trivially using Perl::Tidy or B::Deparse. So I am not very interested
-    in doing this, but you can send a patch if you want.
+    Again, this does not *remove* meaningful parts of a source code
+    (instead, they just transform stuffs). The effect can be reversed
+    trivially using Perl::Tidy or B::Deparse. So I am not very interested in
+    doing this, but you can send a patch if you want.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perl-Stripper>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perl-Stripper>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Stripper>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     There are at least two approaches when analyzing/modifying/producing
-    Perl code: B-based and PPI-based. In general, B-based modules are
-    orders of magnitude faster than PPI-based ones, but each approach has
-    its strengths and weaknesses.
+    Perl code: B-based and PPI-based. In general, B-based modules are orders
+    of magnitude faster than PPI-based ones, but each approach has its
+    strengths and weaknesses.
 
     B::Deparse - strips comments and extra newlines
 
-    B::Deobfuscate - like B::Deparse, but can also rename variables.
-    Despite its name, if applied to a "normal" Perl code, the effect is
-    obfuscation because it removes the original names (and meaning) of
-    variables.
+    B::Deobfuscate - like B::Deparse, but can also rename variables. Despite
+    its name, if applied to a "normal" Perl code, the effect is obfuscation
+    because it removes the original names (and meaning) of variables.
 
     Perl::Strip - PPI-based, focus on compression.
 
     Perl::Squish - PPI-based, focus on compression.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

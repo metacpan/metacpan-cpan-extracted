@@ -1,5 +1,13 @@
-SYNOPSIS
+NAME
+    Data::Format::Pretty::Console - Pretty-print data structure for console
+    output
 
+VERSION
+    This document describes version 0.38 of Data::Format::Pretty::Console
+    (from Perl distribution Data-Format-Pretty-Console), released on
+    2017-07-10.
+
+SYNOPSIS
     In your program:
 
      use Data::Format::Pretty::Console qw(format_pretty);
@@ -53,8 +61,8 @@ SYNOPSIS
      | qux | console |
      '-----+---------'
 
-    2-dimensional array, format_pretty([ [1, 2, ""], [28, "bar", 3],
-    ["foo", 3, undef] ]):
+    2-dimensional array, format_pretty([ [1, 2, ""], [28, "bar", 3], ["foo",
+    3, undef] ]):
 
      +---------+---------+---------+
      |       1 |       2 |         |
@@ -80,7 +88,7 @@ SYNOPSIS
 
      summary:
      Blah...
-    
+
      users:
      .---------------------------------.
      | domains          | name | quota |
@@ -88,7 +96,7 @@ SYNOPSIS
      | foo.com, bar.com | budi |  1000 |
      | baz.com          | arif |  2000 |
      '------------------+------+-------'
-    
+
      verified:
      0
 
@@ -100,7 +108,6 @@ SYNOPSIS
        b: 1
 
 DESCRIPTION
-
     This module is meant to output data structure in a "pretty" or "nice"
     format, suitable for console programs. The idea of this module is that
     for you to just merrily dump data structure to the console, and this
@@ -114,95 +121,118 @@ DESCRIPTION
     more suitable format when your user pipes your program's output into
     some other program.
 
-    Most of the time, you don't have to configure anything, but some
-    options are provided to tweak the output.
+    Most of the time, you don't have to configure anything, but some options
+    are provided to tweak the output.
 
 FUNCTIONS
-
- format_pretty($data, \%opts)
-
+  format_pretty($data, \%opts)
     Return formatted data structure. Options:
 
-      * interactive => BOOL (optional, default undef)
+    *   interactive => BOOL (optional, default undef)
 
-      If set, will override interactive terminal detection (-t STDOUT).
-      Simpler formatting will be done if terminal is non-interactive (e.g.
-      when output is piped). Using this option will force simpler/full
-      formatting.
+        If set, will override interactive terminal detection (-t STDOUT).
+        Simpler formatting will be done if terminal is non-interactive (e.g.
+        when output is piped). Using this option will force simpler/full
+        formatting.
 
-      * list_max_columns => INT
+    *   list_max_columns => INT
 
-      When displaying list as columns, specify maximum number of columns.
-      This can be used to force fewer columns (for example, single column)
-      instead of using the whole available terminal width.
+        When displaying list as columns, specify maximum number of columns.
+        This can be used to force fewer columns (for example, single column)
+        instead of using the whole available terminal width.
 
-      * table_column_orders => [[COLNAME1, COLNAME2], ...]
+    *   table_column_orders => [[COLNAME1, COLNAME2], ...]
 
-      Specify column orders when drawing a table. If a table has all the
-      columns, then the column names will be ordered according to the
-      specification. For example, when table_column_orders is [[qw/foo bar
-      baz/]], this table's columns will not be reordered because it doesn't
-      have all the mentioned columns:
+        Specify column orders when drawing a table. If a table has all the
+        columns, then the column names will be ordered according to the
+        specification. For example, when table_column_orders is [[qw/foo bar
+        baz/]], this table's columns will not be reordered because it
+        doesn't have all the mentioned columns:
 
-       |foo|quux|
+         |foo|quux|
 
-      But this table will:
+        But this table will:
 
-       |apple|bar|baz|foo|quux|
+         |apple|bar|baz|foo|quux|
 
-      into:
+        into:
 
-       |apple|foo|bar|baz|quux|
+         |apple|foo|bar|baz|quux|
 
-      * table_column_formats => [{COLNAME=>FMT, ...}, ...]
+    *   table_column_formats => [{COLNAME=>FMT, ...}, ...]
 
-      Specify formats for columns. Each table format specification is a
-      hashref {COLNAME=>FMT, COLNAME2=>FMT2, ...}. It will be applied to a
-      table if the table has all the columns. FMT is a format specification
-      according to Data::Unixish::Apply, it's basically either a name of a
-      dux function (e.g. "date") or an array of function name + arguments
-      (e.g. [['date', [align => {align=>'middle'}]]). This will be fed to
-      Text::ANSITable's formats column style.
+        Specify formats for columns. Each table format specification is a
+        hashref {COLNAME=>FMT, COLNAME2=>FMT2, ...}. It will be applied to a
+        table if the table has all the columns. FMT is a format
+        specification according to Data::Unixish::Apply, it's basically
+        either a name of a dux function (e.g. "date") or an array of
+        function name + arguments (e.g. "[['date', [align =>
+        {align=>'middle'}]]"). This will be fed to Text::ANSITable's
+        "formats" column style.
 
-      * table_column_types => [{COLNAME=>TYPE, ...}, ...]
+    *   table_column_types => [{COLNAME=>TYPE, ...}, ...]
 
-      Specify types for columns. Each table format specification is a
-      hashref {COLNAME=>TYPE, COLNAME2=>TYPE2, ...}. It will be applied to
-      a table if the table has all the columns. TYPE is type name according
-      to Sah schema. This will be fed to Text::ANSITable's type column
-      style to give hints on how to format the column. Sometimes this is
-      the simpler alternative to table_column_formats.
+        Specify types for columns. Each table format specification is a
+        hashref {COLNAME=>TYPE, COLNAME2=>TYPE2, ...}. It will be applied to
+        a table if the table has all the columns. TYPE is type name
+        according to Sah schema. This will be fed to Text::ANSITable's
+        "type" column style to give hints on how to format the column.
+        Sometimes this is the simpler alternative to "table_column_formats".
 
 ENVIRONMENT
+    *   INTERACTIVE => BOOL
 
-      * INTERACTIVE => BOOL
+        To set default for "interactive" option (overrides automatic
+        detection).
 
-      To set default for interactive option (overrides automatic
-      detection).
+    *   FORMAT_PRETTY_LIST_MAX_COLUMNS => INT
 
-      * FORMAT_PRETTY_LIST_MAX_COLUMNS => INT
+        To set "list_max_columns" option.
 
-      To set list_max_columns option.
+    *   FORMAT_PRETTY_TABLE_COLUMN_FORMATS => ARRAY (JSON)
 
-      * FORMAT_PRETTY_TABLE_COLUMN_FORMATS => ARRAY (JSON)
+        To set "table_column_formats" option, interpreted as JSON.
 
-      To set table_column_formats option, interpreted as JSON.
+    *   FORMAT_PRETTY_TABLE_COLUMN_TYPES => ARRAY (JSON)
 
-      * FORMAT_PRETTY_TABLE_COLUMN_TYPES => ARRAY (JSON)
+        To set "table_column_types" option, interpreted as JSON.
 
-      To set table_column_types option, interpreted as JSON.
+    *   FORMAT_PRETTY_TABLE_COLUMN_ORDERS => ARRAY (JSON)
 
-      * FORMAT_PRETTY_TABLE_COLUMN_ORDERS => ARRAY (JSON)
+        To set "table_column_orders" option, interpreted as JSON.
 
-      To set table_column_orders option, interpreted as JSON.
+    *   COLUMNS => INT
 
-      * COLUMNS => INT
+        To override terminal width detection.
 
-      To override terminal width detection.
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Format-Pretty-Console>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Format-Pretty-Console>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Co
+    nsole>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Modules used for formatting: Text::ANSITable, YAML.
 
     Data::Format::Pretty
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011,
+    2010 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

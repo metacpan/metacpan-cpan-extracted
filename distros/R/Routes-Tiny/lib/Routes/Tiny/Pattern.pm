@@ -29,9 +29,11 @@ sub new {
     $self->{routes}         = $params{routes};
     $self->{subroutes}      = $params{subroutes};
     $self->{strict_trailing_slash} = $params{strict_trailing_slash};
+    $self->{strict_case}    = $params{strict_case};
 
     Scalar::Util::weaken($self->{routes}) if $self->{routes};
     $self->{strict_trailing_slash} = 1 unless defined $self->{strict_trailing_slash};
+    $self->{strict_case} = 0 unless defined $self->{strict_case};
 
     if (my $methods = $self->{method}) {
         $methods = [$methods] unless ref $methods eq 'ARRAY';
@@ -330,10 +332,17 @@ sub _prepare_pattern {
     }
 
     if ($self->{subroutes}) {
-        $re = qr/^ $re /xmsi;
+        $re = "^ $re";
     }
     else {
-        $re = qr/^ $re $/xmsi;
+        $re = "^ $re \$";
+    }
+
+    if ($self->{strict_case}) {
+        $re = qr/$re/xms;
+    }
+    else {
+        $re = qr/$re/xmsi;
     }
 
     if ($part && @$part) {

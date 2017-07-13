@@ -27,22 +27,20 @@ SHAREDLIB = cyg$(TARGET)-$(VER_MAJOR).$(VER_MINOR).dll
 LIBNAME = lib$(TARGET).dll.a
 HEADER = Source/FreeImage.h
 
-DISTDIR ?= Dist
 
 default: all
 
 all: dist
 
-dist: FreeImage
-	cp *.a $(DISTDIR)
-	cp *.dll $(DISTDIR)
-	cp *.dll.a $(DISTDIR)
+dist: $(STATICLIB) $(HEADER)
+	mkdir -p $(DISTDIR)
+	cp $(STATICLIB) $(DISTDIR)
 	cp $(HEADER) $(DISTDIR)
 
 dos2unix:
 	@$(DOS2UNIX) $(SRCS) $(INCLS)
 
-FreeImage: $(STATICLIB)
+FreeImage: $(STATICLIB) $(SHAREDLIB)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@

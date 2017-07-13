@@ -158,7 +158,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="accel_group">menu-accel-group</property>
-            <!--<child>
+            <child>
               <object class="GtkCheckMenuItem" id="menu-item-view-continuous">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -166,7 +166,7 @@
                 <property name="use_underline">True</property>
               </object>
             </child>
-            <child>
+            <!--<child>
               <object class="GtkSeparatorMenuItem" id="separatormenuitem2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -223,6 +223,19 @@
                 <property name="label" translatable="yes">Zoom</property>
                 <child type="submenu">
                   <object class="GtkMenu" id="menu-view-zoom">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="menu-item-view-columns">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Columns</property>
+                <child type="submenu">
+                  <object class="GtkMenu" id="menu-view-columns">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                   </object>

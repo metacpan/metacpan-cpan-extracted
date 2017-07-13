@@ -1,7 +1,7 @@
 package Data::Sah::Format::perl::iso8601_date;
 
-our $DATE = '2016-06-17'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ Data::Sah::Format::perl::iso8601_date - Format date as ISO8601 date (e.g. 2016-0
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::Format::perl::iso8601_date (from Perl distribution Data-Sah-Format), released on 2016-06-17.
+This document describes version 0.003 of Data::Sah::Format::perl::iso8601_date (from Perl distribution Data-Sah-Format), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -85,7 +85,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

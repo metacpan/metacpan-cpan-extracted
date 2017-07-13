@@ -1,12 +1,12 @@
 package Media::Info::Ffmpeg;
 
-our $DATE = '2016-11-28'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Capture::Tiny qw(capture);
 use IPC::System::Options 'system', -log=>1;
@@ -96,7 +96,7 @@ Media::Info::Ffmpeg - Return information on media file/URL, using ffmpeg
 
 =head1 VERSION
 
-This document describes version 0.004 of Media::Info::Ffmpeg (from Perl distribution Media-Info-Ffmpeg), released on 2016-11-28.
+This document describes version 0.005 of Media::Info::Ffmpeg (from Perl distribution Media-Info-Ffmpeg), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -126,7 +126,11 @@ Sample result:
 =head1 FUNCTIONS
 
 
-=head2 get_media_info(%args) -> [status, msg, result, meta]
+=head2 get_media_info
+
+Usage:
+
+ get_media_info(%args) -> [status, msg, result, meta]
 
 Return information on media file/URL, using ffmpeg.
 
@@ -179,7 +183,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

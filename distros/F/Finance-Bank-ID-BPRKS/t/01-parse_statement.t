@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 use DateTime;
-use File::Slurp::Tiny qw(read_file write_file);
+use File::Slurper qw(read_text write_text);
 use FindBin '$Bin';
 
 use Finance::Bank::ID::BPRKS;
@@ -15,7 +15,7 @@ my $ibank = Finance::Bank::ID::BPRKS->new();
 for my $f (
     ["stmt1.html", "invididual, html"],
 ) {
-    my $resp = $ibank->parse_statement(scalar read_file("$Bin/data/$f->[0]"));
+    my $resp = $ibank->parse_statement(read_text("$Bin/data/$f->[0]"));
     die "status=$resp->[0], error=$resp->[1]\n" if $resp->[0] != 200;
     my $stmt = $resp->[2];
 
@@ -45,7 +45,7 @@ for my $f (
     #is($stmt->{transactions}[2]{seq}, 1, "$f->[1] (seq 2)");
 }
 
-my $res = $ibank->parse_statement(scalar(read_file("$Bin/data/stmt1.html")), return_datetime_obj=>0);
+my $res = $ibank->parse_statement(read_text("$Bin/data/stmt1.html"), return_datetime_obj=>0);
 my $stmt = $res->[2];
 ok(!ref($stmt->{start_date}), "return_datetime_obj=0 (1)");
 

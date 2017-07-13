@@ -1,4 +1,9 @@
-Revision history for Log-Dispatch-Dir
+0.15    2017-07-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Replace File::Slurp::Tiny with File::Slurper.
+
 
 0.14    2015-12-16 (PERLANCAR)
 

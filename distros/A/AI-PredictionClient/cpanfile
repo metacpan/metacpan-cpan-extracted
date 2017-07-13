@@ -1,0 +1,29 @@
+requires "AI::PredictionClient::Alien::TensorFlowServingProtos" => "0";
+requires "Alien::Google::GRPC" => "0";
+requires "Cwd" => "0";
+requires "Data::Dumper" => "0";
+requires "Inline" => "0";
+requires "JSON" => "0";
+requires "MIME::Base64" => "0";
+requires "Moo" => "0";
+requires "Moo::Role" => "0";
+requires "MooX::Options" => "0";
+requires "Perl6::Form" => "0";
+requires "perl" => "5.01";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::MinimumVersion" => "0";
+  requires "Test::Perl::Critic" => "0";
+  requires "Test::Pod" => "1.41";
+  requires "Test::Spelling" => "0.12";
+};

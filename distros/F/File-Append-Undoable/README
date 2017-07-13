@@ -1,4 +1,117 @@
-SEE ALSO
+NAME
+    File::Append::Undoable - Append string to a file, with undo support
 
+VERSION
+    This document describes version 0.05 of File::Append::Undoable (from
+    Perl distribution File-Append-Undoable), released on 2017-07-10.
+
+FUNCTIONS
+  append
+    Usage:
+
+     append(%args) -> [status, msg, result, meta]
+
+    Append string to a file, with undo support.
+
+    On do, will trash file, copy it to original location (with the same
+    permission and ownership as the original) and append the string to the
+    end of file. On undo will trash the new file and untrash the original.
+
+    Some notes:
+
+    *   Chown will not be done if we are not running as root.
+
+    *   Symlink is currently not permitted.
+
+    *   Since transaction requires the function to be idempotent, in the
+        "check_state" phase the function will check if the string has been
+        appended. It will refuse to append the same string twice.
+
+    *   Take care not to use string that are too large, as the string, being
+        a function parameter, is entered into the transaction table.
+
+    Fixed state: file exists and string has been appended to end of file.
+
+    Fixable state: file exists and string has not been appended to end of
+    file.
+
+    Unfixable state: file does not exist or path is not a regular file
+    (directory and symlink included).
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   path* => *str*
+
+        The file to append.
+
+    *   string* => *any*
+
+        The string to append to file.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Append-Undoable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Append-Undoable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Append-Undoable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci::Transaction
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 #use File::Stat qw(:stat);
-use File::Slurp::Tiny qw(read_file);
+use File::Slurper qw(read_text);
 
 use Log::Dispatch::Dir;
 
@@ -34,17 +34,17 @@ is($st[2] & 0777, 0750, "permissions 2");
 $log->log_message(message=>101);
 my @f = glob "$dir/dir1/*";
 is(scalar(@f), 1, "log_message 1a");
-is(read_file($f[0]), "101", "log_message 1b");
+is(read_text($f[0]), "101", "log_message 1b");
 
 $log->log_message(message=>102);
 @f = glob "$dir/dir1/*";
 is(scalar(@f), 2, "log_message 2a");
-is(join(".", map {read_file($_)} @f), "101.102", "log_message 2b");
+is(join(".", map {read_text($_)} @f), "101.102", "log_message 2b");
 
 $log->log_message(message=>103);
 @f = glob "$dir/dir1/*";
 is(scalar(@f), 3, "log_message 3a");
-is(join(".", map {read_file($_)} @f), "101.102.103", "log_message 3b");
+is(join(".", map {read_text($_)} @f), "101.102.103", "log_message 3b");
 
 # default filename_pattern: %Y%m%d-%H%M%S.%{pid}.%{ext}
 for (my $i=0; $i<@f; $i++) {

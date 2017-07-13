@@ -18,7 +18,7 @@ provides:
     file: lib/AsposeBarCodeCloud/ApiClient.pm
   AsposeBarCodeCloud::BarcodeApi:
     file: lib/AsposeBarCodeCloud/BarcodeApi.pm
-    version: '1.03'
+    version: v1.0.3
   AsposeBarCodeCloud::Configuration:
     file: lib/AsposeBarCodeCloud/Configuration.pm
   AsposeBarCodeCloud::Object::Barcode:
@@ -101,5 +101,5 @@ requires:
   warnings: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
-version: '1.03'
+version: v1.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

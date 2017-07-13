@@ -1,0 +1,62 @@
+NAME
+    HTTP::Tiny::Patch::LogGer - Log HTTP::Tiny with Log::ger
+
+VERSION
+    This document describes version 0.001 of HTTP::Tiny::Patch::LogGer (from
+    Perl distribution HTTP-Tiny-Patch-LogGer), released on 2017-07-10.
+
+SYNOPSIS
+     use HTTP::Tiny::Patch::LogGer (
+         -log_request          => 1, # default 1
+         -log_response         => 1, # default 1
+         -log_response_content => 1, # default 0
+     );
+
+DESCRIPTION
+    This module patches HTTP::Tiny to log various stuffs with Log::ger.
+    Currently this is what gets logged:
+
+    *   HTTP request
+
+        Currently *NOT* the raw/on-the-wire request.
+
+    *   HTTP response
+
+        Currently *NOT* the raw/on-the-wire response.
+
+CONFIGURATION
+  -log_request => BOOL
+  -log_response => BOOL
+    Content will not be logged though, enable "-log_response_content" for
+    that.
+
+  -log_response_content => BOOL
+FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/HTTP-Tiny-Patch-LogGer>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-HTTP-Tiny-Patch-LogGer>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=HTTP-Tiny-Patch-LogGe
+    r>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Log::ger::For::LWP
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -162,6 +162,8 @@ This Fix can be used inline in a Perl script:
 
 =over
 
+=item * L<Catmandu::Fix::marc_cut>
+
 =item * L<Catmandu::Fix::marc_paste>
 
 =back

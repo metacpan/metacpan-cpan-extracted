@@ -17,13 +17,13 @@ name: Neo4j-Cypher-Abstract
 provides:
   Neo4j::Cypher::Abstract:
     file: lib/Neo4j/Cypher/Abstract.pm
-    version: '0.1001'
+    version: '0.1002'
   Neo4j::Cypher::Abstract::Peeler:
     file: lib/Neo4j/Cypher/Abstract/Peeler.pm
-    version: '0.1001'
+    version: '0.1002'
   Neo4j::Cypher::Pattern:
     file: lib/Neo4j/Cypher/Pattern.pm
-    version: '0.1001'
+    version: '0.1002'
 requires:
   List::Util: '1.33'
   Scalar::Util: '0'
@@ -31,5 +31,5 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Neo4j-Cypher-Abstract
   license: http://dev.perl.org/licenses/
   repository: http://github.com/majensen/cypher-abstract.git
-version: '0.1001'
+version: '0.1002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

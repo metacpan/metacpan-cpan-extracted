@@ -1,0 +1,302 @@
+#!perl
+
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.10'; # VERSION
+# NO_PERINCI_CMDLINE_SCRIPT
+
+use 5.010;
+use strict;
+use warnings;
+use Log::ger;
+
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+my %opts = (
+    library => [],
+    subcommands => [],
+    pass_cmdline_object => 0,
+);
+$Getopt::Long::Complete::opt_permute = 0;
+$Getopt::Long::Complete::opt_pass_through = 1;
+GetOptionsWithCompletion(
+    sub {
+        my %args = @_;
+        #$log->tracef('args=%s', \%args);
+        my $word = $args{word};
+        if ($args{type} eq 'arg' && $args{argpos} == 0) {
+            my $popts = $args{parsed_opts};
+
+            my @scnames;
+            if ($popts && ($popts->{'-s'} || $popts->{'--subcommand'})) {
+                # if user has specified -s (or --subcommand), then we complete
+                # subcommand name in first argument
+                for (
+                    @{ $popts->{'-s'} // [] },
+                    @{ $popts->{'--subcommand'} // [] },
+                ) {
+                    /.+\s(.+)/ and push @scnames, $1;
+                }
+                require Complete::Util;
+                return Complete::Util::complete_array_elem(
+                    word=>$word, array=>\@scnames);
+            } else {
+                # else, we complete Riap URL in the first argument
+                require Complete::Riap;
+                return Complete::Riap::complete_riap_url(
+                    word=>$word, type=>'function',
+                );
+            }
+        } elsif ($args{type} eq 'optval') {
+            my $opt = $args{opt};
+            if ($opt eq '--library' || $opt eq '-I') {
+                require Complete::Module;
+                return Complete::Module::complete_module(word=>$word);
+            }
+        }
+    },
+    'library|I=s' => $opts{library},
+    'help|h|?' => \$opts{help},
+    'version' => sub {
+        no warnings 'once';
+        say "peri-run version " . ($main::VERSION // 'dev');
+        exit 0;
+    },
+    'subcommand|s=s' => $opts{subcommands},
+    'pass-cmdline-object|o' => \$opts{pass_cmdline_object},
+);
+
+my $me = $0; $me =~ s!.+/!!;
+
+my $oscs = $opts{subcommands};
+if ($opts{help} || !@ARGV && !@$oscs) {
+    print <<USAGE;
+$me - Run commands (from any Riap function) on the command-line
+
+Usage:
+  $me --help
+  $me [common options] <command def> [subcommand] [action]
+
+*Common options* include: `--library` (`-I`) to add directory to Perl search dir
+(a la Perl's `-I`), can be specified multiple times. There is also
+`--pass-cmdline-object` (`-o`) if you want to pass Perinci::CmdLine object to
+the function.
+
+*Command def* is either a single command definition or multiple subcommands
+definition. To define a single command, you can specify a Riap function URL
+(e.g. '/Foo/Bar/func'). For multiple subcommands, you can specify a Riap package
+URL (e.g. '/Foo/Bar/') or a Perl module name (e.g. 'Foo::Bar'), in which case
+all functions in the module/package will be listed and added as subcommands.
+Alternatively, you can specify each subcommand separately using '--subcommand'
+('-s'). For example, the command below specifies two subcommands called 'func1'
+and 'altname':
+
+  $me -s /Foo/Bar/func1 -s "/Foo/Bar/func2 altname"
+
+*Subcommand* picks a subcommand name, required only when you specify multiple
+subcommands.
+
+*action* is either '--help' to get help message on the command or subcommand,
+'--list' to list subcommands, '--version' to get version, or zero or more
+command (function) arguments.
+
+Examples:
+  Show usage for a subcommand (function):
+    $me /Foo/Bar/func1 --help
+    $me /Foo/Bar/func1 -h
+
+  Execute a command and display the result as YAML:
+    $me http://example.org/api/Foo/Bar/func --format=yaml --arg 12
+
+  Execute a subcommand:
+    $me -s "/Foo/Bar/func1 sc1" -s "/Foo/Baz/func1 sc2" sc2 --arg 12
+
+Notes:
+* This is just a simple generic front-end for 'Perinci::CmdLine::Any'. For more
+  options/customizations, use or subclass the module directly.
+
+TODO:
+* HTTP authentication parameters
+
+USAGE
+    exit 0;
+}
+
+for my $dir (@{ $opts{library} }) { require lib; lib->import($dir) }
+
+require Perinci::CmdLine::Any;
+my $cmd = Perinci::CmdLine::Any->new(
+    pass_cmdline_object => $opts{pass_cmdline_object},
+);
+
+if (@ARGV && !@$oscs) {
+
+    # a single URL is specified.
+
+    my $url = shift @ARGV;
+    my $type;
+
+    # Perl module (Foo::Bar) is specified, change it to /Foo/Bar/
+    if ($url =~ /\A\w+::(?:\w+)*\z/) {
+        $url =~ s!::!/!;
+        $url = "/$url/";
+        $type = 'package';
+    } else {
+        if ($cmd->riap_client) {
+            # try to find out the entity type
+            my $res = $cmd->riap_client->request(info => $url);
+            die "Can't 'info' $url: $res->[0] - $res->[1]\n"
+                unless $res->[0] == 200;
+            $type = $res->[2]{type} // '';
+            die "Please specify URL to a function or package, not '$type': $url\n"
+                unless $type eq 'function' || $type eq 'package';
+        } else {
+            $type = $url =~ m!/\z! ? 'package' : 'function';
+        }
+    }
+    $cmd->url($url);
+    $cmd->program_name("$me $url")
+        unless defined($ENV{PERINCI_CMDLINE_PROGRAM_NAME});
+    if ($type eq 'package' && $cmd->riap_client) {
+        my $res = $cmd->riap_client->request(list => $url, {detail=>1});
+        die "Can't 'list' $url: $res->[0] - $res->[1]\n"
+            unless $res->[0] == 200;
+        my $scs = {};
+        for my $e (@{$res->[2]}) {
+            next unless $e->{type} eq 'function';
+            my $sub = $e->{uri}; $sub =~ s!.+/!!;
+            $scs->{$sub} = {
+                url => $e->{uri},
+                summary => $e->{summary},
+            };
+        }
+        $cmd->subcommands($scs);
+    }
+
+} elsif (@$oscs) {
+
+    # one or more subcommand URLs are specified.
+
+    my $scs = {};
+    for my $item (@$oscs) {
+        my ($url, $name);
+        if ($item =~ /\s/) {
+            ($url, $name) = split /\s+/, $item, 2;
+        } else {
+            $url = $item;
+            my $i = 1;
+            my $leaf = $url; $leaf =~ s!.+/(.+)!$1!; $leaf ||= "func";
+            while (1) {
+                $name = $leaf . ($i > 1 ? $i : "");
+                last unless $scs->{$name};
+                $i++;
+            }
+        }
+        $scs->{$name} = {url => $url};
+    }
+    $cmd->subcommands($scs);
+
+} else {
+
+    die "BUG: This shouldn't be reached";
+
+}
+
+$cmd->run;
+
+# ABSTRACT: Run commands (from any Riap function) on the command-line
+# PODNAME: peri-run
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-run - Run commands (from any Riap function) on the command-line
+
+=head1 VERSION
+
+This document describes version 0.10 of peri-run (from Perl distribution App-PerinciUtils), released on 2017-07-10.
+
+=head1 SYNOPSIS
+
+Type C<peri-run --help> for more help.
+
+=head1 OPTIONS
+
+=head2 --library, -I
+
+=head2 --help
+
+=head2 --subcommand, -s
+
+=head2 --pass-cmdline-object, -o
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C peri-run peri-run
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete peri-run 'p/*/`peri-run`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-PerinciUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-PerinciUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerinciUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Any>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

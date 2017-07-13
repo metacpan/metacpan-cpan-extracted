@@ -1,19 +1,18 @@
 package Finance::Currency::Convert::KlikBCA;
 
-our $DATE = '2016-10-14'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.14'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(get_currencies convert_currency);
 
 our %SPEC;
 
-my $url = "http://www.bca.co.id/id/Individu/Sarana/Kurs-dan-Suku-Bunga/Kurs-dan-Kalkulator";
+my $url = "https://www.bca.co.id/id/Individu/Sarana/Kurs-dan-Suku-Bunga/Kurs-dan-Kalkulator";
 
 $SPEC{':package'} = {
     v => 1.1,
@@ -197,7 +196,7 @@ Finance::Currency::Convert::KlikBCA - Convert currency using KlikBCA
 
 =head1 VERSION
 
-This document describes version 0.13 of Finance::Currency::Convert::KlikBCA (from Perl distribution Finance-Currency-Convert-KlikBCA), released on 2016-10-14.
+This document describes version 0.14 of Finance::Currency::Convert::KlikBCA (from Perl distribution Finance-Currency-Convert-KlikBCA), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -211,7 +210,7 @@ This document describes version 0.13 of Finance::Currency::Convert::KlikBCA (fro
 This module can extract currency rates from the BCA/KlikBCA (Bank Central Asia's
 internet banking) website:
 
- http://www.bca.co.id/id/Individu/Sarana/Kurs-dan-Suku-Bunga/Kurs-dan-Kalkulator
+ https://www.bca.co.id/id/Individu/Sarana/Kurs-dan-Suku-Bunga/Kurs-dan-Kalkulator
 
 Currently only conversions from a few currencies to Indonesian Rupiah (IDR) are
 supported.
@@ -219,7 +218,11 @@ supported.
 =head1 FUNCTIONS
 
 
-=head2 convert_currency($n, $from, $to, $which) -> any
+=head2 convert_currency
+
+Usage:
+
+ convert_currency($n, $from, $to, $which) -> any
 
 Convert currency using KlikBCA.
 
@@ -258,7 +261,11 @@ Select which rate to use (default is average buy+sell for e-Rate).
 Return value:  (any)
 
 
-=head2 get_currencies() -> [status, msg, result, meta]
+=head2 get_currencies
+
+Usage:
+
+ get_currencies() -> [status, msg, result, meta]
 
 Extract data from KlikBCA/BCA page.
 
@@ -308,7 +315,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command::listdeps 6.009;
+package Dist::Zilla::App::Command::listdeps 6.010;
 # ABSTRACT: print your distribution's prerequisites
 
 use Dist::Zilla::App -command;
@@ -194,7 +194,7 @@ Dist::Zilla::App::Command::listdeps - print your distribution's prerequisites
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 SYNOPSIS
 

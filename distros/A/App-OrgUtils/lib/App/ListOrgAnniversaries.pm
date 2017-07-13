@@ -1,13 +1,13 @@
 package App::ListOrgAnniversaries;
 
-our $DATE = '2016-12-24'; # DATE
-our $VERSION = '0.45'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.46'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use App::OrgUtils;
 use Cwd qw(abs_path);
@@ -29,7 +29,7 @@ sub _process_hl {
 
     return unless $hl->is_leaf;
 
-    $log->tracef("Processing %s ...", $hl->title->as_string);
+    log_trace("Processing %s ...", $hl->title->as_string);
 
     if ($args->{has_tags} || $args->{lacks_tags}) {
         my $tags = [$hl->get_tags];
@@ -63,7 +63,7 @@ sub _process_hl {
                     next unless $k =~ $args->{field_pattern};
                     my $v = $props->{$k};
                     unless ($v =~ /^\s*(\d{4})-(\d{2})-(\d{2})\s*$/) {
-                        $log->warn("Invalid date format $v, ".
+                        log_warn("Invalid date format $v, ".
                                        "must be YYYY-MM-DD");
                         next;
                     }
@@ -77,13 +77,13 @@ sub _process_hl {
     );
 
     if (!@annivs) {
-        $log->debug("Node doesn't contain anniversary fields, skipped");
+        log_debug("Node doesn't contain anniversary fields, skipped");
         return;
     }
-    $log->tracef("annivs = ", \@annivs);
+    log_trace("annivs = ", \@annivs);
     for my $anniv (@annivs) {
         my ($field, $date) = @$anniv;
-        $log->debugf("Anniversary found: field=%s, date=%s",
+        log_debug("Anniversary found: field=%s, date=%s",
                      $field, $date->ymd);
         my $y = $today->year - $date->year;
         my $date_ly = $date->clone; $date_ly->add(years => $y-1);
@@ -111,7 +111,7 @@ sub _process_hl {
                     ordinate($d->year - $date->year)." $field",
                 $hl->title->as_string,
                 $hide_age ? $d->ymd : $date->ymd . " - " . $d->ymd);
-            $log->debugf("Added this anniversary to result: %s", $msg);
+            log_debug("Added this anniversary to result: %s", $msg);
             push @$res, [$msg, $d];
             last DATE;
         }
@@ -271,7 +271,7 @@ App::ListOrgAnniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.45 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2016-12-24.
+This document describes version 0.46 of App::ListOrgAnniversaries (from Perl distribution App-OrgUtils), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -280,7 +280,11 @@ This document describes version 0.45 of App::ListOrgAnniversaries (from Perl dis
 =head1 FUNCTIONS
 
 
-=head2 list_org_anniversaries(%args) -> [status, msg, result, meta]
+=head2 list_org_anniversaries
+
+Usage:
+
+ list_org_anniversaries(%args) -> [status, msg, result, meta]
 
 List all anniversaries in Org files.
 
@@ -382,7 +386,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUti
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-OrgUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
 
 =head1 BUGS
 
@@ -398,7 +402,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

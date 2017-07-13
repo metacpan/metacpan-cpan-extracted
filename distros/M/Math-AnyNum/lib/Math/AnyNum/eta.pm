@@ -25,7 +25,14 @@ sub __eta__ {
     Math::MPFR::Rmpfr_ui_pow($r, 2, $r, $ROUND);
     Math::MPFR::Rmpfr_ui_sub($r, 1, $r, $ROUND);
 
-    Math::MPFR::Rmpfr_zeta($t, $x, $ROUND);
+    if (    Math::MPFR::Rmpfr_integer_p($x)
+        and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+        Math::MPFR::Rmpfr_zeta_ui($t, Math::MPFR::Rmpfr_get_ui($x, $ROUND), $ROUND);
+    }
+    else {
+        Math::MPFR::Rmpfr_zeta($t, $x, $ROUND);
+    }
+
     Math::MPFR::Rmpfr_mul($r, $r, $t, $ROUND);
 
     $r;

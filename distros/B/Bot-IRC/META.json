@@ -52,6 +52,7 @@
             "Math::Expression" : "0",
             "Math::Units" : "0",
             "Time::Crontab" : "0",
+            "Try::Tiny" : "0",
             "YAML::XS" : "0",
             "perl" : "5.012",
             "strict" : "0",
@@ -86,7 +87,7 @@
          "web" : "https://github.com/gryphonshafer/Bot-IRC"
       }
    },
-   "version" : "1.15",
+   "version" : "1.16",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

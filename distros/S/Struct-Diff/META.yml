@@ -1,5 +1,5 @@
 ---
-abstract: 'Recursive diff tools for nested perl structures'
+abstract: 'Recursive diff for nested perl structures'
 author:
   - 'Michael Samoglyadov <mixas@cpan.org>'
 build_requires:
@@ -30,4 +30,4 @@ requires:
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Struct-Diff.pm
-version: 0.88
+version: 0.89

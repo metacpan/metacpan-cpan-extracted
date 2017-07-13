@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::ShareDir 6.009;
+package Dist::Zilla::Plugin::ShareDir 6.010;
 # ABSTRACT: install a directory's contents as "ShareDir" content
 
 use Moose;
@@ -56,7 +56,7 @@ Dist::Zilla::Plugin::ShareDir - install a directory's contents as "ShareDir" con
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 SYNOPSIS
 

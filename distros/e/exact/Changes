@@ -1,5 +1,8 @@
 Revision history for exact
 
+1.02      2017-07-10 13:32:41-04:00 America/New_York
+        - Alter dependencies to enable old versions of Perl back to v5.10
+
 1.01      2017-07-07 18:16:59-04:00 America/New_York
         - Deactivate TravisCI testing of 3 old Perl versions temporarily
         - Check for any possible experiments before import (bug fix)

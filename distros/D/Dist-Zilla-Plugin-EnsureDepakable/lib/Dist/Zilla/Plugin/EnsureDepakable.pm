@@ -1,19 +1,19 @@
 package Dist::Zilla::Plugin::EnsureDepakable;
 
-our $DATE = '2016-10-22'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Moose;
-with 'Dist::Zilla::Role::InstallTool';
+with 'Dist::Zilla::Role::AfterBuild';
 
 use Module::Depakable;
 use namespace::autoclean;
 
-sub setup_installer {
+sub after_build {
     my ($self) = @_;
 
     if ($ENV{DZIL_ENSUREDEPAKABLE_SKIP}) {
@@ -51,7 +51,7 @@ Dist::Zilla::Plugin::EnsureDepakable - Make sure that distribution is "depakable
 
 =head1 VERSION
 
-This document describes version 0.003 of Dist::Zilla::Plugin::EnsureDepakable (from Perl distribution Dist-Zilla-Plugin-EnsureDepakable), released on 2016-10-22.
+This document describes version 0.004 of Dist::Zilla::Plugin::EnsureDepakable (from Perl distribution Dist-Zilla-Plugin-EnsureDepakable), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

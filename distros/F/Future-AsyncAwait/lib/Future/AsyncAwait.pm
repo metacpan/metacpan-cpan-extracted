@@ -8,7 +8,7 @@ package Future::AsyncAwait;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Carp;
 
@@ -95,6 +95,11 @@ returned earlier.
 Because the C<await> keyword may cause its containing function to suspend
 early, returning a pending future instance, it is only allowed inside
 C<async>-marked subs.
+
+The converse is not true; just because a function is marked as C<async> does
+not require it to make use of the C<await> expression. It is still useful to
+turn the result of that function into a future, entirely without C<await>ing
+on any itself.
 
 =head1 EARLY-VERSION WARNING
 

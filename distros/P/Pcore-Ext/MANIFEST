@@ -15,10 +15,12 @@ lib/Pcore/Ext/Class/ReCaptcha.pm
 lib/Pcore/Ext/Context.pm
 lib/Pcore/Ext/Context/Call.pm
 lib/Pcore/Ext/Context/Func.pm
+lib/Pcore/Ext/Context/L10N.pm
 lib/Pcore/Ext/Context/Raw.pm
-lib/Pcore/Ext/Override/v6_2_0.pm
 share/dist-id.json
 share/dist.perl
+share/l10n/l10n.pot
+share/l10n/ru.po
 share/tmpl/ext/index.html
 share/www/static/ext/pcore/ViewController.js
 share/www/static/ext/pcore/ckeditor/CkeditorField.js

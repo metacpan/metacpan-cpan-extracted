@@ -1,0 +1,24 @@
+requires "Alien::Base" => "0";
+requires "base" => "0";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'build' => sub {
+  requires "Alien::Build" => "0.40";
+  requires "Alien::Build::MM" => "0.40";
+  requires "ExtUtils::MakeMaker" => "6.52";
+};
+
+on 'test' => sub {
+  requires "Test::More" => "0";
+};
+
+on 'configure' => sub {
+  requires "Alien::Build" => "0.40";
+  requires "Alien::Build::MM" => "0.40";
+  requires "ExtUtils::MakeMaker" => "6.52";
+};
+
+on 'develop' => sub {
+  requires "Test::Spelling" => "0.12";
+};

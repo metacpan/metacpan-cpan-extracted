@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla
 
+6.010     2017-07-10 09:22:16-04:00 America/New_York
+        - a few documentation improvements (thanks, Chase Whitener, Mary
+          Ehlers, and Jonas B. Nielsen)
+        - improve behavior under a noninteractive terminal
+        - empty file finders should now consistently return []
+
 6.009     2017-03-04 11:16:37-05:00 America/New_York
         - update DateTime::TimeZone prereq on Win32 to improve workingness
           (thanks, Schwern!)
@@ -7,7 +13,7 @@ Revision history for Dist-Zilla
         - improve testing of listdeps (thanks, Mickey Nasriachi!)
         - Module::Runtime is now considered 'internal' for the purpose of
           carping (thanks, Karen Etheridge!)
-        - ./tmp is now pruned by PruneCruft (thanks, Karent Etheridge!)
+        - ./tmp is now pruned by PruneCruft (thanks, Karen Etheridge!)
         - authordeps now picks up :version for the root section (thanks,
           Karen!)
         - the config loading of the "perl" config loader is more reliable, but

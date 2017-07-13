@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
@@ -1005,23 +1005,31 @@ Generalized m-factorial of C<n>. Returns NaN when C<n> or C<m> is negative. (req
 
 =head2 rising_factorial
 
-    rising_factorial(n, k)                        #=> Int | NaN
+    rising_factorial(n, k)                        #=> Int | Rat | NaN
 
 Rising factorial, C<n * (n + 1) * ... * (n + k - 1)>, defined as:
 
     binomial(n + k - 1, k) * k!
 
-Returns NaN for negative values of C<k>.
+For negative values of C<k>, rising factorial is defined as:
+
+    rising_factorial(n, -k) = 1/rising_factorial(n - k, k)
+
+When the denominator is zero, NaN is returned.
 
 =head2 falling_factorial
 
-    falling_factorial(n, k)                       #=> Int | NaN
+    falling_factorial(n, k)                       #=> Int | Rat | NaN
 
 Falling factorial, C<n * (n - 1) * ... * (n - k + 1)>, defined as:
 
     binomial(n, k) * k!
 
-Returns NaN for negative values of C<k>.
+For negative values of C<k>, falling factorial is defined as:
+
+    falling_factorial(n, -k) = 1/falling_factorial(n + k, k)
+
+When the denominator is zero, NaN is returned.
 
 =head2 binomial
 

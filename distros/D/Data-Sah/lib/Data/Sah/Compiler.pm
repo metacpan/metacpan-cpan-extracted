@@ -1,7 +1,7 @@
 package Data::Sah::Compiler;
 
-our $DATE = '2016-09-14'; # DATE
-our $VERSION = '0.87'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.88'; # VERSION
 
 use 5.010;
 use strict;
@@ -10,7 +10,7 @@ use warnings;
 #use Carp;
 use Mo qw(default);
 use Role::Tiny::With;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 use Scalar::Util qw(blessed);
 
 our %coercer_cache; # key=type, value=coercer coderef
@@ -677,7 +677,7 @@ sub compile {
     }
 
     if ($args{log_result}) {# && $log->is_trace) {
-        $log->tracef(
+        log_trace(
             "Schema compilation result:\n%s",
             !ref($cd->{result}) && ($ENV{LINENUM} // 1) ?
                 __linenum($cd->{result}) :
@@ -781,7 +781,7 @@ Data::Sah::Compiler - Base class for Sah compilers (Data::Sah::Compiler::*)
 
 =head1 VERSION
 
-This document describes version 0.87 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2016-09-14.
+This document describes version 0.88 of Data::Sah::Compiler (from Perl distribution Data-Sah), released on 2017-07-10.
 
 =for Pod::Coverage ^(check_compile_args|def|expr|init_cd|literal|name|add_module|add_compile_module|add_runtime_module)$
 
@@ -1268,7 +1268,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

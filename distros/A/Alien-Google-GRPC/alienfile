@@ -1,0 +1,61 @@
+use alienfile;
+
+probe sub {
+  my($build) = @_;  # $build is the Alien::Build instance.
+  system 'pkg-config --exists grpc++';
+  return 'share' unless $? == 0;
+
+  my $cmd_result = qx(protoc --version);
+  return 'system' if $cmd_result =~ /libprotoc.3/;
+  return 'share';
+};
+
+
+share {
+
+  download [ 'git clone -b $(curl -L http://grpc.io/release) https://github.com/grpc/grpc; '
+           . 'cd grpc; git submodule update --init' ];
+
+  extract [ 'mv %{.install.download} .; '
+          . 'mkdir -p  %{.install.download}; '
+          . 'touch %{.install.download}/placate_alien_sensibilities.x' ];
+
+  # extract [ 'cp -rp %{.install.download} .' ]; # Use this version if debugging, so files will not be re-downloaded.
+
+
+  build [
+    [ 'git submodule update --init' ],
+    [ 'bash <<"USE_A_SHELL"
+        cd ./third_party/protobuf
+        ./autogen.sh
+        ./configure --prefix=%{.install.prefix} --with-pic
+        make clean
+        make
+        make install
+        cd ../../
+        prefix=%{.install.prefix} make
+        prefix=%{.install.prefix} make install
+        cd lib && ln -s libgrpc++.so libgrpc++.so.1; cd ..
+USE_A_SHELL
+    ' ],
+  ];
+
+  gather [
+    # Trust the force.
+    # Automagic will rewrite your path.
+    [ 'echo "1.4.1"', \'%{.runtime.version}' ],
+    [ 'echo "-L%{.install.prefix}/lib -lgrpc -lgrpc++ -lprotobuf -lpthread"', \'%{.runtime.libs}'    ],
+    [ 'echo "-I%{.install.prefix}/include -pthread"', \'%{.runtime.cflags}'    ],
+  ];
+
+};
+
+sys {
+  gather [
+    [ 'pkg-config --modversion  grpc++', \'%{.runtime.version}' ],
+    [ 'pkg-config --cflags grpc grpc++  protobuf', \'%{.runtime.cflags}'  ],
+    [ 'pkg-config --libs   grpc grpc++  protobuf', \'%{.runtime.libs}'    ],
+  ];
+};
+
+

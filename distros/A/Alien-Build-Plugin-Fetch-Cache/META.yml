@@ -3,32 +3,35 @@ abstract: 'Alien::Build plugin to cache files downloaded from the internet'
 author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
-  Alien::Build: '0.06'
   Capture::Tiny: '0'
   File::chdir: '0'
-  Test2::Suite: '0.000060'
-  Test::More: '0.94'
+  Test2::V0: '0.000060'
+  Test::Alien::Build: '0'
+  Test::Script: '0'
   perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Alien-Build-Plugin-Fetch-Cache
 requires:
-  Alien::Build: '0.06'
+  Alien::Build: '0.57'
+  Digest::MD5: '0'
   File::HomeDir: '1.00'
+  Number::Bytes::Human: '0'
   Path::Tiny: '0.100'
   Sereal: '3.015'
   URI: '1.71'
   perl: '5.010'
 resources:
+  IRC: irc://irc.perl.org/#native
   bugtracker: https://github.com/plicease/Alien-Build-Plugin-Fetch-Cache/issues
   homepage: https://metacpan.org/pod/Alien::Build::Plugin::Fetch::Cache
   repository: git://github.com/plicease/Alien-Build-Plugin-Fetch-Cache.git
-version: '0.01'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

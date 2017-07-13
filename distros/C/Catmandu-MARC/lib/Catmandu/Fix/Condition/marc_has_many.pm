@@ -7,7 +7,7 @@ use Catmandu::Fix::remove_field;
 use Moo;
 use Catmandu::Fix::Has;
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 with 'Catmandu::Fix::Condition';
 
@@ -28,7 +28,7 @@ sub emit {
     $perl .= $marc_map->emit($fixer,$label);
 
     my $all_match    =
-        $self->marc_path =~ m{^...(\/\d+-\d+)?$} ?
+        $self->marc_path =~ m{^...(\/[0-9]+-[0-9]+)?$} ?
             Catmandu::Fix::Condition::exists->new("$tmp_var.1") :
             Catmandu::Fix::Condition::exists->new("$tmp_var.0.1");
 

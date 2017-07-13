@@ -18,7 +18,7 @@ Perinci::Access::Manual - Perinci::Access manual
 
 =head1 VERSION
 
-This document describes version 0.44 of Perinci::Access::Manual (from Perl distribution Perinci-Access), released on 2015-12-17.
+This document describes version 0.45 of Perinci::Access::Manual (from Perl distribution Perinci-Access), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -43,16 +43,6 @@ of startup overhead), has less features, and used by L<Perinci::CmdLine::Lite>.
 
 Please read up on L<Rinci> and L<Riap> first.
 
-=head1 SEE ALSO
-
-L<Perinci>
-
-L<Perinci::Access::Manual::Examples>
-
-L<Perinci::Access::Manual::FAQ>
-
-L<App::riap>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Access>.
@@ -69,13 +59,23 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Perinci>
+
+L<Perinci::Access::Manual::Examples>
+
+L<Perinci::Access::Manual::FAQ>
+
+L<App::riap>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

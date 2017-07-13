@@ -119,7 +119,6 @@ do { my $x = {
                                    'Test::Fatal' => '0',
                                    'Test::File::ShareDir' => '0',
                                    'Test::More' => '0.96',
-                                   'if' => '0',
                                    'lib' => '0'
                                  }
                  }

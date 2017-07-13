@@ -1,18 +1,24 @@
-SYNOPSIS
+NAME
+    Test::WithDB - Framework for testing application using database
 
-    In your ~/test-withdb.ini:
+VERSION
+    This document describes version 0.09 of Test::WithDB (from Perl
+    distribution Test-WithDB), released on 2017-07-10.
+
+SYNOPSIS
+    In your "~/test-withdb.ini":
 
      admin_dsn ="dbi:Pg;host=localhost"
      admin_user="postgres"
      admin_pass="adminpass"
-    
+
      user_dsn ="dbi:Pg;host=localhost"
      user_user="someuser"
      user_pass="somepass"
-    
+
      # optional: SQL statements to initialize DB by test user after created
      init_sql_admin=CREATE EXTENSION citext
-    
+
      # optional: SQL statements to initialize DB by test user after created
      init_sql_user=
 
@@ -20,39 +26,38 @@ SYNOPSIS
 
      use Test::More;
      use Test::WithDB;
-    
+
      my $twdb = Test::WithDB->new(
          #config_path => '...', # defaults to TWDB_CONFIG_PATH env or ~/test-withdb.ini or ~/twdb.ini
          #config_profile => '...', # defaults to TWDB_CONFIG_PROFILE env or undef
          #name_pattern => '...', # defaults to TWDB_NAME_PATTERN env or 'testdb_%u'
      );
-    
+
      my $dbh = $twdb->create_db; # create db with random name
-    
+
      # do stuffs with dbh
-    
+
      my $dbh2 = $twdb->create_db; # create another db
-    
+
      # do more stuffs
-    
+
      $twdb->done; # will drop all created databases, unless tests are not passing
 
 DESCRIPTION
-
-    This class (Test::WithDB, or TWDB for short) provides a simple
-    framework for testing application that requires database. It is meant
-    to work with Test::More (or to be more exact, any Test::Builder-based
-    module). It offers an easy way to create random databases and
-    initialize them so they are ready for testing. More functionalities
-    will be added in the future.
+    This class ("Test::WithDB", or TWDB for short) provides a simple
+    framework for testing application that requires database. It is meant to
+    work with Test::More (or to be more exact, any Test::Builder-based
+    module). It offers an easy way to create random databases and initialize
+    them so they are ready for testing. More functionalities will be added
+    in the future.
 
     To work with TWDB, first, you supply a configuration file containing
-    admin and normal user's connection information (the admin info is
-    needed to create databases). Then, you call one or more create_db() to
-    create one or more databases for testing. The database will be created
-    with random names.
+    admin and normal user's connection information (the admin info is needed
+    to create databases). Then, you call one or more "create_db()" to create
+    one or more databases for testing. The database will be created with
+    random names.
 
-    At the end of testing, when you call $twdb->done, the class will do
+    At the end of testing, when you call "$twdb->done", the class will do
     this check:
 
      if (Test::More->builder->is_passing) {
@@ -66,134 +71,131 @@ DESCRIPTION
     Currently only supports Postgres, MySQL, and SQLite; and tested mostly
     with Postgres.
 
+CONFIGURATION
+  *admin_dsn => str
+  *admin_user => str
+  *admin_pass => str
+  *user_dsn => str
+  *user_user => str
+  *user_pass => str
+  init_sql_admin => str|array
+  init_sql_user => str|array
+  sqlite_db_dir => str (default: .)
 ATTRIBUTES
+  config_path => str (default: "~/test-withdb.ini" or "~/twdb.ini").
+    Path to configuration file. File will be read using Config::IOD::Reader.
 
- config_path => str (default: ~/test-withdb.ini or ~/twdb.ini).
-
-    Path to configuration file. File will be read using
-    Config::IOD::Reader.
-
- config_profile => str (default: GLOBAL)
-
+  config_profile => str (default: GLOBAL)
     Pick section in configuration file to use.
 
- name_pattern => str (default: testdb_%Y%m%d_%H%M%S_%u)
-
+  name_pattern => str (default: "testdb_%Y%m%d_%H%M%S_%u")
     Pattern for random database name, where several sprintf-/strftime-style
     %X directives are recognized:
 
-      * %%
+    *   "%%"
 
-      Literal percentage sign
+        Literal percentage sign
 
-      * %U
+    *   %U
 
-      32-character random UUID hex. It is recommended that at least you add
-      either this or %u.
+        32-character random UUID hex. It is recommended that at least you
+        add either this or %u.
 
-      * %u
+    *   %u
 
-      8-character prefix of random UUID hex. It is recommended that at
-      least you add either this or %u. If you use %u instead of %U, it is
-      recommended that you also add timestamp.
+        8-character prefix of random UUID hex. It is recommended that at
+        least you add either this or %u. If you use %u instead of %U, it is
+        recommended that you also add timestamp.
 
-      * %Y
+    *   %Y
 
-      4-digit year of current time.
+        4-digit year of current time.
 
-      * %m
+    *   %m
 
-      2-digit month (01-12) of current time.
+        2-digit month (01-12) of current time.
 
-      * %d
+    *   %d
 
-      2-digit day of month (01-31) of current time.
+        2-digit day of month (01-31) of current time.
 
-      * %H
+    *   %H
 
-      2-digit hour (00-23) of current time.
+        2-digit hour (00-23) of current time.
 
-      * %M
+    *   %M
 
-      2-digit minute (00-59) of current time.
+        2-digit minute (00-59) of current time.
 
-      * %S
+    *   %S
 
-      2-digit second (00-60) of current time.
+        2-digit second (00-60) of current time.
 
     You should make sure that the database name won't exceed the maximum
     length allowed by the database software (e.g. 64 character for some SQL
     databases).
 
 METHODS
+  new(%attrs) => obj
+  $twdb->create_db
+    Create a test database with random name according to "name_pattern".
 
- new(%attrs) => obj
-
- $twdb->create_db
-
-    Create a test database with random name according to name_pattern.
-
- $twdb->created_dbs => LIST
-
+  $twdb->created_dbs => LIST
     Return a list of temporary databases already created by this instance.
 
- $twdb->done
-
+  $twdb->done
     Finish testing. Will drop all created databases unless tests are not
-    passing or TWDB_KEEP_TEMP_DBS is set to true.
+    passing or "TWDB_KEEP_TEMP_DBS" is set to true.
 
     Called automatically during DESTROY (but because object destruction
     order are not guaranteed, e.g. DBI database handle might get destroyed
     first preventing proper database deletion to work, it's best that you
-    explicitly call done() yourself).
+    explicitly call "done()" yourself).
 
- $twdb->drop_dbs
-
+  $twdb->drop_dbs
     Explicitly delete created temporary databases, regardless of whether
-    tests are passing or TWDB_KEEP_TEMP_DBS is set.
-
-CONFIGURATION
-
- *admin_dsn => str
-
- *admin_user => str
-
- *admin_pass => str
-
- *user_dsn => str
-
- *user_user => str
-
- *user_pass => str
-
- init_sql_admin => str|array
-
- init_sql_user => str|array
-
- sqlite_db_dir => str (default: .)
+    tests are passing or "TWDB_KEEP_TEMP_DBS" is set.
 
 ENVIRONMENT
+  TWDB_CONFIG_PATH => str
+    Set default "config_path".
 
- TWDB_CONFIG_PATH => str
+  TWDB_CONFIG_PROFILE => str
+    Set default "config_profile".
 
-    Set default config_path.
+  TWDB_NAME_PATTERN => str
+    Set default "name_pattern".
 
- TWDB_CONFIG_PROFILE => str
-
-    Set default config_profile.
-
- TWDB_NAME_PATTERN => str
-
-    Set default name_pattern.
-
- TWDB_KEEP_TEMP_DBS => bool
-
-    Can be set to true to keep done() from automatically dropping
+  TWDB_KEEP_TEMP_DBS => bool
+    Can be set to true to keep "done()" from automatically dropping
     databases.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Test-WithDB>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Test-WithDB>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Test-WithDB>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     DBIx::TempDB
 
     Test::More, Test::Builder
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

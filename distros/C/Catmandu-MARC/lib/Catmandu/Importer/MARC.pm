@@ -3,36 +3,40 @@ use Catmandu::Sane;
 use Catmandu::Util;
 use Moo;
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 has type           => (is => 'ro' , default => sub { 'ISO' });
-has _importer      => (is => 'ro' , lazy => 1 , builder => '_build_importer' , handles => ['generator']);
-has _importer_args => (is => 'rwp', writer => '_set_importer_args');
+has _importer      => (is => 'ro');
 
 with 'Catmandu::Importer';
 
-sub _build_importer {
-    my ($self) = @_;
+sub BUILD {
+    my ($self,$args) = @_;
 
     my $type = $self->type;
 
-    $type = 'Record' if exists $self->_importer_args->{records};
+    # keep USMARC temporary as alias for ISO, remove in future version
+    # print deprecation warning
+    if ($type eq 'USMARC') {
+        $type = 'ISO';
+        warn( "deprecated", "Oops! Importer \"USMARC\" is deprecated. Use \"ISO\" instead." );
+    }
+
+    if (exists $args->{records}) {
+        $type = 'Record';
+    }
 
     my $pkg = Catmandu::Util::require_package($type,'Catmandu::Importer::MARC');
 
-    $pkg->new($self->_importer_args);
+    delete $args->{file};
+    delete $args->{type};
+    delete $args->{fix};
+
+    $self->{_importer} = $pkg->new(file => $self->file, %$args);
 }
 
-sub BUILD {
-    my ($self,$args) = @_;
-    $self->_set_importer_args($args);
-
-    # keep USMARC temporary as alias for ISO, remove in future version
-    # print deprecation warning
-    if ($self->{type} eq 'USMARC') {
-        $self->{type} = 'ISO';
-        warn( "deprecated", "Oops! Importer \"USMARC\" is deprecated. Use \"ISO\" instead." );
-    }
+sub generator {
+    $_[0]->_importer->generator;
 }
 
 1;

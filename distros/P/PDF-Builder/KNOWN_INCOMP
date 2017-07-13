@@ -1,0 +1,112 @@
+A list of known incompatibilities with PDF::API2. Most are very minor, as we 
+have attempted to maintain as much compatibility with the older product 
+(PDF::API2) as possible. This list is believed to be complete, although 
+unexpected incompatibilities cannot be ruled out.
+
+Bug fixes to PDF::API2 (in PDF::Builder) are not mentioned if they correct
+an error (that produces an error message and/or incorrect output) and do not 
+affect the operation or results of otherwise correct code.
+
+3.004     2017-06-17
+
+   No known incompatibilities added.
+
+3.003     2017-05-01
+
+   lib/PDF/Builder/Resource/CIDFont/TrueType.pm
+   lib/PDF/Builder/Resource/Font/BdFont.pm
+   lib/PDF/Builder/Resource/Font/CoreFont.pm
+   lib/PDF/Builder/Resource/Font/Postscript.pm [ref RT #105579 and #113084 (were
+     open)] remove ~time() from font resource names. It appears to be 
+     unnecessary, and made PDFs non-deterministic (two runs with the same input 
+     had different output), making output comparisons difficult for developers.
+     Commented out lines containing ~time(), so they can be restored easily.
+     **Please report any problems which appear to be resource name collisions**
+     This is a change that MAY produce incompatibilities, so heads up!
+
+   lib/PDF/Builder/Content.pm  split out methods text_center(), text_right(), 
+       text_justified(), text_fill_left(), text_fill_center(), 
+       text_fill_right(), text_fill_justified(), paragraph(), section(), and 
+       textlabel() into lib/PDF/Builder/Content/Text.pm.
+       lib/PDF/Builder/Resource/XObject/Form/Hybrid.pm needed to add 
+       Content::Text to the "use base" list, and it is possible that other
+       programs may need to do so. In many cases $grfxobj->textlabel() had to
+       be changed to $textobj->textlabel(), and it is possible that other
+       calls to text methods may be similarly affected.
+
+   lib/PDF/Builder/Content/Text.pm  [ref RT #98546 (was open)] text 
+     justification will now attempt to use wordspace() and charspace() to fit a 
+     line to its alloted space, rather than simply scaling it with hscale(). 
+     This should result in much nicer looking output, though it will not be 
+     identical to PDF::API2's output.
+
+   lib/PDF/Builder/Content.pm  [ref CTS 7] $text->save() and restore() are no
+     longer no-ops, if you had them in your code. They issue the same q and Q
+     commands as a graphics save() and restore().
+
+   lib/PDF/Builder.pm
+   lib/PDF/Builder/Content.pm
+   lib/PDF/Builder/Resource/ExtGState.pm
+   lib/PDF/Builder/Resource/XObject/Image.pm
+   lib/PDF/Builder/Resource/XObject/Form/BarCode/code3of9.pm  deprecated 
+     methods (renamed or absorbed into other methods) now get get warning 
+     messages output, in addition to (the PDF::API2 practice) of calling their
+     replacements. If these new warnings are a problem, your code should be
+     changed to no longer use the deprecated methods. It was felt to be not
+     worthwhile to try to add some kind of global switch to suppress the
+     warnings -- it's also too easy to forget to get around to updating your
+     code!
+
+   lib/PDF/Builder/Content.pm  
+   lib/PDF/Builder/Content/Text.pm [ref RT #98543 (was rejected)] most methods
+     did not have consistent return values. Some returned $self, others returned
+     their old settings, and still others returned nothing. When called without
+     parameters (setting routines, such as linewidth()), the current settings
+     are returned. linedash(-1) may now be used to query the current dash
+     pattern setting. Some methods in PDF::API2 which returned nothing, now 
+     return a setting, but this is unlikely to cause problems in existing code. 
+     Some methods which returned the new value on a setting call (a value was 
+     given) now consistently return $self, permitting chaining of setting calls.
+     It is possible, though unlikely, that existing code was depending on the 
+     new value being returned; these calls will have to be updated.
+    
+     Read the updated POD to clarify what is returned by a method call.
+
+3.002     2017-03-21 
+
+   No known incompatibilities added.
+
+3.001     2017-01-30 
+
+   lib/PDF/Builder/Util.pm  *HexValues() calls, pad with '0' to minimum length
+     (silent error). Document that if wrong number of hex digits, silently 
+     ignore the extra digits. PDF::API2 could produce unexpected results if
+     the wrong number of hex digits were given, or input values which should
+     be in the range 0 to 1 were not (they are now clamped to that range).
+     This may result in different colors being set than in PDF::API2, even
+     though the original colors were erroneously specified!
+
+   lib/PDF/Builder/Content.pm  updates:
+
+     arctocurve() renamed to _arctocurve()
+     fontset() renamed to _fontset()
+     textpos2() renamed to _textpos2()
+     metaStart() renamed to _metaStart()
+     metaEnd() renamed to _metaEnd()  It is unlikely that anyone was using
+       these internal routines, but in case they are...
+
+     [ref RT #98538 (was open)] arc/pie couldn't cross 0 degrees. gave 
+       _arctocurve() an optional direction parameter (default: 
+       0=counterclockwise sweep) and split the arc at 0 degrees.
+
+       *** NOTE *** These functions have always been ambiguous in PDF::API2 in 
+         their definition. If you gave an arc or pie sweep from 60 to 30, did 
+         you mean a clockwise 30 degree arc, or a counterclockwise 330 degree 
+         arc? The addition of a direction parameter (pie, arc) clarifies your 
+         intent, but may result in different arcs being drawn than before 
+         (requiring an explicit 1 in the argument list to set a clockwise 
+         sweep).
+
+     [ref RT #98535 (was rejected)] restore nl(width) capability. PDF::API2
+       cannot specify a width (amount of indent); it was treated as nl(0).
+       

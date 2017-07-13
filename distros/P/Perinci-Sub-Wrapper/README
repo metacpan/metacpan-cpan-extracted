@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Perinci::Sub::Wrapper - A multi-purpose subroutine wrapping framework
 
+VERSION
+    This document describes version 0.84 of Perinci::Sub::Wrapper (from Perl
+    distribution Perinci-Sub-Wrapper), released on 2017-07-10.
+
+SYNOPSIS
     For dynamic usage:
 
      use Perinci::Sub::Wrapper qw(wrap_sub);
@@ -8,7 +14,6 @@ SYNOPSIS
      $wrapped_sub->(); # call the wrapped function
 
 DESCRIPTION
-
     Perinci::Sub::Wrapper (PSW for short) is an extensible subroutine
     wrapping framework. It generates code to do stuffs before calling your
     subroutine, like validate arguments, convert arguments from
@@ -19,60 +24,60 @@ DESCRIPTION
     apply a timeout, currying, and so on.
 
     PSW differs from other function composition or decoration system like
-    Python decorators (or its Perl equivalent Python::Decorator) in a
-    couple of ways:
+    Python decorators (or its Perl equivalent Python::Decorator) in a couple
+    of ways:
 
-      * Single wrapper
+    *   Single wrapper
 
-      Instead of multiple/nested wrapping for implementing different
-      features, PSW is designed to generate a single large wrapper around
-      your code, i.e.:
+        Instead of multiple/nested wrapping for implementing different
+        features, PSW is designed to generate a single large wrapper around
+        your code, i.e.:
 
-       sub _wrapper_for_your_sub {
-           ...
-           # do various stuffs before calling:
-      
-           # e.g. start timer
-           # e.g. convert, prefill, validate arguments
-           my @args = ...;
-           ...
-           your_sub(@args);
-           ...
-           # do various stuffs after calling
-           ...
-           # e.g. report times
-           # e.g. perform retry
-           # e.g. convert or envelope results
-      
-           # return result
-       }
+         sub _wrapper_for_your_sub {
+             ...
+             # do various stuffs before calling:
 
-      Multiple functionalities will be added and combined in this single
-      wrapper subroutine in the appropriate location. This is done to
-      reduce function call overhead or depth of nested call levels. And
-      also to make it easier to embed the wrapping code to your source code
-      (see Dist::Zilla::Plugin::Rinci::Wrap).
+             # e.g. start timer
+             # e.g. convert, prefill, validate arguments
+             my @args = ...;
+             ...
+             your_sub(@args);
+             ...
+             # do various stuffs after calling
+             ...
+             # e.g. report times
+             # e.g. perform retry
+             # e.g. convert or envelope results
 
-      Of course, you can still wrap multiple times if wanted.
+             # return result
+         }
 
-      * Rinci
+        Multiple functionalities will be added and combined in this single
+        wrapper subroutine in the appropriate location. This is done to
+        reduce function call overhead or depth of nested call levels. And
+        also to make it easier to embed the wrapping code to your source
+        code (see Dist::Zilla::Plugin::Rinci::Wrap).
 
-      The wrapper code is built according to the Rinci metadata you
-      provide. Rinci allows you to specify various things for your
-      function, e.g. list of arguments including the expected data type of
-      each argument and whether an argument is required or optional. PSW
-      can then be used to generate the necessary code to enforce this
-      specification, e.g. generate validator for the function arguments.
+        Of course, you can still wrap multiple times if wanted.
 
-      Since Rinci specification is extensible, you can describe additional
-      stuffs for your function and write a PSW plugin to generate the
-      necessary code to implement your specification. An example is timeout
-      to specify execution time limit, implemented by
-      Perinci::Sub::Property::timeout which generates code to call function
-      inside an eval() block and use alarm() to limit the execution.
-      Another example is retry property, implemented by
-      Perinci::Sub::Property::retry which generates code to call function
-      inside a simple retry loop.
+    *   Rinci
+
+        The wrapper code is built according to the Rinci metadata you
+        provide. Rinci allows you to specify various things for your
+        function, e.g. list of arguments including the expected data type of
+        each argument and whether an argument is required or optional. PSW
+        can then be used to generate the necessary code to enforce this
+        specification, e.g. generate validator for the function arguments.
+
+        Since Rinci specification is extensible, you can describe additional
+        stuffs for your function and write a PSW plugin to generate the
+        necessary code to implement your specification. An example is
+        "timeout" to specify execution time limit, implemented by
+        Perinci::Sub::Property::timeout which generates code to call
+        function inside an "eval()" block and use "alarm()" to limit the
+        execution. Another example is "retry" property, implemented by
+        Perinci::Sub::Property::retry which generates code to call function
+        inside a simple retry loop.
 
     Normally you do not use PSW directly in your applications. You might
     want to check out Perinci::Access::Perl and Perinci::Exporter on
@@ -81,161 +86,247 @@ DESCRIPTION
     generated wrapping code to source code during build.
 
 EXTENDING
-
     The framework is simple and extensible. Please delve directly into the
     source code for now. Some notes:
 
     The internal uses OO.
 
-    The main wrapper building mechanism is in the wrap() method.
+    The main wrapper building mechanism is in the "wrap()" method.
 
-    For each Rinci property, it will call handle_NAME() wrapper handler
-    method. The handlemeta_NAME() methods are called first, to determine
+    For each Rinci property, it will call "handle_NAME()" wrapper handler
+    method. The "handlemeta_NAME()" methods are called first, to determine
     order of processing. You can supply these methods either by subclassing
     the class or, more simply, monkeypatching the method in the
-    Perinci::Sub::Wrapper package.
+    "Perinci::Sub::Wrapper" package.
 
     The wrapper handler method will be called with a hash argument,
     containing these keys: value (property value), new (this key will exist
-    if convert argument of wrap() exists, to convert a property to a new
+    if "convert" argument of "wrap()" exists, to convert a property to a new
     value).
 
-    For properties that have name in the form of NAME1.NAME2.NAME3 (i.e.,
+    For properties that have name in the form of "NAME1.NAME2.NAME3" (i.e.,
     dotted) only the first part of the name will be used (i.e.,
-    handle_NAME1()).
+    "handle_NAME1()").
 
 VARIABLES
-
- $Log_Wrapper_Code (BOOL)
-
+  $Log_Wrapper_Code (BOOL)
     Whether to log wrapper result. Default is from environment variable
-    LOG_PERINCI_WRAPPER_CODE, or false. Logging is done with Log::Any at
+    LOG_PERINCI_WRAPPER_CODE, or false. Logging is done with Log::ger at
     trace level.
 
-METHODS
-
-    The OO interface is only used internally or when you want to extend the
-    wrapper.
-
-ENVIRONMENT
-
- LOG_PERINCI_WRAPPER_CODE (bool)
-
-    If set to 1, will log the generated wrapper code. This value is used to
-    set $Log_Wrapper_Code if it is not already set.
-
- PERINCI_WRAPPER_CORE => bool
-
-    Set default for wrap argument core.
-
- PERINCI_WRAPPER_CORE_OR_PP => bool
-
-    Set default for wrap argument core_or_pp.
-
- PERINCI_WRAPPER_PP => bool
-
-    Set default for wrap argument pp.
-
 RINCI FUNCTION METADATA
+  x.perinci.sub.wrapper.disable_validate_args => bool
+    Can be set to 1 to set "validate_args" to 0 by default. This is used
+    e.g. if you already embed/insert code to validate arguments by other
+    means and do not want to repeat validating arguments. E.g. used if you
+    use Dist::Zilla::Plugin::Rinci::Validate.
 
- x.perinci.sub.wrapper.disable_validate_args => bool
-
-    Can be set to 1 to set validate_args to 0 by default. This is used e.g.
-    if you already embed/insert code to validate arguments by other means
-    and do not want to repeat validating arguments. E.g. used if you use
-    Dist::Zilla::Plugin::Rinci::Validate.
-
- x.perinci.sub.wrapper.disable_validate_result => bool
-
-    Can be set to 1 to set validate_result to 0 by default. This is used
+  x.perinci.sub.wrapper.disable_validate_result => bool
+    Can be set to 1 to set "validate_result" to 0 by default. This is used
     e.g. if you already embed/insert code to validate result by other means
     and do not want to repeat validating result. E.g. used if you use
     Dist::Zilla::Plugin::Rinci::Validate.
 
- x.perinci.sub.wrapper.logs => array
-
+  x.perinci.sub.wrapper.logs => array
     Generated/added by this module to the function metadata for every
     wrapping done. Used to avoid adding repeated code, e.g. to validate
     result or arguments.
 
 PERFORMANCE NOTES
-
     The following numbers are produced on an Intel Core i5-2400 3.1GHz
-    desktop using PSW v0.51 and Perl v5.18.2. Operating system is Debian
-    sid (64bit).
+    desktop using PSW v0.51 and Perl v5.18.2. Operating system is Debian sid
+    (64bit).
 
-    For perspective, empty subroutine (sub {}) as well as sub { [200, "OK"]
-    } can be called around 5.3 mil/sec.
+    For perspective, empty subroutine ("sub {}") as well as "sub { [200,
+    "OK"] }" can be called around 5.3 mil/sec.
 
-    Wrapping this subroutine sub { [200, "OK"] } and this simple metadata
-    {v=>1.1} using default options yields call performance for $sub->() of
-    about 0.9 mil/sec. With validate_args=>0 and validate_result=>0, it's
-    1.5 mil/sec.
+    Wrapping this subroutine "sub { [200, "OK"] }" and this simple metadata
+    "{v=>1.1}" using default options yields call performance for "$sub->()"
+    of about 0.9 mil/sec. With "validate_args=>0" and "validate_result=>0",
+    it's 1.5 mil/sec.
 
     As more (and more complex) arguments are introduced and validated,
     overhead will increase. The significant portion of the overhead is in
-    argument validation. For example, this metadata {v=>1.1,
-    args=>{a=>{schema=>"int"}}} yields 0.5 mil/sec.
+    argument validation. For example, this metadata "{v=>1.1,
+    args=>{a=>{schema=>"int"}}}" yields 0.5 mil/sec.
+
+FUNCTIONS
+  wrap_sub
+    Usage:
+
+     wrap_sub(%args) -> [status, msg, result, meta]
+
+    Wrap subroutine to do various things, like enforcing Rinci properties.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   compile => *bool* (default: 1)
+
+        Whether to compile the generated wrapper.
+
+        Can be set to 0 to not actually wrap but just return the generated
+        wrapper source code.
+
+    *   convert => *hash*
+
+        Properties to convert to new value.
+
+        Not all properties can be converted, but these are a partial list of
+        those that can: v (usually do not need to be specified when
+        converting from 1.0 to 1.1, will be done automatically), args_as,
+        result_naked, default_lang.
+
+    *   core => *bool*
+
+        If set to true, will avoid the use of non-core modules.
+
+    *   core_or_pp => *bool*
+
+        If set to true, will avoid the use of non-core XS modules.
+
+        In other words, will stick to core or pure-perl modules only.
+
+    *   debug => *bool* (default: 0)
+
+        Generate code with debugging.
+
+        If turned on, will produce various debugging in the generated code.
+        Currently what this does:
+
+        *   add more comments (e.g. for each property handler)
+
+    *   meta* => *hash*
+
+        The function metadata.
+
+    *   meta_name => *str*
+
+        Where to find the metadata, e.g. "$SPEC{foo}".
+
+        Some wrapper code (e.g. handler for "dep" property) needs to refer
+        to the function metadata. If not provided, the wrapper will store
+        the function metadata in a unique variable (e.g.
+        $Perinci::Sub::Wrapped::meta34127816).
+
+    *   pp => *bool*
+
+        If set to true, will avoid the use of XS modules.
+
+    *   sub => *str*
+
+        The code to be wrapped.
+
+        At least one of "sub" or "sub_name" must be specified.
+
+    *   sub_name => *str*
+
+        The name of the subroutine, e.g. func or Foo::func (qualified).
+
+        At least one of "sub" or "sub_name" must be specified.
+
+    *   validate_args => *bool*
+
+        Whether wrapper should validate arguments.
+
+        If set to true, will validate arguments. Validation error will cause
+        status 400 to be returned. The default is to enable this unless
+        previous wrapper(s) have already done this.
+
+    *   validate_result => *bool*
+
+        Whether wrapper should validate arguments.
+
+        If set to true, will validate sub's result. Validation error will
+        cause wrapper to return status 500 instead of sub's result. The
+        default is to enable this unless previous wrapper(s) have already
+        done this.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: The wrapped subroutine along with its new metadata (hash)
+
+    Aside from wrapping the subroutine, the wrapper will also create a new
+    metadata for the subroutine. The new metadata is a clone of the
+    original, with some properties changed, e.g. schema in "args" and
+    "result" normalized, some values changed according to the "convert"
+    argument, some defaults set, etc.
+
+    The new metadata will also contain (or append) the wrapping log located
+    in the "x.perinci.sub.wrapper.logs" attribute. The wrapping log marks
+    that the wrapper has added some functionality (like validating arguments
+    or result) so that future nested wrapper can choose to avoid duplicating
+    the same functionality.
+
+METHODS
+    The OO interface is only used internally or when you want to extend the
+    wrapper.
 
 FAQ
+  General
+    *   What is a function wrapper?
 
- General
+        A wrapper function calls the target function but with additional
+        behaviors. The goal is similar to function composition or decorator
+        system like in Python (or its Perl equivalent Python::Decorator)
+        where you use a higher-order function which accepts another function
+        and modifies it.
 
-      * What is a function wrapper?
+        It is used to add various functionalities, e.g.: cache/memoization,
+        singleton, adding benchmarking/timing around function call, logging,
+        argument validation (parameter checking), checking
+        pre/post-condition, authentication/authorization checking, etc. The
+        Python folks use decorators quite a bit; see discussions on the
+        Internet on those.
 
-      A wrapper function calls the target function but with additional
-      behaviors. The goal is similar to function composition or decorator
-      system like in Python (or its Perl equivalent Python::Decorator)
-      where you use a higher-order function which accepts another function
-      and modifies it.
+    *   How is PSW different from Python::Decorator?
 
-      It is used to add various functionalities, e.g.: cache/memoization,
-      singleton, adding benchmarking/timing around function call, logging,
-      argument validation (parameter checking), checking
-      pre/post-condition, authentication/authorization checking, etc. The
-      Python folks use decorators quite a bit; see discussions on the
-      Internet on those.
+        PSW uses dynamic code generation (it generates Perl code on the
+        fly). It also creates a single large wrapper instead of nested
+        wrappers. It builds wrapper code according to Rinci specification.
 
-      * How is PSW different from Python::Decorator?
+    *   Why use code generation?
 
-      PSW uses dynamic code generation (it generates Perl code on the fly).
-      It also creates a single large wrapper instead of nested wrappers. It
-      builds wrapper code according to Rinci specification.
+        Mainly because Data::Sah, which is the module used to do argument
+        validation, also uses code generation. Data::Sah allows us to do
+        data validation at full Perl speed, which can be one or two orders
+        of magnitude faster than "interpreter" modules like
+        Data::FormValidator.
 
-      * Why use code generation?
+    *   Why use a single large wrapper?
 
-      Mainly because Data::Sah, which is the module used to do argument
-      validation, also uses code generation. Data::Sah allows us to do data
-      validation at full Perl speed, which can be one or two orders of
-      magnitude faster than "interpreter" modules like Data::FormValidator.
+        This is just a design approach. It can impose some restriction for
+        wrapper code authors, since everything needs to be put in a single
+        subroutine, but has nice properties like less stack trace depth and
+        less function call overhead.
 
-      * Why use a single large wrapper?
+  Debugging
+    *   How to display the wrapper code being generated?
 
-      This is just a design approach. It can impose some restriction for
-      wrapper code authors, since everything needs to be put in a single
-      subroutine, but has nice properties like less stack trace depth and
-      less function call overhead.
+        If environment variable LOG_PERINCI_WRAPPER_CODE or package variable
+        $Log_Perinci_Wrapper_Code is set to true, generated wrapper source
+        code is logged at trace level using Log::ger. It can be displayed,
+        for example:
 
- Debugging
+         % LOG_PERINCI_WRAPPER_CODE=1 TRACE=1 \
+           perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
+           -MPerinci::Sub::Wrapper=wrap_sub \
+           -e 'wrap_sub(sub=>sub{}, meta=>{v=>1.1, args=>{a=>{schema=>"int"}}});'
 
-      * How to display the wrapper code being generated?
+        Note that Data::Sah (the module used to generate validator code)
+        observes "LOG_SAH_VALIDATOR_CODE", but during wrapping this
+        environment flag is currently disabled by this module, so you need
+        to set LOG_PERINCI_WRAPPER_CODE instead.
 
-      If environment variable LOG_PERINCI_WRAPPER_CODE or package variable
-      $Log_Perinci_Wrapper_Code is set to true, generated wrapper source
-      code is logged at trace level using Log::Any. It can be displayed,
-      for example, using Log::Any::App:
-
-       % LOG=1 LOG_PERINCI_WRAPPER_CODE=1 TRACE=1 \
-         perl -MLog::Any::App -MPerinci::Sub::Wrapper=wrap_sub \
-         -e 'wrap_sub(sub=>sub{}, meta=>{v=>1.1, args=>{a=>{schema=>"int"}}});'
-
-      Note that Data::Sah (the module used to generate validator code)
-      observes LOG_SAH_VALIDATOR_CODE, but during wrapping this environment
-      flag is currently disabled by this module, so you need to set
-      LOG_PERINCI_WRAPPER_CODE instead.
-
- caller() doesn't work from inside my wrapped code!
-
+  caller() doesn't work from inside my wrapped code!
     Wrapping adds at least one or two levels of calls: one for the wrapper
     subroutine itself, the other is for the eval trap when necessary.
 
@@ -246,8 +337,36 @@ FAQ
     provided by Perinci::Sub::Util. Or use embedded mode, where the wrapper
     code won't add extra subroutine calls.
 
-SEE ALSO
+ENVIRONMENT
+  LOG_PERINCI_WRAPPER_CODE (bool)
+    If set to 1, will log the generated wrapper code. This value is used to
+    set $Log_Wrapper_Code if it is not already set.
 
+  PERINCI_WRAPPER_CORE => bool
+    Set default for wrap argument "core".
+
+  PERINCI_WRAPPER_CORE_OR_PP => bool
+    Set default for wrap argument "core_or_pp".
+
+  PERINCI_WRAPPER_PP => bool
+    Set default for wrap argument "pp".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Sub-Wrapper>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Sub-Wrapper>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Wrapper>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci, Rinci
 
     Python::Decorator
@@ -255,4 +374,14 @@ SEE ALSO
     Dist::Zilla::Plugin::Rinci::Wrap
 
     Dist::Zilla::Plugin::Rinci::Validate
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

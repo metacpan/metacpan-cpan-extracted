@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::config;
-$Footprintless::App::Command::config::VERSION = '1.24';
+$Footprintless::App::Command::config::VERSION = '1.25';
 # ABSTRACT: Prints the config at the coordinate.
 # PODNAME: Footprintless::App::Command::config
 
@@ -108,7 +108,7 @@ Footprintless::App::Command::config - Prints the config at the coordinate.
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,48 @@
+---
+abstract: 'The base library for Project Renard'
+author:
+  - 'Project Renard'
+build_requires:
+  Test::Most: '0'
+  lib: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Renard-Incunabula
+requires:
+  CHI: '0'
+  Cairo: '0'
+  Function::Parameters: '0'
+  Import::Into: '0'
+  Modern::Perl: '0'
+  Module::Load: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Lsub: '0'
+  MooX::TypeTiny: '0'
+  Path::Tiny: '0'
+  Return::Type: '0'
+  Try::Tiny: '0'
+  Type::Libraries: '0'
+  Type::Library: '0.008'
+  Type::Utils: '0'
+  Types::Common::Numeric: '0'
+  Types::Path::Tiny: '0'
+  Types::Standard: '0'
+  Types::URI: '0'
+  autodie: '0'
+  autovivification: '0'
+  custom::failures: '0'
+  perl: '5.010'
+resources:
+  homepage: https://github.com/project-renard/p5-Renard-Incunabula
+  repository: https://github.com/project-renard/p5-Renard-Incunabula.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogAny::NoAdapterLogging;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.09'; # VERSION
 
 use 5.010001;
 use strict;
@@ -36,7 +36,7 @@ Bencher::Scenario::LogAny::NoAdapterLogging - Benchmark Log::Any logging speed w
 
 =head1 VERSION
 
-This document describes version 0.08 of Bencher::Scenario::LogAny::NoAdapterLogging (from Perl distribution Bencher-Scenarios-LogAny), released on 2017-01-25.
+This document describes version 0.09 of Bencher::Scenario::LogAny::NoAdapterLogging (from Perl distribution Bencher-Scenarios-LogAny), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ Command line:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
 
 Benchmark with C<< bencher -m LogAny::NoAdapterLogging --env-hashes-json '[{"PERL5OPT":"-Iarchive/Log-Any-1.040/lib"},{"PERL5OPT":"-Iarchive/Log-Any-1.041/lib"}]' >>:
 
@@ -82,10 +82,10 @@ Benchmark with C<< bencher -m LogAny::NoAdapterLogging --env-hashes-json '[{"PER
  +----------------+--------------------------------------+-----------+-----------+------------+-----------+---------+
  | participant    | env                                  | rate (/s) | time (ms) | vs_slowest |  errors   | samples |
  +----------------+--------------------------------------+-----------+-----------+------------+-----------+---------+
- | 100k_log_trace | PERL5OPT=-Iarchive/Log-Any-1.040/lib |        15 |        65 |        1   |   0.00017 |      20 |
- | 100k_is_trace  | PERL5OPT=-Iarchive/Log-Any-1.041/lib |        23 |        44 |        1.5 |   0.00011 |      20 |
- | 100k_is_trace  | PERL5OPT=-Iarchive/Log-Any-1.040/lib |        23 |        44 |        1.5 |   0.00012 |      22 |
- | 100k_log_trace | PERL5OPT=-Iarchive/Log-Any-1.041/lib |        43 |        23 |        2.8 | 7.6e-05   |      20 |
+ | 100k_log_trace | PERL5OPT=-Iarchive/Log-Any-1.040/lib |        14 |        72 |        1   |   0.00015 |      20 |
+ | 100k_is_trace  | PERL5OPT=-Iarchive/Log-Any-1.040/lib |        19 |        53 |        1.3 |   0.0001  |      20 |
+ | 100k_is_trace  | PERL5OPT=-Iarchive/Log-Any-1.041/lib |        19 |        53 |        1.4 | 6.7e-05   |      20 |
+ | 100k_log_trace | PERL5OPT=-Iarchive/Log-Any-1.041/lib |        35 |        28 |        2.5 | 3.6e-05   |      20 |
  +----------------+--------------------------------------+-----------+-----------+------------+-----------+---------+
 
 
@@ -113,7 +113,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

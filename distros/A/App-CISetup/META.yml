@@ -24,28 +24,28 @@ name: App-CISetup
 provides:
   App::CISetup:
     file: lib/App/CISetup.pm
-    version: '0.05'
+    version: '0.06'
   App::CISetup::AppVeyor::ConfigFile:
     file: lib/App/CISetup/AppVeyor/ConfigFile.pm
-    version: '0.05'
+    version: '0.06'
   App::CISetup::AppVeyor::ConfigUpdater:
     file: lib/App/CISetup/AppVeyor/ConfigUpdater.pm
-    version: '0.05'
+    version: '0.06'
   App::CISetup::Role::ConfigFile:
     file: lib/App/CISetup/Role/ConfigFile.pm
-    version: '0.05'
+    version: '0.06'
   App::CISetup::Role::ConfigUpdater:
     file: lib/App/CISetup/Role/ConfigUpdater.pm
-    version: '0.05'
+    version: '0.06'
   App::CISetup::Travis::ConfigFile:
     file: lib/App/CISetup/Travis/ConfigFile.pm
-    version: '0.05'
+    version: '0.06'
   App::CISetup::Travis::ConfigUpdater:
     file: lib/App/CISetup/Travis/ConfigUpdater.pm
-    version: '0.05'
+    version: '0.06'
   App::CISetup::Types:
     file: lib/App/CISetup/Types.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   File::Which: '0'
   File::pushd: '0'
@@ -74,7 +74,7 @@ resources:
   bugtracker: https://github.com/maxmind/App-CISetup/issues
   homepage: http://metacpan.org/release/App-CISetup
   repository: git://github.com/maxmind/App-CISetup.git
-version: '0.05'
+version: '0.06'
 x_Dist_Zilla:
   perl:
     version: '5.024001'
@@ -180,7 +180,7 @@ x_Dist_Zilla:
               version: '6.009'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
-          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
           inherit_missing: '1'
           inherit_version: '1'
           meta_noindex: '1'
@@ -656,7 +656,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.05
+          tag: v0.06
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -773,4 +773,5 @@ x_Dist_Zilla:
 x_authority: cpan:MAXMIND
 x_contributors:
   - 'Mark Fowler <mfowler@maxmind.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  - 'Zak B. Elep <zakame@zakame.net>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

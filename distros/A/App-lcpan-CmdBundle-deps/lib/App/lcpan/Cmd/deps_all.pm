@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::deps_all;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Clone::Util qw(modclone);
 
@@ -143,7 +143,7 @@ App::lcpan::Cmd::deps_all - List all dependencies
 
 =head1 VERSION
 
-This document describes version 0.005 of App::lcpan::Cmd::deps_all (from Perl distribution App-lcpan-CmdBundle-deps), released on 2017-01-20.
+This document describes version 0.006 of App::lcpan::Cmd::deps_all (from Perl distribution App-lcpan-CmdBundle-deps), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -152,7 +152,11 @@ This module handles the L<lcpan> subcommand C<deps-all>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 List all dependencies.
 
@@ -216,7 +220,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

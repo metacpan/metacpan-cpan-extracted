@@ -18,7 +18,7 @@ Log::ger::Manual::ForLogAny - Log::ger for Log::Any users
 
 =head1 VERSION
 
-version 0.012
+version 0.015001
 
 =head1 WHY LOG::ANY
 

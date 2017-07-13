@@ -1,7 +1,7 @@
 package Perinci::Examples::Tiny;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 our %SPEC;
 
@@ -173,7 +173,7 @@ Perinci::Examples::Tiny - Small examples
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::Tiny (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::Tiny (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -183,7 +183,11 @@ benchmarking startup overhead of L<Perinci::CmdLine::Inline>-generated scripts.
 =head1 FUNCTIONS
 
 
-=head2 foo1() -> [status, msg, result, meta]
+=head2 foo1
+
+Usage:
+
+ foo1() -> [status, msg, result, meta]
 
 Return the string 'foo1'.
 
@@ -203,7 +207,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 foo2() -> [status, msg, result, meta]
+=head2 foo2
+
+Usage:
+
+ foo2() -> [status, msg, result, meta]
 
 Return the string 'foo1'.
 
@@ -223,7 +231,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 foo3() -> [status, msg, result, meta]
+=head2 foo3
+
+Usage:
+
+ foo3() -> [status, msg, result, meta]
 
 Return the string 'foo1'.
 
@@ -243,7 +255,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 foo4() -> [status, msg, result, meta]
+=head2 foo4
+
+Usage:
+
+ foo4() -> [status, msg, result, meta]
 
 Return the string 'foo1'.
 
@@ -263,7 +279,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 hello_naked() -> any
+=head2 hello_naked
+
+Usage:
+
+ hello_naked() -> any
 
 Hello world.
 
@@ -274,7 +294,11 @@ No arguments.
 Return value:  (any)
 
 
-=head2 noop() -> [status, msg, result, meta]
+=head2 noop
+
+Usage:
+
+ noop() -> [status, msg, result, meta]
 
 Do nothing.
 
@@ -294,7 +318,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 noop2(%args) -> [status, msg, result, meta]
+=head2 noop2
+
+Usage:
+
+ noop2(%args) -> [status, msg, result, meta]
 
 Just like noop, but accepts several arguments.
 
@@ -347,7 +375,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 odd_even(%args) -> [status, msg, result, meta]
+=head2 odd_even
+
+Usage:
+
+ odd_even(%args) -> [status, msg, result, meta]
 
 Return 'odd' or 'even' depending on the number.
 
@@ -375,7 +407,11 @@ that contains extra information.
 Return value:  (str)
 
 
-=head2 sum(%args) -> [status, msg, result, meta]
+=head2 sum
+
+Usage:
+
+ sum(%args) -> [status, msg, result, meta]
 
 Sum numbers in array.
 
@@ -430,7 +466,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

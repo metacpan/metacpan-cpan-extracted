@@ -4,7 +4,7 @@ author:
   - 'Current Maintainer: Geoff Franks <gfranks@cpan.org>'
   - 'Original Author: Simon Flack <simonflk _AT_ cpan.org>'
 build_requires:
-  Test::More: '0.45'
+  Test::More: '0.88'
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
@@ -17,7 +17,7 @@ name: Test-MockModule
 provides:
   Test::MockModule:
     file: lib/Test/MockModule.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Carp: '0'
   SUPER: '0'
@@ -28,5 +28,5 @@ resources:
   homepage: https://github.com/geofffranks/test-mockmodule
   license: http://www.gnu.org/licenses/gpl-3.0.txt
   repository: git://github.com/geofffranks/test-mockmodule.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

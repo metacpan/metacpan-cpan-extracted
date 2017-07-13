@@ -1,7 +1,7 @@
 package App::PerinciUtils;
 
-our $DATE = '2016-05-17'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 
@@ -20,7 +20,7 @@ App::PerinciUtils - Some utilities related to Perinci
 
 =head1 VERSION
 
-This document describes version 0.09 of App::PerinciUtils (from Perl distribution App-PerinciUtils), released on 2016-05-17.
+This document describes version 0.10 of App::PerinciUtils (from Perl distribution App-PerinciUtils), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

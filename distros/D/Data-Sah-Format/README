@@ -1,12 +1,18 @@
-SYNOPSIS
+NAME
+    Data::Sah::Format - Formatter for Data::Sah
 
+VERSION
+    This document describes version 0.003 of Data::Sah::Format (from Perl
+    distribution Data-Sah-Format), released on 2017-07-10.
+
+SYNOPSIS
      use Data::Sah::Format qw(gen_formatter);
-    
+
      my $c = gen_formatter(
          format => 'iso8601_date',
          #format_args => {...},
      );
-    
+
      my $val;
      $val = $c->(1465784006);   # "2016-06-13"
      $val = $c->(DateTime->new(year=>2016, month=>6, day=>13)); # "2016-06-13"
@@ -16,30 +22,62 @@ SYNOPSIS
      $val = $c->([]);           # unchanged
 
 DESCRIPTION
-
 VARIABLES
-
- $Log_Formatter_Code => bool (default: from ENV or 0)
-
+  $Log_Formatter_Code => bool (default: from ENV or 0)
     If set to true, will log the generated formatter code (currently using
-    Log::Any at trace level). To see the log message, e.g. to the screen,
+    Log::ger at trace level). To see the log message, e.g. to the screen,
     you can use something like:
 
-     % TRACE=1 perl -MLog::Any::Adapter=Screen -MData::Sah::Format=gen_formatter \
-         -E'my $c = gen_formatter(...)'
+     % TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
+         -MData::Sah::Format=gen_formatter -E'my $c = gen_formatter(...)'
+
+FUNCTIONS
+  gen_formatter
+    Usage:
+
+     gen_formatter() -> any
+
+    Generate formatter code.
+
+    This function is not exported.
+
+    No arguments.
+
+    Return value: (any)
 
 ENVIRONMENT
-
- LOG_SAH_FORMATTER_CODE => bool
-
+  LOG_SAH_FORMATTER_CODE => bool
     Set default for $Log_Formatter_Code.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah-Format>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Sah-Format>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah-Format>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Data::Sah
 
     Data::Sah::FormatterJS
 
-    App::SahUtils, including format-with-sah to conveniently test
-    formatting from the command-line.
+    App::SahUtils, including format-with-sah to conveniently test formatting
+    from the command-line.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

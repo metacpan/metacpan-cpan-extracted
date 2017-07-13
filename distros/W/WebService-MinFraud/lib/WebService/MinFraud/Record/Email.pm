@@ -3,9 +3,14 @@ package WebService::MinFraud::Record::Email;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
-use WebService::MinFraud::Types qw( Bool BoolCoercion );
+use WebService::MinFraud::Types qw( Bool BoolCoercion Str );
+
+has first_seen => (
+    is  => 'ro',
+    isa => Str,
+);
 
 has is_free => (
     is     => 'ro',
@@ -35,7 +40,7 @@ WebService::MinFraud::Record::Email - Contains data for the email associated wit
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SYNOPSIS
 
@@ -59,6 +64,11 @@ This class contains the data for the email associated with a transaction.
 =head1 METHODS
 
 This class provides the following methods:
+
+=head2 first_seen
+
+A date string (e.g. 2017-04-24) to identify the date an email address was first
+seen by MaxMind. This is expressed using the ISO 8601 date format.
 
 =head2 is_free
 

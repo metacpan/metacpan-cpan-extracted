@@ -1,7 +1,7 @@
 package App::ListOrgHeadlinesFast;
 
-our $DATE = '2016-12-24'; # DATE
-our $VERSION = '0.45'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.46'; # VERSION
 
 use 5.010;
 use strict;
@@ -98,12 +98,16 @@ App::ListOrgHeadlinesFast - List & count Org headlines & todos
 
 =head1 VERSION
 
-This document describes version 0.45 of App::ListOrgHeadlinesFast (from Perl distribution App-OrgUtils), released on 2016-12-24.
+This document describes version 0.46 of App::ListOrgHeadlinesFast (from Perl distribution App-OrgUtils), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 count_org_headlines(%args) -> int
+=head2 count_org_headlines
+
+Usage:
+
+ count_org_headlines(%args) -> int
 
 Count Org headlines.
 
@@ -167,7 +171,11 @@ C</.../i> it is assumed to be a regex.
 Return value:  (int)
 
 
-=head2 count_org_todos(%args) -> int
+=head2 count_org_todos
+
+Usage:
+
+ count_org_todos(%args) -> int
 
 Count Org todos.
 
@@ -227,7 +235,11 @@ C</.../i> it is assumed to be a regex.
 Return value:  (int)
 
 
-=head2 list_org_headlines(%args) -> array[str]
+=head2 list_org_headlines
+
+Usage:
+
+ list_org_headlines(%args) -> array[str]
 
 List Org headlines.
 
@@ -291,7 +303,11 @@ C</.../i> it is assumed to be a regex.
 Return value:  (array[str])
 
 
-=head2 list_org_todos(%args) -> array[str]
+=head2 list_org_todos
+
+Usage:
+
+ list_org_todos(%args) -> array[str]
 
 List Org todos.
 
@@ -356,7 +372,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUti
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-OrgUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
 
 =head1 BUGS
 
@@ -372,7 +388,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

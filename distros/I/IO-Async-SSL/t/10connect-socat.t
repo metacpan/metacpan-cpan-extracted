@@ -33,7 +33,7 @@ my $kid = $loop->spawn_child(
       stdin  => $ssl_rd,
       stdout => $ssl_wr,
    ],
-   command => [ "socat", "OPENSSL-LISTEN:$port,cert=server.pem,key=privkey.pem,verify=0", "STDIO" ],
+   command => [ "socat", "OPENSSL-LISTEN:$port,dhparam=dhparam.pem,cert=server.pem,key=privkey.pem,verify=0", "STDIO" ],
    on_exit => sub {
       my ( $pid, $exitcode ) = @_;
 

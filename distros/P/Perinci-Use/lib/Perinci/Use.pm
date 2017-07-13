@@ -1,13 +1,13 @@
 package Perinci::Use;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Perinci::Access;
 use Perinci::Sub::Util qw(err);
@@ -61,7 +61,7 @@ _
 };
 sub use_riap_package {
     my %args   = @_;
-    $log->tracef("-> use_riap_package(%s)", \%args);
+    log_trace("-> use_riap_package(%s)", \%args);
     my $url    = $args{url}  or return [400, "Please specify url"];
     my $into   = $args{into} or return [400, "Please specify into"];
     return [500, "Invalid module name `$into`"]
@@ -127,7 +127,7 @@ sub use_riap_package {
         ${"$into\::SPEC"}{$e->[0]} = $e->[2];
     }
 
-    $log->tracef("<- use_riap_package()");
+    log_trace("<- use_riap_package()");
     [200, "OK"];
 }
 
@@ -164,7 +164,7 @@ Perinci::Use - Use a Riap package as if it was a local Perl module
 
 =head1 VERSION
 
-This document describes version 0.06 of Perinci::Use (from Perl distribution Perinci-Use), released on 2015-09-04.
+This document describes version 0.07 of Perinci::Use (from Perl distribution Perinci-Use), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -183,7 +183,11 @@ Perl's use().
 =head1 FUNCTIONS
 
 
-=head2 use_riap_package(%args) -> [status, msg, result, meta]
+=head2 use_riap_package
+
+Usage:
+
+ use_riap_package(%args) -> [status, msg, result, meta]
 
 Use a Riap package as if it was a local Perl module.
 
@@ -193,6 +197,8 @@ and for each remote function, create a proxy function. The proxy function will
 then call the remote function.
 
 Currently only functions are imported. Variables and other entities are ignored.
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -227,10 +233,6 @@ that contains extra information.
 
 Return value:  (undef)
 
-=head1 SEE ALSO
-
-L<Perinci::Access>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Use>.
@@ -247,13 +249,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Perinci::Access>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

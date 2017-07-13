@@ -7,10 +7,17 @@ use Exporter::Easy (
         all => [
             qw(
               XGDMatrixCreateFromFile
+              XGDMatrixCreateFromMat
               XGDMatrixNumRow
               XGDMatrixNumCol
+              XGDMatrixSetFloatInfo
+              XGDMatrixGetFloatInfo
               XGDMatrixFree
               XGBoosterCreate
+              XGBoosterSetParam
+              XGBoosterSetAttr
+              XGBoosterGetAttr
+              XGBoosterGetAttrNames
               XGBoosterUpdateOneIter
               XGBoosterBoostOneIter
               XGBoosterPredict
@@ -27,7 +34,7 @@ use AI::XGBoost::CAPI::RAW;
 use FFI::Platypus;
 use Exception::Class ( 'XGBoostException' );
 
-our $VERSION = '0.005';    # VERSION
+our $VERSION = '0.006';    # VERSION
 
 # ABSTRACT: Perl wrapper for XGBoost C API https://github.com/dmlc/xgboost
 
@@ -36,6 +43,22 @@ sub XGDMatrixCreateFromFile {
     $silent //= 1;
     my $matrix = 0;
     my $error = AI::XGBoost::CAPI::RAW::XGDMatrixCreateFromFile( $filename, $silent, \$matrix );
+    _CheckCall($error);
+    return $matrix;
+}
+
+sub XGDMatrixCreateFromMat {
+    my ( $data, $missing ) = @_;
+    $missing //= "NaN";
+
+    # TODO Support simple arrays
+    # TODO Support PDL
+    # TODO ¿Adapters?
+    my $data_adapter = [ map { @$_ } @$data ];
+    my $ncols        = scalar @$data;
+    my $nrows        = scalar @{ $data->[0] };
+    my $matrix       = 0;
+    my $error = AI::XGBoost::CAPI::RAW::XGDMatrixCreateFromMat( $data_adapter, $nrows, $ncols, $missing, \$matrix );
     _CheckCall($error);
     return $matrix;
 }
@@ -54,6 +77,20 @@ sub XGDMatrixNumCol {
     return $cols;
 }
 
+sub XGDMatrixSetFloatInfo {
+    my ( $matrix, $info, $data ) = @_;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixSetFloatInfo( $matrix, $info, $data, scalar @$data ) );
+}
+
+sub XGDMatrixGetFloatInfo {
+    my ( $matrix, $info ) = @_;
+    my $out_len    = 0;
+    my $out_result = 0;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixGetFloatInfo( $matrix, $info, \$out_len, \$out_result ) );
+    my $ffi = FFI::Platypus->new();
+    return $ffi->cast( opaque => "float[$out_len]", $out_result );
+}
+
 sub XGDMatrixFree {
     my ($matrix) = @_;
     _CheckCall( AI::XGBoost::CAPI::RAW::XGDMatrixFree($matrix) );
@@ -65,6 +102,38 @@ sub XGBoosterCreate {
     my $booster = 0;
     _CheckCall( AI::XGBoost::CAPI::RAW::XGBoosterCreate( $matrices, scalar @$matrices, \$booster ) );
     return $booster;
+}
+
+sub XGBoosterSetParam {
+    my ( $booster, $name, $value ) = @_;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGBoosterSetParam( $booster, $name, $value ) );
+}
+
+sub XGBoosterSetAttr {
+    my ( $booster, $name, $value ) = @_;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGBoosterSetAttr( $booster, $name, $value ) );
+}
+
+sub XGBoosterGetAttr {
+    my ( $booster, $name ) = @_;
+    my $value   = 0;
+    my $success = -1;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGBoosterGetAttr( $booster, $name, \$value, \$success ) );
+    if ($success) {
+        my $ffi = FFI::Platypus->new();
+        return $ffi->cast( opaque => "string", $value );
+    }
+    return ();
+}
+
+sub XGBoosterGetAttrNames {
+    my ($booster)  = @_;
+    my $out_len    = 0;
+    my $out_result = 0;
+    _CheckCall( AI::XGBoost::CAPI::RAW::XGBoosterGetAttrNames( $booster, \$out_len, \$out_result ) );
+    my $ffi = FFI::Platypus->new();
+    $out_result = $ffi->cast( opaque => "opaque[$out_len]", $out_result );
+    return [ map { $ffi->cast( opaque => "string", $_ ) } @$out_result ];
 }
 
 sub XGBoosterUpdateOneIter {
@@ -215,7 +284,7 @@ AI::XGBoost::CAPI - Perl wrapper for XGBoost C API https://github.com/dmlc/xgboo
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -272,6 +341,26 @@ whether print messages during loading
 
 Returns a loaded data matrix
 
+=head2 XGDMatrixCreateFromMat
+
+Create from dense matrix
+
+Parameters:
+
+=over 4
+
+=item matrix
+
+matrix data
+
+=item missing
+
+value indicating missing data (optional)
+
+=back
+
+Returns a loaded data matrix
+
 =head2 XGDMatrixNumRow
 
 Get number of rows
@@ -300,6 +389,10 @@ DMatrix
 
 =back
 
+=head2 XGDMatrixSetFloatInfo 
+
+=head2 XGDMatrixGetFloatInfo 
+
 =head2 XGDMatrixFree
 
 Free space in data matrix
@@ -327,6 +420,14 @@ Parameters:
 matrices that are set to be cached
 
 =back
+
+=head2 XGBoosterSetParam
+
+=head2 XGBoosterSetAttr
+
+=head2 XGBoosterGetAttr
+
+=head2 XGBoosterGetAttrNames
 
 =head2 XGBoosterUpdateOneIter
 

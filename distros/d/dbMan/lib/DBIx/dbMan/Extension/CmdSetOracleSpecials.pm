@@ -3,11 +3,11 @@ package DBIx::dbMan::Extension::CmdSetOracleSpecials;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 
-sub IDENTIFICATION { return "000001-000099-000001"; }
+sub IDENTIFICATION { return "000001-000099-000002"; }
 
 sub preference { return 1000; }
 
@@ -31,6 +31,12 @@ sub handle_action {
 			}
 
 			$obj->{-interface}->rebuild_menu();
+		} elsif ($action{cmd} =~ /^set\s+oracle\s+longreadlen\s+to\s+(\d+)\s*$/i) {
+			my $lrl_to = $1;
+			$action{action} = 'OUTPUT';
+			my $lrl_from = $obj->{-dbi}->longreadlen();
+			$obj->{-dbi}->longreadlen($lrl_to);
+			$action{output} = "Oracle LongReadLen changed from $lrl_from to $lrl_to.\n";
 		}
 	}
 
@@ -40,7 +46,8 @@ sub handle_action {
 
 sub cmdhelp {
 	return [
-		'SET ORACLE XPLAN [ON|OFF]' => 'Set Oracle DBMS_XPLAN module on or off (for db version 10 or newer).'
+		'SET ORACLE XPLAN [ON|OFF]' => 'Set Oracle DBMS_XPLAN module on or off (for db version 10 or newer).',
+		'SET ORACLE LONGREADLEN TO <number>' => 'Set Oracle LongReadLen connection parameter to selected value.'
 	];
 }
 
@@ -48,11 +55,16 @@ sub cmdcomplete {
 	my ($obj,$text,$line,$start) = @_;
 
 	my $local_mempool = $obj->{-dbi}->mempool();
+	return qw/ORACLE/ if $line =~ /^\s*SET\s+\S*$/i;
+	return qw/SET/ if $line =~ /^\s*[A-Z]*$/i;
+
+	my @ret = ();
 	if ( $local_mempool ) {
-		return qw/ON OFF/ if $line =~ /^\s*SET\s+ORACLE\s+XPLAN\s+\S*$/i;
-		return qw/XPLAN/ if $line =~ /^\s*SET\s+ORACLE\s+\S*$/i;
-		return qw/ORACLE/ if $line =~ /^\s*SET\s+\S*$/i;
-		return qw/SET/ if $line =~ /^\s*[A-Z]*$/i;
+		push @ret, qw/ON OFF/ if $line =~ /^\s*SET\s+ORACLE\s+XPLAN\s+\S*$/i;
+		push @ret, qw/XPLAN/ if $line =~ /^\s*SET\s+ORACLE\s+\S*$/i;
 	}
-	return ();
+	push @ret, qw/LONGREADLEN/ if $line =~ /^\s*SET\s+ORACLE\s+\S*$/i;
+	push @ret, qw/TO/ if $line =~ /^\s*SET\s+ORACLE\s+LONGREADLEN\s+\S*$/i;
+
+	return @ret;
 }

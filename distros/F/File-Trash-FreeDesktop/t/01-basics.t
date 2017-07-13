@@ -10,7 +10,7 @@ use Test::More 0.98;
 use Cwd 'abs_path';
 use File::chdir;
 use File::MoreUtil qw(file_exists);
-use File::Slurp::Tiny qw(read_file write_file);
+use File::Slurper qw(read_text write_text);
 use File::Temp qw(tempdir);
 use File::Trash::FreeDesktop;
 
@@ -20,11 +20,11 @@ $ENV{HOME} = $dir;
 $CWD = $dir;
 my $trash = File::Trash::FreeDesktop->new;
 
-write_file("f1", "f1");
-write_file("f2", "f2");
+write_text("f1", "f1");
+write_text("f2", "f2");
 mkdir "sub";
-write_file("sub/f1", "sub/f1");
-write_file("sub/f2", "sub/f2");
+write_text("sub/f1", "sub/f1");
+write_text("sub/f2", "sub/f2");
 
 my $ht = $trash->_home_trash;
 diag "home trash is $ht";
@@ -79,48 +79,48 @@ subtest "recover nonexisting file" => sub {
 };
 # state at this point: T()
 
-write_file("f3", "f3a");
+write_text("f3", "f3a");
 $trash->trash("f3");
-write_file("f3", "f3b");
+write_text("f3", "f3b");
 subtest "recover to an existing file" => sub {
     dies_ok { $trash->recover("f3") } "restore target already exists";
-    is(scalar read_file("f3"), "f3b", "existing target not replaced");
+    is(read_text("f3"), "f3b", "existing target not replaced");
     lives_ok { $trash->recover({on_target_exists=>'ignore'}, "f3") }
         "on_target_exists=ignore";
-    is(scalar read_file("f3"), "f3b", "existing target not replaced");
+    is(read_text("f3"), "f3b", "existing target not replaced");
     unlink "f3";
     lives_ok { $trash->recover("f3") } "can recover after target cleared";
-    is(scalar read_file("f3"), "f3a", "the correct file recovered");
+    is(read_text("f3"), "f3a", "the correct file recovered");
 };
 # state at this point: f3 T()
 
 subtest "recover: mtime opt" => sub {
-    write_file("f10", "f10.10");
+    write_text("f10", "f10.10");
     utime 1, 10, "f10";
     $trash->trash("f10");
 
-    write_file("f10", "f10.20");
+    write_text("f10", "f10.20");
     utime 1, 20, "f10";
     $trash->trash("f10");
 
     dies_ok { $trash->recover({mtime=>30}, "f10") } "mtime not found -> dies";
     $trash->recover({mtime=>20}, "f10");
-    is(scalar read_file("f10"), "f10.20", "f10 (mtime 20) recovered first");
+    is(read_text("f10"), "f10.20", "f10 (mtime 20) recovered first");
     unlink "f10";
     $trash->recover({mtime=>10}, "f10");
-    is(scalar read_file("f10"), "f10.10", "f10 (mtime 10) recovered");
+    is(read_text("f10"), "f10.10", "f10 (mtime 10) recovered");
     $trash->empty($ht);
 };
 # state at this point: f1 T()
 
 subtest "recover: suffix opt" => sub {
-    write_file("f10", "f10.a");
+    write_text("f10", "f10.a");
     $trash->trash({suffix=>"a"}, "f10");
 
-    write_file("f10", "f10.b");
+    write_text("f10", "f10.b");
     $trash->trash({suffix=>"b"}, "f10");
 
-    write_file("f10", "f10.another-b");
+    write_text("f10", "f10.another-b");
     dies_ok { $trash->recover({suffix=>"b"}, "f10") }
         "suffix already exists -> dies";
     unlink "f10";
@@ -128,10 +128,10 @@ subtest "recover: suffix opt" => sub {
     dies_ok { $trash->recover({suffix=>"c"}, "f10") }
         "suffix not found -> dies";
     $trash->recover({suffix=>"b"}, "f10");
-    is(scalar read_file("f10"), "f10.b", "f10 (suffix b) recovered first");
+    is(read_text("f10"), "f10.b", "f10 (suffix b) recovered first");
     unlink "f10";
     $trash->recover({suffix=>"a"}, "f10");
-    is(scalar read_file("f10"), "f10.a", "f10 (suffix a) recovered");
+    is(read_text("f10"), "f10.a", "f10 (suffix a) recovered");
     $trash->empty($ht);
 };
 # state at this point: f1 T()
@@ -140,7 +140,7 @@ subtest "trash symlink" => sub {
     plan skip_all => "symlink() not available"
         unless eval { symlink "", ""; 1 };
 
-    write_file("f21", "");
+    write_text("f21", "");
     symlink "f21", "s21";
 
     $trash->trash("s21");

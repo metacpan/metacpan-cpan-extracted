@@ -1,3 +1,18 @@
+0.023   2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Forgot to replace mention of Log::Any with Log::ger in the
+	  doc.
+
+
+0.022   2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Log::Any with Log::ger.
+
+
 0.021   2017-03-14 (PERLANCAR)
 
 	- Add coerce rules: {int,float}::str_percent.

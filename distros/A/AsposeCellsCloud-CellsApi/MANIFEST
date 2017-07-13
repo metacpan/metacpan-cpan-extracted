@@ -1,3 +1,16 @@
+../../Data/aspose-cloud.png
+../../Data/aspose-logo.png
+../../Data/Embeded_OleObject_Sample_Book1.xlsx
+../../Data/encrypted_Sample_Test_Book.xls
+../../Data/Sample_Book1.xlsx
+../../Data/Sample_Book2.xls
+../../Data/Sample_Pivot_Table_Example.xls
+../../Data/Sample_Protected_Test_Book.xls
+../../Data/Sample_SmartMarker.xlsx
+../../Data/Sample_SmartMarker_Data.xml
+../../Data/Sample_Test_Book.xls
+../../Data/testfile.txt
+../../Data/WorkSheetBackground_Sample_Test_Book.xls
 Build.PL
 Changes
 lib/AsposeCellsCloud/ApiClient.pm
@@ -13,6 +26,7 @@ lib/AsposeCellsCloud/Object/AutoShapesResponse.pm
 lib/AsposeCellsCloud/Object/BarcodeResponseList.pm
 lib/AsposeCellsCloud/Object/BaseObject.pm
 lib/AsposeCellsCloud/Object/Border.pm
+lib/AsposeCellsCloud/Object/CalculationOptions.pm
 lib/AsposeCellsCloud/Object/Cell.pm
 lib/AsposeCellsCloud/Object/CellArea.pm
 lib/AsposeCellsCloud/Object/CellResponse.pm

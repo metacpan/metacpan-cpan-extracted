@@ -1,36 +1,45 @@
 package Catmandu::Exporter::MARC;
 use Catmandu::Sane;
+use Catmandu::Util;
 use Moo;
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 has type           => (is => 'ro' , default => sub { 'ISO' });
-has _exporter      => (is => 'ro' , lazy => 1 , builder => '_build_exporter' , handles => 'Catmandu::Exporter');
-has _exporter_args => (is => 'rwp', writer => '_set_exporter_args');
+has _exporter      => (is => 'ro');
 
-sub _build_exporter {
-    my ($self) = @_;
-
-    my $type = $self->type;
-
-    my $pkg = Catmandu::Util::require_package($type,'Catmandu::Exporter::MARC');
-
-    $pkg->new($self->_exporter_args);
-}
+with 'Catmandu::Exporter';
 
 sub BUILD {
     my ($self,$args) = @_;
-    $self->_set_exporter_args($args);
+
+    my $type = $self->type;
 
     # keep USMARC temporary as alias for ISO, remove in future version
     # print deprecation warning
-    if ($self->{type} eq 'USMARC') {
-        $self->{type} = 'ISO';
+    if ($type eq 'USMARC') {
+        $type = 'ISO';
         warn( "deprecated", "Oops! Exporter \"USMARC\" is deprecated. Use \"ISO\" instead." );
     }
+
+    my $pkg = Catmandu::Util::require_package($type,'Catmandu::Exporter::MARC');
+
+    delete $args->{file};
+    delete $args->{fix};
+
+    $self->{_exporter} = $pkg->new(file => $self->file, %$args);
+}
+
+sub add {
+    $_[0]->_exporter->add($_[1]);
+}
+
+sub commit {
+    $_[0]->_exporter->commit;
 }
 
 1;
+
 __END__
 
 =head1 NAME

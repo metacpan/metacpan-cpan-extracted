@@ -1,9 +1,104 @@
-SYNOPSIS
+NAME
+    App::UniqFiles - Report or omit duplicate file contents
 
+VERSION
+    This document describes version 0.12 of App::UniqFiles (from Perl
+    distribution App-UniqFiles), released on 2017-07-10.
+
+SYNOPSIS
      # See uniq-files script
 
 NOTES
+    Warning: cannot properly handle symlinks or special files (socket, pipe,
+    device), so don't feed them.
 
-    Warning: cannot properly handle symlinks or special files (socket,
-    pipe, device), so don't feed them.
+FUNCTIONS
+  uniq_files
+    Usage:
+
+     uniq_files(%args) -> [status, msg, result, meta]
+
+    Report or omit duplicate file contents.
+
+    Given a list of filenames, will check each file size and content for
+    duplicate content. Interface is a bit like the "uniq" Unix command-line
+    program.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   check_content => *bool* (default: 1)
+
+        Whether to check file content .
+
+        If set to 0, uniqueness will be determined solely from file size.
+        This can be quicker but might generate a false positive when two
+        files of the same size are deemed as duplicate even though their
+        content are different.
+
+    *   count => *bool* (default: 0)
+
+        Whether to return each file content's number of occurence.
+
+        1 means the file content is only encountered once (unique), 2 means
+        there is one duplicate, and so on.
+
+    *   files* => *array[str]*
+
+    *   report_duplicate => *int* (default: 2)
+
+        Whether to return duplicate items.
+
+        Can be set to either 0, 1, 2.
+
+        If set to 2 (the default), will only return the first of duplicate
+        items. For example: file1 contains text 'a', file2 'b', file3 'a'.
+        Only file1 will be returned because file2 is unique and file3
+        contains 'a' (already represented by file1).
+
+        If set to 1, will return all the the duplicate items. From the above
+        example: file1 and file3 will be returned.
+
+        If set to 0, duplicate items will not be returned.
+
+    *   report_unique => *bool* (default: 1)
+
+        Whether to return unique items.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-UniqFiles>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-UniqFiles>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-UniqFiles>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

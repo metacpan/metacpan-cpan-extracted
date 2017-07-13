@@ -1,12 +1,12 @@
 package App::riap::Commands;
 
-our $DATE = '2016-08-18'; # DATE
-our $VERSION = '0.36'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.37'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Path::Naive qw(is_abs_path normalize_path concat_path_n);
 #use Perinci::Sub::Util qw(err);
@@ -249,7 +249,7 @@ sub cd {
     #return [403, "Not a directory (package)"]
     #    unless $res->[2]{type} eq 'package';
 
-    $log->tracef("Setting npwd=%s, opwd=%s", $npwd, $opwd);
+    log_trace("Setting npwd=%s, opwd=%s", $npwd, $opwd);
     $shell->state(pwd     => $npwd);
     $shell->state(old_pwd => $opwd);
     [200, "OK"];
@@ -550,7 +550,7 @@ App::riap::Commands - riap shell commands
 
 =head1 VERSION
 
-version 0.36
+version 0.37
 
 =for Pod::Coverage .+
 
@@ -560,7 +560,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienAuthor - Alien author documentation
 
 =head1 VERSION
 
-version 0.55
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -481,7 +481,7 @@ then you can expose them in your L<Alien::Base> subclass:
 You should write a test using L<Test::Alien> to make sure that your 
 alien will work with any XS modules that are going to use it:
 
- use Test2::Bundle::Extended;
+ use Test2::V0;
  use Test::Alien;
  use Alien::Libfoo;
  
@@ -505,7 +505,7 @@ alien will work with any XS modules that are going to use it:
 
 You can also use L<Test::Alien> to test tools instead of libraries:
 
- use Test2::Bundle::Extended;
+ use Test2::V0;
  use Test::Alien;
  use Alien::Libfoo;
  

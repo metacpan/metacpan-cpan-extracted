@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::OutputStartup;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -34,6 +34,9 @@ our %output_modules = (
 our $scenario = {
     modules => {
         'Log::ger::Output::Composite' => {version=>'0.005'},
+        'Log::ger::Output::File' => {version=>'0.002'},
+        'Log::ger::Output::LogAny' => {version=>'0.003'},
+        'Log::ger::Output::Screen' => {version=>'0.004'},
     },
     participants => [
         {name=>"baseline", perl_cmdline => ["-e1"]},
@@ -71,7 +74,7 @@ Bencher::Scenario::LogGer::OutputStartup
 
 =head1 VERSION
 
-This document describes version 0.009 of Bencher::Scenario::LogGer::OutputStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-02.
+This document describes version 0.010 of Bencher::Scenario::LogGer::OutputStartup (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
 
 =head1 SYNOPSIS
 
@@ -93,11 +96,11 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::ger::Output::Array> 0.012
+L<Log::ger::Output::Array> 0.016
 
 L<Log::ger::Output::ArrayWithLimits> 0.001
 
-L<Log::ger::Output::Callback> 0.001
+L<Log::ger::Output::Callback> 0.002
 
 L<Log::ger::Output::Composite> 0.007
 
@@ -111,11 +114,11 @@ L<Log::ger::Output::LogAny> 0.006
 
 L<Log::ger::Output::LogDispatchOutput> 0.001
 
-L<Log::ger::Output::Null> 0.012
+L<Log::ger::Output::Null> 0.016
 
 L<Log::ger::Output::Screen> 0.005
 
-L<Log::ger::Output::String> 0.012
+L<Log::ger::Output::String> 0.016
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -281,31 +284,31 @@ Benchmark with default options (C<< bencher -m LogGer::OutputStartup >>):
  +-----------------------------+-----------+-----------+------------+-----------+---------+
  | participant                 | rate (/s) | time (ms) | vs_slowest |  errors   | samples |
  +-----------------------------+-----------+-----------+------------+-----------+---------+
- | init-with-FileWriteRotate   |      20.4 |      49   |        1   | 4.3e-05   |      20 |
- | init-with-LogDispatchOutput |      35   |      29   |        1.7 | 4.6e-05   |      20 |
- | init-with-LogAny            |      53   |      19   |        2.6 |   5e-05   |      21 |
- | init-with-Composite         |      56   |      18   |        2.7 |   0.00011 |      20 |
- | init-with-DirWriteRotate    |      60   |      17   |        2.9 | 7.8e-05   |      21 |
- | init-with-Screen            |      78   |      13   |        3.8 | 5.1e-05   |      20 |
- | init-with-File              |      78   |      13   |        3.8 | 4.3e-05   |      20 |
- | init-with-Null              |      79   |      13   |        3.9 | 5.7e-05   |      21 |
- | init-with-Array             |      79   |      13   |        3.9 | 3.6e-05   |      20 |
- | init-with-String            |      79   |      13   |        3.9 | 4.2e-05   |      20 |
- | init-with-Callback          |      80   |      12   |        3.9 | 4.1e-05   |      20 |
- | init-with-ArrayWithLimits   |      80   |      12   |        3.9 | 3.7e-05   |      20 |
- | load-Screen                 |      90   |      11   |        4.4 | 1.5e-05   |      20 |
- | load-LogDispatchOutput      |      91   |      11   |        4.5 | 2.7e-05   |      20 |
- | load-Composite              |     120   |       8.5 |        5.7 | 2.8e-05   |      20 |
- | load-LogAny                 |     130   |       7.8 |        6.3 | 3.6e-05   |      20 |
- | load-File                   |     130   |       7.8 |        6.3 | 2.2e-05   |      20 |
- | load-FileWriteRotate        |     130   |       7.7 |        6.3 | 1.6e-05   |      20 |
- | load-String                 |     130   |       7.7 |        6.4 | 1.6e-05   |      21 |
- | load-Array                  |     130   |       7.7 |        6.4 | 3.7e-05   |      20 |
- | load-ArrayWithLimits        |     130   |       7.6 |        6.4 | 9.9e-06   |      20 |
- | load-Callback               |     130   |       7.6 |        6.4 | 2.5e-05   |      21 |
- | load-DirWriteRotate         |     130   |       7.5 |        6.5 | 2.3e-05   |      20 |
- | load-Null                   |     190   |       5.4 |        9.1 | 2.1e-05   |      20 |
- | baseline                    |     200   |       5   |        9.7 | 7.4e-06   |      20 |
+ | init-with-FileWriteRotate   |        19 |      54   |        1   |   0.00014 |      20 |
+ | init-with-LogDispatchOutput |        31 |      32   |        1.7 | 9.1e-05   |      22 |
+ | init-with-LogAny            |        46 |      22   |        2.5 | 7.5e-05   |      21 |
+ | init-with-Composite         |        48 |      21   |        2.6 | 9.8e-05   |      20 |
+ | init-with-DirWriteRotate    |        51 |      19   |        2.8 | 8.4e-05   |      20 |
+ | init-with-String            |        66 |      15   |        3.5 | 4.9e-05   |      20 |
+ | init-with-Null              |        66 |      15   |        3.6 | 5.3e-05   |      20 |
+ | init-with-Screen            |        67 |      15   |        3.6 | 5.1e-05   |      21 |
+ | init-with-File              |        67 |      15   |        3.6 | 4.2e-05   |      20 |
+ | init-with-Array             |        67 |      15   |        3.6 | 3.3e-05   |      21 |
+ | init-with-ArrayWithLimits   |        67 |      15   |        3.6 | 2.2e-05   |      20 |
+ | init-with-Callback          |        68 |      15   |        3.7 | 7.3e-05   |      20 |
+ | load-Screen                 |        75 |      13   |        4   | 3.7e-05   |      20 |
+ | load-LogDispatchOutput      |        76 |      13   |        4.1 | 5.7e-05   |      21 |
+ | load-Composite              |        95 |      11   |        5.1 |   3e-05   |      20 |
+ | load-Callback               |       100 |       9.8 |        5.5 | 3.9e-05   |      20 |
+ | load-DirWriteRotate         |       100 |       9.6 |        5.6 | 2.4e-05   |      20 |
+ | load-File                   |       100 |       9.6 |        5.6 | 2.6e-05   |      20 |
+ | load-ArrayWithLimits        |       100 |       9.6 |        5.6 | 3.4e-05   |      20 |
+ | load-LogAny                 |       110 |       9.5 |        5.7 | 1.4e-05   |      21 |
+ | load-FileWriteRotate        |       110 |       9.5 |        5.7 | 1.5e-05   |      20 |
+ | load-String                 |       110 |       9.5 |        5.7 | 5.2e-05   |      20 |
+ | load-Array                  |       110 |       9.5 |        5.7 | 1.8e-05   |      20 |
+ | load-Null                   |       140 |       7.1 |        7.6 | 2.4e-05   |      20 |
+ | baseline                    |       150 |       6.7 |        8   | 1.7e-05   |      20 |
  +-----------------------------+-----------+-----------+------------+-----------+---------+
 
 
@@ -315,19 +318,19 @@ Benchmark module startup overhead (C<< bencher -m LogGer::OutputStartup --module
  +-------------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
  | participant                         | proc_private_dirty_size (kB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +-------------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Output::Screen            | 864                          | 4.2                | 16             |      11   |                    6   |        1   | 1.7e-05 |      26 |
- | Log::ger::Output::LogDispatchOutput | 856                          | 4.1                | 16             |      11   |                    6   |        1   | 2.3e-05 |      20 |
- | Log::ger::Output::Composite         | 856                          | 4.2                | 16             |       8.6 |                    3.6 |        1.3 | 3.2e-05 |      20 |
- | Log::ger::Output::String            | 864                          | 4.2                | 16             |       7.8 |                    2.8 |        1.4 | 3.1e-05 |      20 |
- | Log::ger::Output::File              | 864                          | 4.1                | 16             |       7.8 |                    2.8 |        1.4 | 3.3e-05 |      20 |
- | Log::ger::Output::Callback          | 860                          | 4.1                | 16             |       7.7 |                    2.7 |        1.4 | 3.2e-05 |      20 |
- | Log::ger::Output::ArrayWithLimits   | 860                          | 4.1                | 16             |       7.7 |                    2.7 |        1.4 | 2.8e-05 |      21 |
- | Log::ger::Output::DirWriteRotate    | 864                          | 4.1                | 16             |       7.7 |                    2.7 |        1.4 | 2.4e-05 |      20 |
- | Log::ger::Output::LogAny            | 1000                         | 4.3                | 16             |       7.7 |                    2.7 |        1.4 | 2.1e-05 |      20 |
- | Log::ger::Output::FileWriteRotate   | 1000                         | 4.3                | 16             |       7.7 |                    2.7 |        1.4 | 2.9e-05 |      20 |
- | Log::ger::Output::Array             | 860                          | 4.1                | 16             |       7.6 |                    2.6 |        1.4 | 2.1e-05 |      20 |
- | Log::ger::Output::Null              | 856                          | 4.1                | 16             |       5.3 |                    0.3 |        2.1 | 6.7e-06 |      20 |
- | perl -e1 (baseline)                 | 844                          | 4.1                | 16             |       5   |                    0   |        2.2 | 6.5e-06 |      20 |
+ | Log::ger::Output::Screen            | 864                          | 4.2                | 16             |      14   |                    7.3 |        1   | 6.7e-05 |      20 |
+ | Log::ger::Output::LogDispatchOutput | 860                          | 4.2                | 16             |      13   |                    6.3 |        1   | 3.3e-05 |      20 |
+ | Log::ger::Output::Composite         | 860                          | 4.1                | 16             |      11   |                    4.3 |        1.3 |   3e-05 |      20 |
+ | Log::ger::Output::LogAny            | 1000                         | 4.3                | 16             |       9.7 |                    3   |        1.4 | 2.8e-05 |      20 |
+ | Log::ger::Output::File              | 864                          | 4.1                | 16             |       9.7 |                    3   |        1.4 | 3.5e-05 |      20 |
+ | Log::ger::Output::String            | 864                          | 4.2                | 16             |       9.6 |                    2.9 |        1.4 | 2.2e-05 |      23 |
+ | Log::ger::Output::ArrayWithLimits   | 856                          | 4.2                | 16             |       9.6 |                    2.9 |        1.4 | 2.5e-05 |      20 |
+ | Log::ger::Output::Callback          | 856                          | 4.1                | 16             |       9.5 |                    2.8 |        1.4 | 2.6e-05 |      20 |
+ | Log::ger::Output::DirWriteRotate    | 868                          | 4.1                | 16             |       9.4 |                    2.7 |        1.4 | 1.5e-05 |      22 |
+ | Log::ger::Output::Array             | 860                          | 4.2                | 16             |       9.4 |                    2.7 |        1.4 | 1.2e-05 |      20 |
+ | Log::ger::Output::FileWriteRotate   | 1004                         | 4.3                | 16             |       9.3 |                    2.6 |        1.4 | 1.4e-05 |      20 |
+ | Log::ger::Output::Null              | 860                          | 4.1                | 16             |       7   |                    0.3 |        1.9 |   1e-05 |      20 |
+ | perl -e1 (baseline)                 | 844                          | 4.1                | 16             |       6.7 |                    0   |        2   | 2.5e-05 |      20 |
  +-------------------------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 

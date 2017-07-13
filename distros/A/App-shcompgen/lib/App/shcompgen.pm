@@ -1,13 +1,13 @@
 package App::shcompgen;
 
-our $DATE = '2016-12-03'; # DATE
-our $VERSION = '0.30'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.31'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::Slurper qw(read_text write_text);
 use Perinci::Object;
@@ -263,7 +263,7 @@ sub _gen_completion_script {
             skip_detect => 1,
         );
         if ($dump_res->[0] != 200) {
-            $log->errorf("Can't dump Getopt::Long script '%s': %s", $progpath, $dump_res);
+            log_error("Can't dump Getopt::Long script '%s': %s", $progpath, $dump_res);
             $script = "# Can't dump Getopt::Long script '$progpath': $dump_res->[0] - $dump_res->[1]\n";
             goto L1;
         }
@@ -295,7 +295,7 @@ sub _gen_completion_script {
             skip_detect => 1,
         );
         if ($dump_res->[0] != 200) {
-            $log->errorf("Can't dump Getopt::Std script '%s': %s", $progpath, $dump_res);
+            log_error("Can't dump Getopt::Std script '%s': %s", $progpath, $dump_res);
             $script = "# Can't dump Getopt::Std script '$progpath': $dump_res->[0] - $dump_res->[1]\n";
             goto L1;
         }
@@ -363,11 +363,11 @@ complete -F _|."$prog $qprog".q|
                         skip_detect => 1,
                     );
                     if ($res->[0] == 200) {
-                        $log->debugf("Using per-option completion script for '%s'", $prog);
+                        log_debug("Using per-option completion script for '%s'", $prog);
                         $script = $res->[2];
                         last GEN_ZSH;
                     } else {
-                        $log->debugf("Can't generate per-option completion script for '%s': %s, falling back", $prog, $res);
+                        log_debug("Can't generate per-option completion script for '%s': %s, falling back", $prog, $res);
                     }
                 } elsif ($detres->[3]{'func.completer_type'} =~ /^Getopt::Long::Descriptive/) {
                     require Complete::Zsh::Gen::FromGetoptLongDescriptive;
@@ -376,11 +376,11 @@ complete -F _|."$prog $qprog".q|
                         skip_detect => 1,
                     );
                     if ($res->[0] == 200) {
-                        $log->debugf("Using per-option completion script for '%s'", $prog);
+                        log_debug("Using per-option completion script for '%s'", $prog);
                         $script = $res->[2];
                         last GEN_ZSH;
                     } else {
-                        $log->debugf("Can't generate per-option completion script for '%s': %s, falling back", $prog, $res);
+                        log_debug("Can't generate per-option completion script for '%s': %s, falling back", $prog, $res);
                     }
                 }
             }
@@ -421,11 +421,11 @@ _|.$prog.q| "$@"
                         skip_detect => 1,
                     );
                     if ($res->[0] == 200) {
-                        $log->debugf("Using per-option completion script for '%s'", $prog);
+                        log_debug("Using per-option completion script for '%s'", $prog);
                         $script = $res->[2];
                         last GEN_FISH;
                     } else {
-                        $log->debugf("Can't generate per-option completion script for '%s': %s, falling back", $prog, $res);
+                        log_debug("Can't generate per-option completion script for '%s': %s, falling back", $prog, $res);
                     }
                 } elsif ($detres->[3]{'func.completer_type'} =~ /^Getopt::Long::Descriptive/) {
                     require Complete::Fish::Gen::FromGetoptLongDescriptive;
@@ -434,11 +434,11 @@ _|.$prog.q| "$@"
                         skip_detect => 1,
                     );
                     if ($res->[0] == 200) {
-                        $log->debugf("Using per-option completion script for '%s'", $prog);
+                        log_debug("Using per-option completion script for '%s'", $prog);
                         $script = $res->[2];
                         last GEN_FISH;
                     } else {
-                        $log->debugf("Can't generate per-option completion script for '%s': %s, falling back", $prog, $res);
+                        log_debug("Can't generate per-option completion script for '%s': %s, falling back", $prog, $res);
                     }
                 }
             }
@@ -646,12 +646,12 @@ sub _generate_or_remove {
   PROG:
     for my $prog0 (@{ $args{prog} }) {
         my ($prog, $progpath);
-        $log->debugf("Processing program %s ...", $prog0);
+        log_debug("Processing program %s ...", $prog0);
         if ($prog0 =~ m!/!) {
             ($prog = $prog0) =~ s!.+/!!;
             $progpath = $prog0;
             unless (-f $progpath) {
-                $log->errorf("No such file %s, skipped", $progpath);
+                log_error("No such file %s, skipped", $progpath);
                 $envres->add_result(404, "No such file", {item_id=>$prog0});
                 next PROG;
             }
@@ -660,7 +660,7 @@ sub _generate_or_remove {
             $prog = $prog0;
             $progpath = File::Which::which($prog0);
             unless ($progpath) {
-                $log->errorf("'%s' not found in PATH, skipped", $prog0);
+                log_error("'%s' not found in PATH, skipped", $prog0);
                 $envres->add_result(404, "Not in PATH", {item_id=>$prog0});
                 next PROG;
             }
@@ -670,12 +670,12 @@ sub _generate_or_remove {
         if ($which eq 'generate') {
             my $detres = _detect_prog(prog=>$prog, progpath=>$progpath, shell=>$args{shell});
             if ($detres->[0] != 200) {
-                $log->errorf("Can't detect '%s': %s", $prog, $detres->[1]);
+                log_error("Can't detect '%s': %s", $prog, $detres->[1]);
                 $envres->add_result($detres->[0], $detres->[1],
                                     {item_id=>$prog0});
                 next PROG;
             }
-            $log->debugf("Detection result for '%s': %s", $prog, $detres);
+            log_debug("Detection result for '%s': %s", $prog, $detres);
             if (!$detres->[2]) {
                 if ($args{remove}) {
                     $which = 'remove';
@@ -697,12 +697,12 @@ sub _generate_or_remove {
 
             if (-f $comppath) {
                 if (!$args{replace}) {
-                    $log->infof("Not replacing completion script for $prog in '$comppath' (use --replace to replace)");
+                    log_info("Not replacing completion script for $prog in '$comppath' (use --replace to replace)");
                     $envres->add_result(304, "Not replaced (already exists)", {item_id=>$prog0});
                     next PROG;
                 }
             }
-            $log->infof("Writing completion script to %s ...", $comppath);
+            log_info("Writing completion script to %s ...", $comppath);
             $written_files{$comppath}++;
             eval { write_text($comppath, $script) };
             if ($@) {
@@ -711,7 +711,7 @@ sub _generate_or_remove {
                 next PROG;
             }
             for my $hs (@helper_scripts) {
-                $log->infof("Writing helper script %s ...", $hs->{path});
+                log_info("Writing helper script %s ...", $hs->{path});
                 $written_files{$hs->{path}}++;
                 eval {
                     write_text($hs->{path}, $hs->{content});
@@ -730,7 +730,7 @@ sub _generate_or_remove {
         if ($which eq 'remove') {
             my $comppath = _completion_script_path(%args, prog => $prog);
             unless (-f $comppath) {
-                $log->debugf("Skipping %s (completion script does not exist)", $prog0);
+                log_debug("Skipping %s (completion script does not exist)", $prog0);
                 $envres->add_result(304, "Completion does not exist", {item_id=>$prog0});
                 next PROG;
             }
@@ -741,7 +741,7 @@ sub _generate_or_remove {
                 next;
             };
             unless ($content =~ /^# FRAGMENT id=shcompgen-header note=(.+)\b/m) {
-                $log->debugf("Skipping %s, not installed by us", $prog0);
+                log_debug("Skipping %s, not installed by us", $prog0);
                 $envres->add_result(304, "Not installed by us", {item_id=>$prog0});
                 next PROG;
             }
@@ -749,7 +749,7 @@ sub _generate_or_remove {
                 # not removing files we already wrote
                 next PROG;
             }
-            $log->infof("Unlinking %s ...", $comppath);
+            log_info("Unlinking %s ...", $comppath);
             unless (unlink $comppath) {
                 $envres->add_result(500, "Can't unlink '$comppath': $!",
                                     {item_id=>$prog0});
@@ -759,7 +759,7 @@ sub _generate_or_remove {
             # shells' completion scripts using this
             while ($content =~ /^# FRAGMENT id=shcompgen-helper-\d+ path=(.+)/mg) {
                 my $hspath = $1;
-                $log->infof("Unlinking helper script %s ...", $1);
+                log_info("Unlinking helper script %s ...", $1);
                 unless (unlink $hspath) {
                     $envres->add_result(500, "Can't unlink helper script '$hspath': $!",
                                         {item_id=>$prog0});
@@ -777,7 +777,7 @@ sub _generate_or_remove {
         if ($args{shell} eq 'tcsh') {
             my $init_script_path = _tcsh_init_script_path(%args);
             my $init_script = _gen_tcsh_init_script(%args);
-            $log->debugf("Re-writing init script %s ...", $init_script_path);
+            log_debug("Re-writing init script %s ...", $init_script_path);
             write_text($init_script_path, $init_script);
         }
     }
@@ -953,7 +953,7 @@ _
     for my $dir (@$dirs) {
         unless (-d $dir) {
             require File::Path;
-            $log->tracef("Creating directory %s ...", $dir);
+            log_trace("Creating directory %s ...", $dir);
             File::Path::make_path($dir)
                   or return [500, "Can't create $dir: $!"];
             $instruction .= "Directory '$dir' created.\n\n";
@@ -1044,7 +1044,7 @@ sub list {
     my $resmeta = {};
     my $dirs = _completion_scripts_dirs(%args);
     for my $dir (@$dirs) {
-        $log->debugf("Opening dir %s ...", $dir);
+        log_debug("Opening dir %s ...", $dir);
         opendir my($dh), $dir or return [500, "Can't read dir '$dir': $!"];
         for my $entry (readdir $dh) {
             next if $entry eq '.' || $entry eq '..';
@@ -1061,15 +1061,15 @@ sub list {
             # XXX refactor: put to function (_read_completion_script)
             my $comppath = _completion_script_path(
                 %args, dir=>$dir, prog=>$prog);
-            $log->debugf("Checking completion script '%s' ...", $comppath);
+            log_debug("Checking completion script '%s' ...", $comppath);
             my $content;
             eval { $content = read_text($comppath) };
             if ($@) {
-                $log->warnf("Can't open file '%s': %s", $comppath, $@);
+                log_warn("Can't open file '%s': %s", $comppath, $@);
                 next;
             };
             unless ($content =~ /^# FRAGMENT id=shcompgen-header note=(.+)(?:\s|$)/m) {
-                $log->debugf("Skipping prog %s, not generated by us", $entry);
+                log_debug("Skipping prog %s, not generated by us", $entry);
                 next;
             }
             my $note = $1;
@@ -1142,12 +1142,16 @@ App::shcompgen - Generate shell completion scripts
 
 =head1 VERSION
 
-This document describes version 0.30 of App::shcompgen (from Perl distribution App-shcompgen), released on 2016-12-03.
+This document describes version 0.31 of App::shcompgen (from Perl distribution App-shcompgen), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 detect_prog(%args) -> [status, msg, result, meta]
+=head2 detect_prog
+
+Usage:
+
+ detect_prog(%args) -> [status, msg, result, meta]
 
 Detect a program.
 
@@ -1177,7 +1181,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 generate(%args) -> [status, msg, result, meta]
+=head2 generate
+
+Usage:
+
+ generate(%args) -> [status, msg, result, meta]
 
 Generate shell completion scripts for detectable programs.
 
@@ -1293,7 +1301,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 guess_shell() -> [status, msg, result, meta]
+=head2 guess_shell
+
+Usage:
+
+ guess_shell() -> [status, msg, result, meta]
 
 Guess running shell.
 
@@ -1313,7 +1325,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 init(%args) -> [status, msg, result, meta]
+=head2 init
+
+Usage:
+
+ init(%args) -> [status, msg, result, meta]
 
 Initialize shcompgen.
 
@@ -1407,7 +1423,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list(%args) -> [status, msg, result, meta]
+=head2 list
+
+Usage:
+
+ list(%args) -> [status, msg, result, meta]
 
 List all shell completion scripts generated by this script.
 
@@ -1500,7 +1520,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 remove(%args) -> [status, msg, result, meta]
+=head2 remove
+
+Usage:
+
+ remove(%args) -> [status, msg, result, meta]
 
 Remove shell completion scripts generated by this script.
 
@@ -1619,7 +1643,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

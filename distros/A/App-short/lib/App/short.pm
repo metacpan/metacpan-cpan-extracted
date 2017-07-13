@@ -1,12 +1,12 @@
 package App::short;
 
-our $DATE = '2017-01-13'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.14'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 # just for testing DZP:Preload
 use constant PRELOAD => $ENV{PRELOAD};
@@ -463,7 +463,7 @@ App::short - Manage short directory symlinks
 
 =head1 VERSION
 
-This document describes version 0.13 of App::short (from Perl distribution App-short), released on 2017-01-13.
+This document describes version 0.14 of App::short (from Perl distribution App-short), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -472,7 +472,11 @@ Please see L<short> script.
 =head1 FUNCTIONS
 
 
-=head2 add_short(%args) -> [status, msg, result, meta]
+=head2 add_short
+
+Usage:
+
+ add_short(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -504,7 +508,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_short_target(%args) -> [status, msg, result, meta]
+=head2 get_short_target
+
+Usage:
+
+ get_short_target(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -534,7 +542,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_duplicates(%args) -> [status, msg, result, meta]
+=head2 list_duplicates
+
+Usage:
+
+ list_duplicates(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -564,7 +576,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_longs(%args) -> [status, msg, result, meta]
+=head2 list_longs
+
+Usage:
+
+ list_longs(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -594,7 +610,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_missing(%args) -> [status, msg, result, meta]
+=head2 list_missing
+
+Usage:
+
+ list_missing(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -624,7 +644,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_shorts(%args) -> [status, msg, result, meta]
+=head2 list_shorts
+
+Usage:
+
+ list_shorts(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -658,7 +682,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 rm_short(%args) -> [status, msg, result, meta]
+=head2 rm_short
+
+Usage:
+
+ rm_short(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -693,7 +721,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-short>
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-App-projdir>.
+Source repository is at L<https://github.com/perlancar/perl-App-short>.
 
 =head1 BUGS
 
@@ -709,7 +737,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

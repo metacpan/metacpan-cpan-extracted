@@ -1,6 +1,8 @@
-package Pod::Weaver::Section::Requires 0.02;
+package Pod::Weaver::Section::Requires;
 # ABSTRACT: Add Pod::Weaver section with all used modules from package excluding listed ones
-$Pod::Weaver::Section::Requires::VERSION = '0.02';
+
+our $VERSION = 0.03;
+
 
 use strict;
 use warnings;
@@ -106,7 +108,7 @@ Pod::Weaver::Section::Requires - Add Pod::Weaver section with all used modules f
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -136,7 +138,7 @@ Milan Sorm <sorm@is4u.cz>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014-2016 by Milan Sorm.
+This software is copyright (c) 2014-2017 by Milan Sorm.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

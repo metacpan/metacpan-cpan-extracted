@@ -304,6 +304,29 @@ or:
 		writer   => '_set_status',
 	);
 
+=head2 file_system_delay
+
+Shared files systems can have a delay period during which an action
+on the file system is not yet visible to another node sharing that
+file system.  This is common for NFS shared file systems, for
+example.
+
+The file_system_delay attribute can be given a non-zero number of
+seconds to indicate the amount of time to wait to ensure that
+actions taken on another node are visible.
+
+This is used for internal actions such as validating that required
+stage output files have been created.
+
+=cut
+
+	has 'file_system_delay' => (
+		is       => 'ro',
+		isa      => 'Int',
+		lazy     => 1,
+		default  => 0,
+	);
+
 #### Internal attributes
 
 	has '_stages' => (

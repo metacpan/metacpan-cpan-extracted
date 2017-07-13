@@ -12,11 +12,11 @@ Iterator for Async stream
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -31,7 +31,7 @@ Creating and managing item for Async::Stream
 
 =head2 new($stream)
 
-Constructor creates instanse of class. 
+Constructor creates instance of class. 
 Class method gets 1 arguments stream from which will be created iterator.
 
   my $iterator = Async::Stream::Iterator->new($stream);

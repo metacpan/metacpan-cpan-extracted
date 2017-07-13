@@ -56,7 +56,7 @@
    "provides" : {
       "PerlIO::http" : {
          "file" : "lib/PerlIO/http.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/Leont/perlio-http"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Leon Timmermans <fawaka@gmail.com>"
    ],

@@ -32,4 +32,6 @@ marc_map('260h','has_260h', value:'BAD')
 marc_map('500^c','has_500_not_c', value: 'OK')
 marc_map('500^a','has_500_not_a', value: 'BAD')
 
+marc_map('008/0','has_800_0')
+
 marc_xml('record')

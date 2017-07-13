@@ -1,6 +1,6 @@
 #############################################################################
 #################         Easy Debugging Module        ######################
-################# Copyright 2013 - 2016 Richard Kelsch ######################
+################# Copyright 2013 - 2017 Richard Kelsch ######################
 #################          All Rights Reserved         ######################
 #############################################################################
 ####### Licensing information available near the end of this file. ##########
@@ -19,7 +19,11 @@ use Term::ANSIColor;
 use Log::Fast;
 use Time::HiRes qw(time);
 use File::Basename;
+
+# "Data::Dumper::Simple" gives better output for debugging, but at a startup cost.
+# It falls back to the default "Data::Dumper" if the "Simple" variant isn't available.
 use Best qw(Data::Dumper::Simple Data::Dumper);
+
 use Config;
 use threads;
 
@@ -27,7 +31,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = 1.18;
+    our $VERSION = '1.19';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -38,6 +42,9 @@ BEGIN {
     # Functions and variables which can be optionally exported
     our @EXPORT_OK = qw(@Levels);
 } ## end BEGIN
+
+$Data::Dumper::Sortkeys = TRUE;
+$Data::Dumper::Purity   = TRUE;
 
 # This can be optionally exported for whatever
 our @Levels = qw( ERR WARN NOTICE INFO VERBOSE DEBUG DEBUGMAX );

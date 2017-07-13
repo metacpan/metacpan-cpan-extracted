@@ -59,7 +59,7 @@ Test::Data::Sah::Format - Test routines for testing Data::Sah::Format::* modules
 
 =head1 VERSION
 
-This document describes version 0.002 of Test::Data::Sah::Format (from Perl distribution Data-Sah-Format), released on 2016-06-17.
+This document describes version 0.003 of Test::Data::Sah::Format (from Perl distribution Data-Sah-Format), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
@@ -87,7 +87,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

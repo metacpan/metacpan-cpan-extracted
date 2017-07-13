@@ -1,4 +1,9 @@
-Revision history for Media-Info-Ffmpeg
+0.005   2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Log::Any with Log::ger.
+
 
 0.004   2016-11-28 (PERLANCAR)
 

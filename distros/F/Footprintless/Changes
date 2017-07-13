@@ -1,5 +1,9 @@
 Revision history for Perl module Footprintless
 
+1.25 2017-07-10
+
+    - resolved https://github.com/lucastheisen/footprintless/issues/4 get_entity fails if value is falsey
+
 1.24 2017-03-16
 
     - resolved https://github.com/lucastheisen/footprintless/issues/3 Add support for one action to be applied to multiple services in one call

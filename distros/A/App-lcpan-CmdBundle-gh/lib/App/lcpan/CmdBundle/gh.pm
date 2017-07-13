@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::gh;
 
-our $DATE = '2017-01-23'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to GitHub
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::gh - More lcpan subcommands related to GitHub
 
 =head1 VERSION
 
-This document describes version 0.003 of App::lcpan::CmdBundle::gh (from Perl distribution App-lcpan-CmdBundle-gh), released on 2017-01-23.
+This document describes version 0.004 of App::lcpan::CmdBundle::gh (from Perl distribution App-lcpan-CmdBundle-gh), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -28,9 +28,9 @@ This bundle provides the following lcpan subcommands:
 
 =over
 
-=item * L<lcpan gh-clone|App::lcpan::Cmd::gh_clone>
-
 =item * L<lcpan gh-open|App::lcpan::Cmd::gh_open>
+
+=item * L<lcpan gh-clone|App::lcpan::Cmd::gh_clone>
 
 =back
 

@@ -1,12 +1,12 @@
 package Perinci::Examples;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use List::Util qw(min max);
 use Perinci::Object;
@@ -160,6 +160,8 @@ _
     },
 };
 sub randlog {
+    no strict 'refs';
+
     my %args      = @_; # NO_VALIDATE_ARGS
     my $n         = $args{n} // 10;
     $n = 1000 if $n > 1000;
@@ -171,9 +173,10 @@ sub randlog {
     for my $i (1..$n) {
         my $num_level = int($min_level + rand()*($max_level-$min_level+1));
         my $str_level = $str_levels{$num_level};
-        $log->$str_level("($i/$n) This is random log message #$i, ".
-                             "level=$num_level ($str_level): ".
-                                 int(rand()*9000+1000));
+        my $logfunc = "log_$str_level";
+        &{$logfunc}("($i/$n) This is random log message #$i, ".
+                        "level=$num_level ($str_level): ".
+                        int(rand()*9000+1000));
     }
     [200, "OK", "$n log message(s) produced"];
 }
@@ -649,7 +652,7 @@ _
 };
 sub merge_hash {
     my %args = @_;
-    my $h1 = $args{h1}; no warnings ('void');require Data::Sah::Compiler::perl::TH::hash;my $arg_err; ((defined($h1)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($h1) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for h1: $arg_err"] } # VALIDATE_ARG
+    my $h1 = $args{h1}; no warnings ('void');my $arg_err; ((defined($h1)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($h1) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for h1: $arg_err"] } # VALIDATE_ARG
     my $h2 = $args{h2}; no warnings ('void');((defined($h2)) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((ref($h2) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0)); if ($arg_err) { return [400, "Invalid argument value for h2: $arg_err"] } # VALIDATE_ARG
 
     [200, "OK", {%$h1, %$h2}];
@@ -676,7 +679,7 @@ $SPEC{test_validate_args} = {
     "x.perinci.sub.wrapper.disable_validate_args" => 1,
 };
 sub test_validate_args {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::int;require Scalar::Util::Numeric;my $arg_err; if (exists($args{'a'})) { (!defined($args{'a'}) ? 1 :  ((Scalar::Util::Numeric::isint($args{'a'})) ? 1 : (($arg_err //= "Not of type integer"),0))); if ($arg_err) { return [400, "Invalid argument value for a: $arg_err"] } }no warnings ('void');require Data::Sah::Compiler::perl::TH::str;if (exists($args{'b'})) { (!defined($args{'b'}) ? 1 :  ((!ref($args{'b'})) ? 1 : (($arg_err //= "Not of type text"),0)) && ((length($args{'b'}) >= 2) ? 1 : (($arg_err //= "Length must be at least 2"),0))); if ($arg_err) { return [400, "Invalid argument value for b: $arg_err"] } }no warnings ('void');require Data::Sah::Compiler::perl::TH::hash;if (exists($args{'h1'})) { (!defined($args{'h1'}) ? 1 :  ((ref($args{'h1'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0))); if ($arg_err) { return [400, "Invalid argument value for h1: $arg_err"] } }# VALIDATE_ARGS
+    my %args = @_; no warnings ('void');require Scalar::Util::Numeric;my $arg_err; if (exists($args{'a'})) { (!defined($args{'a'}) ? 1 :  ((Scalar::Util::Numeric::isint($args{'a'})) ? 1 : (($arg_err //= "Not of type integer"),0))); if ($arg_err) { return [400, "Invalid argument value for a: $arg_err"] } }no warnings ('void');if (exists($args{'b'})) { (!defined($args{'b'}) ? 1 :  ((!ref($args{'b'})) ? 1 : (($arg_err //= "Not of type text"),0)) && ((length($args{'b'}) >= 2) ? 1 : (($arg_err //= "Length must be at least 2"),0))); if ($arg_err) { return [400, "Invalid argument value for b: $arg_err"] } }no warnings ('void');if (exists($args{'h1'})) { (!defined($args{'h1'}) ? 1 :  ((ref($args{'h1'}) eq 'HASH') ? 1 : (($arg_err //= "Not of type hash"),0))); if ($arg_err) { return [400, "Invalid argument value for h1: $arg_err"] } }# VALIDATE_ARGS
     [200];
 }
 
@@ -775,7 +778,7 @@ _
 };
 sub return_args {
     my %args = @_; # NO_VALIDATE_ARGS
-    $log->tracef("return_args() is called with arguments: %s", \%args);
+    log_trace("return_args() is called with arguments: %s", \%args);
     [200, "OK", \%args];
 }
 
@@ -1049,7 +1052,7 @@ _
     },
 };
 sub gen_random_bytes {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::int;require Scalar::Util::Numeric;my $arg_err; if (exists($args{'len'})) { ((defined($args{'len'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'len'})) ? 1 : (($arg_err //= "Not of type integer"),0)) && (($args{'len'} >= 0) ? 1 : (($arg_err //= "Must be at least 0"),0)); if ($arg_err) { return [400, "Invalid argument value for len: $arg_err"] } }# VALIDATE_ARGS
+    my %args = @_; no warnings ('void');require Scalar::Util::Numeric;my $arg_err; if (exists($args{'len'})) { ((defined($args{'len'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((Scalar::Util::Numeric::isint($args{'len'})) ? 1 : (($arg_err //= "Not of type integer"),0)) && (($args{'len'} >= 0) ? 1 : (($arg_err //= "Must be at least 0"),0)); if ($arg_err) { return [400, "Invalid argument value for len: $arg_err"] } }# VALIDATE_ARGS
     my $len = $args{len} // 1024;
     [200, "OK", join("", map {chr(256*rand())} 1..$len)];
 }
@@ -1095,7 +1098,7 @@ Perinci::Examples - Various examples of Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -1119,7 +1122,11 @@ Another paragraph with I<bold>, I<italic> text.
 =head1 FUNCTIONS
 
 
-=head2 arg_default(%args) -> [status, msg, result, meta]
+=head2 arg_default
+
+Usage:
+
+ arg_default(%args) -> [status, msg, result, meta]
 
 Demonstrate argument default value from default and/or schema.
 
@@ -1176,7 +1183,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 call_gen_array(%args) -> [status, msg, result, meta]
+=head2 call_gen_array
+
+Usage:
+
+ call_gen_array(%args) -> [status, msg, result, meta]
 
 Call gen_array().
 
@@ -1206,7 +1217,11 @@ that contains extra information.
 Return value:  (array[int])
 
 
-=head2 call_randlog(%args) -> [status, msg, result, meta]
+=head2 call_randlog
+
+Usage:
+
+ call_randlog(%args) -> [status, msg, result, meta]
 
 Call randlog().
 
@@ -1244,7 +1259,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 delay(%args) -> [status, msg, result, meta]
+=head2 delay
+
+Usage:
+
+ delay(%args) -> [status, msg, result, meta]
 
 Sleep, by default for 10 seconds.
 
@@ -1278,7 +1297,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 dies() -> [status, msg, result, meta]
+=head2 dies
+
+Usage:
+
+ dies() -> [status, msg, result, meta]
 
 Dies tragically.
 
@@ -1300,7 +1323,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 err(%args) -> [status, msg, result, meta]
+=head2 err
+
+Usage:
+
+ err(%args) -> [status, msg, result, meta]
 
 Return error response.
 
@@ -1328,7 +1355,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 gen_array(%args) -> [status, msg, result, meta]
+=head2 gen_array
+
+Usage:
+
+ gen_array(%args) -> [status, msg, result, meta]
 
 Generate an array of specified length.
 
@@ -1358,7 +1389,11 @@ that contains extra information.
 Return value:  (array[int])
 
 
-=head2 gen_hash(%args) -> [status, msg, result, meta]
+=head2 gen_hash
+
+Usage:
+
+ gen_hash(%args) -> [status, msg, result, meta]
 
 Generate a hash with specified number of pairs.
 
@@ -1388,7 +1423,11 @@ that contains extra information.
 Return value:  (array[int])
 
 
-=head2 gen_random_bytes(%args) -> [status, msg, result, meta]
+=head2 gen_random_bytes
+
+Usage:
+
+ gen_random_bytes(%args) -> [status, msg, result, meta]
 
 Generate random bytes of specified length.
 
@@ -1418,7 +1457,11 @@ that contains extra information.
 Return value:  (buf)
 
 
-=head2 gen_sample_data(%args) -> [status, msg, result, meta]
+=head2 gen_sample_data
+
+Usage:
+
+ gen_sample_data(%args) -> [status, msg, result, meta]
 
 Generate sample data of various form.
 
@@ -1463,7 +1506,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 merge_hash(%args) -> [status, msg, result, meta]
+=head2 merge_hash
+
+Usage:
+
+ merge_hash(%args) -> [status, msg, result, meta]
 
 Merge two hashes.
 
@@ -1504,7 +1551,11 @@ that contains extra information.
 Return value:  (hash)
 
 
-=head2 multi_status(%args) -> [status, msg, result, meta]
+=head2 multi_status
+
+Usage:
+
+ multi_status(%args) -> [status, msg, result, meta]
 
 Example for result metadata property `results`.
 
@@ -1534,7 +1585,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 noop(%args) -> [status, msg, result, meta]
+=head2 noop
+
+Usage:
+
+ noop(%args) -> [status, msg, result, meta]
 
 Do nothing, return original argument.
 
@@ -1571,7 +1626,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 noop2(%args) -> [status, msg, result, meta]
+=head2 noop2
+
+Usage:
+
+ noop2(%args) -> [status, msg, result, meta]
 
 Just like noop, but accepts several arguments.
 
@@ -1624,7 +1683,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 randlog(%args) -> [status, msg, result, meta]
+=head2 randlog
+
+Usage:
+
+ randlog(%args) -> [status, msg, result, meta]
 
 Produce some random Log::Any log messages.
 
@@ -1660,7 +1723,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 return_args(%args) -> [status, msg, result, meta]
+=head2 return_args
+
+Usage:
+
+ return_args(%args) -> [status, msg, result, meta]
 
 Return arguments.
 
@@ -1692,7 +1759,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 sum(%args) -> [status, msg, result, meta]
+=head2 sum
+
+Usage:
+
+ sum(%args) -> [status, msg, result, meta]
 
 Sum numbers in array.
 
@@ -1753,7 +1824,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 test_args_as_array($a0, $a1, $a2) -> [status, msg, result, meta]
+=head2 test_args_as_array
+
+Usage:
+
+ test_args_as_array($a0, $a1, $a2) -> [status, msg, result, meta]
 
 This function's metadata sets C<args_as> property to C<array>. This means it wants
 to accept argument as an array, like a regular Perl subroutine accepting
@@ -1785,7 +1860,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 test_args_as_arrayref([$a0, $a1, $a2]) -> [status, msg, result, meta]
+=head2 test_args_as_arrayref
+
+Usage:
+
+ test_args_as_arrayref([$a0, $a1, $a2]) -> [status, msg, result, meta]
 
 This function's metadata sets C<args_as> property to C<arrayref>. This is just
 like C<array>, except the whole argument list is passed in C<$_[0]>.
@@ -1816,7 +1895,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 test_args_as_hashref(\%args) -> [status, msg, result, meta]
+=head2 test_args_as_hashref
+
+Usage:
+
+ test_args_as_hashref(\%args) -> [status, msg, result, meta]
 
 This function's metadata sets C<args_as> property to C<hashref>. This is just like
 C<hash>, except the whole argument hash is passed in C<$_[0]>.
@@ -1845,7 +1928,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 test_binary(%args) -> [status, msg, result, meta]
+=head2 test_binary
+
+Usage:
+
+ test_binary(%args) -> [status, msg, result, meta]
 
 Accept and send binary data.
 
@@ -1901,7 +1988,11 @@ that contains extra information.
 Return value:  (buf)
 
 
-=head2 test_common_opts(%args) -> [status, msg, result, meta]
+=head2 test_common_opts
+
+Usage:
+
+ test_common_opts(%args) -> [status, msg, result, meta]
 
 This function has arguments with the same name as Perinci::CmdLine common options.
 
@@ -1955,7 +2046,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 test_completion(%args) -> [status, msg, result, meta]
+=head2 test_completion
+
+Usage:
+
+ test_completion(%args) -> [status, msg, result, meta]
 
 Do nothing, return args.
 
@@ -2073,7 +2168,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 test_dry_run() -> [status, msg, result, meta]
+=head2 test_dry_run
+
+Usage:
+
+ test_dry_run() -> [status, msg, result, meta]
 
 Will return 'wet' if not run under dry run mode, or 'dry' if dry run.
 
@@ -2109,7 +2208,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 test_result_naked(%args) -> any
+=head2 test_result_naked
+
+Usage:
+
+ test_result_naked(%args) -> any
 
 This function's metadata sets C<result_naked> to true. This means function
 returns just the value (e.g. C<42>) and not with envelope (e.g. C<[200,"OK",42]>).
@@ -2132,7 +2235,11 @@ Arguments ('*' denotes required arguments):
 Return value:  (any)
 
 
-=head2 test_validate_args(%args) -> [status, msg, result, meta]
+=head2 test_validate_args
+
+Usage:
+
+ test_validate_args(%args) -> [status, msg, result, meta]
 
 Does nothing, only here to test # VALIDATE_ARGS.
 
@@ -2162,7 +2269,11 @@ that contains extra information.
 Return value:  (str)
 
 
-=head2 undescribed_args(%args) -> [status, msg, result, meta]
+=head2 undescribed_args
+
+Usage:
+
+ undescribed_args(%args) -> [status, msg, result, meta]
 
 This function has several undescribed args.
 
@@ -2224,7 +2335,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

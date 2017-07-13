@@ -149,5 +149,7 @@ is $records->[0]->{my}{level2}{inverted}, 'black leatherblue pigskin', q|fix: ma
 is $records->[0]->{my}{level1}{inverted}, 'ebinding', q|fix: marc_spec('020[#]$a$q[#]/1-5', my.level1.inverted, invert:1);|;
 is $records->[0]->{my}{multi}{level1}{inverted}, 'bleatherbigskinebinding', q|fix: marc_spec('020[#]$a$q[0]/1-5$q[1]/1-5$q[2]/1-5', my.multi.level1.inverted, invert:1);|;
 
+is $records->[0]->{my}{nullvalue} , '0' , q|fix: marc_spec('008/0', my.nullvalue);|;
+
 
 done_testing;

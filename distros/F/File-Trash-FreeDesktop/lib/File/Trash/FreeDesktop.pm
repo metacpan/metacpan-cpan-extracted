@@ -1,12 +1,12 @@
 package File::Trash::FreeDesktop;
 
-our $DATE = '2015-08-17'; # DATE
-our $VERSION = '0.18'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.19'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Fcntl;
 use File::MoreUtil qw(file_exists l_abs_path);
@@ -29,7 +29,7 @@ sub _mk_trash {
     for ("", "/files", "/info") {
         my $d = "$trash_dir$_";
         unless (-d $d) {
-            $log->tracef("Creating directory %s ...", $d);
+            log_trace("Creating directory %s ...", $d);
             mkdir $d, 0700 or die "Can't mkdir $d: $!";
         }
     }
@@ -70,7 +70,7 @@ sub _select_trash {
     # try home trash
     if ($self->{_home_mp} eq $file_mp) {
         my $trash_dir = $self->_home_trash;
-        $log->tracef("Selected home trash for %s = %s", $afile, $trash_dir);
+        log_trace("Selected home trash for %s = %s", $afile, $trash_dir);
         $self->_mk_home_trash;
         return $trash_dir;
     }
@@ -84,7 +84,7 @@ sub _select_trash {
             next unless $mp eq $file_mp;
         }
         my $trash_dir = ($dir eq "/" ? "" : $dir) . "/.Trash-$>";
-        $log->tracef("Selected trash for %s = %s", $afile, $trash_dir);
+        log_trace("Selected trash for %s = %s", $afile, $trash_dir);
         $self->_mk_trash($trash_dir);
         return $trash_dir;
     }
@@ -229,7 +229,7 @@ sub trash {
     syswrite($fh, "[Trash Info]\nPath=$afile\nDeletionDate=$ts\n");
     close $fh or die "Can't write trash info for $name in $trash_dir: $!";
 
-    $log->tracef("Trashing %s -> %s ...", $afile, $tfile);
+    log_trace("Trashing %s -> %s ...", $afile, $tfile);
     unless (rename($afile, $tfile)) {
         unlink "$trash_dir/info/$name.trashinfo";
         die "Can't rename $afile to $tfile: $!";
@@ -275,7 +275,7 @@ sub recover {
     my $trash_dir = $res[0]{trash_dir};
     my $ifile = "$trash_dir/info/$res[0]{entry}.trashinfo";
     my $tfile = "$trash_dir/files/$res[0]{entry}";
-    $log->tracef("Recovering from trash %s -> %s ...", $tfile, $afile);
+    log_trace("Recovering from trash %s -> %s ...", $tfile, $afile);
     unless (rename($tfile, $afile)) {
         die "Can't rename $tfile to $afile: $!";
     }
@@ -332,7 +332,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.18 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2015-08-17.
+This document describes version 0.19 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -401,6 +401,11 @@ Some other notes:
 =item *
 
 =back
+
+=head1 NOTES
+
+Weird scenario: /PATH/.Trash-UID is mounted on its own scenario? How about
+/PATH/.Trash-UID/{files,info}.
 
 =head1 METHODS
 
@@ -526,10 +531,21 @@ die on errors.
 
 Return list of files erased.
 
-=head1 NOTES
+=head1 HOMEPAGE
 
-Weird scenario: /PATH/.Trash-UID is mounted on its own scenario? How about
-/PATH/.Trash-UID/{files,info}.
+Please visit the project's homepage at L<https://metacpan.org/release/File-Trash-FreeDesktop>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-File-Trash-FreeDesktop>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDesktop>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 SEE ALSO
 
@@ -557,29 +573,13 @@ undeletion function is provided at the time of this writing.
 
 =back
 
-=head1 HOMEPAGE
-
-Please visit the project's homepage at L<https://metacpan.org/release/File-Trash-FreeDesktop>.
-
-=head1 SOURCE
-
-Source repository is at L<https://github.com/sharyanto/perl-File-Trash-FreeDesktop>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDesktop>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+use PDF::Builder::Util;
+use PDF::Builder::Content;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my ($str);
+
+# create a "Hello World!" PDF called BASE
+my $pdf = PDF::Builder->new(-compress => $compress);
+my $f1 = $pdf->corefont('Verdana');
+
+my $page = $pdf->page();
+$page->mediabox(595,842);
+my $text = $page->text();
+$text->textlabel(50,780, $f1, 20, "Hello World!");
+
+$pdf->saveas("$0.BASE.pdf");
+$pdf->end();
+
+# open and read BASE, rewrite "Hello World! (2)", save as UPDATED
+$pdf = PDF::Builder->open("$0.BASE.pdf", -compress => $compress);
+$f1 = $pdf->corefont('Verdana');
+
+$page = $pdf->page();
+$page->mediabox(595,842);
+$text = $page->text();
+$text->textlabel(50,780, $f1, 20, "Hello World! (2)");
+
+$pdf->saveas("$0.UPDATED.pdf");
+$pdf->end();
+
+# open and read UPDATED, rewrite "Hello World! (3)", save as string $str
+$pdf = PDF::Builder->open("$0.UPDATED.pdf", -compress => $compress);
+$f1 = $pdf->corefont('Verdana');
+
+$page = $pdf->page();
+$page->mediabox(595,842);
+$text = $page->text();
+$text->textlabel(50,780, $f1, 20, "Hello World! (3)");
+
+$str = $pdf->stringify();
+$pdf->end();
+
+# open and read string $str, rewrite "Hello World! (4)", save as STRING
+$pdf = PDF::Builder->open_scalar($str, -compress => $compress);
+$f1 = $pdf->corefont('Verdana');
+
+$page = $pdf->page();
+$page->mediabox(595,842);
+$text = $page->text();
+$text->textlabel(50,780, $f1, 20, "Hello World! (4)");
+
+$pdf->saveas("$0.STRING.pdf");
+$pdf->end();
+
+exit;
+
+__END__

@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use PDF::Builder;
+use PDF::Builder::Util;
+
+#my $compress = 'none';  # no stream compression
+my $compress = 'flate';  # compressed stream
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+
+my $f1=$pdf->corefont('Helvetica', -encode=>'latin1');
+my $f2=$pdf->corefont('Helvetica-Bold', -encode=>'latin1');
+
+my $page = $pdf->page();
+$page->mediabox(595,842);
+
+my $txt = $page->text();
+$txt->font($f1, 20);
+
+# rises (up +, down -) are relative to original baseline, not previous text
+
+$txt->translate(50,800);
+$txt->text('normal text');
+$txt->rise(5);
+$txt->text('rise = 5 units');
+$txt->rise(-5);
+$txt->text('rise = -5 units');
+$txt->rise(0);
+
+$txt->translate(50,600);
+$txt->text('normal text');
+$txt->rise(10);
+$txt->text('rise = 10 units');
+$txt->rise(-10);
+$txt->text('rise = -10 units');
+$txt->rise(0);
+
+$txt->translate(50,400);
+$txt->text('normal text');
+$txt->rise(20);
+$txt->text('rise = 20 units');
+$txt->rise(-20);
+$txt->text('rise = -20 units');
+$txt->rise(0);
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__

@@ -1,5 +1,5 @@
 package Moose::Util;
-our $VERSION = '2.2005';
+our $VERSION = '2.2006';
 
 use strict;
 use warnings;
@@ -263,11 +263,11 @@ sub add_method_modifier {
         : find_meta($class_or_obj);
     my $code                = pop @{$args};
     my $add_modifier_method = 'add_' . $modifier_name . '_method_modifier';
-    if ( my $method_modifier_type = ref( @{$args}[0] ) ) {
+    if ( my $method_modifier_type = ref( $args->[0] ) ) {
         if ( $method_modifier_type eq 'Regexp' ) {
             my @all_methods = $meta->get_all_methods;
             my @matched_methods
-                = grep { $_->name =~ @{$args}[0] } @all_methods;
+                = grep { $_->name =~ $args->[0] } @all_methods;
             $meta->$add_modifier_method( $_->name, $code )
                 for @matched_methods;
         }
@@ -541,7 +541,7 @@ Moose::Util - Utilities for working with Moose classes
 
 =head1 VERSION
 
-version 2.2005
+version 2.2006
 
 =head1 SYNOPSIS
 

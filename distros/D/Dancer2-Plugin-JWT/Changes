@@ -1,3 +1,6 @@
+0.013  2017-07-10
+   - Make 'Authorization' header available to clients through ACEH.
+
 0.012  2017-07-07
    - Added example on using the exception hook
    - Fixed configuration file example, with comments on their own lines.

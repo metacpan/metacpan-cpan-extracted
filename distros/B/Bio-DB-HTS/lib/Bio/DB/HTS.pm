@@ -1283,7 +1283,7 @@ Rishi Nag E<lt>rishi@ebi.ac.ukE<gt>
 =cut
 
 package Bio::DB::HTS;
-$Bio::DB::HTS::VERSION = '2.8';
+$Bio::DB::HTS::VERSION = '2.9';
 
 use strict;
 use warnings;
@@ -1337,7 +1337,6 @@ sub new {
                        autoindex     => $autoindex,
                        force_refseq  => $force_refseq, },
       ref $class || $class;
-    my $b = $self->{hts_file};
     $self->header;    # catch it
     return $self;
 } ## end sub new
@@ -2079,7 +2078,7 @@ sub _glob_match {
 
 package Bio::DB::HTS::Fai;
 
-$Bio::DB::HTS::Fai::VERSION = '2.8';
+$Bio::DB::HTS::Fai::VERSION = '2.9';
 
 sub open { shift->load(@_) }
 
@@ -2096,7 +2095,7 @@ package Bio::SeqFeature::HTSCoverage;
 
 use base 'Bio::SeqFeature::Lite';
 
-$Bio::SeqFeature::HTSCoverage::VERSION = '2.8';
+$Bio::SeqFeature::HTSCoverage::VERSION = '2.9';
 
 sub coverage {
     my $self = shift;
@@ -2128,7 +2127,7 @@ sub gff3_string {
 
 package Bio::DB::HTSfile;
 
-$Bio::DB::HTS::HTSfile::VERSION = '2.8';
+$Bio::DB::HTS::HTSfile::VERSION = '2.9';
 
 use File::Spec;
 use Cwd;

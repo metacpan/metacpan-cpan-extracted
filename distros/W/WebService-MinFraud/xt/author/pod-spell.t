@@ -27,8 +27,7 @@ Client
 Country
 CreditCard
 Cronin
-DROLSKY
-DROLSKY's
+CustomInputs
 Data
 DateTime
 Dave
@@ -71,6 +70,8 @@ Issuer
 Jack
 Knop
 Location
+MAXMIND
+MAXMIND's
 Mark
 Mateu
 MaxMind

@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '2.0.1';
+$Git::Hooks::CheckJira::VERSION = '2.1.0';
 use 5.010;
 use utf8;
 use strict;
@@ -119,36 +119,39 @@ sub _disconnect_jira {
 sub check_codes {
     my ($git) = @_;
 
-    my @codes;
+    my $cache = $git->cache($PKG);
 
-  CODE:
-    foreach my $check ($git->get_config($CFG => 'check-code')) {
-        my $code;
-        if ($check =~ s/^file://) {
-            $code = do $check;
-            unless ($code) {
-                if (length $@) {
-                    $git->error($PKG, "couldn't parse option check-code ($check)", $@);
-                } elsif (! defined $code) {
-                    $git->error($PKG, "couldn't do option check-code ($check)", $!);
-                } else {
-                    $git->error($PKG, "couldn't run option check-code ($check)");
+    unless (exists $cache->{codes}) {
+        $cache->{codes} = [];
+      CODE:
+        foreach my $check ($git->get_config($CFG => 'check-code')) {
+            my $code;
+            if ($check =~ s/^file://) {
+                $code = do $check;
+                unless ($code) {
+                    if (length $@) {
+                        $git->error($PKG, "couldn't parse option check-code ($check)", $@);
+                    } elsif (! defined $code) {
+                        $git->error($PKG, "couldn't do option check-code ($check)", $!);
+                    } else {
+                        $git->error($PKG, "couldn't run option check-code ($check)");
+                    }
+                    next CODE;
                 }
-                next CODE;
-            }
-        } else {
-            $code = eval $check; ## no critic (BuiltinFunctions::ProhibitStringyEval)
-            length $@
-                and $git->error($PKG, "couldn't parse option check-code value", $@)
+            } else {
+                $code = eval $check; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+                length $@
+                    and $git->error($PKG, "couldn't parse option check-code value", $@)
                     and next CODE;
-        }
-        defined $code and ref $code and ref $code eq 'CODE'
-            or $git->error($PKG, "option check-code must end with a code ref")
+            }
+            defined $code and ref $code and ref $code eq 'CODE'
+                or $git->error($PKG, "option check-code must end with a code ref")
                 and next CODE;
-        push @codes, $code;
+            push @{$cache->{codes}}, $code;
+        }
     }
 
-    return @codes;
+    return @{$cache->{codes}};
 }
 
 sub _check_jira_keys {          ## no critic (ProhibitExcessComplexity)
@@ -329,7 +332,12 @@ sub check_patchset {
     $branch = "refs/heads/$branch"
         unless $branch =~ m:^refs/:;
 
-    return 1 unless $git->is_ref_enabled($branch, $git->get_config($CFG => 'ref'));
+    if (my @ref = $git->get_config($CFG => 'ref')) {
+        return 1 unless $git->is_ref_enabled($branch, @ref);
+    }
+    if (my @noref = $git->get_config($CFG => 'noref')) {
+        return 0 if $git->is_ref_enabled($branch, @noref);
+    }
 
     return check_commit_msg($git, $commit, $branch);
 }
@@ -340,7 +348,12 @@ sub check_message_file {
     _setup_config($git);
 
     my $current_branch = $git->get_current_branch();
-    return 1 unless $git->is_ref_enabled($current_branch, $git->get_config($CFG => 'ref'));
+    if (my @ref = $git->get_config($CFG => 'ref')) {
+        return 1 unless $git->is_ref_enabled($current_branch, @ref);
+    }
+    if (my @noref = $git->get_config($CFG => 'noref')) {
+        return 0 if $git->is_ref_enabled($current_branch, @noref);
+    }
 
     my $msg = eval { path($commit_msg_file)->slurp };
     defined $msg
@@ -364,7 +377,12 @@ sub check_message_file {
 sub check_ref {
     my ($git, $ref) = @_;
 
-    return 1 unless $git->is_ref_enabled($ref, $git->get_config($CFG => 'ref'));
+    if (my @ref = $git->get_config($CFG => 'ref')) {
+        return 1 unless $git->is_ref_enabled($ref, @ref);
+    }
+    if (my @noref = $git->get_config($CFG => 'noref')) {
+        return 0 if $git->is_ref_enabled($ref, @noref);
+    }
 
     my $errors = 0;
 
@@ -434,7 +452,12 @@ EOF
 sub notify_ref {
     my ($git, $ref, $visibility) = @_;
 
-    return 1 unless $git->is_ref_enabled($ref, $git->get_config($CFG => 'ref'));
+    if (my @ref = $git->get_config($CFG => 'ref')) {
+        return 1 unless $git->is_ref_enabled($ref, @ref);
+    }
+    if (my @noref = $git->get_config($CFG => 'noref')) {
+        return 0 if $git->is_ref_enabled($ref, @noref);
+    }
 
     my $errors = 0;
 
@@ -499,7 +522,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 DESCRIPTION
 
@@ -576,6 +599,17 @@ The refs can be specified as a complete ref name
 (e.g. "refs/heads/master") or by a regular expression starting with a
 caret (C<^>), which is kept as part of the regexp
 (e.g. "^refs/heads/(master|fix)").
+
+=head2 githooks.checkjira.noref REFSPEC
+
+By default, the message of every commit is checked. If you want to exclude
+some refs (usually some branch under refs/heads/), you may specify them with
+one or more instances of this option.
+
+The refs can be specified as in the same way as to the C<ref> option above.
+
+Note that the C<ref> option has precedence over the C<noref> option, i.e.,
+if a reference matches both options it will be checked.
 
 =head2 githooks.checkjira.jiraurl URL
 
@@ -814,7 +848,7 @@ In this case, the visibility isn't restricted at all.
 =head2 githooks.checkjira.skip-merges [01]
 
 By default, all commits are checked. You can exempt merge commits from being
-checked by setting this option to 0.
+checked by setting this option to 1.
 
 =head2 githooks.checkjira.project KEY
 

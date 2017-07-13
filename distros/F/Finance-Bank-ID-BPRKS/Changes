@@ -1,4 +1,11 @@
-Revision history for Finance-Bank-ID-BPRKS
+0.06    2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Replace File::Slurp::Tiny with File::Slurper.
+
+	- Replace Log::Any with Log::ger.
+
 
 0.05    2015-12-16 (PERLANCAR)
 

@@ -8,7 +8,7 @@ use lib "$Bin/lib";
 
 use File::chdir;
 use File::Path qw(remove_tree);
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Temp qw(tempdir);
 use Setup::File;
 use Test::More 0.98;
@@ -39,7 +39,7 @@ test_tx_action(
     tmpdir      => $tmpdir,
     f           => 'Setup::File::mkdir',
     args        => {path=>"file"},
-    reset_state => sub { remove_tree "file"; write_file "file", "" },
+    reset_state => sub { remove_tree "file"; write_text "file", "" },
     status      => 412,
 );
 
@@ -76,7 +76,7 @@ subtest "symlink tests" => sub {
         args        => {path=>"sym1", allow_symlink=>1},
         reset_state => sub {
             remove_tree "sym1";
-            mkdir "dir1"; write_file("file", ""); symlink "file", "sym1";
+            mkdir "dir1"; write_text("file", ""); symlink "file", "sym1";
         },
         status      => 412,
     );

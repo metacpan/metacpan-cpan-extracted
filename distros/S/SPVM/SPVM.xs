@@ -20,9 +20,325 @@
 #include "spvm_sub.h"
 #include "spvm_my_var.h"
 #include "spvm_type.h"
-#include "spvm_api.h"
 
-MODULE = SPVM::Data		PACKAGE = SPVM::Data
+#include "spvm_api.h"
+#include "spvm_xs_util.h"
+
+MODULE = SPVM::ArrayObject		PACKAGE = SPVM::ArrayObject
+
+SV*
+malloc_byte_array(...)
+  PPCODE:
+{
+  SV* sv_class = ST(0);
+  SV* sv_length = ST(1);
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Malloc array object
+  SPVM_API_ARRAY_OBJECT* array_object =  api->malloc_byte_array_noinc(api, length);
+  
+  // New sv array object
+  SV* sv_array_object = SPVM_XS_UTIL_new_sv_array_object("byte[]", array_object);
+  
+  XPUSHs(sv_array_object);
+  XSRETURN(1);
+}
+
+SV*
+set_byte_array_elements(...)
+  PPCODE:
+{
+  SV* sv_array_object = ST(0);
+  SV* sv_nums = ST(1);
+  AV* av_nums = SvRV(sv_nums);
+
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Get content
+  SPVM_API_ARRAY_OBJECT* array_object = SPVM_XS_UTIL_get_array_object(sv_array_object);
+  
+  int32_t length = api->get_array_length(api, array_object);
+  
+  int8_t* elements = api->get_byte_array_elements(api, array_object);
+  
+  {
+    int32_t i;
+    for (i = 0; i < length; i++) {
+      SV** sv_num_ptr = av_fetch(av_nums, i, 0);
+      SV* sv_num = sv_num_ptr ? *sv_num_ptr : &PL_sv_undef;
+      elements[i] = (int8_t)SvIV(sv_num);
+    }
+  }
+  
+  XSRETURN(0);
+}
+
+SV*
+malloc_short_array(...)
+  PPCODE:
+{
+  SV* sv_class = ST(0);
+  SV* sv_length = ST(1);
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Malloc array object
+  SPVM_API_ARRAY_OBJECT* array_object =  api->malloc_short_array_noinc(api, length);
+  
+  // New sv array object
+  SV* sv_array_object = SPVM_XS_UTIL_new_sv_array_object("short[]", array_object);
+  
+  XPUSHs(sv_array_object);
+  XSRETURN(1);
+}
+
+SV*
+set_short_array_elements(...)
+  PPCODE:
+{
+  SV* sv_array_object = ST(0);
+  SV* sv_nums = ST(1);
+  AV* av_nums = SvRV(sv_nums);
+
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Get content
+  SPVM_API_ARRAY_OBJECT* array_object = SPVM_XS_UTIL_get_array_object(sv_array_object);
+  
+  int32_t length = api->get_array_length(api, array_object);
+  
+  int16_t* elements = api->get_short_array_elements(api, array_object);
+  
+  {
+    int32_t i;
+    for (i = 0; i < length; i++) {
+      SV** sv_num_ptr = av_fetch(av_nums, i, 0);
+      SV* sv_num = sv_num_ptr ? *sv_num_ptr : &PL_sv_undef;
+      elements[i] = (int16_t)SvIV(sv_num);
+    }
+  }
+  
+  XSRETURN(0);
+}
+
+SV*
+malloc_int_array(...)
+  PPCODE:
+{
+  SV* sv_class = ST(0);
+  SV* sv_length = ST(1);
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Malloc array object
+  SPVM_API_ARRAY_OBJECT* array_object =  api->malloc_int_array_noinc(api, length);
+  
+  // New sv array object
+  SV* sv_array_object = SPVM_XS_UTIL_new_sv_array_object("int[]", array_object);
+  
+  XPUSHs(sv_array_object);
+  XSRETURN(1);
+}
+
+SV*
+set_int_array_elements(...)
+  PPCODE:
+{
+  SV* sv_array_object = ST(0);
+  SV* sv_nums = ST(1);
+  AV* av_nums = SvRV(sv_nums);
+
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Get content
+  SPVM_API_ARRAY_OBJECT* array_object = SPVM_XS_UTIL_get_array_object(sv_array_object);
+  
+  int32_t length = api->get_array_length(api, array_object);
+  
+  int32_t* elements = api->get_int_array_elements(api, array_object);
+  
+  {
+    int32_t i;
+    for (i = 0; i < length; i++) {
+      SV** sv_num_ptr = av_fetch(av_nums, i, 0);
+      SV* sv_num = sv_num_ptr ? *sv_num_ptr : &PL_sv_undef;
+      elements[i] = (int32_t)SvIV(sv_num);
+    }
+  }
+  
+  XSRETURN(0);
+}
+
+SV*
+malloc_long_array(...)
+  PPCODE:
+{
+  SV* sv_class = ST(0);
+  SV* sv_length = ST(1);
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Malloc array object
+  SPVM_API_ARRAY_OBJECT* array_object =  api->malloc_long_array_noinc(api, length);
+  
+  // New sv array object
+  SV* sv_array_object = SPVM_XS_UTIL_new_sv_array_object("long[]", array_object);
+  
+  XPUSHs(sv_array_object);
+  XSRETURN(1);
+}
+
+SV*
+set_long_array_elements(...)
+  PPCODE:
+{
+  SV* sv_array_object = ST(0);
+  SV* sv_nums = ST(1);
+  AV* av_nums = SvRV(sv_nums);
+
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Get content
+  SPVM_API_ARRAY_OBJECT* array_object = SPVM_XS_UTIL_get_array_object(sv_array_object);
+  
+  int32_t length = api->get_array_length(api, array_object);
+  
+  int64_t* elements = api->get_long_array_elements(api, array_object);
+  
+  {
+    int32_t i;
+    for (i = 0; i < length; i++) {
+      SV** sv_num_ptr = av_fetch(av_nums, i, 0);
+      SV* sv_num = sv_num_ptr ? *sv_num_ptr : &PL_sv_undef;
+      elements[i] = (int64_t)SvIV(sv_num);
+    }
+  }
+  
+  XSRETURN(0);
+}
+
+SV*
+malloc_float_array(...)
+  PPCODE:
+{
+  SV* sv_class = ST(0);
+  SV* sv_length = ST(1);
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Malloc array object
+  SPVM_API_ARRAY_OBJECT* array_object =  api->malloc_float_array_noinc(api, length);
+  
+  // New sv array object
+  SV* sv_array_object = SPVM_XS_UTIL_new_sv_array_object("float[]", array_object);
+  
+  XPUSHs(sv_array_object);
+  XSRETURN(1);
+}
+
+SV*
+set_float_array_elements(...)
+  PPCODE:
+{
+  SV* sv_array_object = ST(0);
+  SV* sv_nums = ST(1);
+  AV* av_nums = SvRV(sv_nums);
+
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Get content
+  SPVM_API_ARRAY_OBJECT* array_object = SPVM_XS_UTIL_get_array_object(sv_array_object);
+  
+  int32_t length = api->get_array_length(api, array_object);
+  
+  float* elements = api->get_float_array_elements(api, array_object);
+  
+  {
+    int32_t i;
+    for (i = 0; i < length; i++) {
+      SV** sv_num_ptr = av_fetch(av_nums, i, 0);
+      SV* sv_num = sv_num_ptr ? *sv_num_ptr : &PL_sv_undef;
+      elements[i] = (float)SvNV(sv_num);
+    }
+  }
+  
+  XSRETURN(0);
+}
+
+SV*
+malloc_double_array(...)
+  PPCODE:
+{
+  SV* sv_class = ST(0);
+  SV* sv_length = ST(1);
+  
+  int32_t length = (int32_t)SvIV(sv_length);
+  
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Malloc array object
+  SPVM_API_ARRAY_OBJECT* array_object =  api->malloc_double_array_noinc(api, length);
+  
+  // New sv array object
+  SV* sv_array_object = SPVM_XS_UTIL_new_sv_array_object("double[]", array_object);
+  
+  XPUSHs(sv_array_object);
+  XSRETURN(1);
+}
+
+SV*
+set_double_array_elements(...)
+  PPCODE:
+{
+  SV* sv_array_object = ST(0);
+  SV* sv_nums = ST(1);
+  AV* av_nums = SvRV(sv_nums);
+
+  // Set API
+  SPVM_API* api = SPVM_XS_UTIL_get_api();
+  
+  // Get content
+  SPVM_API_ARRAY_OBJECT* array_object = SPVM_XS_UTIL_get_array_object(sv_array_object);
+  
+  int32_t length = api->get_array_length(api, array_object);
+  
+  double* elements = api->get_double_array_elements(api, array_object);
+  
+  {
+    int32_t i;
+    for (i = 0; i < length; i++) {
+      SV** sv_num_ptr = av_fetch(av_nums, i, 0);
+      SV* sv_num = sv_num_ptr ? *sv_num_ptr : &PL_sv_undef;
+      elements[i] = (double)SvNV(sv_num);
+    }
+  }
+  
+  XSRETURN(0);
+}
+
+
 
 MODULE = SPVM		PACKAGE = SPVM
 
@@ -293,21 +609,26 @@ call_sub(...)
       SV* sv_arg_type_name = sv_arg_type_name_ptr ? *sv_arg_type_name_ptr : &PL_sv_undef;
       const char* arg_type_name = SvPV_nolen(sv_arg_type_name);
       
-      if (sv_isobject(sv_base_object) && sv_derived_from(sv_base_object, "SPVM::Data")) {
-        assert(0);
+      if (sv_isobject(sv_base_object) && sv_derived_from(sv_base_object, "SPVM::BaseObject")) {
         
         HV* hv_base_object = (HV*)SvRV(sv_base_object);
         
-        SV** sv_base_object_type_name_ptr = hv_fetch(hv_base_object, "type_name", strlen("type_name"), 0);
+        SV** sv_base_object_type_name_ptr = hv_fetch(hv_base_object, "type", strlen("type"), 0);
         SV* sv_base_object_type_name = sv_base_object_type_name_ptr ? *sv_base_object_type_name_ptr : &PL_sv_undef;
         const char* base_object_type_name = SvPV_nolen(sv_base_object_type_name);
         
         if (!strEQ(base_object_type_name, arg_type_name)) {
           croak("Argument base_object type need %s, but %s", arg_type_name, base_object_type_name);
         }
+
+        // Get content
+        SV** sv_content_ptr = hv_fetch(hv_base_object, "content", strlen("content"), 0);
+        SV* sv_content = sv_content_ptr ? *sv_content_ptr : &PL_sv_undef;
+        SV* sviv_content = SvRV(sv_content);
+        size_t iv_content = SvIV(sviv_content);
+        SPVM_API_BASE_OBJECT* base_object = INT2PTR(SPVM_API_BASE_OBJECT*, iv_content);
         
-        // SV** sv_value_ptr = hv_fetch(hv_base_object, "value", strlen("value"), 0);
-        // SV* sv_value = sv_value_ptr ? *sv_value_ptr : &PL_sv_undef;
+        api->push_var_object(api, base_object);
       }
       else {
         SV* sv_value = sv_base_object;
@@ -344,13 +665,11 @@ call_sub(...)
   
   api->call_sub(api, sub_constant_pool_index);
   
-  
-  
   if (SvOK(sv_return_type_name)) {
     // Create base_object
     HV* hv_base_object = sv_2mortal((SV*)newHV());
     SV* sv_base_object = sv_2mortal(newRV_inc((SV*)hv_base_object));
-    HV* hv_class = gv_stashpv("SPVM::Data", 0);
+    HV* hv_class = gv_stashpv("SPVM::Object", 0);
     sv_bless(sv_base_object, hv_class);
 
     const char* return_type_name = SvPV_nolen(sv_return_type_name);
@@ -391,14 +710,14 @@ call_sub(...)
       sv_value = sv_2mortal(newSViv(return_value));
       
       // Store value
-      hv_store(hv_base_object, "value", strlen("value"), SvREFCNT_inc(sv_value), 0);
+      hv_store(hv_base_object, "content", strlen("content"), SvREFCNT_inc(sv_value), 0);
       
       // Store resolved type name
       SV* sv_return_type_name = sv_2mortal(newSVpv(return_type_name, 0));
-      hv_store(hv_base_object, "type_name", strlen("type_name"), SvREFCNT_inc(sv_return_type_name), 0);
+      hv_store(hv_base_object, "type", strlen("type"), SvREFCNT_inc(sv_return_type_name), 0);
       
       {
-        SV** sv_type_name_ptr = hv_fetch(hv_base_object, "type_name", strlen("type_name"), 0);
+        SV** sv_type_name_ptr = hv_fetch(hv_base_object, "type", strlen("type"), 0);
         SV* sv_type_name = sv_type_name_ptr ? *sv_type_name_ptr : &PL_sv_undef;
         const char* type_name = SvPV_nolen(sv_type_name);
       }

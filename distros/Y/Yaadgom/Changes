@@ -1,5 +1,8 @@
 Revision history for Yaadgom
 
+0.08  2017-07-13 05:44:09 -03
+    - Changes on outputed markdown (fix for new github parser)
+
 0.07  2016-04-03 10:53:29 BRT
     - Added missing "\n" after processing {extra}{fields}
 

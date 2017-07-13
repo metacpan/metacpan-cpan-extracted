@@ -1,7 +1,7 @@
 package Data::Unixish::ANSI::highlight;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010;
 use strict;
@@ -123,7 +123,7 @@ Data::Unixish::ANSI::highlight - Highlight string/pattern with color
 
 =head1 VERSION
 
-This document describes version 0.07 of Data::Unixish::ANSI::highlight (from Perl distribution Data-Unixish-ANSI), released on 2015-09-03.
+This document describes version 0.08 of Data::Unixish::ANSI::highlight (from Perl distribution Data-Unixish-ANSI), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -140,9 +140,15 @@ In command line:
 =head1 FUNCTIONS
 
 
-=head2 highlight(%args) -> [status, msg, result, meta]
+=head2 highlight
+
+Usage:
+
+ highlight(%args) -> [status, msg, result, meta]
 
 Highlight string/pattern with color.
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -216,7 +222,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

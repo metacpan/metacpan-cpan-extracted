@@ -14,7 +14,7 @@ use IO::Async::Listener;
 
 use POSIX qw( WEXITSTATUS );
 
-system( "openssl --help >/dev/null 2>&1" ) == 0 or
+system( "openssl help >/dev/null 2>&1" ) == 0 or
    plan skip_all => "no openssl";
 
 my $loop = IO::Async::Loop->new;
@@ -64,7 +64,7 @@ my $kid = $loop->spawn_child(
 close $ssl_rd;
 close $ssl_wr;
 
-END { kill 'TERM', $kid }
+END { kill TERM => $kid if defined $kid }
 
 my @openssl_lines;
 $loop->add( my $openssl_stream = IO::Async::Stream->new(

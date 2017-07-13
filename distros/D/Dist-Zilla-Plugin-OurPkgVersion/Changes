@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-OurPkgVersion
 
+0.12      2017-07-11
+  - Add underscore_eval_version property
+
 0.11      2017-07-02
   - use :PerlExecFiles filefinder whenever possible
 

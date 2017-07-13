@@ -1,0 +1,9 @@
+requires 'Renard::Incunabula',
+	git => 'https://github.com/project-renard/p5-Renard-Incunabula.git',
+	branch => 'master';
+requires 'Renard::Incunabula::Format::PDF',
+	git => 'https://github.com/project-renard/p5-Renard-Incunabula-Format-PDF.git',
+	branch => 'master';
+requires 'Renard::Incunabula::Frontend::Gtk3',
+	git => 'https://github.com/project-renard/p5-Renard-Incunabula-Frontend-Gtk3.git',
+	branch => 'master';

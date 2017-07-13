@@ -1,7 +1,7 @@
 package Bencher::Scenarios::LogAny;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.09'; # VERSION
 
 1;
 # ABSTRACT: Scenarios for benchmarking Log::Any
@@ -18,7 +18,7 @@ Bencher::Scenarios::LogAny - Scenarios for benchmarking Log::Any
 
 =head1 VERSION
 
-This document describes version 0.08 of Bencher::Scenarios::LogAny (from Perl distribution Bencher-Scenarios-LogAny), released on 2017-01-25.
+This document describes version 0.09 of Bencher::Scenarios::LogAny (from Perl distribution Bencher-Scenarios-LogAny), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -28,9 +28,9 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =item * L<Bencher::Scenario::LogAny::Startup>
 
-=item * L<Bencher::Scenario::LogAny::NoAdapterLogging>
-
 =item * L<Bencher::Scenario::LogAny::NullLogging>
+
+=item * L<Bencher::Scenario::LogAny::NoAdapterLogging>
 
 =back
 
@@ -56,7 +56,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

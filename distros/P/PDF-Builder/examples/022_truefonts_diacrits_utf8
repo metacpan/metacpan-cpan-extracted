@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+
+# given one or more .TTF files on the command line, display their contents
+# and some sample text.
+# note that use of -file in new() leaves the PDF in THIS directory, not the
+#   one with the 022_truefonts_diacrits_utf8 file!
+
+use strict;
+use warnings;
+
+use lib qw{ ../lib };
+use File::Basename;
+use PDF::Builder;
+use PDF::Builder::Util;
+use Unicode::UCD 'charinfo';
+use Getopt::Long;
+use utf8;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my $sx = 33;
+my $sy = 45;
+my $fx = 20;
+my $LoremIpsum = qq|Sed ut perspici\x{0361}atis.|;  # times.ttf includes
+my $encoding = 'latin1';
+
+my ($fn, $pdf, $f1, $f2, $gfx, $text, $x, $y, $yp, $page);
+
+GetOptions(
+    "encode|e=s" => \$encoding,
+);
+
+# loop through command line list of font file names
+die "Need at least one TTF file name on command line!\n" if !scalar(@ARGV);
+
+foreach $fn (@ARGV) {
+    if (!-e $fn) {
+	print "$fn cannot be read. Skipping...\n\n";
+	next;
+    }
+
+    my $myName = basename($fn);
+    $myName =~ s/\.ttf$//i;  # remove .ttf (any case)
+
+    $pdf = PDF::Builder->new(-compress => $compress,
+	                  -file => basename($0).'.'.$myName.".pdf");
+
+    $f1 = $pdf->corefont('Helvetica', -encode => 'latin1');
+    $f2 = $pdf->corefont('Helvetica-Bold', -encode => 'latin1');
+
+    print STDERR "\n$myName\n";
+
+    my $font=$pdf->ttfont($fn, -encode => $encoding);
+    $font->data->{'nosubset'}=1;
+    # produce a page with dump of font
+    if (1) {
+        $page = $pdf->page();
+        $page->mediabox(595,842);
+
+        $gfx = $page->gfx();
+
+        my $txt = $page->text();
+            $txt->font($font, $fx);
+
+        my $txt2 = $page->text();
+        #delete $txt->{'Filter'};
+        #delete $txt2->{'Filter'};
+
+        $txt2->textlabel(50,800, $f1,20, "font='".$font->fontname."'");
+        $txt2->textlabel(50,780, $f1,20, "encoding='$encoding'");
+
+        $txt2->font($f1, 5);
+        $txt2->hscale(80);
+
+        my $u = $font->underlineposition*$fx/1000;
+
+	# loop through rows (yp growing from bottom)
+        foreach $yp (0..15) {
+	    $y = 15 - $yp; # grow y from top to bottom instead
+            print STDERR ".";
+	    # loop through columns left to right
+            foreach $x (0..15) {
+                $txt->translate(50+($sx*$x),50+($sy*$y));
+		my $ci = $yp*16 + $x;
+		my $c  = chr($ci);
+                $txt->text($c);
+
+                my $wx=$font->width($c)*$fx;
+
+		# draw cell box
+                $gfx->strokecolor('lightblue');
+                $gfx->move(50+($sx*$x),50+($sy*$y)+$fx);
+                $gfx->line(50+($sx*$x),50+($sy*$y)+$u);
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$u);
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$fx);
+                $gfx->close();
+                $gfx->stroke();
+
+                $gfx->strokecolor('gray');
+                $gfx->move(50+($sx*$x),50+($sy*$y));
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y));
+                $gfx->stroke();
+
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-6);
+                $txt2->text_right($ci);
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-11);
+                $txt2->text_right(sprintf('U=0x%04X',$font->uniByEnc($ci)));
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-16);
+                $txt2->text_right($font->glyphByEnc($ci));
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-21);
+                $txt2->text_right(sprintf('wx=%i',$font->wxByEnc($ci)));
+            } # loop x L to R along row
+        } # loop yp B to T along column and y T to B
+    } # always do this section (if 1)
+    
+    # print out some text in this font on next page
+    my $textL = $LoremIpsum;
+
+    $page = $pdf->page();
+    $page->mediabox(595,842);
+    $text = $page->text();
+    $text->transform(-translate => [50, 800]);
+    $text->fillcolor('black');
+    $text->font($font, 18);
+    $text->lead(18*1.25);
+    my $toprint;
+    while ($textL ne '') {
+    	($toprint, $textL) = $text->_text_fill_line($textL, 500, 0);
+    	$text->text($toprint);
+    	$text->nl();
+    }
+    
+    $pdf->save();
+    $pdf->end();
+} # loop through a font name. go to next command line name.
+
+exit;
+
+__END__
+
+=head1 HISTORY
+
+    $Log$
+    Revision 1.1  2007/10/23 07:48:08  areibens
+    genesis
+
+    Revision 2.2  2007/04/07 10:26:23  areibens
+    added lorem ipsum page
+
+    Revision 2.1  2006/06/19 19:20:13  areibens
+    added details
+
+    Revision 2.0  2005/11/16 02:16:00  areibens
+    revision workaround for SF cvs import not to screw up CPAN
+
+    Revision 1.2  2005/11/16 01:27:48  areibens
+    genesis2
+
+    Revision 1.1  2005/11/16 01:19:24  areibens
+    genesis
+
+    Revision 1.3  2005/09/12 16:55:05  fredo
+    various updates
+
+    Revision 1.2  2004/12/31 02:58:49  fredo
+    no message
+
+    Revision 1.1  2004/04/06 23:04:06  fredo
+    genesis
+
+
+=cut

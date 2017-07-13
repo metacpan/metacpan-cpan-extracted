@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.01
+    version 0.02
 
 SYNOPSIS
 
@@ -25,6 +25,19 @@ CAVEATS
     smarter. There are probably lots of corner cases that this plugin
     doesn't take into account, but it is probably good enough for most
     Alien usage.
+
+ENVIRONMENT
+
+    ALIEN_BUILD_PLUGIN_FETCH_CACHE_PRECACHE
+
+      If set to a true value, then this plugin will precache all files that
+      match the appropriate pattern in the alienfile.
+
+      This can be helpful if you are developing a prefer plugin or filter
+      and will be off-line for the development.
+
+      Be careful, if no pattern is specified you could end up downloading
+      the entire internet!
 
 SEE ALSO
 

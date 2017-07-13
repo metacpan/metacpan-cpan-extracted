@@ -1,37 +1,50 @@
-SYNOPSIS
+NAME
+    Log::ger::Plugin::OptAway - Optimize away higher-level log statements
 
+VERSION
+    version 0.004
+
+SYNOPSIS
      use Log::ger::Plugin->set('OptAway');
      use Log::ger;
 
-    Co demonstrate the effect of optimizing away:
+    To demonstrate the effect of optimizing away:
 
      % perl -MLog::ger -MO=Deparse -e'log_warn "foo\n"; log_debug "bar\n"'
      log_warn("foo\n");
      log_debug("bar\n");
      -e syntax OK
-    
+
      % perl -MLog::ger::Plugin=OptAway -MLog::ger -MO=Deparse -e'log_warn "foo\n"; log_debug "bar\n"'
      log_warn("foo\n");
      '???';
      -e syntax OK
 
 DESCRIPTION
-
-    This plugin replaces logging statements that are higher than the
-    current level ($Log::ger::Current_Level) into a no-op statement using
-    B::CallChecker magic at compile-time. The logging statements will
-    become no-op and will have zero run-time overhead.
+    This plugin replaces logging statements that are higher than the current
+    level ($Log::ger::Current_Level) into a no-op statement using
+    B::CallChecker magic at compile-time. The logging statements will become
+    no-op and will have zero run-time overhead.
 
     By default, since $Current_Level is pre-set at 3 (warn) then
-    log_info(), log_debug(), and log_trace() calls will be turned into
+    "log_info()", "log_debug()", and "log_trace()" calls will be turned into
     no-op.
 
     Caveats:
 
-      * must be done at compile-time
+    *   must be done at compile-time
 
-      * only works when you are using procedural style
+    *   only works when you are using procedural style
 
-      * once optimized away, subsequent logger reinitialization at run-time
-      won't take effect
+    *   once optimized away, subsequent logger reinitialization at run-time
+        won't take effect
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

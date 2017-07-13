@@ -28,6 +28,7 @@ lib/Catmandu/Fix/Inline/marc_set.pm
 lib/Catmandu/Fix/marc_add.pm
 lib/Catmandu/Fix/marc_append.pm
 lib/Catmandu/Fix/marc_copy.pm
+lib/Catmandu/Fix/marc_cut.pm
 lib/Catmandu/Fix/marc_decode_dollar_subfields.pm
 lib/Catmandu/Fix/marc_in_json.pm
 lib/Catmandu/Fix/marc_map.pm
@@ -77,9 +78,10 @@ t/23-mapping_rules_spec.t
 t/24-marc-spec-subspecs.t
 t/25-marc_spec_has.t
 t/26-marc_copy.t
-t/26_marc_replace_all.t
-t/27_marc_append.t
-t/28_marc_paste.t
+t/27-marc_replace_all.t
+t/28-marc_append.t
+t/29-marc_paste.t
+t/30-marc_cut.t
 t/99-deprecate.t
 t/author-pod-syntax.t
 t/bu_bibs.mrc

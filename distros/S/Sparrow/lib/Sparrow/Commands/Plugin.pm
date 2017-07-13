@@ -87,9 +87,12 @@ sub show_installed_plugins {
 sub install_plugin {
 
     my $pid  = shift or confess 'usage: install_plugin(name,opts)';
+
     my %opts = @_;
 
     my $ptype;
+
+    my $pip_command = 'pip';
 
     if ($pid=~/(public|private)@/){
         $ptype = $1;
@@ -139,10 +142,17 @@ to overcome this ambiguity";
                 }                
 
                 if ( -f sparrow_root."/plugins/public/$pid/requirements.txt" ){
-                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
+                  open F, sparrow_root."/plugins/public/$pid/sparrow.json" or confess "can't open file to read: $!";
+                  my $sp = join "", <F>;
+                  my $spj = decode_json($sp);
+                  close F;
+                  if ( $spj->{python_version} && $spj->{python_version} eq '3' ) {
+                    $pip_command = 'pip3'
+                  }
+                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && $pip_command install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
                 }            
 
-            }else{
+            } else {
                 print "public\@$pid is uptodate ($inst_v)\n";
                 if ( -f sparrow_root."/plugins/public/$pid/cpanfile" ){
                   execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && carton install");
@@ -152,7 +162,15 @@ to overcome this ambiguity";
                 }                
 
                 if ( -f sparrow_root."/plugins/public/$pid/requirements.txt" ){
-                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
+                  open F, sparrow_root."/plugins/public/$pid/sparrow.json" or confess "can't open file to read: $!";
+                  my $sp = join "", <F>;
+                  my $spj = decode_json($sp);
+                  close F;
+                  if ( $spj->{python_version} && $spj->{python_version} eq '3' ) {
+                    $pip_command = 'pip3'
+                  }
+                  print "cd ".sparrow_root."/plugins/public/$pid && $pip_command install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"\n";
+                  execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && $pip_command install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
                 }            
 
             }
@@ -182,16 +200,29 @@ to overcome this ambiguity";
             }                
 
             if ( -f sparrow_root."/plugins/public/$pid/requirements.txt" ){
-              execute_shell_command("cd ".sparrow_root."/plugins/public/$pid && pip install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"");
+              open F, sparrow_root."/plugins/public/$pid/sparrow.json" or confess "can't open file to read: $!";
+              my $sp = join "", <F>;
+              my $spj = decode_json($sp);
+              close F;
+              if ( $spj->{python_version} && $spj->{python_version} eq '3' ) {
+                $pip_command = 'pip3'
+              }
+              my $install_cmd="cd ".sparrow_root."/plugins/public/$pid && $pip_command install -t ./python-lib -r requirements.txt --install-option \"--install-scripts=\$PWD/local/bin\"";
+              print "$install_cmd\n";
+              execute_shell_command($install_cmd);
             }            
 
         }
         
     } elsif ($list->{'private@'.$pid} and $ptype ne 'public' ) {
+
         print "installing private\@$pid ...\n";
+
         if ( -d sparrow_root."/plugins/private/$pid" ){
+
             execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && git pull");
             execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && git config credential.helper 'cache --timeout=3000000'");                
+
             if ( -f sparrow_root."/plugins/private/$pid/cpanfile" ){
                 execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && carton install");
             }            
@@ -200,26 +231,47 @@ to overcome this ambiguity";
             }                
 
             if ( -f sparrow_root."/plugins/private/$pid/requirements.txt" ){
-              execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && pip install -t ./python-lib -r requirements.txt");
+              if ( -f sparrow_root."/plugins/private/$pid/sparrow.json" ){
+                open F, sparrow_root."/plugins/private/$pid/sparrow.json" or confess "can't open file to read: $!";
+                my $sp = join "", <F>;
+                my $spj = decode_json($sp);
+                close F;
+  
+                if ( $spj->{python_version} && $spj->{python_version} eq  '3' ) {
+                  $pip_command = 'pip3'
+                }
+              }
+              execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && $pip_command install -t ./python-lib -r requirements.txt");
             }            
 
-        }else{
+        } else {
+
             execute_shell_command("git clone  ".($list->{'private@'.$pid}->{url}).' '.sparrow_root."/plugins/private/$pid");
             execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && git config credential.helper 'cache --timeout=3000000'");                
+
             if ( -f sparrow_root."/plugins/private/$pid/cpanfile" ){
                 execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && carton install");
             }            
+
             if ( -f sparrow_root."/plugins/private/$pid/Gemfile" ){
               execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && bundle --path local");
             }
 
-            if ( -f sparrow_root."/plugins/private/$pid/requirements.txt" ){
-              execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && pip install -t ./python-lib -r requirements.txt");
-            }            
-
-        }
-
-    }else{
+            if ( -f sparrow_root."/plugins/private/$pid/requirements.txt" ) {
+              if ( -f sparrow_root."/plugins/private/$pid/sparrow.json" ){
+                open F, sparrow_root."/plugins/private/$pid/sparrow.json" or confess "can't open file to read: $!";
+                my $sp = join "", <F>;
+                my $spj = decode_json($sp);
+                close F;
+  
+                if ( $spj->{python_version} && $spj->{python_version} eq  '3' ) {
+                  $pip_command = 'pip3'
+                }
+              }            
+              execute_shell_command("cd ".sparrow_root."/plugins/private/$pid && $pip_command install -t ./python-lib -r requirements.txt");
+            }
+      }
+    } else {
         confess "unknown plugin";
     }
 
@@ -249,6 +301,19 @@ sub run_plugin {
 
     my @runtime_params;
 
+    my $cli_args;
+    
+    my $i=0;  
+    for my $a (@args) {
+      if ($a eq '--') {
+        delete $args[$i];
+        $cli_args = join ' ', delete @args[$i .. $#args];
+        last;
+      }
+      $i++;
+    }  
+  
+    
     my $args_st = GetOptionsFromArray(
         \@args,
         "verbose"     => \$verbose_mode,
@@ -297,6 +362,17 @@ to overcome this ambiguity";
 
     my $spj = plugin_meta($pdir);
 
+    if ($spj->{sparrow_version}){
+      # check sparrow version if it's defined at sparrow.json
+
+      my $curr_sp_v  = version->parse($Sparrow::VERSION);
+      my $req_sp_v   = version->parse($spj->{sparrow_version});
+
+      if ($req_sp_v > $curr_sp_v){
+        die "plugin require sparrow version: $req_sp_v, but you have: $curr_sp_v";
+      };
+
+    }
     my $cmd = "cd $pdir && export PATH=\$PATH:\$PWD/local/bin && export PERL5LIB=local/lib/perl5:\$PERL5LIB && export PYTHONPATH=python-lib:\$PYTHONPATH && ";
 
     if ($spj->{plugin_type} eq 'outthentic'){
@@ -329,6 +405,8 @@ to overcome this ambiguity";
     $cmd.= " --cwd $cwd_arg" if $cwd_arg;
     $cmd.= " --story $story_arg" if $story_arg;
     $cmd.= " --args-file $args_file_arg" if $args_file_arg;
+
+    $cmd.= " -- $cli_args" if $cli_args;
 
     if ($verbose_mode){
       print map {"# $_\n"} split /&&\s+/, $cmd;

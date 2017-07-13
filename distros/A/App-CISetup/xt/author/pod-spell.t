@@ -20,6 +20,7 @@ ConfigUpdater
 Dave
 Eilam
 Eilam's
+Elep
 Fowler
 Inc
 MAXMIND
@@ -35,6 +36,7 @@ Rolsky
 Rolsky's
 Travis
 Types
+Zak
 appveyor
 autarch
 bin
@@ -48,3 +50,4 @@ param
 setup
 travis
 unthreaded
+zakame

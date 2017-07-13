@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::sco_author;
 
-our $DATE = '2017-02-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -59,7 +59,7 @@ App::lcpan::Cmd::sco_author - Open author page on search.cpan.org
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::Cmd::sco_author (from Perl distribution App-lcpan-CmdBundle-sco), released on 2017-02-26.
+This document describes version 0.002 of App::lcpan::Cmd::sco_author (from Perl distribution App-lcpan-CmdBundle-sco), released on 2017-07-10.
 
 =head1 DESCRIPTION
 

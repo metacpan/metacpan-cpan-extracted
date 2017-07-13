@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::sco;
 
-our $DATE = '2017-02-26'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to search.cpan.org
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::sco - More lcpan subcommands related to search.cpan.org
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::CmdBundle::sco (from Perl distribution App-lcpan-CmdBundle-sco), released on 2017-02-26.
+This document describes version 0.002 of App::lcpan::CmdBundle::sco (from Perl distribution App-lcpan-CmdBundle-sco), released on 2017-07-10.
 
 =head1 SYNOPSIS
 

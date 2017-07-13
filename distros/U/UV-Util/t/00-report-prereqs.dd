@@ -1,7 +1,7 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'Alien::libuv' => '0.004',
+                                    'Alien::libuv' => '0.006',
                                     'Config' => '0',
                                     'ExtUtils::MakeMaker' => '7.12'
                                   }
@@ -31,7 +31,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Alien::libuv' => '0.004',
+                                      'Alien::libuv' => '0.006',
                                       'Exporter' => '5.57',
                                       'XSLoader' => '0.14',
                                       'perl' => '5.008001',
@@ -44,6 +44,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Alien::libuv' => '0.006',
                                    'ExtUtils::MakeMaker' => '7.12',
                                    'File::Spec' => '0',
                                    'Test::More' => '0.88'

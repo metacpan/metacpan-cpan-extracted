@@ -1,5 +1,9 @@
 Revision history for Perl extension Algorithm::Permute.
 
+0.15  Jul 11 2017
+    - Fixed RT#122432 
+    - C90 compatibility.
+
 0.14  Jul 8 2017
     - Some doc updates.
     - Cleaned up some files in distribution.

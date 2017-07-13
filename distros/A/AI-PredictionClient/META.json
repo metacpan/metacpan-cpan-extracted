@@ -1,0 +1,66 @@
+{
+   "abstract" : "A Perl Prediction client for Google TensorFlow Serving.",
+   "author" : [
+      "Tom Stall <stall@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AI-PredictionClient",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::MinimumVersion" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AI::PredictionClient::Alien::TensorFlowServingProtos" : "0",
+            "Alien::Google::GRPC" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Inline" : "0",
+            "JSON" : "0",
+            "MIME::Base64" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "MooX::Options" : "0",
+            "Perl6::Form" : "0",
+            "perl" : "5.01",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/mountaintom/AI-PredictionClient",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mountaintom/AI-PredictionClient.git",
+         "web" : "https://github.com/mountaintom/AI-PredictionClient"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

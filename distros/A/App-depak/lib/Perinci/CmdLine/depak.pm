@@ -1,17 +1,17 @@
 package Perinci::CmdLine::depak;
 
-our $DATE = '2016-08-02'; # DATE
-our $VERSION = '0.53'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.55'; # VERSION
 
 use 5.010;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 use parent qw(Perinci::CmdLine::Lite);
 
 sub hook_before_read_config_file {
     my ($self, $r) = @_;
 
     if (defined $r->{config_profile}) {
-        $log->tracef("[pericmd-depak] Using config profile '%s' (predefined)",
+        log_trace("[pericmd-depak] Using config profile '%s' (predefined)",
                      $r->{config_profile});
         return;
     }
@@ -39,13 +39,13 @@ sub hook_before_read_config_file {
     }
 
     unless (defined $input_file) {
-        $log->tracef("[pericmd-depak] Not selecting config profile (no input file defined)");
+        log_trace("[pericmd-depak] Not selecting config profile (no input file defined)");
         return;
     }
 
     require File::Spec;
     my ($vol, $dir, $name) = File::Spec->splitpath($input_file);
-    $log->tracef("[pericmd-depak] Selecting config profile '%s' (from input file)", $name);
+    log_trace("[pericmd-depak] Selecting config profile '%s' (from input file)", $name);
     $r->{config_profile} = $name;
     $r->{ignore_missing_config_profile_section} = 1;
 }
@@ -65,7 +65,7 @@ Perinci::CmdLine::depak - Subclass of Perinci::CmdLine::Lite to set config_profi
 
 =head1 VERSION
 
-This document describes version 0.53 of Perinci::CmdLine::depak (from Perl distribution App-depak), released on 2016-08-02.
+This document describes version 0.55 of Perinci::CmdLine::depak (from Perl distribution App-depak), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -103,7 +103,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

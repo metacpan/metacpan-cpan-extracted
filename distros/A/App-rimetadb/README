@@ -1,8 +1,520 @@
-SYNOPSIS
+NAME
+    App::rimetadb - Manage a Rinci metadata database
 
+VERSION
+    This document describes version 0.21 of App::rimetadb (from Perl
+    distribution App-rimetadb), released on 2017-07-10.
+
+SYNOPSIS
     See the included CLI script rimetadb.
 
-SEE ALSO
+FUNCTIONS
+  argument_stats
+    Usage:
 
+     argument_stats(%args) -> [status, msg, result, meta]
+
+    Show statistics on function arguments.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  arguments
+    Usage:
+
+     arguments(%args) -> [status, msg, result, meta]
+
+    List function arguments.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   function => *str*
+
+        Select specific function only.
+
+    *   package => *str*
+
+        Select specific package only.
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   query => *str*
+
+    *   type => *str*
+
+        Select arguments with specific type only.
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  delete
+    Usage:
+
+     delete(%args) -> [status, msg, result, meta]
+
+    Delete a package or function metadata.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   function => *str*
+
+    *   package* => *str*
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  function_stats
+    Usage:
+
+     function_stats(%args) -> [status, msg, result, meta]
+
+    Show some statistics on functions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  functions
+    Usage:
+
+     functions(%args) -> [status, msg, result, meta]
+
+    List functions.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   package => *str*
+
+        Select specific package only.
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   query => *str*
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  meta
+    Usage:
+
+     meta(%args) -> [status, msg, result, meta]
+
+    Get package/function metadata.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   name* => *perl::modname*
+
+        (Fully-qualified) function name or package name.
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  packages
+    Usage:
+
+     packages(%args) -> [status, msg, result, meta]
+
+    List packages.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   query => *str*
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  stats
+    Usage:
+
+     stats() -> [status, msg, result, meta]
+
+    Show some statistics.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  update
+    Usage:
+
+     update(%args) -> [status, msg, result, meta]
+
+    Add/update a package or function metadata.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dist => *str*
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   extra => *str*
+
+    *   function => *str*
+
+    *   metadata* => *hash*
+
+    *   package* => *perl::modname*
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  update_from_modules
+    Usage:
+
+     update_from_modules(%args) -> [status, msg, result, meta]
+
+    Update Rinci metadata database from local Perl modules.
+
+    This routine scans Perl modules, load them, and update the database
+    using Rinci metadata from each modules into the database.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   delete => *bool* (default: 1)
+
+        Whether to delete packages from DB if no longer mentioned as
+        arguments or found in filesystem.
+
+    *   dsn => *str*
+
+        DBI connection DSN.
+
+        If not specified, will default to "dbd:SQLite:$HOME/rimeta.db" where
+        $HOME is user's home directory.
+
+        Note: has been tested with MySQL and SQLite only.
+
+    *   exclude => *array[perl::modname]*
+
+        Perl package names or prefixes to exclude.
+
+    *   force_update => *bool*
+
+        Force update database even though module hasn't changed since last
+        update.
+
+    *   library => *dirname*
+
+        Include library path, like Perl's -I.
+
+        Note that some modules are already loaded before this option takes
+        effect. To make sure you use the right library, you can use
+        "PERL5OPT" or explicitly use "perl" and use its "-I" option.
+
+    *   module_or_package* => *array[perl::modname]*
+
+        Perl module or prefixes or package to add/update.
+
+        For each entry, you can specify:
+
+        *   a Perl module name e.g. "Foo::Bar". An attempt will be made to
+            load that module.
+
+        *   a module prefix ending with "::" or "::*" e.g. "Foo::Bar::*".
+            "Module::List" will be used to list all modules under
+            "Foo::Bar::" recursively and load all those modules.
+
+        *   a package name using "+Foo::Bar" syntax. An attempt to load
+            module with that name will *not* be made. This can be used to
+            add an already-loaded package e.g. by another module).
+
+        *   a package prefix using "+Foo::Bar::" or "+Foo::Bar::*" syntax.
+            Subpackages will be listed recursively (using
+            "Package::MoreUtil"'s "list_subpackages").
+
+    *   password => *str*
+
+        DBI connection password.
+
+    *   require => *array[perl::modname]*
+
+        Require a Perl module, a la Perl's -m.
+
+    *   use => *array[perl::modname]*
+
+        Use a Perl module, a la Perl's -M.
+
+    *   user => *str*
+
+        DBI connection user.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-rimetadb>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-rimetadb>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-rimetadb>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

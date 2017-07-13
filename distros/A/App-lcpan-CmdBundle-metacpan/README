@@ -1,10 +1,49 @@
-SYNOPSIS
+NAME
+    App::lcpan::CmdBundle::metacpan - More lcpan subcommands related to
+    MetaCPAN
 
+VERSION
+    This document describes version 0.003 of App::lcpan::CmdBundle::metacpan
+    (from Perl distribution App-lcpan-CmdBundle-metacpan), released on
+    2017-07-10.
+
+SYNOPSIS
 DESCRIPTION
+    This bundle provides the following lcpan subcommands:
+
+    *   lcpan metacpan-mod
+
+    *   lcpan metacpan-dist
+
+    *   lcpan metacpan-author
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-lcpan-CmdBundle-metacpan>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-lcpan-CmdBundle-metacpan>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan-CmdBundle-m
+    etacpan>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     lcpan
 
-    https://metacpan.org
+    <https://metacpan.org>
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

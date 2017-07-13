@@ -3,7 +3,7 @@ package DBIx::dbMan::Extension::StandardSQL;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 1;
 
@@ -65,11 +65,25 @@ sub handle_action {
 				$action{action} = 'OUTPUT';
 				$action{output} = $obj->{-dbi}->errstr()."\n";
 				$action{processed} = 1;
+
 				$obj->{-dbi}->longreadlen($lr) if $action{longreadlen};
 				$obj->{-interface}->nostatus unless $action{output_quiet};
 				return %action;
 			}
-			my $res = $sth->execute();
+
+			my $res = eval {
+				return $sth->execute();
+			};
+            if ( $@ ) {
+				$action{action} = 'OUTPUT';
+                $action{ output } = ( $@ =~ /^Catched signal INT/ ) ? "Interrupted by user.\n" : $@;
+				$action{processed} = 1;
+
+				$obj->{-dbi}->longreadlen($lr) if $action{longreadlen};
+				$obj->{-interface}->nostatus unless $action{output_quiet};
+				return %action;
+            }
+
 			$obj->{-dbi}->longreadlen($lr) if $action{longreadlen};
 			if (not defined $res) {
 				my $errstr = $obj->{-dbi}->errstr();
@@ -84,7 +98,24 @@ sub handle_action {
 					if ($@) {
 						$action{fieldtypes} = [ map { -9998 } @{$action{fieldnames}} ];
 					}
-					$res = $sth->fetchall_arrayref();
+                    $res = eval {
+                        my $result = [];
+                        while ( my $row = $sth->fetchrow_arrayref() ) {
+                            push @$result, [ @$row ];
+                        }
+                        return $result;
+                    };
+                    if ( $@ ) {
+                        $sth->finish;
+
+                        $action{action} = 'OUTPUT';
+                        $action{ output } = ( $@ =~ /^Catched signal INT/ ) ? "Interrupted by user.\n" : $@;
+                        $action{processed} = 1;
+
+                        $obj->{-dbi}->longreadlen($lr) if $action{longreadlen};
+                        $obj->{-interface}->nostatus unless $action{output_quiet};
+                        return %action;
+                    }
 				}
 				if ($action{explain}) {
 					$action{action} = 'SQL';

@@ -15,7 +15,7 @@ share {
   requires 'Alien::m4'       => '0.11';
 
   plugin Download => (
-    url     => 'http://dist.libuv.org/dist/v1.12.0',
+    url     => 'http://dist.libuv.org/dist/v1.13.1',
     version => qr/^libuv-v([0-9\.]+)\.tar\.gz$/,
   );
 

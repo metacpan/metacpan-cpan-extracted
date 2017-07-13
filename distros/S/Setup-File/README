@@ -1,16 +1,765 @@
+NAME
+    Setup::File - Setup file (existence, mode, permission, content)
+
+VERSION
+    This document describes version 0.23 of Setup::File (from Perl
+    distribution Setup-File), released on 2017-07-10.
+
+FUNCTIONS
+  chmod
+    Usage:
+
+     chmod(%args) -> [status, msg, result, meta]
+
+    Set file's permission mode.
+
+    Fixed state: "path" exists and mode is already correct.
+
+    Fixable state: "path" exists but mode is not correct.
+
+    Unfixable state: "path" doesn't exist.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   follow_symlink => *bool* (default: 0)
+
+        Whether to follow symlink.
+
+    *   mode* => *str*
+
+        Permission mode, either numeric or symbolic (e.g. a+w).
+
+    *   orig_mode => *int*
+
+        If set, confirm if current mode is not the same as this.
+
+    *   path* => *str*
+
+        Path to file/directory.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  chown
+    Usage:
+
+     chown(%args) -> [status, msg, result, meta]
+
+    Set file's ownership.
+
+    Fixed state: "path" exists and ownership is already correct.
+
+    Fixable state: "path" exists but ownership is not correct.
+
+    Unfixable state: "path" doesn't exist.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   follow_symlink => *bool* (default: 0)
+
+        Whether to follow symlink.
+
+    *   group => *str*
+
+        Numeric GID or group.
+
+    *   orig_group => *str*
+
+        If set, confirm if current group is not the same as this.
+
+    *   orig_owner => *str*
+
+        If set, confirm if current owner is not the same as this.
+
+    *   owner => *str*
+
+        Numeric UID or username.
+
+    *   path* => *str*
+
+        Path to file/directory.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mkdir
+    Usage:
+
+     mkdir(%args) -> [status, msg, result, meta]
+
+    Create directory.
+
+    Fixed state: "path" exists and is a directory.
+
+    Fixable state: "path" doesn't exist.
+
+    Unfixable state: "path" exists and is not a directory.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_symlink => *str*
+
+        Whether to regard symlink to a directory as directory.
+
+    *   mode => *str*
+
+        Set mode for the newly created directory.
+
+    *   path* => *str*
+
+        Path to directory.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  mkfile
+    Usage:
+
+     mkfile(%args) -> [status, msg, result, meta]
+
+    Create file (and/or set content).
+
+    Fixed state: "path" exists, is a file, and content is correct.
+
+    Fixable state: "path" doesn't exist. Or "path" exists, is a file, and
+    content is incorrect. Or "orig_path" specified and exists.
+
+    Unfixable state: "path" exists and is not a file.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_symlink => *str*
+
+        Whether to regard symlink to a file as file.
+
+    *   check_content_func => *str*
+
+        Name of function to check content.
+
+        If unset, file will not be checked for its content. If set, function
+        will be called whenever file content needs to be checked. Function
+        will be passed the reference to file content and should return a
+        boolean value indicating whether content is acceptable. If it
+        returns a false value, content is deemed unacceptable and needs to
+        be fixed.
+
+        Alternatively you can use the simpler "content" or "content_md5"
+        argument.
+
+    *   content => *str*
+
+        Desired file content.
+
+        Alternatively you can also use "content_md5", or "gen_content_func"
+        and "check_content_func".
+
+    *   content_md5 => *str*
+
+        Check content against MD5 hash.
+
+        MD5 hash should be expressed in hex (e.g.
+        bed6626e019e5870ef01736b3553e570).
+
+        Used when checking content of existing file.
+
+        Alternatively you can also use "content", or "check_content_func".
+
+    *   gen_content_func => *str*
+
+        Name of function to generate content.
+
+        If set, whenever a new file content is needed (e.g. when file is
+        created or file content reset), this function will be called to
+        provide it. If unset, empty string will be used instead.
+
+        Function will be passed the reference to the current content (or
+        undef) and should return the new content.
+
+        Alternatively you can use the simpler "content" argument.
+
+    *   path* => *str*
+
+        Path to file.
+
+    *   suffix => *str*
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  rmdir
+    Usage:
+
+     rmdir(%args) -> [status, msg, result, meta]
+
+    Delete directory.
+
+    Fixed state: "path" doesn't exist.
+
+    Fixable state: "path" exists and is a directory (or, a symlink to a
+    directory, if "allow_symlink" option is enabled).
+
+    Unfixable state: "path" exists but is not a directory.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_symlink => *bool* (default: 0)
+
+        Whether to regard symlink to a directory as directory.
+
+    *   delete_nonempty_dir => *bool*
+
+        Whether to delete non-empty directory.
+
+        If set to true, will delete non-empty directory.
+
+        If set to false, will never delete non-empty directory.
+
+        If unset (default), will ask for confirmation first by returning
+        status 331. Caller can confirm by passing special argument
+        "-confirm".
+
+    *   path* => *str*
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  rmfile
+    Usage:
+
+     rmfile(%args) -> [status, msg, result, meta]
+
+    Delete file.
+
+    Fixed state: "path" doesn't exist.
+
+    Fixable state: "path" exists and is a file (or, a symlink to a file, if
+    "allow_symlink" option is enabled).
+
+    Unfixable state: "path" exists but is not a file.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_symlink => *bool* (default: 0)
+
+        Whether to regard symlink to a file as file.
+
+    *   orig_content => *str*
+
+        If set, confirm if current content is not the same as this.
+
+        Alternatively, you can use "orig_content_hash".
+
+    *   orig_content_md5 => *str*
+
+        If set, confirm if current content MD5 hash is not the same as this.
+
+        MD5 hash should be expressed in hex (e.g.
+        bed6626e019e5870ef01736b3553e570).
+
+        Alternatively, you can use "orig_content" (for shorter content).
+
+    *   path* => *str*
+
+    *   suffix => *str*
+
+        Use this suffix when trashing.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  setup_dir
+    Usage:
+
+     setup_dir(%args) -> [status, msg, result, meta]
+
+    Setup directory (existence, mode, permission).
+
+    On do, will create directory (if it doesn't already exist) and fix its
+    mode/permission.
+
+    On undo, will restore old mode/permission (and delete directory if it is
+    empty and was created by this function). If directory was created by
+    this function but is not empty, will return status 331 to ask for
+    confirmation ("-confirm"). If confirmation is set to true, will delete
+    non-empty directory.
+
+    Will *not* create intermediate directories like "mkdir -p". Create
+    intermediate directories using several setup_dir() invocation.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_symlink => *bool* (default: 1)
+
+        Whether symlink is allowed.
+
+        If existing dir is a symlink then if allow_symlink is false then it
+        is an unacceptable condition (the symlink will be replaced if
+        replace_symlink is true).
+
+        Note: if you want to setup symlink instead, use Setup::Symlink.
+
+    *   group => *str*
+
+        Expected group.
+
+    *   mode => *str*
+
+        Expected permission mode.
+
+    *   owner => *str*
+
+        Expected owner.
+
+    *   path* => *str*
+
+        Path to file.
+
+    *   replace_dir => *bool* (default: 1)
+
+        Replace existing dir if it needs to be replaced.
+
+    *   replace_file => *bool* (default: 1)
+
+        Replace existing file if it needs to be replaced.
+
+    *   replace_symlink => *bool* (default: 1)
+
+        Replace existing symlink if it needs to be replaced.
+
+    *   should_exist => *bool*
+
+        Whether dir should exist.
+
+        If undef, dir need not exist. If set to 0, dir must not exist and
+        will be deleted if it does. If set to 1, dir must exist and will be
+        created if it doesn't.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  setup_file
+    Usage:
+
+     setup_file(%args) -> [status, msg, result, meta]
+
+    Setup file (existence, mode, permission, content).
+
+    On do, will create file (if it doesn't already exist) and correct
+    mode/permission as well as content.
+
+    On undo, will restore old mode/permission/content, or delete the file
+    again if it was created by this function *and* its content hasn't
+    changed since (if content/ownership/mode has changed, function will
+    request confirmation).
+
+    This function is not exported by default, but exportable.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_symlink => *bool* (default: 1)
+
+        Whether symlink is allowed.
+
+        If existing file is a symlink to a file then if allow_symlink is
+        false then it is an unacceptable condition (the symlink will be
+        replaced if replace_symlink is true).
+
+        Note: if you want to setup symlink instead, use Setup::Symlink.
+
+    *   check_content_func => *str*
+
+        Name of function to check content.
+
+        If unset, file will not be checked for its content. If set, function
+        will be called whenever file content needs to be checked. Function
+        will be passed the reference to file content and should return a
+        boolean value indicating whether content is acceptable. If it
+        returns a false value, content is deemed unacceptable and needs to
+        be fixed.
+
+        Alternatively you can use the simpler "content" argument.
+
+    *   content => *str*
+
+        Desired file content.
+
+        Alternatively you can also use "content_md5", or
+        "check_content_func" and "gen_content_func".
+
+    *   gen_content_func => *str*
+
+        Name of function to generate content.
+
+        If set, whenever a new file content is needed (e.g. when file is
+        created or file content reset), this function will be called to
+        provide it. If unset, empty string will be used instead.
+
+        Function will be passed the reference to the current content (or
+        undef) and should return the new content.
+
+        Alternatively you can use the simpler "content" argument.
+
+    *   group => *str*
+
+        Expected group (either numeric or group name).
+
+    *   mode => *str*
+
+        Expected permission mode.
+
+        Mode is as supported by File::chmod. Either an octal string (e.g.
+        '0755') or a symbolic mode (e.g. 'u+rw').
+
+    *   owner => *str*
+
+        Expected owner (either numeric or username).
+
+    *   path* => *str*
+
+        Path to file.
+
+    *   replace_dir => *bool* (default: 1)
+
+        Replace existing dir if it needs to be replaced.
+
+    *   replace_file => *bool* (default: 1)
+
+        Replace existing file if it needs to be replaced.
+
+    *   replace_symlink => *bool* (default: 1)
+
+        Replace existing symlink if it needs to be replaced.
+
+    *   should_exist => *bool*
+
+        Whether file should exist.
+
+        If undef, file need not exist. If set to 0, file must not exist and
+        will be deleted if it does. If set to 1, file must exist and will be
+        created if it doesn't.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 FAQ
-
- Why not allowing coderef in 'check_content_func' and 'gen_content_func'
- argument?
-
+  Why not allowing coderef in 'check_content_func' and 'gen_content_func' argument?
     Because transactional function needs to store its argument in database
     (currently in JSON), coderefs are not representable in JSON.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Setup-File>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Setup-File>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Setup-File>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Setup
 
     Setup::File::Dir
 
     Setup::File::Symlink
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

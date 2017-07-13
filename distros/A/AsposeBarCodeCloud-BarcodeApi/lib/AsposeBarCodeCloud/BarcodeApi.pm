@@ -13,8 +13,8 @@ use URI::Escape;
 use AsposeBarCodeCloud::ApiClient;
 use AsposeBarCodeCloud::Configuration;
 
-# my $VERSION = '1.03';
-our $VERSION = '1.03';
+# my $VERSION = '1.0.3';
+our $VERSION = '1.0.3';
 sub new {
     my $class   = shift;
     my $default_api_client = $AsposeBarCodeCloud::Configuration::api_client ? $AsposeBarCodeCloud::Configuration::api_client  :

@@ -1,5 +1,8 @@
 Revision history for WWW::Google::APIDiscovery
 
+0.24    Wed Jul 12 10:50:00 2017
+        - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.23    Sat Jul 01 21:50:00 2017
         - Added key 'provides' to the Makefile.PL script.
 

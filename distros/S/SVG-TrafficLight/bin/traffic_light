@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use feature 'say';
+
+use SVG::TrafficLight;
+
+my $tl = SVG::TrafficLight->new;
+
+say $tl->xmlify;

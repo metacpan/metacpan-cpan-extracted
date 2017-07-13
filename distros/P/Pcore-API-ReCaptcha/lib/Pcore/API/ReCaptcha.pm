@@ -1,4 +1,4 @@
-package Pcore::API::ReCaptcha v0.2.0;
+package Pcore::API::ReCaptcha v0.2.1;
 
 use Pcore -dist, -class, -result;
 use Pcore::Util::Data qw[from_json];
@@ -24,6 +24,7 @@ sub verify ( $self, $response, $user_ip = undef, $cb = undef ) {
                 remoteip => $user_ip,
             }
         ),
+        tls_ctx   => undef,         # TODO
         on_finish => sub ($res) {
             my $api_res;
 

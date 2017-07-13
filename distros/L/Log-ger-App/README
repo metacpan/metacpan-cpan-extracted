@@ -1,0 +1,88 @@
+NAME
+    Log::ger::App - An easy way to use Log::ger in applications
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+     use Log::ger::App;
+
+DESCRIPTION
+    This module sets up sensible defaults for Log::ger::Output::Composite
+    from the environment variables.
+
+    Outputs:
+
+     Code                            Screen  File                   Syslog
+     ------------------------------  ------  ----                   ------
+     One-liner (-e)                  y       -                      -
+     Script running as normal user   y       ~/PROGNAME.log         -
+     Script running as root          y       /var/log/PROGNAME.log  -
+     Daemon                          -       /var/log/PROGNAME.log  y
+
+    General log level: the default is warn (like Log::ger's default). You
+    can set it from environment using LOG_LEVEL (e.g. "LOG_LEVEL=trace" to
+    set level to trace or LOG_LEVEL=0 to turn off logging). Alternatively,
+    you can set to trace using "TRACE=1", or debug with "DEBUG=1", info with
+    "VERBOSE=1", error with "QUIET=1".
+
+    Per-output level: the default is to use general level, but you can set a
+    different level using
+    *OUTPUT_NAME*_{"LOG_LEVEL|TRACE|DEBUG|VERBOSE|QUIET"}.
+
+FUNCTIONS
+  $pkg->import(%args)
+    Arguments:
+
+    *   level => str|num
+
+        Explicitly set level.
+
+    *   name => str
+
+        Explicitly set program name. Otherwise, default will be taken from
+        $0 (after path and '.pl' suffix is removed) or set to "prog".
+
+    *   daemon => bool
+
+        Explicitly tell Log::ger::App that your application is a daemon or
+        not. Otherwise, Log::ger::App will try some heuristics to guess
+        whether your application is a daemon: from the value of
+        $main::IS_DAEMON and from the presence of modules like HTTP::Daemon,
+        Proc::Daemon, etc.
+
+ENVIRONMENT
+  LOG_LEVEL => str
+    Can be set to "off" or numeric/string log level.
+
+  TRACE => bool
+  DEBUG => bool
+  VERBOSE => bool
+  QUIET => bool
+  SCREEN_LOG_LEVEL
+  SCREEN_TRACE
+  SCREEN_DEBUG
+  SCREEN_VERBOSE
+  SCREEN_QUIET
+  FILE_LOG_LEVEL
+  FILE_TRACE
+  FILE_DEBUG
+  FILE_VERBOSE
+  FILE_QUIET
+  SYSLOG_LOG_LEVEL
+  SYSLOG_TRACE
+  SYSLOG_DEBUG
+  SYSLOG_VERBOSE
+  SYSLOG_QUIET
+SEE ALSO
+    Log::ger
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

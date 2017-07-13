@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+
+# Display a selection of Unicode character pages in various fonts. 9 pages.
+# Note that this is not strictly Unicode, especially in 00-FF, but closer
+#   to MS CP-1252.
+ 
+use strict;
+use warnings;
+
+use File::Basename;
+use PDF::Builder;
+use PDF::Builder::Util;
+use Unicode::UCD 'charinfo';
+use Encode qw[:all];
+use Getopt::Long;
+use utf8;
+
+#my $compress = 'none'; # uncompress streams
+my $compress = 'flate'; # compressed streams
+
+my $api = PDF::Builder->new(-compress => $compress);
+
+$api->mediabox(595,842);
+
+my $helv = $api->corefont('Helvetica-Bold', -encode=>'latin1');
+my $ge = $api->corefont('Times-Roman', -encode=>'latin1');
+my $g2 = $api->corefont('Times-Roman', -encode=>'uni1');
+my $g3 = $api->corefont('Times-Roman', -encode=>'uni2');
+my $g4 = $api->corefont('Times-Roman', -encode=>'uni3');
+my $g5 = $api->corefont('Times-Roman', -encode=>'uni4');
+my $g6 = $api->corefont('Times-Roman', -encode=>'uni5');
+my $zf = $api->corefont('zapfdingbats');
+my $wd = $api->corefont('wingdings');
+
+my $sx = 33;
+my $sy = 45;
+my $fx = 20;
+
+my ($uf, $x, $y);
+
+my @label = ();
+$label[   0] = '0000 - 00FF Basic Latin (ASCII) and Latin-1';
+$label[   1] = '0100 - 01FF Latin Extended-A and part of -B';
+$label[   2] = '0200 - 02FF rem. Latin Ext-B, IPA, Spacing Modifiers';
+$label[   3] = '0300 - 03FF Comb. diacriticals, Greek and Coptic';
+$label[   4] = '0400 - 04FF Cyrillic';
+$label[   5] = '0500 - 05FF Cyrillic supplementary, Armenian, Hebrew';
+$label[0x26] = '2600 - 26FF Miscellaneous Symbols';
+$label[0x27] = '2700 - 27FF Dingbats';
+$label[0xf0] = 'F000 - F0FF (Private Use, shiftJIS encoded)';
+	
+$uf = $api->unifont(
+    $ge,
+    [$g2, [1]],
+    [$g3, [2]],
+    [$g4, [3]],
+    [$g5, [4]],
+    [$g6, [5]],
+    [$zf, [0x26,0x27]],
+    [$wd, [0xf0]], -encode=>'shiftjis');
+
+my $toprow = 50 + $sy*15;
+my $leftcol = 50;
+
+# block is starting offset in Unicode (block of 256 characters)
+foreach my $block (0,1,2,3,4,5,0x26,0x27,0xf0) {
+    print STDERR ".";  # one page being output
+
+    my $page = $api->page();
+    $page->mediabox(595,842);
+
+    my $gfx = $page->gfx();
+    delete $gfx->{'Filter'};
+    my $text = $page->text();
+    
+    # label page
+    $text->textlabel($leftcol, 50+$toprow, $helv, 20, $label[$block]);
+
+    # character is Unicode $block*256 + $y*16 + $x (0..255), arranged in grid
+    # 00 at upper left to FF in lower right
+    foreach $y (0..15) {      # row T to B
+        foreach $x (0..15) {  # column L to R
+	    # character (no bounding box)
+            $text->textlabel($leftcol+($sx*$x), $toprow-($sy*$y), $uf, $fx, pack('U',$block*256+$y*16+$x));
+	    # label (Unicode name) below, at a slant to fit horizontally
+            $text->textlabel($leftcol+($sx*$x), $toprow-($sy*$y)-6, $helv, 6, nameByUni($block*256+$y*16+$x), -color=>'#a00000', -hscale=>80, -rotate=>-15);
+        }
+    }
+}
+
+$api->saveas("$0.pdf");
+$api->end();
+
+__END__

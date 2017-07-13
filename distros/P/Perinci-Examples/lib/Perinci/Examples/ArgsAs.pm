@@ -1,7 +1,7 @@
 package Perinci::Examples::ArgsAs;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010001;
 use strict;
@@ -100,7 +100,7 @@ Perinci::Examples::ArgsAs - Demonstrate various values of `args_as` function met
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::ArgsAs (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::ArgsAs (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -120,7 +120,11 @@ The functions in this package can test:
 =head1 FUNCTIONS
 
 
-=head2 args_as_array($arg1, $arg2, $arg3) -> [status, msg, result, meta]
+=head2 args_as_array
+
+Usage:
+
+ args_as_array($arg1, $arg2, $arg3) -> [status, msg, result, meta]
 
 Regular perl subs use this.
 
@@ -164,7 +168,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 args_as_arrayref([$arg1, $arg2, $arg3]) -> [status, msg, result, meta]
+=head2 args_as_arrayref
+
+Usage:
+
+ args_as_arrayref([$arg1, $arg2, $arg3]) -> [status, msg, result, meta]
 
 Alternative to `array` to avoid copying.
 
@@ -208,7 +216,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 args_as_hash(%args) -> [status, msg, result, meta]
+=head2 args_as_hash
+
+Usage:
+
+ args_as_hash(%args) -> [status, msg, result, meta]
 
 This is the default.
 
@@ -226,7 +238,7 @@ Examples:
 
 Result:
 
- [200, "OK", ["arg1", "def", "arg3", 0.5, "arg2", 20], {}]
+ [200, "OK", ["arg3", 0.5, "arg2", 20, "arg1", "def"], {}]
 
 =back
 
@@ -256,7 +268,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 args_as_hashref(\%args) -> [status, msg, result, meta]
+=head2 args_as_hashref
+
+Usage:
+
+ args_as_hashref(\%args) -> [status, msg, result, meta]
 
 Alternative to `hash` to avoid copying.
 
@@ -325,7 +341,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

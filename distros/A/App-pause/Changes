@@ -1,3 +1,10 @@
+0.63    2017-07-10 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with static install enabled.
+
+
 0.62    2017-07-04 (PERLANCAR)
 
         - Rebuild CLI (fix handling of --no-ARG option, Perinci::CmdLine::Inline

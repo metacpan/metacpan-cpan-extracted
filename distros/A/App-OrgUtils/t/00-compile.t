@@ -2,7 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
 
 use Test::More;
 
@@ -18,32 +18,34 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/count-done-org-todos',
-    'bin/count-org-headlines-fast',
-    'bin/count-org-todos',
-    'bin/count-org-todos-fast',
-    'bin/count-undone-org-todos',
-    'bin/dump-org-structure',
-    'bin/filter-org-by-headlines',
-    'bin/list-org-anniversaries',
-    'bin/list-org-headlines',
-    'bin/list-org-headlines-fast',
-    'bin/list-org-priorities',
-    'bin/list-org-tags',
-    'bin/list-org-todo-states',
-    'bin/list-org-todos',
-    'bin/list-org-todos-fast',
-    'bin/move-done-todos',
-    'bin/org-to-html',
-    'bin/org-to-html-wordpress',
-    'bin/org2html',
-    'bin/org2html-wp',
-    'bin/stat-org-document'
+    'script/count-done-org-todos',
+    'script/count-org-headlines-fast',
+    'script/count-org-todos',
+    'script/count-org-todos-fast',
+    'script/count-undone-org-todos',
+    'script/dump-org-structure',
+    'script/filter-org-by-headlines',
+    'script/list-org-anniversaries',
+    'script/list-org-headlines',
+    'script/list-org-headlines-fast',
+    'script/list-org-priorities',
+    'script/list-org-tags',
+    'script/list-org-todo-states',
+    'script/list-org-todos',
+    'script/list-org-todos-fast',
+    'script/move-done-todos',
+    'script/org-to-html',
+    'script/org-to-html-wordpress',
+    'script/org2html',
+    'script/org2html-wp',
+    'script/stat-org-document'
 );
 
 # no fake home requested
 
-my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+my @switches = (
+    -d 'blib' ? '-Mblib' : '-Ilib',
+);
 
 use File::Spec;
 use IPC::Open3;
@@ -57,7 +59,11 @@ for my $lib (@module_files)
     # see L<perlfaq8/How can I capture STDERR from an external command?>
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-e', "require q[$lib]"))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
@@ -79,11 +85,15 @@ foreach my $file (@scripts)
     my $line = <$fh>;
 
     close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
-    my @flags = $1 ? split(' ', $1) : ();
+    @switches = (@switches, split(' ', $1)) if $1;
 
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    diag('Running: ', join(', ', map { my $str = $_; $str =~ s/'/\\'/g; q{'} . $str . q{'} }
+            $^X, @switches, '-c', $file))
+        if $ENV{PERL_COMPILE_TEST_DEBUG};
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, @switches, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);

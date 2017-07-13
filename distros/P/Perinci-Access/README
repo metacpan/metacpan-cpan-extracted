@@ -1,30 +1,36 @@
-SYNOPSIS
+NAME
+    Perinci::Access - Wrapper for Perinci Riap clients
 
+VERSION
+    This document describes version 0.45 of Perinci::Access (from Perl
+    distribution Perinci-Access), released on 2017-07-10.
+
+SYNOPSIS
      use Perinci::Access;
-    
+
      my $pa = Perinci::Access->new;
      my $res;
-    
+
      ### launching Riap request
-    
+
      # use Perinci::Access::Perl
      $res = $pa->request(call => "pl:/Mod/SubMod/func");
-    
+
      # use Perinci::Access::Schemeless
      $res = $pa->request(call => "/Mod/SubMod/func");
-    
+
      # use Perinci::Access::HTTP::Client
      $res = $pa->request(info => "http://example.com/Sub/ModSub/func",
                          {uri=>'/Sub/ModSub/func'});
-    
+
      # use Perinci::Access::Simple::Client
      $res = $pa->request(meta => "riap+tcp://localhost:7001/Sub/ModSub/");
-    
+
      # dies, unknown scheme
      $res = $pa->request(call => "baz://example.com/Sub/ModSub/");
-    
+
      ### parse URI
-    
+
      $res = $pa->parse_url("/Foo/bar");                              # {proto=>'pl', path=>"/Foo/bar"}
      $res = $pa->parse_url("pl:/Foo/bar");                           # ditto
      $res = $pa->parse_url("riap+unix:/var/run/apid.sock//Foo/bar"); # {proto=>'riap+unix', path=>"/Foo/bar", unix_sock_path=>"/var/run/apid.sock"}
@@ -32,7 +38,6 @@ SYNOPSIS
      $res = $pa->parse_url("http://cpanlists.org/api/");             # {proto=>'http', path=>"/App/cpanlists/Server/"} # will perform an 'info' Riap request to the server first
 
 DESCRIPTION
-
     This module provides a convenient wrapper to select appropriate Riap
     client (Perinci::Access::*) objects based on URI scheme.
 
@@ -52,89 +57,96 @@ DESCRIPTION
     details).
 
 VARIABLES
-
- $Log_Request (BOOL)
-
+  $Log_Request (BOOL)
     Whether to log every Riap request. Default is from environment variable
-    LOG_RIAP_REQUEST, or false. Logging is done with Log::Any at trace
+    LOG_RIAP_REQUEST, or false. Logging is done with Log::ger at trace
     level.
 
- $Log_Response (BOOL)
-
-    Whether to log every Riap response. Default is from environment
-    variable LOG_RIAP_RESPONSE, or false. Logging is done with Log::Any at
-    trace level.
+  $Log_Response (BOOL)
+    Whether to log every Riap response. Default is from environment variable
+    LOG_RIAP_RESPONSE, or false. Logging is done with Log::ger at trace
+    level.
 
 METHODS
-
- new(%opts) -> OBJ
-
+  new(%opts) -> OBJ
     Create new instance. Known options:
 
-      * handlers => HASH
+    *   handlers => HASH
 
-      A mapping of scheme names and class names or objects. If values are
-      class names, they will be require'd and instantiated. The default is:
+        A mapping of scheme names and class names or objects. If values are
+        class names, they will be require'd and instantiated. The default
+        is:
 
-       {
-         ''           => 'Perinci::Access::Schemeless',
-         pl           => 'Perinci::Access::Perl',
-         http         => 'Perinci::Access::HTTP::Client',
-         https        => 'Perinci::Access::HTTP::Client',
-         'riap+tcp'   => 'Perinci::Access::Simple::Client',
-         'riap+unix'  => 'Perinci::Access::Simple::Client',
-         'riap+pipe'  => 'Perinci::Access::Simple::Client',
-       }
+         {
+           ''           => 'Perinci::Access::Schemeless',
+           pl           => 'Perinci::Access::Perl',
+           http         => 'Perinci::Access::HTTP::Client',
+           https        => 'Perinci::Access::HTTP::Client',
+           'riap+tcp'   => 'Perinci::Access::Simple::Client',
+           'riap+unix'  => 'Perinci::Access::Simple::Client',
+           'riap+pipe'  => 'Perinci::Access::Simple::Client',
+         }
 
-      Objects can be given instead of class names. This is used if you need
-      to pass special options when instantiating the class.
+        Objects can be given instead of class names. This is used if you
+        need to pass special options when instantiating the class.
 
-      * handler_args => HASH
+    *   handler_args => HASH
 
-      Arguments to pass to handler objects' constructors.
+        Arguments to pass to handler objects' constructors.
 
- $pa->request($action, $server_url[, \%extra_keys[, \%client_opts]]) ->
- RESP
-
+  $pa->request($action, $server_url[, \%extra_keys[, \%client_opts]]) -> RESP
     Send Riap request to Riap server. Pass the request to the appropriate
-    Riap client (as configured in handlers constructor options). RESP is
+    Riap client (as configured in "handlers" constructor options). RESP is
     the enveloped result.
 
-    %extra_keys is optional, containing Riap request keys (the action
+    %extra_keys is optional, containing Riap request keys (the "action"
     request key is taken from $action).
 
     %client_opts is optional, containing Riap-client-specific options. For
-    example, to pass HTTP credentials to Perinci::Access::HTTP::Client, you
-    can do:
+    example, to pass HTTP credentials to "Perinci::Access::HTTP::Client",
+    you can do:
 
      $pa->request(call => 'http://example.com/Foo/bar', {args=>{a=>1}},
                   {user=>'admin', password=>'secret'});
 
- $pa->parse_url($server_url[, \%client_opts]) => HASH
-
+  $pa->parse_url($server_url[, \%client_opts]) => HASH
     Parse $server_url into its components. Will be done by respective
-    subclasses. Die on failure (e.g. invalid URL). Return a hash on
-    success, containing at least these keys:
+    subclasses. Die on failure (e.g. invalid URL). Return a hash on success,
+    containing at least these keys:
 
-      * proto => STR
+    *   proto => STR
 
-      * path => STR
+    *   path => STR
 
-      Code entity path. Most URL schemes include the code entity path as
-      part of the URL, e.g. pl, riap+unix, riap+tcp, or riap+pipe. Some do
-      not, e.g. http and https. For the latter case, an info Riap request
-      will be sent to the server first to find out the code entity path .
+        Code entity path. Most URL schemes include the code entity path as
+        part of the URL, e.g. "pl", "riap+unix", "riap+tcp", or "riap+pipe".
+        Some do not, e.g. "http" and "https". For the latter case, an "info"
+        Riap request will be sent to the server first to find out the code
+        entity path .
 
     Subclasses will add other appropriate keys.
 
 ENVIRONMENT
-
     LOG_RIAP_REQUEST
 
     LOG_RIAP_RESPONSE
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Access>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Access>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::Access::Schemeless
 
     Perinci::Access::Perl
@@ -142,4 +154,14 @@ SEE ALSO
     Perinci::Access::HTTP::Client
 
     Perinci::Access::Simple::Client
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

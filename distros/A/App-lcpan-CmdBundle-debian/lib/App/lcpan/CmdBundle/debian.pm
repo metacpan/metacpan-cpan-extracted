@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::debian;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to Debian
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::debian - More lcpan subcommands related to Debian
 
 =head1 VERSION
 
-This document describes version 0.006 of App::lcpan::CmdBundle::debian (from Perl distribution App-lcpan-CmdBundle-debian), released on 2017-01-20.
+This document describes version 0.007 of App::lcpan::CmdBundle::debian (from Perl distribution App-lcpan-CmdBundle-debian), released on 2017-07-10.
 
 =head1 SYNOPSIS
 

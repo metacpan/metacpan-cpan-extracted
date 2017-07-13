@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::FinderCode 6.009;
+package Dist::Zilla::Plugin::FinderCode 6.010;
 # ABSTRACT: a callback-based FileFinder plugin
 
 use Moose;
@@ -57,7 +57,7 @@ Dist::Zilla::Plugin::FinderCode - a callback-based FileFinder plugin
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 AUTHOR
 

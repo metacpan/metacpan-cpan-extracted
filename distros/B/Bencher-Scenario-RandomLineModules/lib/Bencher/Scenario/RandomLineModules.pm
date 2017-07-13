@@ -1,12 +1,12 @@
 package Bencher::Scenario::RandomLineModules;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 sub _create_file {
     my ($num_lines) = @_;
@@ -45,9 +45,9 @@ our $scenario = {
 
         my $dss = $sc->{datasets};
         for my $ds (@$dss) {
-            $log->infof("Creating temporary file with %d lines ...", $ds->{_lines});
+            log_info("Creating temporary file with %d lines ...", $ds->{_lines});
             my $filename = _create_file($ds->{_lines});
-            $log->infof("Created file %s", $filename);
+            log_info("Created file %s", $filename);
             $ds->{args}{filename} = $filename;
         }
     },
@@ -60,7 +60,7 @@ our $scenario = {
         for my $ds (@$dss) {
             my $filename = $ds->{args}{filename};
             next unless $filename;
-            $log->infof("Unlinking %s", $filename);
+            log_info("Unlinking %s", $filename);
             unlink $filename;
         }
     },
@@ -81,7 +81,7 @@ Bencher::Scenario::RandomLineModules - Benchmark modules which pick random line(
 
 =head1 VERSION
 
-This document describes version 0.04 of Bencher::Scenario::RandomLineModules (from Perl distribution Bencher-Scenario-RandomLineModules), released on 2017-01-25.
+This document describes version 0.05 of Bencher::Scenario::RandomLineModules (from Perl distribution Bencher-Scenario-RandomLineModules), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -141,7 +141,7 @@ Code template:
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
 
 Benchmark with default options (C<< bencher -m RandomLineModules >>):
 
@@ -149,10 +149,10 @@ Benchmark with default options (C<< bencher -m RandomLineModules >>):
  +---------------------------------+----------+-----------+-----------+------------+---------+---------+
  | participant                     | dataset  | rate (/s) | time (ms) | vs_slowest |  errors | samples |
  +---------------------------------+----------+-----------+-----------+------------+---------+---------+
- | File::Random::Pick::random_line | 10k_line |       450 |     2.2   |       1    | 5.1e-06 |      20 |
- | File::Random::Pick::random_line | 1k_line  |      4340 |     0.23  |       9.76 | 2.1e-07 |      20 |
- | File::RandomLine                | 1k_line  |     95000 |     0.011 |     210    | 1.3e-08 |      20 |
- | File::RandomLine                | 10k_line |     95000 |     0.01  |     210    | 2.6e-08 |      21 |
+ | File::Random::Pick::random_line | 10k_line |       500 |     2     |        1   | 4.6e-06 |      21 |
+ | File::Random::Pick::random_line | 1k_line  |      4800 |     0.21  |        9.6 | 2.1e-07 |      20 |
+ | File::RandomLine                | 10k_line |     61000 |     0.016 |      120   | 2.7e-08 |      20 |
+ | File::RandomLine                | 1k_line  |     62000 |     0.016 |      120   | 2.3e-08 |      27 |
  +---------------------------------+----------+-----------+-----------+------------+---------+---------+
 
 
@@ -162,9 +162,9 @@ Benchmark module startup overhead (C<< bencher -m RandomLineModules --module-sta
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
  | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | File::RandomLine    | 0.82                         | 4                  | 16             |      15   |                    9.2 |        1   | 9.9e-05 |      21 |
- | File::Random::Pick  | 1.6                          | 5                  | 19             |       9   |                    3.2 |        1.6 | 5.1e-05 |      20 |
- | perl -e1 (baseline) | 0.93                         | 4.3                | 16             |       5.8 |                    0   |        2.5 | 2.4e-05 |      20 |
+ | File::RandomLine    | 0.83                         | 4.2                | 20             |      15   |                    9.6 |        1   |   3e-05 |      20 |
+ | File::Random::Pick  | 1.6                          | 5.1                | 23             |       8.7 |                    3.3 |        1.7 | 3.1e-05 |      20 |
+ | perl -e1 (baseline) | 0.93                         | 4.4                | 20             |       5.4 |                    0   |        2.8 | 1.8e-05 |      20 |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 
@@ -192,7 +192,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -10,7 +10,7 @@ use JSON::RPC::Client;
 
 use Bitcoin::RPC::Client::API;
 
-our $VERSION  = '0.05';
+our $VERSION  = '0.06';
 
 has jsonrpc  => (is => "lazy", default => sub { "JSON::RPC::Client"->new });
 has user     => (is => 'ro');
@@ -44,7 +44,12 @@ sub AUTOLOAD {
    my $url = $uri . $self->user . ":" . $self->password . "\@" . $self->host . ":" . $self->port;
 
    my $client = $self->jsonrpc;
-   $client->ua->timeout($self->timeout); # Because bitcoind is slow
+
+   # Set timeout because bitcoin is slow
+   $client->ua->timeout($self->timeout); 
+
+   # Set Agent, let them know who we be 
+   $client->ua->agent("Bitcoin::RPC::Client/" . $VERSION); 
 
    # Turn on debugging for LWP::UserAgent
    if ($self->debug) {
@@ -159,39 +164,86 @@ Bitcoin::RPC::Client - Bitcoin Core API RPCs
       host     => "127.0.0.1",
    );
 
-   # Getting Data when a hash is returned
-   $info    = $btc->getinfo;
-   $balance = $info->{balance};
-   print $balance;
-
-   # A person would need to know the JSON elements of
-   # the output. 
-   # https://bitcoin.org/en/developer-reference#getinfo
-   #
-   # Ex.
-   #{
-   #   "version" : 80100,
-   #   "protocolversion" : 70001,
-   #   "walletversion" : 60000,
-   #   "balance" : 0.00720000,
-   #   "blocks" : 253032,
-   #   "connections" : 16,
-   #   "proxy" : "",
-   #   "difficulty" : 50810339.04827648,
-   #   "testnet" : false,
-   #   "keypoololdest" : 1365114158,
-   #   "keypoolsize" : 101,
-   #   "paytxfee" : 0.00500000,
-   #   "errors" : ""
-   #}
-
-   # Other functions that do not return a JSON object will have a scalar result
+   # Functions that do not return a JSON object will have a scalar result
    $balance  = $btc->getbalance("yourAccountName");
    print $balance;
 
    # JSON::Boolean objects must be passed as boolean parameters
    $balance  = $btc->getbalance("yourAccountName", 1, JSON::true);
    print $balance;
+
+   # Getting Data when JSON/hash is returned
+   # A person would need to know the JSON elements of
+   # the output https://bitcoin.org/en/developer-reference#getinfo
+   #
+   #{
+   #  "version": 130000,
+   #  "protocolversion": 70014,
+   #  "walletversion": 130000,
+   #  "balance": 0.00000000,
+   #  "blocks": 584240,
+   #  "proxy": "",
+   #  "difficulty": 1,
+   #  "paytxfee": 0.00500000,
+   #  "relayfee": 0.00001000,
+   #  "errors": ""
+   #}
+   $info    = $btc->getinfo;
+   $balance = $info->{balance};
+   print $balance;
+   # 0.0
+
+   # JSON Objects
+   # Let's say we want the timeframe value
+   #
+   #{
+   #  "totalbytesrecv": 7137052851,
+   #  "totalbytessent": 211648636140,
+   #  "uploadtarget": {
+   #    "timeframe": 86400,
+   #    "target": 0,
+   #    "target_reached": false,
+   #    "serve_historical_blocks": true,
+   #    "bytes_left_in_cycle": 0,
+   #    "time_left_in_cycle": 0
+   #  }
+   #}
+   $nettot = $btc->getnettotals;
+   $timeframe = $nettot->{uploadtarget}{timeframe};
+   print $timeframe;
+   # 86400
+
+   # JSON arrays
+   # Let's say we want the softfork IDs from the following:
+   #
+   #{
+   #  "chain": "main",
+   #  "blocks": 464562,
+   #  "headers": 464562,
+   #  "pruned": false,
+   #  "softforks": [
+   #    {
+   #      "id": "bip34",
+   #      "version": 2,
+   #      "reject": {
+   #        "status": true
+   #      }
+   #    },
+   #    {
+   #      "id": "bip66",
+   #      "version": 3,
+   #      "reject": {
+   #        "status": true
+   #      }
+   #    }
+   $bchain = $btc->getblockchaininfo;
+   @forks = @{ $bchain->{softforks} };
+   foreach $f (@forks) {
+      print $f->{id};
+      print "\n";
+   }
+   # bip34
+   # bip66
 
 =head1 DESCRIPTION
 
@@ -239,6 +291,10 @@ Wesley Hinds wesley.hinds@gmail.com
 The latest branch is avaiable from Github.
 
 https://github.com/whindsx/Bitcoin-RPC-Client.git
+
+=head1 DONATE
+
+1Ky49cu7FLcfVmuQEHLa1WjhRiqJU2jHxe 
 
 =head1 LICENSE AND COPYRIGHT
 

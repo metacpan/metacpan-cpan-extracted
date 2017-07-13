@@ -8,7 +8,7 @@ on 'runtime' => sub {
 };
 
 on 'build' => sub {
-    requires 'Alien::libuv' => '0.004';
+    requires 'Alien::libuv' => '0.006';
     requires 'Config';
     requires 'ExtUtils::MakeMaker' => '7.12';
 };
@@ -18,6 +18,7 @@ on 'configure' => sub {
 };
 
 on 'test' => sub {
+    requires 'Alien::libuv';
     requires 'Test::More' => '0.88';
 };
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "it's convinient way to work with async data flow.",
+   "abstract" : "it's convenient way to work with async data flow.",
    "author" : [
       "Kirill Sysoev <k.sysoev@me.com>"
    ],
@@ -40,6 +40,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

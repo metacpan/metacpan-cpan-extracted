@@ -1,37 +1,38 @@
 package Module::Patch;
 
-our $DATE = '2016-06-02'; # DATE
-our $VERSION = '0.24'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.25'; # VERSION
 
 use 5.010001;
-use strict;
+use strict 'subs', 'vars';
 use warnings;
-use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+#use Log::ger;
 
-use Carp;
-use Module::Load;
-use Module::Loaded;
 use Monkey::Patch::Action qw();
-use SHARYANTO::Array::Util qw(match_array_or_regex);
 use Package::MoreUtil qw(list_package_contents package_exists);
 
 our @EXPORT_OK = qw(patch_package);
 
+sub is_loaded {
+    my $mod = shift;
+
+    (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+    exists($INC{$mod_pm}) && $INC{$mod_pm};
+}
+
 my%loaded_by_us;
 
 sub import {
-    no strict 'refs';
-    no warnings; # W lines generate warnings
-
     my $self = shift;
+
+    my $caller = caller;
 
     if ($self eq __PACKAGE__) {
         # we are not subclassed, provide exports
-        my @caller = caller;
-        for (@_) {
-            croak "$_ is not exported by ".__PACKAGE__ unless $_ ~~ @EXPORT_OK;
-            *{"$caller[0]::$_"} = \&$_;
+        for my $exp (@_) {
+            die "$exp is not exported by ".__PACKAGE__
+                unless grep { $_ eq $exp } @EXPORT_OK;
+            *{"$caller\::$exp"} = \&{$_};
         }
     } else {
         # we are subclassed, patch caller with patch_data()
@@ -70,15 +71,15 @@ sub import {
             } elsif ($v == 2) {
                 $mpv = "0.07-0.09";
             }
-            croak "$self ".( ${"$self\::VERSION" } // "?" ).
+            die "$self ".( ${"$self\::VERSION" } // "?" ).
                 " requires Module::Patch $mpv (patch_data format v=$v),".
-                    " this is Module::Patch ".($Module::Patch::VERSION // '?').
-                        " (v=$curv), please install an older version of ".
-                            "Module::Patch or upgrade $self";
+                " this is Module::Patch ".($Module::Patch::VERSION // '?').
+                " (v=$curv), please install an older version of ".
+                "Module::Patch or upgrade $self";
         } elsif ($v == 3) {
             # ok, current version
         } else {
-            croak "BUG: $self: Unknown patch_data format version ($v), ".
+            die "BUG: $self: Unknown patch_data format version ($v), ".
                 "only v=$curv supported by this version of Module::Patch";
         }
 
@@ -89,16 +90,17 @@ sub import {
 
         if (is_loaded($target) && !$loaded_by_us{$target}) {
             if ($load && $warn) {
-                carp "$target is loaded before ".__PACKAGE__.", this is not ".
+                warn "$target is loaded before ".__PACKAGE__.", this is not ".
                     "recommended since $target might export subs before ".
-                        __PACKAGE__." gets the chance to patch them";
+                    __PACKAGE__." gets the chance to patch them";
             }
         } else {
             if ($load) {
-                load $target;
+                eval "package $caller; use $target";
+                die if $@;
                 $loaded_by_us{$target}++;
             } else {
-                croak "FATAL: $self: $target is not loaded, please ".
+                die "FATAL: $self: $target is not loaded, please ".
                     "'use $target' before patching";
             }
         }
@@ -115,7 +117,7 @@ sub import {
         }
 
         if (keys %opts) {
-            croak "$self: Unknown option(s): ".join(", ", keys %opts);
+            die "$self: Unknown option(s): ".join(", ", keys %opts);
         }
 
         if ($pdata->{after_read_config}) {
@@ -153,7 +155,7 @@ sub unimport {
         }
 
         my $handles = ${"$self\::handles"};
-        $log->tracef("Unpatching %s ...", [keys %$handles]);
+        #log_trace("Unpatching %s ...", [keys %$handles]);
         undef ${"$self\::handles"};
         # do we need to undef ${"$self\::config"}?, i'm thinking not really
 
@@ -176,7 +178,7 @@ sub patch_package {
 
     my $handles = {};
     for my $target (ref($package0) eq 'ARRAY' ? @$package0 : ($package0)) {
-        croak "FATAL: Target module '$target' not loaded"
+        die "FATAL: Target module '$target' not loaded"
             unless package_exists($target);
         my $target_version = ${"$target\::VERSION"};
         my @target_subs;
@@ -226,8 +228,8 @@ sub patch_package {
             unless (!defined($pspec->{mod_version}) ||
                         $pspec->{mod_version} eq ':all') {
                 defined($target_version) && length($target_version)
-                    or croak "FATAL: Target package '$target' does not have ".
-                        "\$VERSION";
+                    or die "FATAL: Target package '$target' does not have ".
+                    "\$VERSION";
                 my $mod_versions = $pspec->{mod_version};
                 $mod_versions = ref($mod_versions) eq 'ARRAY' ?
                     [@$mod_versions] : [$mod_versions];
@@ -237,19 +239,19 @@ sub patch_package {
                         if /^:/;
                 }
 
-                my $ver_match=match_array_or_regex(
-                    $target_version, $mod_versions);
-                unless ($ver_match) {
-                    carp "$errp: Target module version $target_version ".
+                unless (grep {
+                    ref($_) eq 'Regexp' ? $target_version =~ $_ : $target_version eq $_
+                } @$mod_versions) {
+                    warn "$errp: Target module version $target_version ".
                         "does not match [".join(", ", @$mod_versions)."], ".
-                            ($opts->{force} ?
-                                 "patching anyway (force)":"skipped"). ".";
+                        ($opts->{force} ?
+                         "patching anyway (force)":"skipped"). ".";
                     next PATCH unless $opts->{force};
                 }
             }
 
             for my $s (@s) {
-                $log->tracef("Patching %s ...", $s);
+                #log_trace("Patching %s ...", $s);
                 $handles->{"$target\::$s"} =
                     Monkey::Patch::Action::patch_package(
                         $target, $s, $act, $pspec->{code});
@@ -276,7 +278,7 @@ Module::Patch - Patch package with a set of patches
 
 =head1 VERSION
 
-This document describes version 0.24 of Module::Patch (from Perl distribution Module-Patch), released on 2016-06-02.
+This document describes version 0.25 of Module::Patch (from Perl distribution Module-Patch), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -285,15 +287,15 @@ To use Module::Patch directly:
  # patching DBI modules so that calls are logged
 
  use Module::Patch qw(patch_package);
- use Log::Any '$log';
+ use Log::ger;
  my $handle = patch_package(['DBI', 'DBI::st', 'DBI::db'], [
      {action=>'wrap', mod_version=>':all', sub_name=>':public', code=>sub {
          my $ctx = shift;
 
-         $log->tracef("Entering %s(%s) ...", $ctx->{orig_name}, \@_);
+         log_trace("Entering %s(%s) ...", $ctx->{orig_name}, \@_);
          my $res;
          if (wantarray) { $res=[$ctx->{orig}->(@_)] } else { $res=$ctx->{orig}->(@_) }
-         $log->tracef("Returned from %s", $ctx->{orig_name});
+         log_trace("Returned from %s", $ctx->{orig_name});
          if (wantarray) { return @$res } else { return $res }
      }},
  ]);
@@ -372,7 +374,7 @@ patching.
 
 =back
 
-=for Pod::Coverage ^(unimport|patch_data)$
+=for Pod::Coverage ^(unimport|patch_data|is_loaded)$
 
 =head1 PATCH DATA SPECIFICATION
 
@@ -516,7 +518,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Module-Pat
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Module-Patch>.
+Source repository is at L<https://github.com/perlancar/perl-Module-Patch>.
 
 =head1 BUGS
 
@@ -545,7 +547,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

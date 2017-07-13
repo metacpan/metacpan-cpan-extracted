@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Advanced interpolation engine for Alien builds
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
 sub new
@@ -51,10 +51,10 @@ sub replace_helper
 }
 
 
-sub execute_helper
+sub has_helper
 {
   my($self, $name) = @_;
-  
+
   foreach my $module (keys %{ $self->{helper}->{$name}->{require} })
   {
     my $version = $self->{helper}->{$name}->{require}->{$module};
@@ -80,7 +80,7 @@ sub execute_helper
   
   my $code = $self->{helper}->{$name}->{code};
   
-  die "no helper defined for $name" unless defined $code;
+  return unless defined $code;
 
   if(ref($code) ne 'CODE')
   {
@@ -92,6 +92,17 @@ sub execute_helper
       $value;
     };
   }
+  
+  $code;
+}
+
+
+sub execute_helper
+{
+  my($self, $name) = @_;
+  
+  my $code = $self->has_helper($name);
+  die "no helper defined for $name" unless defined $code;
   
   $code->();
 }
@@ -174,7 +185,7 @@ Alien::Build::Interpolate - Advanced interpolation engine for Alien builds
 
 =head1 VERSION
 
-version 0.55
+version 0.61
 
 =head1 CONSTRUCTOR
 
@@ -191,6 +202,13 @@ version 0.55
 
  $intr->replace_helper($name => $code);
  $intr->replace_helper($name => $code, %requirements);
+
+=head2 has_helper
+
+ my $coderef = $intr->has_helper($name);
+
+Used to discover if a helper exists with the given name.
+Returns the code reference.
 
 =head2 execute_helper
 

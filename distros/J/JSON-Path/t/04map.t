@@ -1,3 +1,4 @@
+
 =head1 PURPOSE
 
 Test C<jpath_map> exported function.
@@ -63,24 +64,15 @@ my $path1 = '$.store.book[*].title';
 
 jpath_map { uc $_ } $object, '$.store.book[*].title';
 
-is_deeply(
-	[ jpath1($object, $path1) ],
-	[ map uc,'Sayings of the Century' ],
-);
+is_deeply( [ jpath1( $object, $path1 ) ], [ map uc, 'Sayings of the Century' ], );
 
 is_deeply(
-	[ jpath($object, $path1) ],
-	[ map uc, 'Sayings of the Century', 'Sword of Honour', 'Moby Dick', 'The Lord of the Rings' ],
+    [ jpath( $object, $path1 ) ],
+    [ map uc, 'Sayings of the Century', 'Sword of Honour', 'Moby Dick', 'The Lord of the Rings' ],
 );
 
-is(
-	JSON::Path->new('$.store.book[*].author')->set($object => 'Anon', 2),
-	2,
-);
+is( JSON::Path->new('$.store.book[*].author')->set( $object => 'Anon', 2 ), 2, );
 
-is_deeply(
-	[ jpath($object, '$.store.book[*].author') ],
-	[ 'Anon', 'Anon', 'Herman Melville', 'J. R. R. Tolkien' ],
-);
+is_deeply( [ jpath( $object, '$.store.book[*].author' ) ], [ 'Anon', 'Anon', 'Herman Melville', 'J. R. R. Tolkien' ], );
 
 done_testing();

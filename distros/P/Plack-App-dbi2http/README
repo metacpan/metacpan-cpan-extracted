@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Plack::App::dbi2http - Export DBI database as HTTP API (Riap::HTTP)
 
+VERSION
+    This document describes version 0.07 of Plack::App::dbi2http (from Perl
+    distribution Plack-App-dbi2http), released on 2017-07-11.
+
+SYNOPSIS
     Prepare and edit a config file:
 
      % cp share/sample-config/dbi2http.conf.yaml ~
@@ -16,13 +22,13 @@ SYNOPSIS
      % curl http://localhost:5000/list_tables
      countries
      continents
-    
+
      % curl http://localhost:5000/list_columns?table=countries
      id
      ind_name
      eng_name
      tags
-    
+
      % curl 'http://localhost:5000/list_columns?table=countries&detail=1&-riap-fmt=json-pretty'
      [
         200,
@@ -50,13 +56,13 @@ SYNOPSIS
           }
        ]
      ]
-    
+
      % curl 'http://localhost:5000/list_rows?table=countries'
      China   cn      Cina    panda
      Indonesia       id      Indonesia       bali,tropical
      Singapore       sg      Singapura       tropical
      United States of America        us      Amerika Serikat
-    
+
      % curl 'http://localhost:5000/list_rows?table=countries&-riap-fmt=text-pretty'
      .-----------------------------------------------------------------.
      | eng_name                   id   ind_name          tags          |
@@ -75,37 +81,36 @@ SYNOPSIS
      list_columns
      list_rows
      list_tables
-    
+
      riap /> list_tables
      countries
      continents
-    
+
      riap /> list_columns --table countries --detail
-    
+
      riap /> list_rows --table countries
 
 DESCRIPTION
-
     This module provides a sample Plack application, which you can
     customize, to export a DBI database as a HTTP API service.
 
     I was reading Yanick's blog entry today,
-    http://techblog.babyl.ca/entry/waack, titled Instant REST API for Any
-    Databases and I thought I'd quickly cobble up something similar using a
+    <http://techblog.babyl.ca/entry/waack>, titled *Instant REST API for Any
+    Databases* and I thought I'd quickly cobble up something similar using a
     different toolbox. Granted, the resulting HTTP API is not REST (read:
     it's better :-) and at 0.01 the API functions are somewhat limited
     (DBIx::FunctionalAPI) but this demonstrates how easy it is to create
     something usable.
 
     The tools and frameworks are: DBIx::FunctionalAPI which provides a set
-    of functions: list_tables, list_columns, list_rows, create_table,
-    create_row, rename_table, etc. These are normal Perl functions that
-    accept dbh, table arguments and so on.
+    of functions: "list_tables", "list_columns", "list_rows",
+    "create_table", "create_row", "rename_table", etc. These are normal Perl
+    functions that accept "dbh", "table" arguments and so on.
 
     Next we have Perinci::Access::HTTP::Server, a set of Plack middlewares
     that let you access Perl functions over HTTP using the Riap::HTTP
     protocol. We compose the middlewares in a PSGI application called
-    dbi2http.psgi.
+    "dbi2http.psgi".
 
     All you need to do now is just run the PSGI application with Plack,
     using one of the many available PSGI servers. There is a configuration
@@ -123,7 +128,7 @@ DESCRIPTION
      function        list_columns
      function        list_rows
      function        list_tables
-    
+
      Tips:
      * To call a function, try:
          http://localhost:5000/api/list_tables
@@ -136,7 +141,7 @@ DESCRIPTION
          https://metacpan.org/module/Riap
 
     We can see there are 3 top-level functions available. Let's call the
-    list_tables function to, well, list available tables.
+    "list_tables" function to, well, list available tables.
 
      % curl http://localhost:5000/list_tables
      "main"."continents"
@@ -146,9 +151,9 @@ DESCRIPTION
      "main"."continents"
      "main"."countries"
 
-    Functions usually return data structure and the PSGI application
-    formats it as a presentable text to the client. To get the raw data,
-    use the -riap-fmt special argument:
+    Functions usually return data structure and the PSGI application formats
+    it as a presentable text to the client. To get the raw data, use the
+    "-riap-fmt" special argument:
 
      % curl http://localhost:5000/list_tables?-riap-fmt=json-pretty
      [
@@ -165,8 +170,8 @@ DESCRIPTION
      ]
 
     Actually, Riap provides more than just RPC (function call). It can also
-    expose function metadata so the protocol is super-self-discoverable.
-    For example, instead of the default call action, let's call the meta
+    expose function metadata so the protocol is super-self-discoverable. For
+    example, instead of the default "call" action, let's call the "meta"
     action to request the function metadata:
 
      % curl 'http://localhost:5000/list_tables?-riap-action=meta&-riap-fmt=json-pretty'
@@ -237,8 +242,8 @@ DESCRIPTION
        }
      ]
 
-    We can see from the above that the list_columns function accepts
-    arguments table (a string, required) and detail (bool).
+    We can see from the above that the "list_columns" function accepts
+    arguments "table" (a string, required) and "detail" (bool).
 
     For the full specification of the metadata format, see Rinci.
 
@@ -253,8 +258,8 @@ DESCRIPTION
      % riap http://localhost:5000/
      riap />
 
-    We are first presented with a prompt. Let's try listing what's
-    available in the top-level directory:
+    We are first presented with a prompt. Let's try listing what's available
+    in the top-level directory:
 
      riap /> ls -l
      .-------------------------.
@@ -265,8 +270,8 @@ DESCRIPTION
      | function   list_tables  |
      `-------------------------'
 
-    We see that there are three functions available. To call a function,
-    you can run it like a running a program:
+    We see that there are three functions available. To call a function, you
+    can run it like a running a program:
 
      riap /> list_tables
      .-----------------------------------------------------------.
@@ -276,7 +281,7 @@ DESCRIPTION
      `-----------------------------------------------------------'
 
     Note that you can do completion on the command-line. You can even call
-    with --help option like a normal program:
+    with "--help" option like a normal program:
 
      riap /> list_columns --help
      Usage
@@ -291,16 +296,39 @@ DESCRIPTION
          Table name.
 
     This help message is generated from the metadata (so in the background,
-    the client performs a meta request and converts it to a formatted help
+    the client performs a "meta" request and converts it to a formatted help
     message).
 
-    To add HTTP authentication (or do any other customization), you can
-    just add a Plack middleware to the PSGI application.
+    To add HTTP authentication (or do any other customization), you can just
+    add a Plack middleware to the PSGI application.
 
-    Last word, exporting a database as a public API service is usually not
-    a good idea. In case you don't realize that ;-)
+    Last word, exporting a database as a public API service is usually not a
+    good idea. In case you don't realize that ;-)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Plack-App-dbi2http>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Plack-App-dbi2http>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-App-dbi2http>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Rinci, Riap, Riap::HTTP, DBIx::FunctionalAPI, App::riap
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

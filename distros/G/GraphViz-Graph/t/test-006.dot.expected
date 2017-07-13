@@ -1,0 +1,20 @@
+digraph {
+  nd_0001 [
+    shape=none
+    
+  label="Text label"
+  ];
+
+  nd_0002 [
+    shape=none
+    
+  label=<<font point-size="45"><font face="Courier">html</font><font face="Helvetica">label</font></font>>
+  ];
+
+  nd_0003 [
+    shape=none
+  ];
+
+
+  label=<<font point-size='20'><b><font face='Courier'>test-006</font></b></font>>
+}

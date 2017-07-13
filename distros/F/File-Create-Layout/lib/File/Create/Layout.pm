@@ -1,12 +1,12 @@
 package File::Create::Layout;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::chdir;
 
@@ -223,19 +223,19 @@ sub create_files_using_layout {
 
         if (defined $prev_level) {
             if ($e->{level} > $prev_level) {
-                $log->tracef("chdir %s ...", $dirs[-1]);
+                log_trace("chdir %s ...", $dirs[-1]);
                 eval { $CWD = $dirs[-1] };
                 return [500, "Can't chdir to $p/$e->{name}: $!"] if $@;
             } elsif ($e->{level} < $prev_level) {
                 my $dir = join("/", (("..") x ($prev_level - $e->{level})));
-                $log->tracef("chdir %s ...", $dir);
+                log_trace("chdir %s ...", $dir);
                 eval { $CWD = $dir };
                 return [500, "Can't chdir back to $dir: $!"]
                     if $@;
             }
         }
 
-        $log->tracef("Creating %s/%s%s ...",
+        log_trace("Creating %s/%s%s ...",
                      $p, $e->{name}, $e->{is_dir} ? "/":"");
         if ($e->{is_dir}) {
             do {
@@ -324,7 +324,7 @@ File::Create::Layout - Quickly create files/directories according to a layout
 
 =head1 VERSION
 
-This document describes version 0.04 of File::Create::Layout (from Perl distribution File-Create-Layout), released on 2016-03-16.
+This document describes version 0.05 of File::Create::Layout (from Perl distribution File-Create-Layout), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -426,7 +426,11 @@ are not allowed) is used for this:
 =head1 FUNCTIONS
 
 
-=head2 check_layout(%args) -> [status, msg, result, meta]
+=head2 check_layout
+
+Usage:
+
+ check_layout(%args) -> [status, msg, result, meta]
 
 Check whether layout has syntax errors.
 
@@ -456,7 +460,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 create_files_using_layout(%args) -> [status, msg, result, meta]
+=head2 create_files_using_layout
+
+Usage:
+
+ create_files_using_layout(%args) -> [status, msg, result, meta]
 
 Create files/directories according to a layout.
 
@@ -500,7 +508,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 parse_layout(%args) -> [status, msg, result, meta]
+=head2 parse_layout
+
+Usage:
+
+ parse_layout(%args) -> [status, msg, result, meta]
 
 Parse layout string into a data structure suitable for processing.
 
@@ -555,7 +567,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

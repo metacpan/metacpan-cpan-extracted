@@ -1,12 +1,12 @@
 package App::lcpan::Daemon;
 
-our $DATE = '2016-01-17'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use App::lcpan ();
 
@@ -21,7 +21,7 @@ sub _init {
         require PERLANCAR::Module::List;
         no strict 'refs';
 
-        $log->tracef("Enumerating functions ...");
+        log_trace("Enumerating functions ...");
         my $mods = PERLANCAR::Module::List::list_modules(
             "App::lcpan::Cmd::", {list_modules=>1});
 
@@ -36,10 +36,10 @@ sub _init {
             # filesystem), so we exclude all functions that have the tags
             # 'write-to-db' or 'write-to-fs'.
             if (grep {/^write-to-fs/} @{ $meta->{tags} }) {
-                $log->info("Skipped %s (has write-to-fs tag)", $mod);
+                log_info("Skipped %s (has write-to-fs tag)", $mod);
                 next;
             } elsif (grep {/^write-to-db/} @{ $meta->{tags} }) {
-                $log->info("Skipped %s (has write-to-db tag)", $mod);
+                log_info("Skipped %s (has write-to-db tag)", $mod);
                 next;
             }
 
@@ -77,7 +77,7 @@ App::lcpan::Daemon - Daemon-mode lcpan
 
 =head1 VERSION
 
-This document describes version 0.03 of App::lcpan::Daemon (from Perl distribution App-lcpan-Daemon), released on 2016-01-17.
+This document describes version 0.04 of App::lcpan::Daemon (from Perl distribution App-lcpan-Daemon), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

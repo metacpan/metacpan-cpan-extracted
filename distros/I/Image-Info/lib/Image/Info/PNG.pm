@@ -20,13 +20,20 @@ key.
 use strict;
 use vars qw/$VERSION/;
 
-$VERSION = 1.02;
+$VERSION = 1.03;
 
 # Test for Compress::Zlib (for reading zTXt chunks)
 my $have_zlib = 0;
 eval {
     require Compress::Zlib;
     $have_zlib++;
+};
+
+# Test for Encode (for reading iTXt chunks)
+my $have_encode = 0;
+eval {
+    require Encode;
+    $have_encode++;
 };
 
 sub my_read
@@ -132,20 +139,45 @@ sub process_file
 	    }
 	    $info->push_info(0, "resolution" => $res)
 	}
-	elsif ($type eq "tEXt") {
+	elsif ($type eq "tEXt" || $type eq "zTXt" || $type eq "iTXt") {
 	    my($key, $val) = split(/\0/, $data, 2);
-	    # XXX should make sure $key is not in conflict with any
-	    # other key we might generate
-	    $info->push_info(0, $key, $val);
-	}
-	elsif ($type eq "zTXt" && $have_zlib) {
-		my($key, $val) = split(/\0/, $data, 2);
-		my($method,$ctext) = split(//, $val, 2);
-		if ($method eq "\0") {
-		    $info->push_info(0, $key, Compress::Zlib::uncompress($ctext));
-		} else {
-		    $info->push_info(0, "Chunk-$type" => $data);
-		}
+            my($method,$ctext,$is_i);
+            if ($type eq "iTXt") {
+                ++$is_i;
+                (my $compressed, $method, my $lang, my $trans, $ctext)
+                    = unpack "CaZ*Z*a*", $val;
+                unless ($compressed) {
+                    undef $method;
+                    $val = $ctext;
+                }
+            }
+            elsif ($type eq "zTXt") {
+		($method,$ctext) = split(//, $val, 2);
+            }
+
+            if (defined $method) {
+                if ($have_zlib && $method eq "\0") {
+                    $val = Compress::Zlib::uncompress($ctext);
+                } else {
+                    undef $val;
+                }
+            }
+
+            if ($is_i) {
+                if ($have_encode) {
+                    $val = Encode::decode("UTF-8", $val);
+                } else {
+                    undef $val;
+                }
+            }
+
+            if (defined $val) {
+                # XXX should make sure $key is not in conflict with any
+                # other key we might generate
+                $info->push_info(0, $key, $val);
+            } else {
+                $info->push_info(0, "Chunk-$type" => $data);
+            }
 	}
 	elsif ($type eq "tIME" && $len == 7) {
 	    $info->push_info(0, "LastModificationTime",

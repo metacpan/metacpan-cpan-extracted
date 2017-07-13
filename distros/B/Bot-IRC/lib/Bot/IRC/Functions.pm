@@ -5,7 +5,7 @@ use 5.012;
 use strict;
 use warnings;
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -74,7 +74,7 @@ Bot::IRC::Functions - Bot::IRC add maybe helpful functions to the bot
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 

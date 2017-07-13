@@ -31,7 +31,7 @@ no_index:
     - xt
 requires:
   Carp: '0'
-  Catmandu: '1.0601'
+  Catmandu: '1.0602'
   JSON::XS: '2.3'
   List::Util: '0'
   MARC::File::MARCMaker: '0.05'
@@ -50,7 +50,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-MARC/issues
   homepage: https://github.com/LibreCat/Catmandu-MARC
   repository: https://github.com/LibreCat/Catmandu-MARC.git
-version: '1.161'
+version: '1.171'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'

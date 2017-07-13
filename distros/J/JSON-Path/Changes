@@ -1,80 +1,22 @@
-JSON-Path
-=========
+0.310     2017-07-11 13:36:54-05:00 America/Chicago
 
-Created:      2010-07-28
-Home page:    <https://metacpan.org/release/JSON-Path>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=JSON-Path>
-Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+    [ Bug Fixes ]
+    - Fixes RT #122427
+    Slaven Rezic++
 
-0.205	2013-11-02
+0.301     2017-07-10 16:37:15-05:00 America/Chicago
+    
+    [ Bug Fixes ] 
+    - Fix missing version information in main module
 
- [ Bug Fixes ]
- - Fix problem using JSON::Path with Devel::ptkdb.
-   Fixes RT#89393.
-   Henri-Damien Laurent++
-   <https://rt.cpan.org/Ticket/Display.html?id=89393>
+0.300     2017-07-10 11:13:48-05:00 America/Chicago
 
- [ Packaging ]
- - Use Dist::Inkt.
+    [ Bug Fixes ]
+    - Add support for escaping reserved characters
+      Fixes RT #92237
+      Max Laager++
+      <https://rt.cpan.org/Ticket/Display.html?id=92237>
 
- [ Other ]
- - Use Exporter::Tiny instead of Sub::Exporter.
- - Use LV instead of lvalue.pm.
-
-0.204	2013-02-14
-
- [ Bug Fixes ]
- - Fix `set` method which was broken in some circumstances.
-   Fixes RT#83249.
-   Mitsuhiro Nakamura++
-   <https://rt.cpan.org/Ticket/Display.html?id=83249>
-
- [ Documentation ]
- - Add documentation to test suite.
- - Corrections to lvalue documentation.
-
-0.203	2012-10-12
-
- [ Documentation ]
- - Minor corrections to pod.
-
-0.202	2012-10-12
-
- - Added: `get` and `set` methods.
- - Added: `jpath`, `jpath1` and `jpath_map` functions.
- - Added: `map` method.
- - Added: `value` method.
-
-0.201	2012-09-12
-
- [ Bug Fixes ]
- - Remove remaining `use Error` in test suite.
-
-0.200	2012-09-12
-
- [ Packaging ]
- - Drop dependency on common::sense.
- - Modernize.
-
- [ Other ]
- - Updated: Switch from Error.pm exceptions to Carp::croak.
-
-0.101	2011-09-29
-
- [ Bug Fixes ]
- - Fix retrieval of zeroth array element.
-
- [ Packaging ]
- - Add more test cases.
-
-0.100	2010-08-25
-
- - Minor documentation improvements.
- - Updated: Support for JSON::JOM.
-
-0.080_01	2010-07-29
-
- [ Bug Fixes ]
- - Fix license metadata in distribution.
-
-0.080_00	2010-07-28	Ported from PHP.
+    [ Other ]
+    - Setting values on non-existent keys will create the key with the value
+    - Forked from Toby Inkster's JSON::Path 0.205

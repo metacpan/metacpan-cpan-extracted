@@ -1,0 +1,7 @@
+# example good config file
+default_country: 'UK'
+countries:
+  US:
+    coming: 'soon'
+dialer:
+  pause: ','

@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::cpanratings;
 
-our $DATE = '2017-01-24'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to CPAN Ratings
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::cpanratings - More lcpan subcommands related to CPAN Rati
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::CmdBundle::cpanratings (from Perl distribution App-lcpan-CmdBundle-cpanratings), released on 2017-01-24.
+This document describes version 0.003 of App::lcpan::CmdBundle::cpanratings (from Perl distribution App-lcpan-CmdBundle-cpanratings), released on 2017-07-11.
 
 =head1 SYNOPSIS
 

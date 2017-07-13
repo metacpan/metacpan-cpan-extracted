@@ -1,12 +1,12 @@
 package File::Append::Undoable;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::Trash::Undoable;
 use File::Copy;
@@ -95,7 +95,7 @@ sub append {
                             "won't append twice"];
             }
         }
-        $log->info("(DRY) Appending string to file $path ...") if $dry_run;
+        log_info("(DRY) Appending string to file $path ...") if $dry_run;
         return [200, "File $path needs to be appended with a string", undef,
                 {undo_actions=>[
                     ['File::Trash::Undoable::untrash', # restore original
@@ -104,7 +104,7 @@ sub append {
                      {path=>$path, suffix=>substr($taid,0,8)."n"}],
                 ]}];
     } elsif ($tx_action eq 'fix_state') {
-        $log->info("Appending string to file $path ...");
+        log_info("Appending string to file $path ...");
         my $res = File::Trash::Undoable::trash(
             -tx_action=>'fix_state', path=>$path, suffix=>substr($taid,0,8));
         return $res unless $res->[0] == 200 || $res->[0] == 304;
@@ -135,16 +135,16 @@ File::Append::Undoable - Append string to a file, with undo support
 
 =head1 VERSION
 
-This document describes version 0.04 of File::Append::Undoable (from Perl distribution File-Append-Undoable), released on 2015-09-03.
-
-=head1 SEE ALSO
-
-L<Rinci::Transaction>
+This document describes version 0.05 of File::Append::Undoable (from Perl distribution File-Append-Undoable), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 append(%args) -> [status, msg, result, meta]
+=head2 append
+
+Usage:
+
+ append(%args) -> [status, msg, result, meta]
 
 Append string to a file, with undo support.
 
@@ -175,6 +175,8 @@ Fixable state: file exists and string has not been appended to end of file.
 
 Unfixable state: file does not exist or path is not a regular file (directory
 and symlink included).
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -246,13 +248,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Rinci::Transaction>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

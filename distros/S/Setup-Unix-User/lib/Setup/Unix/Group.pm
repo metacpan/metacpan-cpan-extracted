@@ -1,12 +1,12 @@
 package Setup::Unix::Group;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.14'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require Exporter;
 our @ISA       = qw(Exporter);
@@ -67,14 +67,14 @@ sub delgroup {
         return $res unless $res->[0] == 200 || $res->[0] == 404;
 
         return [304, "Group $group already doesn't exist"] if $res->[0] == 404;
-        $log->info("(DRY) Deleting Unix group $group ...") if $dry_run;
+        log_info("(DRY) Deleting Unix group $group ...") if $dry_run;
         return [200, "Group $group needs to be deleted", undef, {undo_actions=>[
             [addgroup => {%ca, gid => $res->[2]{gid}}],
         ]}];
     } elsif ($tx_action eq 'fix_state') {
         # we don't want to have to get_group() when fixing state, to reduce
         # number of read passes to the passwd files
-        $log->info("Deleting Unix group $group ...");
+        log_info("Deleting Unix group $group ...");
         return Unix::Passwd::File::delete_group(%ca);
     }
     [400, "Invalid -tx_action"];
@@ -154,7 +154,7 @@ sub addgroup {
                             "GID ($res->[2]{gid}, wanted $gid)"];
             }
         } else {
-            $log->info("(DRY) Adding Unix group $group ...") if $dry_run;
+            log_info("(DRY) Adding Unix group $group ...") if $dry_run;
             return [200, "Group $group needs to be added", undef,
                     {undo_actions=>[
                         [delgroup => {%ca}],
@@ -163,7 +163,7 @@ sub addgroup {
     } elsif ($tx_action eq 'fix_state') {
         # we don't want to have to get_group() when fixing state, to reduce
         # number of read passes to the passwd files
-        $log->info("Adding Unix group $group ...");
+        log_info("Adding Unix group $group ...");
         $res = Unix::Passwd::File::add_group(
             %ca,
             maybe gid     => $gid,
@@ -233,7 +233,7 @@ sub setup_unix_group {
     #$log->tracef("group=%s, exists=%s, should_exist=%s, ", $group, $exists, $should_exist);
     if ($exists) {
         if (!$should_exist) {
-            $log->info("(DRY) Deleting group $group ...");
+            log_info("(DRY) Deleting group $group ...");
             push    @do  , [delgroup=>{%ca}];
             unshift @undo, [addgroup=>{
                 %ca,
@@ -246,7 +246,7 @@ sub setup_unix_group {
         if ($should_aexist) {
             return [412, "Group $group should already exist"];
         } elsif ($should_exist) {
-            $log->info("(DRY) Adding group $group ...");
+            log_info("(DRY) Adding group $group ...");
             push    @do  , [addgroup=>{
                 %ca,
                 maybe gid     => $args{new_gid},
@@ -279,22 +279,20 @@ Setup::Unix::Group - Setup Unix group (existence)
 
 =head1 VERSION
 
-This document describes version 0.13 of Setup::Unix::Group (from Perl distribution Setup-Unix-User), released on 2015-09-04.
-
-=head1 FAQ
-
-=head1 SEE ALSO
-
-L<Setup>
-
-L<Setup::Unix::User>
+This document describes version 0.14 of Setup::Unix::Group (from Perl distribution Setup-Unix-User), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 addgroup(%args) -> [status, msg, result, meta]
+=head2 addgroup
+
+Usage:
+
+ addgroup(%args) -> [status, msg, result, meta]
 
 Add group.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -378,13 +376,19 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 delgroup(%args) -> [status, msg, result, meta]
+=head2 delgroup
+
+Usage:
+
+ delgroup(%args) -> [status, msg, result, meta]
 
 Delete group.
 
 Fixed state: group does not exist.
 
 Fixable state: group exists.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -441,7 +445,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 setup_unix_group(%args) -> [status, msg, result, meta]
+=head2 setup_unix_group
+
+Usage:
+
+ setup_unix_group(%args) -> [status, msg, result, meta]
 
 Setup Unix group (existence).
 
@@ -453,6 +461,8 @@ is set to false, will delete existing group instead of creating it.
 On undo, will delete Unix group previously created.
 
 On redo, will recreate the Unix group with the same GID.
+
+This function is not exported by default, but exportable.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -543,6 +553,8 @@ that contains extra information.
 
 Return value:  (any)
 
+=head1 FAQ
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Setup-Unix-User>.
@@ -559,13 +571,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Setup>
+
+L<Setup::Unix::User>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

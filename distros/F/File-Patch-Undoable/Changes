@@ -1,4 +1,9 @@
-Revision history for File-Patch-Undoable
+0.09    2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Log::Any with Log::ger.
+
 
 0.08    2016-06-10 (PERLANCAR)
 

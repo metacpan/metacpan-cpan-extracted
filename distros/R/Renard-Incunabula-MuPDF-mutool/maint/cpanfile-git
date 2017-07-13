@@ -1,0 +1,6 @@
+requires 'Renard::Incunabula',
+	git => 'https://github.com/project-renard/p5-Renard-Incunabula.git',
+	branch => 'master';
+requires 'Alien::MuPDF',
+	git => 'https://github.com/project-renard/p5-Alien-MuPDF.git',
+	branch => 'master';

@@ -47,11 +47,11 @@ $dbman->start;
 
 =head1 VERSION
  
-0.40
+0.43
  
 =head1 LICENSE
 
-(c) Copyright 1999-2014 by Milan Sorm <sorm@is4u.cz>
+(c) Copyright 1999-2017 by Milan Sorm <sorm@is4u.cz>
 
 All rights reserved.
 
@@ -69,7 +69,7 @@ Report bugs directly to sorm@is4u.cz.
  
 =head1 LAST MODIFIED
  
-Wed May  7 07:30:31 CEST 2014
+Thu Jul 13 09:14:39 CEST 2017
 
 =head1 SEE ALSO
  

@@ -1,7 +1,7 @@
 package Perinci::Examples::Coercion;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010;
 use strict;
@@ -60,14 +60,18 @@ Perinci::Examples::Coercion - Coercion examples
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::Coercion (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::Coercion (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
 
-=head2 coerce_to_epoch(%args) -> [status, msg, result, meta]
+=head2 coerce_to_epoch
+
+Usage:
+
+ coerce_to_epoch(%args) -> [status, msg, result, meta]
 
 Accept a date (e.g. '2015-11-20', etc), return its Unix epoch.
 
@@ -93,7 +97,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 coerce_to_secs(%args) -> [status, msg, result, meta]
+=head2 coerce_to_secs
+
+Usage:
+
+ coerce_to_secs(%args) -> [status, msg, result, meta]
 
 Accept a duration (e.g. '2hour', 'P2D'), return number of seconds.
 
@@ -140,7 +148,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

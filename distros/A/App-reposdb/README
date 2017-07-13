@@ -1,6 +1,184 @@
-SYNOPSIS
+NAME
+    App::reposdb - Manipulate repos.db
 
+VERSION
+    This document describes version 0.005 of App::reposdb (from Perl
+    distribution App-reposdb), released on 2017-07-10.
+
+SYNOPSIS
     See reposdb.
 
 DESCRIPTION
+    "repos.db" is a SQLite database that lists repository names along with
+    some extra data. They have various uses, but my first use-case for this
+    is to store last commit/status/pull time (updated via a post-commit git
+    hook or "gitwrap"). This is useful to speed up like syncing of
+    repositories in "Git::Bunch" that wants to find out which of the
+    hundreds/thousand+ git repositories are "the most recently used" to
+    prioritize these repositories first. Using information from "repos.db"
+    is faster than having to "git status" or even stat() each repository.
+
+FUNCTIONS
+  add_repo_tag
+    Usage:
+
+     add_repo_tag(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   repo => *str*
+
+    *   reposdb_path* => *str*
+
+    *   tags* => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_repos
+    Usage:
+
+     list_repos(%args) -> [status, msg, result, meta]
+
+    List repositories registered in repos.db.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   has_tags => *array[str]*
+
+    *   lacks_tags => *array[str]*
+
+    *   reposdb_path* => *str*
+
+    *   sorts => *array[str]* (default: ["name"])
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  remove_all_repo_tags
+    Usage:
+
+     remove_all_repo_tags(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   repo => *str*
+
+    *   reposdb_path* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  remove_repo_tag
+    Usage:
+
+     remove_repo_tag(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   repo => *str*
+
+    *   reposdb_path* => *str*
+
+    *   tags* => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  touch_repo
+    Usage:
+
+     touch_repo(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   commit_time => *bool*
+
+    *   pull_time => *bool*
+
+    *   repo => *str*
+
+    *   reposdb_path* => *str*
+
+    *   status_time => *bool*
+
+    *   to => *date*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-reposdb>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-reposdb>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-reposdb>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

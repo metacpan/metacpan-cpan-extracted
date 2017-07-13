@@ -1,7 +1,14 @@
-SYNOPSIS
+NAME
+    Org::To::VCF - Export contacts in Org document to VCF (vCard
+    addressbook)
 
+VERSION
+    This document describes version 0.09 of Org::To::VCF (from Perl
+    distribution Org-To-VCF), released on 2017-07-10.
+
+SYNOPSIS
      use Org::To::VCF qw(org_to_vcf);
-    
+
      my $res = org_to_vcf(
          source_file   => 'addressbook.org', # or source_str
          #target_file  => 'addressbook.vcf', # defaults return the VCF in $res->[2]
@@ -11,15 +18,14 @@ SYNOPSIS
      die "Failed" unless $res->[0] == 200;
 
 DESCRIPTION
-
     Export contacts in Org document to VCF (vCard addressbook).
 
     My use case: I maintain my addressbook in an Org document
-    addressbook.org which I regularly export to VCF and then import to
+    "addressbook.org" which I regularly export to VCF and then import to
     Android phones.
 
-    How contacts are found in an Org document: each contact is written in
-    an Org headline (of whatever level) in a rather free-form format, e.g.:
+    How contacts are found in an Org document: each contact is written in an
+    Org headline (of whatever level) in a rather free-form format, e.g.:
 
      ** dad # [2014-01-25 Sat]  :remind_anniv:
      - fullname :: frasier crane
@@ -35,7 +41,7 @@ DESCRIPTION
     the headline is used. I use timestamps a lot, so currently timestamps
     are stripped from headline titles.
 
-    Perl-style comments (with # to the end of the line) are allowed.
+    Perl-style comments (with "#" to the end of the line) are allowed.
 
     Org-contacts format is also supported, where fields are stored in a
     properties drawer:
@@ -48,8 +54,95 @@ DESCRIPTION
      This is one of my friend.
      *** TODO Call him for the party
 
-SEE ALSO
+FUNCTIONS
+  org_to_vcf
+    Usage:
 
+     org_to_vcf(%args) -> [status, msg, result, meta]
+
+    Export contacts in Org document to VCF (vCard addressbook).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   default_country => *str*
+
+        Specify default country code.
+
+        Free-form phone numbers on phone fields are formatted by this
+        function, e.g. "081 123 4567" becomes 0811234567. If default country
+        is specified (e.g. "ID"), the number will be formatted as
+        +62811234567. Setting this option is recommended so the phone
+        numbers are nicely formatted as international number.
+
+    *   exclude_tags => *array[str]*
+
+        Exclude trees that carry one of these tags.
+
+        If the whole document doesn't have any of these tags, then the whole
+        document will be exported. Otherwise, trees that do not carry one of
+        these tags will be excluded. If a selected tree is a subtree, the
+        heading hierarchy above it will also be selected for export, but not
+        the text below those headings.
+
+        exclude_tags is evaluated after include_tags.
+
+    *   export_notes => *bool* (default: 1)
+
+        Whether to export note fields.
+
+    *   include_tags => *array[str]*
+
+        Include trees that carry one of these tags.
+
+        Works like Org's 'org-export-select-tags' variable. If the whole
+        document doesn't have any of these tags, then the whole document
+        will be exported. Otherwise, trees that do not carry one of these
+        tags will be excluded. If a selected tree is a subtree, the heading
+        hierarchy above it will also be selected for export, but not the
+        text below those headings.
+
+    *   source_file => *str*
+
+        Source Org file to export.
+
+    *   source_str => *str*
+
+        Alternatively you can specify Org string directly.
+
+    *   target_file => *str*
+
+        VCF file to write to.
+
+        If not specified, VCF output string will be returned instead.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Org-To-VCF>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Org-To-VCF>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Org-To-VCF>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     For more information about Org document format, visit
     http://orgmode.org/
 
@@ -59,4 +152,13 @@ SEE ALSO
 
     Org-contacts:
     http://julien.danjou.info/projects/emacs-packages#org-contacts
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

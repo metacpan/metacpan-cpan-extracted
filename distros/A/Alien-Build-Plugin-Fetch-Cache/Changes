@@ -1,4 +1,10 @@
 Revision history for Alien-Build-Plugin-Fetch-Cache
 
+0.02      2017-07-12 16:46:05 -0400
+  - Added abcache command line interface
+  - Fixed bug where filename for cached copy would always be 'data'
+  - Internal cache directory format has changed, remove your old 
+    ~/.alienbuild/plugin_fetch_cache directory
+
 0.01      2017-02-02 22:15:26 -0500
   - initial version

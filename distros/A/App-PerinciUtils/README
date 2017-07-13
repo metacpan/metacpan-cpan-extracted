@@ -1,14 +1,51 @@
-DESCRIPTION
+NAME
+    App::PerinciUtils - Some utilities related to Perinci
 
+VERSION
+    This document describes version 0.10 of App::PerinciUtils (from Perl
+    distribution App-PerinciUtils), released on 2017-07-10.
+
+DESCRIPTION
     This distribution includes a few utility scripts related to Perinci::*
     modules family.
 
-    #INSERT_EXECS_LIST
+    *   normalize-rinci-function-metadata
+
+    *   peri-access
+
+    *   peri-htserve
+
+    *   peri-run
+
+    *   wrap-with-perinci-sub-wrapper
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-PerinciUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-PerinciUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-PerinciUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Perinci
 
     App::PericmdUtils - utilities related to Perinci::CmdLine modules
     family.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

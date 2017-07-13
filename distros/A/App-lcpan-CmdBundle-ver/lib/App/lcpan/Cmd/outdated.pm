@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::outdated;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use ExtUtils::MakeMaker;
 
@@ -75,24 +75,24 @@ FROM module WHERE name IN (".
         next unless exists $mods_from_db{$mod};
 
         my $fname = $mods_from_db{$mod}{fname};
-        $log->tracef("Checking module %s (%s)", $mod, $fname);
+        log_trace("Checking module %s (%s)", $mod, $fname);
 
         my $ver = MM->parse_version($mod_paths->{$mod});
         $ver = 0 if !defined($ver) || defined($ver) && $ver eq 'undef';
-        $log->tracef("Version of installed module %s (%s): %s",
+        log_trace("Version of installed module %s (%s): %s",
                      $mod, $mod_paths->{$mod}, $ver);
 
         # mark all modules from the same file as done
-        $log->tracef("Marking all modules from (%s) as done ...", $fname);
+        log_trace("Marking all modules from (%s) as done ...", $fname);
         for (keys %{ $file_mods{$fname} }) {
-            $log->tracef("  %s", $_);
+            log_trace("  %s", $_);
             $done_mods{$_}++;
         }
         my $cmp = version->parse($ver) <=>
             version->parse($mods_from_db{$mod}{version});
         next unless $cmp == -1;
 
-        $log->tracef("Adding file %s because %s\'s installed version (%s) is older than db version (%s)", $fname, $mod, $ver, $mods_from_db{$mod}{version});
+        log_trace("Adding file %s because %s\'s installed version (%s) is older than db version (%s)", $fname, $mod, $ver, $mods_from_db{$mod}{version});
         push @res, $fname;
 
     }
@@ -115,7 +115,7 @@ App::lcpan::Cmd::outdated - lcpan version of cpan-outdated
 
 =head1 VERSION
 
-This document describes version 0.03 of App::lcpan::Cmd::outdated (from Perl distribution App-lcpan-CmdBundle-ver), released on 2017-01-20.
+This document describes version 0.04 of App::lcpan::Cmd::outdated (from Perl distribution App-lcpan-CmdBundle-ver), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -124,7 +124,11 @@ This module handles the L<lcpan> subcommand C<outdated>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 lcpan version of cpan-outdated.
 
@@ -187,7 +191,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

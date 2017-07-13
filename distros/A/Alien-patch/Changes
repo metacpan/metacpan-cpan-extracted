@@ -1,5 +1,8 @@
 Revision history for Alien-patch
 
+0.12      2017-07-10 15:05:27 -0400
+  - Fixed broken repository link in meta data
+
 0.11      2017-03-20 03:40:13 -0400
   - Fixed botched prereqs from 0.10
 

@@ -17,11 +17,11 @@ name: Yote-Server
 provides:
   Yote::Server:
     file: lib/Yote/Server.pm
-    version: '1.26'
+    version: '1.27'
   Yote::Server::Acct:
-    file: lib/Yote/Server/Acct.pm
+    file: lib/Yote/Server.pm
   Yote::Server::App:
-    file: lib/Yote/Server/App.pm
+    file: lib/Yote/Server.pm
   Yote::Server::ListContainer:
     file: lib/Yote/Server/ListContainer.pm
     version: '1.0'
@@ -48,5 +48,5 @@ requires:
   perl: v5.12.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.26'
+version: '1.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,172 @@
+#!/usr/bin/perl
+
+# wants one or more font names on the command line. If none, use list of
+# core fonts.
+
+# CAUTION: the displayed Unicode value (U=xxxx) appears to be correct in most
+# cases, except that the MS Smart Quotes (32 characters) are given as U=0080
+# through U=009F. Those Unicode values are reserved for the C1 Control character
+# group, not printable glyphs. I don't know if the font files hold incorrect
+# Unicode values, or this program is in error. See PDF::Builder::Resource::
+# Glyphs for u2n and n2u tables -- they may be in error. What the mapping is 
+# from Unicode to the various pages and 00..FF within each page is not clear at 
+# this point, although the "Latinx" encodings seem to be mostly OK. Note that 
+# most fonts spill over onto 1 or more additional pages, which of course is 
+# beyond single byte encoding.
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+use PDF::Builder::Util;
+
+#my $compress = 'none';  # uncompressed streams
+my $compress = 'flate';  # compressed streams
+
+my $sx = 33;
+my $sy = 45;
+my $fx = 20;
+my $gLLx = 50;  # lower left position of grid
+my $gLLy = 50;
+
+# default list of core fonts if user doesn't provide command line list
+my @fns=qw{
+    Helvetica
+    Helvetica-Oblique
+    Helvetica-Bold
+    Helvetica-BoldOblique
+    Courier
+    Courier-Oblique
+    Courier-Bold
+    Courier-BoldOblique
+    Times-Roman
+    Times-Italic
+    Times-Bold
+    Times-BoldItalic
+    Symbol
+    ZapfDingbats
+    bankgothic
+    georgia
+    georgiaitalic
+    georgiabold
+    georgiabolditalic
+    trebuchet
+    trebuchetbold
+    trebuchetbolditalic
+    trebuchetitalic
+    verdana
+    verdanaitalic
+    verdanabold
+    verdanabolditalic
+    wingdings
+    webdings
+};
+
+my @ecs = qw{
+    latin1 
+    latin2 
+    latin3 
+    latin4 
+    latin5 
+    latin6 
+    latin7 
+    latin8 
+    latin9 
+    latin10
+};
+# just Latin-1 for now...
+@ecs = qw{ latin1 };
+
+my ($x, $y, $pdf, $fn, $ec, $f1, $yp);
+
+# override default list with command line entries
+if (scalar @ARGV) {
+    @fns = @ARGV;
+}
+
+# loop through list of font names
+foreach $fn (@fns) {
+    # at least one page for each encoding 
+    foreach $ec (@ecs) {
+        $pdf = PDF::Builder->new(-compress => $compress);
+        $f1 = $pdf->corefont('Helvetica');  # for various labels
+
+        print STDERR "\n$fn -- $ec\n";
+        initNameTable();  # set up u2n and n2u hashes
+        my $fnt = $pdf->corefont($fn, -encode => $ec);
+        my @fonts = ($fnt, $fnt->automap());
+        foreach my $font (@fonts) {   # subfonts within overall font (256 char)
+            my $page = $pdf->page();
+            $page->mediabox(595,842);
+
+            my $gfx = $page->gfx();
+
+            my $txt = $page->text();
+            $txt->font($font,$fx);
+
+            my $txt2 = $page->text();
+
+            $txt2->textlabel($gLLx,800, $f1,20, "font='".$font->fontname." / ".$font->name."'", -hscale=>75);
+            $txt2->textlabel($gLLx,780, $f1,20, "encoding='$ec'");
+
+            $txt2->font($f1, 5);
+            $txt2->hscale(80);
+
+	    # distance below baseline (<0) to clear descenders
+            my $u = $font->underlineposition()*$fx/1000;
+
+	    # draw grid of characters and information
+	    # yp character row value (0..F T to B)
+            foreach $yp (0..15) {
+		$y = 15 - $yp;  # y vertical (row) position T to B
+                print STDERR ".";
+                foreach $x (0..15) {  # x horizontal (column) position L to R
+                    $txt->translate($gLLx+($sx*$x),$gLLy+($sy*$y));
+		    my $ci = $yp*16 + $x;  # 0..255 value
+		    my $c  = chr($ci);
+                    $txt->text($c);
+
+                    my $wx = $font->width($c)*$fx;
+
+		    # bounding box cell around character
+                    $gfx->strokecolor('lightblue');
+                    $gfx->move($gLLx+($sx*$x)    ,$gLLy+($sy*$y)+$fx);
+                    $gfx->line($gLLx+($sx*$x)    ,$gLLy+($sy*$y)+$u);
+                    $gfx->line($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)+$u);
+                    $gfx->line($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y)+$fx);
+                    $gfx->close();
+                    $gfx->stroke();
+
+		    # baseline
+                    $gfx->strokecolor('gray');
+                    $gfx->move($gLLx+($sx*$x)    ,$gLLy+($sy*$y));
+                    $gfx->line($gLLx+($sx*$x)+$wx,$gLLy+($sy*$y));
+                    $gfx->stroke();
+
+		    # character data
+                    $txt2->translate($gLLx+($sx*$x)-2,$gLLy+($sy*$y)-6);
+                    $txt2->text_right($ci);
+                    $txt2->translate($gLLx+($sx*$x)-2,$gLLy+($sy*$y)-11);
+                    if (defined $font->uniByEnc($ci)) {
+                        $txt2->text_right(sprintf('U=0x%04X',$font->uniByEnc($ci)));
+                    } else {
+                        $txt2->text_right('U=0x????');
+		    }
+                    $txt2->translate($gLLx+($sx*$x)-2,$gLLy+($sy*$y)-16);
+                    $txt2->text_right($font->glyphByEnc($ci));
+                    $txt2->translate($gLLx+($sx*$x)-2,$gLLy+($sy*$y)-21);
+                    $txt2->text_right(sprintf('wx=%i',$font->wxByEnc($ci)));
+                } # loop through columns (x)
+            } # loop through rows (yp/y)
+            print STDERR "\n";
+        } # loop through "sub" fonts
+        $pdf->saveas("$0.$fn.$ec.pdf");
+        $pdf->end();
+
+    } # loop through each encoding (ec)
+} # loop for each font name (fn)
+
+exit;
+
+__END__

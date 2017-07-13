@@ -6,13 +6,11 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test::Exception: '0'
   Test::More: '0'
-  Test::Most: '0'
   blib: '1.01'
-  perl: v5.16.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: v5.16.0
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -26,12 +24,12 @@ requires:
   IO::Handle: '0'
   feature: '0'
   mro: '0'
-  perl: v5.16.0
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/gryphonshafer/exact/issues
   homepage: https://github.com/gryphonshafer/exact
   repository: https://github.com/gryphonshafer/exact.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

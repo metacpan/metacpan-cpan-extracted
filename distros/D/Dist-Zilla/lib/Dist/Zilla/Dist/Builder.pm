@@ -1,4 +1,4 @@
-package Dist::Zilla::Dist::Builder 6.009;
+package Dist::Zilla::Dist::Builder 6.010;
 # ABSTRACT: dist zilla subclass for building dists
 
 use Moose 0.92; # role composition fixes
@@ -209,7 +209,7 @@ sub _setup_default_plugins {
       plugin_name => ':NoFiles',
       zilla       => $self,
       style       => 'list',
-      code        => sub { return },
+      code        => sub { [] },
     });
 
     push @{ $self->plugins }, $plugin;
@@ -874,7 +874,7 @@ Dist::Zilla::Dist::Builder - dist zilla subclass for building dists
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 ATTRIBUTES
 

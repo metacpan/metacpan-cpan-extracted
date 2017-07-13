@@ -26,7 +26,7 @@ my $builder = Module::Build->new(
 		'SUPER'               => 0,
 	},
 	build_requires => {
-		'Test::More'          => 0.45,
+		'Test::More'          => 0.88,
 	},
 
 	add_to_cleanup => [

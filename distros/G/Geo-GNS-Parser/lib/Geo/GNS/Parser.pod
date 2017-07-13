@@ -1,0 +1,290 @@
+
+
+=head1 NAME
+
+Geo::GNS::Parser - parse a GNS data file
+
+=head1 SYNOPSIS
+
+    
+    use Geo::GNS::Parser 'parse_file';
+    my $in_file = 'ja.txt';
+    my %lines;
+    my $n_entries;
+    my $n_places;
+    parse_file (file => $in_file, callback => \& callback);
+    print "$n_entries / $n_places\n";
+    exit;
+    
+    sub callback
+    {
+        my (undef, $line) = @_;
+        $n_entries++;
+        my @parts = split /\t/, $_;
+        my $ufi = $line->{UFI};
+        if (my $e = $lines{$ufi}) {
+            print "Duplicate $ufi for $line->{FULL_NAME_RO} $e->{FULL_NAME_RO}\n";
+        }
+        else {
+            $lines{$ufi} = $line;
+            $n_places++;
+        }
+    }
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Geo-GNS-Parser-0.02/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Geo::GNS::Parser version 0.02
+corresponding to git commit L<dd93949b220dd7e8072228a93cebac75b6b536d3|https://github.com/benkasminbullock/Geo-GNS/commit/dd93949b220dd7e8072228a93cebac75b6b536d3> released on Thu Jul 13 08:37:47 2017 +0900.
+
+=head1 DESCRIPTION
+
+Parse the GeoNET Names Server data
+
+=head1 FUNCTIONS
+
+=head2 parse_file
+
+    parse_file (file => 'ja.txt', data => \@array);
+
+Parse the data in the file specified by C<file> and put the lines into
+the array specified by the C<data> parameter. Each line is added to
+the array as a hash reference with the keys given under L</FIELDS>,
+and the values taken from the read line.
+
+    parse_file (file => 'af.txt', callback => \& myroutine);
+
+Parse the data in the file specified by C<file>. As each line of data
+is parsed, call back the code routine specified by C<callback>. The
+callback is called in the form
+
+    &{callback} (undef, \%line);
+
+Possible options are
+
+=over
+
+=item file
+
+The file name. This must be supplied or the module dies.
+
+=item data
+
+An array reference.
+
+=item callback
+
+A code reference to call back. If parse_file is called as
+
+    parse_file (%inputs);
+
+then the callback is called in the form
+
+    &{$inputs{callback}} ($inputs{callback_data}, \%line);
+
+where C<%line> is a hash containing the parts of the line as specified
+under L</FIELDS>.
+
+=item callback_data
+
+User-specified data to pass to the callback routine. See L</callback>
+above.
+
+=back
+
+=head1 FIELDS
+
+The fields in the data are as follows. The meanings of each field are
+explained at
+L<http://geonames.nga.mil/gns/html/gis_countryfiles.html>.
+
+=over
+
+
+
+=item RC
+
+
+
+=item UFI
+
+
+
+=item UNI
+
+
+
+=item LAT
+
+
+
+=item LONG
+
+
+
+=item DMS_LAT
+
+
+
+=item DMS_LONG
+
+
+
+=item MGRS
+
+
+
+=item JOG
+
+
+
+=item FC
+
+
+
+=item DSG
+
+
+
+=item PC
+
+
+
+=item CC1
+
+
+
+=item ADM1
+
+
+
+=item POP
+
+
+
+=item ELEV
+
+
+
+=item CC2
+
+
+
+=item NT
+
+
+
+=item LC
+
+
+
+=item SHORT_FORM
+
+
+
+=item GENERIC
+
+
+
+=item SORT_NAME_RO
+
+
+
+=item FULL_NAME_RO
+
+
+
+=item FULL_NAME_ND_RO
+
+
+
+=item SORT_NAME_RG
+
+
+
+=item FULL_NAME_RG
+
+
+
+=item FULL_NAME_ND_RG
+
+
+
+=item NOTE
+
+
+
+=item MODIFY_DATE
+
+
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item GeoNet Names Server
+
+L<http://geonames.nga.mil/gns/html/>
+
+=item geolocator
+
+L<Geolocator|https://pypi.python.org/pypi/geolocator/> is a
+Python project using this data.
+
+=back
+
+=head2 On CPAN
+
+As of 0.02, I am not aware of any other CPAN module
+which parses the GeoNET data. The following modules are related to
+geography.
+
+=over
+
+=item L<Geo::Distance>
+
+=item L<Geo::Calc>
+
+=item L<Geo::Point>
+
+=item L<Geo::GML>
+
+=back
+
+=head1 HISTORY
+
+=over
+
+=item PrePAN
+
+I proposed this module in 2012 on PrePAN:
+L<http://prepan.org/module/429En4oFbE>.
+
+=item CPAN
+
+I released this module to CPAN in July 2017.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

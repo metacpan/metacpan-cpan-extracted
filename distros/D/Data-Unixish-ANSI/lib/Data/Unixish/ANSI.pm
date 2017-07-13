@@ -1,7 +1,7 @@
 package Data::Unixish::ANSI;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,23 +22,11 @@ Data::Unixish::ANSI - dux functions related to text containing ANSI codes
 
 =head1 VERSION
 
-This document describes version 0.07 of Data::Unixish::ANSI (from Perl distribution Data-Unixish-ANSI), released on 2015-09-03.
+This document describes version 0.08 of Data::Unixish::ANSI (from Perl distribution Data-Unixish-ANSI), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
-
-=head1 SEE ALSO
-
-L<Data::Unixish>
-
-L<dux>
-
-L<Text::ANSI::Util>
-
-L<Term::ANSIColor>
-
-L<Term::ANSIScreen>
 
 =head1 HOMEPAGE
 
@@ -56,13 +44,25 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Data::Unixish>
+
+L<dux>
+
+L<Text::ANSI::Util>
+
+L<Term::ANSIColor>
+
+L<Term::ANSIScreen>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

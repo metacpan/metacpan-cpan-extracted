@@ -1,6 +1,6 @@
 package Dancer2::Core::Error;
 # ABSTRACT: Class representing fatal errors
-$Dancer2::Core::Error::VERSION = '0.205000';
+$Dancer2::Core::Error::VERSION = '0.205001';
 use Moo;
 use Carp;
 use Dancer2::Core::Types;
@@ -9,6 +9,7 @@ use Data::Dumper;
 use Dancer2::FileUtils qw/path open_file/;
 use Sub::Quote;
 use Module::Runtime 'require_module';
+use Ref::Util qw< is_hashref >;
 
 has app => (
     is        => 'ro',
@@ -57,9 +58,7 @@ sub _build_title {
 }
 
 has template => (
-    is => 'ro',
-
-#    isa => sub { ref($_[0]) eq 'SCALAR' || ReadableFilePath->(@_) },
+    is      => 'ro',
     lazy    => 1,
     builder => '_build_error_template',
 );
@@ -418,14 +417,14 @@ sub get_caller {
 
 sub _censor {
     my $hash = shift;
-    if ( !$hash || ref $hash ne 'HASH' ) {
+    unless ( $hash && is_hashref($hash) ) {
         carp "_censor given incorrect input: $hash";
         return;
     }
 
     my $censored = 0;
     for my $key ( keys %$hash ) {
-        if ( ref $hash->{$key} eq 'HASH' ) {
+        if ( is_hashref( $hash->{$key} ) ) {
             # Take a copy of the data, so we can hide sensitive-looking stuff:
             $hash->{$key} = { %{ $hash->{$key} } };
             $censored += _censor( $hash->{$key} );
@@ -468,7 +467,7 @@ Dancer2::Core::Error - Class representing fatal errors
 
 =head1 VERSION
 
-version 0.205000
+version 0.205001
 
 =head1 SYNOPSIS
 
@@ -574,7 +573,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexis Sukrieh.
+This software is copyright (c) 2017 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

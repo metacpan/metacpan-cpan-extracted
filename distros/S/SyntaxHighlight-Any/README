@@ -1,7 +1,14 @@
-SYNOPSIS
+NAME
+    SyntaxHighlight::Any - Common interface for syntax highlighting and
+    detecting language in code
 
+VERSION
+    This document describes version 0.07 of SyntaxHighlight::Any (from Perl
+    distribution SyntaxHighlight-Any), released on 2017-07-10.
+
+SYNOPSIS
      use SyntaxHighlight::Any qw(highlight_string detect_language);
-    
+
      my $str = <<'EOT';
      while (<>) {
          $lines++;
@@ -13,17 +20,18 @@ SYNOPSIS
      my @lang = detect_language($str); # => ("perl")
 
 DESCRIPTION
-
     CAVEAT: EARLY DEVELOPMENT MODULE. SOME FUNCTIONS NOT YET IMPLEMENTED.
     HELP ON ADDING BACKENDS APPRECIATED.
 
     This module provides a common interface for syntax highlighting and
     detecting programming language in code.
 
+BACKENDS
+    Currently, the distribution does not pull the backends as dependencies.
+    Please make sure you install desired backends.
+
 FUNCTIONS
-
- detect_language($code, \%opts) => LIST
-
+  detect_language($code, \%opts) => LIST
     CURRENTLY NOT YET IMPLEMENTED.
 
     Attempt to detect programming language of $code and return zero or more
@@ -32,18 +40,17 @@ FUNCTIONS
 
     %opts is optional. Known options:
 
- highlight_string($code, \%opts) => STR
-
-    Syntax-highlight $code and return the highlighted string. Will choose
-    an appropriate and available backend which is capable of formatting
-    code in the specified/detected language and to the specified output.
-    Die on error (e.g. unexpected output from backend).
+  highlight_string($code, \%opts) => STR
+    Syntax-highlight $code and return the highlighted string. Will choose an
+    appropriate and available backend which is capable of formatting code in
+    the specified/detected language and to the specified output. Die on
+    error (e.g. unexpected output from backend).
 
     Will return $code as-is if no backends are available (a warning is
     produced via Log::Any though).
 
     By default try to detect whether to output HTML code or ANSI codes (see
-    output option). By default try to detect language of $code.
+    "output" option). By default try to detect language of $code.
 
     Backends: currently in general tries GNU Source-highlight (via
     Syntax::SourceHighlight, or binary if module not available), then
@@ -52,42 +59,79 @@ FUNCTIONS
 
     %opts is optional. Known options:
 
-      * lang => STR
+    *   lang => STR
 
-      Tell the function what programming language $code should be regarded
-      as. The list of known languages can be retrieved using
-      list_languages().
+        Tell the function what programming language $code should be regarded
+        as. The list of known languages can be retrieved using
+        "list_languages()".
 
-      If unspecified, the function will perform the following. For backends
-      which can detect the language, this function will just give $code to
-      the backend for it to figure out the language. For backends which
-      cannot detect the language, this function will first call
-      detect_language().
+        If unspecified, the function will perform the following. For
+        backends which can detect the language, this function will just give
+        $code to the backend for it to figure out the language. For backends
+        which cannot detect the language, this function will first call
+        "detect_language()".
 
-      NOTE: SINCE detect_language() is not implemented yet, please specify
-      this.>
+        NOTE: SINCE detect_language() is not implemented yet, please specify
+        this.>
 
-      * output => STR
+    *   output => STR
 
-      Either ansi, in which syntax-highlighting is done with ANSI escape
-      color codes, or html. If not specified, will try to detect whether
-      program is running under terminal (in which case ansi is chosen) or
-      web environment e.g. under CGI/FastCGI, mod_perl, or Plack (in which
-      case html is chosen). If detection fails, ansi is chosen.
+        Either "ansi", in which syntax-highlighting is done with ANSI escape
+        color codes, or "html". If not specified, will try to detect whether
+        program is running under terminal (in which case "ansi" is chosen)
+        or web environment e.g. under CGI/FastCGI, mod_perl, or Plack (in
+        which case "html" is chosen). If detection fails, "ansi" is chosen.
 
- list_languages() => LIST
-
+  list_languages() => LIST
     List known languages.
 
-BACKENDS
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/SyntaxHighlight-Any>.
 
-    Currently, the distribution does not pull the backends as dependencies.
-    Please make sure you install desired backends.
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-SyntaxHighlight-Any>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=SyntaxHighlight-Any>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     For syntax-highlighting (as well as encoding/formatting) to JSON,
-    there's JSON::Color or Syntax::Highlight::JSON (despite the module
-    name, the latter is an encoder, not strictly a string syntax
-    highlighter). For YAML there's YAML::Tiny::Color.
+    there's JSON::Color or Syntax::Highlight::JSON (despite the module name,
+    the latter is an encoder, not strictly a string syntax highlighter). For
+    YAML there's YAML::Tiny::Color.
+
+    An article in late 2012 describing the various CPAN modules for syntax
+    highlighting
+    <http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-sy
+    ntax-highlighting-libraries-on-cpan.html> (with the actual reviews
+    posted to <http://cpanratings.perl.org>). Modules mentioned including:
+    Syntax::SourceHighlight (reviews
+    <http://cpanratings.perl.org/dist/Syntax-SourceHighlight>),
+    Syntax::Highlight::Engine::Kate (reviews
+    <http://cpanratings.perl.org/dist/Syntax-Highlight-Engine-Kate>),
+    Syntax::Highlight::JSON (reviews
+    <http://cpanratings.perl.org/dist/Syntax-Highlight-JSON>),
+    Syntax::Highlight::Engine::Simple (reviews
+    <http://cpanratings.perl.org/dist/Syntax-Highlight-Engine-Simple>),
+    Syntax::Highlight::Universal (reviews
+    <http://cpanratings.perl.org/dist/Syntax-Highlight-Universal>), and
+    Text::Highlight (reviews
+    <http://cpanratings.perl.org/dist/text-highlight>). Some non-Perl
+    solutions are also mentioned.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Util;
-$Footprintless::Util::VERSION = '1.24';
+$Footprintless::Util::VERSION = '1.25';
 # ABSTRACT: A utility method package for common functionality in Footprintless
 # PODNAME: Footprintless::Util
 
@@ -215,7 +215,7 @@ sub spurt {
 sub temp_dir {
     require File::Temp;
     my $temp = File::Temp->newdir( 'fpl_XXXXXXXX', TMPDIR => 1 );
-    if ( !chmod( 02700, $temp ) ) {
+    if ( !chmod( 0700, $temp ) ) {
         croak("unable to create secure temp file");
     }
     return $temp;
@@ -247,7 +247,7 @@ Footprintless::Util - A utility method package for common functionality in Footp
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 SYNOPSIS
 

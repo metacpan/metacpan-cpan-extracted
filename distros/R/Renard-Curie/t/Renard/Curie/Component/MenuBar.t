@@ -1,23 +1,24 @@
 #!/usr/bin/env perl
 
-use Test::Most tests => 7;
+use Test::Most tests => 8;
 
 use lib 't/lib';
 use CurieTestHelper;
 
-use Renard::Curie::Setup;
-use Renard::Curie::Helper;
-use Gtk3;
+use Renard::Incunabula::Common::Setup;
+use Renard::Incunabula::Frontend::Gtk3::Helper;
+use Renard::Curie::App;
 use URI::file;
 use List::AllUtils qw(first);
 use Test::MockModule;
 use Test::MockObject;
+use Glib qw(TRUE FALSE);
 
 subtest 'Check that the menu item File -> Open exists' => sub {
-	require Renard::Curie::App;
-	my $app = Renard::Curie::App->new;
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
 
-	my $menu_bar = $app->menu_bar->get_child;
+	my $menu_bar = $c->menu_bar->get_child;
 	my @toplevel = $menu_bar->get_children;
 	my $file_menu = first {
 		$_->get_property('label') eq '_File'
@@ -47,8 +48,9 @@ subtest "Menu: File -> Open" => sub {
 		($got_file, $destroyed) = (0, 0);
 		$fc->mock( run => 'accept' );
 
-		my $app = Renard::Curie::App->new;
-		Renard::Curie::Helper->callback( $app->menu_bar,
+		my $c = CurieTestHelper->get_app_container;
+		my $app = $c->app;
+		Renard::Incunabula::Frontend::Gtk3::Helper->callback( $c->menu_bar,
 			'on_menu_file_open_activate_cb', undef );
 
 		ok( $got_file, "Callback retrieved the filename");
@@ -59,8 +61,9 @@ subtest "Menu: File -> Open" => sub {
 		($got_file, $destroyed) = (0, 0);
 		$fc->mock( run => 'cancel' );
 
-		my $app = Renard::Curie::App->new;
-		Renard::Curie::Helper->callback( $app->menu_bar,
+		my $c = CurieTestHelper->get_app_container;
+		my $app = $c->app;
+		Renard::Incunabula::Frontend::Gtk3::Helper->callback( $c->menu_bar,
 			'on_menu_file_open_activate_cb', undef );
 		ok(!$got_file, "Callback did not retrieve the filename");
 		ok( $destroyed, "Callback destroyed the dialog");
@@ -69,11 +72,12 @@ subtest "Menu: File -> Open" => sub {
 
 subtest "Menu: File -> Quit" => sub {
 	plan tests => 2;
-	my $app = Renard::Curie::App->new;
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
 
 	Glib::Timeout->add(100, sub {
 		cmp_ok( Gtk3::main_level, '>', 0, 'Main loop is running');
-		$app->menu_bar->builder
+		$c->menu_bar->builder
 			->get_object('menu-item-file-quit')
 			->signal_emit('activate');
 	});
@@ -99,13 +103,51 @@ subtest "Menu: File -> Recent files" => sub {
 	my $rc_mock = Test::MockModule->new('Gtk3::RecentChooser', no_auto => 1);
 	$rc_mock->mock( get_current_item => $pdf_ref_menu_item );
 
-	my $app = Renard::Curie::App->new;
-	my $menu_bar = $app->menu_bar;
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
+	my $menu_bar = $c->menu_bar;
 	my $rc = $menu_bar->recent_chooser;
 
 	$rc->signal_emit('item-activated');
 
-	is path($app->page_document_component->document->filename), $pdf_ref_path, 'File opened from Recent files';
+	is path($c->_test_current_view->document->filename), $pdf_ref_path, 'File opened from Recent files';
+};
+
+subtest "Menu: View -> Continuous" => sub {
+	my $pdf_ref_path = try {
+		CurieTestHelper->test_data_directory->child(qw(PDF Adobe pdf_reference_1-7.pdf));
+	} catch {
+		plan skip_all => "$_";
+	};
+
+	plan tests => 4;
+
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
+	$c->view_manager->open_pdf_document( $pdf_ref_path );
+
+	my $continuous_item = $c->menu_bar->builder
+		->get_object('menu-item-view-continuous');
+
+	subtest "Menu item state" => sub {
+		ok( ! $continuous_item->get_active, "initially not active" );
+	};
+
+	subtest "View is single page" => sub {
+		isa_ok $c->_test_current_view, 'Renard::Curie::Model::View::Grid';
+		ok ! $c->_test_current_view->view_options->grid_options->is_continuous_view;
+	};
+
+	$continuous_item->set_active(TRUE);
+
+	subtest "Menu item state" => sub {
+		ok( $continuous_item->get_active, "now active" );
+	};
+
+	subtest "View is continuous page" => sub {
+		isa_ok $c->_test_current_view, 'Renard::Curie::Model::View::Grid';
+		ok $c->_test_current_view->view_options->grid_options->is_continuous_view;
+	};
 };
 
 subtest "Menu: View -> Zoom" => sub {
@@ -117,10 +159,11 @@ subtest "Menu: View -> Zoom" => sub {
 
 	plan tests => 4;
 
-	my $app = Renard::Curie::App->new;
-	$app->open_pdf_document( $pdf_ref_path );
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
+	$c->view_manager->open_pdf_document( $pdf_ref_path );
 
-	my $zoom_menu = $app->menu_bar->builder
+	my $zoom_menu = $c->menu_bar->builder
 		->get_object('menu-view-zoom');
 
 	my @menu_item_zoom_levels = $zoom_menu->get_children;
@@ -129,7 +172,7 @@ subtest "Menu: View -> Zoom" => sub {
 	} @menu_item_zoom_levels;
 
 	my $get_zoom_level = sub {
-		$app->page_document_component->zoom_level;
+		$c->_test_current_view->zoom_level;
 	};
 
 	subtest 'Initial zoom' => sub {
@@ -154,28 +197,30 @@ subtest "Menu: View -> Zoom" => sub {
 
 subtest "Menu: View -> Sidebar" => sub {
 	plan tests => 1;
-	my $app = Renard::Curie::App->new;
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
 
-	my $initial_outline_reveal = $app->outline->get_reveal_child;
+	my $initial_outline_reveal = $c->outline->get_reveal_child;
 
-	$app->menu_bar->builder
+	$c->menu_bar->builder
 		->get_object('menu-item-view-sidebar')
 		->signal_emit('activate');
 
-	my $post_outline_reveal = $app->outline->get_reveal_child;
+	my $post_outline_reveal = $c->outline->get_reveal_child;
 	isnt( $post_outline_reveal, $initial_outline_reveal,
 		'outline reveal state has been toggled' );
 };
 
 subtest "Menu: Help -> Message log" => sub {
 	plan tests => 2;
-	my $app = Renard::Curie::App->new;
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
 
-	my $log_window = $app->log_window->builder->get_object('log-window');
+	my $log_window = $c->log_window->builder->get_object('log-window');
 
 	ok( ! $log_window->get_visible, 'message log not visible at start' );
 
-	$app->menu_bar->builder
+	$c->menu_bar->builder
 		->get_object('menu-item-help-logwin')
 		->signal_emit('activate');
 

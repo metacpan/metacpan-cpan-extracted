@@ -4,7 +4,7 @@
       "Project Renard"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.010"
+            "perl" : "5.012"
          }
       },
       "develop" : {
@@ -32,64 +32,63 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::MuPDF" : "0.007",
-            "CHI" : "0",
+            "Bread::Board::Declare" : "0",
             "Cairo" : "0",
-            "Capture::Tiny" : "0",
-            "Class::Method::Modifiers" : "0",
             "File::Basename" : "0",
             "File::Spec" : "0",
             "FindBin" : "0",
-            "Function::Parameters" : "0",
             "Getopt::Long::Descriptive" : "0",
             "Glib" : "0",
             "Glib::Object::Introspection" : "0",
             "Glib::Object::Subclass" : "0",
             "Gtk3" : "0",
-            "Import::Into" : "0",
-            "Log::Any" : "0",
+            "Lingua::EN::Inflect" : "0",
+            "List::AllUtils" : "0",
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::Base" : "0",
             "Log::Any::Adapter::Util" : "0",
-            "Modern::Perl" : "0",
             "Module::Util" : "0",
             "Moo" : "2.001001",
             "Moo::Role" : "0",
+            "MooX::BuildArgs" : "0",
             "MooX::HandlesVia" : "0",
+            "MooX::Lsub" : "0",
+            "MooX::Role::CloneSet" : "0",
+            "MooX::Role::CloneSet::BuildArgs" : "0",
             "MooX::Role::Logger" : "0",
-            "MooX::TypeTiny" : "0",
-            "Path::Tiny" : "0",
-            "Return::Type" : "0",
-            "Try::Tiny" : "0",
-            "Type::Libraries" : "0",
-            "Type::Library" : "0.008",
-            "Type::Utils" : "0",
-            "Types::Common::Numeric" : "0",
-            "Types::Path::Tiny" : "0",
-            "Types::Standard" : "0",
+            "MooX::Struct" : "0",
+            "Moose" : "0",
+            "POSIX" : "0",
+            "Renard::Curie::Setup" : "0",
+            "Renard::Incunabula::Common::Error" : "0",
+            "Renard::Incunabula::Common::Setup" : "0",
+            "Renard::Incunabula::Common::Types" : "0",
+            "Renard::Incunabula::Format::PDF::Document" : "0",
+            "Renard::Incunabula::Frontend::Gtk3::Helper" : "0",
+            "Test::Deep::NoTest" : "0",
             "URI" : "0",
             "URI::file" : "0",
-            "XML::Simple" : "0",
-            "autodie" : "0",
-            "autovivification" : "0",
             "constant" : "0",
-            "custom::failures" : "0",
             "lib" : "0",
-            "perl" : "5.010",
+            "perl" : "5.012",
             "strict" : "0",
+            "vars" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "Data::DPath" : "0",
             "File::Temp" : "0",
-            "List::AllUtils" : "0",
+            "Log::Any" : "0",
+            "Path::Tiny" : "0",
+            "Renard::Incunabula::Format::Cairo::ImageSurface::Document" : "0",
+            "Renard::Incunabula::Outline" : "0",
+            "Test::Exception" : "0.43",
             "Test::MockModule" : "0",
             "Test::MockObject" : "0",
             "Test::Most" : "0",
             "Test::Trap" : "0",
-            "perl" : "5.010",
+            "perl" : "5.012",
             "version" : "0.77"
          }
       }
@@ -103,13 +102,13 @@
          "web" : "https://github.com/project-renard/curie"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_contributors" : [
       "Chirag <chiragghanshani@gmail.com>",
       "Helen Bach <haydeez.emma.roydz@gmail.com>",
       "Stanislav Yotov <yotov.st@gmail.com>",
       "Zakariyya Mughal <zaki.mughal@gmail.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0211"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
 }
 

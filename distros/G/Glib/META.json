@@ -84,6 +84,6 @@
       "x_IRC" : "irc://irc.gimp.org/#gtk-perl",
       "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
    },
-   "version" : "1.325",
+   "version" : "1.326",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

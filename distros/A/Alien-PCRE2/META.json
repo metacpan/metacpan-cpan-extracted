@@ -46,7 +46,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.52",
+            "Alien::Build" : "0.60",
             "Alien::Build::MM" : "0.25",
             "IO::Socket::SSL" : "2.043"
          }
@@ -75,6 +75,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.006000",
+   "version" : "0.008000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

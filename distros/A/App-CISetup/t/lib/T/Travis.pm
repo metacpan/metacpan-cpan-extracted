@@ -27,7 +27,7 @@ sub test_create_and_update {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 )) {
+    for my $v (qw( 5.14 5.16 5.18 5.20 5.22 5.24 5.26 )) {
         like(
             $yaml,
             qr/^ +- \Q'$v'\E$/ms,
@@ -72,6 +72,7 @@ sub test_create_and_update {
                 qw(
                     blead
                     dev
+                    5.26
                     5.24
                     5.22
                     5.20
@@ -85,7 +86,7 @@ sub test_create_and_update {
                 include        => [
                     {
                         env  => 'COVERAGE=1',
-                        perl => '5.24'
+                        perl => '5.26'
                     }
                 ],
             },
@@ -123,7 +124,7 @@ sub test_force_threaded_perls {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.3 5.24.1 )) {
+    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.3 5.24.1 5.26.0 )) {
         for my $t ( $v, "$v-thr" ) {
             like(
                 $yaml,
@@ -153,7 +154,7 @@ sub test_distro_has_xs {
 
     my $yaml = $file->slurp;
 
-    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.3 5.24.1 )) {
+    for my $v (qw( 5.14.4 5.16.3 5.18.3 5.20.3 5.22.3 5.24.1 5.26.0 )) {
         for my $t ( $v, "$v-thr" ) {
             like(
                 $yaml,
@@ -176,7 +177,7 @@ sub test_update_helpers_usage {
             before_install => [
                 '$(curl git://github.com/haarg/perl-travis-helper) --auto'
             ],
-            perl => ['5.24'],
+            perl => ['5.26'],
         }
     );
 
@@ -210,7 +211,7 @@ sub test_maybe_disable_sudo {
             language => 'perl',
             before_install =>
                 ['eval $(curl https://travis-perl.github.io/init) --auto'],
-            perl => ['5.24'],
+            perl => ['5.26'],
         }
     );
 
@@ -231,7 +232,7 @@ sub test_maybe_disable_sudo {
             before_install =>
                 ['eval $(curl https://travis-perl.github.io/init) --auto'],
             install => ['sudo foo'],
-            perl    => ['5.24'],
+            perl    => ['5.26'],
         }
     );
 
@@ -262,7 +263,7 @@ sub test_coverity_email {
             },
             before_install =>
                 ['eval $(curl https://travis-perl.github.io/init) --auto'],
-            perl => ['5.24'],
+            perl => ['5.26'],
         }
     );
 
@@ -299,7 +300,7 @@ sub test_email_notifications {
             language => 'perl',
             before_install =>
                 ['eval $(curl https://travis-perl.github.io/init) --auto'],
-            perl => ['5.24'],
+            perl => ['5.26'],
         }
     );
 
@@ -334,7 +335,7 @@ sub test_slack_notifications {
             language => 'perl',
             before_install =>
                 ['eval $(curl https://travis-perl.github.io/init) --auto'],
-            perl => ['5.24'],
+            perl => ['5.26'],
         }
     );
 

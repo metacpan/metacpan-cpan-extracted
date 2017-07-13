@@ -4,15 +4,15 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Test2::Mock: '0.000060'
+  Test2::Require::Module: '0.000060'
   Test2::V0: '0.000060'
-  Test::More: '0.94'
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  IPC::Cmd: '0'
+  File::Which: '0'
   perl: '5.008001'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,23 +26,27 @@ no_index:
 requires:
   Alien::Base: '0.036'
   Capture::Tiny: '0.17'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::ParseXS: '3.21'
   FFI::CheckLib: '0.11'
+  File::Which: '1.10'
   File::chdir: '0'
-  IPC::Cmd: '0'
   JSON::PP: '0'
   Module::Load: '0'
   Path::Tiny: '0.077'
+  Test2::API: '1.302015'
+  Test2::Require: '0.000060'
   Text::ParseWords: '3.26'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/plicease/Alien-Build/issues
+  bugtracker: https://github.com/Perl5-Alien/Alien-Build/issues
   homepage: https://metacpan.org/pod/Alien::Build
-  repository: git://github.com/plicease/Alien-Build.git
-version: '0.55'
+  repository: git://github.com/Perl5-Alien/Alien-Build.git
+version: '0.61'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Diab Jerius (DJERIUS)'
   - 'Roy Storey'
   - 'Ilya Pavlov'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_serialization_backend: 'YAML::Tiny version 1.69'

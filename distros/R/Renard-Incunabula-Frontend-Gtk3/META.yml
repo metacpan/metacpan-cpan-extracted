@@ -1,0 +1,35 @@
+---
+abstract: 'Provides helpers for dealing with Gtk3 code'
+author:
+  - 'Project Renard'
+build_requires:
+  Renard::Incunabula::Devel::TestHelper: '0'
+  Test::Most: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Renard-Incunabula-Frontend-Gtk3
+requires:
+  Class::Method::Modifiers: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Function::Parameters: '0'
+  Gtk3: '0'
+  Module::Util: '0'
+  Moo::Role: '0'
+  Renard::Incunabula::Common::Setup: '0'
+  Renard::Incunabula::Common::Types: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/project-renard/p5-Renard-Incunabula-Frontend-Gtk3
+  repository: https://github.com/project-renard/p5-Renard-Incunabula-Frontend-Gtk3.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

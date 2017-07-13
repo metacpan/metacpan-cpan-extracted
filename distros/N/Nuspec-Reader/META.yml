@@ -1,0 +1,42 @@
+---
+abstract: 'Parse .nuspec file and get access to different parts.'
+author:
+  - 'Miroslav Tynovsky <tynovsky@avast.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Nuspec-Reader
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Nuspec::Reader:
+    file: lib/Nuspec/Reader.pm
+    version: v0.1.0
+requires:
+  Class::Tiny: '0'
+  XML::LibXML: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/avast/Nuspec-Reader/issues
+  homepage: https://github.com/avast/Nuspec-Reader
+  repository: git://github.com/avast/Nuspec-Reader.git
+version: 0.1.0
+x_authority: cpan:TYNOVSKY
+x_contributors:
+  - 'tynovsky <tynovsky@seznam.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

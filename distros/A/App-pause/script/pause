@@ -1,0 +1,1347 @@
+#!perl
+
+# PERICMD_INLINE_SCRIPT: {"config_filename":["pause.conf"],"env_name":"PAUSE_OPT","log":1,"pack_deps":0,"pod":0,"read_config":1,"read_env":1,"script_name":"pause","script_version_from_main_version":1,"shebang":"#!perl","subcommands":{"cleanup":{"url":"/WWW/PAUSE/Simple/delete_old_releases"},"ls":{"url":"/WWW/PAUSE/Simple/list_files"},"ls-dists":{"url":"/WWW/PAUSE/Simple/list_dists"},"ls-mods":{"url":"/WWW/PAUSE/Simple/list_modules"},"reindex":{"url":"/WWW/PAUSE/Simple/reindex_files"},"rm":{"url":"/WWW/PAUSE/Simple/delete_files"},"undelete":{"url":"/WWW/PAUSE/Simple/undelete_files"},"upload":{"url":"/WWW/PAUSE/Simple/upload_files"}},"summary":"A CLI for PAUSE","url":"/WWW/PAUSE/Simple/","use_cleanser":0,"validate_args":1}
+
+my $_pci_metas = do{my$a={cleanup=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},num_keep=>{cmdline_aliases=>{n=>{}},default=>1,description=>"\n1 means to only keep the newest version, 2 means to keep the newest and the\nsecond newest, and so on.\n\n",schema=>["int",{min=>1,req=>1},{}],summary=>"Number of new versions (including newest) to keep"},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>["common"]},protect_files=>{schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Protect some files/wildcard patterns from delete/cleanup",tags=>["category:filtering"],"x.name.is_plural"=>1},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>["common"]},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>["common"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>["common"]}},description=>"\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\n",features=>{dry_run=>1},result=>{},summary=>"Delete older versions of distributions",v=>1.1},ls=>{args=>{del=>{schema=>["bool",{},{}],summary=>"Only list files which are scheduled for deletion","summary.alt.bool.not"=>"Only list files which are not scheduled for deletion",tags=>["category:filtering"]},detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},files=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern",tags=>["category:filtering"],"x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},result=>{},summary=>"List files",v=>1.1},"ls-dists"=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},newest=>{description=>"\nDev versions will be skipped.\n\n",schema=>["bool",{},{}],summary=>"Only show newest non-dev version"},newest_n=>{description=>"\nDev versions will be skipped.\n\n",schema=>["int",{min=>1,req=>1},{}],summary=>"Only show this number of newest non-dev versions"},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\n",result=>{},summary=>"List distributions",v=>1.1},"ls-mods"=>{args=>{detail=>{cmdline_aliases=>{l=>{}},schema=>["bool",{},{}],summary=>"Whether to return detailed records"},modules=>{greedy=>1,pos=>0,schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Module names/wildcard patterns","summary.alt.plurality.singular"=>"Module name/wildcard pattern",tags=>["category:filtering"],"x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},type=>{schema=>["str",{req=>1},{}],summary=>"Only list modules matching certain type",tags=>["category:filtering"]},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},result=>{},summary=>"List modules (permissions)",v=>1.1},reindex=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},features=>{dry_run=>1},result=>{},summary=>"Force reindexing",v=>1.1},rm=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},protect_files=>{schema=>["array",{of=>["str",{req=>1},{}],req=>1},{}],summary=>"Protect some files/wildcard patterns from delete/cleanup",tags=>'fix',"x.name.is_plural"=>1},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\n",features=>{dry_run=>1},result=>{},summary=>"Delete files",v=>1.1},undelete=>{args=>{files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},description=>"\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\n",features=>{dry_run=>1},result=>{},summary=>"Undelete files",v=>1.1},upload=>{args=>{delay=>{description=>"\nIf you upload a lot of files (e.g. 7-10 or more) at a time, the PAUSE indexer\ncurrently might choke with SQLite database locking problem and thus fail to\nindex your releases. Giving a delay of say 2-3 minutes (120-180 seconds) between\nfiles will alleviate this problem.\n\n",schema=>["duration",{req=>1},{}],summary=>"Pause a number of seconds between files"},files=>{greedy=>1,pos=>0,req=>1,schema=>["array",{min_len=>1,of=>["str",{req=>1},{}],req=>1},{}],summary=>"File names/wildcard patterns","summary.alt.plurality.singular"=>"File name/wildcard pattern","x.name.is_plural"=>1},password=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",is_password=>1,schema=>["str",{req=>1},{}],summary=>"PAUSE password",tags=>'fix'},retries=>{default=>5,schema=>["int",{req=>1},{}],summary=>"Number of retries when received 5xx HTTP error from server",tags=>'fix'},retry_delay=>{default=>3,schema=>["duration",{req=>1},{}],summary=>"How long to wait before retrying",tags=>'fix'},subdir=>{default=>"",schema=>["str",{req=>1},{}],summary=>"Subdirectory to put the file(s) into"},username=>{description=>"\nIf unset, default value will be searched from `~/.pause`. Encrypted `.pause` is\nnot yet supported.\n\n",schema=>["str",{match=>"\\A\\w{2,9}\\z",max_len=>9,req=>1},{}],summary=>"PAUSE ID",tags=>'fix'}},args_rels=>{choose_one=>["delay"]},features=>{dry_run=>1},result=>{},summary=>"Upload file(s)",v=>1.1}};$a->{ls}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{ls}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{ls}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{ls}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{"ls-dists"}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{"ls-dists"}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{"ls-dists"}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{"ls-dists"}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{"ls-mods"}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{"ls-mods"}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{"ls-mods"}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{"ls-mods"}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{reindex}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{reindex}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{reindex}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{reindex}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{rm}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{rm}{args}{protect_files}{tags}=$a->{cleanup}{args}{protect_files}{tags};$a->{rm}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{rm}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{rm}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{undelete}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{undelete}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{undelete}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{undelete}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a->{upload}{args}{password}{tags}=$a->{cleanup}{args}{password}{tags};$a->{upload}{args}{retries}{tags}=$a->{cleanup}{args}{retries}{tags};$a->{upload}{args}{retry_delay}{tags}=$a->{cleanup}{args}{retry_delay}{tags};$a->{upload}{args}{username}{tags}=$a->{cleanup}{args}{username}{tags};$a};
+
+# This script is generated by Perinci::CmdLine::Inline version 0.53 on Tue Jul  4 21:38:22 2017.
+
+# Rinci metadata taken from these modules: WWW::PAUSE::Simple 0.43
+
+# You probably should not manually edit this file.
+
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.63'; # VERSION
+# PODNAME: pause
+
+package main;
+use 5.010001;
+use strict;
+#use warnings;
+
+### enable logging
+require Log::ger::Output; Log::ger::Output->set("Screen", formatter => sub { "pause: " . $_[0] },);
+require Log::ger; Log::ger->import;
+
+### declare global variables
+
+our $_pci_meta_result_stream = 0;
+our $_pci_meta_result_type;
+our $_pci_meta_result_type_is_simple;
+our $_pci_meta_skip_format = 0;
+our $_pci_r = {naked_res=>0,read_config=>1,read_env=>1,subcommand_name=>""};
+our %_pci_args;
+
+### declare subroutines
+
+sub _pci_err {
+    my $res = shift;
+    print STDERR "ERROR $res->[0]: $res->[1]\n";
+    exit $res->[0]-300;
+}
+
+sub _pci_json {
+    state $json = do {
+        if (eval { require JSON::XS; 1 }) { JSON::XS->new->canonical(1)->allow_nonref }
+        else { require JSON::PP; JSON::PP->new->canonical(1)->allow_nonref }
+    };
+    $json;
+}
+
+### get arguments (from config file, env, command-line args
+
+{
+my %mentioned_args;
+require Getopt::Long::EvenLess;
+log_trace("Parsing command-line arguments ...");
+require Getopt::Long::Subcommand;
+my $help_msg = "pause\nUsage:\n  pause --help (or -h, -?)\n  pause --subcommands\n  pause --version (or -v)\n  pause [options]\n\nSubcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --cmd=s                        Select subcommand\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --subcommands                  List available subcommands\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n";
+my $go_spec1 = {
+  'cmd=s' => sub { $_[2]{subcommand} = [$_[1]]; $_pci_r->{subcommand_name} = $_[1]; },
+  'config-path=s@' => sub { $_pci_r->{config_paths} //= []; push @{ $_pci_r->{config_paths} }, $_[1]; },
+  'config-profile=s' => sub { $_pci_r->{config_profile} = $_[1]; },
+  'debug' => sub { require Log::ger::Util; Log::ger::Util::set_level("debug"); $_pci_r->{log_level} = "debug"; },
+  'format=s' => sub { $_pci_r->{format} = $_[1]; },
+  'help|h|?' => sub { my $sc_name = $_pci_r->{subcommand_name}; my $first_non_opt_arg; for (@ARGV) { next if /^-/; $first_non_opt_arg = $_; last } if (!length $sc_name && defined $first_non_opt_arg) { $sc_name = $first_non_opt_arg } if (!length $sc_name) { print $help_msg } elsif ($sc_name eq "") { print "pause\nUsage:\n  pause --help (or -h, -?)\n  pause --subcommands\n  pause --version (or -v)\n  pause [options]\n\nSubcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --cmd=s                        Select subcommand\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --quiet                        Set logging level to error\n  --subcommands                  List available subcommands\n  --trace                        Set logging level to trace\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "cleanup") { print "pause cleanup - Delete older versions of distributions\n\nUsage:\n  pause cleanup --help (or -h, -?)\n  pause cleanup --version (or -v)\n  pause cleanup [options]\n\nDeveloper releases will not be deleted.\n\nTo delete developer releases, you can use `delete_files` (rm), e.g. from the\ncommand line:\n\n    % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases\n    % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore\n\nMain options:\n  --detail, -l      Whether to return detailed records\n  --num-keep=i, -n  Number of new versions (including newest) to keep [1]\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls") { print "pause ls - List files\n\nUsage:\n  pause ls --help (or -h, -?)\n  pause ls --version (or -v)\n  pause ls [options] [files] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --del      Only list files which are scheduled for deletion\n  --file=s\@  File name/wildcard pattern (=arg[0-])\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-dists") { print "pause ls-dists - List distributions\n\nUsage:\n  pause ls-dists --help (or -h, -?)\n  pause ls-dists --version (or -v)\n  pause ls-dists [options]\n\nDistribution names will be extracted from tarball/zip filenames.\n\nUnknown/unparseable filenames will be skipped.\n\nMain options:\n  --detail, -l  Whether to return detailed records\n  --newest      Only show newest non-dev version\n  --newest-n=i  Only show this number of newest non-dev versions\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "ls-mods") { print "pause ls-mods - List modules (permissions)\n\nUsage:\n  pause ls-mods --help (or -h, -?)\n  pause ls-mods --version (or -v)\n  pause ls-mods [options] [modules] ...\n\nMain options:\n  --detail, -l  Whether to return detailed records\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --module=s\@  Module name/wildcard pattern (=arg[0-])\n  --type=s     Only list modules matching certain type\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "reindex") { print "pause reindex - Force reindexing\n\nUsage:\n  pause reindex --help (or -h, -?)\n  pause reindex --version (or -v)\n  pause reindex [options] <files> ...\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "rm") { print "pause rm - Delete files\n\nUsage:\n  pause rm --help (or -h, -?)\n  pause rm --version (or -v)\n  pause rm [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nFiltering options:\n  --protect-file=s\@  Protect some files/wildcard patterns from delete/cleanup\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "undelete") { print "pause undelete - Undelete files\n\nUsage:\n  pause undelete --help (or -h, -?)\n  pause undelete --version (or -v)\n  pause undelete [options] <files> ...\n\nWhen a file is deleted, it is not immediately deleted but has\nscheduled_for_deletion status for 72 hours, then deleted. During that time, the\nfile can be undeleted.\n\nMain options:\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } elsif ($sc_name eq "upload") { print "pause upload - Upload file(s)\n\nUsage:\n  pause upload --help (or -h, -?)\n  pause upload --version (or -v)\n  pause upload [options] <files> ...\n\nMain options:\n  --delay=s   Pause a number of seconds between files\n  --file=s\@*  File name/wildcard pattern (=arg[0-])\n  --subdir=s  Subdirectory to put the file(s) into [\"\"]\n\nConfiguration options:\n  --config-path=filename  Set path to configuration file\n  --config-profile=s      Set configuration profile to use\n  --no-config             Do not use any configuration file\n\nEnvironment options:\n  --no-env  Do not read environment for default options\n\nOutput options:\n  --format=s  Choose output format, e.g. json, text\n  --json      Set output format to json\n\nOther options:\n  --debug                        Set logging level to debug\n  --help, -h, -?                 Display help message and exit\n  --log-level=s                  Set logging level (trace|debug|info|warn|error|fatal|none)\n  --naked-res                    When outputing as JSON, strip result envelope\n  --no-naked-res, --nonaked-res  When outputing as JSON, don't strip result envelope\n  --password=s                   PAUSE password\n  --quiet                        Set logging level to error\n  --retries=i                    Number of retries when received 5xx HTTP error from server [5]\n  --retry-delay=s                How long to wait before retrying [3]\n  --trace                        Set logging level to trace\n  --username=s                   PAUSE ID\n  --verbose                      Set logging level to info\n  --version, -v                  Display program's version and exit\n" } else { _pci_err([500, "Unknown subcommand2: $sc_name"]) } exit 0 },
+  'json' => sub { $_pci_r->{format} = (-t STDOUT) ? "json-pretty" : "json"; },
+  'log-level=s' => sub { if ($_[1] eq "trace") { require Log::ger::Util; Log::ger::Util::set_level("trace") } if ($_[1] eq "debug") { require Log::ger::Util; Log::ger::Util::set_level("debug") } if ($_[1] eq "info" ) { require Log::ger::Util; Log::ger::Util::set_level("info" ) } if ($_[1] eq "error") { require Log::ger::Util; Log::ger::Util::set_level("warn" ) } if ($_[1] eq "fatal") { require Log::ger::Util; Log::ger::Util::set_level("debug") } if ($_[1] eq "none")  { require Log::ger::Util; Log::ger::Util::set_level("off"  ) } if ($_[1] eq "off")   { require Log::ger::Util; Log::ger::Util::set_level("off"  ) } $_pci_r->{log_level} = $_[1]; },
+  'naked-res' => sub { $_pci_r->{naked_res} = 1; },
+  'no-config' => sub { $_pci_r->{read_config} = 0; },
+  'no-env' => sub { $_pci_r->{read_env} = 0; },
+  'no-naked-res|nonaked-res' => sub { $_pci_r->{naked_res} = 0; },
+  'quiet' => sub { require Log::ger::Util; Log::ger::Util::set_level("error"); $_pci_r->{log_level} = "error"; },
+  'subcommands' => sub { print "Available subcommands:\n  cleanup\n  ls\n  ls-dists\n  ls-mods\n  reindex\n  rm\n  undelete\n  upload\n"; exit 0 },
+  'trace' => sub { require Log::ger::Util; Log::ger::Util::set_level("trace"); $_pci_r->{log_level} = "trace"; },
+  'verbose' => sub { require Log::ger::Util; Log::ger::Util::set_level("info" ); $_pci_r->{log_level} = "info" ; },
+  'version|v' => sub { no warnings 'once'; require WWW::PAUSE::Simple; print "pause version ", $main::VERSION // '?', ($main::DATE ? " ($main::DATE)" : ''), "\n"; print "  Generated by Perinci::CmdLine::Inline version 0.53 (2017-07-04)\n"; exit 0 },
+};
+my $go_spec2 = {
+  options => {
+    'cmd=s' => {
+      handler => sub { $_[2]{subcommand} = [$_[1]]; $_pci_r->{subcommand_name} = $_[1]; },
+    },
+    'config-path=s@' => {
+      handler => sub {},
+    },
+    'config-profile=s' => {
+      handler => sub {},
+    },
+    'debug' => {
+      handler => sub {},
+    },
+    'format=s' => {
+      handler => sub {},
+    },
+    'help|h|?' => {
+      handler => sub {},
+    },
+    'json' => {
+      handler => sub {},
+    },
+    'log-level=s' => {
+      handler => sub {},
+    },
+    'naked-res' => {
+      handler => sub {},
+    },
+    'no-config' => {
+      handler => sub {},
+    },
+    'no-env' => {
+      handler => sub {},
+    },
+    'no-naked-res|nonaked-res' => {
+      handler => sub {},
+    },
+    'quiet' => {
+      handler => sub {},
+    },
+    'subcommands' => {
+      handler => sub {},
+    },
+    'trace' => {
+      handler => sub {},
+    },
+    'verbose' => {
+      handler => sub {},
+    },
+    'version|v' => {
+      handler => sub {},
+    },
+  },
+  subcommands => {
+    'cleanup' => {
+      options => {
+        'detail' => {
+          handler => sub { $_pci_args{'detail'} = $_[1]; },
+        },
+        'l' => {
+          handler => sub { $_pci_args{'detail'} = $_[1]; },
+        },
+        'n=i' => {
+          handler => sub { $_pci_args{'num_keep'} = $_[1]; },
+        },
+        'no-detail' => {
+          handler => sub { $_pci_args{'detail'} = 0; },
+        },
+        'nodetail' => {
+          handler => sub { $_pci_args{'detail'} = 0; },
+        },
+        'num-keep=i' => {
+          handler => sub { $_pci_args{'num_keep'} = $_[1]; },
+        },
+        'password=s' => {
+          handler => sub { $_pci_args{'password'} = $_[1]; },
+        },
+        'protect-file=s@' => {
+          handler => sub { if ($mentioned_args{'protect_files'}++) { push @{ $_pci_args{'protect_files'} }, $_[1] } else { $_pci_args{'protect_files'} = [$_[1]] } },
+        },
+        'protect-files-json=s' => {
+          handler => sub { $_pci_args{'protect_files'} = _pci_json()->decode($_[1]); },
+        },
+        'retries=i' => {
+          handler => sub { $_pci_args{'retries'} = $_[1]; },
+        },
+        'retry-delay=s' => {
+          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
+        },
+        'username=s' => {
+          handler => sub { $_pci_args{'username'} = $_[1]; },
+        },
+      },
+    },
+    'ls' => {
+      options => {
+        'del' => {
+          handler => sub { $_pci_args{'del'} = $_[1]; },
+        },
+        'detail' => {
+          handler => sub { $_pci_args{'detail'} = $_[1]; },
+        },
+        'file=s@' => {
+          handler => sub { if ($mentioned_args{'files'}++) { push @{ $_pci_args{'files'} }, $_[1] } else { $_pci_args{'files'} = [$_[1]] } },
+        },
+        'files-json=s' => {
+          handler => sub { $_pci_args{'files'} = _pci_json()->decode($_[1]); },
+        },
+        'l' => {
+          handler => sub { $_pci_args{'detail'} = $_[1]; },
+        },
+        'no-del' => {
+          handler => sub { $_pci_args{'del'} = 0; },
+        },
+        'no-detail' => {
+          handler => sub { $_pci_args{'detail'} = 0; },
+        },
+        'nodel' => {
+          handler => sub { $_pci_args{'del'} = 0; },
+        },
+        'nodetail' => {
+          handler => sub { $_pci_args{'detail'} = 0; },
+        },
+        'password=s' => {
+          handler => sub { $_pci_args{'password'} = $_[1]; },
+        },
+        'retries=i' => {
+          handler => sub { $_pci_args{'retries'} = $_[1]; },
+        },
+        'retry-delay=s' => {
+          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
+        },
+        'username=s' => {
+          handler => sub { $_pci_args{'username'} = $_[1]; },
+        },
+      },
+    },
+    'ls-dists' => {
+      options => {
+        'detail' => {
+          handler => sub { $_pci_args{'detail'} = $_[1]; },
+        },
+        'l' => {
+          handler => sub { $_pci_args{'detail'} = $_[1]; },
+        },
+        'newest' => {
+          handler => sub { $_pci_args{'newest'} = $_[1]; },
+        },
+        'newest-n=i' => {
+          handler => sub { $_pci_args{'newest_n'} = $_[1]; },
+        },
+        'no-detail' => {
+          handler => sub { $_pci_args{'detail'} = 0; },
+        },
+        'no-newest' => {
+          handler => sub { $_pci_args{'newest'} = 0; },
+        },
+        'nodetail' => {
+          handler => sub { $_pci_args{'detail'} = 0; },
+        },
+        'nonewest' => {
+          handler => sub { $_pci_args{'newest'} = 0; },
+        },
+        'password=s' => {
+          handler => sub { $_pci_args{'password'} = $_[1]; },
+        },
+        'retries=i' => {
+          handler => sub { $_pci_args{'retries'} = $_[1]; },
+        },
+        'retry-delay=s' => {
+          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
+        },
+        'username=s' => {
+          handler => sub { $_pci_args{'username'} = $_[1]; },
+        },
+      },
+    },
+    'ls-mods' => {
+      options => {
+        'detail' => {
+          handler => sub { $_pci_args{'detail'} = $_[1]; },
+        },
+        'l' => {
+          handler => sub { $_pci_args{'detail'} = $_[1]; },
+        },
+        'module=s@' => {
+          handler => sub { if ($mentioned_args{'modules'}++) { push @{ $_pci_args{'modules'} }, $_[1] } else { $_pci_args{'modules'} = [$_[1]] } },
+        },
+        'modules-json=s' => {
+          handler => sub { $_pci_args{'modules'} = _pci_json()->decode($_[1]); },
+        },
+        'no-detail' => {
+          handler => sub { $_pci_args{'detail'} = 0; },
+        },
+        'nodetail' => {
+          handler => sub { $_pci_args{'detail'} = 0; },
+        },
+        'password=s' => {
+          handler => sub { $_pci_args{'password'} = $_[1]; },
+        },
+        'retries=i' => {
+          handler => sub { $_pci_args{'retries'} = $_[1]; },
+        },
+        'retry-delay=s' => {
+          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
+        },
+        'type=s' => {
+          handler => sub { $_pci_args{'type'} = $_[1]; },
+        },
+        'username=s' => {
+          handler => sub { $_pci_args{'username'} = $_[1]; },
+        },
+      },
+    },
+    'reindex' => {
+      options => {
+        'file=s@' => {
+          handler => sub { if ($mentioned_args{'files'}++) { push @{ $_pci_args{'files'} }, $_[1] } else { $_pci_args{'files'} = [$_[1]] } },
+        },
+        'files-json=s' => {
+          handler => sub { $_pci_args{'files'} = _pci_json()->decode($_[1]); },
+        },
+        'password=s' => {
+          handler => sub { $_pci_args{'password'} = $_[1]; },
+        },
+        'retries=i' => {
+          handler => sub { $_pci_args{'retries'} = $_[1]; },
+        },
+        'retry-delay=s' => {
+          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
+        },
+        'username=s' => {
+          handler => sub { $_pci_args{'username'} = $_[1]; },
+        },
+      },
+    },
+    'rm' => {
+      options => {
+        'file=s@' => {
+          handler => sub { if ($mentioned_args{'files'}++) { push @{ $_pci_args{'files'} }, $_[1] } else { $_pci_args{'files'} = [$_[1]] } },
+        },
+        'files-json=s' => {
+          handler => sub { $_pci_args{'files'} = _pci_json()->decode($_[1]); },
+        },
+        'password=s' => {
+          handler => sub { $_pci_args{'password'} = $_[1]; },
+        },
+        'protect-file=s@' => {
+          handler => sub { if ($mentioned_args{'protect_files'}++) { push @{ $_pci_args{'protect_files'} }, $_[1] } else { $_pci_args{'protect_files'} = [$_[1]] } },
+        },
+        'protect-files-json=s' => {
+          handler => sub { $_pci_args{'protect_files'} = _pci_json()->decode($_[1]); },
+        },
+        'retries=i' => {
+          handler => sub { $_pci_args{'retries'} = $_[1]; },
+        },
+        'retry-delay=s' => {
+          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
+        },
+        'username=s' => {
+          handler => sub { $_pci_args{'username'} = $_[1]; },
+        },
+      },
+    },
+    'undelete' => {
+      options => {
+        'file=s@' => {
+          handler => sub { if ($mentioned_args{'files'}++) { push @{ $_pci_args{'files'} }, $_[1] } else { $_pci_args{'files'} = [$_[1]] } },
+        },
+        'files-json=s' => {
+          handler => sub { $_pci_args{'files'} = _pci_json()->decode($_[1]); },
+        },
+        'password=s' => {
+          handler => sub { $_pci_args{'password'} = $_[1]; },
+        },
+        'retries=i' => {
+          handler => sub { $_pci_args{'retries'} = $_[1]; },
+        },
+        'retry-delay=s' => {
+          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
+        },
+        'username=s' => {
+          handler => sub { $_pci_args{'username'} = $_[1]; },
+        },
+      },
+    },
+    'upload' => {
+      options => {
+        'delay=s' => {
+          handler => sub { $_pci_args{'delay'} = $_[1]; },
+        },
+        'file=s@' => {
+          handler => sub { if ($mentioned_args{'files'}++) { push @{ $_pci_args{'files'} }, $_[1] } else { $_pci_args{'files'} = [$_[1]] } },
+        },
+        'files-json=s' => {
+          handler => sub { $_pci_args{'files'} = _pci_json()->decode($_[1]); },
+        },
+        'password=s' => {
+          handler => sub { $_pci_args{'password'} = $_[1]; },
+        },
+        'retries=i' => {
+          handler => sub { $_pci_args{'retries'} = $_[1]; },
+        },
+        'retry-delay=s' => {
+          handler => sub { $_pci_args{'retry_delay'} = $_[1]; },
+        },
+        'subdir=s' => {
+          handler => sub { $_pci_args{'subdir'} = $_[1]; },
+        },
+        'username=s' => {
+          handler => sub { $_pci_args{'username'} = $_[1]; },
+        },
+      },
+    },
+  },
+  default_subcommand => undef,
+};
+{
+  local @ARGV = @ARGV;
+  my $old_conf = Getopt::Long::EvenLess::Configure("pass_through");
+  Getopt::Long::EvenLess::GetOptions(%$go_spec1);
+  Getopt::Long::EvenLess::Configure($old_conf);
+  { my $first_non_opt_arg; for (@ARGV) { next if /^-/; $first_non_opt_arg = $_; last } if (!length $_pci_r->{subcommand_name} && defined $first_non_opt_arg) { $_pci_r->{subcommand_name} = $first_non_opt_arg } }
+}
+{
+  last unless $_pci_r->{read_env};
+  my $env = $ENV{"PAUSE_OPT"};
+  last unless defined $env;
+  require Complete::Bash;
+  my ($words, undef) = @{ Complete::Bash::parse_cmdline($env, 0) };
+  unshift @ARGV, @$words;
+}
+if ($_pci_r->{read_config}) {
+log_trace("Reading config file(s) ...");
+  require Perinci::CmdLine::Util::Config;
+
+  my $res = Perinci::CmdLine::Util::Config::read_config(
+    config_paths     => $_pci_r->{config_paths},
+    config_filename  => ["pause.conf"],
+    config_dirs      => undef // ["$ENV{HOME}/.config", $ENV{HOME}, "/etc"],
+    program_name     => "pause",
+  );
+  _pci_err($res) unless $res->[0] == 200;
+  $_pci_r->{config} = $res->[2];
+  $_pci_r->{read_config_files} = $res->[3]{"func.read_files"};
+  $_pci_r->{_config_section_read_order} = $res->[3]{"func.section_read_order"}; # we currently dont want to publish this request key
+
+  $res = Perinci::CmdLine::Util::Config::get_args_from_config(
+    r                  => $_pci_r,
+    config             => $_pci_r->{config},
+    args               => \%_pci_args,
+    program_name       => "pause",
+    subcommand_name    => $_pci_r->{subcommand_name},
+    config_profile     => $_pci_r->{config_profile},
+    common_opts        => {},
+    meta               => $_pci_metas->{ $_pci_r->{subcommand_name} },
+    meta_is_normalized => 1,
+  );
+  die $res unless $res->[0] == 200;
+  my $found = $res->[3]{"func.found"};
+  if (defined($_pci_r->{config_profile}) && !$found && defined($_pci_r->{read_config_files}) && @{$_pci_r->{read_config_files}} && !$_pci_r->{ignore_missing_config_profile_section}) {
+    _pci_err([412, "Profile '$_pci_r->{config_profile}' not found in configuration file"]);
+  }
+}
+my $res = Getopt::Long::Subcommand::GetOptions(%$go_spec2);
+_pci_err([500, "GetOptions failed"]) unless $res->{success};
+if (!length $_pci_r->{subcommand_name}) { print $help_msg; exit 0 }
+}
+
+### check arguments
+
+{
+my $res = _pci_check_args(\%_pci_args);
+_pci_err($res) if $res->[0] != 200;
+$_pci_r->{args} = \%_pci_args;
+}
+
+### call function
+
+{
+log_trace("Calling function ...");
+my $sc_name = $_pci_r->{subcommand_name};
+if ($sc_name eq "cleanup") {
+    $_pci_meta_result_type = "";
+    require WWW::PAUSE::Simple;
+    eval { $_pci_r->{res} = WWW::PAUSE::Simple::delete_old_releases(%_pci_args) };
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+}
+elsif ($sc_name eq "ls") {
+    $_pci_meta_result_type = "";
+    require WWW::PAUSE::Simple;
+    eval { $_pci_r->{res} = WWW::PAUSE::Simple::list_files(%_pci_args) };
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+}
+elsif ($sc_name eq "ls-dists") {
+    $_pci_meta_result_type = "";
+    require WWW::PAUSE::Simple;
+    eval { $_pci_r->{res} = WWW::PAUSE::Simple::list_dists(%_pci_args) };
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+}
+elsif ($sc_name eq "ls-mods") {
+    $_pci_meta_result_type = "";
+    require WWW::PAUSE::Simple;
+    eval { $_pci_r->{res} = WWW::PAUSE::Simple::list_modules(%_pci_args) };
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+}
+elsif ($sc_name eq "reindex") {
+    $_pci_meta_result_type = "";
+    require WWW::PAUSE::Simple;
+    eval { $_pci_r->{res} = WWW::PAUSE::Simple::reindex_files(%_pci_args) };
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+}
+elsif ($sc_name eq "rm") {
+    $_pci_meta_result_type = "";
+    require WWW::PAUSE::Simple;
+    eval { $_pci_r->{res} = WWW::PAUSE::Simple::delete_files(%_pci_args) };
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+}
+elsif ($sc_name eq "undelete") {
+    $_pci_meta_result_type = "";
+    require WWW::PAUSE::Simple;
+    eval { $_pci_r->{res} = WWW::PAUSE::Simple::undelete_files(%_pci_args) };
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+}
+elsif ($sc_name eq "upload") {
+    $_pci_meta_result_type = "";
+    require WWW::PAUSE::Simple;
+    eval { $_pci_r->{res} = WWW::PAUSE::Simple::upload_files(%_pci_args) };
+    if ($@) { $_pci_r->{res} = [500, "Function died: $@"] }
+}
+}
+
+### format & display result
+
+{
+log_trace("Displaying result ...");
+my $fres;
+my $save_res; if (exists $_pci_r->{res}[3]{"cmdline.result"}) { $save_res = $_pci_r->{res}[2]; $_pci_r->{res}[2] = $_pci_r->{res}[3]{"cmdline.result"} }
+my $is_success = $_pci_r->{res}[0] =~ /\A2/ || $_pci_r->{res}[0] == 304;
+my $is_stream = $_pci_r->{res}[3]{stream} // $_pci_meta_result_stream // 0;
+if ($is_success && (0 || $_pci_meta_skip_format || $_pci_r->{res}[3]{"cmdline.skip_format"})) { $fres = $_pci_r->{res}[2] }
+elsif ($is_success && $is_stream) {}
+else { require Perinci::Result::Format::Lite; $is_stream=0; $fres = Perinci::Result::Format::Lite::format($_pci_r->{res}, ($_pci_r->{format} // $_pci_r->{res}[3]{"cmdline.default_format"} // "text"), $_pci_r->{naked_res}, 0) }
+
+my $use_utf8 = $_pci_r->{res}[3]{"x.hint.result_binary"} ? 0 : 0;
+if ($use_utf8) { binmode STDOUT, ":utf8" }
+if ($is_stream) {
+    my $code = $_pci_r->{res}[2]; if (ref($code) ne "CODE") { die "Result is a stream but no coderef provided" } if ($_pci_meta_result_type_is_simple) { while(defined(my $l=$code->())) { print $l; print "\n" unless $_pci_meta_result_type eq "buf"; } } else { while (defined(my $rec=$code->())) { print _pci_json()->encode($rec),"\n" } }
+} else {
+    print $fres;
+}
+if (defined $save_res) { $_pci_r->{res}[2] = $save_res }
+}
+
+### exit
+
+{
+my $status = $_pci_r->{res}[0];
+my $exit_code = $_pci_r->{res}[3]{"cmdline.exit_code"} // ($status =~ /200|304/ ? 0 : ($status-300));
+exit($exit_code);
+}
+
+# BEGIN Local::_pci_check_args
+sub _pci_check_args {
+    my ($args) = @_;
+    my $sc_name = $_pci_r->{subcommand_name};
+    if ($sc_name eq "cleanup") {
+      FILL_FROM_POS: {
+            1;
+        }
+        my @check_argv = @ARGV;
+        # fill from cmdline_src
+
+        # fill defaults from "default" property and check against schema
+        $args->{"num_keep"} //= 1;
+        $args->{"retries"} //= 5;
+        $args->{"retry_delay"} //= 3;
+
+        # check required args
+        return [400, "Missing required value for argument: num_keep"] if exists($args->{"num_keep"}) && !defined($args->{"num_keep"});
+        return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
+        return [400, "Missing required value for argument: protect_files"] if exists($args->{"protect_files"}) && !defined($args->{"protect_files"});
+        return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
+        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
+        return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
+        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
+        [200];
+    }    elsif ($sc_name eq "ls") {
+      FILL_FROM_POS: {
+            1;
+            if (@ARGV > 0) { if (exists $args->{"files"}) { return [400, "You specified --file but also argument #0"]; } else { $args->{"files"} = [splice(@ARGV, 0)]; } }
+        }
+        my @check_argv = @ARGV;
+        # fill from cmdline_src
+
+        # fill defaults from "default" property and check against schema
+        $args->{"retries"} //= 5;
+        $args->{"retry_delay"} //= 3;
+
+        # check required args
+        return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
+        return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
+        return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
+        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
+        return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
+        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
+        [200];
+    }    elsif ($sc_name eq "ls-dists") {
+      FILL_FROM_POS: {
+            1;
+        }
+        my @check_argv = @ARGV;
+        # fill from cmdline_src
+
+        # fill defaults from "default" property and check against schema
+        $args->{"retries"} //= 5;
+        $args->{"retry_delay"} //= 3;
+
+        # check required args
+        return [400, "Missing required value for argument: newest_n"] if exists($args->{"newest_n"}) && !defined($args->{"newest_n"});
+        return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
+        return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
+        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
+        return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
+        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
+        [200];
+    }    elsif ($sc_name eq "ls-mods") {
+      FILL_FROM_POS: {
+            1;
+            if (@ARGV > 0) { if (exists $args->{"modules"}) { return [400, "You specified --module but also argument #0"]; } else { $args->{"modules"} = [splice(@ARGV, 0)]; } }
+        }
+        my @check_argv = @ARGV;
+        # fill from cmdline_src
+
+        # fill defaults from "default" property and check against schema
+        $args->{"retries"} //= 5;
+        $args->{"retry_delay"} //= 3;
+
+        # check required args
+        return [400, "Missing required value for argument: modules"] if exists($args->{"modules"}) && !defined($args->{"modules"});
+        return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
+        return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
+        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
+        return [400, "Missing required value for argument: type"] if exists($args->{"type"}) && !defined($args->{"type"});
+        return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
+        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
+        [200];
+    }    elsif ($sc_name eq "reindex") {
+      FILL_FROM_POS: {
+            1;
+            if (@ARGV > 0) { if (exists $args->{"files"}) { return [400, "You specified --file but also argument #0"]; } else { $args->{"files"} = [splice(@ARGV, 0)]; } }
+        }
+        my @check_argv = @ARGV;
+        # fill from cmdline_src
+
+        # fill defaults from "default" property and check against schema
+        $args->{"retries"} //= 5;
+        $args->{"retry_delay"} //= 3;
+
+        # check required args
+        return [400, "Missing required argument: files"] unless exists $args->{"files"};
+        return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
+        return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
+        return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
+        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
+        return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
+        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
+        [200];
+    }    elsif ($sc_name eq "rm") {
+      FILL_FROM_POS: {
+            1;
+            if (@ARGV > 0) { if (exists $args->{"files"}) { return [400, "You specified --file but also argument #0"]; } else { $args->{"files"} = [splice(@ARGV, 0)]; } }
+        }
+        my @check_argv = @ARGV;
+        # fill from cmdline_src
+
+        # fill defaults from "default" property and check against schema
+        $args->{"retries"} //= 5;
+        $args->{"retry_delay"} //= 3;
+
+        # check required args
+        return [400, "Missing required argument: files"] unless exists $args->{"files"};
+        return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
+        return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
+        return [400, "Missing required value for argument: protect_files"] if exists($args->{"protect_files"}) && !defined($args->{"protect_files"});
+        return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
+        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
+        return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
+        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
+        [200];
+    }    elsif ($sc_name eq "undelete") {
+      FILL_FROM_POS: {
+            1;
+            if (@ARGV > 0) { if (exists $args->{"files"}) { return [400, "You specified --file but also argument #0"]; } else { $args->{"files"} = [splice(@ARGV, 0)]; } }
+        }
+        my @check_argv = @ARGV;
+        # fill from cmdline_src
+
+        # fill defaults from "default" property and check against schema
+        $args->{"retries"} //= 5;
+        $args->{"retry_delay"} //= 3;
+
+        # check required args
+        return [400, "Missing required argument: files"] unless exists $args->{"files"};
+        return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
+        return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
+        return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
+        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
+        return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
+        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
+        [200];
+    }    elsif ($sc_name eq "upload") {
+      FILL_FROM_POS: {
+            1;
+            if (@ARGV > 0) { if (exists $args->{"files"}) { return [400, "You specified --file but also argument #0"]; } else { $args->{"files"} = [splice(@ARGV, 0)]; } }
+        }
+        my @check_argv = @ARGV;
+        # fill from cmdline_src
+
+        # fill defaults from "default" property and check against schema
+        $args->{"retries"} //= 5;
+        $args->{"retry_delay"} //= 3;
+        $args->{"subdir"} //= "";
+
+        # check required args
+        return [400, "Missing required value for argument: delay"] if exists($args->{"delay"}) && !defined($args->{"delay"});
+        return [400, "Missing required argument: files"] unless exists $args->{"files"};
+        return [400, "Missing required value for argument: files"] if exists($args->{"files"}) && !defined($args->{"files"});
+        return [400, "Missing required value for argument: password"] if exists($args->{"password"}) && !defined($args->{"password"});
+        return [400, "Missing required value for argument: retries"] if exists($args->{"retries"}) && !defined($args->{"retries"});
+        return [400, "Missing required value for argument: retry_delay"] if exists($args->{"retry_delay"}) && !defined($args->{"retry_delay"});
+        return [400, "Missing required value for argument: subdir"] if exists($args->{"subdir"}) && !defined($args->{"subdir"});
+        return [400, "Missing required value for argument: username"] if exists($args->{"username"}) && !defined($args->{"username"});
+        _pci_err([500, "Extraneous command-line argument(s): ".join(", ", @check_argv)]) if @check_argv;
+        [200];
+    } else { _pci_err([500, "Unknown subcommand1: $sc_name"]); }
+}
+1;
+
+# END Local::_pci_check_args
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pause
+
+=head1 VERSION
+
+This document describes version 0.63 of main (from Perl distribution App-pause), released on 2017-07-10.
+
+=head1 SYNOPSIS
+
+First create a config file C<~/pause.conf> containing:
+
+ username=<Your PAUSE ID>
+ password=<Your PAUSE password>
+
+or if you have C<~/.pause> from L<cpan-upload>, C<pause> can read it too
+(encrypted C<.pause> is currently not supported).
+
+Then:
+
+ # upload one or more files
+ % pause upload Foo-Bar-0.12.tar.gz Baz-2.24.tar.gz
+ % pause upload Foo-Bar-0.12.tar.gz --subdir old/2014; # upload to a subdir
+
+ # list your files
+ % pause ls
+ % pause ls 'App-*'; # accept filenames/wildcard patterns, note: quote first
+ % pause ls -l     ; # see file sizes/mtimes/etc instead of just names
+
+ # list your dists
+ % pause ls-dists
+
+ # delete files
+ % pause rm Foo-Bar-0.12.tar.gz Foo-Bar-0.12.readme Foo-Bar-0.12.meta
+ % pause rm 'Foo-Bar-*'; # accept wildcard patterns, but quote first
+
+ # undelete files scheduled for deletion (but not actually deleted yet)
+ % pause undelete Foo-Bar-0.12.tar.gz Foo-Bar-0.12.readme Foo-Bar-0.12.meta
+ % pause undelete 'Foo-Bar-*'; # accept wildcard patterns, but quote first
+
+ # force reindexing
+ % pause reindex Foo-Bar-0.12.tar.gz Foo-Bar-0.12.meta
+ % pause reindex 'Foo-Bar-*'; # accept wildcard patterns, but quote first
+
+ # clean old releases, by default will only leave the newest non-dev version
+ % pause cleanup
+ % pause cleanup -n 3 ; # keep 3 versions (newest + previous two)
+
+To view permissions:
+
+ # list all modules that you have permissions of
+ % pause ls-mods
+ % pause ls-mods -l ; # show detail
+
+ # list all modules matching a wildcard
+ % pause ls-mods -l 'Unix*'
+
+ # list all modules you have co-maint of
+ % pause ls-mods -l --type co-maint
+
+To change permissions (not yet implemented):
+
+ ...
+
+To change your password (not yet implemented):
+
+ ...
+
+To view your account info (not yet implemented):
+
+ ...
+
+To change your email forwarding (not yet implemented):
+
+ ...
+
+=head1 SUBCOMMANDS
+
+=head2 B<cleanup>
+
+Delete older versions of distributions.
+
+Developer releases will not be deleted.
+
+To delete developer releases, you can use C<delete_files> (rm), e.g. from the
+command line:
+
+ % pause rm 'My-Module-*TRIAL*'; # delete a dist's trial releases
+ % pause rm '*TRIAL*' '*_*'; # delete all files containing TRIAL or underscore
+
+
+=head2 B<ls>
+
+List files.
+
+=head2 B<ls-dists>
+
+List distributions.
+
+Distribution names will be extracted from tarball/zip filenames.
+
+Unknown/unparseable filenames will be skipped.
+
+
+=head2 B<ls-mods>
+
+List modules (permissions).
+
+=head2 B<reindex>
+
+Force reindexing.
+
+=head2 B<rm>
+
+Delete files.
+
+When a file is deleted, it is not immediately deleted but has
+scheduled_for_deletion status for 72 hours, then deleted. During that time, the
+file can be undeleted.
+
+
+=head2 B<undelete>
+
+Undelete files.
+
+When a file is deleted, it is not immediately deleted but has
+scheduled_for_deletion status for 72 hours, then deleted. During that time, the
+file can be undeleted.
+
+
+=head2 B<upload>
+
+Upload file(s).
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--password>=I<s>
+
+PAUSE password.
+
+If unset, default value will be searched from `~/.pause`. Encrypted `.pause` is
+not yet supported.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--retries>=I<i>
+
+Number of retries when received 5xx HTTP error from server.
+
+Default value:
+
+ 5
+
+=item B<--retry-delay>=I<s>
+
+How long to wait before retrying.
+
+Default value:
+
+ 3
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--username>=I<s>
+
+PAUSE ID.
+
+If unset, default value will be searched from `~/.pause`. Encrypted `.pause` is
+not yet supported.
+
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand cleanup
+
+=over
+
+=item B<--detail>, B<-l>
+
+Whether to return detailed records.
+
+=item B<--num-keep>=I<i>, B<-n>
+
+Number of new versions (including newest) to keep.
+
+Default value:
+
+ 1
+
+1 means to only keep the newest version, 2 means to keep the newest and the
+second newest, and so on.
+
+
+=item B<--protect-file>=I<s@>
+
+Protect some files/wildcard patterns from delete/cleanup.
+
+Can be specified multiple times.
+
+=item B<--protect-files-json>=I<s>
+
+Protect some files/wildcard patterns from delete/cleanup (JSON-encoded).
+
+See C<--protect-file>.
+
+=back
+
+=head2 Options for subcommand ls
+
+=over
+
+=item B<--del>
+
+Only list files which are scheduled for deletion.
+
+=item B<--detail>, B<-l>
+
+Whether to return detailed records.
+
+=item B<--file>=I<s@>
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=back
+
+=head2 Options for subcommand ls-dists
+
+=over
+
+=item B<--detail>, B<-l>
+
+Whether to return detailed records.
+
+=item B<--newest>
+
+Only show newest non-dev version.
+
+Dev versions will be skipped.
+
+
+=item B<--newest-n>=I<i>
+
+Only show this number of newest non-dev versions.
+
+Dev versions will be skipped.
+
+
+=back
+
+=head2 Options for subcommand ls-mods
+
+=over
+
+=item B<--detail>, B<-l>
+
+Whether to return detailed records.
+
+=item B<--module>=I<s@>
+
+Module name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--modules-json>=I<s>
+
+Module names/wildcard patterns (JSON-encoded).
+
+See C<--module>.
+
+=item B<--type>=I<s>
+
+Only list modules matching certain type.
+
+=back
+
+=head2 Options for subcommand reindex
+
+=over
+
+=item B<--file>=I<s@>*
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=back
+
+=head2 Options for subcommand rm
+
+=over
+
+=item B<--file>=I<s@>*
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=item B<--protect-file>=I<s@>
+
+Protect some files/wildcard patterns from delete/cleanup.
+
+Can be specified multiple times.
+
+=item B<--protect-files-json>=I<s>
+
+Protect some files/wildcard patterns from delete/cleanup (JSON-encoded).
+
+See C<--protect-file>.
+
+=back
+
+=head2 Options for subcommand undelete
+
+=over
+
+=item B<--file>=I<s@>*
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=back
+
+=head2 Options for subcommand upload
+
+=over
+
+=item B<--delay>=I<s>
+
+Pause a number of seconds between files.
+
+If you upload a lot of files (e.g. 7-10 or more) at a time, the PAUSE indexer
+currently might choke with SQLite database locking problem and thus fail to
+index your releases. Giving a delay of say 2-3 minutes (120-180 seconds) between
+files will alleviate this problem.
+
+
+=item B<--file>=I<s@>*
+
+File name/wildcard pattern.
+
+Can be specified multiple times.
+
+=item B<--files-json>=I<s>
+
+File names/wildcard patterns (JSON-encoded).
+
+See C<--file>.
+
+=item B<--subdir>=I<s>
+
+Subdirectory to put the file(s) into.
+
+Default value:
+
+ ""
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C pause pause
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete pause 'p/*/`pause`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/pause.conf>, F<~/pause.conf>, or F</etc/pause.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ password (see --password)
+ retries (see --retries)
+ retry_delay (see --retry-delay)
+ username (see --username)
+
+=head2 Configuration for subcommand cleanup
+
+ detail (see --detail)
+ num_keep (see --num-keep)
+ protect_files (see --protect-file)
+
+=head2 Configuration for subcommand ls
+
+ del (see --del)
+ detail (see --detail)
+ files (see --file)
+
+=head2 Configuration for subcommand ls-dists
+
+ detail (see --detail)
+ newest (see --newest)
+ newest_n (see --newest-n)
+
+=head2 Configuration for subcommand ls-mods
+
+ detail (see --detail)
+ modules (see --module)
+ type (see --type)
+
+=head2 Configuration for subcommand reindex
+
+ files (see --file)
+
+=head2 Configuration for subcommand rm
+
+ files (see --file)
+ protect_files (see --protect-file)
+
+=head2 Configuration for subcommand undelete
+
+ files (see --file)
+
+=head2 Configuration for subcommand upload
+
+ delay (see --delay)
+ files (see --file)
+ subdir (see --subdir)
+
+=head1 ENVIRONMENT
+
+=head2 PAUSE_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/pause.conf>
+
+F<~/pause.conf>
+
+F</etc/pause.conf>
+
+F<~/.pause>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-pause>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-pause>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-pause>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

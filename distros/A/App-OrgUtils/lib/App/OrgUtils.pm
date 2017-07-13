@@ -1,12 +1,12 @@
 package App::OrgUtils;
 
-our $DATE = '2016-12-24'; # DATE
-our $VERSION = '0.45'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.46'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Org::Parser;
 
@@ -168,7 +168,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.45 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2016-12-24.
+This document describes version 0.46 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -214,7 +214,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUti
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-OrgUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
 
 =head1 BUGS
 
@@ -236,7 +236,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

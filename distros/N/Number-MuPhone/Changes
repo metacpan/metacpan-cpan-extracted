@@ -1,0 +1,12 @@
+Revision history for Number::MuPhone
+
+0.03    2017-07-12
+        Fixed error caused by $ENV{HOME} not existing
+
+0.02    2017-07-10
+        Screwed up initial upload. Deleted from PAUSE and reuploaded with new 
+        version number to be on safe side
+
+0.01    2017-07-07
+        Initial stab - just to get the damn thing out there...
+

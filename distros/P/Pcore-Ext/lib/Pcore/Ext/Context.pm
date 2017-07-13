@@ -5,6 +5,7 @@ use Pcore::Util::Scalar qw[weaken];
 use Pcore::Ext::Context::Raw;
 use Pcore::Ext::Context::Call;
 use Pcore::Ext::Context::Func;
+use Pcore::Ext::Context::L10N;
 
 has app => ( is => 'ro', isa => ConsumerOf ['Pcore::App'], required => 1 );
 has ctx => ( is => 'ro', isa => HashRef, required => 1 );
@@ -200,7 +201,45 @@ sub to_js ( $self ) {
     my $cfg = do {
         my $method = "EXT_$self->{ctx}->{generator}";
 
-        no strict qw[refs];
+        my $l10n = sub ( $msgid, $locale = undef, $domain = undef ) {
+            $domain //= $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
+
+            $self->{ctx}->{l10n_domain}->{$domain} = undef;
+
+            return Pcore::Ext::Context::L10N->new(
+                ext       => $self,
+                is_plural => 0,
+                msgid     => $msgid,
+                domain    => $domain,
+            );
+        };
+
+        my $l10np = sub ( $msgid, $msgid_plural, $num, $locale = undef, $domain = undef ) {
+            $domain //= $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
+
+            $self->{ctx}->{l10n_domain}->{$domain} = undef;
+
+            return Pcore::Ext::Context::L10N->new(
+                ext          => $self,
+                is_plural    => 1,
+                msgid        => $msgid,
+                msgid_plural => $msgid_plural,
+                num          => $num,
+                domain       => $domain,
+            );
+        };
+
+        no strict qw[refs];    ## no critic qw[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+        no warnings qw[redefine];
+
+        tie my $l10n_hash->%*, 'Pcore::Ext::Context::_l10n', $l10n;
+        local ${"$self->{ctx}->{namespace}::l10n"} = $l10n_hash;
+
+        local *{"$self->{ctx}->{namespace}::l10n"}  = $l10n;
+        local *{"$self->{ctx}->{namespace}::l10n_"} = $l10n;
+
+        local *{"$self->{ctx}->{namespace}::l10np"}  = $l10np;
+        local *{"$self->{ctx}->{namespace}::l10np_"} = $l10np;
 
         *{"$self->{ctx}->{namespace}::$method"}->($self);
     };
@@ -243,6 +282,19 @@ package Pcore::Ext::Context::_TiedAttr {
     }
 }
 
+package Pcore::Ext::Context::_l10n {
+
+    sub TIEHASH ( $self, $code ) {
+        return bless [$code], $self;
+    }
+
+    sub FETCH {
+        my $domain = $Pcore::Core::L10N::PACKAGE_DOMAIN->{ caller() };
+
+        return $_[0]->[0]->( $_[1], undef, $domain );
+    }
+}
+
 1;
 ## -----SOURCE FILTER LOG BEGIN-----
 ##
@@ -251,10 +303,12 @@ package Pcore::Ext::Context::_TiedAttr {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
-## |      | 94                   | * Private subroutine/method '_ext_type' declared but not used                                                  |
-## |      | 107                  | * Private subroutine/method '_ext_api_method' declared but not used                                            |
+## |      | 95                   | * Private subroutine/method '_ext_type' declared but not used                                                  |
+## |      | 108                  | * Private subroutine/method '_ext_api_method' declared but not used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 23, 24, 25           | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |    2 | 24, 25, 26, 235      | Miscellanea::ProhibitTies - Tied variable used                                                                 |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 205, 218, 292        | CodeLayout::ProhibitParensWithBuiltins - Builtin function called with parentheses                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -1,7 +1,7 @@
 package Perinci::Examples::CmdLineSrc;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010;
 use strict;
@@ -225,12 +225,16 @@ Perinci::Examples::CmdLineSrc - Examples for using cmdline_src function property
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::CmdLineSrc (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 FUNCTIONS
 
 
-=head2 cmdline_src_file(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_file
+
+Usage:
+
+ cmdline_src_file(%args) -> [status, msg, result, meta]
 
 This function has args with cmdline_src=file.
 
@@ -258,7 +262,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_invalid_arg_type(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_invalid_arg_type
+
+Usage:
+
+ cmdline_src_invalid_arg_type(%args) -> [status, msg, result, meta]
 
 This function has non-str/non-array arg with cmdline_src.
 
@@ -284,7 +292,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_multi_stdin(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_multi_stdin
+
+Usage:
+
+ cmdline_src_multi_stdin(%args) -> [status, msg, result, meta]
 
 This function has multiple args with cmdline_src stdin/stdin_or_files.
 
@@ -312,7 +324,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_multi_stdin_line(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_multi_stdin_line
+
+Usage:
+
+ cmdline_src_multi_stdin_line(%args) -> [status, msg, result, meta]
 
 This function has several stdin_line arguments.
 
@@ -344,7 +360,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_stdin_array(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_stdin_array
+
+Usage:
+
+ cmdline_src_stdin_array(%args) -> [status, msg, result, meta]
 
 This function has arg with cmdline_src=stdin.
 
@@ -370,7 +390,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_stdin_line(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_stdin_line
+
+Usage:
+
+ cmdline_src_stdin_line(%args) -> [status, msg, result, meta]
 
 This function has a single stdin_line argument.
 
@@ -398,7 +422,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_stdin_or_args_array(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_stdin_or_args_array
+
+Usage:
+
+ cmdline_src_stdin_or_args_array(%args) -> [status, msg, result, meta]
 
 This function has array arg with cmdline_src=stdin_or_args.
 
@@ -424,7 +452,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_stdin_or_file_array(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_stdin_or_file_array
+
+Usage:
+
+ cmdline_src_stdin_or_file_array(%args) -> [status, msg, result, meta]
 
 This function has array arg with cmdline_src=stdin_or_file.
 
@@ -450,7 +482,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_stdin_or_file_str(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_stdin_or_file_str
+
+Usage:
+
+ cmdline_src_stdin_or_file_str(%args) -> [status, msg, result, meta]
 
 This function has str arg with cmdline_src=stdin_or_file.
 
@@ -476,7 +512,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_stdin_or_files_array(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_stdin_or_files_array
+
+Usage:
+
+ cmdline_src_stdin_or_files_array(%args) -> [status, msg, result, meta]
 
 This function has array arg with cmdline_src=stdin_or_files.
 
@@ -502,7 +542,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_stdin_or_files_str(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_stdin_or_files_str
+
+Usage:
+
+ cmdline_src_stdin_or_files_str(%args) -> [status, msg, result, meta]
 
 This function has str arg with cmdline_src=stdin_or_files.
 
@@ -528,7 +572,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_stdin_str(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_stdin_str
+
+Usage:
+
+ cmdline_src_stdin_str(%args) -> [status, msg, result, meta]
 
 This function has arg with cmdline_src=stdin.
 
@@ -554,7 +602,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 cmdline_src_unknown(%args) -> [status, msg, result, meta]
+=head2 cmdline_src_unknown
+
+Usage:
+
+ cmdline_src_unknown(%args) -> [status, msg, result, meta]
 
 This function has arg with unknown cmdline_src value.
 
@@ -580,7 +632,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 test_binary(%args) -> [status, msg, result, meta]
+=head2 test_binary
+
+Usage:
+
+ test_binary(%args) -> [status, msg, result, meta]
 
 Accept binary in stdin/file.
 
@@ -630,7 +686,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

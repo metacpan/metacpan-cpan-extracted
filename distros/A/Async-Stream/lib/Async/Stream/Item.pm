@@ -19,11 +19,11 @@ Item for Async::Stream
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 
 =head1 SYNOPSIS
@@ -38,8 +38,8 @@ Creating and managing item for Async::Stream
 
 =head2 new($val,$generator)
 
-Constructor creates instanse of class. 
-Class method gets 2 arguments item's value and generator subroutine referens to generate next item.
+Constructor creates instance of class. 
+Class method gets 2 arguments item's value and generator subroutine references to generate next item.
 
   my $i = 0;
   my $stream_item = Async::Stream::Item->new($i++, sub {
@@ -57,7 +57,7 @@ sub new {
 	my ($class, $val, $next) = @_;
 
 	if (ref $next ne "CODE" and ref $next ne $class) {
-		croak "Second argument can be only subrotine reference or instance of class $class ";
+		croak "Second argument can be only subroutine reference or instance of class $class ";
 	}
 
 	return bless [ $val, $next, []], $class;

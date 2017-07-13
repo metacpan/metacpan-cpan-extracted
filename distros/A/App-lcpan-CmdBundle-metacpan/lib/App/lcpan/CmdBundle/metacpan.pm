@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::metacpan;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to MetaCPAN
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::metacpan - More lcpan subcommands related to MetaCPAN
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::CmdBundle::metacpan (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2017-01-20.
+This document describes version 0.003 of App::lcpan::CmdBundle::metacpan (from Perl distribution App-lcpan-CmdBundle-metacpan), released on 2017-07-10.
 
 =head1 SYNOPSIS
 

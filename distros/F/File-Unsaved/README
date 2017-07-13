@@ -1,10 +1,96 @@
-SYNOPSIS
+NAME
+    File::Unsaved - Check whether file has unsaved modification in an editor
 
+VERSION
+    This document describes version 0.06 of File::Unsaved (from Perl
+    distribution File-Unsaved), released on 2017-07-11.
+
+SYNOPSIS
      use File::Unsaved qw(check_unsaved_file);
      die "Can't modify foo.txt because it is being opened and modified in an editor"
          if check_unsaved_file(path => "foo.txt");
 
 DESCRIPTION
+FUNCTIONS
+  check_unsaved_file
+    Usage:
+
+     check_unsaved_file(%args) -> bool|hash
+
+    Check whether file has unsaved modification in an editor.
+
+    This function tries, using some heuristics, to find out if a file is
+    being opened and has unsaved modification in an editor. Currently the
+    supported editors are: Emacs, joe, vim.
+
+    The heuristics are as folow:
+
+    *   Emacs, joe, mc: check whether ".#<name>" symlink exists. Emacs
+        targets the symlink to "<user>@<host>.<PID>:<timestamp>" while joe
+        and mc to "<user>@<host>.<PID>". Caveat: Unix only.
+
+    *   vim: check whether ".<name>.swp" file exists, not older than file,
+        and its 0x03ef-th byte has the value of "U" (which vim uses to mark
+        the file as unsaved). Caveat: vim can be instructed to put swap file
+        somewhere else or not create swap file at all, so in those cases
+        unsaved data will not be detected.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   check_pid => *bool* (default: 1)
+
+        Whether to check that PID is actually an editor.
+
+        A temporary file might be stale, so checking the existence of
+        temporary file is not enough. If the temporary file provides pointer
+        to a PID, and this setting is set to true, will actually check that
+        the PID exists.
+
+    *   check_proc_name => *bool* (default: 1)
+
+        Whether to check that process name is actually the corresponding
+        editor.
+
+        Is activated only "check_pid" is also 1 and if "Proc::Find" (and
+        thus "Proc::ProcessTable") is available.
+
+        Might produce a false negative if you happen to rename the editor or
+        use a differently-named fork/derivative of said editor, although
+        this should be rare.
+
+    *   path* => *str*
+
+    Return value: (bool|hash)
+
+    Return false if no unsaved data is detected, or else a hash structure.
+    Hash will contain these keys: "editor" (kind of editor, possible values:
+    "emacs", "joe/mc", "joe", "mc", "vim") and might contain these keys:
+    "pid" (PID of editor), "user", "host", "timestamp".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Unsaved>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Unsaved>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Unsaved>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

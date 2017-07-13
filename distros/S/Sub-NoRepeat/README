@@ -1,52 +1,170 @@
-SYNOPSIS
+NAME
+    Sub::NoRepeat - Call a subroutine or run a command, but not repeatedly
 
+VERSION
+    This document describes version 0.04 of Sub::NoRepeat (from Perl
+    distribution Sub-NoRepeat), released on 2017-07-10.
+
+SYNOPSIS
      use Sub::NoRepeat qw(norepeat);
-    
+
      # run coderef
      norepeat(code => \&sub1);
-    
+
      # won't run the same coderef again, noop
      norepeat(code => \&sub1);
-    
+
      # run coderef because this one is different
      norepeat(code => sub { ... });
-    
+
      # won't repeat because we use sub1 as key
      norepeat(code => sub { ... }, key => \&sub1);
-    
+
      # run external command instead of coderef, die on non-zero exit code
      norepeat(command => ['somecmd', '--cmdopt', ...]);
-    
+
      # will repeat after 24 hours
      norepeat(period => '24h', ...);
-    
+
      # will repeat after change of day (equals to once daily):
      norepeat(period => 'daily', ...);
-    
+
      # allows twice daily
      norepeat(period => 'daily', num=>2, ...);
 
 DESCRIPTION
-
     This module is a generalization of the concept of App::norepeat and
     possibly will supersede it in the future.
 
 DATA FILE
-
     Data file is a line-oriented text file, using labeled tab-separated
-    value format (http://ltsv.org/). Each row contains these labels: time
-    (a timestamp either in the format of UTC ISO8601YYYY-MM-DDTHH:MM:SSZ,
-    local ISO8601 YYYY-MM-DDTHH:MM:SS, or Unix timestamp), key (tabs and
-    newlines will be converted to spaces).
+    value format (<http://ltsv.org/>). Each row contains these labels:
+    "time" (a timestamp either in the format of UTC
+    ISO8601"YYYY-MM-DDTHH:MM:SSZ", local ISO8601 "YYYY-MM-DDTHH:MM:SS", or
+    Unix timestamp), "key" (tabs and newlines will be converted to spaces).
 
     The rows are assumed to be sorted chronologically (increasing time).
 
-SEE ALSO
+FUNCTIONS
+  norepeat
+    Usage:
 
+     norepeat(%args) -> any
+
+    Call a subroutine or run a command, but not repeatedly.
+
+    This routine allows you to avoid repeat execution of the same
+    subroutine/command. You can customize the key (which command/code are
+    considered the same, the default is the whole command or ref address of
+    subroutine), the repeat period, and some other stuffs.
+
+    It works simply by recording the keys and timestamps in a data file
+    (defaults to "~/norepeat.dat", can be customized) after successful
+    execution of commands/subroutines. Commands might still repeat if
+    "norepeat" fails to record to data file (e.g. disk is full, permission
+    problem).
+
+    Keywords: repeat interval, not too frequently, not more often than, at
+    most, once daily, weekly, monthly, yearly, period, limit rate.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code => *code*
+
+    *   command => *array[str]*
+
+    *   data_file => *str*
+
+        Set filename to record execution to. Defaults to "~/norepeat.dat".
+
+    *   ignore_failure => *bool* (default: 0)
+
+        By default, if command exits with non-zero status (or subroutine
+        dies), it is assumed to be a failure and won't be recorded in the
+        data file. Another invocation will be allowed to repeat. This option
+        will disregard exit status or trap exception and will still log the
+        data file.
+
+    *   key => *str*
+
+        Key to use when recording event in data file.
+
+        Set key for determining which commands/subroutines are considered
+        the same.
+
+        If you use "command", by default it will be the entire command.
+
+        If you use "code", by default it will be the ref address of the
+        code, e.g. "CODE(0x1655800)".
+
+    *   now => *int*
+
+        Assume current timestamp is this value.
+
+    *   num => *int* (default: 1)
+
+        Allow (num-1) repeating during the same period.
+
+        The default (1) allows no repetition during the same period. A value
+        of 2 means allow repeat once (for a total of 2 executions).
+
+    *   period => *str* (default: "forever")
+
+        Set maximum period of repeat detection. The default (when not
+        specified) is forever, which means to never allow repeat, ever, if
+        the same key (command or subroutine) has been run.
+
+        Can either be set to "<number> (sec|min|hour|day|week|month|year)"
+        to express elapsed period after the last run, or
+        "(hourly|daily|weekly|monthly|yearly)" to express no repetition
+        before the named period (hour|day|week|month|year) changes.
+
+        For example, if period is "2 hour" then subsequent invocation won't
+        repeat commands until 2 hours have elapsed. In other words,
+        command/code won't repeat until the next 2 hours. Note that a month
+        is defined as 30.5 days and a year is defined as 365.25 days.
+
+        If period is "monthly", command/code won't repeat execution until
+        the month changes (e.g. from June to July). If you execute the first
+        command on June 3rd, command won't repeat until July 1st. The same
+        thing would happen if you first executed the command/code on June
+        30th.
+
+        When comparing, local times will be used.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Sub-NoRepeat>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Sub-NoRepeat>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-NoRepeat>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     App::norepeat, the CLI version.
 
     Unix cron facility for periodic/scheduling of execution.
 
     Related: modules to limit the number of program instances that can run
     at a single time: Proc::Govern, Sys::RunAlone.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

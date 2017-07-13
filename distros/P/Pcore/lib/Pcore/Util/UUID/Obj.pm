@@ -11,11 +11,11 @@ sub _build_bin ($self) {
 }
 
 sub _build_str ($self) {
-    return $Pcore::Util::UUID::UUID->to_string( $self->bin );
+    return lc $Pcore::Util::UUID::UUID->to_string( $self->bin );
 }
 
 sub _build_hex ($self) {
-    return $Pcore::Util::UUID::UUID->to_hexstring( $self->bin );
+    return lc $Pcore::Util::UUID::UUID->to_hexstring( $self->bin );
 }
 
 1;

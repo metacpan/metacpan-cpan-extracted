@@ -12,8 +12,9 @@ use IO::Socket::SSL;
 use Time::Crontab;
 use Date::Format 'time2str';
 use Encode 'encode';
+use Try::Tiny;
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 sub new {
     my $class = shift;
@@ -59,7 +60,7 @@ sub run {
         SSL_verify_mode => SSL_VERIFY_NONE,
     ) or die $!;
 
-    eval {
+    try {
         $self->{device} = Daemon::Device->new(
             parent     => \&_parent,
             child      => \&_child,
@@ -72,8 +73,11 @@ sub run {
                 passwd   => $self->{passwd},
             },
         );
+    }
+    catch {
+        croak("Daemon device instantiation failure: $_");
     };
-    croak($@) if ($@);
+
     $self->{device}->run;
 }
 
@@ -111,12 +115,19 @@ sub _parent {
         alarm 1;
         my $time = time;
 
-        $_->{code}->($self) for (
+        for (
             grep {
                 ref $_->{timing} and ( $time % 60 == 0 ) and $_->{timing}->match($time) or
                 not ref $_->{timing} and ( ( $time - $session->{start} ) % $_->{timing} == 0 )
             } @{ $self->{ticks} }
-        );
+        ) {
+            try {
+                $_->{code}->($self);
+            }
+            catch {
+                warn "Tick execution failure: $_\n";
+            };
+        }
     };
 
     local $SIG{__WARN__} = sub { note( undef, $_[0], 'warn' ) };
@@ -125,7 +136,7 @@ sub _parent {
     srand();
     my @lines;
 
-    eval {
+    try {
         while ( my $line = $self->{socket}->getline ) {
             $line =~ s/\003\d{2}(?:,\d{2})?//g; # remove IRC color codes
             $line =~ tr/\000-\037//d;           # remove all control characters
@@ -178,9 +189,11 @@ sub _parent {
 
             push @lines, { line => $line, time => $now };
         }
+    }
+    catch {
+        warn "Daemon parent loop failure: $_\n";
+        kill( 'KILL', $_ ) for ( @{ $device->children } );
     };
-    warn "$@\n";
-    kill( 'KILL', $_ ) for ( @{ $device->children } );
 }
 
 sub _child {
@@ -356,16 +369,16 @@ sub _on_message {
             }
 
             my $rv;
-            eval {
+            try {
                 $rv = $hook->{code}->(
                     $self,
                     { %{ $self->{in} } },
                     $captured_matches,
                 );
-            };
-            if ($@) {
-                warn "$@\n";
             }
+            catch {
+                warn "Plugin hook execution failure: $_\n";
+            };
 
             last if ($rv);
         }
@@ -408,7 +421,7 @@ sub load {
                     last;
                 }
                 else {
-                    croak($@) unless ( $@ =~ /^Can't locate $path/ );
+                    croak("Plugin load failure: $@") unless ( $@ =~ /^Can't locate $path/ );
                 }
             }
             croak("Unable to find or properly load $plugin") unless ($namespace);
@@ -419,7 +432,7 @@ sub load {
             croak("$namespace does not implement init()") unless ( $namespace->can('init') );
 
             eval "${namespace}::init(\$self)";
-            die($@) if ($@);
+            die("Plugin init failure: $@\n") if ($@);
 
             $self->{loaded}{$namespace} = time;
         }
@@ -629,7 +642,7 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
 [![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)

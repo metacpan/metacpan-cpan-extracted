@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
 use parent 'Data::Rx::CommonType::EasyNew';
 
@@ -55,7 +55,7 @@ WebService::MinFraud::Data::Rx::Type::CCToken - A type to check for what MaxMind
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SUPPORT
 

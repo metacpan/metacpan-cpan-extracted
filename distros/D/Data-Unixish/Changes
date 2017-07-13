@@ -1,4 +1,9 @@
-Revision history for Data-Unixish
+1.56    2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Remove unused dependency: Log::Any::IfLOG.
+
 
 1.55    2016-03-16 (PERLANCAR)
 

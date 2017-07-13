@@ -1,0 +1,4 @@
+pkg-config
+libgirepository1.0-dev
+gobject-introspection
+libgtk-3-dev

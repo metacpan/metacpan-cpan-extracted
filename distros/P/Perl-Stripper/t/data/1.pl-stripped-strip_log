@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-use Log::Any::IfLOG qw($log);
+use Log::Any qw($log);
+use Log::ger;
 use vars qw($global $global3);
 
 
@@ -18,13 +19,19 @@ sub foo {
     print "variables inside double quote: $lexical $global
     ";
     $log->info("Will not be stripped %s", $global);
+    log_info("Will not be stripped");
     
     
+    
 
 
     
 
 
+
+
+
+    
 
 
 

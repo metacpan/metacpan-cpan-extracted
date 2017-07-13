@@ -1,7 +1,7 @@
 package File::MoreUtil;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.60'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.61'; # VERSION
 
 use 5.010001;
 use strict;
@@ -63,7 +63,7 @@ File::MoreUtil - File-related utilities
 
 =head1 VERSION
 
-This document describes version 0.60 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2015-09-03.
+This document describes version 0.61 of File::MoreUtil (from Perl distribution File-MoreUtil), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

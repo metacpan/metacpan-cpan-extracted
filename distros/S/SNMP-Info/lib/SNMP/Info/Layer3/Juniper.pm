@@ -40,7 +40,7 @@ use SNMP::Info::LLDP;
 
 use vars qw/$VERSION $DEBUG %GLOBALS %MIBS %FUNCS %MUNGE/;
 
-$VERSION = '3.36';
+$VERSION = '3.37';
 
 %MIBS = (
     %SNMP::Info::Layer3::MIBS,
@@ -110,15 +110,18 @@ sub layers {
 sub os_ver {
     my $juniper = shift;
 
-    my $descr        = $juniper->description() || '';
-    my $lldp_descr   = $juniper->lldp_sysdesc() || '';
+    my $sys_descr  = $juniper->description()  || '';
+    my $lldp_descr = $juniper->lldp_sysdesc() || '';
 
-    if ( $descr =~ m/kernel JUNOS ([^,\s]+)/ ) {
-        return $1;
+    foreach my $descr ($sys_descr, $lldp_descr) {
+        if ( $descr =~ m/kernel JUNOS ([^,\s]+)/ ) {
+            return $1;
+        }
+        elsif ( $descr =~ m/version\s(\S+)\s/ ) {
+            return $1;
+        }
     }
-    elsif ( $lldp_descr =~ m/version\s(\S+)\s/ ) {
-	return $1;
-    }
+
     return;
 }
 

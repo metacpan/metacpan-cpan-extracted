@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::NumericLevel;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ Bencher::Scenario::LogGer::NumericLevel - Benchmark numeric_level()
 
 =head1 VERSION
 
-This document describes version 0.009 of Bencher::Scenario::LogGer::NumericLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-02.
+This document describes version 0.010 of Bencher::Scenario::LogGer::NumericLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::ger::Util> 0.012
+L<Log::ger::Util> 0.016
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -93,8 +93,8 @@ Benchmark with default options (C<< bencher -m LogGer::NumericLevel >>):
  +---------+-----------+-----------+------------+---------+---------+
  | dataset | rate (/s) | time (ns) | vs_slowest |  errors | samples |
  +---------+-----------+-----------+------------+---------+---------+
- | warn    |   2210000 |       453 |        1   | 1.8e-10 |      26 |
- | 1       |   2430000 |       411 |        1.1 | 2.6e-10 |      28 |
+ | warn    |   1955000 |     511.4 |       1    | 1.1e-11 |      20 |
+ | 1       |   2330000 |     430   |       1.19 | 3.8e-10 |      28 |
  +---------+-----------+-----------+------------+---------+---------+
 
 
@@ -104,8 +104,8 @@ Benchmark module startup overhead (C<< bencher -m LogGer::NumericLevel --module-
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
  | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Util      | 0.82                         | 4.1                | 16             |      10   |                    4.9 |          1 |   4e-05 |      20 |
- | perl -e1 (baseline) | 1.3                          | 4.6                | 16             |       5.1 |                    0   |          2 | 1.4e-05 |      20 |
+ | Log::ger::Util      | 0.82                         | 4.1                | 16             |      13   |                    6.3 |        1   | 3.3e-05 |      20 |
+ | perl -e1 (baseline) | 1.4                          | 4.7                | 17             |       6.7 |                    0   |        1.9 | 2.7e-05 |      20 |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 

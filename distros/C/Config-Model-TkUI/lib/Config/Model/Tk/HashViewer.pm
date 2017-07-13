@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::HashViewer;
-$Config::Model::Tk::HashViewer::VERSION = '1.362';
+$Config::Model::Tk::HashViewer::VERSION = '1.363';
 use strict;
 use warnings;
 use Carp;
@@ -37,6 +37,7 @@ sub Populate {
         || die "HashViewer: no -item, got ", keys %$args;
     my $path = delete $args->{-path}
         || die "HashViewer: no -path, got ", keys %$args;
+    my $cme_font = delete $args->{-font};
 
     $cw->add_header( View => $hash )->pack(@fx);
 
@@ -63,6 +64,8 @@ sub Populate {
 
     $cw->add_info_button()->pack( -side => 'left', @fxe1 );
     $cw->add_editor_button($path)->pack( -side => 'right', @fxe1 );
+
+    $cw->ConfigSpecs(-font => [['SELF','DESCENDANTS'], 'font','Font', $cme_font ],);
 
     $cw->SUPER::Populate($args);
 }

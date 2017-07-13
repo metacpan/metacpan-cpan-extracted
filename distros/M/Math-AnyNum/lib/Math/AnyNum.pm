@@ -15,7 +15,7 @@ use POSIX qw(ULONG_MAX LONG_MIN);
 
 use Class::Multimethods qw();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -2520,13 +2520,24 @@ sub zeta {
     my ($x) = @_;
 
     if (!ref($x) and CORE::int($x) eq $x and $x >= 0 and $x <= ULONG_MAX) {
-        my $r = Math::MPFR::Rmpfr_init2($PREC);
-        Math::MPFR::Rmpfr_zeta_ui($r, $x, $ROUND);
-        return bless \$r;
+        ## $x is an unsigned integer
+    }
+    else {
+        $x = _star2mpfr($x);
+
+        # If $x fits inside an unsigned integer, then unpack it.
+        if (    Math::MPFR::Rmpfr_integer_p($x)
+            and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+            $x = Math::MPFR::Rmpfr_get_ui($x, $ROUND);
+        }
     }
 
     my $r = Math::MPFR::Rmpfr_init2($PREC);
-    Math::MPFR::Rmpfr_zeta($r, _star2mpfr($x), $ROUND);
+
+    ref($x)
+      ? Math::MPFR::Rmpfr_zeta($r, $x, $ROUND)
+      : Math::MPFR::Rmpfr_zeta_ui($r, $x, $ROUND);
+
     bless \$r;
 }
 
@@ -3030,76 +3041,102 @@ sub mfactorial {
 }
 
 #
-## falling_factorial(x, y) = binomial(x, y) * y!
+## falling_factorial(x, +y) = binomial(x, y) * y!
+## falling_factorial(x, -y) = 1/falling_factorial(x + y, y)
 #
 sub falling_factorial {
     my ($x, $y) = @_;
 
-    if (ref($x) ne __PACKAGE__) {
-        $x = __PACKAGE__->new($x);
-    }
-
     if (ref($y) ne __PACKAGE__) {
-        if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y <= ULONG_MAX) {
-            ## $y is an unsigned native integer
+        if (!ref($y) and CORE::int($y) eq $y and $y >= LONG_MIN and $y <= ULONG_MAX) {
+            ## $y is a native integer
         }
         else {
             $y = __PACKAGE__->new($y);
         }
     }
 
-    $x = _any2mpz($$x) // (goto &nan);
-    ($y = _any2ui($$y) // (goto &nan)) if ref($y);
+    $x = _star2mpz($x) // (goto &nan);
+    ($y = _any2si($$y) // (goto &nan)) if ref($y);
 
-    my $r = Math::GMPz::Rmpz_init();
+    my $r = Math::GMPz::Rmpz_init_set($x);
 
-    Math::GMPz::Rmpz_fits_ulong_p($x)
-      ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($x), $y)
-      : Math::GMPz::Rmpz_bin_ui($r, $x, $y);
+    if ($y < 0) {
+        Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
+    }
 
-    Math::GMPz::Rmpz_sgn($r) || goto &zero;
+    Math::GMPz::Rmpz_fits_ulong_p($r)
+      ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
+      : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
+
+    if (!Math::GMPz::Rmpz_sgn($r)) {
+        $y < 0
+          ? (goto &nan)
+          : (goto &zero);
+    }
 
     state $t = Math::GMPz::Rmpz_init_nobless();
-    Math::GMPz::Rmpz_fac_ui($t, $y);
+    Math::GMPz::Rmpz_fac_ui($t, CORE::abs($y));
     Math::GMPz::Rmpz_mul($r, $r, $t);
+
+    if ($y < 0) {
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_z($q, $r);
+        Math::GMPq::Rmpq_inv($q, $q);
+        return bless \$q;
+    }
+
     bless \$r;
 }
 
 #
-## rising_factorial(x, y) = binomial(x + y - 1, y) * y!
+## rising_factorial(x, +y) = binomial(x + y - 1, y) * y!
+## rising_factorial(x, -y) = 1/rising_factorial(x - y, y)
 #
 sub rising_factorial {
     my ($x, $y) = @_;
 
-    if (ref($x) ne __PACKAGE__) {
-        $x = __PACKAGE__->new($x);
-    }
-
     if (ref($y) ne __PACKAGE__) {
-        if (!ref($y) and CORE::int($y) eq $y and $y >= 0 and $y <= ULONG_MAX) {
-            ## $y is an unsigned native integer
+        if (!ref($y) and CORE::int($y) eq $y and $y >= LONG_MIN and $y <= ULONG_MAX) {
+            ## $y is a native integer
         }
         else {
             $y = __PACKAGE__->new($y);
         }
     }
 
-    $x = _any2mpz($$x) // (goto &nan);
-    ($y = _any2ui($$y) // (goto &nan)) if ref($y);
+    $x = _star2mpz($x) // (goto &nan);
+    ($y = _any2si($$y) // (goto &nan)) if ref($y);
 
     my $r = Math::GMPz::Rmpz_init_set($x);
-    Math::GMPz::Rmpz_add_ui($r, $r, $y);
+    Math::GMPz::Rmpz_add_ui($r, $r, CORE::abs($y));
     Math::GMPz::Rmpz_sub_ui($r, $r, 1);
 
-    Math::GMPz::Rmpz_fits_ulong_p($r)
-      ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), $y)
-      : Math::GMPz::Rmpz_bin_ui($r, $r, $y);
+    if ($y < 0) {
+        Math::GMPz::Rmpz_sub_ui($r, $r, CORE::abs($y));
+    }
 
-    Math::GMPz::Rmpz_sgn($r) || goto &zero;
+    Math::GMPz::Rmpz_fits_ulong_p($r)
+      ? Math::GMPz::Rmpz_bin_uiui($r, Math::GMPz::Rmpz_get_ui($r), CORE::abs($y))
+      : Math::GMPz::Rmpz_bin_ui($r, $r, CORE::abs($y));
+
+    if (!Math::GMPz::Rmpz_sgn($r)) {
+        $y < 0
+          ? (goto &nan)
+          : (goto &zero);
+    }
 
     state $t = Math::GMPz::Rmpz_init_nobless();
-    Math::GMPz::Rmpz_fac_ui($t, $y);
+    Math::GMPz::Rmpz_fac_ui($t, CORE::abs($y));
     Math::GMPz::Rmpz_mul($r, $r, $t);
+
+    if ($y < 0) {
+        my $q = Math::GMPq::Rmpq_init();
+        Math::GMPq::Rmpq_set_z($q, $r);
+        Math::GMPq::Rmpq_inv($q, $q);
+        return bless \$q;
+    }
+
     bless \$r;
 }
 

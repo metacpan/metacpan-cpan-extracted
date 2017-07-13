@@ -1,4 +1,195 @@
-SYNOPSIS
+NAME
+    RSS::From::Twitter - Convert Twitter page to RSS
 
+VERSION
+    This document describes version 0.08 of RSS::From::Twitter (from Perl
+    distribution RSS-From-Twitter), released on 2017-07-10.
+
+SYNOPSIS
      # Use command-line scripts get-rss-from-twitter{,-list,-search,-user}
+
+FUNCTIONS
+  get_rss_from_twitter
+    Usage:
+
+     get_rss_from_twitter(%args) -> [status, msg, result, meta]
+
+    Convert Twitter page to RSS.
+
+    In June 2013, Twitter retired the RSS v1 API (e.g.
+    http://search.twitter.com/search.rss?q=blah, etc). However, its
+    replacement, the v1.1 API, is not as straightforward to use (e.g. needs
+    auth). This function scrapes the Twitter search result page (e.g.
+    https://twitter.com/search?q=blah) and converts it to RSS. I wrote this
+    because I have other scripts expecting RSS input.
+
+    Expect breakage from time to time though, as scraping method is rather
+    fragile.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   title => *str*
+
+        RSS title.
+
+    *   ua => *obj*
+
+        Supply a custom LWP::UserAgent object.
+
+        If supplied, will be used instead of the default LWP::UserAgent
+        object.
+
+    *   url* => *str*
+
+        URL, e.g. https://twitter.com/foo or file:/test.html.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_rss_from_twitter_list
+    Usage:
+
+     get_rss_from_twitter_list(%args) -> [status, msg, result, meta]
+
+    Convert Twitter public list page to RSS.
+
+    This function calls get_rss_from_twitter() with URL:
+    "https//twitter.com/USERNAME/LISTNAME".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   listname* => *str*
+
+        User's list name.
+
+    *   ua => *obj*
+
+        Supply a custom LWP::UserAgent object.
+
+        If supplied, will be used instead of the default LWP::UserAgent
+        object.
+
+    *   username* => *str*
+
+        Twitter username.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_rss_from_twitter_search
+    Usage:
+
+     get_rss_from_twitter_search(%args) -> [status, msg, result, meta]
+
+    Convert Twitter search result page to RSS.
+
+    This function calls get_rss_from_twitter() with URL:
+    "https//twitter.com/search?q=QUERY".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   query* => *str*
+
+        Search query.
+
+    *   ua => *obj*
+
+        Supply a custom LWP::UserAgent object.
+
+        If supplied, will be used instead of the default LWP::UserAgent
+        object.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_rss_from_twitter_user
+    Usage:
+
+     get_rss_from_twitter_user(%args) -> [status, msg, result, meta]
+
+    Convert Twitter user main page to RSS.
+
+    This function calls get_rss_from_twitter() with URL:
+    "https//twitter.com/USERNAME".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ua => *obj*
+
+        Supply a custom LWP::UserAgent object.
+
+        If supplied, will be used instead of the default LWP::UserAgent
+        object.
+
+    *   username* => *str*
+
+        Twitter username.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/RSS-From-Twitter>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-RSS-From-Twitter>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=RSS-From-Twitter>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

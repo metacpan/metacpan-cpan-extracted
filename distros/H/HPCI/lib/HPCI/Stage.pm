@@ -857,26 +857,27 @@ after '_analyse_completion_state' => sub {
     if ($self->is_pass && $self->_has_files) {
         my $script_time = -M $self->script_file;
         my $files = $self->files;
+		my $fs_delay = $self->group->file_system_delay;
         FILE:
         for my $file (map { ref($_) ? @$_ : $_ } $files->{out}{req} ) {
-			sleep 10 unless -e $file && -M _ <= $script_time;
-            unless (-e $file && (-M _ <= $script_time)) {
-                $self->_set_state('fail');
-                $self->error(
-                    "Stage (", $self->name,
-                    ") status changed to failed because required output file $file was not updated"
-                );
-				if (-e $file) {
-					$self->error( "mod time: (" . -M _ . ") should be le script time ($script_time)" );
-				}
-				else {
-					$self->error( "file does not exist" );
-					sleep 10;
-					my $e = -e $file ? "does" : "does not";
-					$self->error( "after 10 seconds, it $e exist" );
-				}
-                $run->stats->{failure_detected} = "required output file $file not updated";
-                last FILE;
+			while ($fs_delay && ! -e $file) {
+				my $sleep_time = ($fs_delay > 5) ? 5 : $fs_delay;
+				$fs_delay -= $sleep_time;
+				sleep $sleep_time;
+			}
+            next FILE if -e $file && -M _ <= $script_time;
+			$self->_set_state('fail');
+			$run->stats->{failure_detected} = "required output file $file not updated";
+			$self->error(
+				"Stage (", $self->name,
+				") status changed to failed because required output file $file was not updated"
+			);
+			if (-e _) {
+				my $file_time = -M _;
+				$self->error( "mod time: ($file_time) should be more recent (smaller) than script time ($script_time)" );
+			}
+			else {
+				$self->error( "file does not exist" );
             }
         }
     }

@@ -6,6 +6,8 @@ use base 'My::Builder';
 
 use Config;
 my $makefile = 'Makefile.gnu';
+$makefile = 'Makefile.solaris'       if $^O eq 'solaris';
+$makefile = $ENV{FREEIMAGE_MAKEFILE} if $ENV{FREEIMAGE_MAKEFILE};
 
 sub make_clean {
   my $self = shift;

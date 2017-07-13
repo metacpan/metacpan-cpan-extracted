@@ -1,6 +1,264 @@
-SEE ALSO
+NAME
+    Setup::File::Symlink - Setup symlink (existence, target)
 
+VERSION
+    This document describes version 0.29 of Setup::File::Symlink (from Perl
+    distribution Setup-File-Symlink), released on 2017-07-10.
+
+FUNCTIONS
+  ln_s
+    Usage:
+
+     ln_s(%args) -> [status, msg, result, meta]
+
+    Create symlink.
+
+    Fixed state: "symlink" exists and points to "target".
+
+    Fixable state: "symlink" doesn't exist.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   symlink => *str*
+
+        Path to symlink.
+
+    *   target => *str*
+
+        Path to target.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  rmsym
+    Usage:
+
+     rmsym(%args) -> [status, msg, result, meta]
+
+    Delete symlink.
+
+    Will not delete non-symlinks.
+
+    Fixed state: "path" doesn't exist.
+
+    Fixable state: "path" exists, is a symlink, (and if "target" is defined,
+    points to "target").
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   path => *str*
+
+    *   target => *str*
+
+        Only delete if existing symlink has this target.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  setup_symlink
+    Usage:
+
+     setup_symlink(%args) -> [status, msg, result, meta]
+
+    Setup symlink (existence, target).
+
+    When "should_exist=>1" (the default): On do, will create symlink which
+    points to specified target. If symlink already exists but points to
+    another target, it will be replaced with the correct symlink if
+    "replace_symlink" option is true. If a file/dir already exists and
+    "replace_file"/"replace_dir" option is true, it will be moved (trashed)
+    first before the symlink is created. On undo, will delete symlink if it
+    was created by this function, and restore the original symlink/file/dir
+    if it was replaced during do.
+
+    When "should_exist=>0": On do, will remove symlink if it exists (and
+    "replace_symlink" is true). If "replace_file"/"replace_dir" is true,
+    will also remove file/dir. On undo, will restore deleted
+    symlink/file/dir.
+
+    This function is not exported by default, but exportable.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   create => *bool* (default: 1)
+
+        Create if symlink doesn't exist.
+
+        If set to false, then setup will fail (412) if this condition is
+        encountered.
+
+    *   replace_dir => *bool* (default: 0)
+
+        Replace if there is existing dir.
+
+        If set to false, then setup will fail (412) if this condition is
+        encountered.
+
+    *   replace_file => *bool* (default: 0)
+
+        Replace if there is existing non-symlink file.
+
+        If set to false, then setup will fail (412) if this condition is
+        encountered.
+
+    *   replace_symlink => *bool* (default: 1)
+
+        Replace previous symlink if it already exists but doesn't point to
+        the wanted target.
+
+        If set to false, then setup will fail (412) if this condition is
+        encountered.
+
+    *   should_exist => *bool* (default: 1)
+
+        Whether symlink should exist.
+
+    *   symlink* => *str*
+
+        Path to symlink.
+
+    *   target => *str*
+
+        Target path of symlink.
+
+        Required, unless "should_exist => 0".
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Setup-File-Symlink>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Setup-File-Symlink>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Setup-File-Symlink>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Setup
 
     Setup::File
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

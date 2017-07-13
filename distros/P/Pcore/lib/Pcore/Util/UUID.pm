@@ -1,6 +1,6 @@
 package Pcore::Util::UUID;
 
-use Pcore -export => { ALL => [qw[is_uuid_str uuid_bin uuid_str uuid_hex create_uuid create_uuid_from_bin create_uuid_from_str create_uuid_from_hex]] };
+use Pcore -export => { ALL => [qw[looks_like_uuid uuid_bin uuid_str uuid_hex create_uuid create_uuid_from_bin create_uuid_from_str create_uuid_from_hex]] };
 use Pcore::Util::UUID::Obj;
 use Data::UUID qw[];    ## no critic qw[Modules::ProhibitEvilModules]
 
@@ -15,7 +15,7 @@ our $UUID = Data::UUID->new;
 *uuid_str = \&str;
 *uuid_hex = \&hex;
 
-sub is_uuid_str ($str) {
+sub looks_like_uuid ($str) : prototype($) {
     return $str =~ /\A[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}\z/sm;
 }
 
@@ -23,15 +23,15 @@ sub create {
     return bless { bin => $UUID->create_bin }, 'Pcore::Util::UUID::Obj';
 }
 
-sub create_from_bin ($bin) {
+sub create_from_bin ($bin) : prototype($) {
     return bless { bin => $bin }, 'Pcore::Util::UUID::Obj';
 }
 
-sub create_from_str ($str) {
+sub create_from_str ($str) : prototype($) {
     return bless { str => $str }, 'Pcore::Util::UUID::Obj';
 }
 
-sub create_from_hex ($hex) {
+sub create_from_hex ($hex) : prototype($) {
     return bless { hex => $hex }, 'Pcore::Util::UUID::Obj';
 }
 
@@ -40,11 +40,11 @@ sub bin {
 }
 
 sub str {
-    return $UUID->create_str;
+    return lc $UUID->create_str;
 }
 
 sub hex {    ## no critic qw[Subroutines::ProhibitBuiltinHomonyms]
-    return $UUID->create_hex;
+    return lc $UUID->create_hex;
 }
 
 1;

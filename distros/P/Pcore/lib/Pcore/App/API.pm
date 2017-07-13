@@ -5,7 +5,7 @@ use Pcore::App::API::Map;
 use Pcore::Util::Data qw[from_b64 from_b64_url];
 use Pcore::Util::Digest qw[sha3_512];
 use Pcore::Util::Text qw[encode_utf8];
-use Pcore::Util::UUID qw[create_uuid_from_bin uuid_str];
+use Pcore::Util::UUID qw[looks_like_uuid create_uuid_from_bin uuid_str];
 use Pcore::App::API::Auth::Cache;
 
 const our $TOKEN_TYPE_USER_PASSWORD      => 1;
@@ -57,7 +57,7 @@ sub _build_permissions ($self) {
 sub validate_name ( $self, $name ) {
 
     # name looks like UUID string
-    return if $name =~ /\A[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}\z/sm;
+    return if looks_like_uuid $name;
 
     return if $name =~ /[^[:alnum:]_@.-]/smi;
 
@@ -657,8 +657,6 @@ sub remove_user_session ( $self, $user_session_id, $cb = undef ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 60                   | RegularExpressions::ProhibitComplexRegexes - Split long regexps into smaller qr// chunks                       |
-## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 225, 495, 516, 576   | Subroutines::ProhibitManyArgs - Too many arguments                                                             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    3 | 258                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |

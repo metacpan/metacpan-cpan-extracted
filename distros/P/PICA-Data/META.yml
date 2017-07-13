@@ -2,7 +2,13 @@
 abstract: 'PICA record processing'
 author:
   - 'Jakob Voß'
-build_requires: {}
+build_requires:
+  File::Temp: '0.2304'
+  IO::File: '1.14'
+  Test::Exception: '0.43'
+  Test::More: '1.001003'
+  Test::Pod: '0'
+  Test::XML: '0.08'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -21,13 +27,19 @@ no_index:
     - t
     - xt
 requires:
-  XML::LibXML: '1.78'
+  Carp: '0'
+  Exporter: '0'
+  IO::File: '1.14'
+  IO::Handle: '0'
+  List::Util: '0'
+  Scalar::Util: '0'
+  XML::LibXML: '2'
   perl: v5.10.0
 resources:
   bugtracker: https://github.com/gbv/PICA-Data/issues
   homepage: https://github.com/gbv/PICA-Data
   repository: https://github.com/gbv/PICA-Data.git
-version: '0.32'
+version: '0.33'
 x_contributors:
   - 'Carsten Klee <carsten.klee@sbb.spk-berlin.de>'
   - 'Carsten Klee <cKlee@users.noreply.github.com>'

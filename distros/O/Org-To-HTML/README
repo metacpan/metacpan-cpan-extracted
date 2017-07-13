@@ -1,7 +1,13 @@
-SYNOPSIS
+NAME
+    Org::To::HTML - Export Org document to HTML
 
+VERSION
+    This document describes version 0.22 of Org::To::HTML (from Perl
+    distribution Org-To-HTML), released on 2017-07-10.
+
+SYNOPSIS
      use Org::To::HTML qw(org_to_html);
-    
+
      # non-OO interface
      my $res = org_to_html(
          source_file   => 'todo.org', # or source_str
@@ -13,13 +19,12 @@ SYNOPSIS
          #naked        => 0, # if set to 1, no HTML/HEAD/BODY will be output.
      );
      die "Failed" unless $res->[0] == 200;
-    
+
      # OO interface
      my $oeh = Org::To::HTML->new();
      my $html = $oeh->export($doc); # $doc is Org::Document object
 
 DESCRIPTION
-
     Export Org format to HTML. To customize, you can subclass this module.
 
     A command-line utility is included: org-to-html.
@@ -28,37 +33,130 @@ DESCRIPTION
     you'll probably want to use the exporting features or org-mode
     <http://orgmode.org>.
 
+new(%args)
+  $exp->export_document($doc) => HTML
+    Export document to HTML.
+
+FUNCTIONS
+  org_to_html
+    Usage:
+
+     org_to_html(%args) -> [status, msg, result, meta]
+
+    Export Org document to HTML.
+
+    This is the non-OO interface. For more customization, consider
+    subclassing Org::To::HTML.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   css_url => *str*
+
+        Add a link to CSS document.
+
+    *   exclude_tags => *array[str]*
+
+        Exclude trees that carry one of these tags.
+
+        If the whole document doesn't have any of these tags, then the whole
+        document will be exported. Otherwise, trees that do not carry one of
+        these tags will be excluded. If a selected tree is a subtree, the
+        heading hierarchy above it will also be selected for export, but not
+        the text below those headings.
+
+        exclude_tags is evaluated after include_tags.
+
+    *   html_title => *str*
+
+        HTML document title, defaults to source_file.
+
+    *   ignore_unknown_settings => *bool*
+
+    *   include_tags => *array[str]*
+
+        Include trees that carry one of these tags.
+
+        Works like Org's 'org-export-select-tags' variable. If the whole
+        document doesn't have any of these tags, then the whole document
+        will be exported. Otherwise, trees that do not carry one of these
+        tags will be excluded. If a selected tree is a subtree, the heading
+        hierarchy above it will also be selected for export, but not the
+        text below those headings.
+
+    *   naked => *bool*
+
+        Don't wrap exported HTML with HTML/HEAD/BODY elements.
+
+    *   source_file => *str*
+
+        Source Org file to export.
+
+    *   source_str => *str*
+
+        Alternatively you can specify Org string directly.
+
+    *   target_file => *str*
+
+        HTML file to write to.
+
+        If not specified, HTML string will be returned.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 ATTRIBUTES
-
- naked => BOOL
-
+  naked => BOOL
     If set to true, export_document() will not output HTML/HEAD/BODY
     wrapping element. Default is false.
 
- html_title => STR
-
+  html_title => STR
     Title to use in TITLE element. If unset, defaults to "(no title)" when
     exporting.
 
- css_url => STR
-
+  css_url => STR
     If set, export_document() will output a LINK element pointing to this
     CSS.
 
 METHODS
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Org-To-HTML>.
 
-new(%args)
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Org-To-HTML>.
 
- $exp->export_document($doc) => HTML
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Org-To-HTML>
 
-    Export document to HTML.
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     For more information about Org document format, visit
     http://orgmode.org/
 
     Org::Parser
 
     org-to-html
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

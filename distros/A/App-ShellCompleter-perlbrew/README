@@ -1,8 +1,39 @@
-SYNOPSIS
+NAME
+    App::ShellCompleter::perlbrew - Shell completion for perlbrew
 
+VERSION
+    This document describes version 0.007 of App::ShellCompleter::perlbrew
+    (from Perl distribution App-ShellCompleter-perlbrew), released on
+    2017-07-10.
+
+SYNOPSIS
     See _perlbrew included in this distribution.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ShellCompleter-perlbrew>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ShellCompleter-perlbrew>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ShellCompleter-pe
+    rlbrew>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     App::perlbrew.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

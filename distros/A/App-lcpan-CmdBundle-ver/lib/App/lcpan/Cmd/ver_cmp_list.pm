@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::ver_cmp_list;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -89,7 +89,7 @@ sub handle_cmd {
     for my $line (split /^/, $args{list}) {
         $i++;
         unless ($line =~ /^\s*(\w+(?:::\w+)*)(?:\s+([0-9][0-9._]*))?/) {
-            $log->errorf("Syntax error in list line %d: %s, skipped",
+            log_error("Syntax error in list line %d: %s, skipped",
                          $i, $line);
             next;
         }
@@ -156,7 +156,7 @@ App::lcpan::Cmd::ver_cmp_list - Compare a list of module names+versions against 
 
 =head1 VERSION
 
-This document describes version 0.03 of App::lcpan::Cmd::ver_cmp_list (from Perl distribution App-lcpan-CmdBundle-ver), released on 2017-01-20.
+This document describes version 0.04 of App::lcpan::Cmd::ver_cmp_list (from Perl distribution App-lcpan-CmdBundle-ver), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -165,7 +165,11 @@ This module handles the L<lcpan> subcommand C<ver-cmp-list>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Compare a list of module names+versions against database.
 
@@ -230,7 +234,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

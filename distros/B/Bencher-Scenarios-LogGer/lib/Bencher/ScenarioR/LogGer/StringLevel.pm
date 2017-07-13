@@ -1,6 +1,6 @@
 package Bencher::ScenarioR::LogGer::StringLevel;
 
-our $VERSION = 0.009; # VERSION
+our $VERSION = "0.010"; # VERSION
 
 our $results = [
   [
@@ -9,19 +9,19 @@ our $results = [
     [
       {
         dataset    => 1,
-        errors     => 4.2e-10,
-        rate       => 714000,
+        errors     => 1.1e-11,
+        rate       => 567570,
         samples    => 20,
-        time       => 1400,
+        time       => 1.7619,
         vs_slowest => 1,
       },
       {
         dataset    => "warn",
         errors     => 0,
-        rate       => 4622980,
+        rate       => 4062240,
         samples    => 20,
-        time       => 216.311,
-        vs_slowest => 6.47213,
+        time       => 0.24617,
+        vs_slowest => 7.15727,
       },
     ],
     {
@@ -144,7 +144,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 0,
-                                              speed                        => 2286.976,
+                                              speed                        => 2200.023,
                                               stepping                     => 4,
                                             },
                                             {
@@ -259,7 +259,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 1,
-                                              speed                        => 2278.718,
+                                              speed                        => 2199.968,
                                               stepping                     => 4,
                                             },
                                             {
@@ -374,7 +374,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 2,
-                                              speed                        => 2299.992,
+                                              speed                        => 2200.351,
                                               stepping                     => 4,
                                             },
                                             {
@@ -489,18 +489,18 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 3,
-                                              speed                        => 2299.937,
+                                              speed                        => 2199.968,
                                               stepping                     => 4,
                                             },
                                           ],
-      "func.elapsed_time"              => 0.0598480701446533,
+      "func.elapsed_time"              => 0.0763440132141113,
       "func.module_startup"            => undef,
       "func.module_versions"           => {
                                             "__PACKAGE__" => 1.039,
                                             "Bencher::Scenario::LogGer::StringLevel" => undef,
                                             "Benchmark::Dumb" => "0.10",
                                             "Devel::Platform::Info" => 0.16,
-                                            "Log::ger::Util" => 0.012,
+                                            "Log::ger::Util" => 0.016,
                                             "perl" => "v5.24.0",
                                             "Sys::Info" => 0.78,
                                           },
@@ -535,11 +535,11 @@ our $results = [
       "func.scenario_module_mtime"     => 1498961728,
       "func.scenario_module_sha1sum"   => "3ebf05c620be02a5a18a4a3118e8bd5c581b9218",
       "func.scenario_module_sha256sum" => "752ecc4391e9c1129a19ce3986d603ce63bbd04b54d2cfeffff84809c946ff53",
-      "func.time_end"                  => 1498984278.79608,
-      "func.time_factor"               => 1000000000,
-      "func.time_start"                => 1498984278.73623,
+      "func.time_end"                  => 1499940828.84813,
+      "func.time_factor"               => 1000000,
+      "func.time_start"                => 1499940828.77179,
       "table.field_aligns"             => ["left", "number", "number", "number", "number", "number"],
-      "table.field_units"              => [undef, "/s", "ns"],
+      "table.field_units"              => [undef, "/s", "\x{3BC}s"],
       "table.fields"                   => ["dataset", "rate", "time", "vs_slowest", "errors", "samples"],
     },
   ],

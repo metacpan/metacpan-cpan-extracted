@@ -1,0 +1,73 @@
+{
+   "abstract" : "Translate Perl hashrefs into DynamoDb format and vice versa.",
+   "author" : [
+      "Steve Caldwell <scaldwell@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Amazon-DynamoDB-Marshaler",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.18",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "Set::Object" : "0",
+            "boolean" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler/issues"
+      },
+      "homepage" : "https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler.git",
+         "web" : "https://github.com/stevecaldwell77/Net-Amazon-DynamoDB-Marshaler"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Stephen Caldwell <steve@campusexplorer.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

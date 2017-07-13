@@ -1,6 +1,143 @@
-SEE ALSO
+NAME
+    Setup::File::TextFragment - Insert/delete text fragment in a file (with
+    undo support)
 
+VERSION
+    This document describes version 0.06 of Setup::File::TextFragment (from
+    Perl distribution Setup-File-TextFragment), released on 2017-07-10.
+
+FUNCTIONS
+  setup_text_fragment
+    Usage:
+
+     setup_text_fragment(%args) -> [status, msg, result, meta]
+
+    Insert/delete text fragment in a file (with undo support).
+
+    On do, will insert fragment to file (or delete, if "should_exist" is set
+    to false). On undo, will restore old file.
+
+    Unfixable state: file does not exist or not a regular file (directory
+    and symlink included).
+
+    Fixed state: file exists, fragment already exists and with the same
+    content (if "should_exist" is true) or fragment already does not exist
+    (if "should_exist" is false).
+
+    Fixable state: file exists, fragment doesn't exist or payload is not the
+    same (if "should_exist" is true) or fragment still exists (if
+    "should_exist" is false).
+
+    This function is not exported by default, but exportable.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   attrs => *hash*
+
+        Fragment attributes (only for inserting new fragment), passed to
+        Text::Fragment.
+
+    *   comment_style => *bool*
+
+        Will be passed to Text::Fragment.
+
+    *   good_pattern => *str*
+
+        Will be passed to Text::Fragment.
+
+    *   id* => *str*
+
+        Fragment ID.
+
+    *   label => *str*
+
+        Will be passed to Text::Fragment.
+
+    *   path* => *str*
+
+        Path to file.
+
+    *   payload* => *str*
+
+        Fragment content.
+
+    *   replace_pattern => *str*
+
+        Will be passed to Text::Fragment.
+
+    *   should_exist => *bool* (default: 1)
+
+        Whether fragment should exist.
+
+    *   top_style => *bool*
+
+        Will be passed to Text::Fragment.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Setup-File-TextFragment>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Setup-File-TextFragment>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Setup-File-TextFragme
+    nt>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Text::Fragment
 
     Setup
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

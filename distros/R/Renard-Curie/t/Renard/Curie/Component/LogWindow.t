@@ -5,7 +5,7 @@ use Test::Most tests => 1;
 use lib 't/lib';
 use CurieTestHelper;
 
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 use Glib 'TRUE', 'FALSE';
 use Renard::Curie::App;
 
@@ -13,11 +13,12 @@ use Log::Any qw($log);
 
 subtest "Check log buffer" => sub {
 	plan tests => 3;
-	my $app = Renard::Curie::App->new;
+	my $c = CurieTestHelper->get_app_container;
+	my $app = $c->app;
 
 	my $sentinel_value = "My logging test";
 
-	my $buffer = $app->log_window->builder
+	my $buffer = $c->log_window->builder
 		->get_object('log-text')
 		->get_buffer;
 
@@ -40,7 +41,7 @@ subtest "Check log buffer" => sub {
 		qr/$sentinel_value/,
 		'now contains the target logged text' );
 
-	$app->log_window->builder
+	$c->log_window->builder
 		->get_object('button-clear')
 		->signal_emit('clicked');
 

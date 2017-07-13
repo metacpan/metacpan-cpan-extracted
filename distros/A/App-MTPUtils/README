@@ -1,13 +1,152 @@
-SYNOPSIS
+NAME
+    App::MTPUtils - CLI utilities related to MTP (Media Transfer Protocol)
 
+VERSION
+    This document describes version 0.04 of App::MTPUtils (from Perl
+    distribution App-MTPUtils), released on 2017-07-10.
+
+SYNOPSIS
     This distribution includes the following CLI utilities:
 
-    #INSERT_EXECS_LIST
+    Currently these utilities are just some wrappers/helpers for the "mtp-*"
+    CLI utilities distributed in "mtp-tools".
 
-    Currently these utilities are just some wrappers/helpers for the mtp-*
-    CLI utilities distributed in mtp-tools.
+FUNCTIONS
+  delete_files
+    Usage:
+
+     delete_files(%args) -> [status, msg, result, meta]
+
+    Delete multiple files from MTP (wrapper for mtp-delfile).
+
+    This routine is a thin wrapper for "mtp-delfile" command from
+    "mtp-tools".
+
+    To use this routine, you must already run "mtp-files" and save its
+    output in "mtp-files.out" file, e.g.:
+
+     % mtp-files > mtp-files.out
+
+    This file is used for tab completion as well as getting filename/ID when
+    only one is specified. This makes using "mtp-delfile" less painful.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[str]*
+
+        Filenames/IDs/wildcards.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_files
+    Usage:
+
+     get_files(%args) -> [status, msg, result, meta]
+
+    Get multiple files from MTP (wrapper for mtp-getfile).
+
+    This routine is a thin wrapper for "mtp-file" command from "mtp-tools".
+
+    To use this routine, you must already run "mtp-files" and save its
+    output in "mtp-files.out" file, e.g.:
+
+     % mtp-files > mtp-files.out
+
+    This file is used for tab completion as well as getting filename/ID when
+    only one is specified. This makes using "mtp-getfile" less painful.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   files* => *array[str]*
+
+        Filenames/IDs/wildcards.
+
+    *   overwrite => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_files
+    Usage:
+
+     list_files(%args) -> [status, msg, result, meta]
+
+    List files contained in mtp-files.out.
+
+    This routine will present information in "mtp-files.out" in a more
+    readable way, like the Unix "ls" command.
+
+    To use this routine, you must already run "mtp-files" and save its
+    output in "mtp-files.out" file, e.g.:
+
+     % mtp-files > mtp-files.out
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   queries => *array[str]*
+
+        Filenames/wildcards.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-MTPUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-MTPUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-MTPUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    mtp-tools from libmtp, <http://libmtp.sourceforge.net>
 
-    mtp-tools from libmtp, http://libmtp.sourceforge.net
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

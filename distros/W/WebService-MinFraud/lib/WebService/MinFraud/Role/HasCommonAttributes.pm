@@ -3,7 +3,7 @@ package WebService::MinFraud::Role::HasCommonAttributes;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
 use Types::Standard qw( ArrayRef InstanceOf Num Str );
 use Types::UUID;
@@ -71,7 +71,7 @@ WebService::MinFraud::Role::HasCommonAttributes - A role for attributes common t
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SUPPORT
 

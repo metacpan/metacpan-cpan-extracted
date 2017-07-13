@@ -1,3 +1,7 @@
+Overview of changes in Glib 1.326 (stable)
+============================================
+* lib/Glib/GenPod.pm: Allow overriding of current time in generated man-pages
+
 Overview of changes in Glib 1.325 (stable)
 ============================================
 * Try to avoid a possible hang in t/9.t

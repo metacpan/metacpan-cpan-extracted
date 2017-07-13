@@ -23,3 +23,9 @@ Revision history for Data-Dx
 0.000005  Sat Jul  8 09:45:11 2017
 
     Removed POD nit.
+
+
+0.000006  Wed Jul 12 07:50:27 2017
+
+    Refined Makefile.PL
+    (Thanks Dave!)

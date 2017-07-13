@@ -1,31 +1,52 @@
+NAME
+    Log::ger::Like::LogAny - Log like Log::Any
+
+VERSION
+    version 0.003
+
 SYNOPSIS
+    To switch your code from Log::Any to Log::ger, replace this:
 
-    To get logger object:
+     use Log::Any;
+     use Log::Any '$log';
 
-     use Log::ger::Like::LogAny '$log';
-
-    or:
+    to:
 
      use Log::ger::Like::LogAny;
+     use Log::ger::Like::LogAny '$log';
 
-    To log:
+    The rest of this works in Log::Any as well as under
+    Log::ger::Like::LogAny:
 
-     $log->debug("blah ...");
-    
+     my $log = Log::Any->get_logger(category => 'My::Package');
+
+     $log->debug("blah ...", "more blah ...");
+     $log->tracef("fmt %s %s", "blah ...", {data=>'structure'});
+
      if ($log->is_trace) {
-         $log->tracef("Foo is %s", $foo);
+        ...
      }
 
     To set output, use one of the available Log::ger::Output::*. You can
     send logs to Log::Any using Log::ger::Output::LogAny.
 
 DESCRIPTION
-
-    This module mimics Log::Any-like logging interface.
+    This module mimics Log::Any-like logging interface. The idea is that you
+    replace the "use" statement like shown in the Synopsis and you're done
+    switching. Useful for code that uses Log::Any. Not everything is
+    supported though (see the above Synopsis).
 
 SEE ALSO
-
     Log::ger
 
     Log::Any
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

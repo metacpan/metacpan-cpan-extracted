@@ -1,12 +1,12 @@
 package Perinci::Gen::ForModule;
 
-our $DATE = '2016-06-14'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use SHARYANTO::Array::Util   qw(match_array_or_regex);
 use Package::MoreUtil qw(package_exists list_package_contents);
@@ -100,7 +100,7 @@ sub gen_meta_for_module {
     }
 
     if (keys %$metas) {
-        $log->info("Not creating metadata for package $module: ".
+        log_info("Not creating metadata for package $module: ".
                        "already defined");
         return [304, "Not modified"];
     }
@@ -116,19 +116,19 @@ sub gen_meta_for_module {
 
     # generate subroutine metadatas
     for my $sub (sort grep {ref($content{$_}) eq 'CODE'} keys %content) {
-        $log->tracef("Adding meta for subroutine %s ...", $sub);
+        log_trace("Adding meta for subroutine %s ...", $sub);
         if (defined($inc) && !match_array_or_regex($sub, $inc)) {
-            $log->info("Not creating metadata for sub $module\::$sub: ".
+            log_info("Not creating metadata for sub $module\::$sub: ".
                            "doesn't match include_subs");
             next;
         }
         if (defined($exc) &&  match_array_or_regex($sub, $exc)) {
-            $log->info("Not creating metadata for sub $module\::$sub: ".
+            log_info("Not creating metadata for sub $module\::$sub: ".
                            "matches exclude_subs");
             next;
         }
         if ($metas->{$sub}) {
-            $log->info("Not creating metadata for sub $module\::$sub: ".
+            log_info("Not creating metadata for sub $module\::$sub: ".
                            "already defined");
             next;
         }
@@ -169,7 +169,7 @@ Perinci::Gen::ForModule - Generate metadata for a module
 
 =head1 VERSION
 
-This document describes version 0.09 of Perinci::Gen::ForModule (from Perl distribution Perinci-Gen-ForModule), released on 2016-06-14.
+This document describes version 0.10 of Perinci::Gen::ForModule (from Perl distribution Perinci-Gen-ForModule), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -190,7 +190,11 @@ Now Foo::Bar has metadata stored in %Foo::Bar::SPEC.
 =head1 FUNCTIONS
 
 
-=head2 gen_meta_for_module(%args) -> [status, msg, result, meta]
+=head2 gen_meta_for_module
+
+Usage:
+
+ gen_meta_for_module(%args) -> [status, msg, result, meta]
 
 Generate metadata for a module.
 
@@ -269,7 +273,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

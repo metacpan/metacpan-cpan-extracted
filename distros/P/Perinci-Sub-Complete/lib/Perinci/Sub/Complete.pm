@@ -1,12 +1,12 @@
 package Perinci::Sub::Complete;
 
-our $DATE = '2017-01-15'; # DATE
-our $VERSION = '0.91'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.92'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Complete::Util qw(hashify_answer complete_array_elem complete_hash_key combine_answers modify_answer);
 use Complete::Common qw(:all);
@@ -94,7 +94,7 @@ sub complete_from_schema {
     my $word = $args{word} // "";
 
     my $fres;
-    $log->tracef("[comp][periscomp] entering complete_from_schema, word=<%s>, schema=%s", $word, $sch);
+    log_trace("[comp][periscomp] entering complete_from_schema, word=<%s>, schema=%s", $word, $sch);
 
     my ($type, $cs) = @{$sch};
 
@@ -115,7 +115,7 @@ sub complete_from_schema {
                 $cs->{$_} = $cs0->{$_};
             }
         }
-        $log->tracef("[comp][periscomp] retrieving schema from module %s, base type=%s", $pkg, $type);
+        log_trace("[comp][periscomp] retrieving schema from module %s, base type=%s", $pkg, $type);
     }
 
     my $static;
@@ -137,7 +137,7 @@ sub complete_from_schema {
                 }
                 my $mod = "Perinci::Sub::XCompletion::$submod";
                 if (Module::Installed::Tiny::module_installed($mod)) {
-                    $log->tracef("[comp][periscomp] loading module %s ...", $mod);
+                    log_trace("[comp][periscomp] loading module %s ...", $mod);
                     my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                     require $mod_pm;
                     my $fref = \&{"$mod\::gen_completion"};
@@ -145,7 +145,7 @@ sub complete_from_schema {
                 }
             }
             if ($comp) {
-                $log->tracef("[comp][periscomp] using arg completion routine from schema's 'x.completion' attribute");
+                log_trace("[comp][periscomp] using arg completion routine from schema's 'x.completion' attribute");
                 $fres = $comp->(
                     %{$args{extras} // {}},
                     word=>$word, arg=>$args{arg}, args=>$args{args});
@@ -154,13 +154,13 @@ sub complete_from_schema {
             }
 
         if ($cs->{is} && !ref($cs->{is})) {
-            $log->tracef("[comp][periscomp] adding completion from schema's 'is' clause");
+            log_trace("[comp][periscomp] adding completion from schema's 'is' clause");
             push @$words, $cs->{is};
             $static++;
             return; # from eval. there should not be any other value
         }
         if ($cs->{in}) {
-            $log->tracef("[comp][periscomp] adding completion from schema's 'in' clause");
+            log_trace("[comp][periscomp] adding completion from schema's 'in' clause");
             push @$words, grep {!ref($_)} @{ $cs->{in} };
             $static++;
             return; # from eval. there should not be any other value
@@ -182,7 +182,7 @@ sub complete_from_schema {
             }
         }
         if ($type eq 'bool') {
-            $log->tracef("[comp][periscomp] adding completion from possible values of bool");
+            log_trace("[comp][periscomp] adding completion from possible values of bool");
             push @$words, 0, 1;
             $static++;
             return; # from eval
@@ -191,36 +191,36 @@ sub complete_from_schema {
             my $limit = 100;
             if ($cs->{between} &&
                     $cs->{between}[0] - $cs->{between}[0] <= $limit) {
-                $log->tracef("[comp][periscomp] adding completion from schema's 'between' clause");
+                log_trace("[comp][periscomp] adding completion from schema's 'between' clause");
                 push @$words, $cs->{between}[0] .. $cs->{between}[1];
                 $static++;
             } elsif ($cs->{xbetween} &&
                          $cs->{xbetween}[0] - $cs->{xbetween}[0] <= $limit) {
-                $log->tracef("[comp][periscomp] adding completion from schema's 'xbetween' clause");
+                log_trace("[comp][periscomp] adding completion from schema's 'xbetween' clause");
                 push @$words, $cs->{xbetween}[0]+1 .. $cs->{xbetween}[1]-1;
                 $static++;
             } elsif (defined($cs->{min}) && defined($cs->{max}) &&
                          $cs->{max}-$cs->{min} <= $limit) {
-                $log->tracef("[comp][periscomp] adding completion from schema's 'min' & 'max' clauses");
+                log_trace("[comp][periscomp] adding completion from schema's 'min' & 'max' clauses");
                 push @$words, $cs->{min} .. $cs->{max};
                 $static++;
             } elsif (defined($cs->{min}) && defined($cs->{xmax}) &&
                          $cs->{xmax}-$cs->{min} <= $limit) {
-                $log->tracef("[comp][periscomp] adding completion from schema's 'min' & 'xmax' clauses");
+                log_trace("[comp][periscomp] adding completion from schema's 'min' & 'xmax' clauses");
                 push @$words, $cs->{min} .. $cs->{xmax}-1;
                 $static++;
             } elsif (defined($cs->{xmin}) && defined($cs->{max}) &&
                          $cs->{max}-$cs->{xmin} <= $limit) {
-                $log->tracef("[comp][periscomp] adding completion from schema's 'xmin' & 'max' clauses");
+                log_trace("[comp][periscomp] adding completion from schema's 'xmin' & 'max' clauses");
                 push @$words, $cs->{xmin}+1 .. $cs->{max};
                 $static++;
             } elsif (defined($cs->{xmin}) && defined($cs->{xmax}) &&
                          $cs->{xmax}-$cs->{xmin} <= $limit) {
-                $log->tracef("[comp][periscomp] adding completion from schema's 'xmin' & 'xmax' clauses");
+                log_trace("[comp][periscomp] adding completion from schema's 'xmin' & 'xmax' clauses");
                 push @$words, $cs->{xmin}+1 .. $cs->{xmax}-1;
                 $static++;
             } elsif (length($word) && $word !~ /\A-?\d*\z/) {
-                $log->tracef("[comp][periscomp] word not an int");
+                log_trace("[comp][periscomp] word not an int");
                 $words = [];
             } else {
                 # do a digit by digit completion
@@ -251,7 +251,7 @@ sub complete_from_schema {
         }
         if ($type eq 'float') {
             if (length($word) && $word !~ /\A-?\d*(\.\d*)?\z/) {
-                $log->tracef("[comp][periscomp] word not a float");
+                log_trace("[comp][periscomp] word not a float");
                 $words = [];
             } else {
                 $words = [];
@@ -281,7 +281,7 @@ sub complete_from_schema {
         }
     }; # eval
 
-    $log->tracef("[periscomp] complete_from_schema died: %s", $@) if $@;
+    log_trace("[periscomp] complete_from_schema died: %s", $@) if $@;
 
     goto RETURN_RES unless $words;
     $fres = hashify_answer(
@@ -290,7 +290,7 @@ sub complete_from_schema {
     );
 
   RETURN_RES:
-    $log->tracef("[comp][periscomp] leaving complete_from_schema, result=%s", $fres);
+    log_trace("[comp][periscomp] leaving complete_from_schema, result=%s", $fres);
     $fres;
 }
 
@@ -363,17 +363,17 @@ _
 sub complete_arg_val {
     my %args = @_;
 
-    $log->tracef("[comp][periscomp] entering complete_arg_val, arg=<%s>", $args{arg});
+    log_trace("[comp][periscomp] entering complete_arg_val, arg=<%s>", $args{arg});
     my $fres;
 
     my $extras = $args{extras} // {};
 
     my $meta = $args{meta} or do {
-        $log->tracef("[comp][periscomp] meta is not supplied, declining");
+        log_trace("[comp][periscomp] meta is not supplied, declining");
         goto RETURN_RES;
     };
     my $arg  = $args{arg} or do {
-        $log->tracef("[comp][periscomp] arg is not supplied, declining");
+        log_trace("[comp][periscomp] arg is not supplied, declining");
         goto RETURN_RES;
     };
     my $word = $args{word} // '';
@@ -382,7 +382,7 @@ sub complete_arg_val {
 
     my $args_prop = $meta->{args} // {};
     my $arg_spec = $args_prop->{$arg} or do {
-        $log->tracef("[comp][periscomp] arg '$arg' is not specified in meta, declining");
+        log_trace("[comp][periscomp] arg '$arg' is not specified in meta, declining");
         goto RETURN_RES;
     };
 
@@ -394,7 +394,7 @@ sub complete_arg_val {
         {
             $comp = $arg_spec->{completion};
             if ($comp) {
-                $log->tracef("[comp][periscomp] using arg completion routine from arg spec's 'completion' property");
+                log_trace("[comp][periscomp] using arg completion routine from arg spec's 'completion' property");
                 last GET_COMP_ROUTINE;
             }
             my $xcomp = $arg_spec->{'x.completion'};
@@ -413,7 +413,7 @@ sub complete_arg_val {
                     my $mod = "Perinci::Sub::XCompletion::$submod";
                     require Module::Installed::Tiny;
                     if (Module::Installed::Tiny::module_installed($mod)) {
-                        $log->tracef("[comp][periscomp] loading module %s ...", $mod);
+                        log_trace("[comp][periscomp] loading module %s ...", $mod);
                         my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                         require $mod_pm;
                         my $fref = \&{"$mod\::gen_completion"};
@@ -421,7 +421,7 @@ sub complete_arg_val {
                     }
                 }
                 if ($comp) {
-                    $log->tracef("[comp][periscomp] using arg completion routine from arg spec's 'x.completion' attribute");
+                    log_trace("[comp][periscomp] using arg completion routine from arg spec's 'x.completion' attribute");
                     last GET_COMP_ROUTINE;
                 }
             }
@@ -430,11 +430,11 @@ sub complete_arg_val {
                 require Module::Installed::Tiny;
                 my $mod = "Perinci::Sub::ArgEntity::$ent";
                 if (Module::Installed::Tiny::module_installed($mod)) {
-                    $log->tracef("[comp][periscomp] loading module %s ...", $mod);
+                    log_trace("[comp][periscomp] loading module %s ...", $mod);
                     my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                     require $mod_pm;
                     if (defined &{"$mod\::complete_arg_val"}) {
-                        $log->tracef("[comp][periscomp] using arg completion routine from complete_arg_val() from %s", $mod);
+                        log_trace("[comp][periscomp] using arg completion routine from complete_arg_val() from %s", $mod);
                         $comp = \&{"$mod\::complete_arg_val"};
                         last GET_COMP_ROUTINE;
                     }
@@ -444,42 +444,42 @@ sub complete_arg_val {
 
         if ($comp) {
             if (ref($comp) eq 'CODE') {
-                $log->tracef("[comp][periscomp] invoking arg completion routine");
+                log_trace("[comp][periscomp] invoking arg completion routine");
                 $fres = $comp->(
                     %$extras,
                     word=>$word, arg=>$arg, args=>$args{args});
                 return; # from eval
             } elsif (ref($comp) eq 'ARRAY') {
                 # this is deprecated but will be supported for some time
-                $log->tracef("[comp][periscomp] using array specified in arg completion routine: %s", $comp);
+                log_trace("[comp][periscomp] using array specified in arg completion routine: %s", $comp);
                 $fres = complete_array_elem(array=>$comp, word=>$word);
                 $static++;
                 return; # from eval
             }
 
-            $log->tracef("[comp][periscomp] arg spec's 'completion' property is not a coderef or arrayref");
+            log_trace("[comp][periscomp] arg spec's 'completion' property is not a coderef or arrayref");
             if ($args{riap_client} && $args{riap_server_url}) {
-                $log->tracef("[comp][periscomp] trying to perform complete_arg_val request to Riap server");
+                log_trace("[comp][periscomp] trying to perform complete_arg_val request to Riap server");
                 my $res = $args{riap_client}->request(
                     complete_arg_val => $args{riap_server_url},
                     {(uri=>$args{riap_uri}) x !!defined($args{riap_uri}),
                      arg=>$arg, word=>$word},
                 );
                 if ($res->[0] != 200) {
-                    $log->tracef("[comp][periscomp] Riap request failed (%s), declining", $res);
+                    log_trace("[comp][periscomp] Riap request failed (%s), declining", $res);
                     return; # from eval
                 }
                 $fres = $res->[2];
                 return; # from eval
             }
 
-            $log->tracef("[comp][periscomp] declining");
+            log_trace("[comp][periscomp] declining");
             return; # from eval
         }
 
         my $sch = $arg_spec->{schema};
         unless ($sch) {
-            $log->tracef("[comp][periscomp] arg spec does not specify schema, declining");
+            log_trace("[comp][periscomp] arg spec does not specify schema, declining");
             return; # from eval
         };
 
@@ -487,16 +487,16 @@ sub complete_arg_val {
 
         $fres = complete_from_schema(arg=>$arg, extras=>$extras, schema=>$sch, word=>$word);
     };
-    $log->debug("[comp][periscomp] completion died: $@") if $@;
+    log_debug("[comp][periscomp] completion died: $@") if $@;
     unless ($fres) {
-        $log->tracef("[comp][periscomp] no completion from metadata possible, declining");
+        log_trace("[comp][periscomp] no completion from metadata possible, declining");
         goto RETURN_RES;
     }
 
     $fres = hashify_answer($fres);
     $fres->{static} //= $static && $word eq '' ? 1:0;
   RETURN_RES:
-    $log->tracef("[comp][periscomp] leaving complete_arg_val, result=%s", $fres);
+    log_trace("[comp][periscomp] leaving complete_arg_val, result=%s", $fres);
     $fres;
 }
 
@@ -520,7 +520,7 @@ sub complete_arg_elem {
 
     my $fres;
 
-    $log->tracef("[comp][periscomp] entering complete_arg_elem, arg=<%s>, index=<%d>",
+    log_trace("[comp][periscomp] entering complete_arg_elem, arg=<%s>, index=<%d>",
                  $args{arg}, $args{index});
 
     my $extras = $args{extras} // {};
@@ -528,15 +528,15 @@ sub complete_arg_elem {
     my $ourextras = {arg=>$args{arg}, args=>$args{args}};
 
     my $meta = $args{meta} or do {
-        $log->tracef("[comp][periscomp] meta is not supplied, declining");
+        log_trace("[comp][periscomp] meta is not supplied, declining");
         goto RETURN_RES;
     };
     my $arg  = $args{arg} or do {
-        $log->tracef("[comp][periscomp] arg is not supplied, declining");
+        log_trace("[comp][periscomp] arg is not supplied, declining");
         goto RETURN_RES;
     };
     defined(my $index = $args{index}) or do {
-        $log->tracef("[comp][periscomp] index is not supplied, declining");
+        log_trace("[comp][periscomp] index is not supplied, declining");
         goto RETURN_RES;
     };
     my $word = $args{word} // '';
@@ -545,7 +545,7 @@ sub complete_arg_elem {
 
     my $args_prop = $meta->{args} // {};
     my $arg_spec = $args_prop->{$arg} or do {
-        $log->tracef("[comp][periscomp] arg '$arg' is not specified in meta, declining");
+        log_trace("[comp][periscomp] arg '$arg' is not specified in meta, declining");
         goto RETURN_RES;
     };
 
@@ -557,7 +557,7 @@ sub complete_arg_elem {
         {
             $elcomp = $arg_spec->{element_completion};
             if ($elcomp) {
-                $log->tracef("[comp][periscomp] using arg element completion routine from 'element_completion' property");
+                log_trace("[comp][periscomp] using arg element completion routine from 'element_completion' property");
                 last GET_ELCOMP_ROUTINE;
             }
             my $xelcomp = $arg_spec->{'x.element_completion'};
@@ -576,7 +576,7 @@ sub complete_arg_elem {
                     my $mod = "Perinci::Sub::XCompletion::$submod";
                     require Module::Installed::Tiny;
                     if (Module::Installed::Tiny::module_installed($mod)) {
-                        $log->tracef("[comp][periscomp] loading module %s ...", $mod);
+                        log_trace("[comp][periscomp] loading module %s ...", $mod);
                         my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                         require $mod_pm;
                         my $fref = \&{"$mod\::gen_completion"};
@@ -584,7 +584,7 @@ sub complete_arg_elem {
                     }
                 }
                 if ($elcomp) {
-                    $log->tracef("[comp][periscomp] using arg element completion routine from 'x.element_completion' attribute");
+                    log_trace("[comp][periscomp] using arg element completion routine from 'x.element_completion' attribute");
                     last GET_ELCOMP_ROUTINE;
                 }
             }
@@ -593,11 +593,11 @@ sub complete_arg_elem {
                 require Module::Installed::Tiny;
                 my $mod = "Perinci::Sub::ArgEntity::$ent";
                 if (Module::Installed::Tiny::module_installed($mod)) {
-                    $log->tracef("[comp][periscomp] loading module %s ...", $mod);
+                    log_trace("[comp][periscomp] loading module %s ...", $mod);
                     my $mod_pm = $mod; $mod_pm =~ s!::!/!g; $mod_pm .= ".pm";
                     require $mod_pm;
                     if (defined &{"$mod\::complete_arg_val"}) {
-                        $log->tracef("[comp][periscomp] using arg element completion routine from complete_arg_val() from %s", $mod);
+                        log_trace("[comp][periscomp] using arg element completion routine from complete_arg_val() from %s", $mod);
                         $elcomp = \&{"$mod\::complete_arg_val"};
                         last GET_ELCOMP_ROUTINE;
                     }
@@ -608,22 +608,22 @@ sub complete_arg_elem {
         $ourextras->{index} = $index;
         if ($elcomp) {
             if (ref($elcomp) eq 'CODE') {
-                $log->tracef("[comp][periscomp] invoking arg element completion routine");
+                log_trace("[comp][periscomp] invoking arg element completion routine");
                 $fres = $elcomp->(
                     %$extras,
                     %$ourextras,
                     word=>$word);
                 return; # from eval
             } elsif (ref($elcomp) eq 'ARRAY') {
-                $log->tracef("[comp][periscomp] using array specified in arg element completion routine: %s", $elcomp);
+                log_trace("[comp][periscomp] using array specified in arg element completion routine: %s", $elcomp);
                 $fres = complete_array_elem(array=>$elcomp, word=>$word);
                 $static = $word eq '';
             }
 
-            $log->tracef("[comp][periscomp] arg spec's 'element_completion' property is not a coderef or ".
+            log_trace("[comp][periscomp] arg spec's 'element_completion' property is not a coderef or ".
                              "arrayref");
             if ($args{riap_client} && $args{riap_server_url}) {
-                $log->tracef("[comp][periscomp] trying to perform complete_arg_elem request to Riap server");
+                log_trace("[comp][periscomp] trying to perform complete_arg_elem request to Riap server");
                 my $res = $args{riap_client}->request(
                     complete_arg_elem => $args{riap_server_url},
                     {(uri=>$args{riap_uri}) x !!defined($args{riap_uri}),
@@ -631,20 +631,20 @@ sub complete_arg_elem {
                      index=>$index},
                 );
                 if ($res->[0] != 200) {
-                    $log->tracef("[comp][periscomp] Riap request failed (%s), declining", $res);
+                    log_trace("[comp][periscomp] Riap request failed (%s), declining", $res);
                     return; # from eval
                 }
                 $fres = $res->[2];
                 return; # from eval
             }
 
-            $log->tracef("[comp][periscomp] declining");
+            log_trace("[comp][periscomp] declining");
             return; # from eval
         } # if ($elcomp)
 
         my $sch = $arg_spec->{schema};
         unless ($sch) {
-            $log->tracef("[comp][periscomp] arg spec does not specify schema, declining");
+            log_trace("[comp][periscomp] arg spec does not specify schema, declining");
             return; # from eval
         };
 
@@ -652,12 +652,12 @@ sub complete_arg_elem {
 
         my ($type, $cs) = @$nsch;
         if ($type ne 'array') {
-            $log->tracef("[comp][periscomp] can't complete element for non-array");
+            log_trace("[comp][periscomp] can't complete element for non-array");
             return; # from eval
         }
 
         unless ($cs->{of}) {
-            $log->tracef("[comp][periscomp] schema does not specify 'of' clause, declining");
+            log_trace("[comp][periscomp] schema does not specify 'of' clause, declining");
             return; # from eval
         }
 
@@ -667,16 +667,16 @@ sub complete_arg_elem {
 
         $fres = complete_from_schema(schema=>$elsch, word=>$word);
     };
-    $log->debug("[comp][periscomp] completion died: $@") if $@;
+    log_debug("[comp][periscomp] completion died: $@") if $@;
     unless ($fres) {
-        $log->tracef("[comp][periscomp] no completion from metadata possible, declining");
+        log_trace("[comp][periscomp] no completion from metadata possible, declining");
         goto RETURN_RES;
     }
 
     $fres = hashify_answer($fres);
     $fres->{static} //= $static && $word eq '' ? 1:0;
   RETURN_RES:
-    $log->tracef("[comp][periscomp] leaving complete_arg_elem, result=%s", $fres);
+    log_trace("[comp][periscomp] leaving complete_arg_elem, result=%s", $fres);
     $fres;
 }
 
@@ -750,7 +750,7 @@ sub complete_arg_index {
 
     my $fres;
 
-    $log->tracef("[comp][periscomp] entering complete_arg_index, arg=<%s>",
+    log_trace("[comp][periscomp] entering complete_arg_index, arg=<%s>",
                  $args{arg});
 
     my $extras = $args{extras} // {};
@@ -758,11 +758,11 @@ sub complete_arg_index {
     my $ourextras = {arg=>$args{arg}, args=>$args{args}};
 
     my $meta = $args{meta} or do {
-        $log->tracef("[comp][periscomp] meta is not supplied, declining");
+        log_trace("[comp][periscomp] meta is not supplied, declining");
         goto RETURN_RES;
     };
     my $arg  = $args{arg} or do {
-        $log->tracef("[comp][periscomp] arg is not supplied, declining");
+        log_trace("[comp][periscomp] arg is not supplied, declining");
         goto RETURN_RES;
     };
     my $word = $args{word} // '';
@@ -771,7 +771,7 @@ sub complete_arg_index {
 
     my $args_prop = $meta->{args} // {};
     my $arg_spec = $args_prop->{$arg} or do {
-        $log->tracef("[comp][periscomp] arg '$arg' is not specified in meta, declining");
+        log_trace("[comp][periscomp] arg '$arg' is not specified in meta, declining");
         goto RETURN_RES;
     };
 
@@ -783,49 +783,49 @@ sub complete_arg_index {
         {
             $idxcomp = $arg_spec->{index_completion};
             if ($idxcomp) {
-                $log->tracef("[comp][periscomp] using arg element index completion routine from 'index_completion' property");
+                log_trace("[comp][periscomp] using arg element index completion routine from 'index_completion' property");
                 last GET_IDXCOMP_ROUTINE;
             }
         } # GET_IDXCOMP_ROUTINE
 
         if ($idxcomp) {
             if (ref($idxcomp) eq 'CODE') {
-                $log->tracef("[comp][periscomp] invoking arg element index completion routine");
+                log_trace("[comp][periscomp] invoking arg element index completion routine");
                 $fres = $idxcomp->(
                     %$extras,
                     %$ourextras,
                     word=>$word);
                 return; # from eval
             } elsif (ref($idxcomp) eq 'ARRAY') {
-                $log->tracef("[comp][periscomp] using array specified in arg element index completion routine: %s", $idxcomp);
+                log_trace("[comp][periscomp] using array specified in arg element index completion routine: %s", $idxcomp);
                 $fres = complete_array_elem(array=>$idxcomp, word=>$word);
                 $static = $word eq '';
             }
 
-            $log->tracef("[comp][periscomp] arg spec's 'index_completion' property is not a coderef or ".
+            log_trace("[comp][periscomp] arg spec's 'index_completion' property is not a coderef or ".
                              "arrayref");
             if ($args{riap_client} && $args{riap_server_url}) {
-                $log->tracef("[comp][periscomp] trying to perform complete_arg_index request to Riap server");
+                log_trace("[comp][periscomp] trying to perform complete_arg_index request to Riap server");
                 my $res = $args{riap_client}->request(
                     complete_arg_index => $args{riap_server_url},
                     {(uri=>$args{riap_uri}) x !!defined($args{riap_uri}),
                      arg=>$arg, args=>$args{args}, word=>$word},
                 );
                 if ($res->[0] != 200) {
-                    $log->tracef("[comp][periscomp] Riap request failed (%s), declining", $res);
+                    log_trace("[comp][periscomp] Riap request failed (%s), declining", $res);
                     return; # from eval
                 }
                 $fres = $res->[2];
                 return; # from eval
             }
 
-            $log->tracef("[comp][periscomp] declining");
+            log_trace("[comp][periscomp] declining");
             return; # from eval
         } # if ($idxcomp)
 
         my $sch = $arg_spec->{schema};
         unless ($sch) {
-            $log->tracef("[comp][periscomp] arg spec does not specify schema, declining");
+            log_trace("[comp][periscomp] arg spec does not specify schema, declining");
             return; # from eval
         };
 
@@ -833,7 +833,7 @@ sub complete_arg_index {
 
         my ($type, $cs) = @$nsch;
         if ($type ne 'hash') {
-            $log->tracef("[comp][periscomp] can't complete element index for non-hash");
+            log_trace("[comp][periscomp] can't complete element index for non-hash");
             return; # from eval
         }
 
@@ -860,16 +860,16 @@ sub complete_arg_index {
         $fres = complete_hash_key(word => $word, hash => \%keys);
 
     }; # eval
-    $log->debug("[comp][periscomp] completion died: $@") if $@;
+    log_debug("[comp][periscomp] completion died: $@") if $@;
     unless ($fres) {
-        $log->tracef("[comp][periscomp] no index completion from metadata possible, declining");
+        log_trace("[comp][periscomp] no index completion from metadata possible, declining");
         goto RETURN_RES;
     }
 
     $fres = hashify_answer($fres);
     $fres->{static} //= $static && $word eq '' ? 1:0;
   RETURN_RES:
-    $log->tracef("[comp][periscomp] leaving complete_arg_index, result=%s", $fres);
+    log_trace("[comp][periscomp] leaving complete_arg_index, result=%s", $fres);
     $fres;
 }
 
@@ -1005,7 +1005,7 @@ sub complete_cli_arg {
     my $word   = $words->[$cword];
     my $args_prop = $meta->{args} // {};
 
-    $log->tracef('[comp][periscomp] entering %s(), words=%s, cword=%d, word=<%s>',
+    log_trace('[comp][periscomp] entering %s(), words=%s, cword=%d, word=<%s>',
                  $fname, $words, $cword, $word);
 
     my $genres = Perinci::Sub::GetArgs::Argv::gen_getopt_long_spec_from_meta(
@@ -1030,7 +1030,7 @@ sub complete_cli_arg {
     for (keys %$copts) { $copts_by_ospec->{$copts->{$_}{getopt}}=$copts->{$_} }
 
     my $compgl_comp = sub {
-        $log->tracef("[comp][periscomp] entering completion routine (that we supply to Complete::Getopt::Long)");
+        log_trace("[comp][periscomp] entering completion routine (that we supply to Complete::Getopt::Long)");
         my %cargs = @_;
         my $type  = $cargs{type};
         my $ospec = $cargs{ospec} // '';
@@ -1049,15 +1049,15 @@ sub complete_cli_arg {
         if (my $sm = $specmeta->{$ospec}) {
             $cargs{type} = 'optval';
             if ($sm->{arg}) {
-                $log->tracef("[comp][periscomp] completing option value for a known function argument, arg=<%s>, ospec=<%s>", $sm->{arg}, $ospec);
+                log_trace("[comp][periscomp] completing option value for a known function argument, arg=<%s>, ospec=<%s>", $sm->{arg}, $ospec);
                 $cargs{arg} = $sm->{arg};
                 my $arg_spec = $args_prop->{$sm->{arg}} or goto RETURN_RES;
                 if ($comp) {
-                    $log->tracef("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
                     my $compres;
                     eval { $compres = $comp->(%cargs) };
-                    $log->debug("[comp][periscomp] completion died: $@") if $@;
-                    $log->tracef("[comp][periscomp] result from 'completion' routine: %s", $compres);
+                    log_debug("[comp][periscomp] completion died: $@") if $@;
+                    log_trace("[comp][periscomp] result from 'completion' routine: %s", $compres);
                     if ($compres) {
                         $fres = $compres;
                         goto RETURN_RES;
@@ -1099,14 +1099,14 @@ sub complete_cli_arg {
                     goto RETURN_RES;
                 }
             } else {
-                $log->tracef("[comp][periscomp] completing option value for a common option, ospec=<%s>", $ospec);
+                log_trace("[comp][periscomp] completing option value for a common option, ospec=<%s>", $ospec);
                 $cargs{arg}  = undef;
                 my $codata = $copts_by_ospec->{$ospec};
                 if ($comp) {
-                    $log->tracef("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
                     my $res;
                     eval { $res = $comp->(%cargs) };
-                    $log->debug("[comp][periscomp] completion died: $@") if $@;
+                    log_debug("[comp][periscomp] completion died: $@") if $@;
                     if ($res) {
                         $fres = $res;
                         goto RETURN_RES;
@@ -1114,10 +1114,10 @@ sub complete_cli_arg {
                 }
                 if ($codata->{completion}) {
                     $cargs{arg}  = undef;
-                    $log->tracef("[comp][periscomp] completing with common option's 'completion' property");
+                    log_trace("[comp][periscomp] completing with common option's 'completion' property");
                     my $res;
                     eval { $res = $codata->{completion}->(%cargs) };
-                    $log->debug("[comp][periscomp] completion died: $@") if $@;
+                    log_debug("[comp][periscomp] completion died: $@") if $@;
                     if ($res) {
                         $fres = $res;
                         goto RETURN_RES;
@@ -1127,7 +1127,7 @@ sub complete_cli_arg {
                     require Data::Sah::Normalize;
                     my $nsch = Data::Sah::Normalize::normalize_schema(
                         $codata->{schema});
-                    $log->tracef("[comp][periscomp] completing with common option's schema");
+                    log_trace("[comp][periscomp] completing with common option's schema");
                     $fres = complete_from_schema(
                         schema => $nsch, word=>$word);
                     goto RETURN_RES;
@@ -1135,7 +1135,7 @@ sub complete_cli_arg {
                 goto RETURN_RES;
             }
         } elsif ($type eq 'arg') {
-            $log->tracef("[comp][periscomp] completing argument #%d", $cargs{argpos});
+            log_trace("[comp][periscomp] completing argument #%d", $cargs{argpos});
             $cargs{type} = 'arg';
 
             my $pos = $cargs{argpos};
@@ -1146,13 +1146,13 @@ sub complete_cli_arg {
                 my $arg_spec = $args_prop->{$an};
                 next unless !$arg_spec->{greedy} &&
                     defined($arg_spec->{pos}) && $arg_spec->{pos} == $pos - $fasa;
-                $log->tracef("[comp][periscomp] this argument position is for non-greedy function argument <%s>", $an);
+                log_trace("[comp][periscomp] this argument position is for non-greedy function argument <%s>", $an);
                 $cargs{arg} = $an;
                 if ($comp) {
-                    $log->tracef("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
                     my $res;
                     eval { $res = $comp->(%cargs) };
-                    $log->debug("[comp][periscomp] completion died: $@") if $@;
+                    log_debug("[comp][periscomp] completion died: $@") if $@;
                     if ($res) {
                         $fres = $res;
                         goto RETURN_RES;
@@ -1175,12 +1175,12 @@ sub complete_cli_arg {
                 my $index = $pos - $fasa - $arg_spec->{pos};
                 $cargs{arg} = $an;
                 $cargs{index} = $index;
-                $log->tracef("[comp][periscomp] this position is for greedy function argument <%s>'s element[%d]", $an, $index);
+                log_trace("[comp][periscomp] this position is for greedy function argument <%s>'s element[%d]", $an, $index);
                 if ($comp) {
-                    $log->tracef("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                    log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
                     my $res;
                     eval { $res = $comp->(%cargs) };
-                    $log->debug("[comp][periscomp] completion died: $@") if $@;
+                    log_debug("[comp][periscomp] completion died: $@") if $@;
                     if ($res) {
                         $fres = $res;
                         goto RETURN_RES;
@@ -1192,12 +1192,12 @@ sub complete_cli_arg {
                 goto RETURN_RES;
             }
 
-            $log->tracef("[comp][periscomp] there is no matching function argument at this position");
+            log_trace("[comp][periscomp] there is no matching function argument at this position");
             if ($comp) {
-                $log->tracef("[comp][periscomp] invoking routine supplied from 'completion' argument");
+                log_trace("[comp][periscomp] invoking routine supplied from 'completion' argument");
                 my $res;
                 eval { $res = $comp->(%cargs) };
-                $log->debug("[comp][periscomp] completion died: $@") if $@;
+                log_debug("[comp][periscomp] completion died: $@") if $@;
                 if ($res) {
                     $fres = $res;
                     goto RETURN_RES;
@@ -1205,12 +1205,12 @@ sub complete_cli_arg {
             }
             goto RETURN_RES;
         } else {
-            $log->tracef("[comp][periscomp] completing option value for an unknown/ambiguous option, declining ...");
+            log_trace("[comp][periscomp] completing option value for an unknown/ambiguous option, declining ...");
             # decline because there's nothing in Rinci metadata that can aid us
             goto RETURN_RES;
         }
       RETURN_RES:
-        $log->tracef("[comp][periscomp] leaving completion routine (that we supply to Complete::Getopt::Long)");
+        log_trace("[comp][periscomp] leaving completion routine (that we supply to Complete::Getopt::Long)");
         $fres;
     }; # completion routine
 
@@ -1223,7 +1223,7 @@ sub complete_cli_arg {
     );
 
   RETURN_RES:
-    $log->tracef('[comp][periscomp] leaving %s(), result=%s',
+    log_trace('[comp][periscomp] leaving %s(), result=%s',
                  $fname, $fres);
     $fres;
 }
@@ -1243,7 +1243,7 @@ Perinci::Sub::Complete - Complete command-line argument using Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.91 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2017-01-15.
+This document describes version 0.92 of Perinci::Sub::Complete (from Perl distribution Perinci-Sub-Complete), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -1255,7 +1255,11 @@ this module.
 =head1 FUNCTIONS
 
 
-=head2 complete_arg_elem(%args) -> array
+=head2 complete_arg_elem
+
+Usage:
+
+ complete_arg_elem(%args) -> array
 
 Given argument name and function metadata, complete array element.
 
@@ -1352,7 +1356,11 @@ Word to be completed.
 Return value:  (array)
 
 
-=head2 complete_arg_index(%args) -> array
+=head2 complete_arg_index
+
+Usage:
+
+ complete_arg_index(%args) -> array
 
 Given argument name and function metadata, complete arg element index.
 
@@ -1441,7 +1449,11 @@ Word to be completed.
 Return value:  (array)
 
 
-=head2 complete_arg_val(%args) -> array
+=head2 complete_arg_val
+
+Usage:
+
+ complete_arg_val(%args) -> array
 
 Given argument name and function metadata, complete value.
 
@@ -1534,7 +1546,11 @@ Word to be completed.
 Return value:  (array)
 
 
-=head2 complete_cli_arg(%args) -> hash
+=head2 complete_cli_arg
+
+Usage:
+
+ complete_cli_arg(%args) -> hash
 
 Complete command-line argument using Rinci function metadata.
 
@@ -1658,7 +1674,11 @@ You can use C<format_completion> function in L<Complete::Bash> module to format
 the result of this function for bash.
 
 
-=head2 complete_from_schema(%args) -> [status, msg, result, meta]
+=head2 complete_from_schema
+
+Usage:
+
+ complete_from_schema(%args) -> [status, msg, result, meta]
 
 Complete a value from schema.
 
@@ -1700,7 +1720,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Sub-Complete>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Complete>.
 
 =head1 BUGS
 
@@ -1722,7 +1742,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

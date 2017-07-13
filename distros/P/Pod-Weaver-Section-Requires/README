@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Pod-Weaver-Section-Requires,
-version 0.02:
+version 0.03:
 
   Add Pod::Weaver section with all used modules from package excluding listed ones
 
-This software is copyright (c) 2014-2016 by Milan Sorm.
+This software is copyright (c) 2014-2017 by Milan Sorm.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

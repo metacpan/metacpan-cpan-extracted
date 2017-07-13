@@ -1,18 +1,94 @@
-SYNOPSIS
+NAME
+    Perinci::Use - Use a Riap package as if it was a local Perl module
 
+VERSION
+    This document describes version 0.07 of Perinci::Use (from Perl
+    distribution Perinci-Use), released on 2017-07-10.
+
+SYNOPSIS
      # import pyth()
      use Perinci::Use "http://example.com/My/Math", 'pyth';
      print pyth(3, 4); # 5
-    
+
      # import all
      use Perinci::Use "http://example.com/My/Math";
 
 DESCRIPTION
-
     This module provides use_riap_package(), usually used as shown in
     Synopsis, a la Perl's use().
 
-SEE ALSO
+FUNCTIONS
+  use_riap_package
+    Usage:
 
+     use_riap_package(%args) -> [status, msg, result, meta]
+
+    Use a Riap package as if it was a local Perl module.
+
+    "Use" a remote code package over Riap protocol as if it was a local Perl
+    module. Actually, what is being done is query the remote URL for
+    available functions, and for each remote function, create a proxy
+    function. The proxy function will then call the remote function.
+
+    Currently only functions are imported. Variables and other entities are
+    ignored.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   include => *array[str]*
+
+        Do not load all children, only load specified ones.
+
+    *   into* => *str*
+
+        Perl package name to put proxy functions into.
+
+        Example: 'Foo::Bar', 'Example::Module'.
+
+    *   url* => *str*
+
+        Location of Riap package entity.
+
+        Example: '/Foo/Bar/' (local Perl module),
+        'http://example.com/api/Module/'.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (undef)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Use>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Perinci-Use>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Use>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Perinci::Access
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

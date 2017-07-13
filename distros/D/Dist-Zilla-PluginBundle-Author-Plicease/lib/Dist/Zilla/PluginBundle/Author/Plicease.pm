@@ -12,7 +12,7 @@ use File::ShareDir ();
 use Dist::Zilla::Util::CurrentCmd ();
 
 # ABSTRACT: Dist::Zilla plugin bundle used by Plicease
-our $VERSION = '2.16'; # VERSION
+our $VERSION = '2.20'; # VERSION
 
 
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -32,8 +32,8 @@ sub mvp_multivalue_args { qw(
 
 my %plugin_versions = qw(
   Alien                0.023
-  Author::Plicease.*   2.16
-  OurPkgVersion        0.06
+  Author::Plicease.*   2.20
+  OurPkgVersion        0.12
   MinimumPerl          1.006
   InstallGuide         1.200006
   Run::.*              0.035
@@ -151,7 +151,11 @@ sub configure
   $self->_my_add_plugin([ NextRelease => { format => '%-9v %{yyyy-MM-dd HH:mm:ss Z}d' }]);
     
   $self->_my_add_plugin(['AutoPrereqs']);
-  $self->_my_add_plugin([$self->payload->{version_plugin} || 'OurPkgVersion']);
+  $self->_my_add_plugin([$self->payload->{version_plugin} || (
+    'OurPkgVersion', {
+      underscore_eval_version => 1
+    }
+  )]);
   $self->_my_add_plugin(['MetaJSON']);
 
   if($^O ne 'MSWin32')
@@ -189,6 +193,7 @@ sub configure
         maybe skip          => $self->payload->{release_tests_skip},
         maybe diag          => $self->payload->{diag},
         maybe diag_preamble => $self->payload->{diag_preamble},
+        maybe test2_v0      => $self->payload->{test2_v0},
       }
     ]);
   }
@@ -323,7 +328,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.16
+version 2.20
 
 =head1 SYNOPSIS
 
@@ -402,7 +407,10 @@ This plugin bundle is mostly equivalent to
  format = %-9v %{yyyy-MM-dd HH:mm:ss Z}d
  
  [AutoPrereqs]
+ 
  [OurPkgVersion]
+ underscore_eval_version = 1
+ 
  [MetaJSON]
  
  [Git::Check]

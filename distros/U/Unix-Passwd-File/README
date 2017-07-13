@@ -1,58 +1,64 @@
-SYNOPSIS
+NAME
+    Unix::Passwd::File - Manipulate /etc/{passwd,shadow,group,gshadow}
+    entries
 
+VERSION
+    This document describes version 0.24 of Unix::Passwd::File (from Perl
+    distribution Unix-Passwd-File), released on 2017-07-10.
+
+SYNOPSIS
      use Unix::Passwd::File;
-    
+
      # list users. by default uses files in /etc (/etc/passwd, /etc/shadow, et al)
      my $res = list_users(); # [200, "OK", ["root", ...]]
-    
+
      # change location of files, return details
      $res = list_users(etc_dir=>"/some/path", detail=>1);
          # [200, "OK", [{user=>"root", uid=>0, ...}, ...]]
-    
+
      # also return detail, but return array entries instead of hash
      $res = list_users(detail=>1, with_field_names=>0);
          # [200, "OK", [["root", "x", 0, ...], ...]]
-    
+
      # get user/group information
      $res = get_group(user=>"paijo"); # [200, "OK", {user=>"paijo", uid=>501, ...}]
      $res = get_user(user=>"titin");  # [404, "Not found"]
-    
+
      # check whether user/group exists
      say user_exists(user=>"paijo");   # 1
      say group_exists(group=>"titin"); # 0
-    
+
      # get all groups that user is member of
      $res = get_user_groups(user=>"paijo"); # [200, "OK", ["paijo", "satpam"]]
-    
+
      # check whether user is member of a group
      $res = is_member(user=>"paijo", group=>"satpam"); # 1
-    
+
      # adding user/group, by default adding user will also add a group with the same
      # name
      $res = add_user (user =>"ujang", ...); # [200, "OK", {uid=>540, gid=>541}]
      $res = add_group(group=>"ujang", ...); # [412, "Group already exists"]
-    
+
      # modify user/group
      $res = modify_user(user=>"ujang", home=>"/newhome/ujang"); # [200, "OK"]
      $res = modify_group(group=>"titin"); # [404, "Not found"]
-    
+
      # deleting user will also delete user's group
      $res = delete_user(user=>"titin");
-    
+
      # change user password
      $res = set_user_password(user=>"ujang", pass=>"foobar");
      $res = modify_user(user=>"ujang", pass=>"foobar"); # same thing
-    
+
      # add/delete user to/from group
      $res = add_user_to_group(user=>"ujang", group=>"wheel");
      $res = delete_user_from_group(user=>"ujang", group=>"wheel");
-    
+
      # others
      $res = get_max_uid(); # [200, "OK", 65535]
      $res = get_max_gid(); # [200, "OK", 65534]
 
 DESCRIPTION
-
     This module can be used to read and manipulate entries in Unix system
     password files (/etc/passwd, /etc/group, /etc/group, /etc/gshadow; but
     can also be told to search in custom location, for testing purposes).
@@ -67,11 +73,988 @@ DESCRIPTION
 
     No caching is done so you should do your own if you need to.
 
-SEE ALSO
+FUNCTIONS
+  add_delete_user_groups
+    Usage:
 
-    Old modules on CPAN which do not support shadow files are pretty
-    useless to me (e.g. Unix::ConfigFile). Shadow passwords have been
-    around since 1988 (and in Linux since 1992), FFS!
+     add_delete_user_groups(%args) -> [status, msg, result, meta]
+
+    Add or delete user from one or several groups.
+
+    This can be used to reduce several "add_user_to_group()" and/or
+    "delete_user_from_group()" calls to a single call. So:
+
+     add_delete_user_groups(user=>'u',add_to=>['a','b'],delete_from=>['c','d']);
+
+    is equivalent to:
+
+     add_user_to_group     (user=>'u', group=>'a');
+     add_user_to_group     (user=>'u', group=>'b');
+     delete_user_from_group(user=>'u', group=>'c');
+     delete_user_from_group(user=>'u', group=>'d');
+
+    except that "add_delete_user_groups()" does it in one pass.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add_to => *array[str]* (default: [])
+
+        List of group names to add the user as member of.
+
+    *   delete_from => *array[str]* (default: [])
+
+        List of group names to remove the user as member of.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  add_group
+    Usage:
+
+     add_group(%args) -> [status, msg, result, meta]
+
+    Add a new group.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool* (default: 0)
+
+        Whether to backup when modifying files.
+
+        Backup is written with ".bak" extension in the same directory.
+        Unmodified file will not be backed up. Previous backup will be
+        overwritten.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   gid => *int*
+
+        Pick a specific new GID.
+
+        Adding a new group with duplicate GID is allowed.
+
+    *   group* => *str*
+
+    *   max_gid => *int* (default: 65535)
+
+        Pick a range for new GID.
+
+        If a free GID between "min_gid" and "max_gid" is not found, error
+        412 is returned.
+
+    *   members => *any*
+
+        Fill initial members.
+
+    *   min_gid => *int* (default: 1000)
+
+        Pick a range for new GID.
+
+        If a free GID between "min_gid" and "max_gid" is not found, error
+        412 is returned.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  add_user
+    Usage:
+
+     add_user(%args) -> [status, msg, result, meta]
+
+    Add a new user.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool* (default: 0)
+
+        Whether to backup when modifying files.
+
+        Backup is written with ".bak" extension in the same directory.
+        Unmodified file will not be backed up. Previous backup will be
+        overwritten.
+
+    *   encpass => *str*
+
+        Encrypted password.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   expire_date => *int*
+
+        The date of expiration of the account, expressed as the number of
+        days since Jan 1, 1970.
+
+    *   gecos => *str*
+
+        Usually, it contains the full username.
+
+    *   gid => *int*
+
+        Pick a specific GID when creating group.
+
+        Duplicate GID is allowed.
+
+    *   group => *str*
+
+        Select primary group (default is group with same name as user).
+
+        Normally, a user's primary group with group with the same name as
+        user, which will be created if does not already exist. You can pick
+        another group here, which must already exist (and in this case, the
+        group with the same name as user will not be created).
+
+    *   home => *str*
+
+        User's home directory.
+
+    *   last_pwchange => *int*
+
+        The date of the last password change, expressed as the number of
+        days since Jan 1, 1970.
+
+    *   max_gid => *int*
+
+        Pick a range for GID when creating group.
+
+    *   max_pass_age => *int*
+
+        The number of days after which the user will have to change her
+        password.
+
+    *   max_uid => *int* (default: 65535)
+
+        Pick a range for new UID.
+
+        If a free UID between "min_uid" and "max_uid" is not found, error
+        412 is returned.
+
+    *   min_gid => *int*
+
+        Pick a range for GID when creating group.
+
+    *   min_pass_age => *int*
+
+        The number of days the user will have to wait before she will be
+        allowed to change her password again.
+
+    *   min_uid => *int* (default: 1000)
+
+        Pick a range for new UID.
+
+        If a free UID between "min_uid" and "max_uid" is not found, error
+        412 is returned.
+
+    *   pass => *str*
+
+        Password, generally should be "x" which means password is encrypted
+        in shadow.
+
+    *   pass_inactive_period => *int*
+
+        The number of days after a password has expired (see max_pass_age)
+        during which the password should still be accepted (and user should
+        update her password during the next login).
+
+    *   pass_warn_period => *int*
+
+        The number of days before a password is going to expire (see
+        max_pass_age) during which the user should be warned.
+
+    *   shell => *str*
+
+        User's shell.
+
+    *   uid => *int*
+
+        Pick a specific new UID.
+
+        Adding a new user with duplicate UID is allowed.
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  add_user_to_group
+    Usage:
+
+     add_user_to_group(%args) -> [status, msg, result, meta]
+
+    Add user to a group.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   group* => *str*
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  delete_group
+    Usage:
+
+     delete_group(%args) -> [status, msg, result, meta]
+
+    Delete a group.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool* (default: 0)
+
+        Whether to backup when modifying files.
+
+        Backup is written with ".bak" extension in the same directory.
+        Unmodified file will not be backed up. Previous backup will be
+        overwritten.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   group* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  delete_user
+    Usage:
+
+     delete_user(%args) -> [status, msg, result, meta]
+
+    Delete a user.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool* (default: 0)
+
+        Whether to backup when modifying files.
+
+        Backup is written with ".bak" extension in the same directory.
+        Unmodified file will not be backed up. Previous backup will be
+        overwritten.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  delete_user_from_group
+    Usage:
+
+     delete_user_from_group(%args) -> [status, msg, result, meta]
+
+    Delete user from a group.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   group* => *str*
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_group
+    Usage:
+
+     get_group(%args) -> [status, msg, result, meta]
+
+    Get group details by group name or gid.
+
+    Either "group" OR "gid" must be specified.
+
+    The function is not dissimilar to Unix's "getgrnam()" or "getgrgid()".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   gid => *int*
+
+    *   group => *str*
+
+    *   with_field_names => *bool* (default: 1)
+
+        If false, don't return hash.
+
+        By default, a hashref is returned containing field names and its
+        values, e.g. "{group=>"titin", pass=>"x", gid=>500, ...}". With
+        "with_field_names=>0", an arrayref is returned instead: "["titin",
+        "x", 500, ...]".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_max_gid
+    Usage:
+
+     get_max_gid(%args) -> [status, msg, result, meta]
+
+    Get maximum GID used.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_max_uid
+    Usage:
+
+     get_max_uid(%args) -> [status, msg, result, meta]
+
+    Get maximum UID used.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_user
+    Usage:
+
+     get_user(%args) -> [status, msg, result, meta]
+
+    Get user details by username or uid.
+
+    Either "user" OR "uid" must be specified.
+
+    The function is not dissimilar to Unix's "getpwnam()" or "getpwuid()".
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   uid => *int*
+
+    *   user => *str*
+
+    *   with_field_names => *bool* (default: 1)
+
+        If false, don't return hash.
+
+        By default, a hashref is returned containing field names and its
+        values, e.g. "{user=>"titin", pass=>"x", uid=>500, ...}". With
+        "with_field_names=>0", an arrayref is returned instead: "["titin",
+        "x", 500, ...]".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_user_groups
+    Usage:
+
+     get_user_groups(%args) -> [status, msg, result, meta]
+
+    Return groups which the user belongs to.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool* (default: 0)
+
+        If true, return all fields instead of just group names.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   user* => *str*
+
+    *   with_field_names => *bool* (default: 1)
+
+        If false, don't return hash for each entry.
+
+        By default, when "detail=>1", a hashref is returned for each entry
+        containing field names and its values, e.g. "{group=>"titin",
+        pass=>"x", gid=>500, ...}". With "with_field_names=>0", an arrayref
+        is returned instead: "["titin", "x", 500, ...]".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  group_exists
+    Usage:
+
+     group_exists(%args) -> bool
+
+    Check whether group exists.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   gid => *int*
+
+    *   group => *str*
+
+    Return value: (bool)
+
+  is_member
+    Usage:
+
+     is_member(%args) -> bool
+
+    Check whether user is member of a group.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   group* => *str*
+
+    *   user* => *str*
+
+    Return value: (bool)
+
+  list_groups
+    Usage:
+
+     list_groups(%args) -> [status, msg, result, meta]
+
+    List Unix groups in group file.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool* (default: 0)
+
+        If true, return all fields instead of just group names.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   with_field_names => *bool* (default: 1)
+
+        If false, don't return hash for each entry.
+
+        By default, when "detail=>1", a hashref is returned for each entry
+        containing field names and its values, e.g. "{group=>"titin",
+        pass=>"x", gid=>500, ...}". With "with_field_names=>0", an arrayref
+        is returned instead: "["titin", "x", 500, ...]".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_users
+    Usage:
+
+     list_users(%args) -> [status, msg, result, meta]
+
+    List Unix users in passwd file.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool* (default: 0)
+
+        If true, return all fields instead of just usernames.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   with_field_names => *bool* (default: 1)
+
+        If false, don't return hash for each entry.
+
+        By default, when "detail=>1", a hashref is returned for each entry
+        containing field names and its values, e.g. "{user=>"titin",
+        pass=>"x", uid=>500, ...}". With "with_field_names=>0", an arrayref
+        is returned instead: "["titin", "x", 500, ...]".
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_users_and_groups
+    Usage:
+
+     list_users_and_groups(%args) -> [status, msg, result, meta]
+
+    List Unix users and groups in passwd/group files.
+
+    This is basically "list_users()" and "list_groups()" combined, so you
+    can get both data in a single call. Data is returned in an array. Users
+    list is in the first element, groups list in the second.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool* (default: 0)
+
+        If true, return all fields instead of just names.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   with_field_names => *bool* (default: 1)
+
+        If false, don't return hash for each entry.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  modify_group
+    Usage:
+
+     modify_group(%args) -> [status, msg, result, meta]
+
+    Modify an existing group.
+
+    Specify arguments to modify corresponding fields. Unspecified fields
+    will not be modified.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   admins => *str*
+
+        It must be a comma-separated list of user names, or empty.
+
+    *   backup => *bool* (default: 0)
+
+        Whether to backup when modifying files.
+
+        Backup is written with ".bak" extension in the same directory.
+        Unmodified file will not be backed up. Previous backup will be
+        overwritten.
+
+    *   encpass => *str*
+
+        Encrypted password.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   gid => *int*
+
+        Numeric group ID.
+
+    *   group* => *str*
+
+        Group name.
+
+    *   members => *str*
+
+        List of usernames that are members of this group, separated by
+        commas.
+
+    *   pass => *str*
+
+        Password, generally should be "x" which means password is encrypted
+        in gshadow.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  modify_user
+    Usage:
+
+     modify_user(%args) -> [status, msg, result, meta]
+
+    Modify an existing user.
+
+    Specify arguments to modify corresponding fields. Unspecified fields
+    will not be modified.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool* (default: 0)
+
+        Whether to backup when modifying files.
+
+        Backup is written with ".bak" extension in the same directory.
+        Unmodified file will not be backed up. Previous backup will be
+        overwritten.
+
+    *   encpass => *str*
+
+        Encrypted password.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   expire_date => *int*
+
+        The date of expiration of the account, expressed as the number of
+        days since Jan 1, 1970.
+
+    *   gecos => *str*
+
+        Usually, it contains the full username.
+
+    *   gid => *int*
+
+        Numeric primary group ID for this user.
+
+    *   home => *str*
+
+        User's home directory.
+
+    *   last_pwchange => *int*
+
+        The date of the last password change, expressed as the number of
+        days since Jan 1, 1970.
+
+    *   max_pass_age => *int*
+
+        The number of days after which the user will have to change her
+        password.
+
+    *   min_pass_age => *int*
+
+        The number of days the user will have to wait before she will be
+        allowed to change her password again.
+
+    *   pass_inactive_period => *int*
+
+        The number of days after a password has expired (see max_pass_age)
+        during which the password should still be accepted (and user should
+        update her password during the next login).
+
+    *   pass_warn_period => *int*
+
+        The number of days before a password is going to expire (see
+        max_pass_age) during which the user should be warned.
+
+    *   shell => *str*
+
+        User's shell.
+
+    *   uid => *int*
+
+        Numeric user ID.
+
+    *   user* => *str*
+
+        User (login) name.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  set_user_groups
+    Usage:
+
+     set_user_groups(%args) -> [status, msg, result, meta]
+
+    Set the groups that a user is member of.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   groups* => *array[str]* (default: [])
+
+        List of group names that user is member of.
+
+        Aside from this list, user will not belong to any other group.
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  set_user_password
+    Usage:
+
+     set_user_password(%args) -> [status, msg, result, meta]
+
+    Set user's password.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool* (default: 0)
+
+        Whether to backup when modifying files.
+
+        Backup is written with ".bak" extension in the same directory.
+        Unmodified file will not be backed up. Previous backup will be
+        overwritten.
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   pass* => *str*
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  user_exists
+    Usage:
+
+     user_exists(%args) -> bool
+
+    Check whether user exists.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   etc_dir => *str* (default: "/etc")
+
+        Specify location of passwd files.
+
+    *   uid => *int*
+
+    *   user => *str*
+
+    Return value: (bool)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Unix-Passwd-File>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Unix-Passwd-File>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Unix-Passwd-File>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Old modules on CPAN which do not support shadow files are pretty useless
+    to me (e.g. Unix::ConfigFile). Shadow passwords have been around since
+    1988 (and in Linux since 1992), FFS!
 
     Passwd::Unix. I created a fork of Passwd::Unix v0.52 called
     Passwd::Unix::Alt in 2011 to fix some of the deficiencies/quirks in
@@ -81,29 +1064,39 @@ SEE ALSO
     Unix::Passwd::File differs compared to Passwd::Unix (and
     Passwd::Unix::Alt):
 
-      * tests in distribution
+    *   tests in distribution
 
-      * no need to run as root
+    *   no need to run as root
 
-      * no need to be able to read the shadow file for some operations
+    *   no need to be able to read the shadow file for some operations
 
-      For example, list_users() will simply not return the encpass field if
-      the shadow file is unreadable. Of course, access to shadow file is
-      required when getting or setting password.
+        For example, "list_users()" will simply not return the "encpass"
+        field if the shadow file is unreadable. Of course, access to shadow
+        file is required when getting or setting password.
 
-      * strictly procedural (non-OO) interface
+    *   strictly procedural (non-OO) interface
 
-      I consider this a feature :-)
+        I consider this a feature :-)
 
-      * detailed error message for each operation
+    *   detailed error message for each operation
 
-      * removal of global error variable
+    *   removal of global error variable
 
-      * working locking
+    *   working locking
 
-      Locking is done by locking passwd file.
+        Locking is done by locking "passwd" file.
 
     Setup::Unix::User and Setup::Unix::Group, which use this module.
 
     Rinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

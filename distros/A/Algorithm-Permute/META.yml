@@ -18,12 +18,13 @@ name: Algorithm-Permute
 provides:
   Algorithm::Permute:
     file: lib/Algorithm/Permute.pm
-    version: '0.14'
+    version: '0.15'
 requires:
+  Exporter: '0'
   XSLoader: '0'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/stphnlyd/perl5-Algorithm-Permute.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'YAML::Tiny version 1.70'

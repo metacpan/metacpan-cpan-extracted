@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::core_or_pp;
 
-our $DATE = '2017-01-20'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -77,7 +77,7 @@ sub handle_cmd {
         next if $mod eq 'perl'; # XXX check perl version
         my $v = $mods->{version};
         my $subject = "$mod".($v ? " (version $v)" : "");
-        $log->tracef("Checking %s ...", $subject);
+        log_trace("Checking %s ...", $subject);
         if ($core) {
             $what //= "core";
             if (!Module::CoreList::More->is_still_core($mod, $v)) {
@@ -134,7 +134,7 @@ App::lcpan::Cmd::core_or_pp - Check that a module (with its prereqs) are all cor
 
 =head1 VERSION
 
-This document describes version 0.03 of App::lcpan::Cmd::core_or_pp (from Perl distribution App-lcpan-CmdBundle-core_or_pp), released on 2017-01-20.
+This document describes version 0.04 of App::lcpan::Cmd::core_or_pp (from Perl distribution App-lcpan-CmdBundle-core_or_pp), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -143,7 +143,11 @@ This module handles the L<lcpan> subcommand C<core-or-pp>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Check that a module (with its prereqs) are all core/PP.
 
@@ -210,7 +214,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

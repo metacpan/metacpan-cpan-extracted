@@ -1,8 +1,258 @@
+NAME
+    phpBB2::Simple - API for phpBB2
+
+VERSION
+    This document describes version 0.04 of phpBB2::Simple (from Perl
+    distribution phpBB2-Simple), released on 2017-07-10.
+
 SYNOPSIS
-
 DESCRIPTION
-
     I know, phpBB2 is beyond ancient (2007 and earlier), but our intranet
     board still runs it and some things are more convenient to do via CLI
     script than via web-based administration panel.
+
+FUNCTIONS
+  add_user_to_groups
+    Usage:
+
+     add_user_to_groups(%args) -> [status, msg, result, meta]
+
+    Add a user to one or more groups.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_dsn* => *str*
+
+    *   db_password* => *str*
+
+    *   db_user* => *str*
+
+    *   group* => *array[str]*
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  delete_user_from_all_forum_moderators
+    Usage:
+
+     delete_user_from_all_forum_moderators(%args) -> [status, msg, result, meta]
+
+    Delete a user from being moderator in all forums.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_dsn* => *str*
+
+    *   db_password* => *str*
+
+    *   db_user* => *str*
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  delete_user_from_groups
+    Usage:
+
+     delete_user_from_groups(%args) -> [status, msg, result, meta]
+
+    Delete a user from one or more groups.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_dsn* => *str*
+
+    *   db_password* => *str*
+
+    *   db_user* => *str*
+
+    *   group* => *array[str]*
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_group_members
+    Usage:
+
+     list_group_members(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_dsn* => *str*
+
+    *   db_password* => *str*
+
+    *   db_user* => *str*
+
+    *   group* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_groups
+    Usage:
+
+     list_groups(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_dsn* => *str*
+
+    *   db_password* => *str*
+
+    *   db_user* => *str*
+
+    *   detail => *bool*
+
+        Returned detailed record for each item instead of just ID.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_user_groups
+    Usage:
+
+     list_user_groups(%args) -> [status, msg, result, meta]
+
+    List groups which user belongs to.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   db_dsn* => *str*
+
+    *   db_password* => *str*
+
+    *   db_user* => *str*
+
+    *   user* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_users
+    Usage:
+
+     list_users(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   active => *bool*
+
+        Only list active users.
+
+    *   db_dsn* => *str*
+
+    *   db_password* => *str*
+
+    *   db_user* => *str*
+
+    *   detail => *bool*
+
+        Returned detailed record for each item instead of just ID.
+
+    *   level => *str*
+
+        Only list users having certain level.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/phpBB2-Simple>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-phpBB2-Simple>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=phpBB2-Simple>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

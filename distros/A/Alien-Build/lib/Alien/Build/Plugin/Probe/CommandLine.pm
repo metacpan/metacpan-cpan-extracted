@@ -5,9 +5,10 @@ use warnings;
 use Alien::Build::Plugin;
 use Carp ();
 use Capture::Tiny qw( capture );
+use File::Which ();
 
 # ABSTRACT: Probe for tools or commands already available
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
 has '+command' => sub { Carp::croak "@{[ __PACKAGE__ ]} requires command property" };
@@ -28,14 +29,10 @@ sub init
 {
   my($self, $meta) = @_;
   
-  # in core as of 5.10, but still need it for 5.8
-  # apparently.
-  $meta->add_requires( 'configure' => 'IPC::Cmd' => 0 );
-  
   my $check = sub {
     my($build) = @_;
 
-    unless(IPC::Cmd::can_run($self->command))
+    unless(File::Which::which($self->command))
     {
       die 'Command not found ' . $self->command;
     }
@@ -94,7 +91,7 @@ Alien::Build::Plugin::Probe::CommandLine - Probe for tools or commands already a
 
 =head1 VERSION
 
-version 0.55
+version 0.61
 
 =head1 SYNOPSIS
 

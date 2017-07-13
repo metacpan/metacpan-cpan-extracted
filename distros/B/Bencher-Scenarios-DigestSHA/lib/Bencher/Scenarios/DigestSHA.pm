@@ -1,7 +1,7 @@
 package Bencher::Scenarios::DigestSHA;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: Scenarios to benchmark Digest::SHA
@@ -18,7 +18,7 @@ Bencher::Scenarios::DigestSHA - Scenarios to benchmark Digest::SHA
 
 =head1 VERSION
 
-This document describes version 0.002 of Bencher::Scenarios::DigestSHA (from Perl distribution Bencher-Scenarios-DigestSHA), released on 2017-01-25.
+This document describes version 0.003 of Bencher::Scenarios::DigestSHA (from Perl distribution Bencher-Scenarios-DigestSHA), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -26,11 +26,11 @@ This distribution contains the following L<Bencher> scenario modules:
 
 =over
 
+=item * L<Bencher::Scenario::DigestSHA::SHA1>
+
 =item * L<Bencher::Scenario::DigestSHA::SHA512>
 
 =item * L<Bencher::Scenario::DigestSHA::SHA256>
-
-=item * L<Bencher::Scenario::DigestSHA::SHA1>
 
 =back
 
@@ -56,7 +56,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

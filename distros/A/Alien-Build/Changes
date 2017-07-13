@@ -1,5 +1,40 @@
 Revision history for Alien-Build
 
+0.61      2017-07-13 11:10:46 +0000
+  - Add passive property to Download::Negotiate plugin
+  - Add passive property to Fetch::NetFTP plugin
+  - Add log directive to alienfile
+
+0.60      2017-07-12 22:26:22 -0400
+  - Fix broken test t/01_use.t
+
+0.59      2017-07-12 21:10:14 -0400
+  - ACTUALLY removed Alien::Build::Plugin::Probe::GnuWin32, which
+    I promised to remove two releases ago :/
+
+0.58      2017-07-12 20:19:13 -0400
+  - If PkgConfig.pm is needed, version 0.14026 will be required
+    (PkgConfig.pm is a dynamic prereq on environments that do
+    not have pkg-config or pkgconf).
+
+0.57      2017-07-12 16:45:54 -0400
+  - Add alienfile_ok to Test::Alien::Build
+  - Fixed bug with preload and postload environment variables
+  - Removed Alien::Build::Plugin::Fetch::PromptBeforeDownload
+    which is now a separate distribution
+  - Removed Alien::Build::Plugin::Probe::GnuWin32
+    which is now a separate distribution
+
+0.56_01   2017-07-11 16:39:38 -0400
+  - Merged Test-Alien and Alien-Build.  For the old Test-Alien change log
+    see Changes.Test-Alien
+  - Import helpers from Aliens that are required using requires.
+    (this was always the intent, but for some reason was not implemented until now).
+  - Add helper_ok test to Test::Alien
+  - Add interpolate_template_is test to Test::Alien
+  - Add Test::Alien::Build
+  - Add has_helper method to Alien::Build::Interpolate
+
 0.55      2017-07-09 12:25:06 -0400
   - Use lib/pkgconfig and share/aclocal from any Alien::Base requires.
     Previously only Alien::Base modules build with alienfile + Alien::Build

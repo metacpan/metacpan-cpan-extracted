@@ -13,7 +13,6 @@ use Test::More 0.96;
 use File::chdir;
 use File::MoreUtil qw(file_exists);
 use File::Path qw(make_path remove_tree);
-use File::Slurp::Tiny qw(read_file write_file);
 use File::Temp qw(tempdir);
 use File::Trash::FreeDesktop;
 

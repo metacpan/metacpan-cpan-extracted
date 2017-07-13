@@ -1,11 +1,18 @@
-SYNOPSIS
+NAME
+    File::Create::Layout - Quickly create files/directories according to a
+    layout
 
+VERSION
+    This document describes version 0.05 of File::Create::Layout (from Perl
+    distribution File-Create-Layout), released on 2017-07-10.
+
+SYNOPSIS
      use File::Create::Layout qw(
          create_files_using_layout
          check_layout
          parse_layout
      );
-    
+
      my $res = create_files_using_layout(layout => <<'EOL');
      file1.txt
      file2(0600)
@@ -14,7 +21,7 @@ SYNOPSIS
        file1
        file2
        file3
-    
+
      dir2/(root,bin,0600)
        # some comment
        file1
@@ -24,34 +31,32 @@ SYNOPSIS
      EOL
 
 DESCRIPTION
-
     EARLY DEVELOPMENT. MORE OPTIONS WILL BE AVAILABLE (E.G. DRY-RUN,
     CHECKING A LAYOUT AGAINST FILESYSTEM, VARIOUS ERROR HANDLING OPTIONS).
 
 LAYOUT SPECIFICATION
-
     Layout is a text document containing zero or more lines. Each line is
     either a file/directory specification line, a blank line, or a comment
     line.
 
-    Comment line starts with zero or more whitespaces, a # (hash)
+    Comment line starts with zero or more whitespaces, a "#" (hash)
     character, and zero or more non-newline characters as the comment's
     content.
 
     The simplest specification line contains just the name of a file or
-    directory. To specify a directory, you need to add / (slash)
+    directory. To specify a directory, you need to add "/" (slash)
     immediately after the name:
 
      # a file
      foo.txt
-    
+
      # a directory
      bar/
-    
+
      # another directory
      baz.txt/
 
-    To specify filename containing special characters, like #, you can
+    To specify filename containing special characters, like "#", you can
     quote the file using double quotes:
 
      "#tmpname#"
@@ -66,11 +71,11 @@ LAYOUT SPECIFICATION
      # specify permission mode, both are identical
      file.txt(0600)
      file2.txt(600)
-    
+
      # specify owner as well as user+group
      dir1/(ujang,admin,0700)
 
-    Symlink. To create a symlink, add -> (arrow) followed by the symlink
+    Symlink. To create a symlink, add "->" (arrow) followed by the symlink
     target. Like filename, symlink target can be an unquoted sequence of
     non-whitespace characters, or a quoted JSON string if you want to have
     whitespace or other special characters:
@@ -80,8 +85,8 @@ LAYOUT SPECIFICATION
 
     File content. An unquoted JSON hash (object) can be added in the end,
     prefixed by at least one whitespace to specify extra stuffs, including
-    file content. By unquoted, it means that the enclosing curly braces {
-    .. } is not written:
+    file content. By unquoted, it means that the enclosing curly braces "{
+    .. }" is not written:
 
      file.txt "content":"This is line 1\nThis is line 2\n"
      file2.txt(0660)      "content":"secret","foo":"bar","mtime":1441853999
@@ -99,7 +104,129 @@ LAYOUT SPECIFICATION
      file5-in-top-level
      file6
 
-SEE ALSO
+FUNCTIONS
+  check_layout
+    Usage:
 
+     check_layout(%args) -> [status, msg, result, meta]
+
+    Check whether layout has syntax errors.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   layout* => *str*
+
+        Layout.
+
+        See the module documentation for the format/specification of layout.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  create_files_using_layout
+    Usage:
+
+     create_files_using_layout(%args) -> [status, msg, result, meta]
+
+    Create files/directories according to a layout.
+
+    This routine can be used to quickly create several files/directories
+    according to a layout which you specify. The layout uses a few simple
+    rules and common conventions usually found in Linux/Unix environment.
+
+    You can use this routine e.g. in a test script.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   layout* => *str*
+
+        Layout.
+
+        See the module documentation for the format/specification of layout.
+
+    *   prefix => *str*
+
+        Root directory to create the files/directories in.
+
+        Directory must already exist.
+
+        If unspecified, will simply create starting from current directory.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  parse_layout
+    Usage:
+
+     parse_layout(%args) -> [status, msg, result, meta]
+
+    Parse layout string into a data structure suitable for processing.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   layout* => *str*
+
+        Layout.
+
+        See the module documentation for the format/specification of layout.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Create-Layout>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Create-Layout>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Create-Layout>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Setup::File::Layout, transactional/undoable version of this module
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

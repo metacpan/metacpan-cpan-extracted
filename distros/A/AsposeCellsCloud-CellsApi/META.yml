@@ -18,7 +18,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiClient.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: '1.02'
+    version: v1.0.3
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Object::Area:
@@ -41,6 +41,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/BaseObject.pm
   AsposeCellsCloud::Object::Border:
     file: lib/AsposeCellsCloud/Object/Border.pm
+  AsposeCellsCloud::Object::CalculationOptions:
+    file: lib/AsposeCellsCloud/Object/CalculationOptions.pm
   AsposeCellsCloud::Object::Cell:
     file: lib/AsposeCellsCloud/Object/Cell.pm
   AsposeCellsCloud::Object::CellArea:
@@ -349,5 +351,5 @@ requires:
   warnings: '0'
 resources:
   license: http://www.opensource.org/licenses/mit-license.php
-version: '1.02'
+version: v1.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,4 @@
+
 =head1 NAME
 
 WebService::MinFraud::Example - MaxMind minFraud client example
@@ -47,6 +48,12 @@ score.
            cvv_result              => 'N',
            bank_name               => 'Bank of No Hope',
            issuer_id_number        => '323132'
+       },
+       custom_inputs => {
+           section                      => 'news',
+           number_of_previous_purchases => 19,
+           discount                     => 3.2,
+           previous_user                => JSON->true,
        },
        device => {
            accept_language => 'en-US,en;q=0.8',

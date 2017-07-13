@@ -1,6 +1,115 @@
-SYNOPSIS
+NAME
+    Finance::Currency::Convert::GMC - Convert currency using GMC (Golden
+    Money Changer) website
 
+VERSION
+    This document describes version 0.003 of Finance::Currency::Convert::GMC
+    (from Perl distribution Finance-Currency-Convert-GMC), released on
+    2017-07-10.
+
+SYNOPSIS
      use Finance::Currency::Convert::GMC qw(convert_currency);
-    
+
      printf "1 USD = Rp %.0f\n", convert_currency(1, 'USD', 'IDR');
+
+DESCRIPTION
+    This module can extract currency rates from the Golden Money Changer
+    website:
+
+     https://www.gmc.co.id/
+
+    Currently only conversions from a few currencies to Indonesian Rupiah
+    (IDR) are available.
+
+FUNCTIONS
+  convert_currency
+    Usage:
+
+     convert_currency($n, $from, $to, $which) -> any
+
+    Convert currency using GMC.
+
+    Currently can only handle conversion "to" IDR. Dies if given other
+    currency.
+
+    Will warn if failed getting currencies from the webpage.
+
+    Currency rate is not cached (retrieved from the website every time).
+    Employ your own caching.
+
+    Will return undef if no conversion rate is available for the requested
+    currency.
+
+    Use "get_currencies()", which actually retrieves and scrapes the source
+    web page, if you need the more complete result.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $from* => *str*
+
+    *   $n* => *float*
+
+    *   $to* => *str*
+
+    *   $which => *str* (default: "sell")
+
+        Select which rate to use (default is `sell`).
+
+    Return value: (any)
+
+  get_currencies
+    Usage:
+
+     get_currencies() -> [status, msg, result, meta]
+
+    Extract data from GMC page.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+    Will return a hash containing key "currencies".
+
+    The currencies is a hash with currency symbols as keys and prices as
+    values.
+
+    Tha values is a hash with these keys: "buy" and "sell".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-Currency-Convert-GMC>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-Currency-Convert-GMC>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Currency-Conv
+    ert-GMC>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -1,4 +1,9 @@
-Revision history for Org-To-Text
+0.04    2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Log::Any with Log::ger.
+
 
 0.03    2015-09-03 (PERLANCAR)
 

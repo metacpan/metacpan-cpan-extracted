@@ -1,12 +1,12 @@
 package RSS::From::Forum::vBulletin;
 
-our $DATE = '2016-06-14'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use Date::Parse;
 use LWP::UserAgent;
@@ -120,14 +120,14 @@ sub get_rss_from_forum {
                          <span\sclass="time">
                          (\d+:\d+(?:\s[AP]M)?)</span>!x;
             if (!$1) {
-                $log->warn("No date found in entry $iurl");
+                log_warn("No date found in entry $iurl");
                 last;
             }
 
             my $date_s = "$1 $2";
             my $date   = str2time $date_s;
             if (!$date) {
-                $log->warn("Can't parse date `$date_s` in entry $iurl");
+                log_warn("Can't parse date `$date_s` in entry $iurl");
                 last;
             }
             push @rss, "<pubDate>", strftime($datefmt, gmtime($date)),
@@ -159,7 +159,7 @@ RSS::From::Forum::vBulletin - Generate an RSS page by parsing vBulletin forum di
 
 =head1 VERSION
 
-This document describes version 0.10 of RSS::From::Forum::vBulletin (from Perl distribution RSS-From-Forum-vBulletin), released on 2016-06-14.
+This document describes version 0.11 of RSS::From::Forum::vBulletin (from Perl distribution RSS-From-Forum-vBulletin), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -170,7 +170,11 @@ This document describes version 0.10 of RSS::From::Forum::vBulletin (from Perl d
 =head1 FUNCTIONS
 
 
-=head2 get_rss_from_forum(%args) -> [status, msg, result, meta]
+=head2 get_rss_from_forum
+
+Usage:
+
+ get_rss_from_forum(%args) -> [status, msg, result, meta]
 
 Generate an RSS page by parsing vBulletin forum display page.
 
@@ -231,7 +235,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

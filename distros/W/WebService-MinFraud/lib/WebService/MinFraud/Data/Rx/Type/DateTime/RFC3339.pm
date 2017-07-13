@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
 use Carp ();
 use DateTime::Format::RFC3339;
@@ -60,7 +60,7 @@ WebService::MinFraud::Data::Rx::Type::DateTime::RFC3339 - A type to check if a s
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SUPPORT
 

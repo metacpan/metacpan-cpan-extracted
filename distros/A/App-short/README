@@ -1,4 +1,236 @@
-SYNOPSIS
+NAME
+    App::short - Manage short directory symlinks
 
+VERSION
+    This document describes version 0.14 of App::short (from Perl
+    distribution App-short), released on 2017-07-10.
+
+SYNOPSIS
     Please see short script.
+
+FUNCTIONS
+  add_short
+    Usage:
+
+     add_short(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   long* => *str*
+
+    *   long_dir* => *str*
+
+    *   long_include => *array[str]*
+
+    *   short* => *str*
+
+    *   short_dir* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  get_short_target
+    Usage:
+
+     get_short_target(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   long_dir* => *str*
+
+    *   long_include => *array[str]*
+
+    *   short* => *str*
+
+    *   short_dir* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_duplicates
+    Usage:
+
+     list_duplicates(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   long_dir* => *str*
+
+    *   long_include => *array[str]*
+
+    *   short_dir* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_longs
+    Usage:
+
+     list_longs(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   long_dir* => *str*
+
+    *   long_include => *array[str]*
+
+    *   short_dir* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_missing
+    Usage:
+
+     list_missing(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   long_dir* => *str*
+
+    *   long_include => *array[str]*
+
+    *   short_dir* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_shorts
+    Usage:
+
+     list_shorts(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   broken => *bool*
+
+    *   detail => *bool*
+
+    *   long_dir* => *str*
+
+    *   long_include => *array[str]*
+
+    *   query => *str*
+
+    *   short_dir* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  rm_short
+    Usage:
+
+     rm_short(%args) -> [status, msg, result, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   long_dir* => *str*
+
+    *   long_include => *array[str]*
+
+    *   short* => *array[str]*
+
+    *   short_dir* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-short>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-short>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-short>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

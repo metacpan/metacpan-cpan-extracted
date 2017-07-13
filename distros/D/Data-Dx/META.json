@@ -32,14 +32,14 @@
       },
       "runtime" : {
          "requires" : {
-            "Data::Dump" : "0",
-            "Keyword::Declare" : "0.001",
-            "Term::ANSIColor" : "0",
+            "Data::Dump" : "1.23",
+            "Keyword::Declare" : "0.001003",
+            "Term::ANSIColor" : "4.06",
             "Test::More" : "0",
-            "perl" : "5.01"
+            "perl" : "5.012"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.000005"
+   "version" : "0.000006"
 }

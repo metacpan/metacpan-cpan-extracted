@@ -1,13 +1,13 @@
 package Setup::Unix::User;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.13'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.14'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use List::Util qw(first);
 use PerlX::Maybe;
@@ -68,12 +68,12 @@ sub deluser {
         return $res unless $res->[0] == 200 || $res->[0] == 404;
 
         return [304, "User $user already doesn't exist"] if $res->[0] == 404;
-        $log->info("(DRY) Deleting Unix user $user ...") if $dry_run;
+        log_info("(DRY) Deleting Unix user $user ...") if $dry_run;
         return [200, "User $user needs to be deleted", undef, {undo_actions=>[
             [adduser => {%ca, uid => $res->[2]{uid}}],
         ]}];
     } elsif ($tx_action eq 'fix_state') {
-        $log->info("Deleting Unix user $user ...");
+        log_info("Deleting Unix user $user ...");
         return Unix::Passwd::File::delete_user(%ca);
     }
     [400, "Invalid -tx_action"];
@@ -164,7 +164,7 @@ sub adduser {
                             "UID ($res->[2]{uid}, wanted $uid)"];
             }
         } else {
-            $log->info("(DRY) Adding Unix user $user ...") if $dry_run;
+            log_info("(DRY) Adding Unix user $user ...") if $dry_run;
             return [200, "User $user needs to be added", undef,
                     {undo_actions=>[
                         [deluser => {%ca}],
@@ -173,7 +173,7 @@ sub adduser {
     } elsif ($tx_action eq 'fix_state') {
         # we don't want to have to get_user() when fixing state, to reduce
         # number of read passes to the passwd files
-        $log->info("Adding Unix user $user ...");
+        log_info("Adding Unix user $user ...");
         $res = Unix::Passwd::File::add_user(
             %ca,
             maybe uid     => $uid,
@@ -247,7 +247,7 @@ sub add_delete_user_groups {
         }
 
         if (@needs_add || @needs_del) {
-            $log->infof(
+            log_info(
                 "(DRY) Fixing user %s's membership, groups to add to: %s, ".
                     "groups to delete from: %s ...",
                 $user, \@needs_add, \@needs_del) if $dry_run;
@@ -266,7 +266,7 @@ sub add_delete_user_groups {
     } elsif ($tx_action eq 'fix_state') {
         # we don't want to have to get_user_groups() when fixing state, to
         # reduce number of read passes to the passwd files
-        $log->infof("Fixing user %s's membership, groups to add to: %s, ".
+        log_info("Fixing user %s's membership, groups to add to: %s, ".
                         "groups to delete from: %s ...",
                     $user, $add_to, $del_from);
         return Unix::Passwd::File::add_delete_user_groups(
@@ -414,7 +414,7 @@ sub setup_unix_user {
         # create user
         if ($exists) {
             if (!$should_exist) {
-                $log->info("(DRY) Deleting user $user ...") if $dry_run;
+                log_info("(DRY) Deleting user $user ...") if $dry_run;
                 push    @do  , [deluser=>{%ca}];
                 unshift @undo, [adduser=>\%addargs];
                 last;
@@ -423,7 +423,7 @@ sub setup_unix_user {
             if ($should_aexist) {
                 return [412, "User $user should already exist"];
             } elsif ($should_exist) {
-                $log->info("(DRY) Adding user $user ...") if $dry_run;
+                log_info("(DRY) Adding user $user ...") if $dry_run;
                 push    @do  , [adduser=>\%addargs];
                 unshift @undo, [deluser=>{%ca}];
             }
@@ -458,7 +458,7 @@ sub setup_unix_user {
         # create homedir
         my $home = $uentry->{home} // $args{new_home} // "/home/$user";
         if ($create_home && (!$exists || !(-d $home))) {
-            $log->info("(DRY) Creating home directory for $user in $home ...")
+            log_info("(DRY) Creating home directory for $user in $home ...")
                 if $dry_run;
             if ($use_skel) {
                 return [412, "Skeleton directory $skel_dir doesn't exist"]
@@ -511,30 +511,20 @@ Setup::Unix::User - Setup Unix user (existence, home dir, group memberships)
 
 =head1 VERSION
 
-This document describes version 0.13 of Setup::Unix::User (from Perl distribution Setup-Unix-User), released on 2015-09-04.
-
-=head1 FAQ
-
-=head2 How to create user without creating a group with the same name as that user?
-
-By default, C<group> is set to the same name as the user. This will create group
-with the same name as the user (if the group didn't exist). You can set C<group>
-to an existing group, e.g. C<users> and the setup function will not create a new
-group with the same name as user. But note that the group must already exist (if
-it does not, you can create it first using L<Setup::Unix::Group>).
-
-=head1 SEE ALSO
-
-L<Setup>
-
-L<Setup::Unix::Group>
+This document describes version 0.14 of Setup::Unix::User (from Perl distribution Setup-Unix-User), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 add_delete_user_groups(%args) -> [status, msg, result, meta]
+=head2 add_delete_user_groups
+
+Usage:
+
+ add_delete_user_groups(%args) -> [status, msg, result, meta]
 
 Add/delete user from group memberships.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -595,9 +585,15 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 adduser(%args) -> [status, msg, result, meta]
+=head2 adduser
+
+Usage:
+
+ adduser(%args) -> [status, msg, result, meta]
 
 Add user.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -686,9 +682,15 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 deluser(%args) -> [status, msg, result, meta]
+=head2 deluser
+
+Usage:
+
+ deluser(%args) -> [status, msg, result, meta]
 
 Delete user.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -745,7 +747,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 setup_unix_user(%args) -> [status, msg, result, meta]
+=head2 setup_unix_user
+
+Usage:
+
+ setup_unix_user(%args) -> [status, msg, result, meta]
 
 Setup Unix user (existence, group memberships).
 
@@ -756,6 +762,8 @@ created UID/GID in the result.
 On undo, will delete Unix user (along with its initially created home dir and
 files) if it was created by this function. Also will restore old group
 memberships.
+
+This function is not exported by default, but exportable.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -890,6 +898,16 @@ that contains extra information.
 
 Return value:  (any)
 
+=head1 FAQ
+
+=head2 How to create user without creating a group with the same name as that user?
+
+By default, C<group> is set to the same name as the user. This will create group
+with the same name as the user (if the group didn't exist). You can set C<group>
+to an existing group, e.g. C<users> and the setup function will not create a new
+group with the same name as user. But note that the group must already exist (if
+it does not, you can create it first using L<Setup::Unix::Group>).
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Setup-Unix-User>.
@@ -906,13 +924,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Setup>
+
+L<Setup::Unix::Group>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

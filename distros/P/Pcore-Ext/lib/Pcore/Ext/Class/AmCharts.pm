@@ -8,95 +8,102 @@ our $EXT_MAP = {    #
 
 sub EXT_panel ($ext) {
     return {
-        chartConfig => undef,
+        mixins => ['Ext.util.StoreHolder'],
 
-        viewModel => {},
-
-        defaultListenerScope => \1,
-
-        header => {
-            items => [
-                {   xtype    => 'tool',
-                    type     => 'refresh',
-                    tooltip  => 'Refresh',
-                    callback => 'onStoreRefresh',
-                }
-            ]
+        config => {
+            data        => undef,
+            chartConfig => undef,
         },
+
+        layout              => 'fit',
+        defaultBindProperty => 'store',
 
         initComponent => $ext->js_func(
             <<'JS'
-                this.callParent();
+                this.bindStore(this.store || 'ext-empty-store', true);
 
-                this.getViewModel().setStores({
-                    store: {
-                        // autoLoad: true,
-                        model: Ext.create(this.model),
-                        listeners: {
-                            scope: this,
-                            load: 'onStoreLoad'
-                        }
-                    }
-                });
+                this.callParent(arguments);
 JS
         ),
 
-        onStoreRefresh => $ext->js_func(
-            <<'JS'
-                var store = this.getViewModel().getStore('store');
-
-                store.reload();
+        onBindStore => $ext->js_func(
+            [ 'store', 'initial' ], <<'JS'
+                if (this.rendered) this.onStorerefresh();
 JS
         ),
 
-        onStoreLoad => $ext->js_func(
-            <<'JS'
+        getStoreListeners => $ext->js_func(
+            ['store'], <<'JS'
+                return {
+                    load: this.onStorerefresh,
+                    // prefetch: this.updateInfo,
+                    // exception: this.onTotalCountChange
+                };
+JS
+        ),
+
+        setData => $ext->js_func(
+            ['data'], <<'JS'
                 if (this.chart) {
-                    var store = this.getViewModel().getStore('store');
-
-                    this.chart.dataProvider = Ext.pluck(store.data.items, 'data');
+                    this.chart.dataProvider = data;
 
                     this.chart.validateData();
                 }
 JS
         ),
 
-        _attachCharts => $ext->js_func(
+        onStorerefresh => $ext->js_func(
             <<'JS'
-                var me = this;
+                if (this.chart) {
+                    var store = this.getStore();
 
+                    this.setData(Ext.Array.pluck(store.data.items, 'data'));
+                }
+JS
+        ),
+
+        _loadCharts => $ext->js_func(
+            <<'JS'
                 var urls = [];
-                var AmChartsUndefined;
 
-                if (typeof (AmCharts) == 'undefined') {
-                    AmChartsUndefined = 1;
-                    AmCharts = {
-                        themes: {}
-                    };
+                var chartsBaseUrl = '/static/amcharts/v3.21.2/';
+                var mapBaseUrl = '/static/ammap/v3.21.2/';
 
-                    urls.push('/static/amcharts-v3.21.1/amcharts.js');
+                if (typeof AmCharts == 'undefined') {
+                    urls.push( chartsBaseUrl + 'amcharts.js');
+
+                    if (this.chartConfig.type == 'map') {
+                        urls.push( mapBaseUrl + 'ammap_amcharts_extension.js');
+                    }
+                    else {
+                        urls.push( chartsBaseUrl + this.chartConfig.type + '.js');
+                    }
+
+                    if (this.chartConfig.theme) urls.push( chartsBaseUrl + 'themes/' + this.chartConfig.theme + '.js');
                 } else {
-                    AmChartsUndefined = 0;
+                    if (this.chartConfig.type == 'map') {
+                        if (typeof AmCharts.AmMap == 'undefined') urls.push( mapBaseUrl + 'ammap_amcharts_extension.js');
+                    }
+                    else {
+                        var map = {
+                            serial: 'AmSerialChart',
+                            pie: 'AmPieChart',
+                            xy: 'AmXYChart',
+                            radar: 'AmRadarChart',
+                            funnel: 'AmFunnelChart',
+                            gauge: 'GaugeAxis',
+                            stock: 'AmStockChart'
+                        };
+
+                        if (typeof AmCharts[this.chartConfig.type] == 'undefined') urls.push( chartsBaseUrl + this.chartConfig.type + '.js');
+                    }
+
+                    if (this.chartConfig.theme && typeof AmCharts.themes[this.chartConfig.theme] == 'undefined') urls.push( chartsBaseUrl + 'themes/' + this.chartConfig.theme + '.js');
                 }
 
-                if (this.chartConfig.type == 'serial' && typeof (AmCharts.AmSerialChart) == 'undefined') urls.push('/static/amcharts-v3.21.1/serial.js');
-                if (this.chartConfig.type == 'pie' && typeof (AmCharts.AmPieChart) == 'undefined') urls.push('/static/amcharts-v3.21.1/pie.js');
-                if (this.chartConfig.type == 'xy' && typeof (AmCharts.AmXYChart) == 'undefined') urls.push('/static/amcharts-v3.21.1/xy.js');
-                if (this.chartConfig.type == 'radar' && typeof (AmCharts.AmRadarChart) == 'undefined') urls.push('/static/amcharts-v3.21.1/radar.js');
-                if (this.chartConfig.type == 'funnel' && typeof (AmCharts.AmFunnelChart) == 'undefined') urls.push('/static/amcharts-v3.21.1/funnel.js');
-                if (this.chartConfig.type == 'gauge' && typeof (AmCharts.GaugeAxis) == 'undefined') urls.push('/static/amcharts-v3.21.1/gauge.js');
-                if (this.chartConfig.type == 'map' && typeof (AmCharts.AmMap) == 'undefined') urls.push('/static/ammap-v3.21.1/ammap_amcharts_extension.js');
-                if (this.chartConfig.type == 'stock' && typeof (AmCharts.AmStockChart) == 'undefined') urls.push('/static/amcharts-v3.21.1/stock.js');
-
-                if (this.chartConfig.theme == 'black' && typeof (AmCharts.themes.black) == 'undefined') urls.push('/static/amcharts-v3.21.1/themes/black.js');
-                if (this.chartConfig.theme == 'chalk' && typeof (AmCharts.themes.chalk) == 'undefined') urls.push('/static/amcharts-v3.21.1/themes/chalk.js');
-                if (this.chartConfig.theme == 'dark' && typeof (AmCharts.themes.dark) == 'undefined') urls.push('/static/amcharts-v3.21.1/themes/dark.js');
-                if (this.chartConfig.theme == 'light' && typeof (AmCharts.themes.light) == 'undefined') urls.push('/static/amcharts-v3.21.1/themes/light.js');
-                if (this.chartConfig.theme == 'patterns' && typeof (AmCharts.themes.patterns) == 'undefined') urls.push('/static/amcharts-v3.21.1/themes/patterns.js');
-
-                if (AmChartsUndefined) AmCharts = undefined;
-
                 if (urls.length) {
+                    var me = this;
+
                     Ext.Loader.loadScripts({
                         url: urls,
                         cache: true,
@@ -120,18 +127,13 @@ JS
 JS
         ),
 
-        listeners => {
-            afterRender => $ext->js_func(
-                ['me'], <<'JS'
-                    me._attachCharts();
+        afterRender => $ext->js_func(
+            <<'JS'
+                this.callParent(arguments);
+
+                this._loadCharts();
 JS
-            ),
-            resize => $ext->js_func(
-                <<'JS'
-                    if (this.chart) this.chart.invalidateSize();
-JS
-            ),
-        }
+        ),
     };
 }
 

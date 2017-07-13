@@ -9,7 +9,7 @@ SYNOPSIS
 
     Alien::FreeImage installation comprise of these steps:
 
-    *   Build freeimage-3.16.0 static library (*.a) from source codes (that
+    *   Build freeimage-3.17.0 static library (*.a) from source codes (that
         are bundled with this module)
 
     *   Install dev files (*.h, *.a) into *share* directory of

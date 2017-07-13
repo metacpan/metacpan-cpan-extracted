@@ -1,5 +1,12 @@
 Revision history for Alien::JPCRE2.
 
+0.003000 2017-07-13
+
+    - Test Suite, Skip `make check` On System Install
+    - Require Alien::Build v0.60 For Bug Fixes
+    - Alien::PCRE2 Dependency, Remove Hard-Coded Installer Code
+    - Update alienfile To Use Proper Plugins (Thanks plicease)
+
 0.002000 2017-07-04
 
     - Remove Extraneous Debugging Output

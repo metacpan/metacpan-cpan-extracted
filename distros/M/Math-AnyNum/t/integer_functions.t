@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 325;
+plan tests => 327;    # be careful
 
 use Math::AnyNum qw(:ntheory);
 use Math::GMPz::V qw();
@@ -76,14 +76,21 @@ is(rising_factorial(-123,          $o->new(13)), '-764762377697592310465228800')
 is(rising_factorial($o->new(-123), 13),          '-764762377697592310465228800');
 is(rising_factorial($o->new(-123), $o->new(13)), '-764762377697592310465228800');
 
-is(falling_factorial(-123, -13), 'NaN');
-is(rising_factorial(-123, -13), 'NaN');
+is(falling_factorial(-123, -13), '-1/683933833713293936188416000');
+is(rising_factorial(-123, -13), '-1/3012474223753262018150400000');
 
-is(falling_factorial(123,          $o->new(-42)), 'NaN');
-is(falling_factorial($o->new(123), $o->new(-42)), 'NaN');
+is(rising_factorial(12, -13), 'NaN');
+is(falling_factorial(-13, -14), 'NaN');
 
-is(rising_factorial(123,          $o->new(-42)), 'NaN');
-is(rising_factorial($o->new(123), $o->new(-42)), 'NaN');
+is(falling_factorial(123, $o->new(-42)),
+    '1/4465482258831228787047309106389002878492944333613461706826678255930625748893696000000000000');
+is(falling_factorial($o->new(123), $o->new(-42)),
+    '1/4465482258831228787047309106389002878492944333613461706826678255930625748893696000000000000');
+
+is(rising_factorial(123, $o->new(-42)),
+    '1/1379784702635118873851443870763273422674515081030831950911803668709291065344000000000');
+is(rising_factorial($o->new(123), $o->new(-42)),
+    '1/1379784702635118873851443870763273422674515081030831950911803668709291065344000000000');
 
 # The following functions require GMP >= 5.1.0.
 #   primorial
@@ -92,7 +99,9 @@ is(rising_factorial($o->new(123), $o->new(-42)), 'NaN');
 
 SKIP: {
     my $OLD_GMP = ($GMP_V_MAJOR < 5 or ($GMP_V_MAJOR == 5 and $GMP_V_MINOR < 1));
-    skip("old version of GMP detected", 11) if $OLD_GMP;
+
+    # Update this counter when more tests are added or deleted in this section
+    skip("old version of GMP detected", 18) if $OLD_GMP;
 
     is(mfactorial(10, 2), '3840');
     is(mfactorial(11, 3), '880');

@@ -3,7 +3,7 @@ package Software::Release::Watch::Source::WebPage;
 use 5.010;
 use Moo::Role;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 requires "url";
 requires "parse_html";
@@ -34,7 +34,7 @@ Software::Release::Watch::Source::WebPage - Get releases from web page
 
 =head1 VERSION
 
-This document describes version 0.04 of Software::Release::Watch::Source::WebPage (from Perl distribution Software-Release-Watch), released on 2015-09-04.
+This document describes version 0.05 of Software::Release::Watch::Source::WebPage (from Perl distribution Software-Release-Watch), released on 2017-07-10.
 
 =for Pod::Coverage list_releases
 
@@ -60,7 +60,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

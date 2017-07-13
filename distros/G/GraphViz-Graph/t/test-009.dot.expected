@@ -1,0 +1,29 @@
+digraph {
+  nd_0001 [
+    shape=none
+    
+  label="A"
+  ];
+
+  nd_0002 [
+    shape=none
+    
+  label="B"
+  ];
+
+  nd_0003 [
+    shape=none
+    
+  label="C"
+  ];
+
+  nd_0004 [
+    shape=none
+    
+  label="D"
+  ];
+
+nd_0001 -> nd_0002 [dir=both arrowhead=none arrowtail=odot];
+nd_0002 -> nd_0003 [dir=both arrowhead=crow arrowtail=diamond];
+nd_0003 -> nd_0004 [dir=both arrowhead=invempty arrowtail=tee];
+}

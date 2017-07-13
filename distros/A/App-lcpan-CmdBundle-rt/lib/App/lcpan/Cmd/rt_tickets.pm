@@ -1,13 +1,13 @@
 package App::lcpan::Cmd::rt_tickets;
 
-our $DATE = '2017-02-03'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 no warnings 'once';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 use Perinci::Object;
@@ -114,7 +114,7 @@ App::lcpan::Cmd::rt_tickets - Return RT tickets for dist/module
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::rt_tickets (from Perl distribution App-lcpan-CmdBundle-rt), released on 2017-02-03.
+This document describes version 0.003 of App::lcpan::Cmd::rt_tickets (from Perl distribution App-lcpan-CmdBundle-rt), released on 2017-07-10.
 
 =head1 DESCRIPTION
 

@@ -1,11 +1,12 @@
 package Dancer2::Core::Route;
 # ABSTRACT: Dancer2's route handler
-$Dancer2::Core::Route::VERSION = '0.205000';
+$Dancer2::Core::Route::VERSION = '0.205001';
 use Moo;
 use Dancer2::Core::Types;
 use Carp 'croak';
 use List::Util 'first';
 use Scalar::Util 'blessed';
+use Ref::Util qw< is_regexpref >;
 
 our ( $REQUEST, $RESPONSE, $RESPONDER, $WRITER, $ERROR_HANDLER );
 
@@ -183,10 +184,10 @@ sub BUILDARGS {
     # init prefix
     if ( $prefix ) {
         $args{regexp} =
-            ref($regexp) eq 'Regexp' ? qr{^\Q${prefix}\E${regexp}$} :
+            is_regexpref($regexp) ? qr{^\Q${prefix}\E${regexp}$} :
             $prefix . $regexp;
     }
-    elsif ( ref($regexp) ne 'Regexp' ) {
+    elsif ( !is_regexpref($regexp) ) {
         # No prefix, so ensure regexp begins with a '/'
         index( $regexp, '/', 0 ) == 0 or $args{regexp} = "/$regexp";
     }
@@ -195,7 +196,7 @@ sub BUILDARGS {
     $regexp = $args{regexp}; # updated value
     $args{spec_route} = $regexp;
 
-    if ( ref($regexp) eq 'Regexp') {
+    if ( is_regexpref($regexp)) {
         $args{_should_capture} = 1;
     }
     else {
@@ -271,7 +272,7 @@ Dancer2::Core::Route - Dancer2's route handler
 
 =head1 VERSION
 
-version 0.205000
+version 0.205001
 
 =head1 ATTRIBUTES
 
@@ -316,7 +317,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexis Sukrieh.
+This software is copyright (c) 2017 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

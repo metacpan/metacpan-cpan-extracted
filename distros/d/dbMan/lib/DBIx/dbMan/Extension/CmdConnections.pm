@@ -3,7 +3,7 @@ package DBIx::dbMan::Extension::CmdConnections;
 use strict;
 use base 'DBIx::dbMan::Extension';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 1;
 
@@ -48,7 +48,7 @@ sub handle_action {
 			} else {
 				$action{what} = 'all';
 			}
-		} elsif ($action{cmd} =~ /^create\s+(permanent\s+)?connection\s+(\S+)\s+as\s+(\S+?):\s*(.*?)\s+login\s+(\S+)(?:\s+(password\s+(\S+)|nopassword))?(\s+config\s+(\S+?))?(\s+autoopen)?$/i) {
+		} elsif ($action{cmd} =~ /^create\s+(permanent\s+)?connection\s+(\S+)\s+as\s+(\S+?):\s*(.*?)\s+login\s+(\S+)(?:\s+(password\s+(\S+)|nopassword))?(\s+config\s+(\S+?))?(\s+autoopen)?(?:\s+color\s+(\S+?))?$/i) {
 			# as driver:dsn login user [password password]
 			$action{action} = 'CONNECTION';
 			$action{operation} = 'create';
@@ -67,6 +67,7 @@ sub handle_action {
 			}
 			$action{config} = $9 || '';
 			$action{auto_login} = 'yes' if $10;
+			$action{prompt_color} = $11 || '';
 		} elsif ($action{cmd} =~ /^drop\s+(permanent\s+)?connection\s+(\S+)$/i) {
 			$action{action} = 'CONNECTION';
 			$action{operation} = 'drop';
@@ -86,7 +87,7 @@ sub cmdhelp {
 		'CLOSE <connection_name>' => 'Close specific connection',
 		'USE <connection_name>' => 'Set selected connecection as current',
 		'SHOW [ACTIVE|ALL] CONNECTIONS' => 'Show list of active/all connections',
-		'CREATE [PERMANENT] CONNECTION <name> AS <driver>:<dsn> LOGIN <login> [PASSWORD <password> | NOPASSWORD] [CONFIG <config>] [AUTOOPEN]' => 'Creating new connection',
+		'CREATE [PERMANENT] CONNECTION <name> AS <driver>:<dsn> LOGIN <login> [PASSWORD <password> | NOPASSWORD] [CONFIG <config>] [AUTOOPEN] [COLOR <color>]' => 'Creating new connection',
 		'DROP [PERMANENT] CONNECTION <name>' => 'Droping specific connection'
 		];
 }
@@ -107,8 +108,9 @@ sub driverlist {
 sub cmdcomplete {
 	my ($obj,$text,$line,$start) = @_;
 	return $obj->connectionlist(lc $1) if $line =~ /^\s*(REOPEN|OPEN|CLOSE|USE|DROP\s+(PERMANENT\s+)?CONNECTION)\s+\S*$/i;
-	return qw/AUTOOPEN/ if $line =~ /^\s*CREATE\s+(PERMANENT\s+)?CONNECTION\s+\S+\s+AS\s+\S+:\s*\S*\s+LOGIN\s+\S+\s+(NOPASSWORD|PASSWORD\s+\S+)\s+CONFIG\s+\S+\s+\S*$/i;
-	return qw/CONFIG AUTOOPEN/ if $line =~ /^\s*CREATE\s+(PERMANENT\s+)?CONNECTION\s+\S+\s+AS\s+\S+:\s*\S*\s+LOGIN\s+\S+\s+(NOPASSWORD|PASSWORD\s+\S+)\s+\S*$/i;
+	return qw/COLOR/ if $line =~ /^\s*CREATE\s+(PERMANENT\s+)?CONNECTION\s+\S+\s+AS\s+\S+:\s*\S*\s+LOGIN\s+\S+\s+(NOPASSWORD|PASSWORD\s+\S+)\s+CONFIG\s+\S+\s+AUTOOPEN\s+\S*$/i;
+	return qw/AUTOOPEN COLOR/ if $line =~ /^\s*CREATE\s+(PERMANENT\s+)?CONNECTION\s+\S+\s+AS\s+\S+:\s*\S*\s+LOGIN\s+\S+\s+(NOPASSWORD|PASSWORD\s+\S+)\s+CONFIG\s+\S+\s+\S*$/i;
+	return qw/CONFIG AUTOOPEN COLOR/ if $line =~ /^\s*CREATE\s+(PERMANENT\s+)?CONNECTION\s+\S+\s+AS\s+\S+:\s*\S*\s+LOGIN\s+\S+\s+(NOPASSWORD|PASSWORD\s+\S+)\s+\S*$/i;
 	return qw/PASSWORD NOPASSWORD/ if $line =~ /^\s*CREATE\s+(PERMANENT\s+)?CONNECTION\s+\S+\s+AS\s+\S+:\s*\S*\s+LOGIN\s+\S+\s+\S*$/i;
 	return $obj->driverlist if $line =~ /^\s*CREATE\s+(PERMANENT\s+)?CONNECTION\s+\S+\s+AS\s+\S*$/i;
 	return qw/LOGIN/ if $line =~ /^\s*CREATE\s+(PERMANENT\s+)?CONNECTION\s+\S+\s+AS\s+\S+:\s*\S*\s+\S*$/i;

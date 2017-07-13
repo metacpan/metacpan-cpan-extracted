@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::cpanratings_get_reviews;
 
-our $DATE = '2017-01-24'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -66,7 +66,7 @@ App::lcpan::Cmd::cpanratings_get_reviews - Get CPAN Ratings reviews for a dist/m
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::cpanratings_get_reviews (from Perl distribution App-lcpan-CmdBundle-cpanratings), released on 2017-01-24.
+This document describes version 0.003 of App::lcpan::Cmd::cpanratings_get_reviews (from Perl distribution App-lcpan-CmdBundle-cpanratings), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -75,7 +75,11 @@ This module handles the L<lcpan> subcommand C<cpanratings-get-reviews>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Get CPAN Ratings reviews for a dist/module.
 

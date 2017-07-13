@@ -1,0 +1,491 @@
+NAME
+    App::shcompgen - Generate shell completion scripts
+
+VERSION
+    This document describes version 0.31 of App::shcompgen (from Perl
+    distribution App-shcompgen), released on 2017-07-10.
+
+FUNCTIONS
+  detect_prog
+    Usage:
+
+     detect_prog(%args) -> [status, msg, result, meta]
+
+    Detect a program.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   prog* => *str*
+
+    *   shell => *str*
+
+        Override guessing and select shell manually.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  generate
+    Usage:
+
+     generate(%args) -> [status, msg, result, meta]
+
+    Generate shell completion scripts for detectable programs.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bash_global_dir => *array[str]* (default: ["/etc/bash/completions"])
+
+        Directory to put completions scripts.
+
+    *   bash_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   fish_global_dir => *array[str]* (default: ["/etc/fish/completions"])
+
+        Directory to put completions scripts.
+
+    *   fish_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   global => *bool*
+
+        Use global completions directory.
+
+        Shell has global (system-wide) completions directory as well as
+        per-user. For example, in fish the global directory is by default
+        "/etc/fish/completions" and the per-user directory is
+        "~/.config/fish/completions".
+
+        By default, if running as root, the global is chosen. And if running
+        as normal user, per-user directory is chosen. Using "--global" or
+        "--per-user" overrides that and manually select which.
+
+    *   helper_global_dir => *str* (default: "/etc/shcompgen/helpers")
+
+        Directory to put helper scripts.
+
+    *   helper_per_user_dir => *str*
+
+        Directory to put helper scripts.
+
+    *   per_option => *bool*
+
+        Create per-option completion script if possible.
+
+        If set to true, then attempt to create completion script that
+        register each option. This creates nicer completion in some shells,
+        e.g. fish and zsh. For example, option description can be shown.
+
+        This is possible for only some types of scripts, e.g.
+        Perinci::CmdLine- (that does not have subcommands) or
+        Getopt::Long::Descriptive-based ones.
+
+    *   prog => *array[str]*
+
+        Program(s) to generate completion for.
+
+        Can contain path (e.g. "../foo") or a plain word ("foo") in which
+        case will be searched from PATH.
+
+    *   remove => *bool*
+
+        Remove completion for script that (now) is not detected to have
+        completion.
+
+        The default behavior is to simply ignore existing completion script
+        if the program is not detected to have completion. When the "remove"
+        setting is enabled, however, such existing completion script will be
+        removed.
+
+    *   replace => *bool*
+
+        Replace existing script.
+
+        The default behavior is to skip if an existing completion script
+        exists.
+
+    *   shell => *str*
+
+        Override guessing and select shell manually.
+
+    *   stdout => *bool*
+
+        Output completion script to STDOUT.
+
+    *   tcsh_global_dir => *array[str]* (default: ["/etc/tcsh/completions"])
+
+        Directory to put completions scripts.
+
+    *   tcsh_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   zsh_global_dir => *array[str]* (default:
+        ["/usr/local/share/zsh/site-functions"])
+
+        Directory to put completions scripts.
+
+    *   zsh_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  guess_shell
+    Usage:
+
+     guess_shell() -> [status, msg, result, meta]
+
+    Guess running shell.
+
+    This function is not exported.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  init
+    Usage:
+
+     init(%args) -> [status, msg, result, meta]
+
+    Initialize shcompgen.
+
+    This subcommand creates the completion directories and initialization
+    shell script, as well as run "generate".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bash_global_dir => *array[str]* (default: ["/etc/bash/completions"])
+
+        Directory to put completions scripts.
+
+    *   bash_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   fish_global_dir => *array[str]* (default: ["/etc/fish/completions"])
+
+        Directory to put completions scripts.
+
+    *   fish_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   global => *bool*
+
+        Use global completions directory.
+
+        Shell has global (system-wide) completions directory as well as
+        per-user. For example, in fish the global directory is by default
+        "/etc/fish/completions" and the per-user directory is
+        "~/.config/fish/completions".
+
+        By default, if running as root, the global is chosen. And if running
+        as normal user, per-user directory is chosen. Using "--global" or
+        "--per-user" overrides that and manually select which.
+
+    *   helper_global_dir => *str* (default: "/etc/shcompgen/helpers")
+
+        Directory to put helper scripts.
+
+    *   helper_per_user_dir => *str*
+
+        Directory to put helper scripts.
+
+    *   per_option => *bool*
+
+        Create per-option completion script if possible.
+
+        If set to true, then attempt to create completion script that
+        register each option. This creates nicer completion in some shells,
+        e.g. fish and zsh. For example, option description can be shown.
+
+        This is possible for only some types of scripts, e.g.
+        Perinci::CmdLine- (that does not have subcommands) or
+        Getopt::Long::Descriptive-based ones.
+
+    *   shell => *str*
+
+        Override guessing and select shell manually.
+
+    *   tcsh_global_dir => *array[str]* (default: ["/etc/tcsh/completions"])
+
+        Directory to put completions scripts.
+
+    *   tcsh_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   zsh_global_dir => *array[str]* (default:
+        ["/usr/local/share/zsh/site-functions"])
+
+        Directory to put completions scripts.
+
+    *   zsh_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list
+    Usage:
+
+     list(%args) -> [status, msg, result, meta]
+
+    List all shell completion scripts generated by this script.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bash_global_dir => *array[str]* (default: ["/etc/bash/completions"])
+
+        Directory to put completions scripts.
+
+    *   bash_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   detail => *bool*
+
+    *   fish_global_dir => *array[str]* (default: ["/etc/fish/completions"])
+
+        Directory to put completions scripts.
+
+    *   fish_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   global => *bool*
+
+        Use global completions directory.
+
+        Shell has global (system-wide) completions directory as well as
+        per-user. For example, in fish the global directory is by default
+        "/etc/fish/completions" and the per-user directory is
+        "~/.config/fish/completions".
+
+        By default, if running as root, the global is chosen. And if running
+        as normal user, per-user directory is chosen. Using "--global" or
+        "--per-user" overrides that and manually select which.
+
+    *   helper_global_dir => *str* (default: "/etc/shcompgen/helpers")
+
+        Directory to put helper scripts.
+
+    *   helper_per_user_dir => *str*
+
+        Directory to put helper scripts.
+
+    *   per_option => *bool*
+
+        Create per-option completion script if possible.
+
+        If set to true, then attempt to create completion script that
+        register each option. This creates nicer completion in some shells,
+        e.g. fish and zsh. For example, option description can be shown.
+
+        This is possible for only some types of scripts, e.g.
+        Perinci::CmdLine- (that does not have subcommands) or
+        Getopt::Long::Descriptive-based ones.
+
+    *   shell => *str*
+
+        Override guessing and select shell manually.
+
+    *   tcsh_global_dir => *array[str]* (default: ["/etc/tcsh/completions"])
+
+        Directory to put completions scripts.
+
+    *   tcsh_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   zsh_global_dir => *array[str]* (default:
+        ["/usr/local/share/zsh/site-functions"])
+
+        Directory to put completions scripts.
+
+    *   zsh_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  remove
+    Usage:
+
+     remove(%args) -> [status, msg, result, meta]
+
+    Remove shell completion scripts generated by this script.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   bash_global_dir => *array[str]* (default: ["/etc/bash/completions"])
+
+        Directory to put completions scripts.
+
+    *   bash_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   fish_global_dir => *array[str]* (default: ["/etc/fish/completions"])
+
+        Directory to put completions scripts.
+
+    *   fish_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   global => *bool*
+
+        Use global completions directory.
+
+        Shell has global (system-wide) completions directory as well as
+        per-user. For example, in fish the global directory is by default
+        "/etc/fish/completions" and the per-user directory is
+        "~/.config/fish/completions".
+
+        By default, if running as root, the global is chosen. And if running
+        as normal user, per-user directory is chosen. Using "--global" or
+        "--per-user" overrides that and manually select which.
+
+    *   helper_global_dir => *str* (default: "/etc/shcompgen/helpers")
+
+        Directory to put helper scripts.
+
+    *   helper_per_user_dir => *str*
+
+        Directory to put helper scripts.
+
+    *   per_option => *bool*
+
+        Create per-option completion script if possible.
+
+        If set to true, then attempt to create completion script that
+        register each option. This creates nicer completion in some shells,
+        e.g. fish and zsh. For example, option description can be shown.
+
+        This is possible for only some types of scripts, e.g.
+        Perinci::CmdLine- (that does not have subcommands) or
+        Getopt::Long::Descriptive-based ones.
+
+    *   prog => *array[str]*
+
+        Program(s) to remove completion script of.
+
+        Can contain path (e.g. "../foo") or a plain word ("foo") in which
+        case will be searched from PATH.
+
+    *   shell => *str*
+
+        Override guessing and select shell manually.
+
+    *   tcsh_global_dir => *array[str]* (default: ["/etc/tcsh/completions"])
+
+        Directory to put completions scripts.
+
+    *   tcsh_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    *   zsh_global_dir => *array[str]* (default:
+        ["/usr/local/share/zsh/site-functions"])
+
+        Directory to put completions scripts.
+
+    *   zsh_per_user_dir => *array[str]*
+
+        Directory to put completions scripts.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-shcompgen>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-shcompgen>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-shcompgen>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,11 +1,10 @@
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
 
 use File::chdir;
 use File::Path qw(remove_tree);
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Temp qw(tempdir);
 use Setup::Unix::Group qw(setup_unix_group);
 use Setup::Unix::User  qw(setup_unix_user);
@@ -15,7 +14,7 @@ use Unix::Passwd::File;
 
 sub setup_data {
     unlink "$::tmp_dir/passwd";
-    write_file("$::tmp_dir/passwd", <<_);
+    write_text("$::tmp_dir/passwd", <<_);
 root:x:0:0:root:/root:/bin/bash
 bin:x:1:1:bin:/bin:/bin/sh
 daemon:x:2:2:daemon:/sbin:/bin/sh
@@ -24,7 +23,7 @@ u2:x:1001:1001::/home/u2:/bin/bash
 _
 
     unlink "$::tmp_dir/shadow";
-    write_file("$::tmp_dir/shadow", <<_);
+    write_text("$::tmp_dir/shadow", <<_);
 root:*:14607:0:99999:7:::
 bin:*:14607:0:99999:7:::
 daemon:*:14607:0:99999:7:::
@@ -33,7 +32,7 @@ u2:*:14607:0:99999:7:::
 _
 
     unlink "$::tmp_dir/group";
-    write_file("$::tmp_dir/group", <<_);
+    write_text("$::tmp_dir/group", <<_);
 root:x:0:
 bin:x:1:
 daemon:x:2:
@@ -43,7 +42,7 @@ u2:x:1002:u2,u1
 _
 
     unlink "$::tmp_dir/gshadow";
-    write_file("$::tmp_dir/gshadow", <<_);
+    write_text("$::tmp_dir/gshadow", <<_);
 root:::
 bin:::
 daemon:::
@@ -56,9 +55,9 @@ _
     remove_tree "$::tmp_dir/skel";
     mkdir("$::tmp_dir/skel");
     mkdir("$::tmp_dir/skel/.dir1");
-    write_file("$::tmp_dir/skel/.dir1/.file1", "file 1");
-    write_file("$::tmp_dir/skel/.file2", "file 2");
-    write_file("$::tmp_dir/skel/.file3", "file 3");
+    write_text("$::tmp_dir/skel/.dir1/.file1", "file 1");
+    write_text("$::tmp_dir/skel/.file2", "file 2");
+    write_text("$::tmp_dir/skel/.file3", "file 3");
 
     # home dirs
     remove_tree "$::tmp_dir/home";

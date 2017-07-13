@@ -25,7 +25,7 @@ use Test::More tests => 1;
     };
 }
 
-use Dancer::Test 'MyApp';
+use Dancer::Test;
 
 response_content_like [ GET => '/style/fu_manchu' ], 
     qr/Manly \s+ fu_manchu \s+ mustache \s+ you \s+ have \s+ there/x, 

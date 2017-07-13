@@ -1,12 +1,12 @@
 package App::MTPUtils;
 
-our $DATE = '2015-11-07'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 our %SPEC;
 
@@ -210,10 +210,10 @@ sub get_files {
     my $num_files = @{ $res->[2] };
     for my $i (1..$num_files) {
         my $file = $res->[2][$i-1];
-        $log->infof("[%d/%d] Getting file '%s' ...",
+        log_info("[%d/%d] Getting file '%s' ...",
                     $i, $num_files, $file->{name});
         if ((-f $file->{name}) && !$args{overwrite}) {
-            $log->warnf("Skipped file '%s' (%d) (already exists)",
+            log_warn("Skipped file '%s' (%d) (already exists)",
                         $file->{name}, $file->{id});
             next;
         }
@@ -264,7 +264,7 @@ sub delete_files {
     my $num_files = @{ $res->[2] };
     for my $i (1..$num_files) {
         my $file = $res->[2][$i-1];
-        $log->infof("[%d/%d] deleting file '%s' ...",
+        log_info("[%d/%d] deleting file '%s' ...",
                     $i, $num_files, $file->{name});
         IPC::System::Options::system(
             {log=>1, shell=>0},
@@ -290,7 +290,7 @@ App::MTPUtils - CLI utilities related to MTP (Media Transfer Protocol)
 
 =head1 VERSION
 
-This document describes version 0.03 of App::MTPUtils (from Perl distribution App-MTPUtils), released on 2015-11-07.
+This document describes version 0.04 of App::MTPUtils (from Perl distribution App-MTPUtils), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -303,14 +303,14 @@ This distribution includes the following CLI utilities:
 Currently these utilities are just some wrappers/helpers for the C<mtp-*> CLI
 utilities distributed in C<mtp-tools>.
 
-=head1 SEE ALSO
-
-mtp-tools from libmtp, L<http://libmtp.sourceforge.net>
-
 =head1 FUNCTIONS
 
 
-=head2 delete_files(%args) -> [status, msg, result, meta]
+=head2 delete_files
+
+Usage:
+
+ delete_files(%args) -> [status, msg, result, meta]
 
 Delete multiple files from MTP (wrapper for mtp-delfile).
 
@@ -324,7 +324,7 @@ C<mtp-files.out> file, e.g.:
 This file is used for tab completion as well as getting filename/ID when only
 one is specified. This makes using C<mtp-delfile> less painful.
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -348,7 +348,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_files(%args) -> [status, msg, result, meta]
+=head2 get_files
+
+Usage:
+
+ get_files(%args) -> [status, msg, result, meta]
 
 Get multiple files from MTP (wrapper for mtp-getfile).
 
@@ -362,7 +366,7 @@ C<mtp-files.out> file, e.g.:
 This file is used for tab completion as well as getting filename/ID when only
 one is specified. This makes using C<mtp-getfile> less painful.
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -388,7 +392,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_files(%args) -> [status, msg, result, meta]
+=head2 list_files
+
+Usage:
+
+ list_files(%args) -> [status, msg, result, meta]
 
 List files contained in mtp-files.out.
 
@@ -400,7 +408,7 @@ C<mtp-files.out> file, e.g.:
 
  % mtp-files > mtp-files.out
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -441,13 +449,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+mtp-tools from libmtp, L<http://libmtp.sourceforge.net>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

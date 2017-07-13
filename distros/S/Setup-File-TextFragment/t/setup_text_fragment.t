@@ -10,7 +10,7 @@ use FindBin '$Bin';
 use File::chdir;
 use File::Copy;
 use File::Path qw(remove_tree);
-use File::Slurp::Tiny qw(read_file write_file);
+use File::Slurper qw(read_text write_text);
 use File::Temp qw(tempdir);
 use Setup::File::TextFragment;
 use Test::More 0.98;
@@ -47,7 +47,7 @@ test_tx_action(
     args          => {path=>"p", id=>"id1", payload=>"x"},
     reset_state   => sub {
         remove_tree "p";
-        write_file "f", "";
+        write_text "f", "";
         symlink "f", "p";
     },
     status        => 412,
@@ -60,7 +60,7 @@ test_tx_action(
     args          => {path=>"p", id=>"id1", payload=>"x"},
     reset_state   => sub {
         remove_tree "p";
-        write_file "p", "x # FRAGMENT id=id1\n";
+        write_text "p", "x # FRAGMENT id=id1\n";
     },
     status        => 304,
 );
@@ -72,14 +72,14 @@ test_tx_action(
                       comment_style=>"cpp"},
     reset_state   => sub {
         remove_tree "p";
-        write_file "p", "1\n2 // FRAGMENT id=id1\n";
+        write_text "p", "1\n2 // FRAGMENT id=id1\n";
     },
     status        => 200,
     after_do      => sub {
-        is(~~read_file("p"), "1\nx // FRAGMENT id=id1\n", "content");
+        is(read_text("p"), "1\nx // FRAGMENT id=id1\n", "content");
     },
     after_undo    => sub {
-        is(~~read_file("p"), "1\n2 // FRAGMENT id=id1\n", "content");
+        is(read_text("p"), "1\n2 // FRAGMENT id=id1\n", "content");
     },
 );
 

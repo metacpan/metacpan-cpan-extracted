@@ -1,33 +1,29 @@
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::AccelMap;
 # ABSTRACT: Set up the accelerator map (global keybindings)
-$Renard::Curie::Component::AccelMap::VERSION = '0.002';
+$Renard::Curie::Component::AccelMap::VERSION = '0.003';
 use Moo;
-use Function::Parameters;
+use Renard::Incunabula::Frontend::Gtk3::Helper;
 
 method BUILD(@) {
 	Gtk3::AccelMap::add_entry(
 		'<Curie-Main>/File/Open',
-		Gtk3::Gdk::KEY_O,
+		Gtk3::Gdk::KEY_O(),
 		'control-mask'
 	);
 
 	Gtk3::AccelMap::add_entry(
 		'<Curie-Main>/File/Quit',
-		Gtk3::Gdk::KEY_Q,
+		Gtk3::Gdk::KEY_Q(),
 		'control-mask'
 	);
 
 	Gtk3::AccelMap::add_entry(
 		'<Curie-Main>/View/Sidebar',
-		Gtk3::Gdk::KEY_F9,
+		Gtk3::Gdk::KEY_F9(),
 		'release-mask'
 	);
 }
-
-with qw(
-	Renard::Curie::Component::Role::HasParentApp
-);
 
 1;
 
@@ -43,21 +39,13 @@ Renard::Curie::Component::AccelMap - Set up the accelerator map (global keybindi
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 EXTENDS
 
 =over 4
 
 =item * L<Moo::Object>
-
-=back
-
-=head1 CONSUMES
-
-=over 4
-
-=item * L<Renard::Curie::Component::Role::HasParentApp>
 
 =back
 

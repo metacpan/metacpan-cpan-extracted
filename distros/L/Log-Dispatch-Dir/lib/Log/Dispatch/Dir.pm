@@ -1,7 +1,7 @@
 package Log::Dispatch::Dir;
 
-our $DATE = '2015-12-16'; # DATE
-our $VERSION = '0.14'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.15'; # VERSION
 
 use 5.010001;
 use warnings;
@@ -9,7 +9,7 @@ use strict;
 use Log::Dispatch::Output;
 use base qw(Log::Dispatch::Output);
 
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 #use File::Stat qw(:stat); # doesn't work in all platforms?
 use Params::Validate qw(validate SCALAR CODEREF);
 use POSIX;
@@ -144,7 +144,7 @@ sub log_message {
         $filename = "$filename0.$i";
     }
 
-    write_file("$self->{dirname}/$filename", $p{message});
+    write_text("$self->{dirname}/$filename", $p{message});
     $self->_rotate(\%p) if (rand() < $self->{rotate_probability});
 }
 
@@ -219,7 +219,7 @@ Log::Dispatch::Dir - Log messages to separate files in a directory, with rotate 
 
 =head1 VERSION
 
-This document describes version 0.14 of Log::Dispatch::Dir (from Perl distribution Log-Dispatch-Dir), released on 2015-12-16.
+This document describes version 0.15 of Log::Dispatch::Dir (from Perl distribution Log-Dispatch-Dir), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -402,10 +402,6 @@ Sends a message to the appropriate output. Generally this shouldn't be called
 directly but should be called through the C<log()> method (in
 Log::Dispatch::Output).
 
-=head1 SEE ALSO
-
-L<Log::Dispatch>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Log-Dispatch-Dir>.
@@ -422,13 +418,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Log::Dispatch>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

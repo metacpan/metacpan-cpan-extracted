@@ -1,0 +1,109 @@
+#!perl
+
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.46'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+use open qw(:std :utf8);
+use Log::ger;
+
+use Org::Parser;
+use Org::Dump;
+
+my $input = [<>];
+close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
+
+my $doc = Org::Parser->new->parse($input, {
+    ignore_unknown_settings => 1,
+});
+print Org::Dump::dump_element($doc);
+
+1;
+# ABSTRACT: Dump Org document structure
+# PODNAME: dump-org-structure
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dump-org-structure - Dump Org document structure
+
+=head1 VERSION
+
+This document describes version 0.46 of dump-org-structure (from Perl distribution App-OrgUtils), released on 2017-07-10.
+
+=head1 SYNOPSIS
+
+ $ dump-org-structure   foo.org
+ $ dump-org-structure < bar.org
+
+Given an Org document like this:
+
+ * Andi Angkasa
+ - email :: andi@example.com
+ - birthday :: [1981-03-31 ]
+
+will output something like:
+
+ Document:
+   Headline: l=1
+     (title)
+     Text: "Andi Angkasa"
+     (children)
+     List: D(-) indent=0
+       ListItem: -
+         (description term)
+         Text: "email"
+         (children)
+         Text: " andi@example.com\n"
+       ListItem: -
+         (description term)
+         Text: "birthday"
+         (children)
+         Text: " "
+         Timestamp: dt=1981-03-31T00:00:00 "[1981-03-31 Tue]"
+         Text: "\n"
+
+=head1 DESCRIPTION
+
+This script parse input using L<Org::Parser> and dump the structure in an
+outline format. This script is mostly used for debugging.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Org::Parser>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

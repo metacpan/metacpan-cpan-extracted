@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    DBIx::Diff::Schema - Compare schema of two DBI databases
 
+VERSION
+    This document describes version 0.08 of DBIx::Diff::Schema (from Perl
+    distribution DBIx-Diff-Schema), released on 2017-07-10.
+
+SYNOPSIS
      use DBIx::Diff::Schema qw(diff_db_schema diff_table_schema
                                db_schema_eq table_schema_eq);
 
@@ -14,10 +20,187 @@ SYNOPSIS
      say "the two tables are equal" if table_schema_eq($dbh1, $dbh2, 'tablename');
 
 DESCRIPTION
-
     Currently only tested on Postgres and SQLite.
 
-SEE ALSO
+FUNCTIONS
+  db_schema_eq
+    Usage:
 
+     db_schema_eq($dbh1, $dbh2) -> any
+
+    Return true if two DBI databases have the same schema.
+
+    This is basically just a shortcut for:
+
+     my $res = diff_db_schema(...);
+     !%$res;
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh1* => *obj*
+
+        DBI database handle for the first database.
+
+    *   $dbh2* => *obj*
+
+        DBI database handle for the second database.
+
+    Return value: (any)
+
+  diff_db_schema
+    Usage:
+
+     diff_db_schema($dbh1, $dbh2) -> any
+
+    Compare schemas of two DBI databases.
+
+    This function compares schemas of two DBI databases. You supply two
+    "DBI" database handles and this function will return a hash:
+
+     {
+         # list of tables found in first db but missing in second
+         deleted_tables => ['table1', ...],
+ 
+         # list of tables found only in the second db
+         added_tables => ['table2', ...],
+ 
+         # list of modified tables, with details for each
+         modified_tables => {
+             table3 => {
+                 deleted_columns => [...],
+                 added_columns => [...],
+                 modified_columns => {
+                     column1 => {
+                         old_type => '...',
+                         new_type => '...',
+                         ...
+                     },
+                 },
+             },
+         },
+     }
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh1* => *obj*
+
+        DBI database handle for the first database.
+
+    *   $dbh2* => *obj*
+
+        DBI database handle for the second database.
+
+    Return value: (any)
+
+  diff_table_schema
+    Usage:
+
+     diff_table_schema($dbh1, $dbh2, $table1, $table2) -> any
+
+    Compare schema of two DBI tables.
+
+    This function compares schemas of two DBI tables. You supply two "DBI"
+    database handles along with table name and this function will return a
+    hash:
+
+     {
+         deleted_columns => [...],
+         added_columns => [...],
+         modified_columns => {
+             column1 => {
+                 old_type => '...',
+                 new_type => '...',
+                 ...
+             },
+         },
+     }
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh1* => *obj*
+
+        DBI database handle for the first database.
+
+    *   $dbh2* => *obj*
+
+        DBI database handle for the second database.
+
+    *   $table1* => *str*
+
+        Table name.
+
+    *   $table2 => *str*
+
+        Second table name (assumed to be the same as first table name if
+        unspecified).
+
+    Return value: (any)
+
+  table_schema_eq
+    Usage:
+
+     table_schema_eq($dbh1, $dbh2, $table1, $table2) -> any
+
+    Return true if two DBI tables have the same schema.
+
+    This is basically just a shortcut for:
+
+     my $res = diff_table_schema(...);
+     !%res;
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $dbh1* => *obj*
+
+        DBI database handle for the first database.
+
+    *   $dbh2* => *obj*
+
+        DBI database handle for the second database.
+
+    *   $table1* => *str*
+
+        Table name.
+
+    *   $table2 => *str*
+
+        Second table name (assumed to be the same as first table name if
+        unspecified).
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DBIx-Diff-Schema>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DBIx-Diff-Schema>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Diff-Schema>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     DBIx::Compare to compare database contents.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

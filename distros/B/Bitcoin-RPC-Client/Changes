@@ -1,6 +1,10 @@
 Revision history for Bitcoin::RPC::Client 
 
-0.05    2016-1-16/14
+0.06    2017-7-12/14
+        - Set user agent
+        - Updated documentation
+
+0.05    2017-1-16/14
         - New Debug flag dumps HTTP data
         - Print to STDERR error strings same as bitcoin-cli
         - Support for boolean parameters 

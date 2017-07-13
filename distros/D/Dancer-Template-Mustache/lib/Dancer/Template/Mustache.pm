@@ -1,18 +1,18 @@
 package Dancer::Template::Mustache;
-BEGIN {
-  $Dancer::Template::Mustache::AUTHORITY = 'cpan:YANICK';
-}
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Wrapper for the Mustache template system
-$Dancer::Template::Mustache::VERSION = '0.3.0';
+$Dancer::Template::Mustache::VERSION = '1.0.1';
 use strict;
 use warnings;
 
-use Template::Mustache;
+use Template::Mustache 1.0.2;
 use FindBin;
 
 require Dancer;
 
 use Moo;
+
+use Path::Tiny;
 
 require Dancer::Config;
 Dancer::Config->import( 'setting' );
@@ -23,14 +23,6 @@ sub _build_name { 'Dancer::Template::Mustache' }
 
 sub default_tmpl_ext { "mustache" };
 
-has _engine => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-        Template::Mustache->new( %{ $_[0]->config } );
-    },
-);
-
 has _template_path => (
     is => 'ro',
     lazy => 1,
@@ -39,19 +31,21 @@ has _template_path => (
     },
 );
 
+my %file_template; # cache for the templates
+
 sub render {
     my ($self, $template, $tokens) = @_;
 
     my $_template_path = $self->_template_path;
 
-    local $Template::Mustache::template_path = $_template_path;
-
     # remove the views part
     $template =~ s#^\Q$_template_path\E/?##;
 
-    local $Template::Mustache::template_file = $template;
-    
-    return $self->_engine->render($tokens);
+    my $mustache = $file_template{$template} ||= Template::Mustache->new(
+        template_path => path( $self->_template_path, $template )
+    );
+
+    return $mustache->render($tokens); 
 }
 
 1;
@@ -68,7 +62,7 @@ Dancer::Template::Mustache - Wrapper for the Mustache template system
 
 =head1 VERSION
 
-version 0.3.0
+version 1.0.1
 
 =head1 SYNOPSIS
 
@@ -96,12 +90,15 @@ template is sent via the usual I<content> template variable. So a typical
 mustached layout would look like:
 
     <body>
-    {{ content }}
+    {{{ content }}}
     </body>
 
 =head1 SEE ALSO
 
 The Mustache templating system: L<http://mustache.github.com/>
+
+L<Dancer::Template::Handlebars> - Dancer support for Handlebars, a templating system
+that is a superset of Mustache.
 
 =head1 AUTHOR
 
@@ -109,7 +106,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Yanick Champoux.
+This software is copyright (c) 2017, 2014, 2012 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

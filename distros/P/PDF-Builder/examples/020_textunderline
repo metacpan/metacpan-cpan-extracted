@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+use PDF::Builder::Util;
+
+#my $compress = 'none';  # no stream compression
+my $compress = 'flate';  # compressed streams
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+
+my $f1 = $pdf->corefont('Helvetica', -encode=>'latin1');
+my $f2 = $pdf->corefont('Helvetica-Bold', -encode=>'latin1');
+
+my $page = $pdf->page();
+$page->mediabox(595,842);
+
+my $text = $page->text();
+$text->textlabel(50,700, $f2, 20, 'Normal Text in Red', -color=>'red');
+$text->textlabel(50,600, $f2, 20, 'Normal Text in Blue Underline in Red+Yellow',
+    -color=>'#0000CC',
+    -rotate=>-45,
+    -hscale=>65,
+    -underline=>[4,[1,'red'],7,[1.5,'yellow'],11,2],
+);
+
+$text->textlabel(300,600, $f2, 20, 'Text Centered',
+    -color=>'#0000CC',
+    -rotate=>45,
+    -center=>1,
+    -underline=>[4,[2,'red']],
+);
+
+$text->textlabel(550,600, $f2, 20, 'Text Right',
+    -color=>'#0000CC',
+    -rotate=>-45,
+    -right=>1,
+    -underline=>[4,[2,'red']],
+);
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__

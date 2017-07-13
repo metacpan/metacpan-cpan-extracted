@@ -1,8 +1,14 @@
-SYNOPSIS
+NAME
+    Parse::PhoneNumber::ID - Parse Indonesian phone numbers
 
+VERSION
+    This document describes version 0.16 of Parse::PhoneNumber::ID (from
+    Perl distribution Parse-PhoneNumber-ID), released on 2017-07-10.
+
+SYNOPSIS
      use Parse::PhoneNumber::ID qw(parse_id_phone extract_id_phones);
      use Data::Dump;
-    
+
      dd parse_id_phone(text => 'Jual dalmatian 2bl lucu2x. Hub: 7123 4567',
                        default_area_code=>'022');
 
@@ -31,7 +37,132 @@ SYNOPSIS
      say "There are ", scalar(@$phones), "phone number(s) found in text";
      for (@$phones) { say $_->{pretty} }
 
-SEE ALSO
+FUNCTIONS
+  extract_id_phones
+    Usage:
 
+     extract_id_phones(%args) -> any
+
+    Extract phone number(s) from text.
+
+    Extracts phone number(s) from text. Return an array of one or more
+    parsed phone number structure (a hash). Understands the list of known
+    area codes and cellular operators, as well as other information.
+    Understands various syntax e.g. +62.22.1234567, (022) 123-4567,
+    022-123-4567 ext 102, and even things like 7123456/57 (2 adjacent
+    numbers).
+
+    Extraction algorithm is particularly targetted at classified ads text in
+    Indonesian language, but should be quite suitable for any other normal
+    text.
+
+    Non-Indonesian phone numbers (e.g. +65 12 3456 7890) will still be
+    extracted, but without any other detailed information other than country
+    code.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   default_area_code => *str*
+
+        When encountering a number without area code, use this.
+
+        If you want to extract numbers that doesn't contain area code (e.g.
+        7123 4567), you'll need to provide this.
+
+    *   level => *int* (default: 5)
+
+        How hard should the function extract numbers (1-9).
+
+        The higher the level, the harder this function will try finding
+        phone numbers, but the higher the risk of false positives will be.
+        E.g. in text '123456789012345' with level=5 it will not find a phone
+        number, but with level=9 it might assume, e.g. 1234567890 to be a
+        phone number. Normally leaving level at default level is fine.
+
+    *   max_numbers => *int*
+
+    *   text* => *str*
+
+        Text containing phone numbers to extract from.
+
+    Return value: (any)
+
+  parse_id_phone
+    Usage:
+
+     parse_id_phone(%args) -> any
+
+    Alias for extract_id_phones(..., max_numbers=>1)->[0].
+
+    Extracts phone number(s) from text. Return an array of one or more
+    parsed phone number structure (a hash). Understands the list of known
+    area codes and cellular operators, as well as other information.
+    Understands various syntax e.g. +62.22.1234567, (022) 123-4567,
+    022-123-4567 ext 102, and even things like 7123456/57 (2 adjacent
+    numbers).
+
+    Extraction algorithm is particularly targetted at classified ads text in
+    Indonesian language, but should be quite suitable for any other normal
+    text.
+
+    Non-Indonesian phone numbers (e.g. +65 12 3456 7890) will still be
+    extracted, but without any other detailed information other than country
+    code.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   default_area_code => *str*
+
+        When encountering a number without area code, use this.
+
+        If you want to extract numbers that doesn't contain area code (e.g.
+        7123 4567), you'll need to provide this.
+
+    *   level => *int* (default: 5)
+
+        How hard should the function extract numbers (1-9).
+
+        The higher the level, the harder this function will try finding
+        phone numbers, but the higher the risk of false positives will be.
+        E.g. in text '123456789012345' with level=5 it will not find a phone
+        number, but with level=9 it might assume, e.g. 1234567890 to be a
+        phone number. Normally leaving level at default level is fine.
+
+    *   text* => *str*
+
+        Text containing phone numbers to extract from.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Parse-PhoneNumber-ID>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Parse-PhoneNumber-ID>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-PhoneNumber-ID>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Parse::PhoneNumber
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

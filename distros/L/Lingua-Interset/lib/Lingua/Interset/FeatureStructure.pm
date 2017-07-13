@@ -4,7 +4,7 @@
 package Lingua::Interset::FeatureStructure;
 use strict;
 use warnings;
-our $VERSION = '3.005';
+our $VERSION = '3.006';
 
 use utf8;
 use open ':utf8';
@@ -480,10 +480,11 @@ my %matrix = @_matrix =
     'definite' =>
     {
         'priority' => 250,
-        'values' => ['ind', 'def', 'cons', 'com', ''],
+        'values' => ['ind', 'spec', 'def', 'cons', 'com', ''],
         'replacements' =>
         [
             ['ind'],
+            ['spec', 'ind'],
             ['def'],
             ['cons', 'def'],
             ['com', 'cons', 'def']
@@ -522,14 +523,20 @@ my %matrix = @_matrix =
     'number' =>
     {
         'priority' => 320,
-        'values' => ['sing', 'dual', 'plur', 'ptan', 'coll', ''],
+        'values' => ['sing', 'dual', 'tri', 'pauc', 'grpa', 'plur', 'grpl', 'inv', 'ptan', 'coll', 'count', ''],
         'replacements' =>
         [
             ['sing'],
             ['dual', 'plur'],
+            ['tri', 'plur'],
+            ['pauc', 'plur'],
+            ['grpa', 'plur'],
             ['plur'],
+            ['grpl', 'plur'],
+            ['inv'],
             ['ptan', 'plur'],
-            ['coll', 'sing']
+            ['coll', 'sing'],
+            ['count', 'plur']
         ],
         'uname' => 'Number'
     },
@@ -539,7 +546,7 @@ my %matrix = @_matrix =
         'priority' => 330,
         'values' => ['nom', 'gen', 'dat', 'acc', 'voc', 'loc', 'ins',
                      'abl', 'del', 'par', 'dis', 'ess', 'tra', 'com', 'abe', 'ine', 'ela', 'ill', 'ade', 'all', 'sub', 'sup', 'lat',
-                     'add', 'tem', 'ter', 'abs', 'erg', 'cau', 'ben', ''],
+                     'add', 'tem', 'ter', 'abs', 'erg', 'cau', 'ben', 'equ', 'cmp', ''],
         'replacements' =>
         [
             ['nom'],
@@ -571,7 +578,9 @@ my %matrix = @_matrix =
             ['abs', 'nom', 'acc'],
             ['erg', 'nom'],
             ['cau'],
-            ['ben', 'dat']
+            ['ben', 'dat'],
+            ['equ', 'cmp'],
+            ['cmp', 'equ']
         ],
         'uname' => 'Case'
     },
@@ -592,13 +601,14 @@ my %matrix = @_matrix =
     'degree' =>
     {
         'priority' => 230,
-        'values' => ['pos', 'cmp', 'sup', 'abs', 'dim', 'aug', ''],
+        'values' => ['pos', 'cmp', 'sup', 'abs', 'equ', 'dim', 'aug', ''],
         'replacements' =>
         [
             ['pos'],
             ['cmp'],
             ['sup', 'cmp'],
             ['abs', 'sup'],
+            ['equ', 'cmp', 'pos'],
             ['dim'],
             ['aug']
         ],
@@ -608,12 +618,14 @@ my %matrix = @_matrix =
     'person' =>
     {
         'priority' => 260,
-        'values' => ['1', '2', '3', ''],
+        'values' => ['0', '1', '2', '3', '4', ''],
         'replacements' =>
         [
             ['3'],
             ['1'],
-            ['2']
+            ['2'],
+            ['0'],
+            ['4', '3']
         ],
         'uname' => 'Person'
     },
@@ -901,7 +913,7 @@ my %matrix = @_matrix =
     'mood' =>
     {
         'priority' => 70,
-        'values' => ['ind', 'imp', 'cnd', 'pot', 'sub', 'jus', 'opt', 'des', 'nec', 'qot', ''],
+        'values' => ['ind', 'imp', 'cnd', 'pot', 'sub', 'jus', 'prp', 'opt', 'des', 'nec', 'qot', 'adm', ''],
         'replacements' =>
         [
             ['ind'],
@@ -910,10 +922,12 @@ my %matrix = @_matrix =
             ['pot', 'cnd'],
             ['sub', 'cnd', 'jus', 'opt'],
             ['jus', 'sub', 'opt'],
+            ['prp', 'jus'],
             ['opt', 'jus'],
             ['des', 'jus'],
             ['nec', 'imp'],
-            ['qot', 'ind']
+            ['qot', 'ind'],
+            ['adm']
         ],
         'uname' => 'Mood'
     },
@@ -921,15 +935,14 @@ my %matrix = @_matrix =
     'tense' =>
     {
         'priority' => 270,
-        'values' => ['pres', 'fut', 'past', 'aor', 'imp', 'nar', 'pqp', ''],
+        'values' => ['pres', 'fut', 'past', 'aor', 'imp', 'pqp', ''],
         'replacements' =>
         [
             ['pres'],
             ['fut'],
-            ['past', 'aor', 'imp', 'nar'],
+            ['past', 'aor', 'imp'],
             ['aor', 'past'],
             ['imp', 'past'],
-            ['nar', 'past'],
             ['pqp', 'past']
         ],
         'uname' => 'Tense'
@@ -938,7 +951,7 @@ my %matrix = @_matrix =
     'voice' =>
     {
         'priority' => 280,
-        'values' => ['act', 'mid', 'pass', 'rcp', 'cau', 'int', ''],
+        'values' => ['act', 'mid', 'pass', 'rcp', 'cau', 'int', 'antip', 'dir', 'inv', ''],
         'replacements' =>
         [
             ['act'],
@@ -946,21 +959,38 @@ my %matrix = @_matrix =
             ['pass'],
             ['rcp'],
             ['cau'],
-            ['int']
+            ['int'],
+            ['antip'],
+            ['dir'],
+            ['inv']
         ],
         'uname' => 'Voice'
+    },
+    # Evidentiality.
+    'evident' =>
+    {
+        'priority' => 285,
+        'values' => ['fh', 'nfh', ''],
+        'replacements' =>
+        [
+            ['fh'],
+            ['nfh']
+        ],
+        'uname' => 'Evident'
     },
     # Aspect (lexical or grammatical; but see also the 'imp' tense).
     'aspect' =>
     {
         'priority' => 290,
-        'values' => ['imp', 'perf', 'prosp', 'prog', ''],
+        'values' => ['imp', 'perf', 'prosp', 'prog', 'hab', 'iter', ''],
         'replacements' =>
         [
             ['imp'],
             ['perf'],
             ['prosp'],
-            ['prog']
+            ['prog'],
+            ['hab'],
+            ['iter']
         ],
         'uname' => 'Aspect'
     },
@@ -1242,6 +1272,7 @@ my %fvbct =
     'abbr'        => { 'abbr' => 'yes' }, # value renamed in Interset 3.005, 2017-07-08
     'hyph'        => { 'hyph' => 'yes' }, # value renamed in Interset 3.005, 2017-07-08
     'typo'        => { 'typo' => 'yes' }, # value renamed in Interset 3.005, 2017-07-08
+    'tense'       => { 'nar' => 'past' }, # value removed in UD v2, should use evident=nfh + past, 2017-07-11
 );
 sub _get_compatible_value
 {
@@ -2049,6 +2080,9 @@ sub is_adessive {my $self = shift; return $self->contains('case', 'ade');}
 sub is_adjective {my $self = shift; return $self->contains('pos', 'adj');}
 
 #------------------------------------------------------------------------------
+sub is_admirative {my $self = shift; return $self->contains('mood', 'adm');}
+
+#------------------------------------------------------------------------------
 sub is_adposition {my $self = shift; return $self->contains('pos', 'adp');}
 
 #------------------------------------------------------------------------------
@@ -2062,6 +2096,9 @@ sub is_allative {my $self = shift; return $self->contains('case', 'all');}
 
 #------------------------------------------------------------------------------
 sub is_animate {my $self = shift; return $self->contains('animacy', 'anim');}
+
+#------------------------------------------------------------------------------
+sub is_antipassive {my $self = shift; return $self->contains('voice', 'antip');}
 
 #------------------------------------------------------------------------------
 sub is_aorist {my $self = shift; return $self->contains('tense', 'aor');}
@@ -2097,7 +2134,7 @@ sub is_comitative {my $self = shift; return $self->contains('case', 'com');}
 sub is_common_gender {my $self = shift; return $self->contains('gender', 'com');}
 
 #------------------------------------------------------------------------------
-sub is_comparative {my $self = shift; return $self->contains('degree', 'cmp');}
+sub is_comparative {my $self = shift; return $self->contains('degree', 'cmp') || $self->contains('case', 'cmp');}
 
 #------------------------------------------------------------------------------
 sub is_conditional {my $self = shift; return $self->contains('mood', 'cnd');}
@@ -2116,6 +2153,9 @@ sub is_converb {my $self = shift; return $self->contains('verbform', 'conv');}
 
 #------------------------------------------------------------------------------
 sub is_coordinator {my $self = shift; return $self->is_conjunction() && $self->conjtype() eq 'coor';}
+
+#------------------------------------------------------------------------------
+sub is_count_plural {my $self = shift; return $self->contains('number', 'count');}
 
 #------------------------------------------------------------------------------
 sub is_dative {my $self = shift; return $self->contains('case', 'dat');}
@@ -2142,6 +2182,9 @@ sub is_determiner {my $self = shift; return $self->is_pronominal() && $self->is_
 sub is_diminutive {my $self = shift; return $self->contains('degree', 'dim');}
 
 #------------------------------------------------------------------------------
+sub is_direct_voice {my $self = shift; return $self->contains('voice', 'dir');}
+
+#------------------------------------------------------------------------------
 sub is_distributive {my $self = shift; return $self->contains('case', 'dis');}
 
 #------------------------------------------------------------------------------
@@ -2152,6 +2195,9 @@ sub is_elative {my $self = shift; return $self->contains('case', 'ela');}
 
 #------------------------------------------------------------------------------
 sub is_elevating {my $self = shift; return $self->contains('polite', 'elev');}
+
+#------------------------------------------------------------------------------
+sub is_equative {my $self = shift; return $self->contains('degree', 'equ') || $self->contains('case', 'equ');}
 
 #------------------------------------------------------------------------------
 sub is_ergative {my $self = shift; return $self->contains('case', 'erg');}
@@ -2172,6 +2218,9 @@ sub is_feminine {my $self = shift; return $self->contains('gender', 'fem');}
 sub is_finite_verb {my $self = shift; return $self->contains('verbform', 'fin');}
 
 #------------------------------------------------------------------------------
+sub is_first_hand {my $self = shift; return $self->contains('evident', 'fh');}
+
+#------------------------------------------------------------------------------
 sub is_first_person {my $self = shift; return $self->contains('person', '1');}
 
 #------------------------------------------------------------------------------
@@ -2179,6 +2228,9 @@ sub is_foreign {my $self = shift; return $self->foreign() eq 'yes';}
 
 #------------------------------------------------------------------------------
 sub is_formal {my $self = shift; return $self->contains('polite', 'form');}
+
+#------------------------------------------------------------------------------
+sub is_fourth_person {my $self = shift; return $self->contains('person', '4');}
 
 #------------------------------------------------------------------------------
 sub is_future {my $self = shift; return $self->contains('tense', 'fut');}
@@ -2191,6 +2243,15 @@ sub is_gerund {my $self = shift; return $self->contains('verbform', 'ger');}
 
 #------------------------------------------------------------------------------
 sub is_gerundive {my $self = shift; return $self->contains('verbform', 'gdv');}
+
+#------------------------------------------------------------------------------
+sub is_greater_paucal {my $self = shift; return $self->contains('number', 'grpa');}
+
+#------------------------------------------------------------------------------
+sub is_greater_plural {my $self = shift; return $self->contains('number', 'grpl');}
+
+#------------------------------------------------------------------------------
+sub is_habitual {my $self = shift; return $self->contains('aspect', 'hab');}
 
 #------------------------------------------------------------------------------
 sub is_human {my $self = shift; return $self->contains('animacy', 'hum');}
@@ -2208,7 +2269,10 @@ sub is_illative {my $self = shift; return $self->contains('case', 'ill');}
 sub is_imperative {my $self = shift; return $self->contains('mood', 'imp');}
 
 #------------------------------------------------------------------------------
-sub is_imperfect {my $self = shift; return $self->contains('tense', 'imp') && $self->contains('aspect', 'imp');}
+sub is_imperfect {my $self = shift; return $self->contains('tense', 'imp') || $self->contains('aspect', 'imp');}
+
+#------------------------------------------------------------------------------
+sub is_impersonal {my $self = shift; return $self->contains('person', '0');}
 
 #------------------------------------------------------------------------------
 sub is_inanimate {my $self = shift; return $self->contains('animacy', 'inan');}
@@ -2244,6 +2308,15 @@ sub is_interrogative {my $self = shift; $self->contains('prontype', 'int');}
 sub is_intransitive {my $self = shift; return $self->contains('subcat', 'intr');}
 
 #------------------------------------------------------------------------------
+sub is_inverse_number {my $self = shift; return $self->contains('number', 'inv');}
+
+#------------------------------------------------------------------------------
+sub is_inverse_voice {my $self = shift; return $self->contains('voice', 'inv');}
+
+#------------------------------------------------------------------------------
+sub is_iterative {my $self = shift; return $self->contains('aspect', 'iter');}
+
+#------------------------------------------------------------------------------
 sub is_jussive {my $self = shift; return $self->contains('mood', 'jus');}
 
 #------------------------------------------------------------------------------
@@ -2271,7 +2344,7 @@ sub is_motivative {my $self = shift; return $self->contains('case', 'cau');}
 sub is_multiplicative {my $self = shift; return $self->contains('numtype', 'mult');}
 
 #------------------------------------------------------------------------------
-sub is_narrative {my $self = shift; return $self->contains('tense', 'nar');}
+sub is_narrative {my $self = shift; return $self->contains('tense', 'past') && $self->contains('evident', 'nfh');}
 
 #------------------------------------------------------------------------------
 sub is_necessitative {my $self = shift; return $self->contains('mood', 'nec');}
@@ -2281,6 +2354,9 @@ sub is_negative {my $self = shift; return $self->contains('negativeness', 'neg')
 
 #------------------------------------------------------------------------------
 sub is_nominative {my $self = shift; return $self->contains('case', 'nom');}
+
+#------------------------------------------------------------------------------
+sub is_non_first_hand {my $self = shift; return $self->contains('evident', 'nfh');}
 
 #------------------------------------------------------------------------------
 sub is_nonhuman {my $self = shift; return $self->contains('animacy', 'nhum');}
@@ -2311,6 +2387,9 @@ sub is_passive {my $self = shift; return $self->contains('voice', 'pass');}
 
 #------------------------------------------------------------------------------
 sub is_past {my $self = shift; return $self->contains('tense', 'past');}
+
+#------------------------------------------------------------------------------
+sub is_paucal {my $self = shift; return $self->contains('number', 'pauc');}
 
 #------------------------------------------------------------------------------
 sub is_perfect {my $self = shift; return $self->contains('aspect', 'perf');}
@@ -2364,6 +2443,9 @@ sub is_prospective {my $self = shift; return $self->contains('aspect', 'prosp');
 sub is_punctuation {my $self = shift; return $self->contains('pos', 'punc');}
 
 #------------------------------------------------------------------------------
+sub is_purposive {my $self = shift; return $self->contains('mood', 'prp');}
+
+#------------------------------------------------------------------------------
 sub is_quotative {my $self = shift; return $self->contains('mood', 'qot');}
 
 #------------------------------------------------------------------------------
@@ -2383,6 +2465,9 @@ sub is_second_person {my $self = shift; return $self->contains('person', '2');}
 
 #------------------------------------------------------------------------------
 sub is_singular {my $self = shift; return $self->contains('number', 'sing');}
+
+#------------------------------------------------------------------------------
+sub is_specific {my $self = shift; return $self->contains('definite', 'spec');}
 
 #------------------------------------------------------------------------------
 sub is_subjunctive {my $self = shift; return $self->contains('mood', 'sub');}
@@ -2427,6 +2512,9 @@ sub is_transitive {my $self = shift; return $self->contains('subcat', 'tran');}
 sub is_translative {my $self = shift; return $self->contains('case', 'tra');}
 
 #------------------------------------------------------------------------------
+sub is_trial {my $self = shift; return $self->contains('number', 'tri');}
+
+#------------------------------------------------------------------------------
 sub is_typo {my $self = shift; return $self->typo() eq 'yes';}
 
 #------------------------------------------------------------------------------
@@ -2440,6 +2528,9 @@ sub is_vocative {my $self = shift; return $self->contains('case', 'voc');}
 
 #------------------------------------------------------------------------------
 sub is_wh {my $self = shift; return any {m/^(int|rel)$/} ($self->get_list('prontype'));}
+
+#------------------------------------------------------------------------------
+sub is_zero_person {my $self = shift; return $self->contains('person', '0');}
 
 
 
@@ -2839,7 +2930,7 @@ Lingua::Interset::FeatureStructure - Definition of morphosyntactic features and 
 
 =head1 VERSION
 
-version 3.005
+version 3.006
 
 =head1 SYNOPSIS
 
@@ -3204,6 +3295,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 
 =head2 is_adjective()
 
+=head2 is_admirative()
+
 =head2 is_adposition()
 
 =head2 is_adverb()
@@ -3213,6 +3306,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_allative()
 
 =head2 is_animate()
+
+=head2 is_antipassive()
 
 =head2 is_aorist()
 
@@ -3250,6 +3345,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 
 =head2 is_coordinator()
 
+=head2 is_count_plural()
+
 =head2 is_dative()
 
 =head2 is_definite()
@@ -3266,6 +3363,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 
 =head2 is_diminutive()
 
+=head2 is_direct_voice()
+
 =head2 is_distributive()
 
 =head2 is_dual()
@@ -3273,6 +3372,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_elative()
 
 =head2 is_elevating()
+
+=head2 is_equative()
 
 =head2 is_ergative()
 
@@ -3286,11 +3387,15 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 
 =head2 is_finite_verb()
 
+=head2 is_first_hand()
+
 =head2 is_first_person()
 
 =head2 is_foreign()
 
 =head2 is_formal()
+
+=head2 is_fourth_person()
 
 =head2 is_future()
 
@@ -3299,6 +3404,12 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_gerund()
 
 =head2 is_gerundive()
+
+=head2 is_greater_paucal()
+
+=head2 is_greater_plural()
+
+=head2 is_habitual()
 
 =head2 is_human()
 
@@ -3311,6 +3422,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_imperative()
 
 =head2 is_imperfect()
+
+=head2 is_impersonal()
 
 =head2 is_inanimate()
 
@@ -3333,6 +3446,12 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_interrogative()
 
 =head2 is_intransitive()
+
+=head2 is_inverse_number()
+
+=head2 is_inverse_voice()
+
+=head2 is_iterative()
 
 =head2 is_jussive()
 
@@ -3360,6 +3479,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 
 =head2 is_nominative()
 
+=head2 is_non_first_hand()
+
 =head2 is_nonhuman()
 
 =head2 is_neuter()
@@ -3379,6 +3500,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_passive()
 
 =head2 is_past()
+
+=head2 is_paucal()
 
 =head2 is_perfect()
 
@@ -3414,6 +3537,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 
 =head2 is_punctuation()
 
+=head2 is_purposive()
+
 =head2 is_quotative()
 
 =head2 is_rare()
@@ -3427,6 +3552,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_second_person()
 
 =head2 is_singular()
+
+=head2 is_specific()
 
 =head2 is_subjunctive()
 
@@ -3456,6 +3583,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 
 =head2 is_translative()
 
+=head2 is_trial()
+
 =head2 is_typo()
 
 =head2 is_verb()
@@ -3465,6 +3594,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_vocative()
 
 =head2 is_wh()
+
+=head2 is_zero_person()
 
 =head2 enforce_permitted_values()
 

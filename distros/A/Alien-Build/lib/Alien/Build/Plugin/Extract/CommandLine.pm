@@ -4,48 +4,48 @@ use strict;
 use warnings;
 use Alien::Build::Plugin;
 use Path::Tiny ();
-use IPC::Cmd ();
+use File::Which ();
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
 has '+format' => 'tar';
 
 
 has gzip_cmd => sub {
-  IPC::Cmd::can_run('gzip') ? 'gzip' : undef;
+  File::Which::which('gzip') ? 'gzip' : undef;
 };
 
 
 # TODO: use Alien::Libbz2 if available
 has bzip2_cmd => sub {
-  IPC::Cmd::can_run('bzip2') ? 'bzip2' : undef;
+  File::Which::which('bzip2') ? 'bzip2' : undef;
 };
 
 
 # TODO: use Alien::xz if available
 has xz_cmd => sub {
-  IPC::Cmd::can_run('xz') ? 'xz' : undef;
+  File::Which::which('xz') ? 'xz' : undef;
 };
 
 
 has tar_cmd => sub {
-  IPC::Cmd::can_run('bsdtar')
+  File::Which::which('bsdtar')
     ? 'bsdtar'
     # TODO: GNU tar can be iffy on windows, where absolute
     # paths get confused with remote tars.  *sigh* fix later
     # if we can, for now just assume that 'tar.exe' is borked
     # on windows to be on the safe side.  The Fetch::ArchiveTar
     # is probably a better plugin to use on windows anyway.
-    : IPC::Cmd::can_run('tar') && $^O ne 'MSWin32'
+    : File::Which::which('tar') && $^O ne 'MSWin32'
       ? 'tar'
       : undef;
 };
 
 
 has unzip_cmd => sub {
-  IPC::Cmd::can_run('unzip') ? 'unzip' : undef;
+  File::Which::which('unzip') ? 'unzip' : undef;
 };
 
 sub _run
@@ -189,7 +189,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 0.55
+version 0.61
 
 =head1 SYNOPSIS
 

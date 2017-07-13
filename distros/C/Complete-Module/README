@@ -1,24 +1,109 @@
-SYNOPSIS
+NAME
+    Complete::Module - Complete with installed Perl module names
 
+VERSION
+    This document describes version 0.25 of Complete::Module (from Perl
+    distribution Complete-Module), released on 2017-07-11.
+
+SYNOPSIS
      use Complete::Module qw(complete_module);
      my $res = complete_module(word => 'Text::A');
      # -> ['Text::ANSI', 'Text::ANSITable', 'Text::ANSITable::', 'Text::Abbrev']
 
 SETTINGS
-
- $Complete::Module::OPT_SHORTCUT_PREFIXES => hash
-
+  $Complete::Module::OPT_SHORTCUT_PREFIXES => hash
     Shortcut prefixes. The default is:
 
-    # CODE: $Complete::Module::OPT_SHORTCUT_PREFIXES
+     {
+       bs  => "Bencher/Scenario/",
+       bss => "Bencher/Scenarios/",
+       df  => "DateTime/Format/",
+       dz  => "Dist/Zilla/",
+       dzb => "Dist/Zilla/PluginBundle/",
+       dzp => "Dist/Zilla/Plugin/",
+       dzr => "Dist/Zilla/Role/",
+       pw  => "Pod/Weaver/",
+       pwb => "Pod/Weaver/PluginBundle/",
+       pwp => "Pod/Weaver/Plugin/",
+       pwr => "Pod/Weaver/Role/",
+       pws => "Pod/Weaver/Section/",
+       rp  => "Regexp/Pattern/",
+     }
 
     If user types one of the keys, it will be replaced with the matching
     value from this hash.
 
+FUNCTIONS
+  complete_module
+    Usage:
+
+     complete_module(%args) -> any
+
+    Complete with installed Perl module names.
+
+    For each directory in @INC (coderefs are ignored), find Perl modules and
+    module prefixes which have "word" as prefix. So for example, given "Te"
+    as "word", will return e.g. "[Template, Template::, Term::, Test,
+    Test::, Text::]". Given "Text::" will return "[Text::ASCIITable,
+    Text::Abbrev, ...]" and so on.
+
+    This function has a bit of overlapping functionality with Module::List,
+    but this function is geared towards shell tab completion. Compared to
+    Module::List, here are some differences: 1) list modules where prefix is
+    incomplete; 2) interface slightly different; 3) (currently) doesn't do
+    recursing; 4) contains conveniences for completion, e.g. map casing,
+    expand intermediate paths (see "Complete" for more details on those
+    features), autoselection of path separator character, some shortcuts,
+    and so on.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   find_pm => *bool* (default: 1)
+
+        Whether to find .pm files.
+
+    *   find_pmc => *bool* (default: 1)
+
+        Whether to find .pmc files.
+
+    *   find_pod => *bool* (default: 1)
+
+        Whether to find .pod files.
+
+    *   find_prefix => *bool* (default: 1)
+
+        Whether to find module prefixes.
+
+    *   ns_prefix => *str*
+
+        Namespace prefix.
+
+        This is useful if you want to complete module under a specific
+        namespace (instead of the root). For example, if you set "ns_prefix"
+        to "Dist::Zilla::Plugin" (or "Dist::Zilla::Plugin::") and word is
+        "F", you can get "['FakeRelease', 'FileFinder::', 'FinderCode']"
+        (those are modules under the "Dist::Zilla::Plugin::" namespace).
+
+    *   path_sep => *str*
+
+        Path separator.
+
+        For convenience in shell (bash) completion, instead of defaulting to
+        "::" all the time, will look at "word". If word does not contain any
+        "::" then will default to "/". This is because "::" (contains colon)
+        is rather problematic as it is by default a word-break character in
+        bash and the word needs to be quoted to avoid word-breaking by bash.
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (any)
+
 ENVIRONMENT
-
- COMPLETE_MODULE_OPT_SHORTCUT_PREFIXES => str
-
+  "COMPLETE_MODULE_OPT_SHORTCUT_PREFIXES" => str
     Can be used to set the default for
     $Complete::Module::OPT_SHORTCUT_PREFIXES. It should be in the form of:
 
@@ -27,4 +112,31 @@ ENVIRONMENT
     For example:
 
      dzp=Dist/Zilla/Plugin/;pwp=Pod/Weaver/Plugin/
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Module>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Module>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Module>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Complete::Perl
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

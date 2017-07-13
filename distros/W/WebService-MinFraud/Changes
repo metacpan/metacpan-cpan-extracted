@@ -1,3 +1,30 @@
+1.005000 2017-07-07
+
+[ENHANCEMENTS]
+
+- Added support for custom inputs. You may set up custom inputs from your
+  account portal.
+- Added the following new values to the /payment/processor validation:
+  - american_express_payment_gateway
+  - bluesnap
+  - commdoo
+  - curopayments
+  - ebs
+  - exact
+  - hipay
+  - lemon_way
+  - oceanpayment
+  - paymentwall
+  - payza
+  - securetrading
+  - solidtrust_pay
+  - vantiv
+  - vericheck
+  - vpos
+- Added /device/session_id, /device/session_age inputs and /email/first_seen
+  output.
+
+
 1.004000 2017-01-04
 
 [ENHANCEMENTS]

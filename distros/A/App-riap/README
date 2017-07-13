@@ -1,14 +1,27 @@
-SYNOPSIS
+NAME
+    App::riap - Riap command-line client shell
 
+VERSION
+    version 0.37
+
+SYNOPSIS
     Use the provided riap script.
 
 DESCRIPTION
-
-    This is the backend/implementation of the riap script.
+    This is the backend/implementation of the "riap" script.
 
 SEE ALSO
-
     Perinci::Access
 
     peri-access
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

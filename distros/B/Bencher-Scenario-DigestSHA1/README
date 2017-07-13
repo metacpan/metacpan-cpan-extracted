@@ -1,10 +1,115 @@
-BENCHMARK NOTES
+NAME
+    Bencher::Scenario::DigestSHA1 - Benchmark Digest::SHA1 against
+    Digest::SHA
 
+VERSION
+    This document describes version 0.003 of Bencher::Scenario::DigestSHA1
+    (from Perl distribution Bencher-Scenario-DigestSHA1), released on
+    2017-07-10.
+
+SYNOPSIS
+    To run benchmark with default option:
+
+     % bencher -m DigestSHA1
+
+    To run module startup overhead benchmark:
+
+     % bencher --module-startup -m DigestSHA1
+
+    For more options (dump scenario, list/include/exclude/add participants,
+    list/include/exclude/add datasets, etc), see bencher or run "bencher
+    --help".
+
+DESCRIPTION
+    Packaging a benchmark script as a Bencher scenario makes it convenient
+    to include/exclude/add participants/datasets (either via CLI or Perl
+    code), send the result to a central repository, among others . See
+    Bencher and bencher (CLI) for more details.
+
+BENCHMARKED MODULES
+    Version numbers shown below are the versions used when running the
+    sample benchmark.
+
+    Digest::SHA1 2.13
+
+    Digest::SHA 5.96
+
+BENCHMARK PARTICIPANTS
+    *   Digest::SHA1 (perl_code)
+
+        Code template:
+
+         my $ctx = Digest::SHA1->new; open my $fh, "<", <filename>; $ctx->addfile($fh); $ctx->hexdigest
+
+    *   Digest::SHA (perl_code)
+
+        Code template:
+
+         my $ctx = Digest::SHA->new(1); open my $fh, "<", <filename>; $ctx->addfile($fh); $ctx->hexdigest
+
+BENCHMARK DATASETS
+    *   30M_file
+
+SAMPLE BENCHMARK RESULTS
+    Run on: perl: *v5.26.0*, CPU: *Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz
+    (4 cores)*, OS: *GNU/Linux Debian version 8.0*, OS kernel: *Linux
+    version 3.16.0-4-amd64*.
+
+    Benchmark with default options ("bencher -m DigestSHA1"):
+
+     #table1#
+     +--------------+-----------+-----------+------------+---------+---------+
+     | participant  | rate (/s) | time (ms) | vs_slowest |  errors | samples |
+     +--------------+-----------+-----------+------------+---------+---------+
+     | Digest::SHA1 |      5.92 |       169 |        1   | 0.00011 |       6 |
+     | Digest::SHA  |      9.8  |       100 |        1.7 | 0.00036 |       6 |
+     +--------------+-----------+-----------+------------+---------+---------+
+
+    Benchmark module startup overhead ("bencher -m DigestSHA1
+    --module-startup"):
+
+     #table2#
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
+     | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors  | samples |
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
+     | Digest::SHA         | 0.828                        | 4.2                | 20.1           |      13.8 |                    8.4 |        1   | 1.2e-05  |       6 |
+     | Digest::SHA1        | 1.5                          | 5                  | 25             |      11   |                    5.6 |        1.2 |   0.0001 |       6 |
+     | perl -e1 (baseline) | 1.2                          | 4.6                | 22             |       5.4 |                    0   |        2.5 | 5.4e-05  |       6 |
+     +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+----------+---------+
+
+    To display as an interactive HTML table on a browser, you can add option
+    "--format html+datatables".
+
+BENCHMARK NOTES
     Digest::SHA is faster than Digest::SHA1, so in general there is no
     reason to use Digest::SHA1 over Digest::SHA (core module, more
     up-to-date, support more algorithms).
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenario-DigestSHA1>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenario-DigestSHA1>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenario-Dige
+    stSHA1>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     See Bencher::Scenarios::DigestSHA for more SHA-related benchmarks.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

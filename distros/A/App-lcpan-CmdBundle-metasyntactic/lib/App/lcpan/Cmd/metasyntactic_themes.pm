@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::metasyntactic_themes;
 
-our $DATE = '2017-02-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -56,7 +56,7 @@ App::lcpan::Cmd::metasyntactic_themes - List all Acme::MetaSyntactic theme modul
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::metasyntactic_themes (from Perl distribution App-lcpan-CmdBundle-metasyntactic), released on 2017-02-06.
+This document describes version 0.003 of App::lcpan::Cmd::metasyntactic_themes (from Perl distribution App-lcpan-CmdBundle-metasyntactic), released on 2017-07-10.
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogGer::StringLevel;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ Bencher::Scenario::LogGer::StringLevel - Benchmark string_level()
 
 =head1 VERSION
 
-This document describes version 0.009 of Bencher::Scenario::LogGer::StringLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-02.
+This document describes version 0.010 of Bencher::Scenario::LogGer::StringLevel (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
 
 =head1 SYNOPSIS
 
@@ -60,7 +60,7 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::ger::Util> 0.012
+L<Log::ger::Util> 0.016
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -94,10 +94,10 @@ Benchmark with default options (C<< bencher -m LogGer::StringLevel >>):
 
  #table1#
  +---------+-----------+-----------+------------+---------+---------+
- | dataset | rate (/s) | time (ns) | vs_slowest |  errors | samples |
+ | dataset | rate (/s) | time (μs) | vs_slowest |  errors | samples |
  +---------+-----------+-----------+------------+---------+---------+
- | 1       |    714000 |  1400     |    1       | 4.2e-10 |      20 |
- | warn    |   4622980 |   216.311 |    6.47213 |   0     |      20 |
+ | 1       |    567570 |   1.7619  |    1       | 1.1e-11 |      20 |
+ | warn    |   4062240 |   0.24617 |    7.15727 |   0     |      20 |
  +---------+-----------+-----------+------------+---------+---------+
 
 
@@ -107,8 +107,8 @@ Benchmark module startup overhead (C<< bencher -m LogGer::StringLevel --module-s
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
  | participant         | proc_private_dirty_size (MB) | proc_rss_size (MB) | proc_size (MB) | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
- | Log::ger::Util      | 0.82                         | 4.1                | 16             |      10   |                    4.9 |        1   | 5.5e-05 |      20 |
- | perl -e1 (baseline) | 1.3                          | 4.6                | 16             |       5.1 |                    0   |        2.1 | 7.1e-06 |      20 |
+ | Log::ger::Util      | 0.82                         | 4.2                | 16             |      13   |                    5.9 |        1   |   3e-05 |      20 |
+ | perl -e1 (baseline) | 1.3                          | 4.7                | 17             |       7.1 |                    0   |        1.8 | 2.3e-05 |      20 |
  +---------------------+------------------------------+--------------------+----------------+-----------+------------------------+------------+---------+---------+
 
 

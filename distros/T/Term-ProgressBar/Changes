@@ -1,5 +1,8 @@
 Revision history for Perl extension Term::ProgressBar
 
+2.20  2017-07-11 MANWAR
+      - silent mode avoids uninitialized value messages (GFIREBALL)
+
 2.19  2017-07-10 MANWAR
       - Fixed inconsistent version as reported by CPANTS.
 

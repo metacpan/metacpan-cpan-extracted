@@ -17,14 +17,19 @@ build_requires:
   Plack::Request: '0'
   Plack::Session::State::Cookie: '0'
   Plack::Test: '0'
+  Pod::Coverage::TrustPod: '0'
   Sub::Exporter: '0'
+  Test::Kwalitee: '0'
   Test::More: '0'
+  Test::NoTabs: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
   Test::UseAllModules: '0'
   Try::Tiny: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,13 +50,15 @@ requires:
 resources:
   bugtracker: http://github.com/chiselwright/Plack-Middleware-XSRFBlock/issues
   repository: git://github.com/chiselwright/plack-middleware-xsrfblock.git
-version: 0.0.11
+version: 0.0.12
 x_contributors:
   - 'Chisel <chisel.wright@net-a-porter.com>'
-  - 'Chisel Wright <chisel@chizography.net>'
   - 'Daniel Perrett <dp13@sanger.ac.uk>'
+  - 'Karen Etheridge <ether@cpan.org>'
   - 'Matthew Ryall <matt.ryall@gmail.com>'
   - 'Matthias Zeichmann <matthias.zeichmann@gmail.com>'
   - 'Michael Kröll <michael.kroell@geizhals.at>'
   - 'Sebastian Willert <willert@gmail.com>'
+  - 'Sterling Hanenkamp <sterling@ziprecruiter.com>'
   - 'William Wolf <throughnothing@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,6 +1,6 @@
 # ABSTRACT: create new Dancer2 application
 package Dancer2::CLI::Command::gen;
-$Dancer2::CLI::Command::gen::VERSION = '0.205000';
+$Dancer2::CLI::Command::gen::VERSION = '0.205001';
 use strict;
 use warnings;
 
@@ -108,6 +108,13 @@ following commands:
 *****
 NOYAML
     }
+
+    print <<HOWTORUN;
+The application is ready to serve; to run it, do:
+
+        cd $app_path
+        plackup bin/app.psgi
+HOWTORUN
 
     return 0;
 }
@@ -291,7 +298,7 @@ Dancer2::CLI::Command::gen - create new Dancer2 application
 
 =head1 VERSION
 
-version 0.205000
+version 0.205001
 
 =head1 AUTHOR
 
@@ -299,7 +306,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexis Sukrieh.
+This software is copyright (c) 2017 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

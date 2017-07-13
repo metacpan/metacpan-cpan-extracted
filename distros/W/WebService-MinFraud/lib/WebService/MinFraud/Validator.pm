@@ -3,13 +3,14 @@ package WebService::MinFraud::Validator;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
 use Data::Delete 0.05;
 use Data::Rx;
 use Try::Tiny;
 use Types::Standard qw( HashRef InstanceOf Object );
 use WebService::MinFraud::Data::Rx::Type::CCToken;
+use WebService::MinFraud::Data::Rx::Type::CustomInputs;
 use WebService::MinFraud::Data::Rx::Type::DateTime::RFC3339;
 use WebService::MinFraud::Data::Rx::Type::Enum;
 use WebService::MinFraud::Data::Rx::Type::Hex32;
@@ -42,6 +43,7 @@ has _rx => (
                 type_plugins => [
                     qw(
                         WebService::MinFraud::Data::Rx::Type::CCToken
+                        WebService::MinFraud::Data::Rx::Type::CustomInputs
                         WebService::MinFraud::Data::Rx::Type::DateTime::RFC3339
                         WebService::MinFraud::Data::Rx::Type::Enum
                         WebService::MinFraud::Data::Rx::Type::Hex32
@@ -78,6 +80,11 @@ sub _build_request_schema_definition {
                 optional => {
                     user_agent      => '//str',
                     accept_language => '//str',
+                    session_age     => '//num',
+                    session_id      => {
+                        type   => '//str',
+                        length => { min => 1, max => 255, },
+                    },
                 },
             }
         },
@@ -136,6 +143,9 @@ sub _build_request_schema_definition {
                     token => '/maxmind/cctoken',
                 },
             },
+            custom_inputs => {
+                type => '/maxmind/custom_inputs',
+            },
             email => {
                 type     => '//rec',
                 optional => {
@@ -190,33 +200,41 @@ sub _build_request_schema_definition {
                                 'adyen',
                                 'altapay',
                                 'amazon_payments',
+                                'american_express_payment_gateway',
                                 'authorizenet',
                                 'balanced',
                                 'beanstream',
                                 'bluepay',
+                                'bluesnap',
                                 'braintree',
                                 'ccnow',
                                 'chase_paymentech',
                                 'cielo',
                                 'collector',
                                 'compropago',
+                                'commdoo',
                                 'concept_payments',
                                 'conekta',
                                 'cuentadigital',
+                                'curopayments',
                                 'dalpay',
                                 'dibs',
                                 'digital_river',
+                                'ebs',
                                 'ecomm365',
                                 'elavon',
                                 'epay',
                                 'eprocessing_network',
                                 'eway',
+                                'exact',
                                 'first_data',
                                 'global_payments',
+                                'hipay',
                                 'ingenico',
                                 'internetsecure',
                                 'intuit_quickbooks_payments',
                                 'iugu',
+                                'lemon_way',
                                 'mastercard_payment_gateway',
                                 'mercadopago',
                                 'merchant_esolutions',
@@ -224,6 +242,7 @@ sub _build_request_schema_definition {
                                 'mollie',
                                 'moneris_solutions',
                                 'nmi',
+                                'oceanpayment',
                                 'openpaymx',
                                 'optimal_payments',
                                 'orangepay',
@@ -231,6 +250,7 @@ sub _build_request_schema_definition {
                                 'pacnet_services',
                                 'payfast',
                                 'paygate',
+                                'paymentwall',
                                 'payone',
                                 'paypal',
                                 'payplus',
@@ -240,6 +260,7 @@ sub _build_request_schema_definition {
                                 'payture',
                                 'payu',
                                 'payulatam',
+                                'payza',
                                 'pinpayments',
                                 'princeton_payment_solutions',
                                 'psigate',
@@ -250,18 +271,23 @@ sub _build_request_schema_definition {
                                 'redpagos',
                                 'rewardspay',
                                 'sagepay',
+                                'securetrading',
                                 'simplify_commerce',
                                 'skrill',
                                 'smartcoin',
+                                'solidtrust_pay',
                                 'sps_decidir',
                                 'stripe',
                                 'telerecargas',
                                 'towah',
                                 'usa_epay',
+                                'vantiv',
                                 'verepay',
+                                'vericheck',
                                 'vindicia',
                                 'virtual_card_services',
                                 'vme',
+                                'vpos',
                                 'worldpay'
                             ],
 
@@ -355,7 +381,7 @@ WebService::MinFraud::Validator - Validation for the minFraud requests
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SYNOPSIS
 

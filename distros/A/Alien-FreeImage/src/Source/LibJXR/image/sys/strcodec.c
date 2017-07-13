@@ -664,13 +664,14 @@ ERR detach_SB(SimpleBitIO* pSB)
 //================================================================
 // Memory access functions
 //================================================================
-#if (defined(WIN32) && !defined(UNDER_CE)) || (defined(UNDER_CE) && defined(_ARM_)) 
+#if (defined(WIN32) && !defined(UNDER_CE) && (!defined(__MINGW32__) || defined(__MINGW64_TOOLCHAIN__))) || (defined(UNDER_CE) && defined(_ARM_))
 // WinCE ARM and Desktop x86
 #else
 // other platform
 #ifdef _BIG__ENDIAN_
 #define _byteswap_ulong(x)  (x)
 #else // _BIG__ENDIAN_
+#ifndef __MINGW32__
 U32 _byteswap_ulong(U32 bits)
 {
     U32 r = (bits & 0xffu) << 24;
@@ -680,6 +681,7 @@ U32 _byteswap_ulong(U32 bits)
 
     return r;
 }
+#endif
 #endif // _BIG__ENDIAN_
 #endif
 

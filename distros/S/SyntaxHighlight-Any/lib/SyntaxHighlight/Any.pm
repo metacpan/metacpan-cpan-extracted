@@ -1,12 +1,12 @@
 package SyntaxHighlight::Any;
 
-our $DATE = '2015-08-18'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require Exporter;
 our @ISA       = qw(Exporter);
@@ -108,7 +108,7 @@ sub highlight_string {
 
         $res = _try_source_highlight_binary(\$str, $opts);
         if (defined $res) {
-            $log->trace("Used source-highlight binary to format code");
+            log_trace("Used source-highlight binary to format code");
             return $res;
         }
     }
@@ -116,12 +116,12 @@ sub highlight_string {
     if ($LANGS{ $opts->{lang} }{pygments}) {
         $res = _try_pygments_binary(\$str, $opts);
         if (defined $res) {
-            $log->trace("Used pygmentize binary to format code");
+            log_trace("Used pygmentize binary to format code");
             return $res;
         }
     }
 
-    $log->warnf("No syntax highlighting backend for (l=%s, o=%s) is available",
+    log_warn("No syntax highlighting backend for (l=%s, o=%s) is available",
                 $opts->{lang}, $opts->{output});
     return $str;
 }
@@ -152,7 +152,7 @@ SyntaxHighlight::Any - Common interface for syntax highlighting and detecting la
 
 =head1 VERSION
 
-This document describes version 0.06 of SyntaxHighlight::Any (from Perl distribution SyntaxHighlight-Any), released on 2015-08-18.
+This document describes version 0.07 of SyntaxHighlight::Any (from Perl distribution SyntaxHighlight-Any), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -175,6 +175,11 @@ ADDING BACKENDS APPRECIATED.>
 
 This module provides a common interface for syntax highlighting and detecting
 programming language in code.
+
+=head1 BACKENDS
+
+Currently, the distribution does not pull the backends as dependencies. Please
+make sure you install desired backends.
 
 =head1 FUNCTIONS
 
@@ -239,18 +244,6 @@ detection fails, C<ansi> is chosen.
 
 List known languages.
 
-=head1 BACKENDS
-
-Currently, the distribution does not pull the backends as dependencies. Please
-make sure you install desired backends.
-
-=head1 SEE ALSO
-
-For syntax-highlighting (as well as encoding/formatting) to JSON, there's
-L<JSON::Color> or L<Syntax::Highlight::JSON> (despite the module name, the
-latter is an encoder, not strictly a string syntax highlighter). For YAML
-there's L<YAML::Tiny::Color>.
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/SyntaxHighlight-Any>.
@@ -267,13 +260,37 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+For syntax-highlighting (as well as encoding/formatting) to JSON, there's
+L<JSON::Color> or L<Syntax::Highlight::JSON> (despite the module name, the
+latter is an encoder, not strictly a string syntax highlighter). For YAML
+there's L<YAML::Tiny::Color>.
+
+An article in late 2012 describing the various CPAN modules for syntax
+highlighting
+L<http://blogs.perl.org/users/steven_haryanto/2012/11/the-sad-state-of-syntax-highlighting-libraries-on-cpan.html>
+(with the actual reviews posted to L<http://cpanratings.perl.org>). Modules
+mentioned including: L<Syntax::SourceHighlight>
+(L<reviews|http://cpanratings.perl.org/dist/Syntax-SourceHighlight>),
+L<Syntax::Highlight::Engine::Kate>
+(L<reviews|http://cpanratings.perl.org/dist/Syntax-Highlight-Engine-Kate>),
+L<Syntax::Highlight::JSON>
+(L<reviews|http://cpanratings.perl.org/dist/Syntax-Highlight-JSON>),
+L<Syntax::Highlight::Engine::Simple>
+(L<reviews|http://cpanratings.perl.org/dist/Syntax-Highlight-Engine-Simple>),
+L<Syntax::Highlight::Universal>
+(L<reviews|http://cpanratings.perl.org/dist/Syntax-Highlight-Universal>), and
+L<Text::Highlight> (L<reviews|http://cpanratings.perl.org/dist/text-highlight>).
+Some non-Perl solutions are also mentioned.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

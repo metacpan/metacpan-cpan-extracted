@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Storable qw(freeze);
 use Struct::Diff qw(diff);
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
 
@@ -146,6 +146,17 @@ is_deeply(
     $d,
     {D => {a => {D => {aa => {D => {aaa => {N => 'aaan',O => 'aaav'}}}}}}},
     "HASH: deep single-nested changed"
+);
+
+$d = diff(
+    {one =>{same => 1}},
+    {one =>{same => 1, added => 3}},
+    noU => 1
+);
+is_deeply(
+    $d,
+    {D => {one => {D => {added => {A => 3}}}}},
+    "HASH: one subkey unchanged, one added, noU"
 );
 
 $d = diff({ 'a' => { 'aa' => { 'aaa' => 'vaaaa' }}}, {}, 'trimR' => 1);

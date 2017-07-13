@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 38;
+plan tests => 39;
 
 my @module_files = (
     'WebService/MinFraud.pm',
     'WebService/MinFraud/Client.pm',
     'WebService/MinFraud/Data/Rx/Type/CCToken.pm',
+    'WebService/MinFraud/Data/Rx/Type/CustomInputs.pm',
     'WebService/MinFraud/Data/Rx/Type/DateTime/RFC3339.pm',
     'WebService/MinFraud/Data/Rx/Type/Enum.pm',
     'WebService/MinFraud/Data/Rx/Type/Hex32.pm',

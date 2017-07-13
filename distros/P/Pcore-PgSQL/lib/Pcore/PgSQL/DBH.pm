@@ -217,7 +217,7 @@ sub _on_error ( $self, $reason, $fatal ) {
 
     # disconnect on fatal error
     if ($fatal) {
-        $self->{h}->destroy;
+        $self->{h}->destroy if defined $self->{h};
 
         $self->{state} = $STATE_DISCONNECTED;
     }
@@ -419,8 +419,12 @@ sub _ON_DATA_ROW ( $self, $dataref ) {
                 my $type = $sth->{cols}->[ $i - 1 ]->[3];
 
                 # decode bytes array
-                if ( $type eq $SQL_BYTEA ) {
+                if ( $type == $SQL_BYTEA ) {
                     $col = pack 'H*', substr $col, 2;
+                }
+
+                elsif ( $type == $SQL_BOOL ) {
+                    $col = $col eq 'f' ? 0 : 1;
                 }
 
                 # decode text value
@@ -461,6 +465,12 @@ sub _ON_COMMAND_COMPLETE ( $self, $dataref ) {
             tag  => $val[0],
             oid  => $val[1],
             rows => $val[2],
+        };
+    }
+    elsif ( $val[0] eq 'CREATE' ) {
+        $tag = {
+            tag  => $val[0],
+            rows => 0,
         };
     }
     else {
@@ -586,12 +596,19 @@ sub _execute ( $self, $query, $bind, $cb, %args ) {
                 if ( is_plain_arrayref $param) {
                     if ( $param->[1] == $SQL_BYTEA ) {
                         $param_format_codes .= "\x00\x01";    # binary
+
+                        $param = $param->[0];
+                    }
+                    elsif ( $param->[1] == $SQL_BOOL ) {
+                        $param_format_codes .= "\x00\x00";    # text
+
+                        $param = $param->[0] ? '1' : '0';
                     }
                     else {
                         $param_format_codes .= "\x00\x00";    # text
-                    }
 
-                    \$param = \$param->[0];
+                        $param = $param->[0];
+                    }
                 }
                 else {
                     $param_format_codes .= "\x00\x00";        # text
@@ -938,18 +955,18 @@ sub quote_id ( $self, $id ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 179                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 507                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (25)                  |
+## |    3 | 517                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (27)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 860                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 877                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 25, 148, 356, 498,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 562, 572, 588, 591,  |                                                                                                                |
-## |      | 597, 606, 613, 617,  |                                                                                                                |
-## |      | 621, 625, 628        |                                                                                                                |
+## |    2 | 25, 148, 356, 508,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 572, 582, 598, 603,  |                                                                                                                |
+## |      | 608, 614, 623, 630,  |                                                                                                                |
+## |      | 634, 638, 642, 645   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 707, 860             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 724, 877             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 742                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 759                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

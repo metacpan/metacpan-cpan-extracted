@@ -7,7 +7,7 @@ use Test::More;
 plan tests => 1;
 
 BEGIN {
-    use_ok('Debug::Easy') || print "Bail out! Can't load Debug::Easy!\n";
+    use_ok('Debug::Easy');
 }
 
 # diag( "Testing Debug::Easy $Debug::Easy::VERSION, Perl $], $^X" );

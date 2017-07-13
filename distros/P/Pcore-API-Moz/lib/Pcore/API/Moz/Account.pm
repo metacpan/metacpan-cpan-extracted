@@ -41,38 +41,55 @@ sub get_url_metrics ( $self, $domains, $metric, $cb ) {
 
     $self->{next_req_ts} = time + $REQUEST_INTERVAL;
 
-    P->http->post(
-        $url,
-        persistent      => 30,
-        connect_timeout => 15,
-        timeout         => 60,
-        body            => to_json($domains),
-        useragent       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
-        cookies         => $self->{_cookies},
-        on_finish       => sub ($res) {
-            if ( !$res ) {
-                $cb->( result [ $res->status, $res->reason ] );
-            }
-            else {
-                my $json = eval { from_json $res->body->$* };
-
-                if ($@) {
-                    $cb->( result [ 500, 'Invalid JSON body' ] );
+    my $request = sub ($proxy) {
+        P->http->post(
+            $url,
+            persistent      => 30,
+            connect_timeout => 15,
+            timeout         => 60,
+            body            => to_json($domains),
+            useragent       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+            cookies         => $self->{_cookies},
+            proxy           => $proxy,
+            on_finish       => sub ($res) {
+                if ( !$res ) {
+                    $cb->( result [ $res->status, $res->reason ] );
                 }
                 else {
-                    my $data;
+                    my $json = eval { from_json $res->body->$* };
 
-                    for my $i ( 0 .. $domains->$#* ) {
-                        $data->{ $domains->[$i] } = $json->[$i];
+                    if ($@) {
+                        $cb->( result [ 500, 'Invalid JSON body' ] );
                     }
+                    else {
+                        my $data;
 
-                    $cb->( result 200, $data );
+                        for my $i ( 0 .. $domains->$#* ) {
+                            $data->{ $domains->[$i] } = $json->[$i];
+                        }
+
+                        $cb->( result 200, $data );
+                    }
                 }
-            }
 
-            return;
-        },
-    );
+                return;
+            },
+        );
+
+        return;
+    };
+
+    if ( my $proxy_pool = $self->{moz}->{proxy_pool} ) {
+        $self->util->proxy_pool->get_slot(
+            $url->{url},
+            sub ($proxy) {
+                $request->($proxy);
+            }
+        );
+    }
+    else {
+        $request->(undef);
+    }
 
     return;
 }

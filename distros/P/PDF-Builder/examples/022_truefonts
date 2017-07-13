@@ -1,0 +1,278 @@
+#!/usr/bin/perl
+
+# given one or more .TTF files on the command line, display their contents
+# and some sample text.
+# note that use of -file in new() leaves the PDF in THIS directory, not the
+#   one with the 022_truefonts file!
+
+use strict;
+use warnings;
+
+use lib qw{ ../lib };
+use File::Basename;
+use PDF::Builder;
+use PDF::Builder::Util;
+use Unicode::UCD 'charinfo';
+use Getopt::Long;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my $sx = 33;
+my $sy = 45;
+my $fx = 20;
+
+my ($fn, $gfx, $tx, $pdf, $page, $f1, $f2, $x, $y, $xp, $yp);
+
+my $LoremIpsum=q|Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime placeat, facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.|;
+
+my $encoding='latin1';
+
+GetOptions(
+    "encode|e=s" => \$encoding,
+);
+
+# loop through command line list of font file names
+die "Need at least one TTF file name on command line!\n" if !scalar(@ARGV);
+
+foreach $fn (@ARGV) {
+    if (!-e $fn) {
+        print "$fn cannot be read. Skipping...\n\n";
+        next;
+    }
+
+    my $myName = basename($fn);
+    $myName =~ s/\.ttf$//i;  # remove .ttf (any case)
+
+    $pdf = PDF::Builder->new(-compress => $compress, 
+                          -file => basename($0).'.'.$myName.".pdf");
+
+    $f1 = $pdf->corefont('Helvetica', -encode => 'latin1');
+    $f2 = $pdf->corefont('Helvetica-Bold', -encode => 'latin1');
+
+    print STDERR "\n$myName\n";
+
+    my $font = $pdf->ttfont($fn, -encode => $encoding);
+    $font->data()->{'nosubset'} = 1;
+    # produce a page with dump of font
+    if (1) {
+        my $page = $pdf->page();
+        $page->mediabox(595,842);
+
+        my $gfx = $page->gfx();
+
+        my $txt = $page->text();
+        $txt->font($font, $fx);
+
+        my $txt2 = $page->text();
+        #delete $txt->{'Filter'};
+        #delete $txt2->{'Filter'};
+
+        $txt2->textlabel(50,800, $f1,20, "font='".$font->fontname()."'");
+        $txt2->textlabel(50,780, $f1,20, "encoding='$encoding'");
+
+        $txt2->font($f1, 5);
+        $txt2->hscale(80);
+
+        my $u = $font->underlineposition()*$fx/1000;
+
+	# loop through rows (yp growing from bottom)
+        foreach my $yp (0..15) {
+	    $y = 15 - $yp; # grow y from top to bottom instead
+            print STDERR ".";
+	    # loop through columns left to right
+            foreach $x (0..15) {
+                $txt->translate(50+($sx*$x),50+($sy*$y));
+		my $ci = $yp*16 + $x;
+		my $c  = chr($ci);
+                $txt->text($c);
+
+                my $wx = $font->width($c)*$fx;
+
+		# draw cell box
+                $gfx->strokecolor('lightblue');
+                $gfx->move(50+($sx*$x),50+($sy*$y)+$fx);
+                $gfx->line(50+($sx*$x),50+($sy*$y)+$u);
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$u);
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y)+$fx);
+                $gfx->close();
+                $gfx->stroke();
+
+                $gfx->strokecolor('gray');
+                $gfx->move(50+($sx*$x),50+($sy*$y));
+                $gfx->line(50+($sx*$x)+$wx,50+($sy*$y));
+                $gfx->stroke();
+
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-6);
+                $txt2->text_right($ci);
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-11);
+                if (defined $font->uniByEnc($ci)) {
+                    $txt2->text_right(sprintf('U=0x%04X', $font->uniByEnc($ci)));
+		} else {
+                    $txt2->text_right('U=0x????');
+		}
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-16);
+                $txt2->text_right($font->glyphByEnc($ci));
+                $txt2->translate(50+($sx*$x)-2,50+($sy*$y)-21);
+                $txt2->text_right(sprintf('wx=%i',$font->wxByEnc($ci)));
+            } # loop x L to R along row
+        } # loop yp B to T along column and y T to B
+    } # always do this section (if 1)
+
+    my @cids = (0 .. $font->glyphNum()-1);
+    # warning: apparently not all fonts have fontbbox
+    my @fbbx = $font->fontbbox();
+    my $xw = int(($fbbx[2] - $fbbx[0])/20)*20;
+    my $yw = int(($fbbx[3] - $fbbx[1])/20)*20;
+    my $fw = $xw>$yw? $yw: $xw;
+    my $mw = 800/$fw;
+    my $y0 = int((20 - $fbbx[1])/20)*20*$mw;
+    my $sX = 0.045;
+    my $sY = 0.045;
+
+    # one or more pages to display all the cids, 10 col/x x 15 rows/y per page
+    while (scalar @cids>0) {
+        $page = $pdf->page();
+        $page->mediabox(595,842);
+
+        $gfx = $page->gfx();
+        $tx  = $page->text();
+        #delete $gfx->{'Filter'};
+
+	# loop through y coordinates of rows
+	foreach $yp (0 .. 14) {
+	    my $y = 750 - $yp*50;
+	    # loop through x coordinates of columns
+	    foreach $xp (1 .. 10) {
+		my $x = $xp * 50;
+                my $xo = shift(@cids);
+                $gfx->save();
+                $gfx->fillcolor('black');
+                $gfx->transform(-translate => [$x, $y], -scale => [0.045, 0.045]);
+
+		# heavy, solid box for cell (user coordinates 1000x1000)
+                $gfx->linewidth(10);
+                $gfx->rect(0,0, 1000,1000);
+                $gfx->stroke();
+
+                my $wx = $font->wxByCId($xo)*$mw;   # actual width of character
+                my $x0 = (1000-$wx)/2;              # left offset (centered)
+
+		# light, dashed baseline and centered horizontal extents
+                $gfx->linedash(10,20);
+                $gfx->linewidth(0.5);
+                $gfx->move($x0,0);
+                $gfx->line($x0,1000);    # left limit
+                $gfx->move($x0+$wx,1000);
+                $gfx->line($x0+$wx,0);   # right limit
+                $gfx->move(0,$y0);
+                $gfx->line(1000,$y0);    # baseline
+                $gfx->stroke();
+
+		# draw the character
+                $tx->font($font, 1000*$mw*$sX);
+                $tx->translate($x+$x0*$sX,$y+$y0*$sY);
+                $tx->add($font->text_cid(pack('n',$xo)),'Tj');
+
+		# information about the character
+                $tx->font($f1, 100*$sX);
+                $tx->hscale(80);
+                $tx->translate($x+25*$sX,$y+860*$sY);
+                $tx->text("G+$xo"); 
+                $tx->translate($x+25*$sX,$y+10*$sY);
+		if (defined $font->uniByCId($xo)) {
+                    $tx->text(sprintf('U+0x%04X', $font->uniByCId($xo)));
+	        } else {
+                    $tx->text('U+0x????');
+		}
+
+                my $name = $font->glyphByCId($xo);
+                if ($name eq '') {
+                    $tx->fillcolor('red');
+                    $name="NONE";
+                } else {
+                    $tx->fillcolor('blue');
+                }
+
+                $tx->hscale(70);
+                $tx->translate($x+975*$sX,$y+860*$sY);
+                $tx->text_right($name);
+
+                $tx->fillcolor('black');
+                $tx->translate($x+975*$sX,$y+10*$sY);
+                $tx->text_right('wx='.$font->wxByCId($xo));
+
+                $tx->fillcolor('#008000');
+                $tx->translate($x+500*$sX,$y+950*$sY);
+                $tx->hscale(70);
+                my $ci = charinfo($font->uniByCId($xo) || 0);
+                $tx->font($f2, 50*$sX);
+                $tx->text_center($ci->{'name'});
+
+		# restore
+                $tx->fillcolor('black');
+                $tx->hscale(100);
+
+                $gfx->restore();
+
+                last unless scalar @cids>0;
+            } # loop through x coordinates of columns
+            last unless scalar @cids>0;
+        } # loop through y coordinates of rows
+        print STDERR ".";
+    } # loop through cids of font
+    
+    # print out some text in this font on next page
+    my $textL = $LoremIpsum;
+
+    $page = $pdf->page();
+    $page->mediabox(595,842);
+    $tx = $page->text();
+    $tx->transform(-translate => [50, 800]);
+    $tx->fillcolor('black');
+    $tx->font($font, 18);
+    $tx->lead(18*1.25);
+    my $toprint;
+    while ($textL ne '') {
+    	($toprint, $textL) = $tx->_text_fill_line($textL, 500, 0);
+    	$tx->text($toprint);
+    	$tx->nl();
+    }
+    
+    $pdf->save();
+    $pdf->end();
+} # loop through a font name. go to next command line name.
+
+exit;
+
+__END__
+
+=head1 HISTORY
+
+    $Log$
+    Revision 2.2  2007/04/07 10:26:23  areibens
+    added lorem ipsum page
+
+    Revision 2.1  2006/06/19 19:20:13  areibens
+    added details
+
+    Revision 2.0  2005/11/16 02:16:00  areibens
+    revision workaround for SF cvs import not to screw up CPAN
+
+    Revision 1.2  2005/11/16 01:27:48  areibens
+    genesis2
+
+    Revision 1.1  2005/11/16 01:19:24  areibens
+    genesis
+
+    Revision 1.3  2005/09/12 16:55:05  fredo
+    various updates
+
+    Revision 1.2  2004/12/31 02:58:49  fredo
+    no message
+
+    Revision 1.1  2004/04/06 23:04:06  fredo
+    genesis
+
+
+=cut

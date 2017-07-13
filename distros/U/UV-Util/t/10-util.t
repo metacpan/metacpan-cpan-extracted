@@ -5,6 +5,17 @@ use UV::Util ();
 
 use Test::More;
 
+require Alien::libuv;
+  diag "version        = ", Alien::libuv->config('version');
+  diag "cflags         = ", Alien::libuv->cflags;
+  diag "cflags_static  = ", Alien::libuv->cflags_static;
+  diag "libs           = ", Alien::libuv->libs;
+  diag "libs_static    = ", Alien::libuv->libs_static;
+  diag "bin_dir        = ", $_ for Alien::libuv->bin_dir;
+  diag "Install type   = ", Alien::libuv->install_type;
+
+  diag " ";
+  diag " ";
 can_ok(
     'UV::Util', (
         qw(UV_UNKNOWN_HANDLE UV_ASYNC UV_CHECK UV_FS_EVENT UV_FS_POLL),

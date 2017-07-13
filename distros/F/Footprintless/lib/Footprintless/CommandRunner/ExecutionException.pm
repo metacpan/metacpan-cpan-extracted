@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::CommandRunner::ExecutionException;
-$Footprintless::CommandRunner::ExecutionException::VERSION = '1.24';
+$Footprintless::CommandRunner::ExecutionException::VERSION = '1.25';
 # ABSTRACT: An exception for failures when executing commands
 # PODNAME: Footprintless::CommandRunner::ExecutionException
 
@@ -99,7 +99,7 @@ Footprintless::CommandRunner::ExecutionException - An exception for failures whe
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 DESCRIPTION
 

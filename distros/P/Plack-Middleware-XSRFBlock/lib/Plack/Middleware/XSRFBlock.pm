@@ -1,16 +1,15 @@
 package Plack::Middleware::XSRFBlock;
+
 {
   $Plack::Middleware::XSRFBlock::DIST = 'Plack-Middleware-XSRFBlock';
 }
-$Plack::Middleware::XSRFBlock::VERSION = '0.0.11';
+$Plack::Middleware::XSRFBlock::VERSION = '0.0.12';
 use strict;
 use warnings;
 use parent 'Plack::Middleware';
 
 
 use Digest::HMAC_SHA1 'hmac_sha1_hex';
-use HTML::Escape qw(escape_html);
-use HTML::Parser;
 use HTTP::Status qw(:constants);
 
 use Plack::Response;
@@ -74,6 +73,51 @@ sub prepare_app {
     });
 }
 
+sub detect_xsrf {
+    my $self    = shift;
+    my $request = shift;
+    my $env     = shift;
+
+    # X- header takes precedence over form fields
+    my $val;
+    $val = $request->header( $self->header_name )
+        if (defined $self->header_name);
+    # fallback to the parameter value
+    $val ||= $request->parameters->{ $self->parameter_name };
+
+    # it's not easy to decide if we're missing the X- value or the form
+    # value
+    # We can say for certain that if we don't have the header_name set
+    # it's a missing form parameter
+    # If it is set ... well, either could be missing
+    if (not defined $val and not length $val) {
+        # no X- headers expected
+        return 'form field missing'
+            if not defined $self->header_name;
+
+        # X- headers and form data allowed
+        return 'xsrf token missing';
+
+    }
+
+    # grab the cookie where we store the token
+    my $cookie_value = $request->cookies->{$self->cookie_name};
+
+    # get the value we expect from the cookie
+    return 'cookie missing'
+        unless defined $cookie_value;
+
+    # reject if the form value and the token don't match
+    return 'invalid token'
+        if $val ne $cookie_value;
+
+    return 'invalid signature'
+        if $self->invalid_signature($val);
+
+    # No XSRF detected
+    return;
+}
+
 sub call {
     my $self    = shift;
     my $env     = shift;
@@ -85,184 +129,177 @@ sub call {
     # we'll need the Plack::Request for this request
     my $request = Plack::Request->new($env);
 
-    # grab the cookie where we store the token
-    my $cookie_value = $request->cookies->{$self->cookie_name};
-
     # deal with form posts
     if ($request->method =~ m{^post$}i) {
         $self->log(info => 'POST submitted');
 
-        # X- header takes precedence over form fields
-        my $val;
-        $val = $request->header( $self->header_name )
-            if (defined $self->header_name);
-        # fallback to the parameter value
-        $val ||= $request->parameters->{ $self->parameter_name };
-
-        # it's not easy to decide if we're missing the X- value or the form
-        # value
-        # We can say for certain that if we don't have the header_name set
-        # it's a missing form parameter
-        # If it is set ... well, either could be missing
-        if (not defined $val and not length $val) {
-            # no X- headers expected
-            return $self->xsrf_detected(
-                { env => $env, msg => 'form field missing' } )
-              if not defined $self->header_name;
-
-            # X- headers and form data allowed
-            return $self->xsrf_detected(
-                { env => $env, msg => 'xsrf token missing' } )
-
-        }
-
-        # get the value we expect from the cookie
-        return $self->xsrf_detected( { env => $env, msg => 'cookie missing' } )
-          unless defined $cookie_value;
-
-        # reject if the form value and the token don't match
-        return $self->xsrf_detected( { env => $env, msg => 'invalid token' } )
-          if $val ne $cookie_value;
-
-        return $self->xsrf_detected( { env => $env,
-                msg => 'invalid signature' } )
-          if $self->invalid_signature($val);
+        my $msg = $self->detect_xsrf($request, $env);
+        return $self->xsrf_detected({ env => $env, msg => $msg })
+            if defined $msg;
     }
+
+    return $self->filter_response($request, $env);
+}
+
+sub cookie_handler {
+    my ($self, $request, $env, $res) = @_;
+
+    # grab the cookie where we store the token
+    my $cookie_value = $request->cookies->{$self->cookie_name};
+
+    # Determine whether to create a new token, based on the request
+    $cookie_value = $self->_token_generator->()
+        if $self->token_per_request->( $self, $request, $env );
+
+    # make it easier to work with the headers
+    my $headers = Plack::Util::headers($res->[1]);
+
+    # we can't form-munge anything non-HTML
+    my $ct = $headers->get('Content-Type') || '';
+    if($ct !~ m{^text/html}i and $ct !~ m{^application/xhtml[+]xml}i){
+        return $res;
+    }
+
+    # GITHUB ISSUE #12 - set cookie after we're happy it's HTML
+    # get the token value from:
+    # - cookie value, if it's already set
+    # - from the generator, if we don't have one yet
+    my $token = $cookie_value ||= $self->_token_generator->();
+
+    my %cookie_expires;
+    unless ( $self->cookie_is_session_cookie ) {
+        $cookie_expires{expires} = time + $self->cookie_expiry_seconds;
+    }
+
+    # we need to add our cookie
+    $self->_set_cookie(
+        $token,
+        $res,
+        path    => '/',
+        %cookie_expires,
+    );
+
+    return $token;
+}
+
+sub filter_response_html {
+    my ($self, $request, $env, $res, $token) = @_;
+
+    # Do not load these unless HTML filter is used
+    require HTML::Parser;
+    require HTML::Escape;
+    import HTML::Escape qw(escape_html);
+
+    # escape token (someone might have tampered with the cookie)
+    $token = escape_html($token);
+
+    # let's inject our field+token into the form
+    my @out;
+    my $http_host = $request->uri->host;
+    my $parameter_name = $self->parameter_name;
+
+    my $p = HTML::Parser->new( api_version => 3 );
+
+    $p->handler(default => [\@out , '@{text}']),
+
+    # we need *all* tags, otherwise we end up with gibberish as the final
+    # page output
+    # i.e. unless there's a better way, we *can not* do
+    #    $p->report_tags(qw/head form/);
+
+    # inject our xSRF information
+    $p->handler(
+        start => sub {
+            my($tag, $attr, $text) = @_;
+            # we never want to throw anything away
+            push @out, $text;
+
+            # for easier comparison
+            $tag = lc($tag);
+
+            # If we found the head tag and we want to add a <meta> tag
+            if( $tag eq 'head' && $self->meta_tag) {
+                # Put the csrftoken in a <meta> element in <head>
+                # So that you can get the token in javascript in your
+                # App to set in X-CSRF-Token header for all your AJAX
+                # Requests
+                push @out,
+                    sprintf(
+                        q{<meta name="%s" content="%s"/>},
+                        $self->meta_tag,
+                        $token
+                    );
+            }
+
+            # If tag isn't 'form' and method isn't 'post' we dont care
+            return unless
+                    defined $tag
+                && defined $attr->{'method'}
+                && $tag eq 'form'
+                && $attr->{'method'} =~ /post/i;
+
+            if(
+                !(
+                    defined $attr
+                        and
+                    exists $attr->{'action'}
+                        and
+                    $attr->{'action'} =~ m{^https?://([^/:]+)[/:]}
+                        and
+                    defined $http_host
+                        and
+                    $1 ne $http_host
+                )
+            ) {
+                push @out,
+                    sprintf(
+                        '<input type="hidden" name="%s" value="%s" />',
+                        $parameter_name,
+                        $token
+                    );
+            }
+
+            # TODO: determine xhtml or html?
+            return;
+        },
+        "tagname, attr, text",
+    );
+
+    # we never want to throw anything away
+    $p->handler(
+        default => sub {
+            my($tag, $attr, $text) = @_;
+            push @out, $text;
+        },
+        "tagname, attr, text",
+    );
+
+    my $done;
+    return sub {
+        return if $done;
+
+        if(defined(my $chunk = shift)) {
+            $p->parse($chunk);
+        }
+        else {
+            $p->eof;
+            $done++;
+        }
+        join '', splice @out;
+    }
+}
+
+sub filter_response {
+    my ($self, $request, $env) = @_;
 
     return Plack::Util::response_cb($self->app->($env), sub {
         my $res = shift;
 
-        # Determine whether to create a new token, based on the request
-        $cookie_value = $self->_token_generator->()
-            if $self->token_per_request->( $self, $request, $env );
-
-        # make it easier to work with the headers
-        my $headers = Plack::Util::headers($res->[1]);
-
-        # we can't form-munge anything non-HTML
-        my $ct = $headers->get('Content-Type') || '';
-        if($ct !~ m{^text/html}i and $ct !~ m{^application/xhtml[+]xml}i){
-            return $res;
-        }
-
-        # GITHUB ISSUE #12 - set cookie after we're happy it's HTML
-        # get the token value from:
-        # - cookie value, if it's already set
-        # - from the generator, if we don't have one yet
-        my $token = $cookie_value ||= $self->_token_generator->();
-
-        my %cookie_expires;
-        unless ( $self->cookie_is_session_cookie ) {
-            $cookie_expires{expires} = time + $self->cookie_expiry_seconds;
-        }
-
-        # we need to add our cookie
-        $self->_set_cookie(
-            $token,
-            $res,
-            path    => '/',
-            %cookie_expires,
-        );
+        my $token = $self->cookie_handler($request, $env, $res);
 
         return $res unless $self->inject_form_input;
 
-        # escape token (someone might have tampered with the cookie)
-        $token = escape_html($token);
-
-        # let's inject our field+token into the form
-        my @out;
-        my $http_host = $request->uri->host;
-        my $parameter_name = $self->parameter_name;
-
-        my $p = HTML::Parser->new( api_version => 3 );
-
-        $p->handler(default => [\@out , '@{text}']),
-
-        # we need *all* tags, otherwise we end up with gibberish as the final
-        # page output
-        # i.e. unless there's a better way, we *can not* do
-        #    $p->report_tags(qw/head form/);
-
-        # inject our xSRF information
-        $p->handler(
-            start => sub {
-                my($tag, $attr, $text) = @_;
-                # we never want to throw anything away
-                push @out, $text;
-
-                # for easier comparison
-                $tag = lc($tag);
-
-                # If we found the head tag and we want to add a <meta> tag
-                if( $tag eq 'head' && $self->meta_tag) {
-                    # Put the csrftoken in a <meta> element in <head>
-                    # So that you can get the token in javascript in your
-                    # App to set in X-CSRF-Token header for all your AJAX
-                    # Requests
-                    push @out,
-                        sprintf(
-                            q{<meta name="%s" content="%s"/>},
-                            $self->meta_tag,
-                            $token
-                        );
-                }
-
-                # If tag isn't 'form' and method isn't 'post' we dont care
-                return unless
-                       defined $tag
-                    && defined $attr->{'method'}
-                    && $tag eq 'form'
-                    && $attr->{'method'} =~ /post/i;
-
-                if(
-                    !(
-                        defined $attr
-                            and
-                        exists $attr->{'action'}
-                            and
-                        $attr->{'action'} =~ m{^https?://([^/:]+)[/:]}
-                            and
-                        defined $http_host
-                            and
-                        $1 ne $http_host
-                    )
-                ) {
-                    push @out,
-                        sprintf(
-                            '<input type="hidden" name="%s" value="%s" />',
-                            $parameter_name,
-                            $token
-                        );
-                }
-
-                # TODO: determine xhtml or html?
-                return;
-            },
-            "tagname, attr, text",
-        );
-
-        # we never want to throw anything away
-        $p->handler(
-            default => sub {
-                my($tag, $attr, $text) = @_;
-                push @out, $text;
-            },
-            "tagname, attr, text",
-        );
-
-        my $done;
-        return sub {
-            return if $done;
-
-            if(defined(my $chunk = shift)) {
-                $p->parse($chunk);
-            }
-            else {
-                $p->eof;
-                $done++;
-            }
-            join '', splice @out;
-        }
+        return $self->filter_response_html($request, $env, $res, $token);
     });
 }
 
@@ -340,7 +377,7 @@ Plack::Middleware::XSRFBlock - Block XSRF Attacks with minimal changes to your a
 
 =head1 VERSION
 
-version 0.0.11
+version 0.0.12
 
 =head1 SYNOPSIS
 
@@ -505,6 +542,14 @@ to the browser.
 
 =back
 
+=head2 detect_xsrf($self, $request, $env)
+
+=head2 cookie_handler($self, $request, $env, $res)
+
+=head2 filter_response_html($self, $request, $env, $res, $token)
+
+=head2 filter_response($self, $request, $env)
+
 =head2 invalid_signature($self, $value)
 
 =head2 xsrf_detected($self, $args)
@@ -601,7 +646,7 @@ the same terms as the Perl 5 programming language system itself.
 
 =head1 CONTRIBUTORS
 
-=for stopwords Chisel Wright Daniel Perrett Matthew Ryall Matthias Zeichmann Michael Kröll Sebastian Willert William Wolf
+=for stopwords Chisel Daniel Perrett Karen Etheridge Matthew Ryall Matthias Zeichmann Michael Kröll Sebastian Willert Sterling Hanenkamp William Wolf
 
 =over 4
 
@@ -611,11 +656,11 @@ Chisel <chisel.wright@net-a-porter.com>
 
 =item *
 
-Chisel Wright <chisel@chizography.net>
+Daniel Perrett <dp13@sanger.ac.uk>
 
 =item *
 
-Daniel Perrett <dp13@sanger.ac.uk>
+Karen Etheridge <ether@cpan.org>
 
 =item *
 
@@ -632,6 +677,10 @@ Michael Kröll <michael.kroell@geizhals.at>
 =item *
 
 Sebastian Willert <willert@gmail.com>
+
+=item *
+
+Sterling Hanenkamp <sterling@ziprecruiter.com>
 
 =item *
 

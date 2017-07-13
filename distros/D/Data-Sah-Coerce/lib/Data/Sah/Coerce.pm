@@ -1,12 +1,12 @@
 package Data::Sah::Coerce;
 
-our $DATE = '2017-03-14'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.023'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Sah::CoerceCommon;
 
@@ -94,7 +94,7 @@ sub gen_coercer {
     }
 
     if ($Log_Coercer_Code) {
-        $log->tracef("Coercer code (gen args: %s): %s", \%args, $code);
+        log_trace("Coercer code (gen args: %s): %s", \%args, $code);
     }
 
     return $code if $args{source};
@@ -119,7 +119,7 @@ Data::Sah::Coerce - Coercion rules for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.021 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2017-03-14.
+This document describes version 0.023 of Data::Sah::Coerce (from Perl distribution Data-Sah-Coerce), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -289,12 +289,12 @@ modules then compose them into the final code, something like (in pseudocode):
 
 =head2 $Log_Coercer_Code => bool (default: from ENV or 0)
 
-If set to true, will log the generated coercer code (currently using L<Log::Any>
+If set to true, will log the generated coercer code (currently using L<Log::ger>
 at trace level). To see the log message, e.g. to the screen, you can use
 something like:
 
- % TRACE=1 perl -MLog::Any::Adapter=Screen -MData::Sah::Coerce=gen_coercer \
-     -E'my $c = gen_coercer(...)'
+ % TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
+     -MData::Sah::Coerce=gen_coercer -E'my $c = gen_coercer(...)'
 
 =head1 FUNCTIONS
 

@@ -9,7 +9,7 @@
 
 package Glib::GenPod;
 
-our $VERSION = '1.325';
+our $VERSION = '1.326';
 
 use strict;
 use warnings;
@@ -40,7 +40,7 @@ our @EXPORT = qw(
 our $COPYRIGHT = undef;
 our $AUTHORS = 'Gtk2-Perl Team';
 our $MAIN_MOD = undef;
-our $YEAR = strftime "%Y", gmtime;
+our $YEAR = strftime "%Y", gmtime($ENV{SOURCE_DATE_EPOCH} || time);
 
 our ($xspods, $data);
 	

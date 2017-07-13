@@ -40,6 +40,7 @@ return {
             template_dir        => "$properties{'dev.foo.overlay.dir'}/template",
             to_dir              => $foo_tomcat_directory
         },
+        site          => '',
         sudo_username => $properties->{'dev.foo.sudo_username'},
         tomcat        => {
             'Config::Entities::inherit' => [ 'hostname', 'sudo_username' ],

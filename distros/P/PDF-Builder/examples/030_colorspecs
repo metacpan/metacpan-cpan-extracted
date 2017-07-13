@@ -1,0 +1,206 @@
+#!/usr/bin/perl
+
+# display RGB colorspace 16 pages (green 0 to F) of 256 colors R x B
+#   with red increasing to right and blue increasing to top
+# same, for Gamma 2.2
+# display CMYK colorspace 16 pages (magenta 0 to F) of 256 colors C x Y
+#   with cyan increasing to right and yellow increasing to top. Black = 0 in all
+# display Lab colorspace 16 pages (L 0 to F) of 256 colors a x b
+#   with a increasing to right and b increasing to top
+# display named colors 2.5 pages, alphabetical order L to R, B to T
+
+# TBD: consider reordering to put min in upper left, max in lower right
+#      (are there any conventions for this?). currently is LL/UR.
+
+use strict;
+use warnings;
+
+use PDF::Builder;
+use PDF::Builder::Util;
+use POSIX;
+use Math::Trig;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my $cx = 315;
+my $cy = 400;
+my $cr = 15;
+my $cs = 32;
+my $ang = 30;
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+my @doSect = (1, 1, 1, 1, 1);  # which section(s) to display
+
+$pdf->mediabox(595,842);
+
+my $fnt = $pdf->corefont('Verdana-Bold');
+
+my ($page, $gfx, $text);
+
+if ($doSect[0]) {
+# RGB colorspace
+print STDERR "RGB colorspace (16 pages)  ";
+foreach my $z (0 .. 0xf) {  # one green value per page
+    print STDERR ".";
+    $page = $pdf->page();
+    $gfx = $page->gfx();
+    $text = $page->text();
+    $text->linewidth(0);
+    $text->render(2);
+    
+    $text->textlabel(300,750, $fnt, 20, 'RGB Colorspace', -color=>'#000', -hscale=>125, -center=>1);
+
+    $text->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        foreach my $y (0 .. 0xf) {
+            my $t = sprintf('#%01X%01X%01X', $x,$z,$y);
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs, $cr);
+            $gfx->fillstroke();
+            $text->textlabel($cx+($x-8)*$cs+2,$cy+($y-8)*$cs-2, $fnt,8, $t, -color=>'#000', -strokecolor=>'#FFF', -rotate=>$ang, -hscale=>85, -center=>1);
+        }
+    }
+}
+print STDERR "\n";
+}
+
+if ($doSect[1]) {
+# RGB colorspace with Gamma = 2.2
+print STDERR "RGB colorspace with Gamma 2.2 (16 pages)  ";
+foreach my $z (0 .. 0xf) {  # one green value per page
+    print STDERR ".";
+    $page = $pdf->page();
+    $gfx = $page->gfx();
+    $text = $page->text();
+    $text->linewidth(0);
+    $text->render(2);
+    
+    $text->textlabel(300,750, $fnt, 20, 'RGB Colorspace (Gamma=2.2)', -color=>'#000', -hscale=>125, -center=>1);
+
+    $text->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        foreach my $y (0 .. 0xf) {
+            my $t = sprintf('#%01X%01X%01X', $x,$z,$y);
+            $gfx->fillcolor($x/0xf,$z/0xf,$y/0xf);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs, $cr);
+            $gfx->fillstroke();
+            $text->textlabel($cx+($x-8)*$cs+2,$cy+($y-8)*$cs-2, $fnt,8, $t, -color=>'#000', -strokecolor=>'#FFF', -rotate=>$ang, -hscale=>85, -center=>1);
+        }
+    }
+}
+print STDERR "\n";
+}
+
+if ($doSect[2]) {
+# CMYK colorspace  
+print STDERR "CMYK colorspace (16 pages)  ";
+foreach my $z (0 .. 0xf) {  # one magenta value per page
+    print STDERR ".";
+    $page = $pdf->page();
+    $gfx = $page->gfx();
+    $text = $page->text();
+    $text->linewidth(0);
+    $text->render(2);
+    
+    $text->textlabel(300,750, $fnt,20, 'CMYK Colorspace', -color=>'#000', -hscale=>125, -center=>1);
+
+    $text->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        foreach my $y (0 .. 0xf) {
+            my $t = sprintf('%%%01X%01X%01X0', $x,$z,$y);
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs, $cr);
+            $gfx->fillstroke();
+            $text->textlabel($cx+($x-8)*$cs+2,$cy+($y-8)*$cs-2, $fnt,8, $t, -color=>'#000', -strokecolor=>'#FFF', -rotate=>$ang, -hscale=>85, -center=>1);
+        }
+    }
+}
+print STDERR "\n";
+}
+
+if ($doSect[3]) {
+# Lab colorspace
+print STDERR "L*a*b colorspace (16 pages)  ";
+foreach my $z (0 .. 0xf) {  # one L value per page
+    print STDERR ".";
+    $page = $pdf->page();
+    $gfx = $page->gfx();
+    $text = $page->text();
+    $text->linewidth(0);
+    $text->render(2);
+    
+    $text->textlabel(300,750, $fnt,20, 'Lab Colorspace', -color=>'#000', -hscale=>125, -center=>1);
+
+    $text->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        foreach my $y (0 .. 0xf) {
+            my $t=sprintf('$%01X%01X%01X',$z,$x,$y);
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs, $cr);
+            $gfx->fillstroke();
+            $text->textlabel($cx+($x-8)*$cs+2,$cy+($y-8)*$cs-2, $fnt,8, $t, -color=>'#000', -strokecolor=>'#FFF', -rotate=>$ang, -hscale=>85, -center=>1);
+        }
+    }
+}
+print STDERR "\n";
+}
+
+if ($doSect[4]) {
+# named colors
+print STDERR "named colors (RGB colorspace)  ";
+my @cols=sort keys %PDF::Builder::Util::colors;
+# quick'n'dirty numeric sort of two 0..100 sections of list
+# after sorting, they should be contiguous stretches. will need to revisit
+# this code if no longer 0..max sequence
+foreach my $base ('gray', 'grey') {
+    my $start = 0;
+    my $end = -1;
+    my ($i, $j);
+    for ($i=0; $i<scalar @cols; $i++) {
+        next unless $cols[$i] =~ m/^$base\d+$/;
+	if ($end < $start) { $start = $end = $i; } else { $end = $i; }
+    }
+    # have $start and $end indices in @cols. rewrite them
+    for ($i=$start, $j=0; $i<=$end; $i++, $j++) {
+	$cols[$i] = $base.$j;
+    }
+}
+
+while (scalar @cols > 0) {  # next (up to) 256 names
+    print STDERR ".";
+    $page = $pdf->page();
+    $gfx = $page->gfx();
+    $text = $page->text();
+    $text->linewidth(0);
+    $text->render(2);
+    
+    $text->textlabel(300,750, $fnt,20, 'Named Colors (RGB)', -color=>'#000', -hscale=>125, -center=>1);
+
+    $text->strokecolor('#000');
+
+    foreach my $x (0 .. 0xf) {
+        last if scalar @cols == 0;
+        foreach my $y (0 .. 0xf) { 
+            last if scalar @cols == 0;
+            my $t = shift @cols;
+            $gfx->fillcolor($t);
+            $gfx->circle($cx+($x-8)*$cs,$cy+($y-8)*$cs, $cr);
+            $gfx->fillstroke();
+            $text->textlabel($cx+($x-8)*$cs+2,$cy+($y-8)*$cs-2, $fnt,7, $t, -color=>'#000', -strokecolor=>'#FFF', -rotate=>$ang, -hscale=>85, -center=>1);
+        }
+    }
+}
+print STDERR "\n";
+}
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__

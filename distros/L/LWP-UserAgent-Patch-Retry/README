@@ -1,30 +1,31 @@
-SYNOPSIS
+NAME
+    LWP::UserAgent::Patch::Retry - Add retries
 
+VERSION
+    This document describes version 0.04 of LWP::UserAgent::Patch::Retry
+    (from Perl distribution LWP-UserAgent-Patch-Retry), released on
+    2017-07-10.
+
+SYNOPSIS
      use LWP::UserAgent::Patch::Retry -n => 2, -delay => 3;
 
 DESCRIPTION
-
     This patch adds retries to LWP::UserAgent when response from request is
     not a success.
 
-    Can be used with WWW::Mechanize because that module uses
-    LWP::UserAgent.
+    Can be used with WWW::Mechanize because that module uses LWP::UserAgent.
 
 CONFIGURATION
+  -n => INT (default: 2)
+    Number of retries. Default is 2, which means it will retry twice (so the
+    total number of requests is 3).
 
- -n => INT (default: 2)
-
-    Number of retries. Default is 2, which means it will retry twice (so
-    the total number of requests is 3).
-
- -delay => INT (default: 3)
-
+  -delay => INT (default: 3)
     Delay between retries, in seconds.
 
- -criteria => CODE
-
-    Specify custom criteria of whether to retry. Will be passed ($self,
-    $response) and should return 1 if retry should be performed. For
+  -criteria => CODE
+    Specify custom criteria of whether to retry. Will be passed "($self,
+    $response)" and should return 1 if retry should be performed. For
     example if you do not want to retry on 404 errors:
 
      use LWP::UserAgent::Patch::Retry
@@ -34,15 +35,37 @@ CONFIGURATION
          };
 
 FAQ
-
- Why not subclass?
-
+  Why not subclass?
     By patching, you do not need to replace all the client code which uses
     LWP::UserAgent (or WWW::Mechanize, and so on).
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-UserAgent-Patch-Retry>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-UserAgent-Patch-Retry>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Patch-R
+    etry>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     LWP::UserAgent::Determined, LWP::UserAgent::ExponentialBackoff
 
     Retry in general: Retry, Sub::Retry, Perinci::Sub::Property::retry
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2013 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

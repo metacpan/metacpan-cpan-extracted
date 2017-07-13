@@ -7,7 +7,7 @@ use Module::Load ();
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
 has '+url' => sub { Carp::croak "url is a required property" };
@@ -20,6 +20,10 @@ has 'version' => undef;
 
 
 has 'ssl'     => 0;
+
+
+has 'passive' => 0;
+
 has 'scheme'  => undef;
 
 sub _pick_fetch
@@ -61,11 +65,14 @@ sub init
 {
   my($self, $meta) = @_;
   
+  $meta->add_requires('share' => 'Alien::Build::Plugin::Download::Negotiate' => '0.61')
+    if $self->passive;
+
   $meta->prop->{plugin_download_negotiate_default_url} = $self->url;
 
   my $fetch = $self->_pick_fetch;
   
-  $self->_plugin($meta, 'Fetch', $fetch, url => $self->url, ssl => $self->ssl);
+  $self->_plugin($meta, 'Fetch', $fetch, url => $self->url, ssl => $self->ssl, passive => $self->passive);
   
   if($self->version)
   {
@@ -93,10 +100,11 @@ sub init
 
 sub _plugin
 {
-  my($self, $meta, $type, $name, @args) = @_;
+  my($self, $meta, $type, $name, %args) = @_;
   my $class = "Alien::Build::Plugin::${type}::$name";
   Module::Load::load($class);
-  my $plugin = $class->new(@args);
+  delete $args{passive} unless $type eq 'Fetch' && $name eq 'NetFTP';
+  my $plugin = $class->new(%args);
   $plugin->init($meta);
 }
 
@@ -114,7 +122,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 0.55
+version 0.61
 
 =head1 SYNOPSIS
 
@@ -163,6 +171,10 @@ If your initial URL does not need SSL, but you know ahead of time that a subsequ
 request will need it (for example, if your directory listing is on C<http>, but includes
 links to C<https> URLs), then you can set this property to true, and the appropriate
 Perl SSL modules will be loaded.
+
+=head2 passive
+
+If using FTP, attempt a passive mode transfer first, before trying an active mode transfer.
 
 =head1 SEE ALSO
 

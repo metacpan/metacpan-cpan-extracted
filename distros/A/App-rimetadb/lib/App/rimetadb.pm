@@ -1,13 +1,13 @@
 package App::rimetadb;
 
-our $DATE = '2016-12-10'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.21'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Module::Load qw(autoload load);
 
@@ -150,7 +150,7 @@ our %args_query = (
 our %args_package = (
     package => {
         summary => 'Select specific package only',
-        schema => 'str*', # XXX package name
+        schema => 'perl::modname*',
         tags => ['category:filtering'],
     },
 );
@@ -364,11 +364,11 @@ _
                 my %args = @_;
                 my $val = $args{value};
                 if (my ($mod, $imp) = $val =~ /(.+?)=(.+)/) {
-                    $log->debug("Loading module $mod ...");
+                    log_debug("Loading module $mod ...");
                     load $mod;
                     $mod->import(split /,/, $imp);
                 } else {
-                    $log->debug("Loading module $val ...");
+                    log_debug("Loading module $val ...");
                     autoload $val;
                 }
             },
@@ -380,7 +380,7 @@ _
             cmdline_on_getopt => sub {
                 my %args = @_;
                 my $val = $args{value};
-                $log->debug("Loading module $val ...");
+                log_debug("Loading module $val ...");
                 load $val;
             },
         },
@@ -418,7 +418,7 @@ sub update_from_modules {
     for my $entry (@{ $args{module_or_package} }) {
         if ($entry =~ /\A\+(.+)::\*?\z/) {
             # package prefix
-            $log->debug("Listing all packages under $1 ...");
+            log_debug("Listing all packages under $1 ...");
             for (Package::MoreUtil::list_subpackages($1, 1)) {
                 next if $_ ~~ @pkgs || _is_excluded($_, $exc);
                 push @pkgs, $_;
@@ -430,19 +430,19 @@ sub update_from_modules {
             push @pkgs, $pkg;
         } elsif ($entry =~ /(.+::)\*?\z/) {
             # module prefix
-            $log->debug("Listing all modules under $1 ...");
+            log_debug("Listing all modules under $1 ...");
             my $res = Module::List::list_modules(
                 $1, {list_modules=>1, recurse=>1});
             for my $mod (sort keys %$res) {
                 next if $mod ~~ @pkgs || _is_excluded($mod, $exc);
-                $log->debug("Loading module $mod ...");
+                log_debug("Loading module $mod ...");
                 load $mod;
                 push @pkgs, $mod;
             }
         } else {
             # module name
             next if $entry ~~ @pkgs || _is_excluded($entry, $exc);
-            $log->debug("Loading module $entry ...");
+            log_debug("Loading module $entry ...");
             load $entry;
             push @pkgs, $entry;
         }
@@ -455,7 +455,7 @@ sub update_from_modules {
     for my $pkg (@pkgs) {
         $i++;
         $progress->update(pos=>$i, message => "Processing package $pkg ...") if $progress;
-        $log->debug("Processing package $pkg ...");
+        log_debug("Processing package $pkg ...");
         #sleep 1;
         my $rec = $dbh->selectrow_hashref("SELECT * FROM package WHERE name=?",
                                           {}, $pkg);
@@ -463,7 +463,7 @@ sub update_from_modules {
         my @st = stat($mp) if $mp;
 
         unless ($args{force} || !$rec || !$rec->{mtime} || !@st || $rec->{mtime} < $st[9]) {
-            $log->debug("$pkg ($mp) hasn't changed since last recorded, skipped");
+            log_debug("$pkg ($mp) hasn't changed since last recorded, skipped");
             next;
         }
 
@@ -486,7 +486,7 @@ sub update_from_modules {
         for my $e (@{ $res->[2] }) {
             my $f = $e; $f =~ s!.+/!!;
             $j++;
-            $log->debug("Processing function $pkg\::$f ...");
+            log_debug("Processing function $pkg\::$f ...");
             $progress->update(pos => $i + $j/$numf, message => "Processing function $pkg\::$f ...") if $progress;
             $res = _pa->request(meta => "$uri$e");
             die "Can't meta $e: $res->[0] - $res->[1]" unless $res->[0] == 200;
@@ -502,7 +502,7 @@ sub update_from_modules {
         $sth->execute;
         while (my $row = $sth->fetchrow_hashref) {
             next if $row->{name} ~~ @pkgs;
-            $log->info("Package $row->{name} no longer exists, deleting from database ...");
+            log_info("Package $row->{name} no longer exists, deleting from database ...");
             push @deleted_pkgs, $row->{name};
         }
         if (@deleted_pkgs && !$args{-dry_run}) {
@@ -589,7 +589,7 @@ $SPEC{delete} = {
     args => {
         %args_common,
         package => {
-            schema => 'str*',
+            schema => 'perl::modname*',
             req => 1,
             completion => \&_complete_package,
         },
@@ -961,7 +961,7 @@ App::rimetadb - Manage a Rinci metadata database
 
 =head1 VERSION
 
-This document describes version 0.20 of App::rimetadb (from Perl distribution App-rimetadb), released on 2016-12-10.
+This document describes version 0.21 of App::rimetadb (from Perl distribution App-rimetadb), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -970,7 +970,11 @@ See the included CLI script L<rimetadb>.
 =head1 FUNCTIONS
 
 
-=head2 argument_stats(%args) -> [status, msg, result, meta]
+=head2 argument_stats
+
+Usage:
+
+ argument_stats(%args) -> [status, msg, result, meta]
 
 Show statistics on function arguments.
 
@@ -1011,7 +1015,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 arguments(%args) -> [status, msg, result, meta]
+=head2 arguments
+
+Usage:
+
+ arguments(%args) -> [status, msg, result, meta]
 
 List function arguments.
 
@@ -1068,7 +1076,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 delete(%args) -> [status, msg, result, meta]
+=head2 delete
+
+Usage:
+
+ delete(%args) -> [status, msg, result, meta]
 
 Delete a package or function metadata.
 
@@ -1113,7 +1125,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 function_stats(%args) -> [status, msg, result, meta]
+=head2 function_stats
+
+Usage:
+
+ function_stats(%args) -> [status, msg, result, meta]
 
 Show some statistics on functions.
 
@@ -1154,7 +1170,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 functions(%args) -> [status, msg, result, meta]
+=head2 functions
+
+Usage:
+
+ functions(%args) -> [status, msg, result, meta]
 
 List functions.
 
@@ -1203,7 +1223,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 meta(%args) -> [status, msg, result, meta]
+=head2 meta
+
+Usage:
+
+ meta(%args) -> [status, msg, result, meta]
 
 Get package/function metadata.
 
@@ -1248,7 +1272,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 packages(%args) -> [status, msg, result, meta]
+=head2 packages
+
+Usage:
+
+ packages(%args) -> [status, msg, result, meta]
 
 List packages.
 
@@ -1293,7 +1321,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 stats() -> [status, msg, result, meta]
+=head2 stats
+
+Usage:
+
+ stats() -> [status, msg, result, meta]
 
 Show some statistics.
 
@@ -1313,7 +1345,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 update(%args) -> [status, msg, result, meta]
+=head2 update
+
+Usage:
+
+ update(%args) -> [status, msg, result, meta]
 
 Add/update a package or function metadata.
 
@@ -1364,7 +1400,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 update_from_modules(%args) -> [status, msg, result, meta]
+=head2 update_from_modules
+
+Usage:
+
+ update_from_modules(%args) -> [status, msg, result, meta]
 
 Update Rinci metadata database from local Perl modules.
 
@@ -1499,7 +1539,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

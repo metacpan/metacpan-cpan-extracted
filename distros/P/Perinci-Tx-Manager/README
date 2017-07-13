@@ -1,93 +1,91 @@
-SYNOPSIS
+NAME
+    Perinci::Tx::Manager - A Rinci transaction manager
 
+VERSION
+    This document describes version 0.57 of Perinci::Tx::Manager (from Perl
+    distribution Perinci-Tx-Manager), released on 2017-07-10.
+
+SYNOPSIS
      # used by Perinci::Access::Schemeless
 
 DESCRIPTION
-
-    This class implements transaction and undo manager (TM), as specified
-    by Rinci::function::Transaction and Riap::Transaction. It is meant to
-    be instantiated by Perinci::Access::Schemeless, but will also be passed
-    to transactional functions to save undo/redo data.
+    This class implements transaction and undo manager (TM), as specified by
+    Rinci::function::Transaction and Riap::Transaction. It is meant to be
+    instantiated by Perinci::Access::Schemeless, but will also be passed to
+    transactional functions to save undo/redo data.
 
     It uses SQLite database to store transaction list and undo/redo data as
     well as transaction data directory to provide trash_dir/tmp_dir for
     functions that require it.
 
 ATTRIBUTES
-
- _tx_id
-
+  _tx_id
     This is just a convenience so that methods that require tx_id will get
     the default value from here if tx_id not specified in arguments.
 
 METHODS
-
- new(%args) => OBJ
-
+  new(%args) => OBJ
     Create new object. Arguments:
 
-      * pa => OBJ
+    *   pa => OBJ
 
-      Perinci::Access::Schemeless object. This is required by
-      Perinci::Tx::Manager to load/get functions when it wants to perform
-      undo/redo/recovery. Perinci::Access::Schemeless conveniently
-      require() the Perl modules and wraps the functions.
+        Perinci::Access::Schemeless object. This is required by
+        Perinci::Tx::Manager to load/get functions when it wants to perform
+        undo/redo/recovery. Perinci::Access::Schemeless conveniently
+        require() the Perl modules and wraps the functions.
 
-      * data_dir => STR (default ~/.perinci/.tx)
+    *   data_dir => STR (default "~/.perinci/.tx")
 
-      * max_txs => INT (default 1000)
+    *   max_txs => INT (default 1000)
 
-      Limit maximum number of transactions maintained by the TM, including
-      all rolled back and committed transactions, since they are still
-      recorded in the database. The default is 1000.
+        Limit maximum number of transactions maintained by the TM, including
+        all rolled back and committed transactions, since they are still
+        recorded in the database. The default is 1000.
 
-      Not yet implemented.
+        Not yet implemented.
 
-      After this limit is reached, cleanup will be performed to delete
-      rolled back transactions, and after that committed transactions.
+        After this limit is reached, cleanup will be performed to delete
+        rolled back transactions, and after that committed transactions.
 
-      * max_open_txs => INT (default 100)
+    *   max_open_txs => INT (default 100)
 
-      Limit maximum number of open (in progress, aborted, prepared)
-      transactions. This exclude resolved transactions (rolled back and
-      committed). The default is no limit.
+        Limit maximum number of open (in progress, aborted, prepared)
+        transactions. This exclude resolved transactions (rolled back and
+        committed). The default is no limit.
 
-      Not yet implemented.
+        Not yet implemented.
 
-      After this limit is reached, starting a new transaction will fail.
+        After this limit is reached, starting a new transaction will fail.
 
-      * max_committed_txs => INT (default 100)
+    *   max_committed_txs => INT (default 100)
 
-      Limit maximum number of committed transactions that is recorded by
-      the database. This is equal to the number of undo steps that are
-      remembered.
+        Limit maximum number of committed transactions that is recorded by
+        the database. This is equal to the number of undo steps that are
+        remembered.
 
-      After this limit is reached, cleanup will automatically be performed
-      so that the oldest committed transactions are purged.
+        After this limit is reached, cleanup will automatically be performed
+        so that the oldest committed transactions are purged.
 
-      Not yet implemented.
+        Not yet implemented.
 
-      * max_open_age => INT
+    *   max_open_age => INT
 
-      Limit the maximum age of open transactions (in seconds). If this
-      limit is reached, in progress transactions will automatically be
-      purged because it times out.
+        Limit the maximum age of open transactions (in seconds). If this
+        limit is reached, in progress transactions will automatically be
+        purged because it times out.
 
-      Not yet implemented.
+        Not yet implemented.
 
-      * max_committed_age => INT
+    *   max_committed_age => INT
 
-      Limit the maximum age of committed transactions (in seconds). If this
-      limit is reached, the old transactions will start to be purged.
+        Limit the maximum age of committed transactions (in seconds). If
+        this limit is reached, the old transactions will start to be purged.
 
-      Not yet implemented.
+        Not yet implemented.
 
- $tx->get_trash_dir => RESP
-
- $tx->get_tmp_dir => RESP
-
- $tm->begin(%args) => RESP
-
+  $tx->get_trash_dir => RESP
+  $tx->get_tmp_dir => RESP
+  $tm->begin(%args) => RESP
     Start a new transaction.
 
     Arguments: tx_id (str, required, unless already supplied via _tx_id()),
@@ -96,24 +94,24 @@ METHODS
 
     TM will create an entry for this transaction in its database.
 
- $tm->action(%args) => RESP
-
+  $tm->action(%args) => RESP
     Perform action for the transaction by calling one or more functions.
 
-    Arguments: f (fully-qualified function name), args (arguments to
-    function, hashref). Or, actions (list of function calls, array, [[f1,
-    args1], ...], alternative to specifying f and args), confirm (bool, if
-    set to true then will pass -confirm => 1 special argument to functions;
-    see status code 331 in Rinci::function for more details on this).
+    Arguments: "f" (fully-qualified function name), "args" (arguments to
+    function, hashref). Or, "actions" (list of function calls, array, "[[f1,
+    args1], ...]", alternative to specifying "f" and "args"), "confirm"
+    (bool, if set to true then will pass "-confirm => 1" special argument to
+    functions; see status code 331 in Rinci::function for more details on
+    this).
 
-    TM will also pass the following special arguments: -tx_v =>
-    PROTO_VERSION, -tx_rollback => 1 during rollback, and -tx_recovery => 1
-    during recovery, for informative purposes.
+    TM will also pass the following special arguments: "-tx_v =>
+    PROTO_VERSION", "-tx_rollback => 1" during rollback, and "-tx_recovery
+    => 1" during recovery, for informative purposes.
 
-    To perform a single action, specify f and args. To perform several
-    actions, supply actions.
+    To perform a single action, specify "f" and "args". To perform several
+    actions, supply "actions".
 
-    Note: special arguments (those started with dash, -) will be stripped
+    Note: special arguments (those started with dash, "-") will be stripped
     from function arguments by TM.
 
     If response from function is not success, rollback() will be called.
@@ -122,93 +120,106 @@ METHODS
     call a pure function, you do not have to use TM's action() but rather
     call the function directly, since this will not have any side effects.
 
-    Tip: During fix_state, function can return stash in result metadata
+    Tip: During "fix_state", function can return "stash" in result metadata
     which can be set to hash. This will be collected and passed by TM in
-    -stash special argument. This is useful in multiple actions where one
+    "-stash" special argument. This is useful in multiple actions where one
     action might need to check result from previous action.
 
- $tx->commit(%args) => RESP
-
+  $tx->commit(%args) => RESP
     Commit a transaction.
 
-    Arguments: tx_id
+    Arguments: "tx_id"
 
- $tx->rollback(%args) => RESP
-
+  $tx->rollback(%args) => RESP
     Rollback a transaction.
 
-    Arguments: tx_id, sp_id (optional, savepoint name to rollback to a
+    Arguments: "tx_id", "sp_id" (optional, savepoint name to rollback to a
     specific savepoint only).
 
     Currently rolling back to a savepoint is not implemented.
 
- $tx->prepare(%args) => RESP
-
+  $tx->prepare(%args) => RESP
     Prepare a transaction.
 
-    Arguments: tx_id
+    Arguments: "tx_id"
 
-    Currently will return 501 (not implemented). Rinci::Transaction does
-    not yet support distributed transaction.
+    Currently will return 501 (not implemented). Rinci::Transaction does not
+    yet support distributed transaction.
 
- $tx->savepoint(%args) => RESP
-
+  $tx->savepoint(%args) => RESP
     Declare a savepoint.
 
-    Arguments: tx_id, sp_id (savepoint name).
+    Arguments: "tx_id", "sp_id" (savepoint name).
 
     Currently not implemented.
 
- $tx->release_savepoint(%args) => RESP
-
+  $tx->release_savepoint(%args) => RESP
     Release (forget) a savepoint.
 
-    Arguments: tx_id, sp_id (savepoint name).
+    Arguments: "tx_id", "sp_id" (savepoint name).
 
     Currently not implemented.
 
- $tx->undo(%args) => RESP
-
+  $tx->undo(%args) => RESP
     Undo a committed transaction.
 
-    Arguments: tx_id, confirm (bool, if set to true then will pass -confirm
-    => 1 special argument to functions; see status code 331 in
+    Arguments: "tx_id", "confirm" (bool, if set to true then will pass
+    "-confirm => 1" special argument to functions; see status code 331 in
     Rinci::function for more details on this).
 
- $tx->redo(%args) => RESP
-
+  $tx->redo(%args) => RESP
     Redo an undone committed transaction.
 
-    Arguments: tx_id, confirm (bool, if set to true then will pass -confirm
-    => 1 special argument to functions; see status code 331 in
+    Arguments: "tx_id", "confirm" (bool, if set to true then will pass
+    "-confirm => 1" special argument to functions; see status code 331 in
     Rinci::function for more details on this).
 
- $tx->list(%args) => RESP
-
+  $tx->list(%args) => RESP
     List transactions.
 
     Arguments: detail (bool, default 0, whether to return transaction
     records instead of just a list of transaction ID's).
 
-    Return an array of results sorted by creation date (in ascending
-    order).
+    Return an array of results sorted by creation date (in ascending order).
 
- $tx->discard(%args) => RESP
-
+  $tx->discard(%args) => RESP
     Discard (forget) a client's committed transaction.
 
-    Arguments: tx_id
+    Arguments: "tx_id"
 
     Transactions that can be discarded are committed, undone committed, or
-    inconsistent ones (i.e., those with final statuses C, U, X).
+    inconsistent ones (i.e., those with final statuses "C", "U", "X").
 
- $tm->discard_all(%args) => RESP
-
+  $tm->discard_all(%args) => RESP
     Discard (forget) all committed transactions.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-Tx-Manager>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-Tx-Manager>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Tx-Manager>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci::Transaction
 
     Perinci::Access::Schemeless
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

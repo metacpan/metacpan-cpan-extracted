@@ -1,7 +1,7 @@
 package App::PDRUtils::MultiCmd::inc_prereq_version_to;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.10'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.11'; # VERSION
 
 use 5.010001;
 use strict;
@@ -28,7 +28,7 @@ App::PDRUtils::MultiCmd::inc_prereq_version_to - Increase prereq version to a sp
 
 =head1 VERSION
 
-This document describes version 0.10 of App::PDRUtils::MultiCmd::inc_prereq_version_to (from Perl distribution App-PDRUtils), released on 2017-07-03.
+This document describes version 0.11 of App::PDRUtils::MultiCmd::inc_prereq_version_to (from Perl distribution App-PDRUtils), released on 2017-07-10.
 
 =head1 FUNCTIONS
 

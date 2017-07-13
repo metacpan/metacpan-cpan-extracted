@@ -1,6 +1,6 @@
 package Dancer2::Core::Response::Delayed;
 # ABSTRACT: Delayed responses
-$Dancer2::Core::Response::Delayed::VERSION = '0.205000';
+$Dancer2::Core::Response::Delayed::VERSION = '0.205001';
 use Moo;
 use Dancer2::Core::Types qw<CodeRef InstanceOf>;
 
@@ -64,7 +64,7 @@ Dancer2::Core::Response::Delayed - Delayed responses
 
 =head1 VERSION
 
-version 0.205000
+version 0.205001
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ This object represents a delayed (asynchronous) response for L<Dancer2>.
 It can be used via the C<delayed> keyword.
 
 It keeps references to a request and a response in order to avoid
-keeping a reference ot the application.
+keeping a reference to the application.
 
 =head1 ATTRIBUTES
 
@@ -167,7 +167,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexis Sukrieh.
+This software is copyright (c) 2017 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

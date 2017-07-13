@@ -1,12 +1,12 @@
 package Setup::File;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.22'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.23'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::Trash::Undoable;
 use File::MoreUtil qw(dir_empty);
@@ -101,7 +101,7 @@ sub rmdir {
                     }
                 }
             }
-            $log->info("(DRY) Removing dir $path ...") if $dry_run;
+            log_info("(DRY) Removing dir $path ...") if $dry_run;
             unshift @undo, (
                 ['File::Trash::Undoable::untrash' =>
                      {path=>$path, suffix=>substr($taid,0,8)}],
@@ -179,14 +179,14 @@ sub mkdir {
             unshift @undo, [rmdir => {path => $path}];
         }
         if (@undo) {
-            $log->info("(DRY) Creating dir $path ...") if $dry_run;
+            log_info("(DRY) Creating dir $path ...") if $dry_run;
             return [200, "Dir $path needs to be created", undef,
                     {undo_actions=>\@undo}];
         } else {
             return [304, "Dir $path already exists"];
         }
     } elsif ($tx_action eq 'fix_state') {
-        $log->info("Creating dir $path ...");
+        log_info("Creating dir $path ...");
         if (CORE::mkdir($path, $mode)) {
             return [200, "Fixed"];
         } else {
@@ -272,7 +272,7 @@ sub chmod {
         my @undo;
         return [412, "Path $path doesn't exist"] if !$exists;
         if ($cur_mode != $want_mode) {
-            $log->infof("(DRY) chmod %s to %04o ...", $path, $want_mode)
+            log_info("(DRY) chmod %s to %04o ...", $path, $want_mode)
                 if $dry_run;
             unshift @undo, [chmod => {
                 path => $path, mode=>$cur_mode, orig_mode=>$want_mode,
@@ -280,7 +280,7 @@ sub chmod {
             }];
         }
         if (@undo) {
-            $log->infof("(DRY) Chmod %s to %04o ...", $path, $want_mode)
+            log_info("(DRY) Chmod %s to %04o ...", $path, $want_mode)
                 if $dry_run;
             return [200, "Path $path needs to be chmod'ed to ".
                         sprintf("%04o", $want_mode), undef,
@@ -289,7 +289,7 @@ sub chmod {
             return [304, "Fixed, mode already ".sprintf("%04o", $cur_mode)];
         }
     } elsif ($tx_action eq 'fix_state') {
-        $log->infof("Chmod %s to %04o ...", $path, $want_mode);
+        log_info("Chmod %s to %04o ...", $path, $want_mode);
         if (CORE::chmod($want_mode, $path)) {
             return [200, "Fixed"];
         } else {
@@ -442,7 +442,7 @@ sub chown {
         return [412, "$path doesn't exist"] if !$exists;
         if (defined($want_uid) && $cur_uid != $want_uid ||
                 defined($want_gid) && $cur_gid != $want_gid) {
-            $log->infof("(DRY) Chown %s to (%s, %s)",
+            log_info("(DRY) Chown %s to (%s, %s)",
                         $path, $want_owner, $want_group) if $dry_run;
             unshift @undo, [chown => {
                 path  => $path,
@@ -463,7 +463,7 @@ sub chown {
         }
     } elsif ($tx_action eq 'fix_state') {
         my $res;
-        $log->infof("%schown %path to (%s, %s) ...", $follow_sym ? "" : "l",
+        log_info("%schown %path to (%s, %s) ...", $follow_sym ? "" : "l",
                     $path, $want_uid // -1, $want_gid // -1);
         if ($follow_sym) {
             $res = CORE::chown   ($want_uid // -1, $want_gid // -1, $path);
@@ -564,8 +564,8 @@ sub rmfile {
             if (!$args{-confirm} && (defined($args{orig_content}) ||
                                          defined($args{orig_content_md5}))) {
                 if (defined $args{orig_content}) {
-                    require File::Slurp::Tiny;
-                    my $ct = eval { File::Slurp::Tiny::read_file($path) };
+                    require File::Slurper;
+                    my $ct = eval { File::Slurper::read_text($path) };
                     return [500, "Can't read file $path: $!"]
                         unless defined($ct);
                     return [331, "File $path has changed content, confirm ".
@@ -582,7 +582,7 @@ sub rmfile {
                         if $ctx->hexdigest ne $args{orig_content_md5};
                 }
             }
-            $log->info("(DRY) Removing file $path ...") if $dry_run;
+            log_info("(DRY) Removing file $path ...") if $dry_run;
             unshift @undo, (
                 ['File::Trash::Undoable::untrash' =>
                      {path=>$path, suffix=>$suffix}],
@@ -690,7 +690,7 @@ _
 };
 sub mkfile {
     require Digest::MD5;
-    require File::Slurp::Tiny;
+    require File::Slurper;
 
     my %args = @_;
 
@@ -715,7 +715,7 @@ sub mkfile {
 
     my $fix_content;
     if ($exists) {
-        my $ct = eval { File::Slurp::Tiny::read_file($path) };
+        my $ct = eval { File::Slurper::read_text($path) };
         return [500, "Can't read content of file $path: $!"]
             unless defined($ct);
         my $res;
@@ -734,7 +734,7 @@ sub mkfile {
         my @undo;
         if ($exists) {
             if ($fix_content) {
-                $log->info("(DRY) Replacing file $path ...") if $dry_run;
+                log_info("(DRY) Replacing file $path ...") if $dry_run;
                 $msg = "File $path needs to be replaced";
                 unshift @undo, (
                     ["File::Trash::Undoable::untrash",
@@ -744,7 +744,7 @@ sub mkfile {
                 );
             }
         } else {
-            $log->info("(DRY) File $path should be created");
+            log_info("(DRY) File $path should be created");
             my $ct = "";
             if (defined $args{gen_content_func}) {
                 no strict 'refs';
@@ -753,7 +753,7 @@ sub mkfile {
                 $ct = $args{content};
             }
             my $md5 = Digest::MD5::md5_hex($ct);
-            $log->info("(DRY) Creating file $path ...") if $dry_run;
+            log_info("(DRY) Creating file $path ...") if $dry_run;
             $msg = "File $path needs to be created";
             unshift @undo, [rmfile =>
                                 {path => $path, suffix=>$suffix."n",
@@ -782,8 +782,8 @@ sub mkfile {
             } elsif (defined $args{content}) {
                 $ct = $args{content};
             }
-            $log->info("Creating file $path ...");
-            if (eval { File::Slurp::Tiny::write_file($path, $ct); 1 }) {
+            log_info("Creating file $path ...");
+            if (eval { File::Slurper::write_text($path, $ct); 1 }) {
                 CORE::chmod(0644, $path);
                 return [200, "OK"];
             } else {
@@ -869,7 +869,7 @@ sub _setup_file_or_dir {
     {
         if (defined($should_exist) && !$should_exist) {
             if ($exists) {
-                $log->info("(DRY) Removing $which $path ...") if $dry_run;
+                log_info("(DRY) Removing $which $path ...") if $dry_run;
                 push    @do  , $act_trash;
                 unshift @undo, $act_untrash;
             }
@@ -883,7 +883,7 @@ sub _setup_file_or_dir {
                 return [412,
                         "must replace symlink $path but instructed not to"];
             }
-            $log->info("(DRY) Replacing symlink $path with $which ...")
+            log_info("(DRY) Replacing symlink $path with $which ...")
                 if $dry_run;
             push    @do  , $act_trash;
             unshift @undo, $act_untrash;
@@ -891,7 +891,7 @@ sub _setup_file_or_dir {
             if (!$replace_dir) {
                 return [412, "must replace dir $path but instructed not to"];
             }
-            $log->info("(DRY) Replacing file $path with $which ...")
+            log_info("(DRY) Replacing file $path with $which ...")
                 if $dry_run;
             push    @do  , $act_trash;
             unshift @undo, $act_untrash;
@@ -899,7 +899,7 @@ sub _setup_file_or_dir {
             if (!$replace_file) {
                 return [412, "must replace file $path but instructed not to"];
             }
-            $log->info("(DRY) Replacing dir $path with $which ...")
+            log_info("(DRY) Replacing dir $path with $which ...")
                 if $dry_run;
             push    @do  , $act_trash;
             unshift @undo, $act_untrash;
@@ -1187,27 +1187,16 @@ Setup::File - Setup file (existence, mode, permission, content)
 
 =head1 VERSION
 
-This document describes version 0.22 of Setup::File (from Perl distribution Setup-File), released on 2015-09-04.
-
-=head1 FAQ
-
-=head2 Why not allowing coderef in 'check_content_func' and 'gen_content_func' argument?
-
-Because transactional function needs to store its argument in database
-(currently in JSON), coderefs are not representable in JSON.
-
-=head1 SEE ALSO
-
-L<Setup>
-
-L<Setup::File::Dir>
-
-L<Setup::File::Symlink>
+This document describes version 0.23 of Setup::File (from Perl distribution Setup-File), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 chmod(%args) -> [status, msg, result, meta]
+=head2 chmod
+
+Usage:
+
+ chmod(%args) -> [status, msg, result, meta]
 
 Set file's permission mode.
 
@@ -1216,6 +1205,8 @@ Fixed state: C<path> exists and mode is already correct.
 Fixable state: C<path> exists but mode is not correct.
 
 Unfixable state: C<path> doesn't exist.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -1280,7 +1271,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 chown(%args) -> [status, msg, result, meta]
+=head2 chown
+
+Usage:
+
+ chown(%args) -> [status, msg, result, meta]
 
 Set file's ownership.
 
@@ -1289,6 +1284,8 @@ Fixed state: C<path> exists and ownership is already correct.
 Fixable state: C<path> exists but ownership is not correct.
 
 Unfixable state: C<path> doesn't exist.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -1361,7 +1358,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 mkdir(%args) -> [status, msg, result, meta]
+=head2 mkdir
+
+Usage:
+
+ mkdir(%args) -> [status, msg, result, meta]
 
 Create directory.
 
@@ -1370,6 +1371,8 @@ Fixed state: C<path> exists and is a directory.
 Fixable state: C<path> doesn't exist.
 
 Unfixable state: C<path> exists and is not a directory.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -1430,7 +1433,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 mkfile(%args) -> [status, msg, result, meta]
+=head2 mkfile
+
+Usage:
+
+ mkfile(%args) -> [status, msg, result, meta]
 
 Create file (and/or set content).
 
@@ -1440,6 +1447,8 @@ Fixable state: C<path> doesn't exist. Or C<path> exists, is a file, and content 
 incorrect. Or C<orig_path> specified and exists.
 
 Unfixable state: C<path> exists and is not a file.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -1540,7 +1549,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 rmdir(%args) -> [status, msg, result, meta]
+=head2 rmdir
+
+Usage:
+
+ rmdir(%args) -> [status, msg, result, meta]
 
 Delete directory.
 
@@ -1550,6 +1563,8 @@ Fixable state: C<path> exists and is a directory (or, a symlink to a directory,
 if C<allow_symlink> option is enabled).
 
 Unfixable state: C<path> exists but is not a directory.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -1615,7 +1630,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 rmfile(%args) -> [status, msg, result, meta]
+=head2 rmfile
+
+Usage:
+
+ rmfile(%args) -> [status, msg, result, meta]
 
 Delete file.
 
@@ -1625,6 +1644,8 @@ Fixable state: C<path> exists and is a file (or, a symlink to a file, if
 C<allow_symlink> option is enabled).
 
 Unfixable state: C<path> exists but is not a file.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -1697,7 +1718,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 setup_dir(%args) -> [status, msg, result, meta]
+=head2 setup_dir
+
+Usage:
+
+ setup_dir(%args) -> [status, msg, result, meta]
 
 Setup directory (existence, mode, permission).
 
@@ -1711,6 +1736,8 @@ confirmation is set to true, will delete non-empty directory.
 
 Will I<not> create intermediate directories like "mkdir -p". Create intermediate
 directories using several setup_dir() invocation.
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -1805,7 +1832,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 setup_file(%args) -> [status, msg, result, meta]
+=head2 setup_file
+
+Usage:
+
+ setup_file(%args) -> [status, msg, result, meta]
 
 Setup file (existence, mode, permission, content).
 
@@ -1815,6 +1846,8 @@ mode/permission as well as content.
 On undo, will restore old mode/permission/content, or delete the file again if
 it was created by this function I<and> its content hasn't changed since (if
 content/ownership/mode has changed, function will request confirmation).
+
+This function is not exported by default, but exportable.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -1943,6 +1976,13 @@ that contains extra information.
 
 Return value:  (any)
 
+=head1 FAQ
+
+=head2 Why not allowing coderef in 'check_content_func' and 'gen_content_func' argument?
+
+Because transactional function needs to store its argument in database
+(currently in JSON), coderefs are not representable in JSON.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Setup-File>.
@@ -1959,13 +1999,21 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Setup>
+
+L<Setup::File::Dir>
+
+L<Setup::File::Symlink>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

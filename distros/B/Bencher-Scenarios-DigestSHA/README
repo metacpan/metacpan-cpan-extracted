@@ -1,0 +1,42 @@
+NAME
+    Bencher::Scenarios::DigestSHA - Scenarios to benchmark Digest::SHA
+
+VERSION
+    This document describes version 0.003 of Bencher::Scenarios::DigestSHA
+    (from Perl distribution Bencher-Scenarios-DigestSHA), released on
+    2017-07-10.
+
+DESCRIPTION
+    This distribution contains the following Bencher scenario modules:
+
+    *   Bencher::Scenario::DigestSHA::SHA1
+
+    *   Bencher::Scenario::DigestSHA::SHA512
+
+    *   Bencher::Scenario::DigestSHA::SHA256
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Scenarios-DigestSHA>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Scenarios-DigestSHA>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Scenarios-Dig
+    estSHA>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

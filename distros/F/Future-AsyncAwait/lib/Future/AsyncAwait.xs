@@ -8,11 +8,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-/*
- * Magic that we attach to suspended CVs, that contains state required to restore
- * them
- */
-
 typedef struct SuspendedFrame SuspendedFrame;
 struct SuspendedFrame {
   SuspendedFrame *next;
@@ -24,6 +19,16 @@ struct SuspendedFrame {
 
   U32 marklen;
   I32 *marks;
+
+  /* items from the save stack */
+  /* For now the only thing we can save from the savestack are PADOFFSETs
+   * denoting SAVEt_CLEARSV operations
+   */
+  U32 savedlen;
+  struct SavedClearPad {
+    PADOFFSET padix;
+    U32 count;
+  } *saved;
 
   union {
     struct {
@@ -43,6 +48,24 @@ typedef struct {
   U32 padlen;
   SV **padslots;
 } SuspendedState;
+
+#define save_clearpadrange(padix, count)  MY_save_clearpadrange(aTHX_ padix, count)
+static void MY_save_clearpadrange(pTHX_ PADOFFSET padix, U32 count)
+{
+  /* Code stolen from PP(pp_padrange) in pp_hot.c */
+  const UV payload = (UV)(
+                (padix << (OPpPADRANGE_COUNTSHIFT + SAVE_TIGHT_SHIFT))
+              | (count << SAVE_TIGHT_SHIFT)
+              | SAVEt_CLEARPADRANGE);
+  dSS_ADD;
+  SS_ADD_UV(payload);
+  SS_ADD_END(1);
+}
+
+/*
+ * Magic that we attach to suspended CVs, that contains state required to restore
+ * them
+ */
 
 static MGVTBL vtbl = {
   NULL, /* get   */
@@ -111,31 +134,51 @@ static void MY_suspend_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
   }
 
   I32 old_saveix = cx->blk_oldsaveix;
+  /* This is an over-estimate but it doesn't matter. We just waste a bit of RAM
+   * temporarily
+   */
+  I32 savedlen = PL_savestack_ix - old_saveix;
+  if(savedlen)
+    Newx(frame->saved, savedlen, struct SavedClearPad);
+  else
+    frame->saved = NULL;
+  frame->savedlen = 0; /* we increment it as we fill it */
+
   while(PL_savestack_ix > old_saveix) {
     /* Useful references
      *   scope.h
      *   scope.c: Perl_leave_scope()
      */
 
-    /* TODO: cope with more things
-     * Right now all we can handle is a single SAVEt_ALLOC that implies zero size
-     */
-    UV uv = PL_savestack[PL_savestack_ix].any_uv;
+    UV uv = PL_savestack[PL_savestack_ix-1].any_uv;
     U8 type = (U8)uv & SAVE_MASK;
 
     switch(type) {
-      case SAVEt_ALLOC: {
-        U8 size = (type >> SAVE_TIGHT_SHIFT);
-        if(size > 0)
-          croak("TODO: Handle SAVEt_ALLOC of non-zero size %d", size);
+      case SAVEt_CLEARPADRANGE: {
+        UV padix = uv >> (OPpPADRANGE_COUNTSHIFT + SAVE_TIGHT_SHIFT);
+        I32 count = (uv >> SAVE_TIGHT_SHIFT) & OPpPADRANGE_COUNTMASK;
 
-        /* At this point we know it's safe to just ignore it */
+        frame->saved[frame->savedlen].padix = padix;
+        frame->saved[frame->savedlen].count = count;
+        frame->savedlen++;
+
+        PL_savestack_ix--;
+        break;
+      }
+
+      case SAVEt_CLEARSV: {
+        UV padix = (uv >> SAVE_TIGHT_SHIFT);
+
+        frame->saved[frame->savedlen].padix = padix;
+        frame->saved[frame->savedlen].count = 1;
+        frame->savedlen++;
+
         PL_savestack_ix--;
         break;
       }
 
       default:
-        croak("TODO: Top of PL_savestack is not SAVEt_ALLOC but %d", type);
+        croak("TODO: Unsure how to handle savestack entry of %d", type);
     }
   }
 
@@ -171,6 +214,12 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
      *   https://perl5.git.perl.org/perl.git/blob/HEAD:/cop.h
      */
     switch(CxTYPE(cx)) {
+      case CXt_BLOCK:
+        frame->type = CXt_BLOCK;
+        frame->gimme = cx->blk_gimme;
+        /* nothing else special */
+        continue;
+
       case CXt_LOOP_PLAIN: {
         frame->type = CXt_LOOP_PLAIN;
         frame->loop.loopop = cx->blk_loop.my_op;
@@ -201,7 +250,7 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
       }
 
       default:
-        croak("TODO: unsure how to handle a context frame of type %d\n", CxTYPE(cx));
+        croak("TODO: unsure how to handle a context frame of type %d", CxTYPE(cx));
     }
   }
 
@@ -238,9 +287,10 @@ static void MY_suspendedstate_suspend(pTHX_ SuspendedState *state, CV *cv)
 #define resume_block(frame, cx)  MY_resume_block(aTHX_ frame, cx)
 static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
 {
+  I32 i;
+
   if(frame->stacklen) {
     dSP;
-    I32 i;
     EXTEND(SP, frame->stacklen);
 
     for(i = 0; i < frame->stacklen; i++) {
@@ -252,14 +302,22 @@ static void MY_resume_block(pTHX_ SuspendedFrame *frame, PERL_CONTEXT *cx)
   }
 
   if(frame->marklen) {
-    I32 i;
-
     for(i = 0; i < frame->marklen; i++) {
       PUSHMARK(PL_stack_base + frame->marks[i] - cx->blk_oldsp);
     }
 
     Safefree(frame->marks);
   }
+
+  for(i = frame->savedlen - 1; i >= 0; i--) {
+    if(frame->saved[i].count == 1)
+      save_clearsv(PL_curpad + frame->saved[i].padix);
+    else
+      save_clearpadrange(frame->saved[i].padix, frame->saved[i].count);
+  }
+
+  if(frame->saved)
+    Safefree(frame->saved);
 }
 
 #define suspendedstate_resume(state, cv)  MY_suspendedstate_resume(aTHX_ state, cv)
@@ -272,8 +330,13 @@ static void MY_suspendedstate_resume(pTHX_ SuspendedState *state, CV *cv)
     PERL_CONTEXT *cx;
 
     switch(frame->type) {
+      case CXt_BLOCK:
+        cx = cx_pushblock(CXt_BLOCK, frame->gimme, PL_stack_sp, PL_savestack_ix);
+        /* nothing else special */
+        break;
+
       case CXt_LOOP_PLAIN:
-        cx = cx_pushblock(CXt_LOOP_PLAIN, G_VOID, PL_stack_sp, PL_savestack_ix);
+        cx = cx_pushblock(CXt_LOOP_PLAIN, frame->gimme, PL_stack_sp, PL_savestack_ix);
         /* don't call cx_pushloop_plain() because it will get this wrong */
         cx->blk_loop.my_op = frame->loop.loopop;
         break;
@@ -401,6 +464,11 @@ static SV *MY_future_new_from_proto(pTHX_ SV *proto)
   FREETMPS;
   LEAVE;
 
+  if(!SvROK(f))
+    croak("Expected Future->new to yield a new reference");
+
+  assert(SvREFCNT(f) == 1);
+  assert(SvREFCNT(SvRV(f)) == 1);
   return f;
 }
 
@@ -674,6 +742,11 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
   I32 floor_ix = start_subparse(FALSE, name ? 0 : CVf_ANON);
   SAVEFREESV(PL_compcv);
 
+  /* Save the identity of the currently-compiling sub so that 
+   * await_keyword_plugin() can check
+   */
+  hv_stores(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", newRV((SV *)PL_compcv));
+
   I32 save_ix = block_start(TRUE);
 
   OP *body = parse_block(0);
@@ -721,12 +794,29 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
 
 static int await_keyword_plugin(pTHX_ OP **op_ptr)
 {
-  /* TODO: Forbid this except inside 'async sub' */
+  SV **asynccvrefp = hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", 0);
+  if(!asynccvrefp || !*asynccvrefp ||
+     SvRV(*asynccvrefp) != (SV *)PL_compcv)
+    croak("Cannot 'await' outside of an 'async sub'");
 
   lex_read_space(0);
 
-  /* await EXPR wants a single term expression */
-  OP *expr = parse_termexpr(0);
+  OP *expr;
+  /* await TERMEXPR wants a single term expression
+   * await( FULLEXPR ) will be a full expression */
+  if(lex_peek_unichar(0) == '(') {
+    lex_read_unichar(0);
+
+    expr = parse_fullexpr(0);
+
+    lex_read_space(0);
+
+    if(lex_peek_unichar(0) != ')')
+      croak("Expected ')'");
+    lex_read_unichar(0);
+  }
+  else
+    expr = parse_termexpr(0);
 
   *op_ptr = newAWAITOP(0, expr);
 

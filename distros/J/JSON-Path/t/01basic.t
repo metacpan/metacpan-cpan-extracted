@@ -1,3 +1,4 @@
+
 =head1 PURPOSE
 
 Some basic JSON Path selection tests, including some using C<eval>,
@@ -19,7 +20,7 @@ terms as Perl itself.
 =cut
 
 use Test::More tests => 10;
-BEGIN { use_ok('JSON::Path') };
+BEGIN { use_ok('JSON::Path') }
 
 use JSON;
 my $object = from_json(<<'JSON');
@@ -62,32 +63,34 @@ my $object = from_json(<<'JSON');
 JSON
 
 my $path1 = JSON::Path->new('$.store.book[0].title');
-is("$path1", '$.store.book[0].title', "overloaded stringification");
+is( "$path1", '$.store.book[0].title', "overloaded stringification" );
 
 my @results1 = $path1->values($object);
-is($results1[0], 'Sayings of the Century', "basic value result");
+is( $results1[0], 'Sayings of the Century', "basic value result" );
 
 @results1 = $path1->paths($object);
-is($results1[0], "\$['store']['book']['0']['title']", "basic path result");
+is( $results1[0], "\$['store']['book']['0']['title']", "basic path result" );
 
 my $path2 = JSON::Path->new('$..book[-1:]');
 my ($results2) = $path2->values($object);
 
-is(ref $results2, 'HASH', "hashref value result");
-is($results2->{isbn}, "0-395-19395-8", "hashref seems to be correct");
+is( ref $results2,     'HASH',          "hashref value result" );
+is( $results2->{isbn}, "0-395-19395-8", "hashref seems to be correct" );
 
-ok($JSON::Path::Safe, "safe by default");
+ok( $JSON::Path::Safe, "safe by default" );
 
-ok(!eval {
-	my $path3 = JSON::Path->new('$..book[?($_->{author} =~ /tolkien/i)]');
-	my $results3 = $path3->values($object);
-	1;
-}, "eval disabled by default");
+ok( !eval {
+        my $path3    = JSON::Path->new('$..book[?($_->{author} =~ /tolkien/i)]');
+        my $results3 = $path3->values($object);
+        1;
+    },
+    "eval disabled by default"
+);
 
 $JSON::Path::Safe = 0;
 
 my $path3 = JSON::Path->new('$..book[?($_->{author} =~ /tolkien/i)]');
 my ($results3) = $path3->values($object);
 
-is(ref $results3, 'HASH', "dangerous hashref value result");
-is($results3->{isbn}, "0-395-19395-8", "dangerous hashref seems to be correct");
+is( ref $results3,     'HASH',          "dangerous hashref value result" );
+is( $results3->{isbn}, "0-395-19395-8", "dangerous hashref seems to be correct" );

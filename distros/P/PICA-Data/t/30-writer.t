@@ -1,10 +1,13 @@
 use strict;
 use Test::More;
+use Test::XML;
 
 use PICA::Data qw(pica_writer pica_parser);
 use PICA::Writer::Plain;
 use PICA::Writer::Plus;
 use PICA::Writer::XML;
+use PICA::Writer::PPXML;
+use PICA::Parser::PPXML;
 
 use File::Temp qw(tempfile);
 use IO::File;
@@ -122,5 +125,21 @@ ok $@, 'invalid filename';
 
 eval { pica_writer('plain', fh => {} ) };
 ok $@, 'invalid handle';
+
+# PPXML
+my $parser = pica_parser( 'PPXML' => 't/files/slim_ppxml.xml' );
+my $record;
+($fh, $filename) = tempfile();
+$writer = PICA::Writer::PPXML->new( fh => $fh );
+while($record = $parser->next){
+    $writer->write($record);
+}
+$writer->end;
+close $fh;
+
+$out = do { local (@ARGV,$/)=$filename; <> };
+my $in = do { local (@ARGV,$/)='t/files/slim_ppxml.xml'; <> };
+
+is_xml($out, $in, 'PPXML writer');
 
 done_testing;

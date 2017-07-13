@@ -1,12 +1,12 @@
 package LWP::UserAgent::Patch::Retry;
 
-our $DATE = '2015-08-17'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Module::Patch 0.12 qw();
 use base qw(Module::Patch);
@@ -27,12 +27,12 @@ my $p_send_request = sub {
                  !$resp->is_success) {
             $retries++;
             if ($retries > $config{-n}) {
-                $log->tracef("Reached retry limit for LWP request (%s %s)",
+                log_trace("Reached retry limit for LWP request (%s %s)",
                              $request->method, $request->uri);
                 last;
             } else {
                 sleep $config{-delay};
-                $log->tracef("Retrying LWP request (%s %s) (#%d)",
+                log_trace("Retrying LWP request (%s %s) (#%d)",
                              $request->method, $request->uri, $retries);
                 next;
             }
@@ -83,7 +83,7 @@ LWP::UserAgent::Patch::Retry - Add retries
 
 =head1 VERSION
 
-This document describes version 0.03 of LWP::UserAgent::Patch::Retry (from Perl distribution LWP-UserAgent-Patch-Retry), released on 2015-08-17.
+This document describes version 0.04 of LWP::UserAgent::Patch::Retry (from Perl distribution LWP-UserAgent-Patch-Retry), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -126,19 +126,13 @@ you do not want to retry on 404 errors:
 By patching, you do not need to replace all the client code which uses
 LWP::UserAgent (or WWW::Mechanize, and so on).
 
-=head1 SEE ALSO
-
-L<LWP::UserAgent::Determined>, L<LWP::UserAgent::ExponentialBackoff>
-
-Retry in general: L<Retry>, L<Sub::Retry>, L<Perinci::Sub::Property::retry>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/LWP-UserAgent-Patch-Retry>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-LWP-UserAgent-Patch-Retry>.
+Source repository is at L<https://github.com/perlancar/perl-LWP-UserAgent-Patch-Retry>.
 
 =head1 BUGS
 
@@ -148,13 +142,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<LWP::UserAgent::Determined>, L<LWP::UserAgent::ExponentialBackoff>
+
+Retry in general: L<Retry>, L<Sub::Retry>, L<Perinci::Sub::Property::retry>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

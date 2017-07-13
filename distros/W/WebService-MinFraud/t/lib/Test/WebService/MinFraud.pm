@@ -109,8 +109,8 @@ sub test_insights {
             },
             'type',
         ],
-        device     => [ 'confidence', 'id', 'last_seen' ],
-        email      => [ 'is_free',    'is_high_risk' ],
+        device     => [ 'confidence', 'id',      'last_seen' ],
+        email      => [ 'first_seen', 'is_free', 'is_high_risk' ],
         ip_address => \@ip_address_hashes,
     };
 

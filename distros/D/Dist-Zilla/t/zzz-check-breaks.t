@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.017
+# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.018
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 SKIP: {
     eval 'require Module::Runtime::Conflicts; Module::Runtime::Conflicts->check_conflicts';
@@ -32,6 +32,7 @@ my $breaks = {
   "Dist::Zilla::Plugin::Git" => "<= 2.036",
   "Dist::Zilla::Plugin::Keywords" => "<= 0.006",
   "Dist::Zilla::Plugin::MakeMaker::Awesome" => "< 0.22",
+  "Dist::Zilla::Plugin::NameFromDirectory" => "<= 0.03",
   "Dist::Zilla::Plugin::PodWeaver" => "<= 4.006",
   "Dist::Zilla::Plugin::Prereqs::AuthorDeps" => "<= 0.005",
   "Dist::Zilla::Plugin::ReadmeAnyFromPod" => "< 0.161170",
@@ -56,3 +57,5 @@ if (my @breaks = grep { defined $result->{$_} } keys %$result)
     diag "$result->{$_}" for sort @breaks;
     diag "\n", 'You should now update these modules!';
 }
+
+pass 'checked x_breaks data';

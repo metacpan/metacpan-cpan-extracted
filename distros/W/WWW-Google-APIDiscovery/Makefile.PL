@@ -27,9 +27,9 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'WWW::Google::APIDiscovery'                => { file => 'lib/WWW/Google/APIDiscovery.pm'             , version => '0.23' },
-            'WWW::Google::APIDiscovery::API'           => { file => 'lib/WWW/Google/APIDiscovery/API.pm'         , version => '0.23' },
-            'WWW::Google::APIDiscovery::API::Metadata' => { file => 'lib/WWW/Google/APIDiscovery/API/Metadata.pm', version => '0.23' },
+            'WWW::Google::APIDiscovery'                => { file => 'lib/WWW/Google/APIDiscovery.pm'             , version => '0.24' },
+            'WWW::Google::APIDiscovery::API'           => { file => 'lib/WWW/Google/APIDiscovery/API.pm'         , version => '0.24' },
+            'WWW::Google::APIDiscovery::API::MetaData' => { file => 'lib/WWW/Google/APIDiscovery/API/MetaData.pm', version => '0.24' },
         },
         resources => {
             repository => {

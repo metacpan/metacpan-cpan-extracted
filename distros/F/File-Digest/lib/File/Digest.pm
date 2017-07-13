@@ -1,12 +1,12 @@
 package File::Digest;
 
-our $DATE = '2016-11-23'; # DATE
-our $VERSION = '0.006'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(digest_files);
@@ -69,11 +69,11 @@ sub digest_file {
     my $algo = $args{algorithm} // 'md5';
 
     unless (-f $file) {
-        $log->warnf("Can't open %s: no such file", $file);
+        log_warn("Can't open %s: no such file", $file);
         return [404, "No such file '$file'"];
     }
     open my($fh), "<", $file or do {
-        $log->warnf("Can't open %s: %s", $file, $!);
+        log_warn("Can't open %s: %s", $file, $!);
         return [500, "Can't open '$file': $!"];
         next;
     };
@@ -147,7 +147,7 @@ File::Digest - Calculate file checksum/digest (using various algorithms)
 
 =head1 VERSION
 
-This document describes version 0.006 of File::Digest (from Perl distribution File-Digest), released on 2016-11-23.
+This document describes version 0.007 of File::Digest (from Perl distribution File-Digest), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -163,7 +163,11 @@ This document describes version 0.006 of File::Digest (from Perl distribution Fi
 =head1 FUNCTIONS
 
 
-=head2 digest_file(%args) -> [status, msg, result, meta]
+=head2 digest_file
+
+Usage:
+
+ digest_file(%args) -> [status, msg, result, meta]
 
 Calculate file checksum/digest (using various algorithms).
 
@@ -193,7 +197,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 digest_files(%args) -> [status, msg, result, meta]
+=head2 digest_files
+
+Usage:
+
+ digest_files(%args) -> [status, msg, result, meta]
 
 Calculate file checksum/digest (using various algorithms).
 
@@ -253,7 +261,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

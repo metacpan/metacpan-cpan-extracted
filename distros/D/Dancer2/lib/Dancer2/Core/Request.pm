@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '0.205000';
+$Dancer2::Core::Request::VERSION = '0.205001';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -13,6 +13,7 @@ use URI::Escape;
 use Safe::Isa;
 use Hash::MultiValue;
 use Module::Runtime 'require_module';
+use Ref::Util qw< is_ref is_arrayref is_hashref >;
 
 use Dancer2::Core::Types;
 use Dancer2::Core::Request::Upload;
@@ -213,7 +214,7 @@ sub deserialize {
 
     # Set body parameters (decoded HMV)
     $self->{'body_parameters'} =
-        Hash::MultiValue->from_mixed( ref $data eq 'HASH' ? %$data : () );
+        Hash::MultiValue->from_mixed( is_hashref($data) ? %$data : () );
 
     return $data;
 }
@@ -331,7 +332,7 @@ sub query_parameters {
             Hash::MultiValue->new(
                 map {;
                     my $key = $_;
-                    ref $query->{$key} eq 'ARRAY'
+                    is_arrayref( $query->{$key} )
                     ? ( map +( $key => $_ ), @{ $query->{$key} } )
                     : ( $key => $query->{$key} )
                 } keys %{$query}
@@ -389,17 +390,17 @@ sub _decode {
     my ($h) = @_;
     return if not defined $h;
 
-    if ( !ref($h) && !utf8::is_utf8($h) ) {
+    if ( !is_ref($h) && !utf8::is_utf8($h) ) {
         return decode( 'UTF-8', $h );
-    }
-    elsif ( ref($h) eq 'HASH' ) {
-        return { map {my $t = _decode($_); $t} (%$h) };
-    }
-    elsif ( ref($h) eq 'ARRAY' ) {
-        return [ map _decode($_), @$h ];
     }
     elsif ( ref($h) eq 'Hash::MultiValue' ) {
         return Hash::MultiValue->from_mixed(_decode($h->as_hashref_mixed));
+    }
+    elsif ( is_hashref($h) ) {
+        return { map {my $t = _decode($_); $t} (%$h) };
+    }
+    elsif ( is_arrayref($h) ) {
+        return [ map _decode($_), @$h ];
     }
 
     return $h;
@@ -422,7 +423,7 @@ sub upload {
 
     return $res unless wantarray;
     return ()   unless defined $res;
-    return ( ref($res) eq 'ARRAY' ) ? @$res : $res;
+    return ( is_arrayref($res) ) ? @$res : $res;
 }
 
 sub _build_params {
@@ -437,7 +438,7 @@ sub _build_params {
 
     # and merge everything
     $self->{_params} = {
-        map +( ref $_ eq 'HASH' ? %{$_} : () ),
+        map +( is_hashref($_) ? %{$_} : () ),
         $previous,
         $get_params,
         $self->_body_params,
@@ -481,7 +482,7 @@ sub _parse_get_params {
         # looking for multi-value params
         if ( exists $query_params->{$key} ) {
             my $prev_val = $query_params->{$key};
-            if ( ref($prev_val) && ref($prev_val) eq 'ARRAY' ) {
+            if ( is_arrayref($prev_val) ) {
                 push @{ $query_params->{$key} }, $val;
             }
             else {
@@ -506,7 +507,7 @@ sub _read_to_end {
 
     my $body = '';
     if ( $content_length && $content_length > 0 ) {
-        while ( length ( my $buffer = $self->_read() ) ) {
+        while ( defined ( my $buffer = $self->_read() ) ) {
             $body .= $buffer;
         }
         $self->{_http_body}->add($body);
@@ -555,7 +556,7 @@ sub _build_uploads {
 
     for my $name ( keys %{$uploads} ) {
         my $files = $uploads->{$name};
-        $files = ref $files eq 'ARRAY' ? $files : [$files];
+        $files = is_arrayref($files) ? $files : [$files];
 
         my @uploads = map Dancer2::Core::Request::Upload->new(
                               headers  => $_->{headers},
@@ -666,7 +667,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 0.205000
+version 0.205001
 
 =head1 SYNOPSIS
 
@@ -1112,7 +1113,7 @@ Checks whether we are behind a proxy using the C<behind_proxy>
 configuration option, and if so returns the first
 C<HTTP_X_FORWARDED_HOST>, since this is a comma separated list.
 
-If you have not configured that you behind a proxy, it returns HTTP
+If you have not configured that you are behind a proxy, it returns HTTP
 header C<HTTP_HOST>.
 
 =item C<keep_alive>
@@ -1179,7 +1180,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexis Sukrieh.
+This software is copyright (c) 2017 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

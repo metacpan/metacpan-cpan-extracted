@@ -1,9 +1,7 @@
-package Pcore::Ext v0.9.1;
+package Pcore::Ext v0.11.0;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Context;
-use JavaScript::Packer qw[];
-use JavaScript::Beautifier qw[];
 
 our $SCANNED;
 
@@ -26,8 +24,9 @@ sub SCAN ( $self, $app, $ext, $framework ) {
 
     my $namespaces;
 
-    my $root_namespace = ref($app) . '::Ext';
-    my $root_path      = $root_namespace =~ s[::][/]smgr;
+    my $root_namespace  = ref($app) . '::Ext';
+    my $root_path       = $root_namespace =~ s[::][/]smgr;
+    my $l10n_class_name = 'L10n.' . ( ref($app) =~ s/:://smgr );
 
     for my $path ( grep { !ref } @INC ) {
 
@@ -70,8 +69,9 @@ sub SCAN ( $self, $app, $ext, $framework ) {
                             };
 
                             $CFG->{app}->{$class_name} = {
-                                namespace => "$root_namespace\::$class_name",
-                                name      => $class_name,
+                                namespace       => "$root_namespace\::$class_name",
+                                name            => $class_name,
+                                l10n_class_name => $l10n_class_name,
                             };
                         }
 
@@ -141,14 +141,15 @@ sub SCAN ( $self, $app, $ext, $framework ) {
             my $ext_class = "${NS}.${namespace}${class_name}" =~ s/:://smgr;
 
             $CFG->{class}->{$ext_class} = {
-                class          => $ext_class,
-                namespace      => $namespace,
-                api_ver        => $ext_api_ver,
-                root_namespace => $root_namespace,
-                app_namespace  => $namespace_cfg->{app_namespace},
-                app_name       => $namespace_cfg->{app_name},
-                generator      => $class,
-                extend         => $ext_map->{$class},
+                class           => $ext_class,
+                namespace       => $namespace,
+                api_ver         => $ext_api_ver,
+                root_namespace  => $root_namespace,
+                app_namespace   => $namespace_cfg->{app_namespace},
+                app_name        => $namespace_cfg->{app_name},
+                generator       => $class,
+                extend          => $ext_map->{$class},
+                l10n_class_name => $l10n_class_name,
             };
 
             $CFG->{perl_class}->{"$namespace\::$class"} = $ext_class;
@@ -181,27 +182,11 @@ sub SCAN ( $self, $app, $ext, $framework ) {
         $class->{alias} = "$extend->{alias_namespace}.$class->{type}";
     }
 
-    # generate content
-    my $js_packer = JavaScript::Packer->init;
-
+    # generate JS content
     for my $class ( values $CFG->{class}->%* ) {
         my $ctx = $self->_get_ctx( $class->{class}, $app, $framework );
 
         $class->{js} = $ctx->to_js;
-
-        if ( $app->{devel} ) {
-            $ctx->{ctx}->{js} = \JavaScript::Beautifier::js_beautify(
-                $ctx->{ctx}->{js}->$*,
-                {   indent_size               => 4,
-                    indent_character          => q[ ],
-                    preserve_newlines         => 1,
-                    space_after_anon_function => 1,
-                }
-            );
-        }
-        else {
-            $js_packer->minify( $ctx->{ctx}->{js}, { compress => 'obfuscate' } );    # clean
-        }
     }
 
     # build ext apps
@@ -246,10 +231,13 @@ sub SCAN ( $self, $app, $ext, $framework ) {
                 push $ext_app->{api}->{ delete $class_cfg->{api}->{$method_id}->{action} }->@*, $class_cfg->{api}->{$method_id};
             }
 
+            # add locale domains
+            $ext_app->{l10n_domain}->@{ keys $class_cfg->{l10n_domain}->%* } = ();
+
             return;
         };
 
-        # start sorting deps
+        # sort deps
         for my $class ( values $CFG->{class}->%* ) {
             next if $class->{app_namespace} // $class->{namespace} ne $ext_app->{namespace};
 
@@ -277,7 +265,7 @@ sub _get_ctx ( $self, $class, $app, $framework ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 20                   | Subroutines::ProhibitExcessComplexity - Subroutine "SCAN" with high complexity score (39)                      |
+## |    3 | 18                   | Subroutines::ProhibitExcessComplexity - Subroutine "SCAN" with high complexity score (37)                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

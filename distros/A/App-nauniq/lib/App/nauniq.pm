@@ -1,6 +1,6 @@
 package App::nauniq;
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 1;
 # ABSTRACT: Non-adjacent uniq
@@ -17,7 +17,7 @@ App::nauniq - Non-adjacent uniq
 
 =head1 VERSION
 
-This document describes version 0.09 of App::nauniq (from Perl distribution App-nauniq), released on 2015-07-30.
+This document describes version 0.10 of App::nauniq (from Perl distribution App-nauniq), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -45,7 +45,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

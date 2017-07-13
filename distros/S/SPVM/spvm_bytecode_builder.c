@@ -755,7 +755,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     break;
                   }
                   case SPVM_OP_C_CODE_BLOCK: {
-                    if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_IF) {
+                    if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_IF_TURE) {
                       
                       // Has else block
                       if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_HAS_ELSE) {
@@ -783,7 +783,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                       bytecode_array->values[bytecode_index + 1] = (jump_offset >> 8) & 0xFF;
                       bytecode_array->values[bytecode_index + 2] = jump_offset & 0xFF;
                     }
-                    else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_ELSE) {
+                    else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_IF_FALSE) {
                       
                       assert(goto_if_block_end_bytecode_index_stack->length > 0);
                       
@@ -1684,18 +1684,23 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                       }
                     }
                     else {
-                      assert(0);
+                      if (
+                        (src_type->id == SPVM_TYPE_C_ID_STRING || src_type->id == SPVM_TYPE_C_ID_ARRAY_BYTE)
+                        || (dist_type->id == SPVM_TYPE_C_ID_STRING || dist_type->id == SPVM_TYPE_C_ID_ARRAY_BYTE)
+                      )
+                      {
+                        // OK
+                      }
+                      else {
+                        assert(0);
+                      }
                     }
                     
                     break;
                   }
                   case SPVM_OP_C_CODE_POP: {
                     
-                    SPVM_OP* op_first = op_cur->first;
-                    
-                    if (op_first->code != SPVM_OP_C_CODE_ASSIGN && op_first->code != SPVM_OP_C_CODE_RETURN && !op_first->lvalue) {
-                      SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_POP);
-                    }
+                    SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_POP);
                     
                     break;
                   }
@@ -1847,6 +1852,8 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     
                     _Bool bytecode_set = 0;
                     if (constant->code == SPVM_CONSTANT_C_CODE_BYTE) {
+                      // Currently not used logic
+                      assert(0);
                       if (constant->uv.long_value == 0) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_BYTE_0);
                         bytecode_set = 1;
@@ -1862,6 +1869,9 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                       }
                     }
                     else if (constant->code == SPVM_CONSTANT_C_CODE_SHORT) {
+                      // Currently not used logic
+                      assert(0);
+                      
                       if (constant->uv.long_value == 0) {
                         SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CONSTANT_SHORT_0);
                         bytecode_set = 1;

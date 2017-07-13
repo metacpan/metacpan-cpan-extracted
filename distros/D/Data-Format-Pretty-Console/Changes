@@ -1,4 +1,9 @@
-Revision history for Data-Format-Pretty-Console
+0.38    2017-07-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Log::Any with Log::ger.
+
 
 0.37    2016-03-13 (PERLANCAR)
 

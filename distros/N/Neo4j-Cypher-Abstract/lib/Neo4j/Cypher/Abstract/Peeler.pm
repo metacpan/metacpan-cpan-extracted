@@ -5,11 +5,6 @@ use Scalar::Util qw(looks_like_number blessed);
 use strict;
 use warnings;
 
-# issues to solve:
-#  quoting
-#  parens
-#  param binding
-
 # quoting logic:
 # if config:bind = true
 # if anon_placeholder (like ?) is in config, then return literals without
@@ -20,8 +15,7 @@ use warnings;
 # if config:bind false
 # leave tokens and identifiers as-is, no bind_values or parameters
 
-our $VERSION = '0.1001';
-our $VERSION = '0.1001';
+our $VERSION = '0.1002';
 my $SQL_ABSTRACT = 1;
 
 sub puke(@);
@@ -608,6 +602,8 @@ operators or functions.
 Contents of scalar references are always treated as literals and
 inserted into the expression verbatim.
 
+=head2 Expressing Expressions
+
 =over
 
 =item * Functions
@@ -718,7 +714,24 @@ correctly quote string values and such.
 
 =head2 The config hash
 
- TBD
+The C<Peeler> object property C<{config}> is a hashref containing
+various defaults to make Peeler output sound like Cypher. One could
+customize it to make output sound like SQL (someday).
+
+Keys/values are as follows:
+
+ bind => 1,
+ anon_placeholder => undef, # '?',
+ hash_op => '-and',
+ array_op => '-or',
+ list_braces => '[]',
+ ineq_op => '<>',
+ implicit_eq_op => '=',
+ quote_lit => "'",
+ esc_quote_lit => "\\",
+ parameter_sigil => qw/^([:$?])|({[^}]+}$)/,
+ quote_fld => undef,
+ safe_identifier => qw/[a-zA-Z_.]+/
 
 =head1 METHODS
 
@@ -726,15 +739,17 @@ correctly quote string values and such.
 
 =item express()
 
-Canonize, then peel.
+Canonize, then peel. Returns scalar string (the expression).
 
 =item canonize()
 
-Render SQL:A-like expression into a canonical lisp-like array tree.
+Render SQL:A-like expression into a canonical lisp-like array
+tree. Returns an arrayref.
 
 =item peel()
 
-Render a canonical tree as a Cypher string expression
+Render a canonical tree as a Cypher string expression. Returns scalar
+string.
 
 =item parameters()
 
@@ -756,6 +771,10 @@ L<Neo4j::Cypher::Abstract>, L<SQL::Abstract>.
  Mark A. Jensen
  CPAN: MAJENSEN
  majensen -at- cpan -dot- org
+
+=head1 LICENSE
+
+This software is provided for use under the terms of Perl itself.
 
 =head1 COPYRIGHT
 

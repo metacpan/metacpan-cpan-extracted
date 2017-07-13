@@ -11,10 +11,10 @@ package Algorithm::Permute;
 use strict;
 use warnings;
 
-our @ISA = qw(Exporter);
+use Exporter 'import';
 our @EXPORT_OK = qw(permute);
 
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;

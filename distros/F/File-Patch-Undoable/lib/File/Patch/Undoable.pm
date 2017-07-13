@@ -1,12 +1,12 @@
 package File::Patch::Undoable;
 
-our $DATE = '2016-06-10'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.09'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Capture::Tiny qw(capture);
 use File::Temp qw(tempfile);
@@ -47,7 +47,7 @@ On do, will patch file with the supplied patch. On undo, will apply the reverse
 of the patch.
 
 Note: Symlink is currently not permitted (except for the patch file). Patching
-is currently done with the `patch` program.
+is currently done with the <prog:patch> program.
 
 Unfixable state: file does not exist or not a regular file (directory and
 symlink included), patch file does not exist or not a regular file (but symlink
@@ -128,7 +128,7 @@ sub patch {
         if (!$?) {
             return [304, "Patch $patch already applied to $file"];
         } elsif (($? >> 8) == 1) {
-            $log->info("(DRY) Patching file $file with $patch ...") if $dry_run;
+            log_info("(DRY) Patching file $file with $patch ...") if $dry_run;
             return [200, "File $file needs to be patched with $patch", undef,
                     {undo_actions=>[
                         [patch=>{file=>$file, patch=>$patch, reverse=>!$rev}],
@@ -138,7 +138,7 @@ sub patch {
         }
 
     } elsif ($tx_action eq 'fix_state') {
-        $log->info("Patching file $file with $patch ...");
+        log_info("Patching file $file with $patch ...");
 
         # first patch to a temporary output first, because patch can produce
         # half-patched file.
@@ -178,14 +178,18 @@ File::Patch::Undoable - Patch a file, with undo support
 
 =head1 VERSION
 
-This document describes version 0.08 of File::Patch::Undoable (from Perl distribution File-Patch-Undoable), released on 2016-06-10.
+This document describes version 0.09 of File::Patch::Undoable (from Perl distribution File-Patch-Undoable), released on 2017-07-10.
 
 =head1 KNOWN ISSUES
 
 =head1 FUNCTIONS
 
 
-=head2 patch(%args) -> [status, msg, result, meta]
+=head2 patch
+
+Usage:
+
+ patch(%args) -> [status, msg, result, meta]
 
 Patch a file, with undo support.
 
@@ -193,7 +197,7 @@ On do, will patch file with the supplied patch. On undo, will apply the reverse
 of the patch.
 
 Note: Symlink is currently not permitted (except for the patch file). Patching
-is currently done with the C<patch> program.
+is currently done with the L<patch> program.
 
 Unfixable state: file does not exist or not a regular file (directory and
 symlink included), patch file does not exist or not a regular file (but symlink
@@ -301,7 +305,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -53,6 +53,7 @@ my $build = Module::Build->new
     'Carp' => '0',
     'Config::Model' => '2.095',
     'Config::Model::ObjTreeScanner' => '0',
+    'File::HomeDir' => '0',
     'Log::Log4perl' => '1.11',
     'Path::Tiny' => '0',
     'Pod::POM' => '0',
@@ -68,6 +69,7 @@ my $build = Module::Build->new
     'Tk::DialogBox' => '0',
     'Tk::DirSelect' => '0',
     'Tk::DoubleClick' => '0',
+    'Tk::FontDialog' => '0',
     'Tk::Frame' => '0',
     'Tk::Menubutton' => '0',
     'Tk::NoteBook' => '0',
@@ -80,6 +82,7 @@ my $build = Module::Build->new
     'Tk::Toplevel' => '0',
     'Tk::Tree' => '0',
     'Try::Tiny' => '0',
+    'YAML' => '0',
     'perl' => '5.010'
   },
 

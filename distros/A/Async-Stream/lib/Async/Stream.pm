@@ -14,17 +14,17 @@ our @EXPORT_OK = qw(merge branch);
 
 =head1 NAME
 
-Async::Stream - it's convinient way to work with async data flow.
+Async::Stream - it's convenient way to work with async data flow.
 
-IMPORTANT! PUBLIC INTERFACE IS CHANGING, DO NOT USE IN PRODACTION BEFORE VERSION 1.0.
+IMPORTANT! PUBLIC INTERFACE ISN'T STABLE, DO NOT USE IN PRODACTION BEFORE VERSION 1.0.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -57,8 +57,8 @@ Module helps to organize your async code to stream.
 
 =head2 new($generator)
 
-Constructor creates instanse of class. 
-Class method gets 1 arguments - generator subroutine referens to generate items.
+Constructor creates instance of class. 
+Class method gets 1 arguments - generator subroutine references to generate items.
 Generator will get a callback which it will use for returning result. 
 If generator is exhausted then returning callback is called without arguments.
 
@@ -78,7 +78,7 @@ sub new {
 	my %args = @_;
 
 	if (ref $generator ne 'CODE') {
-		croak 'First argument can be only subrotine reference';
+		croak 'First argument can be only subroutine reference';
 	} elsif (defined $args{prefetch} and $args{prefetch} < 0) {
 		croak 'Prefetch can\'t be less then zero';
 	}
@@ -95,7 +95,7 @@ sub new {
 
 =head2 new_from(@array_of_items)
 
-Constructor creates instanse of class. 
+Constructor creates instance of class. 
 Class method gets a list of items which are used for generating streams.
 	
   my @domains = qw(
@@ -173,7 +173,7 @@ sub to_arrayref {
 	my $return_cb = shift;
 
 	if (ref $return_cb ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	my @result;
@@ -211,7 +211,7 @@ sub for_each {
 	my $action = shift;
 
 	if (ref $action ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	my $iterator = $self->iterator;
@@ -243,7 +243,7 @@ sub peek {
 	my $action = shift;
 
 	if (ref $action ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	my $iterator = $self->iterator;
@@ -265,7 +265,7 @@ sub peek {
 	return $self;
 }
 
-=head2 filter($predicat)
+=head2 filter($predicate)
 
 The method filters current stream. Filter works like lazy grep.
 
@@ -277,7 +277,7 @@ sub filter {
 	my $is_intresting = shift;
 
 	if (ref $is_intresting ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	my $iterator = $self->iterator;
@@ -315,7 +315,7 @@ sub smap {
 	my $transform = shift;
 
 	if (ref $transform ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	my $iterator = $self->iterator;
@@ -355,7 +355,7 @@ sub transform {
 	my $transform = shift;
 
 	if (ref $transform ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	my $iterator = $self->iterator;
@@ -395,7 +395,7 @@ sub reduce  {
 	my $return_cb = shift;
 
 	if (ref $return_cb ne 'CODE' or ref $code ne 'CODE') {
-		croak 'First and Second arguments can be only subrotine references'
+		croak 'First and Second arguments can be only subroutine references'
 	}
 
 	my $pkg = caller;
@@ -446,7 +446,7 @@ sub sum {
 	my $return_cb = shift;
 
 	if (ref $return_cb ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	$self->reduce(sub{$a+$b}, $return_cb);
@@ -469,7 +469,7 @@ sub min {
 	my $return_cb = shift;
 
 	if (ref $return_cb ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	$self->reduce(sub{$a < $b ? $a : $b}, $return_cb);
@@ -492,7 +492,7 @@ sub max {
 	my $return_cb = shift;
 
 	if (ref $return_cb ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	$self->reduce(sub{$a > $b ? $a : $b}, $return_cb);
@@ -500,13 +500,13 @@ sub max {
 	return $self;
 }
 
-=head2 concat(@list_of_another_streams)
+=head2 append(@list_of_another_streams)
 
-The method concatenates several streams.
+The method appends several streams to tail of current stream.
 
-  $stream->concat($stream1)->to_arrayref(sub {print @{$_[0]}}); 
+  $stream->append($stream1)->to_arrayref(sub {print @{$_[0]}}); 
 =cut
-sub concat {
+sub append {
 	my $self = shift;
 	my @streams = @_;
 
@@ -550,7 +550,7 @@ sub count {
 	my $return_cb = shift;
 
 	if (ref $return_cb ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	my $result = 0;
@@ -645,7 +645,7 @@ sub limit {
 	return $self;
 }
 
-=head2 arrange($comporator)
+=head2 arrange($comparator)
 
 The method sorts whole stream.
 
@@ -656,7 +656,7 @@ sub arrange {
 	my $comporator = shift;
 
 	if (ref $comporator ne 'CODE') {
-		croak 'First argument can be only subrotine reference'
+		croak 'First argument can be only subroutine reference'
 	}
 
 	my $pkg = caller;
@@ -703,13 +703,13 @@ sub arrange {
 	return $self;
 }
 
-=head2 cut_arrange($predicat, $comporator)
+=head2 cut_arrange($predicate, $comparator)
 
 Sometimes stream can be infinity and you can't you $stream->arrange, 
-you need certain parts of streams for example cut part by lenght of items.
+you need certain parts of streams for example cut part by length of items.
 
   $stream
-    ->cut_arrange(sub {lenght $a != lenght $b},sub {$a <=> $b})
+    ->cut_arrange(sub {length $a != length $b},sub {$a <=> $b})
     ->to_arrayref(sub {print @{$_[0]}});
 =cut
 sub cut_arrange {
@@ -791,7 +791,7 @@ sub cut_arrange {
 	return $self;
 }
 
-=head2 merge {comporator} $stream1, $stream2;
+=head2 merge {comparator} $stream1, $stream2;
 
 Merge two or more stream by comparing each item of stream and return new stream.
 
@@ -915,6 +915,88 @@ sub branch (&$) {
 
 	return $truth_branch, $false_branch
 }
+
+=head2 any($predicat, $return_cb)
+
+Method look for any equivalent item in steam. if there is any then return that.
+if there isn't  then return nothing.
+
+  $stream->any(sub {$_ % 2})->to_arrayref(sub {print @{$_[0]}});
+=cut
+sub any {
+	my $self = shift;
+	my $predicat = shift;
+	my $return_cb = shift;
+
+	my $iterator = $self->iterator;
+
+	my $next_cb; $next_cb = sub {
+		my $next_cb = $next_cb;
+		$iterator->next(sub {
+			if (@_) {
+				local *{_} = \$_[0];
+				if ($predicat->()) {
+					$return_cb->($_[0]);
+				} else {
+					$next_cb->();
+				}
+			} else {
+				$return_cb->()
+			}
+		});
+	}; $next_cb->();
+	weaken $next_cb;
+
+	return $self;
+}
+
+=head2 distinct($key_generator)
+
+Method discards duplicate items from stream. 
+By default uniqueness of items will be determined by textual representation of item.
+
+  $stream->distinct(sub {$_->{name}})->to_arrayref(sub {print @{$_[0]}});
+=cut
+sub distinct {
+	my $self = shift;
+	my $to_key = shift;
+
+	if (ref $to_key ne 'CODE') {
+		$to_key = sub { "$_" };
+	}
+
+	my $iterator = $self->iterator;
+
+	my %index_of;
+
+	my $generator; $generator = sub {
+		my $return_cb = shift;
+		$iterator->next(sub {
+				if (@_) {
+					my $key;
+					{
+						local *{_} = \$_[0];
+						$key = $to_key->()
+					}
+
+					if (exists $index_of{$key}) {
+						$generator->($return_cb);
+					} else {
+						$index_of{$key} = undef;
+						$return_cb->($_[0]);
+					}
+				} else {
+					$return_cb->();
+				}
+			});
+
+	};
+
+	$self->_set_head($generator);
+
+	return $self;
+}
+
 
 sub _set_head {
 	my $self = shift;

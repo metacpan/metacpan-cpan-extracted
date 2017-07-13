@@ -1,13 +1,13 @@
 package Data::Unixish::ANSI::color;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010;
 use strict;
 use syntax 'each_on_array'; # to support perl < 5.12
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Unixish::Util qw(%common_args);
 use Term::ANSIColor qw();
@@ -84,7 +84,7 @@ Data::Unixish::ANSI::color - Colorize text with ANSI color codes
 
 =head1 VERSION
 
-This document describes version 0.07 of Data::Unixish::ANSI::color (from Perl distribution Data-Unixish-ANSI), released on 2015-09-03.
+This document describes version 0.08 of Data::Unixish::ANSI::color (from Perl distribution Data-Unixish-ANSI), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -101,9 +101,15 @@ In command line:
 =head1 FUNCTIONS
 
 
-=head2 color(%args) -> [status, msg, result, meta]
+=head2 color
+
+Usage:
+
+ color(%args) -> [status, msg, result, meta]
 
 Colorize text with ANSI color codes.
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -161,7 +167,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

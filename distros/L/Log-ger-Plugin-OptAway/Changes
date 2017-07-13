@@ -1,3 +1,8 @@
+0.004   2017-07-11 (PERLANCAR)
+
+	- Avoid perl undef warning.
+
+
 0.003   2017-06-23 (PERLANCAR)
 
 	- Adjust to Log::ger 0.005.

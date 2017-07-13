@@ -6,7 +6,7 @@ use warnings;
 use Test::More 0.96;
 
 use File::chdir;
-use File::Slurp::Tiny qw(write_file);
+use File::Slurper qw(write_text);
 use File::Temp qw(tempdir);
 use Setup::File::Symlink;
 use Test::Perinci::Tx::Manager qw(test_tx_action);
@@ -56,7 +56,7 @@ test_tx_action(
     tmpdir => $tmpdir,
     reset_state => sub {
         unlink "$tmpdir/s";
-        write_file("$tmpdir/s", "$tmpdir/s");
+        write_text("$tmpdir/s", "$tmpdir/s");
     },
     f      => 'Setup::File::Symlink::rmsym',
     args   => {path=>"$tmpdir/s"},

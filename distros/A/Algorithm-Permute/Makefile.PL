@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Algorithm::Permute",
   "PREREQ_PM" => {
+    "Exporter" => 0,
     "XSLoader" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -25,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::LeakTrace" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %WriteMakefileArgs = (
 );
 
 my %FallbackPrereqs = (
+  "Exporter" => 0,
   "Test::LeakTrace" => 0,
   "Test::More" => 0,
   "XSLoader" => 0,

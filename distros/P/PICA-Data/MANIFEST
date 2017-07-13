@@ -19,6 +19,7 @@ lib/PICA/Parser/XML.pm
 lib/PICA/Path.pm
 lib/PICA/Writer/Base.pm
 lib/PICA/Writer/Binary.pm
+lib/PICA/Writer/PPXML.pm
 lib/PICA/Writer/Plain.pm
 lib/PICA/Writer/Plus.pm
 lib/PICA/Writer/XML.pm
@@ -36,5 +37,6 @@ t/files/pica.plain
 t/files/pica.plus
 t/files/pica.xml
 t/files/ppxml.xml
+t/files/slim_ppxml.xml
 t/files/sru_picaxml.xml
 t/files/sru_ppxml.xml

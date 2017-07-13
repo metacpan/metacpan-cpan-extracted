@@ -1,0 +1,22 @@
+---
+abstract: 'Perl module to handle SID files (Commodore-64 music files).'
+author:
+  - 'LaLa <LaLa@C64.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Audio-SID
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5'
+version: '4.01'

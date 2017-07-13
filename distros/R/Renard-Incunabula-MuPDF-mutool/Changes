@@ -1,0 +1,30 @@
+0.003 2017-07-11 23:17:21-0500
+  - Split off from Renard-Curie-0.002.
+
+    project-renard/p5-Renard-Incunabula
+      s/Renard::Curie::Setup/Renard::Incunabula::Common::Setup
+      s/Renard::Curie::Types/Renard::Incunabula::Common::Types
+      s/Renard::Curie::Error/Renard::Incunabula::Common::Error/
+      s/Renard::Curie::Model::Document/Renard::Incunabula::Document/
+      s/Renard::Curie::Model::Outline/Renard::Incunabula::Outline/
+      s/Renard::Curie::Model::Document::Role::FromFile/Renard::Incunabula::Document::Role::FromFile
+      s/Renard::Curie::Model::Document::Role::Pageable/Renard::Incunabula::Document::Role::Pageable
+      s/Renard::Curie::Model::Document::Role::Cacheable/Renard::Incunabula::Document::Role::Cacheable
+      s/Renard::Curie::Model::Document::Role::Renderable/Renard::Incunabula::Document::Role::Renderable
+      s/Renard::Curie::Model::Document::Role::Boundable/Renard::Incunabula::Document::Role::Boundable
+      s/Renard::Curie::Model::Document::Role::Outlineable/Renard::Incunabula::Document::Role::Outlineable
+      s/Renard::Curie::Model::Page::Role::CairoRenderableFromPNG/Renard::Incunabula::Page::Role::CairoRenderableFromPNG/
+      s/Renard::Curie::Model::Page::Role::Bounds/Renard::Incunabula::Page::Role::Bounds/
+      s/Renard::Curie::Model::Page::Role::BoundsFromCairoImageSurface/Renard::Incunabula::Page::Role::BoundsFromCairoImageSurface/
+      s/Renard::Curie::Model::Page::Role::CairoRenderable/Renard::Incunabula::Page::Role::CairoRenderable/
+      s/Renard::Curie::Model::Page::CairoImageSurface/Renard::Incunabula::Page::CairoImageSurface/
+      s/Renard::Curie::Model::Page::RenderedFromPNG/Renard::Incunabula::Page::RenderedFromPNG/
+      s/Renard::Curie::Model::Document::CairoImageSurface/Renard::Incunabula::Format::Cairo::ImageSurface::Document/
+
+    project-renard/p5-Renard-Incunabula-MuPDF-mutool
+      s/Renard::Curie::Data::PDF/Renard::Incunabula::MuPDF::mutool/
+
+    See <https://github.com/project-renard/curie/issues/26>,
+    <https://github.com/project-renard/curie/pull/210>.
+
+  - Documentation fixes.

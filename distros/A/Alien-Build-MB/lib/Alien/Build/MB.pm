@@ -7,7 +7,7 @@ use Alien::Build;
 use base qw( Module::Build );
 
 # ABSTRACT: Alien::Build installer class for Module::Build
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 
 sub new
@@ -65,6 +65,7 @@ sub new
   
   $build->set_stage ($stage->stringify );
   $build->set_prefix($prefix->stringify);
+  $build->runtime_prop->{perl_module_version} = $self->dist_version;
   
   $build->checkpoint;
 
@@ -153,7 +154,7 @@ Alien::Build::MB - Alien::Build installer class for Module::Build
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,5 @@
 Changes
 cpanfile
-Finance-GDAX-API-0.03.tar.gz
 lib/Finance/GDAX/API.pm
 lib/Finance/GDAX/API/Account.pm
 lib/Finance/GDAX/API/CoinbaseAccount.pm

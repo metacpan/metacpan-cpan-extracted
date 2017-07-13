@@ -19,16 +19,16 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "parent" => 0,
     "strict" => 0,
+    "vars" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => "0.98",
-    "vars" => 0
+    "Test::More" => "0.98"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.016",
   "test" => {
     "TESTS" => "t/*.t"
   }

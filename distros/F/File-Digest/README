@@ -1,21 +1,105 @@
-SYNOPSIS
+NAME
+    File::Digest - Calculate file checksum/digest (using various algorithms)
 
+VERSION
+    This document describes version 0.007 of File::Digest (from Perl
+    distribution File-Digest), released on 2017-07-10.
+
+SYNOPSIS
      use File::Digest qw(digest_files);
-    
+
      my $res = digest_files(
          files => ["file1", "file2"],
          algorithm => 'md5', # default md5, available also: crc32, sha1, sha256
      );
 
 DESCRIPTION
+FUNCTIONS
+  digest_file
+    Usage:
+
+     digest_file(%args) -> [status, msg, result, meta]
+
+    Calculate file checksum/digest (using various algorithms).
+
+    Return 400 status when algorithm is unknown/unsupported.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   algorithm => *str* (default: "md5")
+
+    *   file* => *filename*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  digest_files
+    Usage:
+
+     digest_files(%args) -> [status, msg, result, meta]
+
+    Calculate file checksum/digest (using various algorithms).
+
+    Dies when algorithm is unsupported/unknown.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   algorithm => *str* (default: "md5")
+
+    *   files* => *array[filename]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Digest>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-File-Digest>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Digest>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     sum from PerlPowerTools (which only supports older algorithms like
     CRC32).
 
     Backend modules: Digest::CRC, Digest::MD5, Digest::SHA.
 
-    xsum from App::xsum which can also check checksums/digests from
-    checksum file e.g. MD5SUMS.
+    xsum from App::xsum which can also check checksums/digests from checksum
+    file e.g. MD5SUMS.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

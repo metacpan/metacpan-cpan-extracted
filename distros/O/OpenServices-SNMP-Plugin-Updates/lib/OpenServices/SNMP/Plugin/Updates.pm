@@ -17,11 +17,11 @@ OpenServices::SNMP::Plugin::Updates - Expose pending security updates over SNMP
 
 =head1 VERSION
 
-Version 1.0.1
+Version 1.0.3
 
 =cut
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.0.3';
 
 =head1 BASE OID
 
@@ -80,7 +80,7 @@ sub check {
             my $output = qx/apt-get upgrade -s/;
             my @packages;
             foreach my $line (split /\n/, $output) {
-                if (my ($name, $version) = $line =~ /^Inst (\S+) \[(\S+)\] \(\S+ Debian:security \[\S+\]\)/) {
+                if (my ($name, $version) = $line =~ /^Inst (\S+) \[\S+\] \((\S+) (?:Debian:security|Debian-Security:\d+\/\w+) \[\S+\]\)/) {
                     push @packages, "$name-$version";
                 }
             }
@@ -96,7 +96,7 @@ sub check {
             my $output = qx/yum list-security -y/;
             my @packages;
             foreach my $line (split /\n/, $output) {
-                if (my ($name) = $line =~ /^\w+-\d+[:-]\d+ +\S+ +(\S+)$/) {
+                if (my ($name) = $line =~ /^\w+-\d+[:-]\d+ \S+ (\S+)$/) {
                     push @packages, $name;
                 }
             }
@@ -119,6 +119,7 @@ sub check {
             }
             foreach (@packages) {
                 $updates->{$counter} = $_;
+                print STDERR "Pending security update: $_\n";
                 $counter++;
             }
         }
@@ -135,12 +136,13 @@ sub handler {
     my $request;
 
     my $updates = check();
+    my $size = keys %$updates;
 
     for($request = $requests; $request; $request = $request->next()) {
         my $oid = $request->getOID();
         if ($request_info->getMode() == MODE_GET) {
             if ($oid == $BASEOID) {
-                $request->setValue(ASN_INTEGER, scalar keys %$updates);
+                $request->setValue(ASN_INTEGER, $size);
             } else {
                 foreach my $package_oid (sort {$a <=> $b} keys %$updates) {
                     if ($oid == $BASEOID + ".$package_oid") {
@@ -151,7 +153,7 @@ sub handler {
         } elsif ($request_info->getMode() == MODE_GETNEXT) {
             if ($oid < $BASEOID) {
                 $request->setOID($BASEOID);
-                $request->setValue(ASN_INTEGER, scalar keys %$updates);
+                $request->setValue(ASN_INTEGER, $size);
             } else {
                 foreach my $package_oid (sort {$a <=> $b} keys %$updates) {
                     if ($oid < $BASEOID + ".$package_oid") {

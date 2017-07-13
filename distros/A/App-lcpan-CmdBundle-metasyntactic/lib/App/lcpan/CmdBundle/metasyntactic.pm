@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::metasyntactic;
 
-our $DATE = '2017-02-06'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to Acme::MetaSyntactic
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::metasyntactic - More lcpan subcommands related to Acme::M
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::CmdBundle::metasyntactic (from Perl distribution App-lcpan-CmdBundle-metasyntactic), released on 2017-02-06.
+This document describes version 0.003 of App::lcpan::CmdBundle::metasyntactic (from Perl distribution App-lcpan-CmdBundle-metasyntactic), released on 2017-07-10.
 
 =head1 SYNOPSIS
 

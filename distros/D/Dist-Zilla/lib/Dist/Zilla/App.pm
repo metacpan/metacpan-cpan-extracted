@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App 6.009;
+package Dist::Zilla::App 6.010;
 # ABSTRACT: Dist::Zilla's App::Cmd
 
 use App::Cmd::Setup 0.330 -app; # better compilation error detection
@@ -175,7 +175,7 @@ Dist::Zilla::App - Dist::Zilla's App::Cmd
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 METHODS
 

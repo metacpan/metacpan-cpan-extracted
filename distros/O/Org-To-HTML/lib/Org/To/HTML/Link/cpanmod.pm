@@ -1,7 +1,7 @@
 package Org::To::HTML::Link::cpanmod;
 
-our $DATE = '2016-12-24'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.22'; # VERSION
 
 1;
 # ABSTRACT: cpanmod
@@ -18,7 +18,7 @@ Org::To::HTML::Link::cpanmod - cpanmod
 
 =head1 VERSION
 
-This document describes version 0.21 of Org::To::HTML::Link::cpanmod (from Perl distribution Org-To-HTML), released on 2016-12-24.
+This document describes version 0.22 of Org::To::HTML::Link::cpanmod (from Perl distribution Org-To-HTML), released on 2017-07-10.
 
 =head1 HOMEPAGE
 
@@ -42,7 +42,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

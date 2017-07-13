@@ -1,7 +1,7 @@
 package Complete::Module;
 
-our $DATE = '2015-12-02'; # DATE
-our $VERSION = '0.24'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.25'; # VERSION
 
 use 5.010001;
 use strict;
@@ -66,13 +66,13 @@ module prefixes which have `word` as prefix. So for example, given `Te` as
 `word`, will return e.g. `[Template, Template::, Term::, Test, Test::, Text::]`.
 Given `Text::` will return `[Text::ASCIITable, Text::Abbrev, ...]` and so on.
 
-This function has a bit of overlapping functionality with `Module::List`, but
-this function is geared towards shell tab completion. Compared to
-`Module::List`, here are some differences: 1) list modules where prefix is
-incomplete; 2) interface slightly different; 3) (currently) doesn't do
-recursing; 4) contains conveniences for completion, e.g. map casing, expand
-intermediate paths (see `Complete` for more details on those features),
-autoselection of path separator character, some shortcuts, and so on.
+This function has a bit of overlapping functionality with <pm:Module::List>, but
+this function is geared towards shell tab completion. Compared to Module::List,
+here are some differences: 1) list modules where prefix is incomplete; 2)
+interface slightly different; 3) (currently) doesn't do recursing; 4) contains
+conveniences for completion, e.g. map casing, expand intermediate paths (see
+`Complete` for more details on those features), autoselection of path separator
+character, some shortcuts, and so on.
 
 _
     args => {
@@ -222,7 +222,7 @@ Complete::Module - Complete with installed Perl module names
 
 =head1 VERSION
 
-This document describes version 0.24 of Complete::Module (from Perl distribution Complete-Module), released on 2015-12-02.
+This document describes version 0.25 of Complete::Module (from Perl distribution Complete-Module), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -237,6 +237,8 @@ This document describes version 0.24 of Complete::Module (from Perl distribution
 Shortcut prefixes. The default is:
 
  {
+   bs  => "Bencher/Scenario/",
+   bss => "Bencher/Scenarios/",
    df  => "DateTime/Format/",
    dz  => "Dist/Zilla/",
    dzb => "Dist/Zilla/PluginBundle/",
@@ -247,28 +249,20 @@ Shortcut prefixes. The default is:
    pwp => "Pod/Weaver/Plugin/",
    pwr => "Pod/Weaver/Role/",
    pws => "Pod/Weaver/Section/",
+   rp  => "Regexp/Pattern/",
  }
 
 If user types one of the keys, it will be replaced with the matching value from
 this hash.
 
-=head1 ENVIRONMENT
-
-=head2 C<COMPLETE_MODULE_OPT_SHORTCUT_PREFIXES> => str
-
-Can be used to set the default for C<$Complete::Module::OPT_SHORTCUT_PREFIXES>.
-It should be in the form of:
-
- shortcut1=Value1;shortcut2=Value2;...
-
-For example:
-
- dzp=Dist/Zilla/Plugin/;pwp=Pod/Weaver/Plugin/
-
 =head1 FUNCTIONS
 
 
-=head2 complete_module(%args) -> any
+=head2 complete_module
+
+Usage:
+
+ complete_module(%args) -> any
 
 Complete with installed Perl module names.
 
@@ -277,13 +271,13 @@ module prefixes which have C<word> as prefix. So for example, given C<Te> as
 C<word>, will return e.g. C<[Template, Template::, Term::, Test, Test::, Text::]>.
 Given C<Text::> will return C<[Text::ASCIITable, Text::Abbrev, ...]> and so on.
 
-This function has a bit of overlapping functionality with C<Module::List>, but
-this function is geared towards shell tab completion. Compared to
-C<Module::List>, here are some differences: 1) list modules where prefix is
-incomplete; 2) interface slightly different; 3) (currently) doesn't do
-recursing; 4) contains conveniences for completion, e.g. map casing, expand
-intermediate paths (see C<Complete> for more details on those features),
-autoselection of path separator character, some shortcuts, and so on.
+This function has a bit of overlapping functionality with L<Module::List>, but
+this function is geared towards shell tab completion. Compared to Module::List,
+here are some differences: 1) list modules where prefix is incomplete; 2)
+interface slightly different; 3) (currently) doesn't do recursing; 4) contains
+conveniences for completion, e.g. map casing, expand intermediate paths (see
+C<Complete> for more details on those features), autoselection of path separator
+character, some shortcuts, and so on.
 
 This function is not exported by default, but exportable.
 
@@ -335,6 +329,19 @@ Word to complete.
 
 Return value:  (any)
 
+=head1 ENVIRONMENT
+
+=head2 C<COMPLETE_MODULE_OPT_SHORTCUT_PREFIXES> => str
+
+Can be used to set the default for C<$Complete::Module::OPT_SHORTCUT_PREFIXES>.
+It should be in the form of:
+
+ shortcut1=Value1;shortcut2=Value2;...
+
+For example:
+
+ dzp=Dist/Zilla/Plugin/;pwp=Pod/Weaver/Plugin/
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Complete-Module>.
@@ -351,13 +358,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Complete::Perl>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

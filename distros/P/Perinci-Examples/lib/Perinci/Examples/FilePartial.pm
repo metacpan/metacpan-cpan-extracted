@@ -1,7 +1,7 @@
 package Perinci::Examples::FilePartial;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 use 5.010;
 use strict;
@@ -37,7 +37,7 @@ $SPEC{read_file} = {
     result => {schema=>'buf*', partial=>1},
 };
 sub read_file {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::str;my $arg_err; if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
 
     my $path = $args{path};
     (-f $path) or return [404, "No such file '$path'"];
@@ -71,7 +71,7 @@ $SPEC{write_file} = {
     },
 };
 sub write_file {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::buf;my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');require Data::Sah::Compiler::perl::TH::str;if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
 
     my $path = $args{path};
     my $start = $args{"-arg_part_start"} // 0;
@@ -102,7 +102,7 @@ _
     },
 };
 sub append_file {
-    my %args = @_; no warnings ('void');require Data::Sah::Compiler::perl::TH::buf;my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');require Data::Sah::Compiler::perl::TH::str;if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
+    my %args = @_; no warnings ('void');my $arg_err; if (exists($args{'content'})) { ((defined($args{'content'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'content'})) ? 1 : (($arg_err //= "Not of type buffer"),0)); if ($arg_err) { return [400, "Invalid argument value for content: $arg_err"] } }if (!exists($args{'content'})) { return [400, "Missing argument: content"] } no warnings ('void');if (exists($args{'path'})) { ((defined($args{'path'})) ? 1 : (($arg_err //= "Required but not specified"),0)) && ((!ref($args{'path'})) ? 1 : (($arg_err //= "Not of type text"),0)); if ($arg_err) { return [400, "Invalid argument value for path: $arg_err"] } }if (!exists($args{'path'})) { return [400, "Missing argument: path"] } # VALIDATE_ARGS
 
     my $path = $args{path};
 
@@ -129,7 +129,7 @@ Perinci::Examples::FilePartial - Examples for reading/writing files (demos parti
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::FilePartial (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::FilePartial (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -147,7 +147,11 @@ partial.
 =head1 FUNCTIONS
 
 
-=head2 append_file(%args) -> [status, msg, result, meta]
+=head2 append_file
+
+Usage:
+
+ append_file(%args) -> [status, msg, result, meta]
 
 This function doesn't actually accept partial content, because by nature it is
 already a partial/incremental operation.
@@ -176,7 +180,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 read_file(%args) -> [status, msg, result, meta]
+=head2 read_file
+
+Usage:
+
+ read_file(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -200,7 +208,11 @@ that contains extra information.
 Return value:  (buf)
 
 
-=head2 write_file(%args) -> [status, msg, result, meta]
+=head2 write_file
+
+Usage:
+
+ write_file(%args) -> [status, msg, result, meta]
 
 This function is not exported.
 
@@ -247,7 +259,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -115,11 +115,11 @@ sub load
   }};
 
   my @preload = qw( Core::Setup Core::Download Core::FFI );
-  @preload = split ';', $ENV{ALIEN_BUILD_PRELOAD}
+  push @preload, split ';', $ENV{ALIEN_BUILD_PRELOAD}
     if defined $ENV{ALIEN_BUILD_PRELOAD};
   
   my @postload = qw( Core::Legacy Core::Gather );
-  @postload = split ';', $ENV{ALIEN_BUILD_POSTLOAD}
+  push @postload, split ';', $ENV{ALIEN_BUILD_POSTLOAD}
     if defined $ENV{ALIEN_BUILD_POSTLOAD};
 
   my $self = $class->new(
@@ -247,10 +247,12 @@ sub load_requires
     my $ver = $reqs->{$mod};
     eval qq{ use $mod @{[ $ver ? $ver : '' ]} () };
     die if $@;
+
     if($mod->can('bin_dir'))
     {
       push @{ $self->{bin_dir} }, $mod->bin_dir;
     }
+
     if(($mod->can('runtime_prop') && $mod->runtime_prop)
     || ($mod->isa('Alien::Base')  && $mod->install_type('share')))
     {
@@ -271,6 +273,17 @@ sub load_requires
         push @{ $self->{aclocal_path} }, $path;
       }
     }
+    
+    if($mod->can('alien_helper'))
+    {
+      my $helpers = $mod->alien_helper;
+      foreach my $name (sort keys %$helpers)
+      {
+        my $code = $helpers->{$name};
+        $self->meta->interpolator->replace_helper($name => $code);
+      }
+    }
+
   }
   1;
 }
@@ -906,7 +919,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 0.55
+version 0.61
 
 =head1 SYNOPSIS
 

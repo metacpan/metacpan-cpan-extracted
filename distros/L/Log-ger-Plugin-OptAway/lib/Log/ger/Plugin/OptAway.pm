@@ -1,7 +1,7 @@
 package Log::ger::Plugin::OptAway;
 
-our $DATE = '2017-06-23'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 use strict;
 use warnings;
@@ -20,10 +20,12 @@ sub get_hooks {
                 my %args = @_;
 
                 # we are only relevant when targetting package
-                return [undef] unless $args{target} eq 'package';
+                return [undef] unless ($args{target}||'') eq 'package';
 
                 for my $r (@{ $args{routines} }) {
-                    my $fullname = "$args{target_arg}\::$r->[1]";
+                    my ($code, $name, $lnum, $type) = @$r;
+                    next unless $type =~ /\Alog_/;
+                    my $fullname = "$args{target_arg}\::$name";
                     if ($Log::ger::Current_Level < $r->[2]) {
                         #print "D:no-oping $fullname\n";
                         B::CallChecker::cv_set_call_checker(
@@ -53,14 +55,14 @@ Log::ger::Plugin::OptAway - Optimize away higher-level log statements
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
  use Log::ger::Plugin->set('OptAway');
  use Log::ger;
 
-Co demonstrate the effect of optimizing away:
+To demonstrate the effect of optimizing away:
 
  % perl -MLog::ger -MO=Deparse -e'log_warn "foo\n"; log_debug "bar\n"'
  log_warn("foo\n");

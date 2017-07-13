@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::bencher_scenario_mods;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -47,7 +47,7 @@ App::lcpan::Cmd::bencher_scenario_mods - List all Bencher::Scenario::* modules
 
 =head1 VERSION
 
-This document describes version 0.001 of App::lcpan::Cmd::bencher_scenario_mods (from Perl distribution App-lcpan-CmdBundle-bencher), released on 2017-01-25.
+This document describes version 0.002 of App::lcpan::Cmd::bencher_scenario_mods (from Perl distribution App-lcpan-CmdBundle-bencher), released on 2017-07-10.
 
 =head1 DESCRIPTION
 
@@ -56,7 +56,11 @@ This module handles the L<lcpan> subcommand C<bencher-scenario-mods>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 List all Bencher::Scenario::* modules.
 

@@ -19,6 +19,39 @@ SPVM::Test - SPVM test module
 
 package Test {
   sub main($mvar : int) : int {
+    # Convert to string to byte[]
+    {
+      my $string = "abc";
+      my $bytes = (byte[])$string;
+      $string = (string)$bytes;
+    }
+    # MIN long constant;
+    {
+      my $num = -9223372036854775808L;
+      std::println_long($num);
+    }
+    {
+      my $var = 3;
+      while (my $var = 964) {
+        std::println_int($var);
+        last;
+      }
+    }
+    
+    {
+      my $error = "First";
+      $@ = "Error";
+      if (my $error = $@) {
+        std::println($error);
+      }
+    }
+    
+    # Check for third part bug
+    {
+      for (my $i = 0; $i < 260; $i++) {
+      }
+    }
+    
     # Exception variable
     {
       $@ = "Exception";
@@ -76,7 +109,7 @@ package Test {
     }
     # String escape character
     {
-      my $string : byte[] = "abc\"\'\\\n\t\b\r\fdef";
+      my $string : string = "abc\"\'\\\n\t\b\r\fdef";
      
       std::println($string);
     }
@@ -286,7 +319,7 @@ package Test {
     }
 
     {
-      my $string : byte[] = "ace";
+      my $string : string = "ace";
      
       std::println($string);
     }
@@ -583,7 +616,8 @@ package Test {
     my $v2 : int;
     my $v3 : int;
     
-    $v3 = $v2 = $v1 = 5;
+    $v3 = $v2 = $v1 = 543;
+    std::println_int($v3);
     
     100;
     1000;
@@ -746,7 +780,9 @@ package Test {
     else {
       
     }
-
+    
+    array_malloc();
+    
     return 2;
   }
   
@@ -818,6 +854,13 @@ package Test {
       die $obj_error2;
     }
   }
+  sub array_malloc() : int {
+    
+    my $nums = malloc int[3];
+    
+    return @$nums;
+  }
+
 }
 
 =head1 NAME

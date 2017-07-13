@@ -41,7 +41,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 5.43) {
 			'Text::CSV_XS' => 0, 'Data::ShowTable' => 0,
 			'Data::Dumper' => 0, 'Term::Screen' => 0,
 			'Term::ReadLine' => 0, 'Term::ReadKey' => 0,
-			'Cwd' => 0 };
+			'Term::ANSIColor' => 0, 'Cwd' => 0 };
 	if (uc prompt("Do you want tab completation in command line version [Y/n]?",'Y') eq 'Y') {
 		$opts{PREREQ_PM}->{'Term::ReadLine::Gnu'} = 0;
 	}

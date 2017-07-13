@@ -1,0 +1,397 @@
+#!perl
+
+# Note: This script is a CLI 
+# and generated automatically using Perinci::CmdLine::Gen version 0.46
+
+our $DATE = '2017-07-10'; # DATE
+our $DIST = 'phpBB2-Simple'; # DIST
+our $VERSION = '0.04'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/phpBB2/Simple/",
+    subcommands => {
+        "add-user-to-groups"                    => {
+                                                       summary => "Add a user to one or more groups",
+                                                       url => "/phpBB2/Simple/add_user_to_groups",
+                                                   },
+        "delete-user-from-all-forum-moderators" => {
+                                                       summary => "Delete a user from being moderator in all forums",
+                                                       url => "/phpBB2/Simple/delete_user_from_all_forum_moderators",
+                                                   },
+        "delete-user-from-groups"               => {
+                                                       summary => "Delete a user from one or more groups",
+                                                       url => "/phpBB2/Simple/delete_user_from_groups",
+                                                   },
+        "list-group-members"                    => { url => "/phpBB2/Simple/list_group_members" },
+        "list-groups"                           => { url => "/phpBB2/Simple/list_groups" },
+        "list-user-groups"                      => {
+                                                       summary => "List groups which user belongs to",
+                                                       url => "/phpBB2/Simple/list_user_groups",
+                                                   },
+        "list-users"                            => { url => "/phpBB2/Simple/list_users" },
+    },
+    program_name => "phpbb2",
+)->run;
+
+# ABSTRACT: API for phpBB2
+# PODNAME: phpbb2
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+phpbb2 - API for phpBB2
+
+=head1 VERSION
+
+This document describes version 0.04 of phpbb2 (from Perl distribution phpBB2-Simple), released on 2017-07-10.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % phpbb2 add-user-to-groups [options] <user> <group> ...
+ % phpbb2 delete-user-from-all-forum-moderators [options] <user>
+ % phpbb2 delete-user-from-groups [options] <user> <group> ...
+ % phpbb2 list-group-members [options] <group>
+ % phpbb2 list-groups [options]
+ % phpbb2 list-user-groups [options] <user>
+ % phpbb2 list-users [options]
+
+=head1 SUBCOMMANDS
+
+=head2 B<add-user-to-groups>
+
+Add a user to one or more groups.
+
+=head2 B<delete-user-from-all-forum-moderators>
+
+Delete a user from being moderator in all forums.
+
+=head2 B<delete-user-from-groups>
+
+Delete a user from one or more groups.
+
+=head2 B<list-group-members>
+
+=head2 B<list-groups>
+
+=head2 B<list-user-groups>
+
+List groups which user belongs to.
+
+=head2 B<list-users>
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--db-dsn>=I<s>*
+
+=item B<--db-password>=I<s>*
+
+=item B<--db-user>=I<s>*
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand add-user-to-groups
+
+=over
+
+=item B<--group-json>=I<s>
+
+See C<--group>.
+
+=item B<--group>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--user>=I<s>*
+
+=back
+
+=head2 Options for subcommand delete-user-from-all-forum-moderators
+
+=over
+
+=item B<--user>=I<s>*
+
+=back
+
+=head2 Options for subcommand delete-user-from-groups
+
+=over
+
+=item B<--group-json>=I<s>
+
+See C<--group>.
+
+=item B<--group>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--user>=I<s>*
+
+=back
+
+=head2 Options for subcommand list-group-members
+
+=over
+
+=item B<--group>=I<s>*
+
+=back
+
+=head2 Options for subcommand list-groups
+
+=over
+
+=item B<--detail>
+
+Returned detailed record for each item instead of just ID.
+
+=back
+
+=head2 Options for subcommand list-user-groups
+
+=over
+
+=item B<--user>=I<s>*
+
+=back
+
+=head2 Options for subcommand list-users
+
+=over
+
+=item B<--active>
+
+Only list active users.
+
+=item B<--detail>
+
+Returned detailed record for each item instead of just ID.
+
+=item B<--level>=I<s>
+
+Only list users having certain level.
+
+Valid values:
+
+ ["user","moderator","administrator"]
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C phpbb2 phpbb2
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete phpbb2 'p/*/`phpbb2`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/phpbb2.conf>, F<~/phpbb2.conf>, or F</etc/phpbb2.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ db_dsn (see --db-dsn)
+ db_password (see --db-password)
+ db_user (see --db-user)
+ format (see --format)
+ naked_res (see --naked-res)
+
+=head2 Configuration for subcommand add-user-to-groups
+
+ group (see --group)
+ user (see --user)
+
+=head2 Configuration for subcommand delete-user-from-all-forum-moderators
+
+ user (see --user)
+
+=head2 Configuration for subcommand delete-user-from-groups
+
+ group (see --group)
+ user (see --user)
+
+=head2 Configuration for subcommand list-group-members
+
+ group (see --group)
+
+=head2 Configuration for subcommand list-groups
+
+ detail (see --detail)
+
+=head2 Configuration for subcommand list-user-groups
+
+ user (see --user)
+
+=head2 Configuration for subcommand list-users
+
+ active (see --active)
+ detail (see --detail)
+ level (see --level)
+
+=head1 ENVIRONMENT
+
+=head2 PHPBB2_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/phpbb2.conf>
+
+F<~/phpbb2.conf>
+
+F</etc/phpbb2.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/phpBB2-Simple>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-phpBB2-Simple>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=phpBB2-Simple>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

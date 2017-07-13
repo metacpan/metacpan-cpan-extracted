@@ -1,24 +1,55 @@
-SYNOPSIS
+NAME
+    LWP::UserAgent::Patch::HTTPSHardTimeout - Add hard timeout to HTTPS
+    requests
 
+VERSION
+    This document describes version 0.06 of
+    LWP::UserAgent::Patch::HTTPSHardTimeout (from Perl distribution
+    LWP-UserAgent-Patch-HTTPSHardTimeout), released on 2017-07-10.
+
+SYNOPSIS
      use LWP::UserAgent::Patch::HTTPSHardTimeout -timeout => 300;
 
 DESCRIPTION
-
     This module contains a simple workaround for hanging issue with HTTPS
     requests. It wraps send_request() with an alarm() timeout.
 
     Can be used with WWW::Mechanize because it uses LWP::UserAgent.
 
 FAQ
-
- Why not subclass?
-
+  Why not subclass?
     By patching, you do not need to replace all the client code which uses
     LWP::UserAgent (or WWW::Mechanize, and so on).
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/LWP-UserAgent-Patch-HTTPSHardTimeout>.
 
-    http://stackoverflow.com/questions/9400068/make-timeout-work-for-lwpuseragent-https
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-LWP-UserAgent-Patch-HTTPSHardTimeout>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=LWP-UserAgent-Patch-H
+    TTPSHardTimeout>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    http://stackoverflow.com/questions/9400068/make-timeout-work-for-lwpuser
+    agent-https
 
     LWPx::ParanoidAgent
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2012 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -3,7 +3,7 @@ package WebService::MinFraud::Error::WebService;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.004000';
+our $VERSION = '1.005000';
 
 use WebService::MinFraud::Types qw( Str );
 
@@ -33,7 +33,7 @@ WebService::MinFraud::Error::WebService - An explicit error returned by the minF
 
 =head1 VERSION
 
-version 1.004000
+version 1.005000
 
 =head1 SYNOPSIS
 

@@ -17,7 +17,11 @@ const char* const SPVM_CONSTANT_C_CODE_NAMES[] = {
 };
 
 SPVM_CONSTANT* SPVM_CONSTANT_new(SPVM_COMPILER* compiler) {
-  return SPVM_COMPILER_ALLOCATOR_alloc_memory_pool(compiler, compiler->allocator, sizeof(SPVM_CONSTANT));
+  SPVM_CONSTANT* constant = SPVM_COMPILER_ALLOCATOR_alloc_memory_pool(compiler, compiler->allocator, sizeof(SPVM_CONSTANT));
+  
+  constant->sign = 0;
+  
+  return constant;
 }
 
 SPVM_CONSTANT* SPVM_CONSTANT_create_int_1(SPVM_COMPILER* compiler) {

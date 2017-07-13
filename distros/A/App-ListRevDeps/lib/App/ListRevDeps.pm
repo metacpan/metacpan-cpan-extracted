@@ -1,12 +1,12 @@
 package App::ListRevDeps;
 
-our $DATE = '2016-01-18'; # DATE
-our $VERSION = '0.15'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.16'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 our %SPEC;
 require Exporter;
@@ -84,7 +84,7 @@ sub list_rev_deps {
     $do_list = sub {
         my ($dist, $level) = @_;
         $level //= 0;
-        $log->debugf("Listing reverse dependencies for dist %s (level=%d) ...", $mod, $level);
+        log_debug("Listing reverse dependencies for dist %s (level=%d) ...", $mod, $level);
 
         my @res;
 
@@ -97,9 +97,9 @@ sub list_rev_deps {
         # API function instead, see CPAN::ReverseDependencies.
         my $depdists = $chi->compute(
             "metacpan-dist_rev_deps-$dist", $ce, sub {
-                $log->infof("Querying MetaCPAN for dist %s ...", $dist);
+                log_info("Querying MetaCPAN for dist %s ...", $dist);
                 my $res = $mcpan->rev_deps($dist);
-                if ($ENV{LOG_API_RESPONSE}) { $log->tracef("API result: %s", $res) }
+                if ($ENV{LOG_API_RESPONSE}) { log_trace("API result: %s", $res) }
                 $res;
             });
 
@@ -107,7 +107,7 @@ sub list_rev_deps {
         for my $d (@{ $depdists->{items} }) {
             my $d_name = $d->{_source}{distribution};
             if ($exclude_re && $d_name =~ $exclude_re) {
-                $log->infof("Excluded dist %s", $d_name)
+                log_info("Excluded dist %s", $d_name)
                     unless $excluded{$d_name}++;
                 next;
             }
@@ -142,9 +142,9 @@ sub list_rev_deps {
         } else {
             my $modinfo = $chi->compute(
                 "metacpan-mod-$_", $ce, sub {
-                    $log->infof("Querying MetaCPAN for module %s ...", $_);
+                    log_info("Querying MetaCPAN for module %s ...", $_);
                     my $res = $mcpan->module($_);
-                    if ($ENV{LOG_API_RESPONSE}) { $log->tracef("API result: %s", $res) }
+                    if ($ENV{LOG_API_RESPONSE}) { log_trace("API result: %s", $res) }
                     $res;
                 });
             $dist = $modinfo->distribution;
@@ -172,7 +172,7 @@ App::ListRevDeps - List reverse dependencies of a Perl module
 
 =head1 VERSION
 
-This document describes version 0.15 of App::ListRevDeps (from Perl distribution App-ListRevDeps), released on 2016-01-18.
+This document describes version 0.16 of App::ListRevDeps (from Perl distribution App-ListRevDeps), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -186,11 +186,15 @@ caches results for 24 hours.
 =head1 FUNCTIONS
 
 
-=head2 list_rev_deps(%args) -> [status, msg, result, meta]
+=head2 list_rev_deps
+
+Usage:
+
+ list_rev_deps(%args) -> [status, msg, result, meta]
 
 List reverse dependencies of a Perl module.
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -245,7 +249,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-ListRe
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-ListRevDeps>.
+Source repository is at L<https://github.com/perlancar/perl-App-ListRevDeps>.
 
 =head1 BUGS
 
@@ -267,7 +271,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

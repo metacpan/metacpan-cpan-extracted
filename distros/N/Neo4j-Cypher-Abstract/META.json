@@ -35,15 +35,15 @@
    "provides" : {
       "Neo4j::Cypher::Abstract" : {
          "file" : "lib/Neo4j/Cypher/Abstract.pm",
-         "version" : "0.1001"
+         "version" : "0.1002"
       },
       "Neo4j::Cypher::Abstract::Peeler" : {
          "file" : "lib/Neo4j/Cypher/Abstract/Peeler.pm",
-         "version" : "0.1001"
+         "version" : "0.1002"
       },
       "Neo4j::Cypher::Pattern" : {
          "file" : "lib/Neo4j/Cypher/Pattern.pm",
-         "version" : "0.1001"
+         "version" : "0.1002"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "http://github.com/majensen/cypher-abstract.git"
       }
    },
-   "version" : "0.1001",
+   "version" : "0.1002",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

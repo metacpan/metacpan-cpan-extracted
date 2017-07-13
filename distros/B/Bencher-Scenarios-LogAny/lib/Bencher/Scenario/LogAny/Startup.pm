@@ -1,7 +1,7 @@
 package Bencher::Scenario::LogAny::Startup;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.09'; # VERSION
 
 use 5.010001;
 use strict;
@@ -10,14 +10,12 @@ use warnings;
 our $scenario = {
     module_startup => 1,
     modules => {
-        'Log::Any::IfLOG' => {version=>0.07},
     },
     participants => [
         {module => 'Log::Any'},
         {module => 'Log::Any::Adapter::Null'},
         {module => 'Log::Any::Adapter::Screen'},
         {module => 'Log::Any::Adapter::Stdout'},
-        {module => 'Log::Any::IfLOG'},
         {module => 'Log::Any::Proxy'},
     ],
 };
@@ -37,7 +35,7 @@ Bencher::Scenario::LogAny::Startup
 
 =head1 VERSION
 
-This document describes version 0.08 of Bencher::Scenario::LogAny::Startup (from Perl distribution Bencher-Scenarios-LogAny), released on 2017-01-25.
+This document describes version 0.09 of Bencher::Scenario::LogAny::Startup (from Perl distribution Bencher-Scenarios-LogAny), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -55,17 +53,15 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<Log::Any> 1.042
+L<Log::Any> 1.049
 
-L<Log::Any::Adapter::Null> 1.042
+L<Log::Any::Adapter::Null> 1.049
 
 L<Log::Any::Adapter::Screen> 0.13
 
-L<Log::Any::Adapter::Stdout> 1.042
+L<Log::Any::Adapter::Stdout> 1.049
 
-L<Log::Any::IfLOG> 0.08
-
-L<Log::Any::Proxy> 1.042
+L<Log::Any::Proxy> 1.049
 
 =head1 BENCHMARK PARTICIPANTS
 
@@ -95,12 +91,6 @@ L<Log::Any::Adapter::Stdout>
 
 
 
-=item * Log::Any::IfLOG (perl_code)
-
-L<Log::Any::IfLOG>
-
-
-
 =item * Log::Any::Proxy (perl_code)
 
 L<Log::Any::Proxy>
@@ -111,7 +101,7 @@ L<Log::Any::Proxy>
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.24.0 >>, CPU: I<< Intel(R) Core(TM) M-5Y71 CPU @ 1.20GHz (2 cores) >>, OS: I<< GNU/Linux LinuxMint version 17.3 >>, OS kernel: I<< Linux version 3.19.0-32-generic >>.
+Run on: perl: I<< v5.26.0 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux Debian version 8.0 >>, OS kernel: I<< Linux version 3.16.0-4-amd64 >>.
 
 Benchmark with C<< bencher -m LogAny::Startup --include-path archive/Log-Any-0.15/lib --include-path archive/Log-Any-1.032/lib --include-path archive/Log-Any-1.038/lib --include-path archive/Log-Any-1.040/lib --include-path archive/Log-Any-1.041/lib --multimodver Log::Any >>:
 
@@ -119,18 +109,17 @@ Benchmark with C<< bencher -m LogAny::Startup --include-path archive/Log-Any-0.1
  +-------------------------+---------------+-----------+---------------------------+--------+-----------+------------------------+------------+---------+---------+
  | proc_private_dirty_size | proc_rss_size | proc_size | participant               | modver | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors | samples |
  +-------------------------+---------------+-----------+---------------------------+--------+-----------+------------------------+------------+---------+---------+
- | 1.4                     | 4.8           | 17        | Log::Any                  | 1.032  |      16   |                   14.1 |        1   | 6.5e-05 |      21 |
- | 1.4                     | 4.7           | 17        | Log::Any::Adapter::Screen |        |      11   |                    9.1 |        1.5 | 3.1e-05 |      20 |
- | 0.86                    | 4.1           | 16        | Log::Any::Adapter::Stdout |        |       9.8 |                    7.9 |        1.6 | 5.2e-05 |      21 |
- | 1.6                     | 5             | 17        | Log::Any::Adapter::Null   |        |       9.4 |                    7.5 |        1.7 | 1.6e-05 |      22 |
- | 0.82                    | 4.1           | 16        | Log::Any::Proxy           |        |       8.9 |                    7   |        1.8 | 4.5e-05 |      20 |
- | 1.4                     | 4.9           | 17        | Log::Any                  | 1.041  |       8.8 |                    6.9 |        1.8 | 5.2e-05 |      20 |
- | 1.4                     | 4.7           | 17        | Log::Any                  | 1.042  |       8.8 |                    6.9 |        1.8 | 4.7e-05 |      20 |
- | 1.4                     | 4.8           | 17        | Log::Any                  | 1.038  |       7.7 |                    5.8 |        2   | 3.3e-05 |      20 |
- | 1.5                     | 4.7           | 17        | Log::Any                  | 1.040  |       7.7 |                    5.8 |        2.1 | 4.3e-05 |      20 |
- | 1.5                     | 4.8           | 17        | Log::Any                  | 0.15   |       4.7 |                    2.8 |        3.3 | 2.7e-05 |      20 |
- | 1.4                     | 4.7           | 17        | Log::Any::IfLOG           |        |       2.3 |                    0.4 |        6.7 | 5.5e-06 |      20 |
- | 1.4                     | 4.7           | 17        | perl -e1 (baseline)       |        |       1.9 |                    0   |        8.4 | 1.2e-05 |      20 |
+ | 1.6                     | 5             | 21        | Log::Any                  | 1.032  |      17   |                   15.1 |        1   | 6.1e-05 |      20 |
+ | 1.6                     | 5             | 21        | Log::Any::Adapter::Screen |        |      13   |                   11.1 |        1.3 | 2.7e-05 |      20 |
+ | 1.5                     | 5             | 21        | Log::Any::Adapter::Stdout |        |      12   |                   10.1 |        1.4 | 4.9e-05 |      20 |
+ | 1.7                     | 5.2           | 21        | Log::Any::Adapter::Null   |        |      12   |                   10.1 |        1.4 | 3.7e-05 |      20 |
+ | 1.6                     | 5.1           | 21        | Log::Any                  | 1.049  |      11   |                    9.1 |        1.5 | 6.4e-05 |      20 |
+ | 0.83                    | 4.2           | 20        | Log::Any::Proxy           |        |      11   |                    9.1 |        1.5 | 4.1e-05 |      20 |
+ | 1.6                     | 5.1           | 21        | Log::Any                  | 1.041  |       9.5 |                    7.6 |        1.8 | 3.4e-05 |      20 |
+ | 1.6                     | 5             | 21        | Log::Any                  | 1.040  |       8.3 |                    6.4 |        2   | 4.7e-05 |      20 |
+ | 1.6                     | 5             | 21        | Log::Any                  | 1.038  |       8.1 |                    6.2 |        2   | 3.3e-05 |      20 |
+ | 1.6                     | 5             | 21        | Log::Any                  | 0.15   |       4.9 |                    3   |        3.4 | 1.2e-05 |      20 |
+ | 1.5                     | 5             | 21        | perl -e1 (baseline)       |        |       1.9 |                    0   |        9   | 1.6e-05 |      20 |
  +-------------------------+---------------+-----------+---------------------------+--------+-----------+------------------------+------------+---------+---------+
 
 
@@ -158,7 +147,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

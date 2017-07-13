@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// Tom Stall -  mtm@mountaintom.com
+
+package base64;
+option cc_enable_arenas = true;
+option java_outer_classname = "base64";
+option java_multiple_files = true;
+option java_package = "org.tds";
+
+// Protocol buffer to encode/decode base64 data for JSON transport.
+// Protocol Buffers encode bytes to base64 when transforming to JSON.
+
+message Base64Proto {
+ repeated bytes base64  = 1;
+};

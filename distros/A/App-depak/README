@@ -1,4 +1,292 @@
-SYNOPSIS
+NAME
+    App::depak - Pack your dependencies onto your script file
 
+VERSION
+    This document describes version 0.55 of App::depak (from Perl
+    distribution App-depak), released on 2017-07-10.
+
+SYNOPSIS
     See depak.
+
+FUNCTIONS
+  depak
+    Usage:
+
+     depak(%args) -> [status, msg, result, meta]
+
+    Pack your dependencies onto your script file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_xs => *array[str]*
+
+    *   args => *array[str]*
+
+        Script arguments.
+
+        Will be used when running your script, e.g. when "trace_method" is
+        "fatpacker" or "require". For example, if your script requires three
+        arguments: "--foo", 2, "bar baz" then you can either use:
+
+         % depak script output --args --foo --args 2 --args "bar baz"
+
+        or:
+
+         % depak script output --args-json '["--foo",2,"bar baz"]'
+
+    *   debug_keep_tempdir => *bool*
+
+        Keep temporary directory for debugging.
+
+    *   exclude_core => *bool* (default: 1)
+
+        Whether to exclude core modules.
+
+    *   exclude_dist => *array[str]*
+
+        Exclude all modules of dist.
+
+        Just like the "exclude" option, but will exclude module as well as
+        other modules from the same distribution. Module name must be the
+        main module of the distribution. Will determine other modules from
+        the ".packlist" file.
+
+    *   exclude_list => *str*
+
+        Exclude modules from a list in a file.
+
+    *   exclude_module => *array[str]*
+
+        Modules to exclude.
+
+        When you don't want to include a module, specify it here.
+
+    *   exclude_pattern => *array[str]*
+
+        Regex patterns of modules to exclude.
+
+        When you don't want to include a pattern of modules, specify it
+        here.
+
+    *   exclude_prereq => *array[str]*
+
+        This option can be used to express that script will depend on a
+        specified module, instead of including it packed. The prereq-ed
+        module, as well as other modules in the same distribution, as well
+        as its prereqs and so on recursively, will be excluded from packing
+        as well.
+
+        This option can be used to express dependency to an XS module, since
+        XS modules cannot be packed.
+
+        To query dependencies, a local CPAN index is used for querying
+        speed. Thus, this option requires that "lcpan" is installed and a
+        fairly recent lcpan index is available.
+
+    *   include_dir => *array[str]*
+
+        Include extra modules under directories.
+
+    *   include_dist => *array[str]*
+
+        Include all modules of dist.
+
+        Just like the "include" option, but will include module as well as
+        other modules from the same distribution. Module name must be the
+        main module of the distribution. Will determine other modules from
+        the ".packlist" file.
+
+    *   include_list => *str*
+
+        Include extra modules from a list in a file.
+
+    *   include_module => *array[str]*
+
+        Include extra modules.
+
+        When the tracing process fails to include a required module, you can
+        add it here.
+
+    *   include_prereq => *array[str]*
+
+        This option can be used to include a module, as well as other
+        modules in the same distribution as that module, as well as the
+        distribution's recursive dependencies, for packing. Dependencies
+        will be searched using a local CPAN index. This is a convenient
+        alternative to tracing a module. So you might want to use this
+        option together with setting "trace_method" to "none".
+
+        This option requires that "lcpan" is installed and a fairly recent
+        lcpan index is available.
+
+    *   input_file => *str* (default: "-")
+
+        Path to input file (script to be packed).
+
+        "-" (or if unspecified) means to take from standard input
+        (internally, a temporary file will be created to handle this).
+
+    *   multiple_runs => *array[hash]*
+
+        Pass to tracepm.
+
+    *   output_file => *str* (default: "-")
+
+        Path to output file.
+
+        "-" (or if unspecified) means to output to stdout.
+
+    *   overwrite => *bool* (default: 0)
+
+        Whether to overwrite output if previously exists.
+
+    *   pack_method => *str* (default: "fatpack")
+
+        Packing method to use.
+
+        Either "fatpack" (the default) or "datapack". Fatpack puts packed
+        modules inside Perl variables and load them via require hook.
+        Datapack puts packed modules in DATA section. For more details about
+        each method, please consult "Module::FatPack" and
+        "Module::DataPack".
+
+        One thing to remember is, with datapack, your script cannot load
+        modules during compile-time ("use"): all modules must be loaded
+        during run-time ("require") when data section is already available.
+        Also, your script currently cannot contain data section of its own.
+
+    *   perl_version => *str*
+
+        Perl version to target, defaults to current running version.
+
+        This is for determining which modules are considered core and should
+        be skipped by default (when "exclude_core" option is enabled).
+        Different perl versions have different sets of core modules as well
+        as different versions of the modules.
+
+    *   shebang => *str* (default: "/usr/bin/perl")
+
+        Set shebang line/path.
+
+    *   skip_not_found => *bool*
+
+        Instead of dying, skip when module to add is not found.
+
+        This option is useful when you use "include_prereq", because modules
+        without its own .pm files will also be included (CPAN indexes
+        packages, including those that do not have their own .pm files).
+
+        By default, this option is turned off unless when you use
+        "include_prereq" where this option is by default turned on. You can
+        of course override the default by explicitly specify this option.
+
+    *   squish => *bool* (default: 0)
+
+        Whether to squish included modules using Perl::Squish.
+
+    *   strip => *bool* (default: 0)
+
+        Whether to strip included modules using Perl::Strip.
+
+    *   stripper => *bool* (default: 0)
+
+        Whether to strip included modules using Perl::Stripper.
+
+    *   stripper_comment => *bool* (default: 1)
+
+        Set strip_comment=1 (strip comments) in Perl::Stripper.
+
+    *   stripper_log => *bool* (default: 0)
+
+        Set strip_log=1 (strip log statements) in Perl::Stripper.
+
+    *   stripper_maintain_linum => *bool* (default: 0)
+
+        Set maintain_linum=1 in Perl::Stripper.
+
+    *   stripper_pod => *bool* (default: 1)
+
+        Set strip_pod=1 (strip POD) in Perl::Stripper.
+
+    *   stripper_ws => *bool* (default: 1)
+
+        Set strip_ws=1 (strip whitespace) in Perl::Stripper.
+
+    *   test => *bool*
+
+        Test the resulting output.
+
+        Testing is done by running the resulting packed script with perl. To
+        test, at least one test case is required (see "--test-case-json").
+        Test cases specify what arguments to give to program, what exit code
+        we expect, and what the output should contain.
+
+    *   test_cases => *array[hash]*
+
+        Example case:
+
+         {"args":["--help"], "exit_code":0, "perl_args":["-Mlib::core::only"], "output_like":"Usage:"}
+
+    *   trace_extra_opts => *hash*
+
+        Pass more options to `App::tracepm`.
+
+    *   trace_method => *str* (default: "fatpacker")
+
+        Which method to use to trace dependencies.
+
+        The default is "fatpacker", which is the same as what "fatpack
+        trace" does. Different tracing methods have different pro's and
+        con's, one method might detect required modules that another method
+        does not, and vice versa. There are several methods available,
+        please see "App::tracepm" for more details.
+
+        A special value of "none" is also provided. If this is selected,
+        then depak will not perform any tracing. Usually used in conjunction
+        with "--include-from".
+
+    *   use => *array[str]*
+
+        Additional modules to "use".
+
+        Will be passed to the tracer. Will currently only affect the
+        "fatpacker" and "require" methods (because those methods actually
+        run your script).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-depak>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-depak>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-depak>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

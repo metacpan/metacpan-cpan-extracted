@@ -1,0 +1,30 @@
+---
+abstract: 'Probe for GnuWin32 packages using the Windows registry'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::V0: '0.000060'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Build-Plugin-Probe-GnuWin32
+requires:
+  Alien::Build: '0.57'
+  Alien::Build::Plugin: '0'
+  Capture::Tiny: '0'
+  Module::Load: '0'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/Alien-Build-Plugin-Probe-GnuWin32/issues
+  homepage: https://metacpan.org/pod/Alien::Build::Plugin::Probe::GnuWin32
+  repository: git://github.com/plicease/Alien-Build-Plugin-Probe-GnuWin32.git
+version: '0.59'
+x_serialization_backend: 'YAML::Tiny version 1.70'

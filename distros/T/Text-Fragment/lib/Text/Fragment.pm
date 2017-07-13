@@ -1,12 +1,12 @@
 package Text::Fragment;
 
-our $DATE = '2016-01-29'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Clone;
 
@@ -692,7 +692,7 @@ Text::Fragment - Manipulate fragments in text
 
 =head1 VERSION
 
-This document describes version 0.09 of Text::Fragment (from Perl distribution Text-Fragment), released on 2016-01-29.
+This document describes version 0.10 of Text::Fragment (from Perl distribution Text-Fragment), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -807,7 +807,11 @@ Another example (using C<ini>-style comment):
 =head1 FUNCTIONS
 
 
-=head2 delete_fragment(%args) -> [status, msg, result, meta]
+=head2 delete_fragment
+
+Usage:
+
+ delete_fragment(%args) -> [status, msg, result, meta]
 
 Delete fragment in text.
 
@@ -865,7 +869,11 @@ Will return status 304 if nothing is changed (i.e. when the fragment that needs
 to be deleted already does not exist in the text).
 
 
-=head2 get_fragment(%args) -> [status, msg, result, meta]
+=head2 get_fragment
+
+Usage:
+
+ get_fragment(%args) -> [status, msg, result, meta]
 
 Get fragment with a certain ID in text.
 
@@ -914,7 +922,11 @@ following keys: C<raw> (string), C<payload> (string), C<attrs> (hash), C<id>
 Return 404 if fragment is not found.
 
 
-=head2 insert_fragment(%args) -> [status, msg, result, meta]
+=head2 insert_fragment
+
+Usage:
+
+ insert_fragment(%args) -> [status, msg, result, meta]
 
 Insert or replace a fragment in text.
 
@@ -998,7 +1010,11 @@ Will return status 304 if nothing is changed (i.e. if fragment with the
 same payload that needs to be inserted already exists in the text).
 
 
-=head2 list_fragments(%args) -> [status, msg, result, meta]
+=head2 list_fragments
+
+Usage:
+
+ list_fragments(%args) -> [status, msg, result, meta]
 
 List fragments in text.
 
@@ -1040,7 +1056,11 @@ C<payload> (string), C<attrs> (hash), C<id> (string, can also be found in
 attributes).
 
 
-=head2 set_fragment_attrs(%args) -> [status, msg, result, meta]
+=head2 set_fragment_attrs
+
+Usage:
+
+ set_fragment_attrs(%args) -> [status, msg, result, meta]
 
 Set/unset attributes of a fragment.
 
@@ -1098,7 +1118,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Text-Fragm
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Text-Fragment>.
+Source repository is at L<https://github.com/perlancar/perl-Text-Fragment>.
 
 =head1 BUGS
 
@@ -1114,7 +1134,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

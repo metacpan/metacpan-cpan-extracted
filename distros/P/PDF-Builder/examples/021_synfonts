@@ -1,0 +1,167 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+use PDF::Builder::Util;
+
+#my $compress = 'none'; # no stream compression
+my $compress = 'flate'; # compress streams
+
+my $sx = 33;
+my $sy = 45;
+my $fx = 20;
+
+my ($fn, $x, $y, $yp, $k);
+
+# outer loop, one file each for Times-Roman, Times-Italic, etc.
+foreach $fn (qw(
+    Times-Roman
+    Times-Italic
+    Times-Bold
+    Times-BoldItalic
+    Courier
+    Courier-Oblique
+    Courier-Bold
+    Courier-BoldOblique
+    Helvetica
+    Helvetica-Oblique
+    Helvetica-Bold
+    Helvetica-BoldOblique
+    Symbol
+    ZapfDingbats
+    bankgothic
+    georgia
+    georgiaitalic
+    georgiabold
+    georgiabolditalic
+    trebuchet
+    trebuchetitalic
+    trebuchetbold
+    trebuchetbolditalic
+    verdana
+    verdanaitalic
+    verdanabold
+    verdanabolditalic
+    wingdings
+    webdings
+)) {
+
+    my $pdf = PDF::Builder->new(-compress => $compress);
+    initNameTable();
+
+    my $f1 = $pdf->corefont('Helvetica');  # for various labels
+
+    print STDERR "\n$fn\n";
+
+
+    my $fn1 = $pdf->corefont($fn, -encode => 'latin1');
+
+    my @fonts = ($fn1, $fn1->automap());
+    my @variants = ({-slant=>0.750}, {-oblique=>12}, {-bold=>4}, {-caps=>1});
+    my @varLabels = ('slant 0.750', 'oblique 12', 'bold 4', 'caps 1');
+    my $varNum = 0;
+
+    print STDERR "  ".(scalar @variants)." variants of font, each ".
+                      (scalar @fonts)." page(s)\n";
+
+    foreach $varNum ( 0..$#variants ) {
+	# 4 or so variants requested per font
+	$k = $variants[$varNum];
+
+        foreach my $fnt (@fonts) {  
+	    # individual pages of each font, character list varies by font
+
+            my $font = $pdf->synfont($fnt, %{$k});
+
+            my $page = $pdf->page();
+            $page->mediabox(595,842);
+
+            my $gfx = $page->gfx();
+
+            my $txt = $page->text();
+                $txt->font($font, $fx);
+
+            my $txt2 = $page->text();
+
+                $txt2->translate(50,800);
+                $txt2->font($f1, 20);
+		if (defined $font->fontname()) {
+		    $x = $font->fontname();
+		} else {
+		    $x = $fn;
+		}
+		if (defined $font->name()) {
+		    $y = $font->name();
+		} else {
+		    $y = '??????';
+		}
+                $txt2->text("font='$x / $y'");
+
+                $txt2->translate(50,780);
+		$txt2->font($f1, 15);
+		$txt2->text("variant = $varLabels[$varNum]");
+
+                $txt2->font($f1, 5);
+                $txt2->hscale(80);
+
+	    # distance below baseline (<0) to clear descenders
+            my $u=$font->underlineposition * $fx/1000;
+
+            print STDERR ".";  # one . per page
+	    # draw grid of characters and information
+	    # yp character row value (increasing)
+            foreach $yp (0..15) {
+		$y = 15 - $yp;  # y vertical (row) position T to B
+                foreach $x (0..15) {
+                    $txt->translate(50+($sx*$x), 50+($sy*$y));
+		    my $ci = $yp*16 + $x;
+		    my $c  = chr($ci);
+                    $txt->text($c);
+
+                    my $wx = $font->width($c) * $fx;
+
+		    # bound box cell around character
+                    $gfx->strokecolor('lightblue');
+                    $gfx->move(50+($sx*$x), 50+($sy*$y)+$fx);
+                    $gfx->line(50+($sx*$x), 50+($sy*$y)+$u);
+                    $gfx->line(50+($sx*$x)+$wx, 50+($sy*$y)+$u);
+                    $gfx->line(50+($sx*$x)+$wx, 50+($sy*$y)+$fx);
+                    $gfx->close();
+                    $gfx->stroke();
+
+		    # baseline
+                    $gfx->strokecolor('gray');
+                    $gfx->move(50+($sx*$x), 50+($sy*$y));
+                    $gfx->line(50+($sx*$x)+$wx, 50+($sy*$y));
+                    $gfx->stroke();
+
+		    # character data
+                    $txt2->translate(50+($sx*$x)-2, 50+($sy*$y)-6);
+                    $txt2->text_right($ci);
+                    $txt2->translate(50+($sx*$x)-2, 50+($sy*$y)-11);
+                    if (defined $font->uniByEnc($ci)) {
+                        $txt2->text_right(sprintf('U=0x%04X',$font->uniByEnc($ci)));
+		    } else {
+                        $txt2->text_right('U=0x????');
+	            }
+                    $txt2->translate(50+($sx*$x)-2, 50+($sy*$y)-16);
+                    $txt2->text_right($font->glyphByEnc($ci));
+                    $txt2->translate(50+($sx*$x)-2, 50+($sy*$y)-21);
+                    $txt2->text_right(sprintf('wx=%i', $font->wxByEnc($ci)));
+                }
+            }
+
+        } # end inner loop of 1 or more font pages
+    } # end middle loop of @variants list
+    
+    $pdf->saveas("$0.$fn.pdf");
+    $pdf->end();
+    print STDERR "\n";
+   #last;
+} # loop of typefaces  Times-Roman, Times-Italic, etc. separate files
+exit;
+
+__END__

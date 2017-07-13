@@ -1,6 +1,6 @@
 package UV::Util;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 

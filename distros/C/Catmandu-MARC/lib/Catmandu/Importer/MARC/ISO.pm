@@ -70,7 +70,7 @@ use Moo;
 use MARC::File::USMARC;
 use Catmandu::Importer::MARC::Decoder;
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 with 'Catmandu::Importer';
 
@@ -125,7 +125,7 @@ sub decode_marc {
     if ($id =~ /^00/ && $record->field($id)) {
         $sysid = $record->field($id)->data();
     }
-    elsif ($id =~ /^(\d{3})([\da-zA-Z])$/) {
+    elsif ($id =~ /^([0-9]{3})([0-9a-zA-Z])$/) {
         my $field = $record->field($1);
         $sysid = $field->subfield($2) if ($field);
     }

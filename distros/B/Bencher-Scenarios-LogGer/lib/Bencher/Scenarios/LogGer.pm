@@ -1,7 +1,7 @@
 package Bencher::Scenarios::LogGer;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 1;
 # ABSTRACT: Scenarios for benchmarking Log::ger
@@ -18,7 +18,7 @@ Bencher::Scenarios::LogGer - Scenarios for benchmarking Log::ger
 
 =head1 VERSION
 
-This document describes version 0.009 of Bencher::Scenarios::LogGer (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-02.
+This document describes version 0.010 of Bencher::Scenarios::LogGer (from Perl distribution Bencher-Scenarios-LogGer), released on 2017-07-13.
 
 =head1 DESCRIPTION
 

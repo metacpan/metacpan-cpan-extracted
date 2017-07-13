@@ -1,3 +1,25 @@
+0.2.45 2017-07-13
+
+* Fix some pip install issues 
+* Declare sparrow version at sparrow.json to require Sparrow of certain version
+
+0.2.44 2017-07-11
+
+* Hotfix: PYTHONPATH set for `task run`
+
+0.2.43 2017-07-11
+
+* Support for experimental feature - now you can set python version in sparrow.json to make `plg install` command use proper pip (pip or pip3) when install dependencies
+
+0.2.42 2017-07-11
+
+* Support for experimental feature - pass command line arguments in free style by ` -- args args args ` in `plg run` and `task run` commands
+
+0.2.41 2017-07-10
+
+* Requires Outthentic, version 0.3.0
+
+
 0.2.40 2017-07-07
 
 * `sparrow plg install`  - Install pythin scripts into local/bin

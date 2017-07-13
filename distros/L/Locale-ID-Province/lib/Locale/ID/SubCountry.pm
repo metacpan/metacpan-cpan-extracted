@@ -1,7 +1,7 @@
 package Locale::ID::SubCountry;
 use Locale::ID::Province;
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 our @ISA       = @Locale::ID::Province::ISA;
 our @EXPORT    = @Locale::ID::Province::EXPORT;
@@ -26,16 +26,22 @@ Locale::ID::SubCountry - Alias for Locale::ID::Province
 
 =head1 VERSION
 
-This document describes version 0.09 of Locale::ID::SubCountry (from Perl distribution Locale-ID-Province), released on 2015-09-03.
+This document describes version 0.10 of Locale::ID::SubCountry (from Perl distribution Locale-ID-Province), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 list_id_provinces(%args) -> [status, msg, result, meta]
+=head2 list_id_provinces
+
+Usage:
+
+ list_id_provinces(%args) -> [status, msg, result, meta]
 
 Provinces in Indonesia.
 
 REPLACE ME
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -323,7 +329,7 @@ Only return a certain number of records.
 
 Only return starting from the n'th record.
 
-=item * B<sort> => I<str>
+=item * B<sort> => I<array[str]>
 
 Order records according to certain field(s).
 
@@ -417,7 +423,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

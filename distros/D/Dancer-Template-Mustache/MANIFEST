@@ -1,5 +1,4 @@
 AUTHOR_PLEDGE
-Build.PL
 CONTRIBUTORS
 Changes
 INSTALL
@@ -7,14 +6,17 @@ LICENSE
 MANIFEST
 META.json
 META.yml
-README
+Makefile.PL
 README.mkdn
 SIGNATURE
+cpanfile
+doap.xml
 inc/Devel/AssertOS.pm
 inc/Devel/AssertOS/MSWin32.pm
 inc/Devel/CheckOS.pm
 lib/Dancer/Template/Mustache.pm
-t/000-report-versions-tiny.t
+t/00-report-prereqs.dd
+t/00-report-prereqs.t
 t/01-basic.t
 t/app.t
 t/layout.t

@@ -27,15 +27,15 @@ sub _validate_meta($) {
 
 =head1 NAME
 
-Struct::Diff - Recursive diff tools for nested perl structures
+Struct::Diff - Recursive diff for nested perl structures
 
 =head1 VERSION
 
-Version 0.88
+Version 0.89
 
 =cut
 
-our $VERSION = '0.88';
+our $VERSION = '0.89';
 
 =head1 SYNOPSIS
 
@@ -194,7 +194,8 @@ sub diff($$;@) {
             }
         }
 
-        $d = $alt if (keys %{$d} > 1); # return 'D' version of diff
+        $d = $alt # return 'D' version of diff
+            if (keys %{$d} > 1 or ($sd) = values %{$d} and keys %{$sd} != @keys);
     } elsif (ref $a ? $a == $b : freeze(\$a) eq freeze(\$b)) {
         $d->{U} = $a unless ($opts{noU});
     } else {
@@ -288,36 +289,36 @@ Divide diff to pseudo original structures
 
 sub split_diff($);
 sub split_diff($) {
-    my $d = shift;
+    my $d = $_[0];
     _validate_meta($d);
-    my $s = {};
+    my (%out, $sd);
 
-    if (exists $d->{'D'}) {
-        if (ref $d->{'D'} eq 'ARRAY') {
-            for my $di (@{$d->{'D'}}) {
-                my $ts = split_diff($di);
-                push @{$s->{'a'}}, $ts->{'a'} if (exists $ts->{'a'});
-                push @{$s->{'b'}}, $ts->{'b'} if (exists $ts->{'b'});
+    if (exists $d->{D}) {
+        if (ref $d->{D} eq 'ARRAY') {
+            for (@{$d->{D}}) {
+                $sd = split_diff($_);
+                push @{$out{a}}, $sd->{a} if (exists $sd->{a});
+                push @{$out{b}}, $sd->{b} if (exists $sd->{b});
             }
         } else { # HASH
-            for my $key (keys %{$d->{'D'}}) {
-                my $ts = split_diff($d->{'D'}->{$key});
-                $s->{'a'}->{$key} = $ts->{'a'} if (exists $ts->{'a'});
-                $s->{'b'}->{$key} = $ts->{'b'} if (exists $ts->{'b'});
+            for (keys %{$d->{D}}) {
+                $sd = split_diff($d->{D}->{$_});
+                $out{a}->{$_} = $sd->{a} if (exists $sd->{a});
+                $out{b}->{$_} = $sd->{b} if (exists $sd->{b});
             }
         }
-    } elsif (exists $d->{'U'}) {
-        $s->{'a'} = $s->{'b'} = $d->{'U'};
-    } elsif (exists $d->{'A'}) {
-        $s->{'b'} = $d->{'A'};
-    } elsif (exists $d->{'R'}) {
-        $s->{'a'} = $d->{'R'};
+    } elsif (exists $d->{U}) {
+        $out{a} = $out{b} = $d->{U};
+    } elsif (exists $d->{A}) {
+        $out{b} = $d->{A};
+    } elsif (exists $d->{R}) {
+        $out{a} = $d->{R};
     } else {
-        $s->{'b'} = $d->{'N'} if (exists $d->{'N'});
-        $s->{'a'} = $d->{'O'} if (exists $d->{'O'});
+        $out{b} = $d->{N} if (exists $d->{N});
+        $out{a} = $d->{O} if (exists $d->{O});
     }
 
-    return $s;
+    return \%out;
 }
 
 =head2 dtraverse
@@ -399,39 +400,44 @@ Apply diff
 
 =cut
 
-sub patch($$);
 sub patch($$) {
-    my ($s, $d) = @_;
-    _validate_meta($d);
+    my @stack = @_;
+    my ($s, $d, $i);
 
-    if (exists $d->{'D'}) {
-        if (ref $d->{'D'} eq 'ARRAY') {
-            for my $i (0 .. $#{$d->{'D'}}) {
-                my $si = exists $d->{'D'}->[$i]->{'I'} ? $d->{'D'}->[$i]->{'I'} : $i; # use provided index
-                if (exists $d->{'D'}->[$i]->{'D'} or exists $d->{'D'}->[$i]->{'N'}) {
-                    patch(ref $s->[$si] ? $s->[$si] : \$s->[$si], $d->{'D'}->[$i]);
-                } elsif (exists $d->{'D'}->[$i]->{'A'}) {
-                    splice @{$s}, $si, 1,
-                        (@{$s} > $si ?
-                            ($d->{'D'}->[$i]->{'A'}, $s->[$si]) :
-                            $d->{'D'}->[$i]->{'A'});
-                } elsif (exists $d->{'D'}->[$i]->{'R'}) {
-                    splice @{$s}, $si, 1;
+    while (@stack) {
+        ($s, $d) = splice @stack, 0, 2;
+        _validate_meta($d);
+
+        if (exists $d->{D}) {
+            if (ref $d->{D} eq 'ARRAY') {
+                for (0 .. $#{$d->{D}}) {
+                    $i = exists $d->{D}->[$_]->{I} ? $d->{D}->[$_]->{I} : $_; # use provided index
+                    if (exists $d->{D}->[$_]->{D} or exists $d->{D}->[$_]->{N}) {
+                        push @stack,
+                            (ref $s->[$i] ? $s->[$i] : \$s->[$i]), $d->{D}->[$_];
+                    } elsif (exists $d->{D}->[$_]->{A}) {
+                        splice @{$s}, $i, 1, (@{$s} > $i
+                            ? ($d->{D}->[$_]->{A}, $s->[$i])
+                            : $d->{D}->[$_]->{A});
+                    } elsif (exists $d->{D}->[$_]->{R}) {
+                        splice @{$s}, $i, 1;
+                    }
+                }
+            } else { # HASH
+                for (keys %{$d->{D}}) {
+                    if (exists $d->{D}->{$_}->{D} or exists $d->{D}->{$_}->{N}) {
+                        push @stack,
+                            (ref $s->{$_} ? $s->{$_} : \$s->{$_}), $d->{D}->{$_};
+                    } elsif (exists $d->{D}->{$_}->{A}) {
+                        $s->{$_} = $d->{D}->{$_}->{A};
+                    } elsif (exists $d->{D}->{$_}->{R}) {
+                        delete $s->{$_};
+                    }
                 }
             }
-        } else { # HASH
-            for my $k (keys %{$d->{'D'}}) {
-                if (exists $d->{'D'}->{$k}->{'D'} or exists $d->{'D'}->{$k}->{'N'}) {
-                    patch(ref $s->{$k} ? $s->{$k} : \$s->{$k}, $d->{'D'}->{$k});
-                } elsif (exists $d->{'D'}->{$k}->{'A'}) {
-                    $s->{$k} = $d->{'D'}->{$k}->{'A'};
-                } elsif (exists $d->{'D'}->{$k}->{'R'}) {
-                    delete $s->{$k};
-                }
-            }
+        } elsif (exists $d->{N}) {
+            ${$s} = $d->{N};
         }
-    } elsif (exists $d->{'N'}) {
-        ${$s} = $d->{'N'};
     }
 }
 

@@ -1,13 +1,13 @@
 package App::tracepm;
 
-our $DATE = '2016-01-18'; # DATE
-our $VERSION = '0.19'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.20'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use version;
 
@@ -283,7 +283,7 @@ sub tracepm {
         my $i = 0;
         while (<$fh>) {
             chomp;
-            $log->trace("got line: $_");
+            log_trace "got line: $_";
 
             my $r = {};
             $i++;
@@ -327,7 +327,7 @@ sub tracepm {
         my $scan;
         $scan = sub {
             my $file = shift;
-            $log->infof("Scanning %s ...", $file);
+            log_info "Scanning %s ...", $file;
             my $cache_key = "tracepm-$method-$file";
             my $sres = $chi->compute(
                 $cache_key, "24h", # XXX cache should check timestamp
@@ -349,23 +349,23 @@ sub tracepm {
                     last MOD if $seen_mods{$mod}++;
                     my $path = Module::Path::More::module_path(module=>$mod);
                     unless ($path) {
-                        $log->infof("Skipped recursing to %s: path not found", $mod);
+                        log_info "Skipped recursing to %s: path not found", $mod;
                         last;
                     }
                     if ($mod ~~ @recurse_blacklist) {
-                        $log->infof("Skipped recursing to %s: excluded by hard-coded blacklist", $mod);
+                        log_info "Skipped recursing to %s: excluded by hard-coded blacklist", $mod;
                         last;
                     }
                     if ($args{recurse_exclude}) {
                         if ($mod ~~ @{ $args{recurse_exclude} }) {
-                            $log->infof("Skipped recursing to %s: excluded by list", $mod);
+                            log_info "Skipped recursing to %s: excluded by list", $mod;
                             last;
                         }
                     }
                     if ($args{recurse_exclude_pattern}) {
                         for (@{ $args{recurse_exclude_pattern} }) {
                             if ($mod =~ /$_/) {
-                                $log->infof("Skipped recursing to %s: excluded by pattern %s", $mod, $_);
+                                log_info "Skipped recursing to %s: excluded by pattern %s", $mod, $_;
                                 last CHECK_RECURSE;
                             }
                         }
@@ -375,14 +375,14 @@ sub tracepm {
                         my $is_core = Module::CoreList::More->is_still_core(
                             $mod, undef, $plver); # XXX use $v?
                         if ($is_core) {
-                            $log->infof("Skipped recursing to %s: core module", $mod);
+                            log_info "Skipped recursing to %s: core module", $mod;
                         }
                     }
                     if ($args{recurse_exclude_xs}) {
                         require Module::XSOrPP;
                         my $is_xs = Module::XSOrPP::is_xs($mod);
                         if ($is_xs) {
-                            $log->infof("Skipped recursing to %s: XS module", $mod);
+                            log_info "Skipped recursing to %s: XS module", $mod;
                             last;
                         }
                     }
@@ -393,7 +393,7 @@ sub tracepm {
                 push @res, $r;
             }
             if (@new) {
-                $log->debugf("Recursively scanning %s ...", join(", ", @new));
+                log_debug "Recursively scanning %s ...", join(", ", @new);
                 $scan->($_) for @new;
             }
         };
@@ -439,7 +439,7 @@ App::tracepm - Trace dependencies of your Perl script
 
 =head1 VERSION
 
-This document describes version 0.19 of App::tracepm (from Perl distribution App-tracepm), released on 2016-01-18.
+This document describes version 0.20 of App::tracepm (from Perl distribution App-tracepm), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -450,11 +450,15 @@ This distribution provides command-line utility called L<tracepm>.
 =head1 FUNCTIONS
 
 
-=head2 tracepm(%args) -> [status, msg, result, meta]
+=head2 tracepm
+
+Usage:
+
+ tracepm(%args) -> [status, msg, result, meta]
 
 Trace dependencies of your Perl script.
 
-This function is not exportable.
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -594,7 +598,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-tracep
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-tracepm>.
+Source repository is at L<https://github.com/perlancar/perl-App-tracepm>.
 
 =head1 BUGS
 
@@ -610,7 +614,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

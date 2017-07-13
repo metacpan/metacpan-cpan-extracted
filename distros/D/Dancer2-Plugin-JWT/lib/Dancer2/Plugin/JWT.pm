@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Dancer2::Plugin::JWT;
 # ABSTRACT: JSON Web Token made simple for Dancer2
-$Dancer2::Plugin::JWT::VERSION = '0.012';
+$Dancer2::Plugin::JWT::VERSION = '0.013';
 use Dancer2::Plugin;
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use URI;
@@ -152,6 +152,16 @@ on_plugin_import {
         )
     );
 
+    $dsl->app->add_hook(
+	Dancer2::Core::Hook->new(
+	    name => 'after',
+	    code => sub {
+		my $response = shift;
+		$response->push_header('Access-Control-Expose-Headers' => 'Authorization');
+	    }
+	)
+    );
+    
     $dsl->app->add_hook(
         Dancer2::Core::Hook->new(
             name => 'before',

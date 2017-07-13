@@ -1,3 +1,20 @@
+0.0218 2017-07-13
+  - Fix float culcuration bugs
+  - add SPVM::byte_array, SPVM::short_array, SPVM::long_array, SPVM::float_array, SPVM::double_array function
+    to create SPVM array object.
+0.0217 2017-07-12
+  - Support SPVM::int_array([1, 2, 3]) function
+    This values can be passed to SPVM function.
+0.0216 2017-07-12
+  - Fix constant sign is not initialized bug
+0.0215 2017-07-11
+  - Support while (my $var = 3) { ... }
+  - Support long min constant -9223372036854775808
+  - Fix array malloc bug
+0.0214 2017-07-11
+  - Fix for statement segmentaion fault bug
+  - VAR = TERM return VAR. For example, allow the syntax "if (my $error = $@) { ... }
+  - Fix if condition (byte, short, long, float) bugs.
 0.0213 2017-07-10
   - Fix MANIFEST
 0.0212 2017-07-10

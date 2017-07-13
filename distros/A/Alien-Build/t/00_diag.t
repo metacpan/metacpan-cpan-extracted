@@ -1,7 +1,7 @@
-use strict;
-use warnings;
+use Test2::V0;
 use Config;
-use Test::More tests => 1;
+
+eval q{ require Test::More };
 
 # This .t file is generated.
 # make changes instead to dist.ini
@@ -10,16 +10,21 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Acme::Alien::DontPanic
   Alien::Base
+  Alien::Libarchive
   Capture::Tiny
+  ExtUtils::CBuilder
   ExtUtils::MakeMaker
+  ExtUtils::ParseXS
   FFI::CheckLib
+  FFI::Platypus
   File::Listing
   File::Listing::Ftpcopy
+  File::Which
   File::chdir
   HTML::LinkExtor
   HTTP::Tiny
-  IPC::Cmd
   JSON::PP
   LWP
   Module::Load
@@ -28,9 +33,11 @@ $modules{$_} = $_ for qw(
   PkgConfig
   PkgConfig::LibPkgConf
   Sort::Versions
+  Test2::API
   Test2::Mock
+  Test2::Require
+  Test2::Require::Module
   Test2::V0
-  Test::More
   Text::ParseWords
   URI
   YAML
@@ -80,7 +87,7 @@ if(@keys > 0)
 
 diag sprintf $format, 'perl ', $];
 
-foreach my $module (@modules)
+foreach my $module (sort @modules)
 {
   if(eval qq{ require $module; 1 })
   {
@@ -102,3 +109,4 @@ if($post_diag)
 
 spacer;
 
+done_testing;

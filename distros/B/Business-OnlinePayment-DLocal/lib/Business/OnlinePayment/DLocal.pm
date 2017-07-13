@@ -14,7 +14,7 @@ use Log::Scrubber qw(disable $SCRUBBER scrubber :Carp scrubber_add_scrubber);
 @ISA     = qw(Business::OnlinePayment::HTTPS);
 $me      = 'Business::OnlinePayment::DLocal';
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # PODNAME: Business::OnlinePayment::DLocal
 # ABSTRACT: Business::OnlinePayment::DLocal - DLocal (astropay) backend for Business::OnlinePayment
 
@@ -166,7 +166,7 @@ sub _authorization_only {
         url => 'https://'.$self->server.'/api_curl/cc/'.(lc($content->{'action'})eq 'normal authorization' ? 'sale' : 'auth'),
         control => ['x_invoice','x_amount','x_currency','x_email','cc_number','cc_exp_month','cc_cvv','cc_exp_year','x_cpf','x_country','cc_token'],
         post_data => ['x_login','x_trans_key','x_version','x_invoice','x_amount','x_currency','x_description','x_device_id','x_country',
-                    'x_cpf','x_name','x_email','cc_number','cc_exp_month','cc_exp_year','cc_cvv','cc_token','control','type'],
+                    'x_phone','x_address','x_cpf','x_name','x_email','cc_number','cc_exp_month','cc_exp_year','cc_cvv','cc_token','control','type'],
     };
 
     my $res = $self->_send_request($config,$content);
@@ -466,7 +466,7 @@ Business::OnlinePayment::DLocal - Business::OnlinePayment::DLocal - DLocal (astr
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

@@ -1,5 +1,10 @@
 Revision history for Alien-libuv
 
+0.006     2017-07-10
+  - Bump the share version to libuv v1.13.1
+  - Add a recommended test install of FFI::Platypus
+  - Diag out the install_type for better debugging later
+
 0.005     2017-07-08
   - Updated the requirements to include Alien::m4
   - Update requirements of Alien::libtool, automake, and autoconf for some

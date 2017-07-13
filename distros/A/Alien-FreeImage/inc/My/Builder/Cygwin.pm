@@ -5,6 +5,7 @@ use warnings;
 use base 'My::Builder';
 
 my $makefile = 'Makefile.gnu';
+#my $makefile = 'Makefile.cygwin'; ## troubles with Source/LibJXR/common/include/guiddef.h
 
 sub make_clean {
   my $self = shift;

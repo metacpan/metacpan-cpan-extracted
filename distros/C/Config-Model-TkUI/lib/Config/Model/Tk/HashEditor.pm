@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::HashEditor;
-$Config::Model::Tk::HashEditor::VERSION = '1.362';
+$Config::Model::Tk::HashEditor::VERSION = '1.363';
 use strict;
 use warnings;
 use Carp;
@@ -61,6 +61,7 @@ sub Populate {
         || die "HashEditor: no -item, got ", keys %$args;
     delete $args->{-path};
     $cw->{store_cb} = delete $args->{-store_cb} || die __PACKAGE__, "no -store_cb";
+    my $cme_font = delete $args->{-font};
 
     unless ( defined $up_img ) {
         $add_img    = $cw->Photo( -file => $icon_path . 'add.png' );
@@ -230,6 +231,8 @@ sub Populate {
     $cw->add_info_button()->pack( @fx, qw/-anchor n/ );
     $cw->add_summary($hash)->pack(@fx);
     $cw->add_description($hash)->pack(@fbe1);
+
+    $cw->ConfigSpecs(-font => [['SELF','DESCENDANTS'], 'font','Font', $cme_font ],);
 
     $cw->Tk::Frame::Populate($args);
 }

@@ -1,12 +1,12 @@
 package phpBB2::Simple;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use DBI;
 use Perinci::Object;
@@ -306,7 +306,7 @@ phpBB2::Simple - API for phpBB2
 
 =head1 VERSION
 
-This document describes version 0.03 of phpBB2::Simple (from Perl distribution phpBB2-Simple), released on 2015-09-04.
+This document describes version 0.04 of phpBB2::Simple (from Perl distribution phpBB2-Simple), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -319,10 +319,16 @@ web-based administration panel.
 =head1 FUNCTIONS
 
 
-=head2 add_user_to_groups(%args) -> [status, msg, result, meta]
+=head2 add_user_to_groups
+
+Usage:
+
+ add_user_to_groups(%args) -> [status, msg, result, meta]
 
 Add a user to one or more groups.
 
+This function is not exported.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
@@ -351,10 +357,16 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 delete_user_from_all_forum_moderators(%args) -> [status, msg, result, meta]
+=head2 delete_user_from_all_forum_moderators
+
+Usage:
+
+ delete_user_from_all_forum_moderators(%args) -> [status, msg, result, meta]
 
 Delete a user from being moderator in all forums.
 
+This function is not exported.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
@@ -381,9 +393,15 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 delete_user_from_groups(%args) -> [status, msg, result, meta]
+=head2 delete_user_from_groups
+
+Usage:
+
+ delete_user_from_groups(%args) -> [status, msg, result, meta]
 
 Delete a user from one or more groups.
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -413,7 +431,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_group_members(%args) -> [status, msg, result, meta]
+=head2 list_group_members
+
+Usage:
+
+ list_group_members(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -441,7 +465,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_groups(%args) -> [status, msg, result, meta]
+=head2 list_groups
+
+Usage:
+
+ list_groups(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -471,9 +501,15 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_user_groups(%args) -> [status, msg, result, meta]
+=head2 list_user_groups
+
+Usage:
+
+ list_user_groups(%args) -> [status, msg, result, meta]
 
 List groups which user belongs to.
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -501,7 +537,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_users(%args) -> [status, msg, result, meta]
+=head2 list_users
+
+Usage:
+
+ list_users(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -560,7 +602,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

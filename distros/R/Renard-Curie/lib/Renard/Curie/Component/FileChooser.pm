@@ -1,10 +1,10 @@
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::FileChooser;
 # ABSTRACT: Component that implements a file chooser dialog
-$Renard::Curie::Component::FileChooser::VERSION = '0.002';
+$Renard::Curie::Component::FileChooser::VERSION = '0.003';
 use Moo;
-use Renard::Curie::Types qw(InstanceOf);
-use Function::Parameters;
+use Renard::Incunabula::Frontend::Gtk3::Helper;
+use Renard::Incunabula::Common::Types qw(InstanceOf);
 
 has all_filter => (
 	is => 'lazy', # _build_all_filter
@@ -35,7 +35,7 @@ method _build_pdf_filter() :ReturnType(InstanceOf['Gtk3::FileFilter']) {
 method get_open_file_dialog() :ReturnType(InstanceOf['Gtk3::FileChooserDialog']) {
 	my $dialog = Gtk3::FileChooserDialog->new(
 		"Open File",
-		$self->app->window,
+		$self->main_window->window,
 		'GTK_FILE_CHOOSER_ACTION_OPEN',
 		'gtk-cancel' => 'cancel',
 		'gtk-open' => 'accept',
@@ -54,7 +54,7 @@ method get_open_file_dialog_with_filters() :ReturnType(InstanceOf['Gtk3::FileCho
 }
 
 with qw(
-	Renard::Curie::Component::Role::HasParentApp
+	Renard::Curie::Component::Role::HasParentMainWindow
 );
 
 1;
@@ -71,7 +71,7 @@ Renard::Curie::Component::FileChooser - Component that implements a file chooser
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 EXTENDS
 
@@ -85,7 +85,7 @@ version 0.002
 
 =over 4
 
-=item * L<Renard::Curie::Component::Role::HasParentApp>
+=item * L<Renard::Curie::Component::Role::HasParentMainWindow>
 
 =back
 

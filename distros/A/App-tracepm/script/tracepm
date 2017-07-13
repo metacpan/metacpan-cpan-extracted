@@ -1,0 +1,428 @@
+#!perl
+
+# Note: This script is a CLI  for Riap function /App/tracepm/tracepm
+# and generated automatically using Perinci::CmdLine::Gen version 0.46
+
+our $DATE = '2017-07-10'; # DATE
+our $DIST = 'App-tracepm'; # DIST
+our $VERSION = '0.20'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/App/tracepm/tracepm",
+    program_name => "tracepm",
+)->run;
+
+# ABSTRACT: Trace dependencies of your Perl script
+# PODNAME: tracepm
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+tracepm - Trace dependencies of your Perl script
+
+=head1 VERSION
+
+This document describes version 0.20 of tracepm (from Perl distribution App-tracepm), released on 2017-07-10.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % tracepm [options] [script] [args] ...
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--args-json>=I<s>
+
+Script arguments (JSON-encoded).
+
+See C<--args>.
+
+=item B<--args>=I<s@>
+
+Script arguments.
+
+Can be specified multiple times.
+
+=item B<--cache-prereqscanner>
+
+Whether cache Perl::PrereqScanner{,::Lite} result.
+
+=item B<--method>=I<s>
+
+Tracing method to use.
+
+Default value:
+
+ "fatpacker"
+
+Valid values:
+
+ ["fatpacker","require","prereqscanner","prereqscanner_lite","prereqscanner_recurse","prereqscanner_lite_recurse"]
+
+There are several tracing methods that can be used:
+
+* `fatpacker` (the default): This method uses the same method that `fatpacker
+  trace` uses, which is running the script using `perl -c` then collect the
+  populated `%INC`. Only modules loaded during compile time are detected.
+
+* `require`: This method runs your script normally until it exits. At the start
+  of program, it replaces `CORE::GLOBAL::require()` with a routine that logs the
+  require() argument to the log file. Modules loaded during runtime is also
+  logged by this method. But some modules might not work, specifically modules
+  that also overrides require() (there should be only a handful of modules that
+  do this though).
+
+* `prereqscanner`: This method does not run your Perl program, but statically
+  analyze it using `Perl::PrereqScanner`. Since it uses `PPI`, it can be rather
+  slow.
+
+* `prereqscanner_recurse`: Like `prereqscanner`, but will recurse into all
+  non-core modules until they are exhausted. Modules that are not found will be
+  skipped. It is recommended to use the various `recurse_exclude_*` options
+  options to limit recursion.
+
+* `prereqscanner_lite`: This method is like the `prereqscanner` method, but
+  instead of `Perl::PrereqScanner` it uses `Perl::PrereqScanner::Lite`. The
+  latter does not use `PPI` but use `Compiler::Lexer` which is significantly
+  faster.
+
+* `prereqscanner_lite_recurse`: Like `prereqscanner_lite`, but recurses.
+
+
+=item B<--multiple-runs-json>=I<s>
+
+Parameter to run script multiple times (JSON-encoded).
+
+See C<--multiple-runs>.
+
+=item B<--multiple-runs>=I<s>
+
+Parameter to run script multiple times.
+
+A more general alternative to using `args`. Script will be run multiple times,
+each with setting from element of this option.
+
+Can be used to reach multiple run pathways and trace more modules.
+
+Example:
+
+    [{"args":["-h"]}, # help mode
+     {"args":[""], "env":{"COMP_LINE":"cmd x", "COMP_POINT":5}},
+    ],
+
+
+=item B<--perl-version>=I<s>, B<-V>
+
+Perl version, defaults to current running version.
+
+This is for determining which module is core (the list differs from version to
+version. See Module::CoreList for more details.
+
+
+=item B<--recurse-exclude-core>
+
+When recursing, exclude core modules.
+
+=item B<--recurse-exclude-json>=I<s>
+
+When recursing, exclude some modules (JSON-encoded).
+
+See C<--recurse-exclude>.
+
+=item B<--recurse-exclude-pattern-json>=I<s>
+
+When recursing, exclude some module patterns (JSON-encoded).
+
+See C<--recurse-exclude-pattern>.
+
+=item B<--recurse-exclude-pattern>=I<s@>
+
+When recursing, exclude some module patterns.
+
+Can be specified multiple times.
+
+=item B<--recurse-exclude-xs>
+
+When recursing, exclude XS modules.
+
+=item B<--recurse-exclude>=I<s@>
+
+When recursing, exclude some modules.
+
+Can be specified multiple times.
+
+=item B<--trap-script-output>
+
+Trap script output so it does not interfere with trace result.
+
+=item B<--use-json>=I<s>
+
+Additional modules to "use" (JSON-encoded).
+
+See C<--use>.
+
+=item B<--use>=I<s@>
+
+Additional modules to "use".
+
+This is like running:
+
+    perl -MModule1 -MModule2 script.pl
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>
+
+Whether to return records instead of just module names.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--core>
+
+Filter only modules that are in core.
+
+=item B<--xs>
+
+Filter only modules that are XS modules.
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--eval>=I<s>, B<-e>
+
+Specify script from command-line instead.
+
+=item B<--script>=I<s>
+
+Path to script file (script to be packed).
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C tracepm tracepm
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete tracepm 'p/*/`tracepm`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/tracepm.conf>, F<~/tracepm.conf>, or F</etc/tracepm.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ args (see --args)
+ cache_prereqscanner (see --cache-prereqscanner)
+ core (see --core)
+ detail (see --detail)
+ eval (see --eval)
+ format (see --format)
+ method (see --method)
+ multiple_runs (see --multiple-runs)
+ naked_res (see --naked-res)
+ perl_version (see --perl-version)
+ recurse_exclude (see --recurse-exclude)
+ recurse_exclude_core (see --recurse-exclude-core)
+ recurse_exclude_pattern (see --recurse-exclude-pattern)
+ recurse_exclude_xs (see --recurse-exclude-xs)
+ script (see --script)
+ trap_script_output (see --trap-script-output)
+ use (see --use)
+ xs (see --xs)
+
+=head1 ENVIRONMENT
+
+=head2 TRACEPM_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/tracepm.conf>
+
+F<~/tracepm.conf>
+
+F</etc/tracepm.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-tracepm>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-tracepm>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-tracepm>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

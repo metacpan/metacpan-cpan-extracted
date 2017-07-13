@@ -32,4 +32,4 @@ requires:
   perl: 5.006
 resources:
   repository: git://github.com/eserte/image-info.git
-version: 1.40
+version: 1.41

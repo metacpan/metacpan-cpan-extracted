@@ -173,13 +173,13 @@ t/img-rgba16/troubles/sample-71x71-RGBA16_64.jp2
 t/img-rgba16/troubles/sample-71x71-RGBA16_64.jxr
 t/img-rgbaf.t
 t/img-rgbaf/sample-71x71-RGBAF_128.exr
-t/img-rgbaf/sample-71x71-RGBAF_128.tiff
 t/img-rgbaf/troubles/sample-71x71-RGBAF_128.jxr
+t/img-rgbaf/troubles/sample-71x71-RGBAF_128.tiff
 t/img-rgbf.t
 t/img-rgbf/sample-71x71-RGBF_96.exr
 t/img-rgbf/sample-71x71-RGBF_96.pfm
-t/img-rgbf/sample-71x71-RGBF_96.tiff
 t/img-rgbf/troubles/sample-71x71-RGBF_96.jxr
+t/img-rgbf/troubles/sample-71x71-RGBF_96.tiff
 t/img-uint16.t
 t/img-uint16/sample-71x71-UINT16_16.pgm
 t/img-uint16/sample-71x71-UINT16_16.png

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Extract;
-$Footprintless::Extract::VERSION = '1.24';
+$Footprintless::Extract::VERSION = '1.25';
 # ABSTRACT: Extracts data from archives
 # PODNAME: Footprintless::Extract
 #
@@ -125,7 +125,7 @@ Footprintless::Extract - Extracts data from archives
 
 =head1 VERSION
 
-version 1.24
+version 1.25
 
 =head1 DESCRIPTION
 

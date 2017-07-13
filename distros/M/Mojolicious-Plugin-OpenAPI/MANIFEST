@@ -4,6 +4,7 @@
 Changes
 cpanfile
 lib/Mojolicious/Plugin/OpenAPI.pm
+lib/Mojolicious/Plugin/OpenAPI/Guides/Security.pod
 lib/Mojolicious/Plugin/OpenAPI/Guides/Swagger2.pod
 lib/Mojolicious/Plugin/OpenAPI/Guides/Tutorial.pod
 Makefile.PL
@@ -30,6 +31,8 @@ t/reply-asset.t
 t/reply-spec.t
 t/reply.t
 t/route-names.t
+t/security-disabled.t
+t/security.t
 t/set-request.t
 t/spec.t
 t/swagger2.t

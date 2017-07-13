@@ -34,6 +34,7 @@ clean;
 my $group = HPCI->group(
     cluster => $cluster,
     base_dir => "$dir_path/scratch",
+    file_system_delay => 30,	
     name => 'T_Req_Out'
     );
 
@@ -62,6 +63,7 @@ sleep 2;
 $group = HPCI->group(
     cluster => $cluster,
     base_dir => "$dir_path/scratch",
+    file_system_delay => 30,	
     name => 'T_Req_Out2'
     );
 
@@ -81,6 +83,7 @@ ok ($ret->{echoTest}[0]{failure_detected}, "Failure detection should be triggere
 $group = HPCI->group(
     cluster => $cluster,
     base_dir => "$dir_path/scratch",
+    file_system_delay => 30,	
     name => 'T_Req_Out3'
     );
 

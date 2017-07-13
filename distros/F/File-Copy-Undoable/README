@@ -1,16 +1,141 @@
+NAME
+    File::Copy::Undoable - Copy file/directory using rsync, with undo
+    support
+
+VERSION
+    This document describes version 0.12 of File::Copy::Undoable (from Perl
+    distribution File-Copy-Undoable), released on 2017-07-10.
+
+FUNCTIONS
+  cp
+    Usage:
+
+     cp(%args) -> [status, msg, result, meta]
+
+    Copy file/directory using rsync, with undo support.
+
+    On do, will copy "source" to "target" (which must not exist beforehand).
+    On undo, will trash "target".
+
+    Fixed state: "source" exists and "target" exists. Content or sizes are
+    not checked; only existence.
+
+    Fixable state: "source" exists and "target" doesn't exist.
+
+    Unfixable state: "source" does not exist.
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   rsync_opts => *array[str]* (default: ["-a"])
+
+        Rsync options.
+
+        By default, "-a" is used. You can add, for example, "--delete" or
+        other rsync options.
+
+    *   source* => *str*
+
+    *   target* => *str*
+
+        Target location.
+
+        Note that to avoid ambiguity, you must specify full location instead
+        of just directory name. For example: cp(source=>'/dir',
+        target=>'/a') will copy /dir to /a and cp(source=>'/dir',
+        target=>'/a/dir') will copy /dir to /a/dir.
+
+    *   target_group => *str*
+
+        Set group of target.
+
+        See "target_owner".
+
+    *   target_owner => *str*
+
+        Set ownership of target.
+
+        If set, will do a "chmod -Rh" on the target after rsync to set
+        ownership. This usually requires super-user privileges. An example
+        of this is copying files on behalf of user from a source that is
+        inaccessible by the user (e.g. a system backup location). Or,
+        setting up user's home directory when creating a user.
+
+        Will do nothing if not running as super-user.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 FAQ
-
- Why do you use rsync? Why not, say, File::Copy::Recursive?
-
-    With rsync, we can continue interrupted transfer. We need this ability
-    for recovery. Also, rsync can handle hardlinks and preservation of
+  Why do you use rsync? Why not, say, File::Copy::Recursive?
+    With "rsync", we can continue interrupted transfer. We need this ability
+    for recovery. Also, "rsync" can handle hardlinks and preservation of
     ownership, something which File::Copy::Recursive currently does not do.
     And, being implemented in C, it might be faster when processing large
     files/trees.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Copy-Undoable>.
 
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Copy-Undoable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Copy-Undoable>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Setup
 
     Rinci::Transaction
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

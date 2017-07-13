@@ -1,9 +1,33 @@
 ==================================================
-Changes from 2016-05-09 00:00:00 +0000 to present.
+Changes from 2016-07-12 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2017-05-09 18:08:12 +0000
+version 0.005 at 2017-07-12 01:27:30 +0000
+------------------------------------------
+
+  Change: ab9ead958aa8977df9e38c13b3a460d4437bbac1
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-07-11 21:27:19 +0000
+
+    Version bump 
+
+  Change: 65c6f168c91b1584d65795b950da365061dd14b5
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-07-11 17:08:51 +0000
+
+    Merge pull request #3 from oaxlin/master
+
+    add missing fields for phone/address 
+
+  Change: 5da518a046cd33c29ae172b63dc44a600e3a661e
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-07-11 15:01:47 +0000
+
+    add missing fields for phone/address 
+
+------------------------------------------
+version 0.004 at 2017-05-09 18:08:03 +0000
 ------------------------------------------
 
   Change: 8cf428963af3304d843e2e074fca4b7fd4dd2c09

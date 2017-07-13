@@ -3,7 +3,7 @@ package Data::Format::Pretty::HTML;
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Format::Pretty::Console 0.24;
 use HTML::Entities;
@@ -15,7 +15,7 @@ require Exporter;
 our @ISA = qw(Exporter Data::Format::Pretty::Console);
 our @EXPORT_OK = qw(format_pretty);
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 sub content_type { "text/html" }
 
@@ -138,7 +138,7 @@ Data::Format::Pretty::HTML - Pretty-print data structure for HTML output
 
 =head1 VERSION
 
-This document describes version 0.10 of Data::Format::Pretty::HTML (from Perl distribution Data-Format-Pretty-HTML), released on 2015-08-17.
+This document describes version 0.11 of Data::Format::Pretty::HTML (from Perl distribution Data-Format-Pretty-HTML), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -270,17 +270,13 @@ href="http://foo">http://foo</a>'. Default is true.
 
 =back
 
-=head1 SEE ALSO
-
-L<Data::Format::Pretty>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Data-Format-Pretty-HTML>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Format-Pretty-HTML>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Format-Pretty-HTML>.
 
 =head1 BUGS
 
@@ -290,13 +286,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Data::Format::Pretty>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

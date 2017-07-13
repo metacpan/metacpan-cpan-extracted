@@ -1,11 +1,11 @@
 use 5.010;
-use lib "lib";
-use lib "../JSON-JOM/lib";
-use JSON::JOM qw[from_json to_json to_jom];
-use JSON::Path;
+use JSON::MaybeXS;
 use Scalar::Util qw[blessed];
+use lib "../lib";
+use JSON::Path;
 
-my $object = to_jom(from_json(<<'JSON'));
+my $json = JSON::MaybeXS->new( pretty => 1 );
+my $object = $json->decode(<<'JSON');
 {
 	"store": {
 		"book": [
@@ -51,8 +51,8 @@ foreach ('$.store.book[0].title', '$.store.book[*].author', '$..author', '$..boo
 {
 	my $jpath = JSON::Path->new($_);
 	say $jpath;
-	say to_json([$jpath->values($object)], {pretty=>1});
-	say to_json([$jpath->paths($object)], {pretty=>1});
+	say $json->encode([$jpath->values($object)]);
+	say $json->encode([$jpath->paths($object)]);
 	say [$jpath->values($object)]->[0]->nodePath
 		if blessed([$jpath->values($object)]->[0]);
 	say '-' x 40;

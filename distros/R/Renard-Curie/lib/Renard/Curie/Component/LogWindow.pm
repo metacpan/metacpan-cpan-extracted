@@ -1,12 +1,12 @@
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 package Renard::Curie::Component::LogWindow;
 # ABSTRACT: Component that collects log messages
-$Renard::Curie::Component::LogWindow::VERSION = '0.002';
+$Renard::Curie::Component::LogWindow::VERSION = '0.003';
 use Moo;
+use Renard::Incunabula::Frontend::Gtk3::Helper;
 use MooX::HandlesVia;
 use Glib 'TRUE', 'FALSE';
-use Renard::Curie::Types qw(ArrayRef HashRef Str);
-use Function::Parameters;
+use Renard::Incunabula::Common::Types qw(ArrayRef HashRef Str);
 
 has log_messages => (
 	is => 'rw',
@@ -75,8 +75,8 @@ callback on_clicked_button_clear_cb( $event, $self ) {
 }
 
 with qw(
-	Renard::Curie::Component::Role::FromBuilder
-	Renard::Curie::Component::Role::UIFileFromPackageName
+	Renard::Incunabula::Frontend::Gtk3::Component::Role::FromBuilder
+	Renard::Incunabula::Frontend::Gtk3::Component::Role::UIFileFromPackageName
 );
 
 1;
@@ -93,7 +93,7 @@ Renard::Curie::Component::LogWindow - Component that collects log messages
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 EXTENDS
 
@@ -107,9 +107,9 @@ version 0.002
 
 =over 4
 
-=item * L<Renard::Curie::Component::Role::FromBuilder>
+=item * L<Renard::Incunabula::Frontend::Gtk3::Component::Role::FromBuilder>
 
-=item * L<Renard::Curie::Component::Role::UIFileFromPackageName>
+=item * L<Renard::Incunabula::Frontend::Gtk3::Component::Role::UIFileFromPackageName>
 
 =back
 

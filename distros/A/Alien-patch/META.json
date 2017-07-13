@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,16 +16,16 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.27",
-            "Alien::Build::MM" : "0.25",
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52",
             "File::chdir" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.27",
-            "Alien::Build::MM" : "0.25",
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52",
             "IPC::Cmd" : "0",
             "perl" : "5.006"
@@ -57,7 +57,7 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0",
-            "Test2::Suite" : "0.000060",
+            "Test2::V0" : "0.000060",
             "Test::Alien" : "0",
             "Test::More" : "0.94",
             "perl" : "5.006"
@@ -67,17 +67,21 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Perl5-Alien/Perl5-Alien/issues"
+         "web" : "https://github.com/Perl5-Alien/Alien-patch/issues"
       },
       "homepage" : "https://metacpan.org/pod/Alien::patch",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Perl5-Alien/Perl5-Alien.git",
-         "web" : "https://github.com/Perl5-Alien/Perl5-Alien"
+         "url" : "git://github.com/Perl5-Alien/Alien-patch.git",
+         "web" : "https://github.com/Perl5-Alien/Alien-patch"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "0.12",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Zakariyya Mughal"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

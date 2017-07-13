@@ -69,7 +69,7 @@ static PerlIO* PerlIOHttp_open(pTHX_ PerlIO_funcs *self, PerlIO_list_t *layers, 
 	if (SvTRUE(*hv_fetchs((HV*)SvRV(tiny), "success", 0))) {
 		SV* content = sv_2mortal(newRV_inc(*hv_fetchs((HV*)SvRV(tiny), "content", 0)));
 		PerlIO* ret = PerlIO_allocate(aTHX);
-		PerlIO_funcs * vtable = PerlIO_find_layer(aTHX, "scalar", 6, TRUE);
+		PerlIO_funcs * vtable = PerlIO_find_layer(aTHX_ "scalar", 6, TRUE);
 		PerlIO_push(aTHX_ ret, vtable, mode, content);
 		return ret;
 	}

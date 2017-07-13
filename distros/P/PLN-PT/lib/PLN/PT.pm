@@ -1,6 +1,6 @@
 package PLN::PT;
 # ABSTRACT: interface for the http://pln.pt web service
-$PLN::PT::VERSION = '0.003';
+$PLN::PT::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -44,8 +44,25 @@ sub dep_parser {
   my $url = $self->_cat('dep_parser');
   $url .= '?' . $self->_args($opts);
 
-  my $res = $self->_post($url, $text, $opts);
   return $self->_post($url, $text, $opts);
+}
+
+sub tf {
+  my ($self, $text, $opts) = @_;
+
+  my $url = $self->_cat('tf');
+  $url .= '?' . $self->_args($opts);
+
+  return $self->_post($url, $text, $opts);
+}
+
+sub stopwords {
+  my ($self, $opts) = @_;
+
+  my $url = $self->_cat('stopwords');
+  $url .= '?' . $self->_args($opts);
+
+  return $self->_get($url, $opts);
 }
 
 sub _post {
@@ -66,6 +83,31 @@ sub _post {
     }
     else {
       print STDERR "HTTP POST error: ", $res->code, " - ", $res->message, "\n";
+      return undef;
+    }
+  }
+
+  return $data if ($opts->{output} and $opts->{output} eq 'raw');
+  return JSON::MaybeXS->new(utf8 => 1)->decode($data);
+}
+
+sub _get {
+  my ($self, $url, $opts) = @_;
+
+  my $key = $url . '-' . md5_base64(join('', values %$opts));
+  my $data = $self->{cache}->get($key);
+
+  unless ($data) {
+    my $req = HTTP::Request->new(GET => $url);
+
+    my $res = $self->{ua}->request($req);
+    if ($res->is_success) {
+      $data = $res->decoded_content;
+      $data = $res->content unless $data;
+      $self->{cache}->set($key, $data);
+    }
+    else {
+      print STDERR "HTTP GET error: ", $res->code, " - ", $res->message, "\n";
       return undef;
     }
   }
@@ -108,7 +150,7 @@ PLN::PT - interface for the http://pln.pt web service
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

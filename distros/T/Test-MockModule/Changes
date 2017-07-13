@@ -1,5 +1,12 @@
 Revision history for Test::MockModule
 
+v0.12
+    - Added the `noop()` function to make mocking noops easier. Thanks for the PR,
+      Ali Zia!
+
+v0.11 2016-10-27
+    - Various housekeeping, testing and minor fixes, courtesy of Paul Cochrane, thanks!
+
 v0.10 2015-05-30
     - Updated docs for mocking when using exported functions
 

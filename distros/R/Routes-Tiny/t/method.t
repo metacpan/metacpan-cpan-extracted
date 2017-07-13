@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 
 use Routes::Tiny;
 
@@ -23,3 +23,7 @@ ok(!$r->match('photos/1', method => 'head'));
 
 $r->add_route('/logout', method => 'gEt');
 ok($r->match('logout', method => 'geT'));
+
+$r->add_route(POST => '/users/:id');
+ok(!$r->match('users/1'));
+ok($r->match('users/1', method => 'post'));

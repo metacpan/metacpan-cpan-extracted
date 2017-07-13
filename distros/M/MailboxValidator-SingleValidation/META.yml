@@ -1,0 +1,24 @@
+---
+abstract: "Email verification module for Perl using MailboxValidator API. It validates if the email is valid, from a free provider, contains high-risk keywords, whether it's a catch-all address and so much more."
+author:
+  - 'MailboxValidator.com <support@mailboxvalidator.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MailboxValidator-SingleValidation
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::Parse: 0
+  LWP::Simple: 0
+  URI::Escape: 0
+version: 1.03

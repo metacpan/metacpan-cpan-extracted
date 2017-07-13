@@ -1,8 +1,10 @@
+Ala.sid
 Changes
+LICENSE
 Makefile.PL
-MANIFEST
-SID.pm
+MANIFEST			This list of files
 README
-test.pl
-SIDtest.pl
+SID.pm
 SID_file_format.txt
+SIDtest.pl
+test.pl

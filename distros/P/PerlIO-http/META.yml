@@ -23,7 +23,7 @@ name: PerlIO-http
 provides:
   PerlIO::http:
     file: lib/PerlIO/http.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   HTTP::Tiny: '0'
   XSLoader: '0'
@@ -33,7 +33,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-http
   repository: git://github.com/Leont/perlio-http.git
-version: '0.003'
+version: '0.004'
 x_contributors:
   - 'Leon Timmermans <fawaka@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

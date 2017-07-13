@@ -1,11 +1,79 @@
-SYNOPSIS
+NAME
+    PHPLive::Report - Generate reports for PHP Live!
 
+VERSION
+    This document describes version 0.07 of PHPLive::Report (from Perl
+    distribution PHPLive-Report), released on 2017-07-10.
+
+SYNOPSIS
     Use the included gen-phplive-reports to generate HTML report files.
 
 DESCRIPTION
-
     PHP Live! is a web-based live chat/live support application,
-    http://www.phplivesupport.com/. As of this writing, version 4.4.7, the
+    <http://www.phplivesupport.com/>. As of this writing, version 4.4.7, the
     reports it generates are quite limited. This module produces additional
     reports for your PHP Live! installation.
+
+FUNCTIONS
+  gen_phplive_reports
+    Usage:
+
+     gen_phplive_reports(%args) -> any
+
+    Generate reports for PHP Live!.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbh* => *obj*
+
+    *   month* => *int*
+
+    *   year* => *int*
+
+    Return value: (any)
+
+  parse_phplive_transcript
+    Usage:
+
+     parse_phplive_transcript($transcript) -> any
+
+    The "plain" column in "p_transcripts" table stores the actual chat
+    transcript. Entities characters like "<" and ">" are
+    HTML-entities-escaped (becoming "&lt;" and "&gt;"). Multiple lines are
+    squished together into a single line. No timestamp is recorded for each
+    message.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $transcript* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/PHPLive-Report>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-PHPLive-Report>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=PHPLive-Report>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

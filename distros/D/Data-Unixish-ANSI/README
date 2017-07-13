@@ -1,9 +1,29 @@
-SYNOPSIS
+NAME
+    Data::Unixish::ANSI - dux functions related to text containing ANSI
+    codes
 
+VERSION
+    This document describes version 0.08 of Data::Unixish::ANSI (from Perl
+    distribution Data-Unixish-ANSI), released on 2017-07-10.
+
+SYNOPSIS
 DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Unixish-ANSI>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Unixish-ansi>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Unixish-ANSI>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Data::Unixish
 
     dux
@@ -13,4 +33,14 @@ SEE ALSO
     Term::ANSIColor
 
     Term::ANSIScreen
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

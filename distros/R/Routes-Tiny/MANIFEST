@@ -24,6 +24,7 @@ t/match-zeros.t
 t/match.t
 t/method.t
 t/not-strict-trailing-slash.t
+t/strict-case.t
 t/strict-trailing-slash.t
 t/subroutes.t
 t/unbalanced-parentheses.t

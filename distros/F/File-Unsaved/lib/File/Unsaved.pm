@@ -1,7 +1,7 @@
 package File::Unsaved;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.06'; # VERSION
 
 use 5.010001;
 use strict;
@@ -159,7 +159,7 @@ File::Unsaved - Check whether file has unsaved modification in an editor
 
 =head1 VERSION
 
-This document describes version 0.05 of File::Unsaved (from Perl distribution File-Unsaved), released on 2015-09-03.
+This document describes version 0.06 of File::Unsaved (from Perl distribution File-Unsaved), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,11 @@ This document describes version 0.05 of File::Unsaved (from Perl distribution Fi
 =head1 FUNCTIONS
 
 
-=head2 check_unsaved_file(%args) -> bool|hash
+=head2 check_unsaved_file
+
+Usage:
+
+ check_unsaved_file(%args) -> bool|hash
 
 Check whether file has unsaved modification in an editor.
 
@@ -194,6 +198,8 @@ unsaved). Caveat: vim can be instructed to put swap file somewhere else or not
 create swap file at all, so in those cases unsaved data will not be detected.
 
 =back
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -229,8 +235,6 @@ contain these keys: C<editor> (kind of editor, possible values: C<emacs>,
 C<joe/mc>, C<joe>, C<mc>, C<vim>) and might contain these keys: C<pid> (PID of
 editor), C<user>, C<host>, C<timestamp>.
 
-=head1 SEE ALSO
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/File-Unsaved>.
@@ -247,13 +251,15 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

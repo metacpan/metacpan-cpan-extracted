@@ -4,7 +4,7 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -19,19 +19,15 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "Module::Build" : "0.28"
-         }
-      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
-            "version" : "0.9901"
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
          }
       },
       "runtime" : {
@@ -39,23 +35,29 @@
             "Dancer" : "0",
             "FindBin" : "0",
             "Moo" : "0",
-            "Template::Mustache" : "0",
+            "Path::Tiny" : "0",
+            "Template::Mustache" : "v1.0.2",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
             "Dancer::FileUtils" : "0",
             "Dancer::Test" : "0",
-            "Test::More" : "0.88"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
          }
       }
    },
    "provides" : {
       "Dancer::Template::Mustache" : {
          "file" : "lib/Dancer/Template/Mustache.pm",
-         "version" : "v0.3.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -63,20 +65,22 @@
       "bugtracker" : {
          "web" : "https://github.com/yanick/Dancer-Template-Mustache/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/Dancer-Template-Mustache/",
+      "homepage" : "https://github.com/yanick/Dancer-Template-Mustache",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/yanick/Dancer-Template-Mustache.git",
          "web" : "https://github.com/yanick/Dancer-Template-Mustache"
       }
    },
-   "version" : "0.3.0",
+   "version" : "1.0.1",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_authority" : "cpan:YANICK",
    "x_contributors" : [
+      "Yanick Champoux <champoux@pythian.com>",
       "Yanick Champoux <yanick@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

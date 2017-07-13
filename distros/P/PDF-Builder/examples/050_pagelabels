@@ -1,0 +1,88 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+use PDF::Builder::Util;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my @labels = (
+	'upper case Roman numeral I',
+	'upper case Roman numeral II',
+	'upper case Roman numeral III',
+	'upper case Roman numeral IV',
+	'decimal (Arabic) number 1',
+	'decimal (Arabic) number 2',
+	'decimal (Arabic) number 3',
+	'decimal (Arabic) number 4',
+	'decimal (Arabic) number 5',
+	'decimal (Arabic) number 6',
+	'decimal (Arabic) number 7',
+	'decimal (Arabic) number 8',
+	'decimal (Arabic) number 9',
+	'decimal (Arabic) number 10',
+	'prefixed A-1',
+	'prefixed A-2',
+	'prefixed B-1',
+	'prefixed B-2',
+	'prefixed C-1',
+	'prefixed C-2',
+	'decimal (Arabic) number 10',
+	'decimal (Arabic) number 11',
+	'upper case letter A',
+	'upper case letter B',
+	'lower case Roman numeral i',
+	'lower case Roman numeral ii',
+);
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+
+my $f1=$pdf->corefont('Helvetica', -encode=>'latin1');      # unused?
+my $f2=$pdf->corefont('Helvetica-Bold', -encode=>'latin1'); # "Page Index=" text
+
+# initial pass, create 26 pages labeled "Page Index=n" for n=0-25
+foreach my $i (0 .. 25) {
+	my $page = $pdf->page();
+	$page->mediabox(595,842);
+	
+	my $text=$page->text();
+	$text->textlabel(40,700, $f2, 20, 'Page Index='.$i.',');
+	$text->textlabel(40,670, $f2, 20, 'thumbnail label should be '.$labels[$i]);
+}
+
+# modify page numbering /Catalog /PageLabels entries
+# note that each style change resets page to 1
+# this number NOT on printed page... only in reader thumbnail
+
+# pages 0..3 should be Upper Case Roman (I..IV)
+$pdf->pageLabel(0, { -style => 'Roman' });  # 0 << /S /R >> default St 1
+
+# pages 4..13 s/b decimal, restart at 1 (1..10)
+$pdf->pageLabel(4, { -start => 1 });  # 4 << /S /D /St 1 >>
+
+# pages 14..15 s/b A-decimal, restart at 1 (A-1, A-2)
+$pdf->pageLabel(14, { -start => 1, -prefix => 'A-' }); # 14 << /P (A-) /S /D /St 1 >>
+# pages 16..17 s/b B-1, B-2
+$pdf->pageLabel(16, { -start => 1, -prefix => 'B-' }); # 16 << /P (B-) /S /D /St 1 >>
+# pages 18..19 s/b C-1, C-2
+$pdf->pageLabel(18, { -start => 1, -prefix => 'C-' }); # 18 << /P (C-) /S /D /St 1 >>
+
+# pages 20..21 s/b decimal, restart at 10 (10..11)
+$pdf->pageLabel(20, { -start => 10 }); # 20 << /S /D /St 10 >>
+
+# pages 22..23 s/b Alpha, auto-restarts at 1 (A, B)
+$pdf->pageLabel(22, { -style => 'Alpha' }); # 22 << /S /A >>
+
+# pages 24..25 s/b lowercase roman, auto-restarts at 1 (i, ii)
+$pdf->pageLabel(24, { -style => 'roman' }); # 24 << /S /r >>
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__

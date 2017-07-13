@@ -51,6 +51,8 @@ is $records->[0]->{has_500_not_c}, 'OK' , '^c value subfield';
 
 ok ! $records->[0]->{has_500_not_a}, '^a value subfield';
 
+is $records->[0]->{has_800_0} , '0' , '800/0';
+
 # gh#46: Test for subfield codes 0
 {
     my $mrc

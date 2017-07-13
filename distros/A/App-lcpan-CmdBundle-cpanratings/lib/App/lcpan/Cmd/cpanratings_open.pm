@@ -1,12 +1,12 @@
 package App::lcpan::Cmd::cpanratings_open;
 
-our $DATE = '2017-01-24'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 require App::lcpan;
 
@@ -69,7 +69,7 @@ App::lcpan::Cmd::cpanratings_open - Open CPAN Ratings page for dist/module
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::Cmd::cpanratings_open (from Perl distribution App-lcpan-CmdBundle-cpanratings), released on 2017-01-24.
+This document describes version 0.003 of App::lcpan::Cmd::cpanratings_open (from Perl distribution App-lcpan-CmdBundle-cpanratings), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,11 @@ This module handles the L<lcpan> subcommand C<cpanratings-open>.
 =head1 FUNCTIONS
 
 
-=head2 handle_cmd(%args) -> [status, msg, result, meta]
+=head2 handle_cmd
+
+Usage:
+
+ handle_cmd(%args) -> [status, msg, result, meta]
 
 Open CPAN Ratings page for dist/module.
 

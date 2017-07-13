@@ -45,7 +45,6 @@ $root->set_txt( "SOMETEXT" );
 my $fooObj   = $root->get_fooObj;
 my $innerfoo = $fooObj->get_innerfoo;
 $store->stow_all;
-$store->_purge; # this is threaded and WEAK_REFS made before the servers starts and hanging out break the tests
 
 #use Devel::SimpleProfiler;
 #Devel::SimpleProfiler::init( '/tmp/foobar', qr/Yote::[^O]|Lock|Data|test_suite/ );

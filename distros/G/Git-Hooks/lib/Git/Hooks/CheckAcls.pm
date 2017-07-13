@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckAcls;
 # ABSTRACT: Git::Hooks plugin for branch/tag access control
-$Git::Hooks::CheckAcls::VERSION = '2.0.1';
+$Git::Hooks::CheckAcls::VERSION = '2.1.0';
 use 5.010;
 use utf8;
 use strict;
@@ -126,7 +126,7 @@ Git::Hooks::CheckAcls - Git::Hooks plugin for branch/tag access control
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 DESCRIPTION
 

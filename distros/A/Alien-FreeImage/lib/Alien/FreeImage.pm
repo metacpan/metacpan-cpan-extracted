@@ -13,7 +13,7 @@ Alien::FreeImage - Building freeimage library L<http://freeimage.sourceforge.net
 
 =cut
 
-our $VERSION = '0.011';
+our $VERSION = '1.001';
 
 =head1 SYNOPSIS
 
@@ -24,7 +24,7 @@ Alien::FreeImage installation comprise of these steps:
 
 =over
 
-=item * Build B<freeimage-3.16.0> static library (*.a) from source codes (that are bundled with this module)
+=item * Build B<freeimage-3.17.0> static library (*.a) from source codes (that are bundled with this module)
 
 =item * Install dev files (*.h, *.a) into I<share> directory of Alien::FreeImage distribution
 

@@ -8,7 +8,7 @@ use lib $Bin, "$Bin/t";
 
 use File::chdir;
 use File::Path qw(remove_tree);
-use File::Slurp::Tiny qw(read_file write_file);
+use File::Slurper qw(read_text write_text);
 use File::Temp qw(tempdir);
 use Setup::File;
 use Test::More 0.98;
@@ -28,11 +28,11 @@ for my $existed (0, 1) {
                           owner=>3, group=>4},
         reset_state   => sub {
             remove_tree "p";
-            do { write_file("p", "foo"); chown 1, 2, "p" } if $existed;
+            do { write_text("p", "foo"); chown 1, 2, "p" } if $existed;
         },
         after_do      => sub {
             ok((-f "p"), "file created");
-            is(scalar(read_file "p"), "bar", "content set");
+            is(read_text("p"), "bar", "content set");
             my @st = stat "p";
             is($st[4], 3, "owner set");
             is($st[5], 4, "group set");
@@ -40,7 +40,7 @@ for my $existed (0, 1) {
         after_undo    => sub {
             if ($existed) {
                 ok((-f "p"), "file still exists");
-                is(scalar(read_file "p"), "foo", "old content restored");
+                is(read_text("p"), "foo", "old content restored");
                 my @st = stat "p";
                 is($st[4], 1, "old owner restored");
                 is($st[5], 2, "old group restored");

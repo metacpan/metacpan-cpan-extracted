@@ -4,7 +4,7 @@ use 5.012;
 use utf8;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Keyword::Declare;
 
@@ -147,7 +147,7 @@ Data::Dx - Dump data structures with name and point-of-origin
 
 =head1 VERSION
 
-This document describes Data::Dx version 0.000005
+This document describes Data::Dx version 0.000006
 
 
 =head1 SYNOPSIS

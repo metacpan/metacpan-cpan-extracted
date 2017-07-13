@@ -1,12 +1,12 @@
 package RSS::From::Twitter;
 
-our $DATE = '2015-09-04'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use HTML::Entities;
 use LWP::UserAgent;
@@ -267,7 +267,7 @@ RSS::From::Twitter - Convert Twitter page to RSS
 
 =head1 VERSION
 
-This document describes version 0.07 of RSS::From::Twitter (from Perl distribution RSS-From-Twitter), released on 2015-09-04.
+This document describes version 0.08 of RSS::From::Twitter (from Perl distribution RSS-From-Twitter), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -276,7 +276,11 @@ This document describes version 0.07 of RSS::From::Twitter (from Perl distributi
 =head1 FUNCTIONS
 
 
-=head2 get_rss_from_twitter(%args) -> [status, msg, result, meta]
+=head2 get_rss_from_twitter
+
+Usage:
+
+ get_rss_from_twitter(%args) -> [status, msg, result, meta]
 
 Convert Twitter page to RSS.
 
@@ -288,6 +292,8 @@ and converts it to RSS. I wrote this because I have other scripts expecting RSS
 input.
 
 Expect breakage from time to time though, as scraping method is rather fragile.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -321,12 +327,18 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_rss_from_twitter_list(%args) -> [status, msg, result, meta]
+=head2 get_rss_from_twitter_list
+
+Usage:
+
+ get_rss_from_twitter_list(%args) -> [status, msg, result, meta]
 
 Convert Twitter public list page to RSS.
 
 This function calls get_rss_from_twitter() with URL:
 C<https//twitter.com/USERNAME/LISTNAME>.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -360,12 +372,18 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_rss_from_twitter_search(%args) -> [status, msg, result, meta]
+=head2 get_rss_from_twitter_search
+
+Usage:
+
+ get_rss_from_twitter_search(%args) -> [status, msg, result, meta]
 
 Convert Twitter search result page to RSS.
 
 This function calls get_rss_from_twitter() with URL:
 C<https//twitter.com/search?q=QUERY>.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -395,12 +413,18 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 get_rss_from_twitter_user(%args) -> [status, msg, result, meta]
+=head2 get_rss_from_twitter_user
+
+Usage:
+
+ get_rss_from_twitter_user(%args) -> [status, msg, result, meta]
 
 Convert Twitter user main page to RSS.
 
 This function calls get_rss_from_twitter() with URL:
 C<https//twitter.com/USERNAME>.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -451,7 +475,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

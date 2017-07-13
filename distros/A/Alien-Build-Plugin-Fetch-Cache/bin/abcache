@@ -1,0 +1,169 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use autodie;
+use 5.010;
+use Path::Tiny qw( path );
+use Pod::Usage qw( pod2usage );
+use Getopt::Long qw( GetOptions );
+use File::HomeDir;
+use Sereal 3.015 qw( decode_sereal );
+use URI;
+use Number::Bytes::Human qw( format_bytes );
+
+# ABSTRACT: Command line interface to Alien::Build::Plugin::Fetch::Cache
+# PODNAME: abcache
+our $VERSION = '0.02'; # VERSION
+
+
+my $opt_list;
+my $opt_clear;
+
+GetOptions(
+  'list'      => \$opt_list,
+  'clear'     => \$opt_clear,
+  'version|v' => sub { say "abcache (Alien::Build::Plugin::Fetch::Cache) version @{[ $main::VERSION // 'dev' ]}" },
+  'help|h'    => sub { pod2usage( -exitval => 0 ) },
+) || pod2usage( -exitval => 2 );
+
+my $root = path(File::HomeDir->my_home, '.alienbuild/plugin_fetch_cache');
+
+sub recurse
+{
+  my $cb = shift;
+  my $dir = shift // $root;
+  my $list = shift // [];
+
+  foreach my $child (sort $dir->children)
+  {
+    next unless -d $child;
+    if(-d $child)
+    {
+      recurse($cb, $child, [ @$list, $child->basename ]);
+    }
+  }
+
+  my $meta = $dir->child('meta');
+  if(-f $meta)
+  {
+    my($scheme, $host, @rest) = @$list;
+    my $uri = URI->new;
+    $uri->scheme($scheme);
+    $uri->host($host);
+    $uri->path(join('/', @rest));
+    $cb->($uri, decode_sereal($meta->slurp_raw), $meta);
+  }
+
+}
+
+if($opt_list)
+{
+  recurse(sub {
+    my($uri, $meta, $metafile) = @_;
+    
+    my $size = 0;
+    my $age  = 0;
+    if($meta->{path})
+    {
+      $size = -s $meta->{path};
+      $age  = -A $meta->{path};
+    }
+    elsif($meta->{content})
+    {
+      $size = do { use bytes; length $meta->{content} };
+      $age  = -A $metafile;
+    }
+    
+    printf "%5s %5s %s\n", format_bytes($size), int($age), $uri;
+  });
+}
+elsif($opt_clear)
+{
+  my $rm = sub {
+    say "RM    $_[0]";
+    unlink $_[0];
+  };
+  my $rmdir = sub {
+    say "RMDIR $_[0]";
+    rmdir $_[0];
+  };
+  recurse(sub {
+    my($uri, $meta, $metafile) = @_;
+
+    my $dir = $metafile->parent;
+    
+    if($meta->{path})
+    {
+      $rm->($meta->{path});
+    }
+    
+    $rm->($metafile);
+    
+    $rmdir->($dir);
+    
+  });
+}
+else
+{
+  pod2usage( -exitval =>2, msg => 'you must specify at least one of --list, --clear' );
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+abcache - Command line interface to Alien::Build::Plugin::Fetch::Cache
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+ % abcache --list
+ % abcache --clear
+
+=head1 DESCRIPTION
+
+This program provides a command line interface to the L<Alien::Build> plugin
+C<Fetch::Cache>, which allows you to list or clear the cache.
+
+=head1 OPTIONS
+
+=head2 --list
+
+List all the items in the cache.
+
+=head2 --clear
+
+Clear all the items in the cache.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Alien>
+
+=item L<Alien::Build>
+
+=item L<Alien::Build::Plugin::Fetch::Cache>
+
+=back
+
+=head1 AUTHOR
+
+Graham Ollis <plicease@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Graham Ollis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

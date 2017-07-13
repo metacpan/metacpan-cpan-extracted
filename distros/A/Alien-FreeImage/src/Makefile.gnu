@@ -15,7 +15,7 @@ LIBRARIES = -lstdc++
 
 MODULES = $(SRCS:.c=.o)
 MODULES := $(MODULES:.cpp=.o)
-CFLAGS ?= -O3 -fexceptions -fvisibility=hidden
+CFLAGS ?= -O3 -fPIC -fexceptions -fvisibility=hidden
 # OpenJPEG
 CFLAGS += -DOPJ_STATIC
 # LibRaw
@@ -23,12 +23,12 @@ CFLAGS += -DNO_LCMS
 # LibJXR
 CFLAGS += -DDISABLE_PERF_MEASUREMENT -D__ANSI__
 CFLAGS += $(INCLUDE)
-CXXFLAGS ?= -O3 -fexceptions -fvisibility=hidden -Wno-ctor-dtor-privacy
+CXXFLAGS ?= -O3 -fPIC -fexceptions -fvisibility=hidden -Wno-ctor-dtor-privacy
 # LibJXR
 CXXFLAGS += -D__ANSI__
 CXXFLAGS += $(INCLUDE)
 
-ifneq ($(CYGWIN),1)
+ifeq ($(shell sh -c 'uname -m 2>/dev/null || echo not'),x86_64)
 	CFLAGS += -fPIC
 	CXXFLAGS += -fPIC
 endif
@@ -40,7 +40,7 @@ LIBNAME	= lib$(TARGET).so
 VERLIBNAME = $(LIBNAME).$(VER_MAJOR)
 HEADER = Source/FreeImage.h
 
-DISTDIR ?= Dist
+
 
 default: all
 
@@ -50,6 +50,7 @@ dist: $(STATICLIB) $(HEADER)
 	mkdir -p $(DISTDIR)
 	cp $(STATICLIB) $(DISTDIR)
 	cp $(HEADER) $(DISTDIR)
+ 
 
 dos2unix:
 	@$(DOS2UNIX) $(SRCS) $(INCLS)

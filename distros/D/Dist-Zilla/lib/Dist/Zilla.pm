@@ -1,4 +1,4 @@
-package Dist::Zilla 6.009;
+package Dist::Zilla 6.010;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
@@ -890,7 +890,7 @@ Dist::Zilla - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 DESCRIPTION
 
@@ -1162,7 +1162,7 @@ Ricardo SIGNES 😏 <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ævar Arnfjörð Bjarmason Alastair McGowan-Douglas Alexei Znamensky Alex Vandiver ambs Andrew Rodland Andy Jack Apocalypse ben hengst Bernardo Rechea Brian Fraser Caleb Cushing Chisel Christian Walde Christopher J. Madsen Chris Weyl Cory G Watson csjewell Curtis Brandt Dagfinn Ilmari Mannsåker Damien KRotkine Danijel Tasov Dave O'Neill Rolsky David E. Wheeler Golden H. Adler Steinbrunner Zurborg Davor Cubranic Dimitar Petrov Doug Bell Erik Carlsson Fayland Lam Florian Ragwitz Fred Moyer fREW Schmidt gardnerm Gianni Ceccarelli Graham Barr Knop Ollis Grzegorz Rożniecki Hans Dieter Pearcey Hunter McMillen Ivan Bessarabov Jakob Voss jantore Jérôme Quelin Jesse Luehrs Vincent John Napiorkowski Jonathan C. Otsuka Rockway Scott Duff Yu Karen Etheridge Kent Fredric Leon Timmermans Lucas Theisen Luc St-Louis Marcel Gruenauer Martin McGrath Mateu X mauke Michael G. Schwern Jemmeson Mickey Nasriachi Mike Doherty Mohammad S Anwar Moritz Onken Neil Bowers Nickolay Platonov Nick Tonkin nperez Olivier Mengué Paul Cochrane Pedro Melo Philippe Bruhat (BooK) Randy Stauner robertkrimen Rob Hoelz Robin Smidsrød Roy Ivy III Shawn M Moore Smylers Steffen Schwigon Steven Haryanto Tatsuhiko Miyagawa Upasana Shukla Vyacheslav Matjukhin Yanick Champoux Yuval Kogman
+=for stopwords Ævar Arnfjörð Bjarmason Alastair McGowan-Douglas Alexei Znamensky Alex Vandiver ambs Andrew Rodland Andy Jack Apocalypse ben hengst Bernardo Rechea Brian Fraser Caleb Cushing Chase Whitener Chisel Christian Walde Christopher J. Madsen Chris Weyl Cory G Watson csjewell Curtis Brandt Dagfinn Ilmari Mannsåker Damien KRotkine Danijel Tasov Dave O'Neill Rolsky David E. Wheeler Golden H. Adler Steinbrunner Zurborg Davor Cubranic Dimitar Petrov Doug Bell Erik Carlsson Fayland Lam Florian Ragwitz Fred Moyer fREW Schmidt gardnerm Gianni Ceccarelli Graham Barr Knop Ollis Grzegorz Rożniecki Hans Dieter Pearcey Hunter McMillen Ivan Bessarabov Jakob Voss jantore Jérôme Quelin Jesse Luehrs Vincent John Napiorkowski jonasbn Jonathan C. Otsuka Rockway Scott Duff Yu Karen Etheridge Kent Fredric Leon Timmermans Lucas Theisen Luc St-Louis Marcel Gruenauer Martin McGrath Mary Ehlers Mateu X mauke Michael G. Schwern Jemmeson Mickey Nasriachi Mike Doherty Mohammad S Anwar Moritz Onken Neil Bowers Nickolay Platonov Nick Tonkin nperez Olivier Mengué Paul Cochrane Pedro Melo Philippe Bruhat (BooK) Randy Stauner robertkrimen Rob Hoelz Robin Smidsrød Roy Ivy III Shawn M Moore Smylers Steffen Schwigon Steven Haryanto Tatsuhiko Miyagawa Upasana Shukla Vyacheslav Matjukhin Yanick Champoux Yuval Kogman
 
 =over 4
 
@@ -1213,6 +1213,10 @@ Brian Fraser <fraserbn@gmail.com>
 =item *
 
 Caleb Cushing <xenoterracide@gmail.com>
+
+=item *
+
+Chase Whitener <cwhitener@gmail.com>
 
 =item *
 
@@ -1380,6 +1384,10 @@ John Napiorkowski <jjnapiork@cpan.org>
 
 =item *
 
+jonasbn <jonasbn@gmail.com>
+
+=item *
+
 Jonathan C. Otsuka <djgoku@gmail.com>
 
 =item *
@@ -1421,6 +1429,10 @@ Marcel Gruenauer <hanekomu@gmail.com>
 =item *
 
 Martin McGrath <mcgrath.martin@gmail.com>
+
+=item *
+
+Mary Ehlers <regina.verb.ae@gmail.com>
 
 =item *
 

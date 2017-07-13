@@ -7,6 +7,7 @@ README.md
 t/01_use.t
 t/02_pcre2_config.t
 t/03_pcre2grep.t
+t/04_xs.t
 t/_DaysOfTheWeek.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

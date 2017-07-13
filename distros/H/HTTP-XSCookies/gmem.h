@@ -31,17 +31,22 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* Sob... we need these to use Perl's macros for memory management */
+#include "EXTERN.h"
+#include "perl.h"
+#include "ppport.h"
+
 #define _GMEM_NEW(scalar, type, size) \
   do { \
-    scalar = (type) malloc(size); \
+    Newx(scalar, size, type); \
   } while (0)
 #define _GMEM_REALLOC(scalar, type, osize, nsize) \
   do { \
-    scalar = (type) realloc(scalar, nsize); \
+    Renew(scalar, nsize, type); \
   } while (0)
 #define _GMEM_DEL(scalar, type, size) \
   do { \
-    free(scalar); \
+    Safefree(scalar); \
     scalar = 0; \
   } while (0)
 
@@ -56,11 +61,11 @@ void gmem_fini(void);
 
 #define GMEM_NEWARR(array, type, count, size)  \
   do { \
-    array = (type) calloc(count, size); \
+    Newxz(array, count, type); \
   } while (0)
 #define GMEM_DELARR(array, type, count, size) \
   do { \
-    free(array); \
+    Safefree(array); \
     array = 0; \
 } while (0)
 
@@ -101,13 +106,13 @@ void gmem_fini(void);
   } while (0)
 #define GMEM_NEWARR(array, type, count, size) \
   do { \
-    array = (type) calloc(count, size); \
+    Newxz(array, count, type);
     gmem_new_called(__FILE__, __LINE__, array, count, size); \
   } while (0)
 #define GMEM_DELARR(array, type, count, size)   \
   do { \
     gmem_del_called(__FILE__, __LINE__, array, count, size); \
-    free(array); \
+    Safefree(array); \
     array = 0; \
   } while (0)
 #define GMEM_NEWSTR(tgt, src, len, ret) \

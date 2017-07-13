@@ -1,4 +1,120 @@
-SEE ALSO
+NAME
+    File::Prepend::Undoable - Prepend string to a file, with undo support
 
+VERSION
+    This document describes version 0.05 of File::Prepend::Undoable (from
+    Perl distribution File-Prepend-Undoable), released on 2017-07-10.
+
+FUNCTIONS
+  prepend
+    Usage:
+
+     prepend(%args) -> [status, msg, result, meta]
+
+    Prepend string to a file, with undo support.
+
+    On do, will trash file, copy it to original location (with the same
+    permission and ownership as the original) and prepend the string to the
+    beginning of file. On undo will trash the new file and untrash the
+    original.
+
+    Some notes:
+
+    *   Chown will not be done if we are not running as root.
+
+    *   Symlink is currently not permitted.
+
+    *   Since transaction requires the function to be idempotent, in the
+        "check_state" phase the function will check if the string has been
+        prepended. It will refuse to prepend the same string twice.
+
+    *   Take care not to use string that are too large, as the string, being
+        a function parameter, is entered into the transaction table.
+
+    Fixed state: file exists and string has been prepended to beginning of
+    file.
+
+    Fixable state: file exists and string has not been prepended to
+    beginning of file.
+
+    Unfixable state: file does not exist or path is not a regular file
+    (directory and symlink included).
+
+    This function is not exported.
+
+    This function is idempotent (repeated invocations with same arguments
+    has the same effect as single invocation). This function supports
+    transactions.
+
+    Arguments ('*' denotes required arguments):
+
+    *   path* => *str*
+
+        The file to prepend.
+
+    *   string* => *any*
+
+        The string to prepend to file.
+
+    Special arguments:
+
+    *   -tx_action => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_action_id => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_recovery => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_rollback => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    *   -tx_v => *str*
+
+        For more information on transaction, see Rinci::Transaction.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Prepend-Undoable>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Prepend-Undoable>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Prepend-Undoable
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Rinci::Transaction
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

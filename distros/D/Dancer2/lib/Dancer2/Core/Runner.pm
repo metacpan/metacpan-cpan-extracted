@@ -1,6 +1,6 @@
 package Dancer2::Core::Runner;
 # ABSTRACT: Top-layer class to start a dancer app
-$Dancer2::Core::Runner::VERSION = '0.205000';
+$Dancer2::Core::Runner::VERSION = '0.205001';
 use Moo;
 use Carp 'croak';
 use Module::Runtime 'require_module';
@@ -8,6 +8,7 @@ use Dancer2::Core::MIME;
 use Dancer2::Core::Types;
 use Dancer2::Core::Dispatcher;
 use Plack::Builder qw();
+use Ref::Util qw< is_ref is_regexpref >;
 
 # Hashref of configurable items for the runner.
 # Defaults come from ENV vars. Updated via global triggers
@@ -174,14 +175,14 @@ sub psgi_app {
         my @found_apps = ();
 
         foreach my $app_req ( @{$apps} ) {
-            if ( ref $app_req eq 'Regexp' ) {
+            if ( is_regexpref($app_req) ) {
                 # find it in the apps registry
                 push @found_apps,
                     grep +( $_->name =~ $app_req ), @{ $self->apps };
             } elsif ( ref $app_req eq 'Dancer2::Core::App' ) {
                 # use it directly
                 push @found_apps, $app_req;
-            } elsif ( ! ref $app_req ) {
+            } elsif ( !is_ref($app_req) ) {
                 # find it in the apps registry
                 push @found_apps,
                     grep +( $_->name eq $app_req ), @{ $self->apps };
@@ -260,7 +261,7 @@ Dancer2::Core::Runner - Top-layer class to start a dancer app
 
 =head1 VERSION
 
-version 0.205000
+version 0.205001
 
 =head1 AUTHOR
 
@@ -268,7 +269,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexis Sukrieh.
+This software is copyright (c) 2017 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

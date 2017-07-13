@@ -1,13 +1,13 @@
 package Perinci::Tx::Manager;
 
-our $DATE = '2016-06-10'; # DATE
-our $VERSION = '0.56'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.57'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use DBI;
 use File::Flock::Retry;
@@ -122,7 +122,7 @@ sub _unlock_db {
 sub _init {
     my ($self) = @_;
     my $data_dir = $self->{data_dir};
-    $log->tracef("$lp Initializing data dir %s ...", $data_dir);
+    log_trace("$lp Initializing data dir %s ...", $data_dir);
 
     unless (-d "$self->{data_dir}/.trash") {
         mkdir "$self->{data_dir}/.trash"
@@ -268,7 +268,7 @@ _
     }
 
     $self->{_dbh} = $dbh;
-    $log->tracef("$lp Data dir initialization finished");
+    log_trace("$lp Data dir initialization finished");
     $self->_recover;
 }
 
@@ -432,7 +432,7 @@ sub _set_tx_status_before_or_after_actions {
 
     if ($which0 eq 'before') {
         if ($ns ne $os) {
-            $log->tracef("$lp Setting transient transaction status ".
+            log_trace("$lp Setting transient transaction status ".
                              "%s -> %s ...", $os, $ns);
             $dbh->do("UPDATE tx SET status='$ns', last_action_id=NULL ".
                          "WHERE ser_id=?", {}, $tx->{ser_id})
@@ -462,7 +462,7 @@ sub _set_tx_status_before_or_after_actions {
         }
 
         if ($os ne $fs) {
-            $log->tracef("$lp Setting final transaction status %s -> %s ...",
+            log_trace("$lp Setting final transaction status %s -> %s ...",
                          $ns, $fs);
             $dbh->do("UPDATE tx SET status='$fs',last_action_id=NULL ".
                          "WHERE ser_id=?",
@@ -567,17 +567,17 @@ sub _perform_action {
     $args{-tx_action} = 'check_state';
     $args{-tx_action_id} = UUID::Random::generate();
     $self->{_res} = $res = $action->[4]->(%args);
-    $log->tracef("$lp check_state args: %s, result: %s", \%args, $res);
+    log_trace("$lp check_state args: %s, result: %s", \%args, $res);
     return err(532, "$ep: Check state failed", $res)
         unless $res->[0] == 200 || $res->[0] == 304;
-    $log->debug($res->[1]) if $res->[0] == 200 && $res->[1];
+    log_debug($res->[1]) if $res->[0] == 200 && $res->[1];
     my $undo_actions = $res->[3]{undo_actions} // [];
     my $do_actions   = $res->[3]{do_actions};
     $self->_collect_stash($res);
 
     for ('after_check_state') {
         last unless $_hooks{$_};
-        $log->tracef("$lp hook: $_");
+        log_trace("$lp hook: $_");
         $_hooks{$_}->($self, which=>$which, action=>$action, res=>$res);
     }
 
@@ -640,7 +640,7 @@ sub _perform_action {
 
         for ('before_inner_action') {
             last unless $_hooks{$_};
-            $log->tracef("$lp hook: $_");
+            log_trace("$lp hook: $_");
             $_hooks{$_}->($self, which=>$which, actions=>$do_actions);
         }
 
@@ -649,14 +649,14 @@ sub _perform_action {
 
         for ('after_inner_action') {
             last unless $_hooks{$_};
-            $log->tracef("$lp hook: $_");
+            log_trace("$lp hook: $_");
             $_hooks{$_}->($self, which=>$which,actions=>$do_actions,res=>$res);
         }
 
     } elsif ($self->{_res}[0] == 200) {
         $args{-tx_action} = 'fix_state';
         $self->{_res} = $res = $action->[4]->(%args);
-        $log->tracef("$lp fix_state args: %s, result: %s", \%args, $res);
+        log_trace("$lp fix_state args: %s, result: %s", \%args, $res);
         return [532, "$ep: action failed", $res]
             unless $res->[0] == 200 || $res->[0] == 304;
         $self->_collect_stash($res);
@@ -664,7 +664,7 @@ sub _perform_action {
 
     for ('after_fix_state') {
         last unless $_hooks{$_};
-        $log->tracef("$lp hook: $_");
+        log_trace("$lp hook: $_");
         $_hooks{$_}->($self, which=>$which, action=>$action, res=>$res);
     }
 
@@ -733,7 +733,7 @@ sub _action_loop {
     # give up).
     my $eval_res = eval {
         $actions = $self->_get_actions_from_db($which)->[2] unless $actions;
-        $log->tracef("$lp Actions to perform: %s",
+        log_trace("$lp Actions to perform: %s",
                      [map {[$_->[0], $_->[2] // $_->[1]]} @$actions]);
 
         # check the actions
@@ -787,9 +787,9 @@ sub _action_loop {
         }
     }
 
-    if ($log->is_trace) {
+    if (log_is_trace) {
         my $undo_actions = $self->_get_undo_actions_from_db($which)->[2];
-        $log->tracef("$lp Recorded undo actions: %s",
+        log_trace("$lp Recorded undo actions: %s",
                      [map {[$_->[0], $_->[2]]} @$undo_actions])
             if $undo_actions;
     }
@@ -799,7 +799,7 @@ sub _action_loop {
 
 sub _cleanup {
     my ($self, $which) = @_;
-    $log->tracef("$lp Performing cleanup ...");
+    log_trace("$lp Performing cleanup ...");
 
     # there should be only one process running
     my $res = $self->_lock_db(undef);
@@ -818,7 +818,7 @@ sub _cleanup {
             @{ $dbh->selectall_arrayref("SELECT ser_id FROM tx") // []};
         for my $tx_id (@dirs) {
             next if $tx_id ~~ @tx_ids;
-            $log->tracef("Deleting %s ...", "$dir/$tx_id");
+            log_trace("Deleting %s ...", "$dir/$tx_id");
             remove "$dir/$tx_id";
         }
     }
@@ -830,7 +830,7 @@ sub _cleanup {
     # XXX also rolls back all i Rtxs that have been going around too for
     # long
 
-    $log->tracef("$lp Finished cleanup");
+    log_trace("$lp Finished cleanup");
     $self->_unlock_db;
 
     [200];
@@ -839,7 +839,7 @@ sub _cleanup {
 sub _recover {
     my ($self, $which) = @_;
 
-    $log->tracef("$lp Performing recovery ...");
+    log_trace("$lp Performing recovery ...");
     local $self->{_in_recovery} = 1;
 
     # there should be only one process running
@@ -886,7 +886,7 @@ sub _recover {
 
   EXIT_RECOVERY:
     $self->_unlock_db;
-    $log->tracef("$lp Finished recovery");
+    log_trace("$lp Finished recovery");
     [200];
 }
 
@@ -1359,7 +1359,7 @@ sub _discard {
                 $dbh->do("DELETE FROM tx WHERE ser_id IN ($txs)")
                     or return [532, "db: Can't delete tx: ".$dbh->errstr];
                 $dbh->do("DELETE FROM do_action WHERE tx_ser_id IN ($txs)");
-                $log->infof("$lp discard tx: %s", \@txs);
+                log_info("$lp discard tx: %s", \@txs);
             }
             [200];
         },
@@ -1391,7 +1391,7 @@ Perinci::Tx::Manager - A Rinci transaction manager
 
 =head1 VERSION
 
-This document describes version 0.56 of Perinci::Tx::Manager (from Perl distribution Perinci-Tx-Manager), released on 2016-06-10.
+This document describes version 0.57 of Perinci::Tx::Manager (from Perl distribution Perinci-Tx-Manager), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -1633,7 +1633,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

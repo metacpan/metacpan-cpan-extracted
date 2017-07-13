@@ -55,6 +55,12 @@
     "last_4_digits": "7643",
     "token": "7aF1Zx118523mw4cwl5x2"
   },
+  "custom_inputs": {
+    "float_input": 12.1,
+    "integer_input": 3123,
+    "string_input": "This is a string input.",
+    "boolean_input": true
+  },
   "order": {
     "amount": 323.21,
     "currency": "USD",
@@ -82,6 +88,8 @@
   "device": {
     "ip_address": "81.2.69.160",
     "user_agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.89 Safari/537.36",
-    "accept_language": "en-US,en;q=0.8"
+    "accept_language": "en-US,en;q=0.8",
+    "session_age": "3600.6",
+    "session_id": "foobar"
   }
 }

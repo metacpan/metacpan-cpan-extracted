@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Dist::Zilla::App::Command 6.009;
+package Dist::Zilla::App::Command 6.010;
 # ABSTRACT: base class for dzil commands
 
 use App::Cmd::Setup -command;
@@ -42,7 +42,7 @@ Dist::Zilla::App::Command - base class for dzil commands
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 METHODS
 

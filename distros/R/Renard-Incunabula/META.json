@@ -1,0 +1,83 @@
+{
+   "abstract" : "The base library for Project Renard",
+   "author" : [
+      "Project Renard"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Renard-Incunabula",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::More" : "0",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0",
+            "Cairo" : "0",
+            "Function::Parameters" : "0",
+            "Import::Into" : "0",
+            "Modern::Perl" : "0",
+            "Module::Load" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "MooX::Lsub" : "0",
+            "MooX::TypeTiny" : "0",
+            "Path::Tiny" : "0",
+            "Return::Type" : "0",
+            "Try::Tiny" : "0",
+            "Type::Libraries" : "0",
+            "Type::Library" : "0.008",
+            "Type::Utils" : "0",
+            "Types::Common::Numeric" : "0",
+            "Types::Path::Tiny" : "0",
+            "Types::Standard" : "0",
+            "Types::URI" : "0",
+            "autodie" : "0",
+            "autovivification" : "0",
+            "custom::failures" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "lib" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/project-renard/p5-Renard-Incunabula",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/project-renard/p5-Renard-Incunabula.git",
+         "web" : "https://github.com/project-renard/p5-Renard-Incunabula"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

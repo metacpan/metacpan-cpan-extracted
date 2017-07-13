@@ -1,75 +1,81 @@
-SYNOPSIS
+NAME
+    File::Trash::FreeDesktop - Trash files
 
+VERSION
+    This document describes version 0.19 of File::Trash::FreeDesktop (from
+    Perl distribution File-Trash-FreeDesktop), released on 2017-07-10.
+
+SYNOPSIS
      use File::Trash::FreeDesktop;
-    
+
      my $trash = File::Trash::FreeDesktop->new;
-    
+
      # list available (for the running user) trash directories
      my @trashes = $trash->list_trashes;
-    
+
      # list the content of a trash directory
      my @content = $trash->list_contents("/tmp/.Trash-1000");
-    
+
      # list the content of all available trash directories
      my @content = $trash->list_contents;
-    
+
      # trash a file
      $trash->trash("/foo/bar");
-    
+
      # specify some options when trashing
      $trash->trash({on_not_found=>'ignore'}, "/foo/bar");
-    
+
      # recover a file from trash (untrash)
      $trash->recover('/foo/bar');
-    
+
      # untrash a file from a specific trash directory
      $trash->recover('/tmp/file', '/tmp/.Trash-1000');
-    
+
      # specify some options when untrashing
      $trash->recover({on_not_found=>'ignore', on_target_exists=>'ignore'}, '/path');
-    
+
      # empty a trash directory
      $trash->empty("$ENV{HOME}/.local/share/Trash");
-    
+
      # empty all available trashes
      $trash->empty;
 
 DESCRIPTION
-
     This module lets you trash/erase/restore files, also list the contents
     of trash directories. This module follows the freedesktop.org trash
     specification [1], with some notes/caveats:
 
-      * For home trash, $HOME/.local/share/Trash is used instead of
-      $HOME/.Trash
+    *   For home trash, $HOME/.local/share/Trash is used instead of
+        $HOME/.Trash
 
-      This is what KDE and GNOME use these days.
+        This is what KDE and GNOME use these days.
 
-      * Symlinks are currently not checked
+    *   Symlinks are currently not checked
 
-      The spec requires implementation to check whether trash directory is
-      a symlink, and refuse to use it in that case. This module currently
-      does not do said checking.
+        The spec requires implementation to check whether trash directory is
+        a symlink, and refuse to use it in that case. This module currently
+        does not do said checking.
 
-      * Currently cross-device copying is not implemented/done
+    *   Currently cross-device copying is not implemented/done
 
-      It should not matter though, because trash directories are
-      per-filesystem.
+        It should not matter though, because trash directories are
+        per-filesystem.
 
     Some other notes:
 
-      * 
+    *
+
+NOTES
+    Weird scenario: /PATH/.Trash-UID is mounted on its own scenario? How
+    about /PATH/.Trash-UID/{files,info}.
 
 METHODS
-
- $trash = File::Trash::FreeDesktop->new(%opts)
-
+  $trash = File::Trash::FreeDesktop->new(%opts)
     Constructor.
 
     Currently there are no known options.
 
- $trash->list_trashes() => LIST
-
+  $trash->list_trashes() => LIST
     List user's existing trash directories on the system.
 
     Return a list of trash directories. Sample output:
@@ -77,8 +83,7 @@ METHODS
      ("/home/mince/.local/share/Trash",
       "/tmp/.Trash-1000")
 
- $trash->list_contents([$trash_dir]) => LIST
-
+  $trash->list_contents([$trash_dir]) => LIST
     List contents of trash director(y|ies).
 
     If $trash_dir is not specified, list contents from all existing trash
@@ -92,79 +97,77 @@ METHODS
       {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510,
        trash_dir=>"/tmp/.Trash-1000"})
 
- $trash->trash([\%opts, ]$file) => STR
-
+  $trash->trash([\%opts, ]$file) => STR
     Trash a file (move it into trash dir).
 
     Will try to find a trash dir that resides in the same filesystem/device
-    as the file and is writable. $home/.local/share/Trash is tried first,
-    then $device_root/.Trash-$uid, then $device_root/tmp/.Trash-$uid. Will
-    die if no suitable trash dir is found.
+    as the file and is writable. "$home/.local/share/Trash" is tried first,
+    then "$device_root/.Trash-$uid", then "$device_root/tmp/.Trash-$uid".
+    Will die if no suitable trash dir is found.
 
     Will also die if moving file to trash (currently using rename()) fails.
 
     Upon success, will return the location of the file in the trash dir
-    (e.g. /tmp/.Trash-1000/files/foo).
+    (e.g. "/tmp/.Trash-1000/files/foo").
 
     If first argument is a hashref, it will be accepted as options. Known
     options:
 
-      * on_not_found => STR (default 'die')
+    *   on_not_found => STR (default 'die')
 
-      Specify what to do when the file to be deleted is not found. The
-      default is 'die', but can also be set to 'ignore' and return
-      immediately.
+        Specify what to do when the file to be deleted is not found. The
+        default is 'die', but can also be set to 'ignore' and return
+        immediately.
 
-      * suffix => STR
+    *   suffix => STR
 
-      Pick a suffix. Normally, file will be stored in files/ORIGNAME inside
-      trash directory, or, if that file already exists, in
-      files/ORIGNAME.1, files/ORIGNAME.2, and so on. This setting overrides
-      this behavior and picks files/ORIGNAME.SUFFIX. Can be used to
-      identify and restore particular file later. However, will die if file
-      with that suffix already exists, so be sure to pick a unique suffix.
+        Pick a suffix. Normally, file will be stored in "files/ORIGNAME"
+        inside trash directory, or, if that file already exists, in
+        "files/ORIGNAME.1", "files/ORIGNAME.2", and so on. This setting
+        overrides this behavior and picks "files/ORIGNAME.SUFFIX". Can be
+        used to identify and restore particular file later. However, will
+        die if file with that suffix already exists, so be sure to pick a
+        unique suffix.
 
- $trash->recover([\%opts, ]$file[, $trash_dir])
-
+  $trash->recover([\%opts, ]$file[, $trash_dir])
     Recover a file from trash.
 
-    Unless $trash_dir is specified, will search in all existing user's
-    trash dirs. Will die on errors.
+    Unless $trash_dir is specified, will search in all existing user's trash
+    dirs. Will die on errors.
 
     If first argument is a hashref, it will be accepted as options. Known
     options:
 
-      * on_not_found => STR (default 'die')
+    *   on_not_found => STR (default 'die')
 
-      Specify what to do when file is not found in the trash. The default
-      is 'die', but can also be set to 'ignore' and return immediately.
+        Specify what to do when file is not found in the trash. The default
+        is 'die', but can also be set to 'ignore' and return immediately.
 
-      * on_target_exists => STR (default 'die')
+    *   on_target_exists => STR (default 'die')
 
-      Specify what to do when restore target already exists. The default is
-      'die', but can also be set to 'ignore' and return immediately.
+        Specify what to do when restore target already exists. The default
+        is 'die', but can also be set to 'ignore' and return immediately.
 
-      * mtime => INT
+    *   mtime => INT
 
-      Only recover file if file's mtime is the one specified. This can be
-      useful to make sure that the file we recover is really the one that
-      we trashed earlier, especially if we trash several files with the
-      same path.
+        Only recover file if file's mtime is the one specified. This can be
+        useful to make sure that the file we recover is really the one that
+        we trashed earlier, especially if we trash several files with the
+        same path.
 
-      (Ideally, instead of mtime we should use some unique ID that we write
-      in the .trashinfo file, but I fear that an extra parameter in
-      .trashinfo file might confuse other implementations.)
+        (Ideally, instead of mtime we should use some unique ID that we
+        write in the .trashinfo file, but I fear that an extra parameter in
+        .trashinfo file might confuse other implementations.)
 
-      See also suffix, which is the recommended way to identify and recover
-      particular file.
+        See also "suffix", which is the recommended way to identify and
+        recover particular file.
 
-      * suffix => STR
+    *   suffix => STR
 
-      Only recover file having the specified suffix, chosen previously
-      during trash().
+        Only recover file having the specified suffix, chosen previously
+        during trash().
 
- $trash->erase($file[, $trash_dir]) => LIST
-
+  $trash->erase($file[, $trash_dir]) => LIST
     Erase (unlink()) a file in trash.
 
     Unless $trash_dir is specified, will empty all existing user's trash
@@ -172,8 +175,7 @@ METHODS
 
     Return list of files erased.
 
- $trash->empty([$trash_dir]) => LIST
-
+  $trash->empty([$trash_dir]) => LIST
     Empty trash.
 
     Unless $trash_dir is specified, will empty all existing user's trash
@@ -181,31 +183,51 @@ METHODS
 
     Return list of files erased.
 
-NOTES
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Trash-FreeDesktop>.
 
-    Weird scenario: /PATH/.Trash-UID is mounted on its own scenario? How
-    about /PATH/.Trash-UID/{files,info}.
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Trash-FreeDesktop>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDeskto
+    p>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     [1] http://freedesktop.org/wiki/Specifications/trash-spec
 
     Related modules on CPAN:
 
-      * Trash::Park
+    *   Trash::Park
 
-      Different trash structure (a single CSV file per trash to hold a list
-      of deleted files, files stored using original path structure, e.g.
-      home/dir/file). Does not create per-filesystem trash.
+        Different trash structure (a single CSV file per trash to hold a
+        list of deleted files, files stored using original path structure,
+        e.g. "home/dir/file"). Does not create per-filesystem trash.
 
-      * File::Trash
+    *   File::Trash
 
-      Different trash structure (does not keep info file, files stored
-      using original path structure, e.g. home/dir/file). Does not create
-      per-filesystem trash.
+        Different trash structure (does not keep info file, files stored
+        using original path structure, e.g. "home/dir/file"). Does not
+        create per-filesystem trash.
 
-      * File::Remove
+    *   File::Remove
 
-      File::Remove includes the trash() function which supports Win32, but
-      no undeletion function is provided at the time of this writing.
+        File::Remove includes the trash() function which supports Win32, but
+        no undeletion function is provided at the time of this writing.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

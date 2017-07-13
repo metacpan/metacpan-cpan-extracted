@@ -7,7 +7,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw( _read_win32_reg_dump );
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '0.55'; # VERSION
+our $VERSION = '0.61'; # VERSION
 
 
 # perl -MYAML= -MConfig::INI::Reader::Multiline -MFile::BOM -E 'use autodie; open $fh, "<:via(File::BOM)", "foo.reg"; <$fh>; say Dump(Config::INI::Reader::Multiline->read_handle($fh))'
@@ -82,7 +82,7 @@ Alien::Build::Util::Win32::RegistryDump - Private utility functions for Alien::B
 
 =head1 VERSION
 
-version 0.55
+version 0.61
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '2.0.1';
+$Git::Repository::Plugin::GitHooks::VERSION = '2.1.0';
 use parent qw/Git::Repository::Plugin/;
 
 use 5.010;
@@ -1104,7 +1104,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 SYNOPSIS
 

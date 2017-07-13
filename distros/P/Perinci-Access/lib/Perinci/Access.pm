@@ -1,12 +1,12 @@
 package Perinci::Access;
 
-our $DATE = '2015-12-17'; # DATE
-our $VERSION = '0.44'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.45'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Scalar::Util qw(blessed);
 use URI::Split qw(uri_split uri_join);
@@ -72,16 +72,16 @@ sub _request_or_parse_url {
 
     my $res;
     if ($which eq 'request') {
-        if ($Log_Request && $log->is_trace) {
-            $log->tracef(
+        if ($Log_Request && log_is_trace()) {
+            log_trace(
                 "Riap request (%s): %s -> %s (%s)",
                 ref($self->{_handler_objs}{$sch}),
                 $action, $uri, $extra, $copts);
         }
         $res = $self->{_handler_objs}{$sch}->request(
             $action, $uri, $extra, $copts);
-        if ($Log_Response && $log->is_trace) {
-            $log->tracef("Riap response: %s", $res);
+        if ($Log_Response && log_is_trace()) {
+            log_trace("Riap response: %s", $res);
         }
     } else {
         $res = $self->{_handler_objs}{$sch}->parse_url($uri, $copts);
@@ -114,7 +114,7 @@ Perinci::Access - Wrapper for Perinci Riap clients
 
 =head1 VERSION
 
-This document describes version 0.44 of Perinci::Access (from Perl distribution Perinci-Access), released on 2015-12-17.
+This document describes version 0.45 of Perinci::Access (from Perl distribution Perinci-Access), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -173,12 +173,12 @@ the B<handlers> attribute (see its documentation for more details).
 =head2 $Log_Request (BOOL)
 
 Whether to log every Riap request. Default is from environment variable
-LOG_RIAP_REQUEST, or false. Logging is done with L<Log::Any> at trace level.
+LOG_RIAP_REQUEST, or false. Logging is done with L<Log::ger> at trace level.
 
 =head2 $Log_Response (BOOL)
 
 Whether to log every Riap response. Default is from environment variable
-LOG_RIAP_RESPONSE, or false. Logging is done with L<Log::Any> at trace level.
+LOG_RIAP_RESPONSE, or false. Logging is done with L<Log::ger> at trace level.
 
 =head1 METHODS
 
@@ -255,16 +255,6 @@ LOG_RIAP_REQUEST
 
 LOG_RIAP_RESPONSE
 
-=head1 SEE ALSO
-
-L<Perinci::Access::Schemeless>
-
-L<Perinci::Access::Perl>
-
-L<Perinci::Access::HTTP::Client>
-
-L<Perinci::Access::Simple::Client>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Access>.
@@ -281,13 +271,23 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Perinci::Access::Schemeless>
+
+L<Perinci::Access::Perl>
+
+L<Perinci::Access::HTTP::Client>
+
+L<Perinci::Access::Simple::Client>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

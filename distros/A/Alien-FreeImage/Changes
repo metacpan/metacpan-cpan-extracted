@@ -1,5 +1,8 @@
 Revision history for Perl module Alien::FreeImage
 
+1.001   2017-07-11
+        - upgrade to FreeImage-3.17.0
+
 0.011   2014-12-09
         - flag -fPIC strikes again
 

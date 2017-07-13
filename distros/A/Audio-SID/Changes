@@ -1,5 +1,25 @@
 Revision history:
 
+4.01 - Wed July 12 2017
+        - Now licensed under MIT License.
+        - Minor documentation updates.
+
+4.00 - Fri June 30 2017
+        - Updated to handle PSID/RSID files versions 1 through 4.
+        - The text fields of 'title', 'author' and 'released' are now
+          allowed to be exactly 32 chars in length as per the latest SID file
+          format spec.
+        - Added support for second and third SID model fields.
+        - Added support for second and third SID address fields.
+        - Fixed 'speed' field related algorithms for PSID v1 or PlaySID-
+          specific files when the number of songs is more than 32 as per the
+          latest SID file format spec.
+        - Fixed MD5 calculation bug for files with more than 32 songs. (I'm
+          hoping this will fix MD5 calculations once and for all. :-)
+        - Fixed: v1 files are now always considered PlaySID specific.
+        - Fixed: during validation, ROM area checks for the relocation range
+          are now applied to RSID files only.
+
 3.11 - Sun Aug 14 2005
         - The textual fields of "title", "author" and "released" were
           handled as Unicode. They were supposed to be ISO 8859-1 ASCII

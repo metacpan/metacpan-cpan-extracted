@@ -1,4 +1,9 @@
-Revision history for Finance-Currency-Convert-KlikBCA
+0.14    2017-07-11 (PERLANCAR)
+
+        - Update URL from http:// to https:// to re-pass the test.
+
+	- Remove dependency to Log::Any::IfLOG.
+
 
 0.13    2016-10-14 (PERLANCAR)
 

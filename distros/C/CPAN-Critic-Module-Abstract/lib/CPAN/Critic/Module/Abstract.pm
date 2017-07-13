@@ -1,12 +1,12 @@
 package CPAN::Critic::Module::Abstract;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.08'; # VERSION
 
 use 5.010;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Package::MoreUtil qw(list_package_contents);
 use Perinci::Sub::DepChecker qw(check_deps);
@@ -190,7 +190,7 @@ declare_policy
         return [412, "Empty result from langof"] unless keys(%langs);
         my @langs = sort { $langs{$b}<=>$langs{$a} } keys %langs;
         my $confidence = Lingua::Identify::confidence(%langs);
-        $log->tracef(
+        log_trace(
             "Lingua::Identify result: langof=%s, langs=%s, confidence=%s",
             \%langs, \@langs, $confidence);
         if ($langs[0] ne 'en') {
@@ -277,12 +277,12 @@ sub critique_cpan_module_abstract {
     my $pr = $PROFILES{$profile} or return [400, "No such profile '$profile'"];
 
     my @res;
-    $log->tracef("Running critic profile %s on abstract %s ...",
+    log_trace("Running critic profile %s on abstract %s ...",
                  $profile, $abstract);
     my $pass;
     my $stash = {};
     for my $pol0 (@{ $pr->{policies} }) {
-        $log->tracef("Running policy %s ...", $pol0);
+        log_trace("Running policy %s ...", $pol0);
         my $pol = ref($pol0) eq 'HASH' ? %$pol0 : {name=>$pol0};
         my $spec = $SPEC{"policy_$pol->{name}"} or
             return [400, "No such policy $pol->{name}"];
@@ -294,7 +294,7 @@ sub critique_cpan_module_abstract {
         no strict 'refs';
         my $code = \&{__PACKAGE__ . "::policy_$pol->{name}"};
         my $res = $code->(abstract=>$abstract, stash=>$stash); # XXX args
-        $log->tracef("Result from policy %s: %s", $pol->{name}, $res);
+        log_trace("Result from policy %s: %s", $pol->{name}, $res);
         if ($res->[0] == 409) {
             my $severity = $spec->{"_cpancritic.severity"};
             $pass = 0 if $severity >= 5;
@@ -325,7 +325,7 @@ CPAN::Critic::Module::Abstract - Critic CPAN module abstract
 
 =head1 VERSION
 
-This document describes version 0.07 of CPAN::Critic::Module::Abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2015-09-03.
+This document describes version 0.08 of CPAN::Critic::Module::Abstract (from Perl distribution CPAN-Critic-Module-Abstract), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -343,9 +343,15 @@ Dist::Zilla plugin coming shortly.
 =head1 FUNCTIONS
 
 
-=head2 critique_cpan_module_abstract(%args) -> [status, msg, result, meta]
+=head2 critique_cpan_module_abstract
+
+Usage:
+
+ critique_cpan_module_abstract(%args) -> [status, msg, result, meta]
 
 Critic CPAN module abstract.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -369,7 +375,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_empty(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_empty
+
+Usage:
+
+ policy_prohibit_empty(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -393,7 +405,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_ends_with_full_stop(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_ends_with_full_stop
+
+Usage:
+
+ policy_prohibit_ends_with_full_stop(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -417,7 +435,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_just_module_name(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_just_module_name
+
+Usage:
+
+ policy_prohibit_just_module_name(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -441,7 +465,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_multiline(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_multiline
+
+Usage:
+
+ policy_prohibit_multiline(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -465,7 +495,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_redundancy(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_redundancy
+
+Usage:
+
+ policy_prohibit_redundancy(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -489,7 +525,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_shouting(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_shouting
+
+Usage:
+
+ policy_prohibit_shouting(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -513,7 +555,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_starts_with_lowercase_letter(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_starts_with_lowercase_letter
+
+Usage:
+
+ policy_prohibit_starts_with_lowercase_letter(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -537,7 +585,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_template(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_template
+
+Usage:
+
+ policy_prohibit_template(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -561,7 +615,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_too_long(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_too_long
+
+Usage:
+
+ policy_prohibit_too_long(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -587,7 +647,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_prohibit_too_short(%args) -> [status, msg, result, meta]
+=head2 policy_prohibit_too_short
+
+Usage:
+
+ policy_prohibit_too_short(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -613,7 +679,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 policy_require_english(%args) -> [status, msg, result, meta]
+=head2 policy_require_english
+
+Usage:
+
+ policy_require_english(%args) -> [status, msg, result, meta]
+
+This function is not exported.
 
 Arguments ('*' denotes required arguments):
 
@@ -660,7 +732,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

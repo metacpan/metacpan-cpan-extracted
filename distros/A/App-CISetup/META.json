@@ -93,35 +93,35 @@
    "provides" : {
       "App::CISetup" : {
          "file" : "lib/App/CISetup.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::CISetup::AppVeyor::ConfigFile" : {
          "file" : "lib/App/CISetup/AppVeyor/ConfigFile.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::CISetup::AppVeyor::ConfigUpdater" : {
          "file" : "lib/App/CISetup/AppVeyor/ConfigUpdater.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::CISetup::Role::ConfigFile" : {
          "file" : "lib/App/CISetup/Role/ConfigFile.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::CISetup::Role::ConfigUpdater" : {
          "file" : "lib/App/CISetup/Role/ConfigUpdater.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::CISetup::Travis::ConfigFile" : {
          "file" : "lib/App/CISetup/Travis/ConfigFile.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::CISetup::Travis::ConfigUpdater" : {
          "file" : "lib/App/CISetup/Travis/ConfigUpdater.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "App::CISetup::Types" : {
          "file" : "lib/App/CISetup/Types.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -136,7 +136,7 @@
          "web" : "https://github.com/maxmind/App-CISetup"
       }
    },
-   "version" : 0.05,
+   "version" : 0.06,
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.024001"
@@ -271,7 +271,7 @@
                   "include_underscores" : 0
                },
                "Dist::Zilla::Role::MetaProvider::Provider" : {
-                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002003",
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
                   "inherit_missing" : 1,
                   "inherit_version" : 1,
                   "meta_noindex" : 1
@@ -884,7 +884,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.05",
+                  "tag" : "v0.06",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -1042,8 +1042,9 @@
    },
    "x_authority" : "cpan:MAXMIND",
    "x_contributors" : [
-      "Mark Fowler <mfowler@maxmind.com>"
+      "Mark Fowler <mfowler@maxmind.com>",
+      "Zak B. Elep <zakame@zakame.net>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0229"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

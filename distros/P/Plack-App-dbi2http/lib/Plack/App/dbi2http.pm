@@ -4,8 +4,8 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.06'; # VERSION
-our $DATE = '2015-09-06'; # DATE
+our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-07-11'; # DATE
 
 1;
 # ABSTRACT: Export DBI database as HTTP API (Riap::HTTP)
@@ -22,7 +22,7 @@ Plack::App::dbi2http - Export DBI database as HTTP API (Riap::HTTP)
 
 =head1 VERSION
 
-This document describes version 0.06 of Plack::App::dbi2http (from Perl distribution Plack-App-dbi2http), released on 2015-09-06.
+This document describes version 0.07 of Plack::App::dbi2http (from Perl distribution Plack-App-dbi2http), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -323,17 +323,13 @@ Plack middleware to the PSGI application.
 Last word, exporting a database as a public API service is usually B<not a good
 idea>. In case you don't realize that ;-)
 
-=head1 SEE ALSO
-
-L<Rinci>, L<Riap>, L<Riap::HTTP>, L<DBIx::FunctionalAPI>, L<App::riap>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Plack-App-dbi2http>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Plack-App-dbi2http>.
+Source repository is at L<https://github.com/perlancar/perl-Plack-App-dbi2http>.
 
 =head1 BUGS
 
@@ -343,13 +339,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Rinci>, L<Riap>, L<Riap::HTTP>, L<DBIx::FunctionalAPI>, L<App::riap>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

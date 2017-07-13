@@ -1,4 +1,9 @@
-Revision history for Data-Sah
+0.88    2016-07-10 (PERLANCAR)
+
+        - No functional changes.
+
+        - Replace Log::Any with Log::ger.
+
 
 0.87    2016-09-14 (PERLANCAR)
 
@@ -166,7 +171,6 @@ Revision history for Data-Sah
           DateTime; 2) date/duration does not always have to be converted to
           DateTime/DateTime::Duration during validation, by default ints are
           used to reduce overhead and dependencies, but this can be changed.
-
           Coercion of clause/attribute value has not been reimplemented though,
           that will follow in the next release.
 

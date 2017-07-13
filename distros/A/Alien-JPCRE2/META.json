@@ -32,10 +32,11 @@
       "build" : {
          "requires" : {
             "Alien::Build::MM" : "0.25",
-            "Alien::PCRE2" : "0.006",
+            "Alien::PCRE2" : "0",
             "Alien::gmake" : "0.11",
             "Archive::Tar" : "0",
             "Config" : "0",
+            "Env::ShellWords" : "0.01",
             "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
@@ -48,16 +49,18 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.52",
-            "Alien::Build::MM" : "0.25",
-            "Alien::PCRE2" : "0.006",
+            "Alien::Build" : "0.60",
+            "Alien::Build::MM" : "0.60",
+            "Alien::Build::Plugin::Build::SearchDep" : "0.35",
+            "ExtUtils::CBuilder" : "0",
             "File::Find::Rule" : "0.34",
             "IO::Socket::SSL" : "2.043"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Build" : "0.25"
+            "Alien::Build" : "0.25",
+            "Alien::PCRE2" : "0.008"
          }
       }
    },
@@ -77,6 +80,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.002000",
+   "version" : "0.003000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,7 +1,7 @@
 package App::lcpan::CmdBundle::bugs;
 
-our $DATE = '2017-01-23'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 1;
 # ABSTRACT: More lcpan subcommands related to bugtracker
@@ -18,7 +18,7 @@ App::lcpan::CmdBundle::bugs - More lcpan subcommands related to bugtracker
 
 =head1 VERSION
 
-This document describes version 0.002 of App::lcpan::CmdBundle::bugs (from Perl distribution App-lcpan-CmdBundle-bugs), released on 2017-01-23.
+This document describes version 0.003 of App::lcpan::CmdBundle::bugs (from Perl distribution App-lcpan-CmdBundle-bugs), released on 2017-07-10.
 
 =head1 SYNOPSIS
 

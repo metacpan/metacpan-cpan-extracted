@@ -43,6 +43,9 @@ subtest name => sub {
 
     $version->_init_by_version_string('sierra');
     cmp_version $version, 10, 12;
+
+    $version->_init_by_version_string('high_sierra');
+    cmp_version $version, 10, 13;
 };
 
 subtest code => sub {

@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Footprintless",
   "PREREQ_PM" => {
     "App::Cmd" => "0.330",
-    "Config::Entities" => "1.06",
+    "Config::Entities" => "1.07",
     "IPC::Run" => "0.94",
     "IPC::Run3" => "0.048",
     "JSON" => "2.90",
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => "0.90"
   },
-  "VERSION" => "1.24",
+  "VERSION" => "1.25",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::Cmd" => "0.330",
-  "Config::Entities" => "1.06",
+  "Config::Entities" => "1.07",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "IPC::Run" => "0.94",

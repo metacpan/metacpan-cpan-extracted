@@ -1,12 +1,12 @@
 package File::Truncate::Undoable;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use File::Trash::Undoable;
 
@@ -67,7 +67,7 @@ sub truncate {
         return [500, "File $path can't be stat'd"]       unless @st;
         return [304, "File $path is already truncated"]  if $is_zero;
 
-        $log->info("(DRY) Truncating file $path ...") if $dry_run;
+        log_info("(DRY) Truncating file $path ...") if $dry_run;
         return [200, "File $path needs to be truncated", undef,
                 {undo_actions=>[
                     ['File::Trash::Undoable::untrash',
@@ -76,7 +76,7 @@ sub truncate {
                      {path=>$path, suffix=>substr($taid,0,8)."n"}], # trash new
                 ]}];
     } elsif ($tx_action eq 'fix_state') {
-        $log->info("Truncating file $path ...");
+        log_info("Truncating file $path ...");
         my $res = File::Trash::Undoable::trash(
             -tx_action=>'fix_state', path=>$path, suffix=>substr($taid,0,8));
         return $res unless $res->[0] == 200 || $res->[0] == 304;
@@ -103,16 +103,16 @@ File::Truncate::Undoable - Truncate a file, with undo support
 
 =head1 VERSION
 
-This document describes version 0.04 of File::Truncate::Undoable (from Perl distribution File-Truncate-Undoable), released on 2015-09-03.
-
-=head1 SEE ALSO
-
-L<Rinci::Transaction>
+This document describes version 0.05 of File::Truncate::Undoable (from Perl distribution File-Truncate-Undoable), released on 2017-07-10.
 
 =head1 FUNCTIONS
 
 
-=head2 truncate(%args) -> [status, msg, result, meta]
+=head2 truncate
+
+Usage:
+
+ truncate(%args) -> [status, msg, result, meta]
 
 Truncate a file, with undo support.
 
@@ -129,6 +129,8 @@ Fixable state: file exists and size is not zero.
 
 Unfixable state: file does not exist or path is not a regular file (directory
 and symlink included).
+
+This function is not exported.
 
 This function is idempotent (repeated invocations with same arguments has the same effect as single invocation). This function supports transactions.
 
@@ -194,13 +196,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Rinci::Transaction>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

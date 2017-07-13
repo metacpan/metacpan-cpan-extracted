@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::NodeEditor;
-$Config::Model::Tk::NodeEditor::VERSION = '1.362';
+$Config::Model::Tk::NodeEditor::VERSION = '1.363';
 use strict;
 use warnings;
 use Carp;
@@ -44,6 +44,7 @@ sub Populate {
         || die "NodeViewer: no -item, got ", keys %$args;
     $cw->{path} = delete $args->{-path};
     $cw->{store_cb} = delete $args->{-store_cb} || die __PACKAGE__, "no -store_cb";
+    my $cme_font = delete $args->{-font};
 
     $cw->add_header( Edit => $node )->pack(@fx);
 
@@ -74,6 +75,8 @@ sub Populate {
     else {
         $cw->add_help( class => $node->get_help )->pack(@fx);
     }
+
+    $cw->ConfigSpecs(-font => [['SELF','DESCENDANTS'], 'font','Font', $cme_font ],);
 
     # don't call directly SUPER::Populate as it's LeafViewer's populate
     $cw->Tk::Frame::Populate($args);

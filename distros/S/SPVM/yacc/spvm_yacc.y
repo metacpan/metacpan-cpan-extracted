@@ -17,15 +17,15 @@
 %token <opval> LAST NEXT NAME VAR CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF DIE
 %token <opval> SWITCH CASE DEFAULT VOID EVAL EXCEPTION_VAR
 
-%type <opval> grammar opt_statements statements statement my field if_statement else_statement
+%type <opval> grammar opt_statements statements statement my_var field if_statement else_statement
 %type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop
 %type <opval> opt_terms terms term args arg opt_args use declaration_in_package declarations_in_package
 %type <opval> enumeration_values enumeration_value
 %type <opval> type package_name field_name sub_name package declarations_in_grammar opt_enumeration_values type_array
-%type <opval> for_statement while_statement expression opt_declarations_in_grammar opt_term
+%type <opval> for_statement while_statement expression opt_declarations_in_grammar
 %type <opval> call_field array_elem convert_type enumeration new_object type_name array_length declaration_in_grammar
 %type <opval> switch_statement case_statement default_statement type_array_with_length
-%type <opval> ';' opt_descriptors descriptors type_or_void normal_statement eval_block
+%type <opval> ';' opt_descriptors descriptors type_or_void normal_statement normal_statement_for_end eval_block
 
 
 %right <opval> ASSIGN
@@ -230,8 +230,16 @@ normal_statement
       $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, $1->file, $1->line);
     }
 
+normal_statement_for_end
+  : term
+    {
+      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_POP, $1->file, $1->line);
+      SPVM_OP_sibling_splice(compiler, $$, NULL, 0, $1);
+    }
+  | expression
+
 for_statement
-  : FOR '(' normal_statement term ';' opt_term ')' block
+  : FOR '(' normal_statement term ';' normal_statement_for_end ')' block
     {
       $$ = SPVM_OP_build_for_statement(compiler, $1, $3, $4, $6, $8);
     }
@@ -260,7 +268,14 @@ default_statement
 if_statement
   : IF '(' term ')' block else_statement
     {
-      $$ = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
+      SPVM_OP* op_if = SPVM_OP_build_if_statement(compiler, $1, $3, $5, $6);
+      
+      // if is wraped with block to allow the following syntax
+      //  if (my $var = 3) { ... }
+      SPVM_OP* op_block = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BLOCK, $1->file, $1->line);
+      SPVM_OP_sibling_splice(compiler, op_block, op_block->last, 0, op_if);
+      
+      $$ = op_block;
     }
 
 else_statement
@@ -270,7 +285,6 @@ else_statement
     };
   | ELSE block
     {
-      $2->flag |= SPVM_OP_C_FLAG_BLOCK_ELSE;
       $$ = $2;
     }
   | ELSIF '(' term ')' block else_statement
@@ -299,22 +313,14 @@ enumeration
       $$ = SPVM_OP_build_enumeration(compiler, $1, $2);
     }
 
-my
+my_var
   : MY VAR ':' type
     {
-      $$ = SPVM_OP_build_my_var(compiler, $1, $2, $4, NULL);
+      $$ = SPVM_OP_build_my_var(compiler, $1, $2, $4);
     }
   | MY VAR
     {
-      $$ = SPVM_OP_build_my_var(compiler, $1, $2, NULL, NULL);
-    }
-  | MY VAR ':' type ASSIGN term
-    {
-      $$ = SPVM_OP_build_my_var(compiler, $1, $2, $4, $6);
-    }
-  | MY VAR ASSIGN term
-    {
-      $$ = SPVM_OP_build_my_var(compiler, $1, $2, NULL, $4);
+      $$ = SPVM_OP_build_my_var(compiler, $1, $2, NULL);
     }
 
 expression
@@ -335,7 +341,18 @@ expression
     {
       $$ = SPVM_OP_build_die(compiler, $1, $2);
     }
-  | my
+  | call_field ASSIGN term
+    {
+      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+    }
+  | array_elem ASSIGN term
+    {
+      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+    }
+  | EXCEPTION_VAR ASSIGN term
+    {
+      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+    }
 
 opt_terms
   :	/* Empty */
@@ -369,17 +386,14 @@ array_length
     {
       $$ = SPVM_OP_build_array_length(compiler, $1, $3);
     }
-opt_term
-  : /* NULL */
-    {
-      $$ = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NULL, compiler->cur_file, compiler->cur_line);
-    }
-  | term
 
 term
   : VAR
   | EXCEPTION_VAR
   | CONSTANT
+    {
+      $$ = SPVM_OP_build_constant(compiler, $1);
+    }
   | UNDEF
   | call_sub
   | call_field
@@ -389,6 +403,7 @@ term
   | convert_type
   | new_object
   | array_length
+  | my_var
 
 new_object
   : MALLOC type_name
@@ -428,8 +443,21 @@ unop
     }
   | '-' term %prec UMINUS
     {
-      SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEGATE, $1->file, $1->line);
-      $$ = SPVM_OP_build_unop(compiler, op, $2);
+      if ($2->code == SPVM_OP_C_CODE_CONSTANT) {
+        SPVM_CONSTANT* constant = $2->uv.constant;
+        if (constant->code == SPVM_CONSTANT_C_CODE_INT || constant->code == SPVM_CONSTANT_C_CODE_LONG) {
+          constant->sign = 1;
+          $$ = $2;
+        }
+        else {
+          SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEGATE, $1->file, $1->line);
+          $$ = SPVM_OP_build_unop(compiler, op, $2);
+        }
+      }
+      else {
+        SPVM_OP* op = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEGATE, $1->file, $1->line);
+        $$ = SPVM_OP_build_unop(compiler, op, $2);
+      }
     }
   | INC term
     {
@@ -503,9 +531,13 @@ binop
     {
       $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
     }
-  | term ASSIGN term
+  | my_var ASSIGN term
     {
-      $$ = SPVM_OP_build_binop(compiler, $2, $1, $3);
+      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
+    }
+  | VAR ASSIGN term
+    {
+      $$ = SPVM_OP_build_assignop(compiler, $2, $1, $3);
     }
   | '(' term ')'
     {
@@ -584,7 +616,7 @@ args
 arg
   : VAR ':' type
     {
-      $$ = SPVM_OP_build_my_var(compiler, SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY_VAR, $1->file, $1->line), $1, $3, NULL);
+      $$ = SPVM_OP_build_my_var(compiler, SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY, $1->file, $1->line), $1, $3);
     }
 
 opt_descriptors

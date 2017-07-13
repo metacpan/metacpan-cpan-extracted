@@ -1,11 +1,12 @@
 package Pcore::App::Controller::Ext;
 
-use Pcore -role, -result;
+use Pcore -const, -role, -result;
 use Pcore::Ext;
 use Pcore::Share::Ext_v6_2_0;
 use Pcore::Share::WWW;
-use Pcore::Share::WWW::CDN;
 use Pcore::Util::Data qw[to_json];
+use JavaScript::Packer qw[];
+use JavaScript::Beautifier qw[];
 
 with qw[Pcore::App::Controller];
 
@@ -19,9 +20,12 @@ has cache => ( is => 'ro', isa => ScalarRef, init_arg => undef );
 
 our $EXT_VER       = 'v6.2.0';
 our $EXT_FRAMEWORK = 'classic';
+our $ext_framework = 'Pcore::Share::Ext_v6_2_0';
+
+const our $DEFAULT_LOCALE => 'en';
 
 sub BUILD ( $self, $args ) {
-    Pcore::Ext->SCAN( $self->{app}, Pcore::Share::Ext_v6_2_0->get_cfg, $EXT_FRAMEWORK );
+    Pcore::Ext->SCAN( $self->{app}, $ext_framework->get_cfg, $EXT_FRAMEWORK );
 
     die qq[Ext app "$self->{ext_app}" not found] if !$Pcore::Ext::CFG->{app}->{ $self->ext_app };
 
@@ -55,7 +59,11 @@ around run => sub ( $orig, $self, $req ) {
                 $req->(404)->finish;
             }
             else {
-                $req->( 200, [ 'Content-Type' => 'application/javascript' ], $class->{js} )->finish;
+                if ( !exists $self->{cache}->{class}->{ $class->{class} } ) {
+                    $self->{cache}->{class}->{ $class->{class} } = $self->_prepare_js( $class->{js}->$* );
+                }
+
+                $req->( 200, [ 'Content-Type' => 'application/javascript' ], $self->{cache}->{class}->{ $class->{class} } )->finish;
             }
 
             return;
@@ -67,9 +75,16 @@ around run => sub ( $orig, $self, $req ) {
         return;
     }
 
+    # get locale from query string
+    my ($locale) = $req->{env}->{QUERY_STRING} =~ /\blocale=([[:alpha:]-]+)/sm;
+
+    # validate locale
+    my $locales = $ext_framework->get_locale;
+    $locale = defined $locale && exists $locales->{$locale} ? $locale : exists $locales->{ $self->ext_default_locale } ? $self->ext_default_locale : $DEFAULT_LOCALE;
+
     # return cached content
-    if ( $self->{cache} ) {
-        $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{cache} )->finish;
+    if ( $self->{cache}->{app}->{$locale} ) {
+        $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{cache}->{app}->{$locale} )->finish;
 
         return;
     }
@@ -85,91 +100,169 @@ around run => sub ( $orig, $self, $req ) {
     if ( $req->{env}->{QUERY_STRING} =~ /\btheme=([[:lower:]-]+)/sm ) {
         my $theme = $1;
 
-        $ext_resources = Pcore::Share::WWW::CDN->ext( $EXT_VER, $EXT_FRAMEWORK, $theme, $self->{app}->{devel} );
+        $ext_resources = $ext_framework->ext( $EXT_FRAMEWORK, $theme, $self->{app}->{devel} );
     }
 
     # fallback to the default theme
     if ( !$ext_resources ) {
         my $theme = $EXT_FRAMEWORK eq 'classic' ? $self->ext_default_theme_classic : $self->ext_default_theme_modern;
 
-        $ext_resources = Pcore::Share::WWW::CDN->ext( $EXT_VER, $EXT_FRAMEWORK, $theme, $self->{app}->{devel} );
+        $ext_resources = $ext_framework->ext( $EXT_FRAMEWORK, $theme, $self->{app}->{devel} );
     }
 
     push $resources->@*, $ext_resources->@*;
 
     # Ext locale
-    my $locale = $self->ext_default_locale;
-
-    push $resources->@*, Pcore::Share::WWW::CDN->ext_locale( $EXT_VER, $EXT_FRAMEWORK, $locale, $self->{app}->{devel} );
-
-    # Ext overrides
-    my $overrides;
-
-    my $class = eval {
-        my $over = $EXT_VER =~ s/[.]/_/smgr;
-
-        P->class->load("Pcore::Ext::Override::$over");
-    };
-
-    if ( !$@ ) {
-        $overrides = $class->overrides;
-
-        if ( !$self->{app}->{devel} ) {
-            require JavaScript::Packer;
-
-            my $js_packer = JavaScript::Packer->init;
-
-            $js_packer->minify( \$overrides, { compress => 'obfuscate' } );    # clean
-        }
-    }
-
-    my $loader_path = {
-        $Pcore::Ext::NS => '.',
-        Ext             => '/static/ext/src/',
-        'Ext.ux'        => '/static/ext/ux/',
-    };
+    push $resources->@*, $ext_framework->ext_locale( $EXT_FRAMEWORK, $locale, $self->{app}->{devel} );
 
     my $ext_app = $Pcore::Ext::CFG->{app}->{ $self->{ext_app} };
 
-    my $api_map = {
+    # load locale domains
+    my $locale_domains = [qw[Lcom]];
+    for my $domain ( keys $ext_app->{l10n_domain}->%* ) {
+        Pcore::Core::L10N::load_domain_locale( $domain, $locale );
+    }
 
-        # type            => 'remoting',
-        type    => 'websocket',
-        url     => $self->{app}->{router}->get_host_api_path( $req->{host} ),
-        actions => $ext_app->{api},
+    # prepare locale messages
+    my $locale_messages;
+    for my $domain ( keys $Pcore::Core::L10N::MESSAGES->%* ) {
+        $locale_messages->{$domain} = $Pcore::Core::L10N::MESSAGES->{$domain}->{$locale};
+    }
 
-        # not mandatory options
-        id              => 'api',
-        namespace       => 'API.' . ref( $self->{app} ) =~ s[::][]smgr,
-        timeout         => 0,                                             # milliseconds, 0 - no timeout
-        version         => undef,
-        maxRetries      => 0,                                             # number of times to re-attempt delivery on failure of a call
-        headers         => {},
-        enableBuffer    => 10,                                            # \1, \0, milliseconds
-        enableUrlEncode => undef,
-    };
+    my $ext_app_js = $self->_prepare_ext_app_js(
+        {   overrides => $ext_framework->get_overrides,
+            locale    => {
+                class_name      => $ext_app->{l10n_class_name},
+                messages        => to_json($locale_messages),
+                plural_form_exp => $Pcore::Core::L10N::LOCALE_PLURAL_FORM->{$locale}->{exp} // 'null',
+            },
+            api_map => to_json(
+                {   type    => 'websocket',                                                 # remoting
+                    url     => $self->{app}->{router}->get_host_api_path( $req->{host} ),
+                    actions => $ext_app->{api},
 
-    my $data = {
-        INDEX => {                                                        #
-            title => $self->ext_app_title
-        },
-        resources => $resources,
-        ext       => {
-            api_map        => to_json($api_map)->$*,
-            loader_path    => to_json( $loader_path, readable => $self->{app}->{devel} )->$*,
+                    # not mandatory options
+                    id              => 'api',
+                    namespace       => 'API.' . ref( $self->{app} ) =~ s[::][]smgr,
+                    timeout         => 0,                                                   # milliseconds, 0 - no timeout
+                    version         => undef,
+                    maxRetries      => 0,                                                   # number of times to re-attempt delivery on failure of a call
+                    headers         => {},
+                    enableBuffer    => 10,                                                  # \1, \0, milliseconds
+                    enableUrlEncode => undef,
+                }
+            ),
+            loader_paths => to_json(
+                {   $Pcore::Ext::NS => '.',
+                    Ext             => '/static/ext/src/',
+                    'Ext.ux'        => '/static/ext/ux/',
+                }
+            ),
             app_namespace  => $Pcore::Ext::NS,
             viewport_class => $ext_app->{viewport},
-            overrides      => $overrides,
-            static_classes => !$self->{app}->{devel} ? $ext_app->{js}->$* : undef,
-        },
-    };
+            static_classes => $ext_app->{js},
+        }
+    );
 
-    $self->{cache} = P->tmpl->render( 'ext/index.html', $data );
+    # generate HTML tmpl
+    $self->{cache}->{app}->{$locale} = P->tmpl->render(
+        'ext/index.html',
+        {   INDEX => {    #
+                title => $self->ext_app_title
+            },
+            resources  => $resources,
+            ext_app_js => $ext_app_js->$*,
+        }
+    );
 
-    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{cache} )->finish;
+    $req->( 200, [ 'Content-Type' => 'text/html; charset=UTF-8' ], $self->{cache}->{app}->{$locale} )->finish;
 
     return;
 };
+
+sub _prepare_ext_app_js ( $self, $data ) {
+    my $static_classes = $self->{app}->{devel} ? \q[] : $data->{static_classes};
+
+    my $ext_app_js = <<"JS";
+        $data->{overrides}->$*;
+
+        Ext.define('$data->{locale}->{class_name}', {
+            singleton: true,
+
+            messages: $data->{locale}->{messages}->$*,
+
+            l10n: function(msgid, domain) {
+                if (msgid in this.messages[domain] && typeof( this.messages[domain][msgid][0] ) != 'undefined' ) {
+                    return this.messages[domain][msgid][0];
+                }
+                else {
+                    return msgid;
+                }
+            },
+
+            l10np: function(msgid, msgid_plural, n, domain) {
+                var idx = $data->{locale}->{plural_form_exp};
+
+                if (msgid in this.messages[domain] && typeof( this.messages[domain][msgid][idx] ) != 'undefined' ) {
+                    return this.messages[domain][msgid][idx];
+                }
+                else {
+                    if ( n == 1 ) {
+                        return msgid;
+                    }
+                    else {
+                        return msgid_plural;
+                    }
+                }
+            }
+        });
+
+        Ext.Loader.setConfig({
+            enabled: true,
+            disableCaching: false,
+            paths: $data->{loader_paths}->$*
+        });
+
+        Ext.onReady(function() {
+            Ext.ariaWarn = Ext.emptyFn;
+
+            $static_classes->$*;
+
+            Ext.direct.Manager.addProvider($data->{api_map}->$*);
+
+            Ext.application({
+                extend: 'Ext.app.Application',
+                requires: ['$data->{viewport_class}'],
+                name: '$data->{app_namespace}',
+                appFolder: '.',
+                glyphFontFamily: 'FontAwesome',
+                mainView: '$data->{viewport_class}'
+            });
+        });
+JS
+
+    return $self->_prepare_js($ext_app_js);
+}
+
+sub _prepare_js ( $self, $js ) {
+    if ( $self->{app}->{devel} ) {
+        $js = JavaScript::Beautifier::js_beautify(
+            $js,
+            {   indent_size               => 4,
+                indent_character          => q[ ],
+                preserve_newlines         => 1,
+                space_after_anon_function => 1,
+            }
+        );
+    }
+    else {
+        my $js_packer = JavaScript::Packer->init;
+
+        $js_packer->minify( \$js, { compress => 'obfuscate' } );    # clean
+    }
+
+    return \$js;
+}
 
 1;
 __END__

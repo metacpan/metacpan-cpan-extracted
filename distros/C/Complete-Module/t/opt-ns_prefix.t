@@ -21,7 +21,7 @@ my $dir = tempdir(CLEANUP => 0);
 
     mkdir("Foo");
     mkdir("Foo/Bar");
-    write_file("Foo/Bar/Baz.pm", "");
+    write_text("Foo/Bar/Baz.pm", "");
 }
 
 {

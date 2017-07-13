@@ -1,0 +1,156 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Basename;
+use PDF::Builder;
+use PDF::Builder::Util;
+use PDF::Builder::Win32;
+use Unicode::UCD 'charinfo';
+use Encode qw[:all];
+use Getopt::Long;
+use Data::Dumper;
+use utf8;
+
+#my $compress = 'none'; # uncompressed streams
+my $compress = 'flate'; # compressed streams
+
+my %wxf = PDF::Builder::Win32->enumwinfonts();
+# Dumper(%wxf);  appears to return nothing
+
+foreach my $k (sort keys %wxf) {
+    print "font '$wxf{$k}' has key '$k'\n";
+
+    my $api = PDF::Builder->new(-compress => $compress);
+    
+    $api->mediabox(595,842);
+    
+    my $helv = $api->corefont('Helvetica-Bold', -encode=>'latin1');
+    
+    my $sx = 33;
+    my $sy = 45;
+    my $fx = 20;
+
+    my $xf = $api->winfont($k, -encode=>'latin1');
+
+    my $page = $api->page();
+    $page->mediabox(595,842);
+
+    my $gfx = $page->gfx();
+    my $text = $page->text();
+
+#   $gfx->textlabel(50,800, $helv,20, $wxf{$k}, -hscale=>90);
+    $gfx->textlabel(50,800, $helv,20, $wxf{$k});
+    
+    # row number yp
+    foreach my $yp (0..15) {
+	my $y = 15 - $yp; # row location top to bottom
+	# column number x left to right
+        foreach my $x (0..15) {
+            my $c = $yp*16 + $x;
+            $text->textlabel(50+($sx*$x),50+($sy*$y), $xf,$fx, pack('C',$c));
+            $text->textlabel(50+($sx*$x),50+($sy*$y)-6, $helv,6, nameByUni($c), -color=>'#a00000', -hscale=>80, -rotate=>-15);
+        }
+    }
+
+    if ($xf->can('uniByCId') and $xf->can('glyphNum')) {
+        my @cids = (0 .. $xf->glyphNum()-1);
+        my @fbbx = $xf->fontbbox();
+        my $xw = int(($fbbx[2] - $fbbx[0])/20)*20;
+        my $yw = int(($fbbx[3] - $fbbx[1])/20)*20;
+        my $fw = $xw>$yw? $yw: $xw;
+        my $mw = 800/$fw;
+        my $y0 = int((20 - $fbbx[1])/20)*20*$mw;
+    
+	# create pages until run out of cids
+        while (scalar @cids>0) {
+            $page = $api->page();
+            $page->mediabox(595,842);
+    
+            $gfx = $page->gfx();
+            $text = $page->text();
+	    my $scale = 0.045;
+    
+	    # row positions (y value)
+            foreach my $y (750,700,650,600,550,500,450,400,350,300,250,200,150,100,50) {
+		# column positions (x value)
+                foreach my $x (50,100,150,200,250,300,350,400,450,500) {
+                    my $xo = shift(@cids);
+                    $gfx->save();
+                    $gfx->fillcolor('black');
+                    $gfx->transform(-translate => [$x, $y], -scale => [0.045, 0.045]);
+    
+                    $gfx->linewidth(10);
+                    $gfx->rect(0,0, 1000,1000);
+                    $gfx->stroke();
+    
+                    my $wx = $xf->wxByCId($xo)*$mw;
+                    my $x0 = (1000-$wx)/2;
+    
+                    $gfx->linedash(10,20);
+                    $gfx->linewidth(0.5);
+                    $gfx->move($x0,0);
+                    $gfx->line($x0,1000);
+                    $gfx->move($x0+$wx,1000);
+                    $gfx->line($x0+$wx,0);
+                    $gfx->move(0,$y0);
+                    $gfx->line(1000,$y0);
+                    $gfx->stroke();
+    
+                    $text->font($xf, 1000*$mw*$scale);
+                    $text->translate($x+$x0*$scale,$y+$y0*$scale);
+                    $text->add($xf->text_cid(pack('n',$xo)), 'Tj');
+    
+                    $text->font($helv, 100*$scale);
+                    $text->hscale(80);
+                    $text->translate($x+25*$scale,$y+860*$scale);
+                    $text->text("G+$xo"); 
+                    $text->translate($x+25*$scale,$y+10*$scale);
+                    $text->text(sprintf('U+0x%04X', $xf->uniByCId($xo)));
+    
+                    my $name = $xf->glyphByCId($xo);
+                    if ($name eq '') {
+                        $text->fillcolor('red');
+                        $name = "NONE";
+                    } else {
+                        $text->fillcolor('blue');
+                    }
+    
+                    $text->hscale(70);
+                    $text->translate($x+975*$scale,$y+860*$scale);
+                    $text->text_right($name);
+    
+                    $text->fillcolor('black');
+                    $text->translate($x+975*$scale,$y+10*$scale);
+                    $text->text_right('wx='.$xf->wxByCId($xo));
+    
+                    $text->fillcolor('#008000');
+                    $text->translate($x+500*$scale,$y+950*$scale);
+                    $text->hscale(70);
+                    my $ci = charinfo($xf->uniByCId($xo) || 0);
+                    $text->font($helv,50*$scale);
+                    $text->text_center($ci->{'name'});
+    
+                    # restore
+		    $text->fillcolor('black');
+		    $text->hscale(100);
+
+                    $gfx->restore();
+    
+                    last unless scalar @cids>0;
+                } # next column in row (x pos)
+                last unless scalar @cids>0;
+            } # next row (y pos)
+            print STDERR ".";
+            ## $api->finishobjects($page,$gfx);
+        } # loop through cids
+    } # both uniByCId and glyphNum OK
+
+    $api->saveas("$0.$k.pdf");
+    $api->end();
+} # loop through keys of %wxf
+
+#print Dumper($PDF::Builder::wf);
+
+__END__

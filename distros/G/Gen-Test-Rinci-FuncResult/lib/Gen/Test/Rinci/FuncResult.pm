@@ -1,7 +1,7 @@
 package Gen::Test::Rinci::FuncResult;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.05'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.06'; # VERSION
 
 use 5.010001;
 use strict;
@@ -209,7 +209,7 @@ Gen::Test::Rinci::FuncResult - Generate a test function for a function
 
 =head1 VERSION
 
-This document describes version 0.05 of Gen::Test::Rinci::FuncResult (from Perl distribution Gen-Test-Rinci-FuncResult), released on 2015-09-03.
+This document describes version 0.06 of Gen::Test::Rinci::FuncResult (from Perl distribution Gen-Test-Rinci-FuncResult), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -235,7 +235,11 @@ This document describes version 0.05 of Gen::Test::Rinci::FuncResult (from Perl 
 =head1 FUNCTIONS
 
 
-=head2 gen_test_func(%args) -> [status, msg, result, meta]
+=head2 gen_test_func
+
+Usage:
+
+ gen_test_func(%args) -> [status, msg, result, meta]
 
 Generate a test function for a function.
 
@@ -292,6 +296,8 @@ Todo:
 
 =back
 
+This function is not exported by default, but exportable.
+
 Arguments ('*' denotes required arguments):
 
 =over 4
@@ -333,10 +339,6 @@ Return value:  (any)
 
 =head1 FAQ
 
-=head1 SEE ALSO
-
-L<Rinci>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Gen-Test-Rinci-FuncResult>.
@@ -353,13 +355,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Rinci>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

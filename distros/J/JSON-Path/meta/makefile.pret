@@ -1,0 +1,8 @@
+# This file provides instructions for packaging.
+
+`JSON-Path`
+	deps:runtime-requirement  [ deps:on "JSON::MaybeXS 1.003005"^^deps:CpanId ];
+	deps:runtime-requirement  [ deps:on "Exporter::Tiny"^^deps:CpanId ];
+	deps:runtime-requirement  [ deps:on "LV"^^deps:CpanId ];
+	deps:test-requirement     [ deps:on "Test::More 0.61"^^deps:CpanId ];
+	.

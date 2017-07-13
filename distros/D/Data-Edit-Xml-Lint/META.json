@@ -1,0 +1,44 @@
+{
+   "abstract" : "Lint an xml file using xmllint",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Edit-Xml-Lint",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Table::Text" : "0",
+            "POSIX" : "0",
+            "XML::Parser" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Edit::Xml::Lint" : {
+         "file" : "lib/Data/Edit/Xml/Lint.pm",
+         "version" : "2017.714"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2017.714"
+}

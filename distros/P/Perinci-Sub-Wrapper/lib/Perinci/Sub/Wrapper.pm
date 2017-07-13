@@ -1,13 +1,13 @@
 package Perinci::Sub::Wrapper;
 
-our $DATE = '2016-06-02'; # DATE
-our $VERSION = '0.83'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.84'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Data::Dmp qw(dmp);
 use Function::Fallback::CoreOrPP qw(clone);
@@ -1233,7 +1233,7 @@ sub wrap {
                 'unless (ref($_w_res) eq "ARRAY" && $_w_res->[0]) {',
             );
             $self->indent;
-            if ($log->is_trace) {
+            if (log_is_trace) {
                 $self->_add_module('Data::Dumper');
                 $self->push_lines(
                     'local $Data::Dumper::Purity   = 1;',
@@ -1292,9 +1292,9 @@ sub wrap {
         $result->{source} = $self->_format_embed_wrapper_code;
     } else {
         my $source = $self->_format_dyn_wrapper_code;
-        if ($Log_Wrapper_Code && $log->is_trace) {
+        if ($Log_Wrapper_Code && log_is_trace()) {
             require String::LineNumber;
-            $log->tracef("wrapper code:\n%s",
+            log_trace("wrapper code:\n%s",
                          $ENV{LINENUM} // 1 ?
                              String::LineNumber::linenum($source) :
                                    $source);
@@ -1474,7 +1474,7 @@ Perinci::Sub::Wrapper - A multi-purpose subroutine wrapping framework
 
 =head1 VERSION
 
-This document describes version 0.83 of Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2016-06-02.
+This document describes version 0.84 of Perinci::Sub::Wrapper (from Perl distribution Perinci-Sub-Wrapper), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -1582,7 +1582,7 @@ only the first part of the name will be used (i.e., C<handle_NAME1()>).
 =head2 $Log_Wrapper_Code (BOOL)
 
 Whether to log wrapper result. Default is from environment variable
-LOG_PERINCI_WRAPPER_CODE, or false. Logging is done with L<Log::Any> at trace
+LOG_PERINCI_WRAPPER_CODE, or false. Logging is done with L<Log::ger> at trace
 level.
 
 =head1 RINCI FUNCTION METADATA
@@ -1627,7 +1627,11 @@ mil/sec.
 =head1 FUNCTIONS
 
 
-=head2 wrap_sub(%args) -> [status, msg, result, meta]
+=head2 wrap_sub
+
+Usage:
+
+ wrap_sub(%args) -> [status, msg, result, meta]
 
 Wrap subroutine to do various things, like enforcing Rinci properties.
 
@@ -1797,11 +1801,11 @@ properties like less stack trace depth and less function call overhead.
 
 If environment variable L<LOG_PERINCI_WRAPPER_CODE> or package variable
 $Log_Perinci_Wrapper_Code is set to true, generated wrapper source code is
-logged at trace level using L<Log::Any>. It can be displayed, for example, using
-L<Log::Any::App>:
+logged at trace level using L<Log::ger>. It can be displayed, for example:
 
- % LOG=1 LOG_PERINCI_WRAPPER_CODE=1 TRACE=1 \
-   perl -MLog::Any::App -MPerinci::Sub::Wrapper=wrap_sub \
+ % LOG_PERINCI_WRAPPER_CODE=1 TRACE=1 \
+   perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
+   -MPerinci::Sub::Wrapper=wrap_sub \
    -e 'wrap_sub(sub=>sub{}, meta=>{v=>1.1, args=>{a=>{schema=>"int"}}});'
 
 Note that L<Data::Sah> (the module used to generate validator code) observes
@@ -1848,7 +1852,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Perinci-Sub-Wrapper>.
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Wrapper>.
 
 =head1 BUGS
 
@@ -1874,7 +1878,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

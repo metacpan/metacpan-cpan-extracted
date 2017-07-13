@@ -1,5 +1,11 @@
-SYNOPSIS
+NAME
+    Data::Format::Pretty::HTML - Pretty-print data structure for HTML output
 
+VERSION
+    This document describes version 0.11 of Data::Format::Pretty::HTML (from
+    Perl distribution Data-Format-Pretty-HTML), released on 2017-07-10.
+
+SYNOPSIS
     In your program:
 
      use Data::Format::Pretty::HTML qw(format_pretty);
@@ -38,8 +44,8 @@ SYNOPSIS
        <tr><td>qux</td><td>html</td></tr>
      </table>
 
-    2-dimensional array, format_pretty([ [1, 2, ""], [28, "bar", 3],
-    ["foo", 3, undef] ]):
+    2-dimensional array, format_pretty([ [1, 2, ""], [28, "bar", 3], ["foo",
+    3, undef] ]):
 
      <table>
        <tr><th>column0</th><th>column1</th><th>column2</th></tr>
@@ -64,12 +70,12 @@ SYNOPSIS
     {name=>"arif", domains=>["baz.com"], quota=>"2000"}], verified => 0}):
 
      <table>
-    
+
        <tr>
          <td>summary</td>
          <td>Blah...</td>
        </tr>
-    
+
        <tr>
          <td>users</td>
          <td>
@@ -79,12 +85,12 @@ SYNOPSIS
              <tr><td>baz.com</td><td>arif</td><td class="number">2000</td></tr>
          </td>
        </tr>
-    
+
        <tr>
          <td>verified</td>
          <td class="number">0</td>
        </tr>
-    
+
      </table>
 
     Structures which can't be handled yet will simply be output as YAML,
@@ -95,7 +101,6 @@ SYNOPSIS
      </pre>
 
 DESCRIPTION
-
     This module has the same spirit as Data::Format::Pretty::Console (and
     currently implemented as its subclass). The idea is to throw it some
     data structure and let it figure out how to best display the data in a
@@ -103,24 +108,47 @@ DESCRIPTION
 
     Differences with Data::Format::Pretty::Console:
 
-      * hot (hash of table) structure is rendered as table of inner tables
+    *   hot (hash of table) structure is rendered as table of inner tables
 
 FUNCTIONS
-
- format_pretty($data, \%opts)
-
+  format_pretty($data, \%opts)
     Return formatted data structure as HTML. Options:
 
-      * table_column_orders => [[colname, colname], ...]
+    *   table_column_orders => [[colname, colname], ...]
 
-      See Data::Format::Pretty::Console for more details.
+        See Data::Format::Pretty::Console for more details.
 
-      * linkify_urls_in_text => BOOL
+    *   linkify_urls_in_text => BOOL
 
-      Whether to convert 'http://foo' in text into '<a
-      href="http://foo">http://foo</a>'. Default is true.
+        Whether to convert 'http://foo' in text into '<a
+        href="http://foo">http://foo</a>'. Default is true.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Format-Pretty-HTML>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Format-Pretty-HTML>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-HT
+    ML>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Data::Format::Pretty
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -6,7 +6,7 @@ use base qw( Alien::Base );
 use Env qw( @PATH );
 
 # ABSTRACT: Find or build patch
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 
 my $in_path;
@@ -58,14 +58,14 @@ Alien::patch - Find or build patch
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
  use Alien::patch ();
  use Env qw( @PATH );
  
- unshift @ENV, Alien::patch->bin_dir;
+ unshift @PATH, Alien::patch->bin_dir;
  my $patch = Alien::patch->exe;
  system "$patch -p1 < foo.patch";
 
@@ -136,7 +136,11 @@ removed, but not before 31 January 2018.
 
 =head1 AUTHOR
 
-Graham Ollis <plicease@cpan.org>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Zakariyya Mughal
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::PPI 6.009;
+package Dist::Zilla::Role::PPI 6.010;
 # ABSTRACT: a role for plugins which use PPI
 
 use Moose::Role;
@@ -68,7 +68,7 @@ sub save_ppi_document_to_file {
 
 #pod =method document_assigns_to_variable
 #pod
-#pod   if( $self->ppi_document_for_file($document, '$FOO')) { ... }
+#pod   if( $self->document_assigns_to_variable($document, '$FOO')) { ... }
 #pod
 #pod This method returns true if the document assigns to the given variable (the
 #pod sigil must be included).
@@ -127,7 +127,7 @@ Dist::Zilla::Role::PPI - a role for plugins which use PPI
 
 =head1 VERSION
 
-version 6.009
+version 6.010
 
 =head1 DESCRIPTION
 
@@ -157,7 +157,7 @@ It also updates the internal PPI document cache with the new document.
 
 =head2 document_assigns_to_variable
 
-  if( $self->ppi_document_for_file($document, '$FOO')) { ... }
+  if( $self->document_assigns_to_variable($document, '$FOO')) { ... }
 
 This method returns true if the document assigns to the given variable (the
 sigil must be included).

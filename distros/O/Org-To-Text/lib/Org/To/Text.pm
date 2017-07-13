@@ -1,10 +1,10 @@
 package Org::To::Text;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.04'; # VERSION
 
 use 5.010001;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 our %SPEC;
 $SPEC{org_to_text} = {
@@ -30,7 +30,7 @@ Org::To::Text - Export Org document to text
 
 =head1 VERSION
 
-This document describes version 0.03 of Org::To::Text (from Perl distribution Org-To-Text), released on 2015-09-03.
+This document describes version 0.04 of Org::To::Text (from Perl distribution Org-To-Text), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -44,9 +44,15 @@ NOT YET IMPLEMENTED.
 =head1 FUNCTIONS
 
 
-=head2 org_to_text() -> [status, msg, result, meta]
+=head2 org_to_text
+
+Usage:
+
+ org_to_text() -> [status, msg, result, meta]
 
 Export Org document to text.
+
+This function is not exported.
 
 No arguments.
 
@@ -60,14 +66,6 @@ element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
-
-=head1 SEE ALSO
-
-For more information about Org document format, visit http://orgmode.org/
-
-L<Org::Parser>
-
-L<Org::To::HTML>
 
 =head1 HOMEPAGE
 
@@ -85,13 +83,21 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+For more information about Org document format, visit http://orgmode.org/
+
+L<Org::Parser>
+
+L<Org::To::HTML>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

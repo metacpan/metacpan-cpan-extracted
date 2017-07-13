@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::HE::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.005';
+our $VERSION = '3.006';
 
 use utf8;
 use open ':utf8';
@@ -1054,7 +1054,7 @@ Lingua::Interset::Tagset::HE::Conll - Driver for the Hebrew tagset.
 
 =head1 VERSION
 
-version 3.005
+version 3.006
 
 =head1 SYNOPSIS
 

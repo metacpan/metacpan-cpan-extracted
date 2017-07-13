@@ -88,6 +88,11 @@ sub handle_request {
         $template = "$app_path/$template";
     }
 
+    #
+    # assume the path is split into key/val pairs.
+    # this is presumptuous, but some things might use it
+    # maybe shouldn't include this?
+    #
     my( $path_args );
     my $path = [ @path ];
     while( @path ) {
@@ -103,12 +108,12 @@ sub handle_request {
         path_args => $path_args,
         app       => $app,
         login     => $login,
-        op        => $self,
+        op        => $self,       #this operator
         req       => $req,
         session   => $session,
         path      => $path,
         template  => $template,
-	uri       => $ruri,
+        uri       => $ruri,
     } );
 
     my $res;
@@ -169,7 +174,7 @@ sub make_page {
         return REDIRECT;
     }
     $req->content_type('text/html');
-    my $template = $state_manager->{template};
+    my $template = $state_manager->template;
 
     my $html = $self->{tx}->render( $self->tmpl( $template ), {%$state_manager} );
 
@@ -184,6 +189,13 @@ sub new {
     my( $pkg, $args ) = @_;
     my $self = {%$args};
     bless $self, $pkg;
+}
+
+#
+# Can be overridden. Template to render this request.
+#
+sub template {
+    shift->{template};
 }
 
 sub logout {
@@ -203,6 +215,9 @@ sub logout {
     $token_cookie->bake( $req );
 }
 
+#
+# Render a template with the given path (list)
+#
 sub tmpl {
     my( $self, @path ) = @_;
     $self->{op}->tmpl( $self->{app_info}{template_path}, @path);

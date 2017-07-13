@@ -5,12 +5,13 @@ author:
 build_requires:
   Dancer::FileUtils: '0'
   Dancer::Test: '0'
-  Module::Build: '0.28'
-  Test::More: '0.88'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build: '0.28'
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,21 +23,24 @@ no_index:
 provides:
   Dancer::Template::Mustache:
     file: lib/Dancer/Template/Mustache.pm
-    version: v0.3.0
+    version: v1.0.1
 requires:
   Dancer: '0'
   FindBin: '0'
   Moo: '0'
-  Template::Mustache: '0'
+  Path::Tiny: '0'
+  Template::Mustache: v1.0.2
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/yanick/Dancer-Template-Mustache/issues
-  homepage: http://search.cpan.org/dist/Dancer-Template-Mustache/
+  homepage: https://github.com/yanick/Dancer-Template-Mustache
   repository: https://github.com/yanick/Dancer-Template-Mustache.git
-version: 0.3.0
+version: 1.0.1
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
 x_contributors:
+  - 'Yanick Champoux <champoux@pythian.com>'
   - 'Yanick Champoux <yanick@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

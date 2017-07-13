@@ -241,3 +241,19 @@ Revision history for Debug-Easy
 1.18    March 10, 2017
 
         Some minor documentation and threads check changes.
+
+1.18.1  March 10, 2017
+
+        Added GitHub info to the documentation.
+
+1.18.2  June 3, 2017
+
+        Fixed the tests.
+
+1.18.3  June 14, 2017
+
+        Apparently the tests were still flakey.  This should fix.
+
+1.19    July 12, 2017
+
+        Dumper sorting and purity is enabled by default

@@ -2,7 +2,7 @@
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '2.0.1';
+$Git::Hooks::CheckCommit::VERSION = '2.1.0';
 use 5.010;
 use utf8;
 use strict;
@@ -77,7 +77,7 @@ sub merge_errors {
     if ($commit->parent() > 1) { # it's a merge commit
         if (my @mergers = $git->get_config($CFG => 'merger')) {
             if (none {$git->match_user($_)} @mergers) {
-                $git->error($PKG, "commit @{[$commit->commit]} is a merge but you (@{[$git->authenticated_user]}) are not allowed to do merges");
+                $git->error($PKG, "commit @{[$commit->commit]} is a merge but you (@{[$git->authenticated_user]}) are not allowed to perform merges");
                 return 1;
             }
         }
@@ -209,10 +209,10 @@ sub code_errors {
 
     my $errors = 0;
 
-    state $codes;
+    my $cache = $git->cache($PKG);
 
-    unless (ref $codes) {
-        $codes = [];
+    unless (exists $cache->{codes}) {
+        $cache->{codes} = [];
       CODE:
         foreach my $check ($git->get_config($CFG => 'check-code')) {
             my $code;
@@ -238,7 +238,7 @@ sub code_errors {
                 }
             }
             if (defined $code && ref $code && ref $code eq 'CODE') {
-                push @$codes, $code;
+                push @{$cache->{codes}}, $code;
             } else {
                 $git->error($PKG, "option check-code must end with a code ref");
                 ++$errors;
@@ -246,7 +246,7 @@ sub code_errors {
         }
     }
 
-    foreach my $code (@$codes) {
+    foreach my $code (@{$cache->{codes}}) {
         my $ok = eval { $code->($git, $commit, $ref) };
         if (defined $ok) {
             unless ($ok) {
@@ -389,7 +389,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 DESCRIPTION
 

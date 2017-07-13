@@ -18,9 +18,29 @@ Log::ger::Manual::FAQ - FAQ on Log::ger
 
 =head1 VERSION
 
-version 0.012
+version 0.015001
 
-=head1 OUTPUT
+=head1 GENERAL
+
+=head2 How to use OO style?
+
+The default in Log::ger is to use procedural style:
+
+ use Log::ger;
+
+ log_warn("blah");
+ if (log_is_debug()) {
+     log_debug("Format: %s %s", "blah ...", {data=>'structure'});
+ }
+
+However, you can also use objects:
+
+ use Log::ger (); # don't initialize and export logger subroutines
+ my $log = Log::ger->get_logger;
+ $log->warn("blah");
+ if ($log->is_debug) {
+     $log->debug("Format: %s %s", "blah ...", {data=>'structure'});
+ }
 
 =head2 How to create multiple loggers?
 
@@ -40,6 +60,8 @@ in Log::ger:
 
  log_debug("Headers is: %s", $http_res->{headers});
  $log_dump->debug($http_res->{content});
+
+=head1 OUTPUT
 
 =head2 How to send logs to several outputs?
 
@@ -115,6 +137,51 @@ routines but C<Log::ger::Util::numeric_level> will recognize them.
 
 =head1 FORMAT & LAYOUT
 
+=head2 How to do sprintf-style formatting?
+
+By default, the Log::ger formatter already does sprintf-style formatting:
+
+ log_warn("Format %s %s", "blah ...", {data=>'structure'});
+
+If there is only one argument, no formatting is done.
+
+ log_warn("blah ...");
+
+=head2 Why doesn't Log::ger log multiple arguments?
+
+Logging multiple arguments is not supported by the default formatter because by
+default Log::ger adopts sprintf style:
+
+ log_warn("blah ...", "more blah ...");
+
+Either join the arguments first, use sprintf style, or use some of the other
+formatters that support this, e.g. L<Log::ger::Like::LogAny>.
+
+=head2 How to use deferred calculation of arguments?
+
+Use a formatter like L<Log::ger::Format::Block>, or
+L<Log::ger::Format::Flogger>, or develop your own formatter to do what you want.
+
+You can also do this:
+
+ if (log_is_trace()) {
+     log_trace("Format %s", $foo->something_that_is_expensive_to_calculate);
+ }
+
+=head2 How to dump data structures?
+
+The default formatter already dumps data structures:
+
+ log_warn("Format %s %s", "blah ...", {data=>'structure'});
+
+=head2 How to log raw data structure?
+
+You can use a formatter like L<Log::ger::Format::None> which will prevent your
+log message from being stringified. To output this to destination, combine this
+with a layout plugin like L<Log::ger::Layout::JSON> or
+L<Log::ger::Layout::LTSV>. Or perhaps write your own output module that accepts
+raw data structure instead of formatted string and send it somewhere.
+
 =head2 How to do custom formatting?
 
 For example, a la L<Log::Contextual>:
@@ -126,6 +193,14 @@ See L<Log::ger::Format::Block> for an example.
 =head2 How to add timestamps?
 
 Use a layouter, e.g. L<Log::ger::Layout::Pattern>.
+
+=head2 How to use microsecond in timestamps?
+
+TODO
+
+=head2 How to redact sensitive information?
+
+TODO
 
 =head1 TARGETS
 

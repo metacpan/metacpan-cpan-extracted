@@ -48,8 +48,7 @@ enum {
   SPVM_OP_C_CODE_GRAMMAR,
   SPVM_OP_C_CODE_NAME,
   SPVM_OP_C_CODE_PACKAGE,
-  SPVM_OP_C_CODE_MY_VAR,
-  SPVM_OP_C_CODE_MY_VAR_ASSIGN,
+  SPVM_OP_C_CODE_MY,
   SPVM_OP_C_CODE_FIELD,
   SPVM_OP_C_CODE_SUB,
   SPVM_OP_C_CODE_ENUM,
@@ -119,8 +118,8 @@ extern const char* const SPVM_OP_C_CODE_NAMES[];
 
 enum {
   // Block flag
-  SPVM_OP_C_FLAG_BLOCK_IF = 1,
-  SPVM_OP_C_FLAG_BLOCK_ELSE = 2,
+  SPVM_OP_C_FLAG_BLOCK_IF_TURE = 1,
+  SPVM_OP_C_FLAG_BLOCK_IF_FALSE = 2,
   SPVM_OP_C_FLAG_BLOCK_LOOP = 4,
   SPVM_OP_C_FLAG_BLOCK_SWITCH = 8,
   SPVM_OP_C_FLAG_BLOCK_HAS_ELSE = 16,
@@ -207,7 +206,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
 SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op_subname, SPVM_OP* op_subargs, SPVM_OP* op_descriptors, SPVM_OP* type, SPVM_OP* op_block);
 SPVM_OP* SPVM_OP_build_CONSTVALUE(SPVM_COMPILER* compiler, SPVM_OP* op_const);
 SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_field_base_name, SPVM_OP* type);
-SPVM_OP* SPVM_OP_build_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type, SPVM_OP* op_term);
+SPVM_OP* SPVM_OP_build_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages);
 SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package);
 SPVM_OP* SPVM_OP_build_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, SPVM_OP* op_subname, SPVM_OP* op_terms);
@@ -215,6 +214,8 @@ SPVM_OP* SPVM_OP_build_convert_type(SPVM_COMPILER* compiler, SPVM_OP* op_type, S
 SPVM_OP* SPVM_OP_build_enumeration(SPVM_COMPILER* compiler, SPVM_OP* op_enumeration, SPVM_OP* op_enumeration_block);
 SPVM_OP* SPVM_OP_build_unop(SPVM_COMPILER* compiler, SPVM_OP* op_unary, SPVM_OP* op_first);
 SPVM_OP* SPVM_OP_build_array_elem(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_term);
+SPVM_OP* SPVM_OP_build_assignop(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_OP* op_first, SPVM_OP* op_last);
+SPVM_OP* SPVM_OP_build_constant(SPVM_COMPILER* compiler, SPVM_OP* op_constant);
 
 void SPVM_OP_resolve_op_convert_type(SPVM_COMPILER* compiler, SPVM_OP* op_convert_type);
 

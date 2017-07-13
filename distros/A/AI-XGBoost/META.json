@@ -36,6 +36,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Exception::Class" : "0",
             "Exporter::Easy" : "0",
             "FFI::Platypus" : "0",
@@ -67,7 +68,7 @@
          "web" : "https://github.com/pablrod/p5-AI-XGBoost"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

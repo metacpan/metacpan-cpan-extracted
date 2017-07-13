@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -50,13 +50,13 @@
             "Dist::Zilla" : "6.00",
             "Dist::Zilla::App::Command::aliendeps" : "0.01",
             "Dist::Zilla::Plugin::Alien" : "0.023",
-            "Dist::Zilla::Plugin::Author::Plicease" : "2.16",
+            "Dist::Zilla::Plugin::Author::Plicease" : "2.20",
             "Dist::Zilla::Plugin::AutoMetaResources" : "1.20",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.150250",
             "Dist::Zilla::Plugin::InsertExample" : "0.04",
             "Dist::Zilla::Plugin::InstallGuide" : "1.200006",
             "Dist::Zilla::Plugin::MinimumPerl" : "1.006",
-            "Dist::Zilla::Plugin::OurPkgVersion" : "0.06",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0.12",
             "Dist::Zilla::Plugin::PodWeaver" : "4.006",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.150250",
             "Dist::Zilla::Plugin::Run::BeforeBuild" : "0.035",
@@ -102,7 +102,7 @@
          "web" : "https://github.com/plicease/Dist-Zilla-PluginBundle-Author-Plicease"
       }
    },
-   "version" : "2.16",
+   "version" : "2.20",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

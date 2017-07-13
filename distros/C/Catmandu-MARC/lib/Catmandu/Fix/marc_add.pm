@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Inlineable';
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 has marc_path   => (fix_arg => 1);
 has subfields   => (fix_arg => 'collect');
@@ -29,7 +29,10 @@ Catmandu::Fix::marc_add - add new fields to marc
     # Set literal values
     marc_add('900', a, 'test' , 'b', test)
     marc_add('900', ind1 , ' ' , a, 'test' , 'b', test)
-    marc_add('900', ind1 , ' ' , a, 'test' , 'b', test , record:record2)
+    marc_add('900', ind1 , ' ' , a, 'test' , 'b', test)
+
+    # Set control fields
+    marc_add('009','_','23123131')
 
     # Copy data from an other field (when the field value is an array, the
     # subfield will be repeated)
@@ -61,7 +64,10 @@ This Fix can be used inline in a Perl script:
 
 =head1 SEE ALSO
 
-L<Catmandu::Fix>
+L<Catmandu::Fix::marc_set>,
+L<Catmandu::Fix::marc_copy>,
+L<Catmandu::Fix::marc_cut>,
+L<Catmandu::Fix::marc_paste>
 
 =cut
 

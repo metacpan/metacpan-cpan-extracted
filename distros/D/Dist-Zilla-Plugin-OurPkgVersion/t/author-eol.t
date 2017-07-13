@@ -22,6 +22,7 @@ my @files = (
     't/01-basic.t',
     't/02-vstring.t',
     't/03-trial.t',
+    't/04-underscore.t',
     't/author-critic.t',
     't/author-eol.t',
     't/author-mojibake.t',

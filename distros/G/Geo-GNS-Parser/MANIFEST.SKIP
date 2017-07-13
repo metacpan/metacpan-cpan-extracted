@@ -1,0 +1,9 @@
+^.*\.tmpl$
+^MANIFEST\.bak$
+^examples/.*-out\.txt$
+^(?:blib|xt|\.git)/.*$
+^MYMETA\..*$
+^pm_to_blib$
+^.*\.~\d+~$
+^(?:build|make-pod)\.pl$
+^Makefile$

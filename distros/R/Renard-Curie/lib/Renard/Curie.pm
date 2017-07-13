@@ -1,7 +1,7 @@
-use Renard::Curie::Setup;
+use Renard::Incunabula::Common::Setup;
 package Renard::Curie;
 # ABSTRACT: A document reader written with GTK+.
-$Renard::Curie::VERSION = '0.002';
+$Renard::Curie::VERSION = '0.003';
 1;
 
 __END__
@@ -16,7 +16,11 @@ Renard::Curie - A document reader written with GTK+.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
+
+=head1 SEE ALSO
+
+L<Repository information|http://project-renard.github.io/doc/development/repo/curie/>
 
 =head1 AUTHOR
 

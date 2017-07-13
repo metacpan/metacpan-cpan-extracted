@@ -1,3 +1,4 @@
+
 =head1 PURPOSE
 
 Test C<jpath> and C<jpath1> exported functions.
@@ -61,14 +62,11 @@ JSON
 
 my $path1 = '$.store.book[*].title';
 
-is_deeply(
-	[ jpath1($object, $path1) ],
-	[ 'Sayings of the Century' ],
-);
+is_deeply( [ jpath1( $object, $path1 ) ], ['Sayings of the Century'], );
 
 is_deeply(
-	[ jpath($object, $path1) ],
-	[ 'Sayings of the Century', 'Sword of Honour', 'Moby Dick', 'The Lord of the Rings' ],
+    [ jpath( $object, $path1 ) ],
+    [ 'Sayings of the Century', 'Sword of Honour', 'Moby Dick', 'The Lord of the Rings' ],
 );
 
 done_testing();

@@ -1,6 +1,6 @@
 package Bencher::ScenarioR::LogGer::LayoutStartup;
 
-our $VERSION = 0.009; # VERSION
+our $VERSION = "0.010"; # VERSION
 
 our $results = [
   [
@@ -8,44 +8,44 @@ our $results = [
     "OK",
     [
       {
-        errors => 5.1e-05,
+        errors => 5.3e-05,
         participant => "load-JSON",
-        rate => 65,
+        rate => 60,
         samples => 20,
-        time => 15,
+        time => 17,
         vs_slowest => 1,
       },
       {
-        errors => 7.4e-06,
+        errors => 4e-05,
         participant => "load-YAML",
-        rate => 65,
+        rate => 61,
+        samples => 20,
+        time => 16,
+        vs_slowest => 1,
+      },
+      {
+        errors => 0.0001,
+        participant => "load-LTSV",
+        rate => 62,
+        samples => 20,
+        time => 16,
+        vs_slowest => 1,
+      },
+      {
+        errors => 8.9e-06,
+        participant => "load-Pattern",
+        rate => 64.9,
         samples => 20,
         time => 15.4,
-        vs_slowest => 1.01,
+        vs_slowest => 1.08,
       },
       {
-        errors => 2.1e-05,
-        participant => "load-LTSV",
-        rate => 67,
-        samples => 20,
-        time => 15,
-        vs_slowest => 1,
-      },
-      {
-        errors => 6.5e-06,
-        participant => "load-Pattern",
-        rate => 68.5,
-        samples => 20,
-        time => 14.6,
-        vs_slowest => 1.06,
-      },
-      {
-        errors => 4.1e-06,
+        errors => 2.4e-05,
         participant => "baseline",
-        rate => 209,
-        samples => 22,
-        time => 4.78,
-        vs_slowest => 3.24,
+        rate => 160,
+        samples => 20,
+        time => 6.3,
+        vs_slowest => 2.6,
       },
     ],
     {
@@ -168,7 +168,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 0,
-                                              speed                        => 2299.992,
+                                              speed                        => 2114.492,
                                               stepping                     => 4,
                                             },
                                             {
@@ -283,7 +283,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 1,
-                                              speed                        => 2300.046,
+                                              speed                        => 2114.328,
                                               stepping                     => 4,
                                             },
                                             {
@@ -398,7 +398,7 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 2,
-                                              speed                        => 2299.992,
+                                              speed                        => "2099.890",
                                               stepping                     => 4,
                                             },
                                             {
@@ -513,11 +513,11 @@ our $results = [
                                               number_of_cores              => 2,
                                               number_of_logical_processors => 4,
                                               processor_id                 => 3,
-                                              speed                        => 2277.679,
+                                              speed                        => 2169.945,
                                               stepping                     => 4,
                                             },
                                           ],
-      "func.elapsed_time"              => 1.75339603424072,
+      "func.elapsed_time"              => 1.86966395378113,
       "func.module_startup"            => undef,
       "func.module_versions"           => {
                                             "__PACKAGE__"                              => 1.039,
@@ -562,9 +562,9 @@ our $results = [
       "func.scenario_module_mtime"     => 1498961728,
       "func.scenario_module_sha1sum"   => "d7c9b98e30622206fbbf957960dbedb4df39dfb0",
       "func.scenario_module_sha256sum" => "51f457d0cc5b3373aca89a08fd42501b541acbe2ad3121a37756a35e8c3e2cdb",
-      "func.time_end"                  => 1498984204.23858,
+      "func.time_end"                  => 1499940740.41153,
       "func.time_factor"               => 1000,
-      "func.time_start"                => 1498984202.48518,
+      "func.time_start"                => 1499940738.54186,
       "table.field_aligns"             => ["left", "left", "number", "number", "number", "number", "number"],
       "table.field_units"              => [undef, undef, "/s", "ms"],
       "table.fields"                   => [

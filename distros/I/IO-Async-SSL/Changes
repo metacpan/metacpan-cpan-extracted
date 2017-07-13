@@ -1,5 +1,12 @@
 Revision history for IO-Async-SSL
 
+0.20    2017/07/11 12:49:13
+        [BUGFIXES]
+         * Minor fixes to openssl-running unit tests
+         * Provide a dhparam.pem override file for testing with socat, as some
+           versions object to the default one (thanks ilmari)
+         * Rebuild SSL certs to 2048 bits
+
 0.19    2015/10/15 16:44:06
         [BUGFIXES]
          * Catch ->start_SSL throwing errors, rather than expecting it to

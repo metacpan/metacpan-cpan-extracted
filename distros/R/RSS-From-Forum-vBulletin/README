@@ -1,6 +1,79 @@
-SYNOPSIS
+NAME
+    RSS::From::Forum::vBulletin - Generate an RSS page by parsing vBulletin
+    forum display page
 
+VERSION
+    This document describes version 0.11 of RSS::From::Forum::vBulletin
+    (from Perl distribution RSS-From-Forum-vBulletin), released on
+    2017-07-10.
+
+SYNOPSIS
      # See get-rss-from-forum for command-line usage
 
 DESCRIPTION
+FUNCTIONS
+  get_rss_from_forum
+    Usage:
+
+     get_rss_from_forum(%args) -> [status, msg, result, meta]
+
+    Generate an RSS page by parsing vBulletin forum display page.
+
+    Many vBulletin forums do not turn on RSS feeds. This function parses
+    vBulletin forum display page and create a simple RSS page so you can
+    subscribe to it using RSS.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   ua => *obj*
+
+        Supply a custom LWP::UserAgent object.
+
+        If supplied, will be used instead of the default LWP::UserAgent
+        object.
+
+    *   url* => *str*
+
+        Forum URL (the forum display page).
+
+        Usually it's of the form: http://host/path/forumdisplay.php?f=XXX
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/RSS-From-Forum-vBulletin>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-RSS-From-Forum-vBulletin>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=RSS-From-Forum-vBulle
+    tin>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2012, 2011 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

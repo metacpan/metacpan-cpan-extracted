@@ -1,23 +1,29 @@
-SYNOPSIS
+NAME
+    Data::Sah - Fast and featureful data structure validation
 
+VERSION
+    This document describes version 0.88 of Data::Sah (from Perl
+    distribution Data-Sah), released on 2017-07-10.
+
+SYNOPSIS
     Non-OO interface:
 
      use Data::Sah qw(
          normalize_schema
          gen_validator
      );
-    
+
      my $v;
-    
+
      # generate a validator for schema
      $v = gen_validator(["int*", min=>1, max=>10]);
-    
+
      # validate your data using the generated validator
      say "valid" if $v->(5);     # valid
      say "valid" if $v->(11);    # invalid
      say "valid" if $v->(undef); # invalid
      say "valid" if $v->("x");   # invalid
-    
+
      # generate validator which reports error message string
      $v = gen_validator(["int*", min=>1, max=>10],
                         {return_type=>'str', lang=>'id_ID'});
@@ -27,7 +33,7 @@ SYNOPSIS
      say $v->(5);  # ''
      say $v->(12); # 'Data tidak boleh lebih besar dari 10'
                    # (in English: 'Data must not be larger than 10')
-    
+
      # normalize a schema
      my $nschema = normalize_schema("int*"); # => ["int", {req=>1}, {}]
      normalize_schema(["int*", min=>0]); # => ["int", {min=>0, req=>1}, {}]
@@ -36,10 +42,10 @@ SYNOPSIS
 
      use Data::Sah;
      my $sah = Data::Sah->new;
-    
+
      # get perl compiler
      my $pl = $sah->get_compiler("perl");
-    
+
      # compile schema into Perl code
      my $cd = $pl->compile(schema => ["int*", min=>0]);
      say $cd->{result};
@@ -55,10 +61,10 @@ SYNOPSIS
      (# clause: min
      ($data >= 0))
 
-    To see the full validator code (with sub {} and all), you can do
+    To see the full validator code (with "sub {}" and all), you can do
     something like:
 
-     % LOG=1 LOG_SAH_VALIDATOR_CODE=1 TRACE=1 perl -MLog::Any::App -MData::Sah=gen_validator -E'gen_validator(["int*", min=>0])'
+     % LOG_SAH_VALIDATOR_CODE=1 TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen -MData::Sah=gen_validator -E'gen_validator(["int*", min=>0])'
 
     which will print log message like:
 
@@ -86,116 +92,130 @@ SYNOPSIS
        20|        return($_sahv_res);
        21|    }}
 
-STATUS
-
-    Some features are not implemented yet:
-
-      * def/subschema
-
-      * expression
-
-      * obj: meths, attrs properties
-
-      * .prio, .err_msg, .ok_err_msg attributes
-
-      * .result_var attribute
-
-      * BaseType: if, prefilters, postfilters, check, prop, check_prop
-      clauses
-
-      * HasElems: each_index, check_each_elem, check_each_index, exists
-      clauses
-
-      * HasElems: len, elems, indices properties
-
-      * hash: check_each_key, check_each_value, allowed_keys_re,
-      forbidden_keys_re clauses
-
-      * array: uniq clauses
-
-      * human compiler: markdown output
-
 DESCRIPTION
-
-    This distribution, Data-Sah, implements compilers for producing Perl
+    This distribution, "Data-Sah", implements compilers for producing Perl
     and JavaScript validators, as well as translatable human description
     text from Sah schemas. Compiler approach is used instead of interpreter
     for faster speed.
 
-    The generated validator code can run without the Data::Sah::* modules.
+    The generated validator code can run without the "Data::Sah::*" modules.
+
+STATUS
+    Some features are not implemented yet:
+
+    *   def/subschema
+
+    *   expression
+
+    *   obj: meths, attrs properties
+
+    *   .prio, .err_msg, .ok_err_msg attributes
+
+    *   .result_var attribute
+
+    *   BaseType: if, prefilters, postfilters, check, prop, check_prop
+        clauses
+
+    *   HasElems: each_index, check_each_elem, check_each_index, exists
+        clauses
+
+    *   HasElems: len, elems, indices properties
+
+    *   hash: check_each_key, check_each_value, allowed_keys_re,
+        forbidden_keys_re clauses
+
+    *   array: uniq clauses
+
+    *   human compiler: markdown output
+
+VARIABLES
+  $Log_Validator_Code (bool, default: 0)
+MODULE ORGANIZATION
+    Data::Sah::Type::* roles specify Sah types, e.g. "Data::Sah::Type::bool"
+    specifies the bool type. It can also be used to name distributions that
+    introduce new types, e.g. "Data-Sah-Type-complex" which introduces
+    complex number type.
+
+    Data::Sah::FuncSet::* roles specify bundles of functions, e.g.
+    <Data::Sah::FuncSet::Core> specifies the core/standard functions.
+
+    Data::Sah::Compiler::$LANG:: namespace is for compilers. Each compiler
+    might further contain "::TH::*" (type handler) and "::FSH::*" (function
+    handler) subnamespaces to implement appropriate functionalities, e.g.
+    Data::Sah::Compiler::perl::TH::bool is the bool type handler for the
+    Perl compiler, Data::Sah::Compiler::perl::FSH::Core is the Core funcset
+    handler for Perl compiler.
+
+    Data::Sah::Coerce::$LANG::$TARGET_TYPE::$SOURCE_TYPE_AND_EXTRA_DESCRIPTI
+    ON contains coercion rules.
+
+    Data::Sah::TypeX::$TYPENAME::$CLAUSENAME namespace can be used to name
+    distributions that extend an existing Sah type by introducing a new
+    clause for it. See Data::Sah::Manual::Extending for an example.
+
+    Data::Sah::Lang::$LANGCODE namespaces are for modules that contain
+    translations. They are further organized according to the organization
+    of other Data::Sah modules, e.g. Data::Sah::Lang::en_US::Type::int or
+    "Data::Sah::Lang::en_US::TypeX::str::is_palindrome".
+
+    Sah::Schema:: namespace is reserved for modules that contain bundles of
+    schemas. For example, "Sah::Schema::CPANMeta" contains the schema to
+    validate CPAN META.yml. Sah::Schema::Int contains various schemas for
+    integers such as "pos_int", "int8", "uint32". Sah::Schema::Sah contains
+    the schema for Sah schema itself.
 
 FUNCTIONS
-
     None exported by default.
 
- normalize_schema($schema) => ARRAY
-
+  normalize_schema($schema) => ARRAY
     Normalize $schema.
 
     Can also be used as a method.
 
- gen_validator($schema, \%opts) => CODE (or STR)
+  gen_validator($schema, \%opts) => CODE (or STR)
+    Generate validator code for $schema. Can also be used as a method. Known
+    options (unknown options will be passed to Perl schema compiler):
 
-    Generate validator code for $schema. Can also be used as a method.
-    Known options (unknown options will be passed to Perl schema compiler):
+    *   accept_ref => BOOL (default: 0)
 
-      * accept_ref => BOOL (default: 0)
+        Normally the generated validator accepts data, as in:
 
-      Normally the generated validator accepts data, as in:
+         $res = $vdr->($data);
+         $res = $vdr->(42);
 
-       $res = $vdr->($data);
-       $res = $vdr->(42);
+        If this option is set to true, validator accepts reference to data
+        instead, as in:
 
-      If this option is set to true, validator accepts reference to data
-      instead, as in:
+         $res = $vdr->(\$data);
 
-       $res = $vdr->(\$data);
+        This allows $data to be modified by the validator (mainly, to set
+        default value specified in schema). For example:
 
-      This allows $data to be modified by the validator (mainly, to set
-      default value specified in schema). For example:
+         my $data;
+         my $vdr = gen_validator([int => {min=>0, max=>10, default=>5}],
+                                 {accept_ref=>1});
+         my $res = $vdr->(\$data);
+         say $res;  # => 1 (success)
+         say $data; # => 5
 
-       my $data;
-       my $vdr = gen_validator([int => {min=>0, max=>10, default=>5}],
-                               {accept_ref=>1});
-       my $res = $vdr->(\$data);
-       say $res;  # => 1 (success)
-       say $data; # => 5
+    *   source => BOOL (default: 0)
 
-      * source => BOOL (default: 0)
-
-      If set to 1, return source code string instead of compiled
-      subroutine. Usually only needed for debugging (but see also
-      $Log_Validator_Code and LOG_SAH_VALIDATOR_CODE if you want to log
-      validator source code).
+        If set to 1, return source code string instead of compiled
+        subroutine. Usually only needed for debugging (but see also
+        $Log_Validator_Code and "LOG_SAH_VALIDATOR_CODE" if you want to log
+        validator source code).
 
 ATTRIBUTES
-
- compilers => HASH
-
-    A mapping of compiler name and compiler (Data::Sah::Compiler::*)
+  compilers => HASH
+    A mapping of compiler name and compiler ("Data::Sah::Compiler::*")
     objects.
 
-VARIABLES
-
- $Log_Validator_Code (bool, default: 0)
-
-ENVIRONMENT
-
- LOG_SAH_VALIDATOR_CODE => bool
-
-    If set to true, will log (using Log::Any, at the trace level) the
-    validator code being generated. See "SYNOPSIS" or "FAQ" for example on
-    how to see this log message.
-
 METHODS
-
- new() => OBJ
-
+  new() => OBJ
     Create a new Data::Sah instance.
 
- $sah->get_compiler($name) => OBJ
-
-    Get compiler object. Data::Sah::Compiler::$name will be loaded first
+  $sah->get_compiler($name) => OBJ
+    Get compiler object. "Data::Sah::Compiler::$name" will be loaded first
     and instantiated if not already so. After that, the compiler object is
     cached.
 
@@ -203,11 +223,10 @@ METHODS
 
      my $plc = $sah->get_compiler("perl"); # loads Data::Sah::Compiler::perl
 
- $sah->normalize_schema($schema) => HASH
-
-    Normalize a schema, e.g. change int* into [int => {req=>1}], as well as
-    do some sanity checks on it. Returns the normalized schema if succeeds,
-    or dies on error.
+  $sah->normalize_schema($schema) => HASH
+    Normalize a schema, e.g. change "int*" into "[int => {req=>1}]", as well
+    as do some sanity checks on it. Returns the normalized schema if
+    succeeds, or dies on error.
 
     Can also be used as a function.
 
@@ -215,16 +234,14 @@ METHODS
     (distributed separately in Data-Sah-Normalize). Use that module instead
     if you just need normalizing schemas, to reduce dependencies.
 
- $sah->normalize_clset($clset[, \%opts]) => HASH
-
-    Normalize a clause set, e.g. change {"!match"=>"abc"} into
-    {"match"=>"abc", "match.op"=>"not"}. Produce a shallow copy of the
+  $sah->normalize_clset($clset[, \%opts]) => HASH
+    Normalize a clause set, e.g. change "{"!match"=>"abc"}" into
+    "{"match"=>"abc", "match.op"=>"not"}". Produce a shallow copy of the
     input clause set hash.
 
     Can also be used as a function.
 
- $sah->normalize_var($var) => STR
-
+  $sah->normalize_var($var) => STR
     Normalize a variable name in expression into its fully
     qualified/absolute form.
 
@@ -234,66 +251,25 @@ METHODS
 
      [int => {min => 10, 'max=' => '2*$min'}]
 
-    $min in the above expression will be normalized as schema:clauses.min.
+    $min in the above expression will be normalized as "schema:clauses.min".
 
- $sah->gen_validator($schema, \%opts) => CODE
-
+  $sah->gen_validator($schema, \%opts) => CODE
     Use the Perl compiler to generate validator code. Can also be used as a
-    function. See the documentation as a function for list of known
-    options.
-
-MODULE ORGANIZATION
-
-    Data::Sah::Type::* roles specify Sah types, e.g. Data::Sah::Type::bool
-    specifies the bool type. It can also be used to name distributions that
-    introduce new types, e.g. Data-Sah-Type-complex which introduces
-    complex number type.
-
-    Data::Sah::FuncSet::* roles specify bundles of functions, e.g.
-    <Data::Sah::FuncSet::Core> specifies the core/standard functions.
-
-    Data::Sah::Compiler::$LANG:: namespace is for compilers. Each compiler
-    might further contain ::TH::* (type handler) and ::FSH::* (function
-    handler) subnamespaces to implement appropriate functionalities, e.g.
-    Data::Sah::Compiler::perl::TH::bool is the bool type handler for the
-    Perl compiler, Data::Sah::Compiler::perl::FSH::Core is the Core funcset
-    handler for Perl compiler.
-
-    Data::Sah::Coerce::$LANG::$TARGET_TYPE::$SOURCE_TYPE_AND_EXTRA_DESCRIPTION
-    contains coercion rules.
-
-    Data::Sah::TypeX::$TYPENAME::$CLAUSENAME namespace can be used to name
-    distributions that extend an existing Sah type by introducing a new
-    clause for it. See Data::Sah::Manual::Extending for an example.
-
-    Data::Sah::Lang::$LANGCODE namespaces are for modules that contain
-    translations. They are further organized according to the organization
-    of other Data::Sah modules, e.g. Data::Sah::Lang::en_US::Type::int or
-    Data::Sah::Lang::en_US::TypeX::str::is_palindrome.
-
-    Sah::Schema:: namespace is reserved for modules that contain bundles of
-    schemas. For example, Sah::Schema::CPANMeta contains the schema to
-    validate CPAN META.yml. Sah::Schema::Int contains various schemas for
-    integers such as pos_int, int8, uint32. Sah::Schema::Sah contains the
-    schema for Sah schema itself.
+    function. See the documentation as a function for list of known options.
 
 FAQ
-
     See also Sah::FAQ.
 
- Comparison to {JSON::Schema, Data::Rx, Data::FormValidator, ...}?
-
+  Comparison to {JSON::Schema, Data::Rx, Data::FormValidator, ...}?
     See Sah::FAQ.
 
- Why is it so slow?
-
+  Why is it so slow?
     You probably do not reuse the compiled schema, e.g. you continually
     destroy and recreate Data::Sah object, or repeatedly recompile the same
     schema. To gain the benefit of compilation, you need to keep the
     compiled result and use the generated Perl code repeatedly.
 
- Can I generate another schema dynamically from within the schema?
-
+  Can I generate another schema dynamically from within the schema?
     For example:
 
      // if first element is an integer, require the array to contain only integers,
@@ -301,34 +277,33 @@ FAQ
      ["array", {"min_len": 1, "of=": "[is_int($_[0]) ? 'int':'str']"}]
 
     Currently no, Data::Sah does not support expression on clauses that
-    contain other schemas. In other words, dynamically generated schemas
-    are not supported. To support this, if the generated code needs to run
+    contain other schemas. In other words, dynamically generated schemas are
+    not supported. To support this, if the generated code needs to run
     independent of Data::Sah, it needs to contain the compiler code itself
     (or an interpreter) to compile or evaluate the generated schema.
 
-    However, an eval_schema() Sah function which uses Data::Sah can be
+    However, an "eval_schema()" Sah function which uses Data::Sah can be
     trivially declared and target the Perl compiler.
 
- How to display the validator code being generated?
-
-    Use the source => 1 option in gen_validator().
+  How to display the validator code being generated?
+    Use the "source => 1" option in "gen_validator()".
 
     If you use the OO interface, e.g.:
 
      # generate perl code
      my $cd = $plc->compile(schema=>..., ...);
 
-    then the generated code is in $cd->{result} and you can just print it.
+    then the generated code is in "$cd->{result}" and you can just print it.
 
-    If you generate validator using gen_validator(), you can set
+    If you generate validator using "gen_validator()", you can set
     environment LOG_SAH_VALIDATOR_CODE or package variable
     $Log_Validator_Code to true and the generated code will be logged at
-    trace level using Log::Any. The log can be displayed using, e.g.,
-    Log::Any::App:
+    trace level using Log::ger. The log can be displayed using, e.g.,
+    Log::ger::Output::Screen:
 
      % LOG_SAH_VALIDATOR_CODE=1 TRACE=1 \
-       perl -MLog::Any::App -MData::Sah=gen_validator \
-       -e '$sub = gen_validator([int => min=>1, max=>10])'
+       perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
+       -MData::Sah=gen_validator -e '$sub = gen_validator([int => min=>1, max=>10])'
 
     Sample output:
 
@@ -361,15 +336,13 @@ FAQ
        24|    }}
 
     Lastly, you can also use validate-with-sah CLI utility from the
-    App::SahUtils distribution (use the --show-code option).
+    App::SahUtils distribution (use the "--show-code" option).
 
- How to show the validation error message? The validator only returns
- true/false!
-
-    Pass the return_type=>"str" to get an error message string on error, or
-    return_type=>"full" to get a hash of detailed error messages. Note also
-    that the error messages are translateable (e.g. use LANG or lang=>...
-    option. For example:
+  How to show the validation error message? The validator only returns true/false!
+    Pass the "return_type=>"str"" to get an error message string on error,
+    or "return_type=>"full"" to get a hash of detailed error messages. Note
+    also that the error messages are translateable (e.g. use "LANG" or
+    "lang=>..." option. For example:
 
      my $v = gen_validator([int => between => [1,10]], {return_type=>"str"});
      say "$_: ", $v->($_) for 1, "x", 12;
@@ -380,36 +353,31 @@ FAQ
      "x": Input is not of type integer
      12: Must be between 1 and 10
 
- How to show all the error and warning messages?
+  How to show all the error and warning messages?
+    If you pass "return_type=>"full"" then the generated validator code can
+    return a hashref containing all the errors (in the "errors" key) and
+    warnings (in the "warnings" key) instead of just a boolean (when
+    "return_type=>"bool"") or a string containing the first encountered
+    error message (when "return_type=>"str"") .
 
-    If you pass return_type=>"full" then the generated validator code can
-    return a hashref containing all the errors (in the errors key) and
-    warnings (in the warnings key) instead of just a boolean (when
-    return_type=>"bool") or a string containing the first encountered error
-    message (when return_type=>"str") .
-
- How to get the data value with the default filled in, or coercion done?
-
-    If you use return_type=>"full", the generated validator code will also
-    return the input data after the default is filled in or coercion is
-    done in the value key of the result hashref. Or, if you do not need a
+  How to get the data value with the default filled in, or coercion done?
+    If you use "return_type=>"full"", the generated validator code will also
+    return the input data after the default is filled in or coercion is done
+    in the "value" key of the result hashref. Or, if you do not need a
     validator that checks for all errors/warnings, you can use
-    return_type=>"bool+val" or return_type=>"str+val". For example:
+    "return_type=>"bool+val"" or "return_type=>"str+val"". For example:
 
      my $v = gen_validator(["date", {"x.perl.coerce_to"=>"DateTime"}],
                            {return_type=>"str+val"});
-    
+
      my ($err, $val) = @{ $v->("2016-05-14") };
 
-    The validator will return an error message string (or an empty string
-    if validation succeeds) as well as the final value. In the example
-    above, $val will contain a DateTime object. This is convenient because
-    the final value is what is usually used further after validation
-    process.
+    The validator will return an error message string (or an empty string if
+    validation succeeds) as well as the final value. In the example above,
+    $val will contain a DateTime object. This is convenient because the
+    final value is what is usually used further after validation process.
 
- What does the @... prefix that is sometimes shown on the error message
- mean?
-
+  What does the "@..." prefix that is sometimes shown on the error message mean?
     It shows the path to data item that fails the validation, e.g.:
 
      my $v = gen_validator([array => of => [int=>min=>5], {return_type=>"str"});
@@ -430,17 +398,17 @@ FAQ
      @[1][a]: Input is not of type integer
 
     Note that for validator that returns full result hashref
-    (return_type=>"full") the error messages in the errors key are also
+    ("return_type=>"full"") the error messages in the "errors" key are also
     keyed with data path, albeit in a slightly different format (i.e.
-    slash-separated, e.g. 2 and 1/a) for easier parsing.
+    slash-separated, e.g. 2 and "1/a") for easier parsing.
 
- How to show the process of validation by the compiled code?
+  How to show the process of validation by the compiled code?
+    If you are generating Perl code from schema, you can pass "debug=>1"
+    option so the code contains logging (Log::ger-based) and other debugging
+    information, which you can display. For example:
 
-    If you are generating Perl code from schema, you can pass debug=>1
-    option so the code contains logging (Log::Any-based) and other
-    debugging information, which you can display. For example:
-
-     % TRACE=1 perl -MLog::Any::App -MData::Sah=gen_validator -E'
+     % TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
+       -MData::Sah=gen_validator -E'
        $v = gen_validator([array => of => [hash => {req_keys=>["a"]}]],
                           {return_type=>"str", debug=>1});
        say "Validation result: ", $v->([{a=>1}, "x"]);'
@@ -458,51 +426,77 @@ FAQ
      [spath=['of']]check type 'hash' ...
      Validation result: [spath=of]@1: Input is not of type hash
 
- What else can I do with the compiled code?
-
+  What else can I do with the compiled code?
     Data::Sah offers some options in code generation. Beside compiling the
     validator code into a subroutine, there are also some other options.
     Examples:
 
-      * Dist::Zilla::Plugin::Rinci::Validate
+    *   Dist::Zilla::Plugin::Rinci::Validate
 
-      This plugin inserts the generated code (without the sub { ... }
-      wrapper) to validate the content of %args right before # VALIDATE_ARG
-      or # VALIDATE_ARGS like below:
+        This plugin inserts the generated code (without the "sub { ... }"
+        wrapper) to validate the content of %args right before "#
+        VALIDATE_ARG" or "# VALIDATE_ARGS" like below:
 
-       $SPEC{foo} = {
-           args => {
-               arg1 => { schema => ..., req=>1 },
-               arg2 => { schema => ... },
-           },
-           ...
-       };
-       sub foo {
-           my %args = @_; # VALIDATE_ARGS
-       }
+         $SPEC{foo} = {
+             args => {
+                 arg1 => { schema => ..., req=>1 },
+                 arg2 => { schema => ... },
+             },
+             ...
+         };
+         sub foo {
+             my %args = @_; # VALIDATE_ARGS
+         }
 
-      The schemas will be retrieved from the Rinci metadata ($SPEC{foo}
-      above). This means, subroutines in your built distribution will do
-      argument validation.
+        The schemas will be retrieved from the Rinci metadata ($SPEC{foo}
+        above). This means, subroutines in your built distribution will do
+        argument validation.
 
-      * Perinci::Sub::Wrapper
+    *   Perinci::Sub::Wrapper
 
-      This module is part of the Perinci family. What the module does is
-      basically wrap your subroutine with a wrapper code that can include
-      validation code (among others). This is a convenient way to add
-      argument validation to an existing subroutine/code.
+        This module is part of the Perinci family. What the module does is
+        basically wrap your subroutine with a wrapper code that can include
+        validation code (among others). This is a convenient way to add
+        argument validation to an existing subroutine/code.
+
+ENVIRONMENT
+  LOG_SAH_VALIDATOR_CODE => bool
+    If set to true, will log (using Log::ger, at the trace level) the
+    validator code being generated. See "SYNOPSIS" or "FAQ" for example on
+    how to see this log message.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Sah>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Data-Sah>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
-  Other compiled validators
-
-  Other interpreted validators
-
+   Other compiled validators
+   Other interpreted validators
     Params::Validate is very fast, although minimal. Data::Rx, Kwalify,
     Data::Verifier, Data::Validator, JSON::Schema, Validation::Class.
 
-    For Moo/Mouse/Moose stuffs: Moose type system,
-    MooseX::Params::Validate, Type::Tiny, among others.
+    For Moo/Mouse/Moose stuffs: Moose type system, MooseX::Params::Validate,
+    Type::Tiny, among others.
 
     Form-oriented: Data::FormValidator, FormValidator::Lite, among others.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

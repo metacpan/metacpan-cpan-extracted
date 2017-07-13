@@ -1,11 +1,11 @@
 package Org::Element;
 
-our $DATE = '2016-12-24'; # DATE
-our $VERSION = '0.53'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.54'; # VERSION
 
 use 5.010;
 use locale;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 use Moo;
 use Scalar::Util qw(refaddr);
 
@@ -186,7 +186,7 @@ Org::Element - Base class for Org document elements
 
 =head1 VERSION
 
-This document describes version 0.53 of Org::Element (from Perl distribution Org-Parser), released on 2016-12-24.
+This document describes version 0.54 of Org::Element (from Perl distribution Org-Parser), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -283,7 +283,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Org-Parser
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Org-Parser>.
+Source repository is at L<https://github.com/perlancar/perl-Org-Parser>.
 
 =head1 BUGS
 
@@ -299,7 +299,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

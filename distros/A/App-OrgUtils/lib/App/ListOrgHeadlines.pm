@@ -1,13 +1,13 @@
 package App::ListOrgHeadlines;
 
-our $DATE = '2016-12-24'; # DATE
-our $VERSION = '0.45'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.46'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use App::OrgUtils;
 use Cwd qw(abs_path);
@@ -416,7 +416,7 @@ App::ListOrgHeadlines - List all headlines in all Org files
 
 =head1 VERSION
 
-This document describes version 0.45 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2016-12-24.
+This document describes version 0.46 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -427,7 +427,11 @@ This document describes version 0.45 of App::ListOrgHeadlines (from Perl distrib
 =head1 FUNCTIONS
 
 
-=head2 list_org_headlines(%args) -> [status, msg, result, meta]
+=head2 list_org_headlines
+
+Usage:
+
+ list_org_headlines(%args) -> [status, msg, result, meta]
 
 List all headlines in all Org files.
 
@@ -576,7 +580,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUti
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-App-OrgUtils>.
+Source repository is at L<https://github.com/perlancar/perl-App-OrgUtils>.
 
 =head1 BUGS
 
@@ -592,7 +596,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

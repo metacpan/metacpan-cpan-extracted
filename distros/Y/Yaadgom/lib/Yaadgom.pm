@@ -2,7 +2,7 @@ use strict;
 
 package Yaadgom;
 use 5.008_005;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Moo;
 use Devel::GlobalDestruction;
 
@@ -76,12 +76,12 @@ sub process_response {
 
 sub _write_title {
     my ( $self, $title ) = @_;
-    "## $title\n\n";
+    "\n## $title\n\n";
 }
 
 sub _write_subtitle {
     my ( $self, $title ) = @_;
-    "### $title\n\n";
+    "\n### $title\n\n";
 }
 
 sub _write_line {
@@ -106,7 +106,7 @@ sub format_body {
     my @results = @{ $self->last_trigger_results };
     ($body) = @{ $results[-1] } if $results[-1];
 
-    return "$header\n$body";
+    return "$header\n\n$body";
 }
 
 sub get_markdown {

@@ -1,0 +1,15 @@
+TYPEMAP
+std::string	T_STD_STRING
+std::string*	T_STD_STRING_PTR
+
+INPUT
+T_STD_STRING
+    $var = std::string( SvPV_nolen( $arg ), SvCUR( $arg ) );
+T_STD_STRING_PTR
+    $var = new std::string( SvPV_nolen( $arg ), SvCUR( $arg ) );
+
+OUTPUT
+T_STD_STRING
+    $arg = newSVpvn( $var.c_str(), $var.length() );
+T_STD_STRING_PTR
+    $arg = newSVpvn( $var->c_str(), $var->length() );

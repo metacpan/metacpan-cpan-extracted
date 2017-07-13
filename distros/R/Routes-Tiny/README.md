@@ -31,6 +31,7 @@ Routes::Tiny - Routes
     my $captures_hashref = $match->captures;
 
     # Matching with method
+    $routes->add_route('/hello/world', method => 'GET');
     my $match = $routes->match('/hello/world', method => 'GET');
 
     # Subroutes
@@ -109,14 +110,20 @@ It is possible to specify a globbing placeholder.
 
 It is possible to pass arguments to the match object AS IS.
 
-## `Path building`
+## `Matching with methods`
 
-    $routes->add_route('/articles/:id', name => 'article');
+    # Exact HTTP method definition
+    $routes->add_route('/articles', method => 'GET', defaults => {action => 'list'});
 
-    $path = $routes->build_path('article', id => 123);
-    # $path is '/articles/123'
+    # Sweeter method definition
+    # METHOD => PATTERN should go as first parameters to add_route()
+    $routes->add_route(PUT => '/articles', defaults => {action => 'create'});
 
-It is possible to reconstruct a path from route's name and parameters.
+    $match = $routes->match('/articles', method => 'GET');
+    # $m->captures is {action => 'list'}
+
+    $match = $routes->match('/articles', method => 'PUT');
+    # $m->captures is {action => 'create'}
 
 ## `Subroutes`
 
@@ -144,6 +151,15 @@ Parent routes mounts names of children routes, so it's possible to buil path
     $path = $routes->build_path('comments', type => 'articles', id => 123, page => 5);
     # $path is '/articles/123/comments/5/'
 
+## `Path building`
+
+    $routes->add_route('/articles/:id', name => 'article');
+
+    $path = $routes->build_path('article', id => 123);
+    # $path is '/articles/123'
+
+It is possible to reconstruct a path from route's name and parameters.
+
 # WARNINGS
 
 ## `Trailing slash issue`
@@ -159,6 +175,20 @@ Trailing slash is important.
 If you don't want this behaviour pass `strict_trailing_slash` to the constructor:
 
     my $routes = Routes::Tiny->new(strict_trailing_slash => 0);
+
+## `Case sensitivity`
+
+Routes::Tiny is case sensitive by default (since 0.20).
+
+It means that
+
+    $routes->add_route('/admin/');
+
+will NOT match both `/admin/` and `/ADMIN/`.
+
+If you don't want this behaviour pass `strict_case` to the constructor:
+
+    my $routes = Routes::Tiny->new(strict_case => 0);
 
 # METHODS
 

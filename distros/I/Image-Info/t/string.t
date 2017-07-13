@@ -72,14 +72,15 @@ TESTFILES: for my $f (@tests)
       my $base = basename $file;
       my $h1 = image_info($file);
 
-      is ($h1->{error}, undef, 'no error');
+      is ($h1->{error}, undef, "no error with $base");
       my $expected_warning = $expected_warnings->{$base};
-      is ($h1->{Warn}, $expected_warning, 'no/expected warning');
+      is ($h1->{Warn}, $expected_warning, "no/expected warning with $base")
+	  or do { require Data::Dumper; diag Data::Dumper::Dumper($h1->{Warn}) };
 
       my $img = cat($file);
       my $h2 = image_info(\$img);
 
-      is_deeply ($h1, $h2, $file);
+      is_deeply ($h1, $h2, "image_info for $file on file and string yields the same");
       } # end inner SKIP
     } # end for each file
   } # end SKIP all block

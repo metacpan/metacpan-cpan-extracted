@@ -2,14 +2,12 @@ package #
 Devel::CheckOS;
 
 use strict;
+use warnings;
 use Exporter;
 
-use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
+use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 
-$VERSION = '1.73';
-
-# localising prevents the warningness leaking out of this module
-local $^W = 1;    # use warnings is a 5.6-ism
+our $VERSION = '1.76';
 
 @ISA = qw(Exporter);
 @EXPORT_OK = qw(os_is os_isnt die_if_os_is die_if_os_isnt die_unsupported list_platforms list_family_members);
@@ -313,6 +311,9 @@ Thanks to Yanick Champoux for a patch to let Devel::AssertOS support
 negative assertions.
 
 Thanks to Brian Fraser for adding Android support.
+
+Thanks to Dale Evans for Debian detection, a bunch of Mac OS X specific version
+detection modules, and perl 5.6 support.
 
 =head1 SOURCE CODE REPOSITORY
 

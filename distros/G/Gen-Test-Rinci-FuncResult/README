@@ -1,27 +1,149 @@
-SYNOPSIS
+NAME
+    Gen::Test::Rinci::FuncResult - Generate a test function for a function
 
+VERSION
+    This document describes version 0.06 of Gen::Test::Rinci::FuncResult
+    (from Perl distribution Gen-Test-Rinci-FuncResult), released on
+    2017-07-11.
+
+SYNOPSIS
      use Gen::Test::Rinci::FuncResult qw(gen_test_func);
      use Test::More;
-    
+
      sub divide {
          my %args = @_;
          my ($a, $b) = ($args{a}, $args{b});
          return [500, "undefined"] if $a == 0 && $b == 0;
          [200, "OK", $a/$b];
      }
-    
+
      gen_test_func(name => 'test_divide', func => \&divide);
-    
+
      test_divide(args=>{a=>6, b=>3}, result=>2);
      test_divide(args=>{a=>6, b=>0}, dies=>1);
      test_divide(args=>{a=>0, b=>0}, status=>500);
      done_testing;
 
 DESCRIPTION
+FUNCTIONS
+  gen_test_func
+    Usage:
+
+     gen_test_func(%args) -> [status, msg, result, meta]
+
+    Generate a test function for a function.
+
+    This function (A) will generate a function (B).
+
+    A accepts, among others, the name or the reference to the function that
+    you want to test (T) and the name of the generated function, B.
+
+    B will run T once with some specified arguments, catch exception, and
+    test its result. The result is expected to be an enveloped result (see
+    the documentation of "Rinci::function" for more details about enveloped
+    result).
+
+    B will accept the following arguments:
+
+    *   name (str)
+
+        Name of the test. Will default to "T (ARGS...)" to show the name of
+        the target function and the arguments that it is called with.
+
+    *   args (hash or array)
+
+        Argument to feed to function T.
+
+    *   dies (bool, default => 0)
+
+        Whether function T should die when run. If set to 1, further tests
+        will not be done except the test that function dies.
+
+    *   status (int, default => 200)
+
+        Will test the result's status code.
+
+    *   result (any)
+
+        If specified, will test the actual result of the function.
+
+    *   run (code)
+
+        Instead of running function T with "args", will execute this code
+        instead.
+
+    *   posttest (code)
+
+        Run this code for additional tests.
+
+    Todo:
+
+    *   Handle function with "result_naked" => 1.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   func* => *code*
+
+        Target function to test.
+
+    *   install => *bool* (default: 1)
+
+        Whether to install the function.
+
+    *   name* => *str*
+
+        Name of the test function to generate (B).
+
+        Can be fully qualified, e.g. "Pkg::SubPkg::funcname" or unqualified
+        "funcname" (where the package will be taken from the "package"
+        argument). Relevant for when installing the function.
+
+    *   package => *any*
+
+        Perl package to put this function in.
+
+        Relevant only when installing the function.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
 
 FAQ
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Gen-Test-Rinci-FuncResult>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Gen-Test-Rinci-FuncResult>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Gen-Test-Rinci-FuncRe
+    sult>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Rinci
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

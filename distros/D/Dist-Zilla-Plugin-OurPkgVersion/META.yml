@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/plicease/dist-zilla-plugin-ourpkgversion/issues
   homepage: https://metacpan.org/dist/Dist-Zilla-Plugin-OurPkgVersion
   repository: git://github.com/plicease/dist-zilla-plugin-ourpkgversion.git
-version: '0.11'
+version: '0.12'
 x_contributors:
   - 'Alexandr Ciornii <alexchorny@gmail.com>'
   - 'Alexei Znamensky <russoz@cpan.org>'

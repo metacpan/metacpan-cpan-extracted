@@ -1,12 +1,12 @@
 package App::UniqFiles;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.11'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.12'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use Digest::MD5;
 
@@ -104,16 +104,22 @@ _
             summary   => 'List all files which do no have duplicate contents',
             src       => 'uniq-files *',
             src_plang => 'bash',
+            test      => 0,
+            'x.doc.show_result' => 0,
         },
         {
             summary   => 'List all files which have duplicate contents',
             src       => 'uniq-files -d *',
             src_plang => 'bash',
+            test      => 0,
+            'x.doc.show_result' => 0,
         },
         {
             summary   => 'List number of occurences of contents for each file',
             src       => 'uniq-files -c *',
             src_plang => 'bash',
+            test      => 0,
+            'x.doc.show_result' => 0,
         },
     ],
 };
@@ -133,7 +139,7 @@ sub uniq_files {
     for my $f (@$files) {
         my @st = stat $f;
         unless (@st) {
-            $log->error("Can't stat file `$f`: $!, skipped");
+            log_error("Can't stat file `$f`: $!, skipped");
             next;
         }
         $size_counts{$st[7]}++;
@@ -151,7 +157,7 @@ sub uniq_files {
         if ($check_content) {
             my $fh;
             unless (open $fh, "<", $f) {
-                $log->error("Can't open file `$f`: $!, skipped");
+                log_error("Can't open file `$f`: $!, skipped");
                 next;
             }
             my $ctx = Digest::MD5->new;
@@ -214,7 +220,7 @@ App::UniqFiles - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.11 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2015-09-03.
+This document describes version 0.12 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -228,32 +234,18 @@ device), so don't feed them.
 =head1 FUNCTIONS
 
 
-=head2 uniq_files(%args) -> [status, msg, result, meta]
+=head2 uniq_files
+
+Usage:
+
+ uniq_files(%args) -> [status, msg, result, meta]
 
 Report or omit duplicate file contents.
 
-Examples:
-
- uniq_files();
-
-
-List all files which do no have duplicate contents.
-
-
- uniq_files();
-
-
-List all files which have duplicate contents.
-
-
- uniq_files();
-
-
-List number of occurences of contents for each file.
-
-
 Given a list of filenames, will check each file size and content for duplicate
 content. Interface is a bit like the C<uniq> Unix command-line program.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -331,7 +323,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

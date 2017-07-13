@@ -1,0 +1,35 @@
+---
+abstract: "Retrieve PDF image and text data via MuPDF's mutool"
+author:
+  - 'Project Renard'
+build_requires:
+  Data::DPath: '0'
+  Renard::Incunabula::Devel::TestHelper: '0'
+  Test::Most: '0'
+  lib: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Renard-Incunabula-MuPDF-mutool
+requires:
+  Alien::MuPDF: '0.007'
+  Capture::Tiny: '0'
+  Function::Parameters: '0'
+  Log::Any: '0'
+  Path::Tiny: '0'
+  Renard::Incunabula::Common::Setup: '0'
+  XML::Simple: '0'
+  constant: '0'
+  perl: '5.010'
+resources:
+  homepage: https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool
+  repository: https://github.com/project-renard/p5-Renard-Incunabula-MuPDF-mutool.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

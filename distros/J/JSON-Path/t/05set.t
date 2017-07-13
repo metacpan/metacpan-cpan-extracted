@@ -1,3 +1,4 @@
+
 =head1 PURPOSE
 
 Exercise C<< JSON::Path::set >>.
@@ -66,49 +67,25 @@ my $object = from_json(<<'JSON');
 JSON
 
 my $titles = '$.store.book[*].title';
-my $jpath = JSON::Path->new($titles);
+my $jpath  = JSON::Path->new($titles);
 
-is_deeply(
-	[ $jpath->values($object) ],
-	[
-		"Sayings of the Century",
-		"Sword of Honour",
-		"Moby Dick",
-		"The Lord of the Rings",
-	]
-);
+is_deeply( [ $jpath->values($object) ],
+    [ "Sayings of the Century", "Sword of Honour", "Moby Dick", "The Lord of the Rings", ] );
 
-is(
-	$jpath->set($object => 'TBD', 2),
-	2,
-);
+is( $jpath->set( $object => 'TBD', 2 ), 2, );
 
-is_deeply(
-	[ $jpath->values($object) ],
-	[
-		"TBD",
-		"TBD",
-		"Moby Dick",
-		"The Lord of the Rings",
-	],
-);
+is_deeply( [ $jpath->values($object) ], [ "TBD", "TBD", "Moby Dick", "The Lord of the Rings", ], );
 
 my $author = '$.store.book[2].author';
 $jpath = JSON::Path->new($author);
 
-is(
-	$jpath->value($object),
-	"Herman Melville",
-);
+is( $jpath->value($object), "Herman Melville", );
 
-is(
-	$jpath->set($object => 'Anon'),
-	1,
-);
+is( $jpath->set( $object => 'Anon' ), 1, );
 
-is(
-	$jpath->value($object),
-	'Anon',
-);
+is( $jpath->value($object), 'Anon', );
 
+$jpath = JSON::Path->new('$.store.book.0.publisher');
+is( $jpath->set( $object, 'Peculiar Publications' ), 1 );
+is( $jpath->value( $object ), 'Peculiar Publications' );
 done_testing;

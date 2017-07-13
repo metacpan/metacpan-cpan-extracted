@@ -6,7 +6,7 @@ use Test::More;
 
 use Async::Stream qw(merge branch);
 
- plan tests => 23;
+ plan tests => 25;
 
 
 subtest 'Method new' => sub {
@@ -178,18 +178,18 @@ subtest 'Method count' => sub {
 };
 
 
-subtest 'Method concat' => sub {
+subtest 'Method append' => sub {
 	plan tests => 2;
 
 	my @test_array = (1,2,3);
 	my $test_stream = Async::Stream->new_from(@test_array);
 	my $test_stream1 = Async::Stream->new_from(@test_array);
 	$test_stream
-		->concat($test_stream1)
-		->to_arrayref(sub {is_deeply($_[0], [@test_array,@test_array], "Method concat")});
+		->append($test_stream1)
+		->to_arrayref(sub {is_deeply($_[0], [@test_array,@test_array], "Method append")});
 
-	eval {$test_stream->concat('bad argument')};
-	ok($@, "Method concat with bad argument");
+	eval {$test_stream->append('bad argument')};
+	ok($@, "Method append with bad argument");
 };
 
 
@@ -378,6 +378,34 @@ subtest 'Branch' => sub {
 
 	eval { $test_stream->branch(sub {$a <=> $b}) };
 	ok($@, "Static method branch with bad argument");
+};
+
+subtest 'Distinct' => sub {
+	plan tests => 3;
+
+	my @test_array = (1,1,2,2,3,3,3);
+	my $test_stream = Async::Stream->new_from(@test_array);
+
+	$test_stream->distinct()->to_arrayref(sub {is_deeply($_[0], [1,2,3], "Distinct stream 1")});
+
+	@test_array = (1,1,2,2,3,3,3);
+	$test_stream = Async::Stream->new_from(@test_array);
+	$test_stream->distinct(sub {int($_)})->to_arrayref(sub {is_deeply($_[0], [1,2,3], "Custom serialize for distinct stream")});
+
+	@test_array = (1,1,2,2,3,3,3);
+	$test_stream = Async::Stream->new_from(@test_array);
+	$test_stream->distinct(sub {"single_key"})->to_arrayref(sub {is_deeply($_[0], [1], "Single key for distinct stream")});
+};
+
+subtest 'Any' => sub {
+	plan tests => 2;
+
+	my @test_array = (1,2,3);
+	my $test_stream = Async::Stream->new_from(@test_array);
+
+	$test_stream->any(sub{$_ == 2},sub{is($_[0], 2, "Any item is found")});
+
+	$test_stream->any(sub{$_ == 4},sub{ok(!defined $_[0], "Any item isn't found")});
 };
 
 diag( "Testing Async::Stream $Async::Stream::VERSION, Perl $], $^X" );

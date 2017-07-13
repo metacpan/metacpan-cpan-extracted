@@ -1,13 +1,13 @@
 package DBIx::FunctionalAPI;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.08'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.09'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use List::MoreUtils qw(uniq);
 use Complete::Util qw(complete_array_elem);
@@ -172,7 +172,7 @@ DBIx::FunctionalAPI - Some functions to expose your database as an API
 
 =head1 VERSION
 
-This document describes version 0.08 of DBIx::FunctionalAPI (from Perl distribution DBIx-FunctionalAPI), released on 2015-09-03.
+This document describes version 0.09 of DBIx::FunctionalAPI (from Perl distribution DBIx-FunctionalAPI), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -190,7 +190,13 @@ also be set via the C<$dbh> package variable.
 =head1 FUNCTIONS
 
 
-=head2 list_columns(%args) -> [status, msg, result, meta]
+=head2 list_columns
+
+Usage:
+
+ list_columns(%args) -> [status, msg, result, meta]
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -222,7 +228,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_rows(%args) -> [status, msg, result, meta]
+=head2 list_rows
+
+Usage:
+
+ list_rows(%args) -> [status, msg, result, meta]
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -254,7 +266,13 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 list_tables(%args) -> [status, msg, result, meta]
+=head2 list_tables
+
+Usage:
+
+ list_tables(%args) -> [status, msg, result, meta]
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -279,8 +297,6 @@ Return value:  (any)
 
 =for Pod::Coverage ^()$
 
-=head1 SEE ALSO
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/DBIx-FunctionalAPI>.
@@ -297,13 +313,15 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

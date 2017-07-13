@@ -41,13 +41,13 @@
    "provides" : {
       "Yote::Server" : {
          "file" : "lib/Yote/Server.pm",
-         "version" : "1.26"
+         "version" : "1.27"
       },
       "Yote::Server::Acct" : {
-         "file" : "lib/Yote/Server/Acct.pm"
+         "file" : "lib/Yote/Server.pm"
       },
       "Yote::Server::App" : {
-         "file" : "lib/Yote/Server/App.pm"
+         "file" : "lib/Yote/Server.pm"
       },
       "Yote::Server::ListContainer" : {
          "file" : "lib/Yote/Server/ListContainer.pm",
@@ -78,6 +78,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,10 +1,11 @@
 # ABSTRACT: Dancer2's Domain Specific Language (DSL)
 
 package Dancer2::Core::DSL;
-$Dancer2::Core::DSL::VERSION = '0.205000';
+$Dancer2::Core::DSL::VERSION = '0.205001';
 use Moo;
 use Carp;
 use Module::Runtime 'require_module';
+use Ref::Util qw< is_arrayref >;
 use Dancer2::Core::Hook;
 use Dancer2::FileUtils;
 use Dancer2::Core::Response::Delayed;
@@ -219,7 +220,7 @@ sub any {
 
     # If they've supplied their own list of methods,
     # expand del, otherwise give them the default list.
-    if ( ref $_[0] eq 'ARRAY' ) {
+    if ( is_arrayref($_[0]) ) {
         s/^del$/delete/ for @{ $_[0] };
     }
     else {
@@ -513,7 +514,7 @@ Dancer2::Core::DSL - Dancer2's Domain Specific Language (DSL)
 
 =head1 VERSION
 
-version 0.205000
+version 0.205001
 
 =head1 FUNCTIONS
 
@@ -542,7 +543,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexis Sukrieh.
+This software is copyright (c) 2017 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

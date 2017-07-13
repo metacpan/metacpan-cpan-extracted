@@ -1,12 +1,18 @@
-SYNOPSIS
+NAME
+    Org::Parser - Parse Org documents
 
+VERSION
+    This document describes version 0.54 of Org::Parser (from Perl
+    distribution Org-Parser), released on 2017-07-10.
+
+SYNOPSIS
      use 5.010;
      use Org::Parser;
      my $orgp = Org::Parser->new();
-    
+
      # parse a file
      my $doc = $orgp->parse_file("$ENV{HOME}/todo.org");
-    
+
      # parse a string
      $doc = $orgp->parse(<<EOF);
      #+TODO: TODO | DONE CANCELLED
@@ -29,7 +35,7 @@ SYNOPSIS
      + definition :: list
      + another :: def
      EOF
-    
+
      # walk the document tree
      $doc->walk(sub {
          my ($el) = @_;
@@ -65,78 +71,90 @@ SYNOPSIS
      ...
 
 DESCRIPTION
-
     This module parses Org documents. See http://orgmode.org/ for more
     details on Org documents.
 
-    See todo.org in the distribution for the list of already- and not yet
+    See "todo.org" in the distribution for the list of already- and not yet
     implemented stuffs.
 
 ATTRIBUTES
-
 METHODS
-
- new()
-
+  new()
     Create a new parser instance.
 
- $orgp->parse($str | $arrayref | $coderef | $filehandle, \%opts) => $doc
-
+  $orgp->parse($str | $arrayref | $coderef | $filehandle, \%opts) => $doc
     Parse document (which can be contained in a scalar $str, an arrayref of
     lines $arrayref, a subroutine which will be called for chunks until it
     returns undef, or a filehandle).
 
     Returns Org::Document object.
 
-    If 'handler' attribute is specified, will call handler repeatedly
-    during parsing. See the 'handler' attribute for more details.
+    If 'handler' attribute is specified, will call handler repeatedly during
+    parsing. See the 'handler' attribute for more details.
 
     Will die if there are syntax errors in documents.
 
     Known options:
 
-      * time_zone => STR
+    *   time_zone => STR
 
-      Will be passed to Org::Document's constructor.
+        Will be passed to Org::Document's constructor.
 
- $orgp->parse_file($filename, \%opts) => $doc
-
+  $orgp->parse_file($filename, \%opts) => $doc
     Just like parse(), but will load document from file instead.
 
     Known options (aside from those known by parse()):
 
-      * cache => bool (default: from PERL_ORG_PARSER_CACHE, or 0)
+    *   cache => bool (default: from PERL_ORG_PARSER_CACHE, or 0)
 
-      Since Org::Parser can spend some time to parse largish Org files,
-      this is an option to store the parse result (using Storable). If
-      caching is turned on, then after the first parse, the result will be
-      stored in:
+        Since Org::Parser can spend some time to parse largish Org files,
+        this is an option to store the parse result (using Storable). If
+        caching is turned on, then after the first parse, the result will be
+        stored in:
 
-       ~/.cache/perl-org-parser/<filename>.<md5-digest-of-file-absolute-path>.storable
+         ~/.cache/perl-org-parser/<filename>.<md5-digest-of-file-absolute-path>.storable
 
-      and subsequent calls to this function can directly use this cache, as
-      long as the cache is not stale.
+        and subsequent calls to this function can directly use this cache,
+        as long as the cache is not stale.
 
 FAQ
-
- Why? Just as only perl can parse Perl, only org-mode can parse Org anyway!
-
+  Why? Just as only perl can parse Perl, only org-mode can parse Org anyway!
     True. I'm only targetting good enough. As long as I can parse/process
     all my Org notes and todo files, I have no complaints.
 
- It's too slow!
-
+  It's too slow!
     Parser is completely regex-based at the moment (I plan to use Marpa
     someday). Performance is quite lousy but I'm not annoyed enough at the
     moment to overhaul it.
 
 ENVIRONMENT
+  PERL_ORG_PARSER_CACHE => bool
+    Set default for "cache" option in "parse_file()".
 
- PERL_ORG_PARSER_CACHE => bool
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Org-Parser>.
 
-    Set default for cache option in parse_file().
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Org-Parser>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Org::Document
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

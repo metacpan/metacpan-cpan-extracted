@@ -1,4 +1,171 @@
-SYNOPSIS
+NAME
+    App::tracepm - Trace dependencies of your Perl script
 
+VERSION
+    This document describes version 0.20 of App::tracepm (from Perl
+    distribution App-tracepm), released on 2017-07-10.
+
+SYNOPSIS
     This distribution provides command-line utility called tracepm.
+
+FUNCTIONS
+  tracepm
+    Usage:
+
+     tracepm(%args) -> [status, msg, result, meta]
+
+    Trace dependencies of your Perl script.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   args => *array[str]*
+
+        Script arguments.
+
+    *   cache_prereqscanner => *bool* (default: 0)
+
+        Whether cache Perl::PrereqScanner{,::Lite} result.
+
+    *   core => *bool*
+
+        Filter only modules that are in core.
+
+    *   detail => *bool* (default: 0)
+
+        Whether to return records instead of just module names.
+
+    *   eval => *str*
+
+        Specify script from command-line instead.
+
+    *   method => *str* (default: "fatpacker")
+
+        Tracing method to use.
+
+        There are several tracing methods that can be used:
+
+        *   "fatpacker" (the default): This method uses the same method that
+            "fatpacker trace" uses, which is running the script using "perl
+            -c" then collect the populated %INC. Only modules loaded during
+            compile time are detected.
+
+        *   "require": This method runs your script normally until it exits.
+            At the start of program, it replaces "CORE::GLOBAL::require()"
+            with a routine that logs the require() argument to the log file.
+            Modules loaded during runtime is also logged by this method. But
+            some modules might not work, specifically modules that also
+            overrides require() (there should be only a handful of modules
+            that do this though).
+
+        *   "prereqscanner": This method does not run your Perl program, but
+            statically analyze it using "Perl::PrereqScanner". Since it uses
+            "PPI", it can be rather slow.
+
+        *   "prereqscanner_recurse": Like "prereqscanner", but will recurse
+            into all non-core modules until they are exhausted. Modules that
+            are not found will be skipped. It is recommended to use the
+            various "recurse_exclude_*" options options to limit recursion.
+
+        *   "prereqscanner_lite": This method is like the "prereqscanner"
+            method, but instead of "Perl::PrereqScanner" it uses
+            "Perl::PrereqScanner::Lite". The latter does not use "PPI" but
+            use "Compiler::Lexer" which is significantly faster.
+
+        *   "prereqscanner_lite_recurse": Like "prereqscanner_lite", but
+            recurses.
+
+    *   multiple_runs => *array[hash]*
+
+        Parameter to run script multiple times.
+
+        A more general alternative to using "args". Script will be run
+        multiple times, each with setting from element of this option.
+
+        Can be used to reach multiple run pathways and trace more modules.
+
+        Example:
+
+         [{"args":["-h"]}, # help mode
+          {"args":[""], "env":{"COMP_LINE":"cmd x", "COMP_POINT":5}},
+         ],
+
+    *   perl_version => *str*
+
+        Perl version, defaults to current running version.
+
+        This is for determining which module is core (the list differs from
+        version to version. See Module::CoreList for more details.
+
+    *   recurse_exclude => *array[str]*
+
+        When recursing, exclude some modules.
+
+    *   recurse_exclude_core => *bool*
+
+        When recursing, exclude core modules.
+
+    *   recurse_exclude_pattern => *array[str]*
+
+        When recursing, exclude some module patterns.
+
+    *   recurse_exclude_xs => *bool*
+
+        When recursing, exclude XS modules.
+
+    *   script => *str*
+
+        Path to script file (script to be packed).
+
+    *   trap_script_output => *bool*
+
+        Trap script output so it does not interfere with trace result.
+
+    *   use => *array[str]*
+
+        Additional modules to "use".
+
+        This is like running:
+
+         perl -MModule1 -MModule2 script.pl
+
+    *   xs => *bool*
+
+        Filter only modules that are XS modules.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-tracepm>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-tracepm>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-tracepm>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

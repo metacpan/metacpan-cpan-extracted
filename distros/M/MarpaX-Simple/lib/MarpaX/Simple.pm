@@ -1,12 +1,12 @@
 package MarpaX::Simple;
 
-our $DATE = '2015-09-03'; # DATE
-our $VERSION = '0.06'; # VERSION
+our $DATE = '2017-07-10'; # DATE
+our $VERSION = '0.07'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Marpa::R2;
 use UUID::Random;
@@ -105,19 +105,19 @@ sub gen_parser {
             last;
         } elsif ($args{grammar_class_file}) {
             require File::ShareDir;
-            require File::Slurp::Tiny;
-            $bnf = File::Slurp::Tiny::read_file(
+            require File::Slurper;
+            $bnf = File::Slurper::read_text(
                 File::ShareDir::class_file(__PACKAGE__,
                                            $args{grammar_class_file}));
         } elsif ($args{grammar_module_file}) {
             require File::ShareDir;
-            require File::Slurp::Tiny;
-            $bnf = File::Slurp::Tiny::read_file(
+            require File::Slurper;
+            $bnf = File::Slurper::read_text(
                 File::ShareDir::module_file(__PACKAGE__,
                                             $args{grammar_module_file}));
         } elsif ($args{grammar_file}) {
-            require File::Slurp::Tiny;
-            $bnf = File::Slurp::Tiny::read_file($args{grammar_file});
+            require File::Slurper;
+            $bnf = File::Slurper::read_text($args{grammar_file});
         } elsif ($args{grammar}) {
             $bnf = $args{grammar};
         }
@@ -169,7 +169,7 @@ MarpaX::Simple - Generate Marpa-based parser
 
 =head1 VERSION
 
-This document describes version 0.06 of MarpaX::Simple (from Perl distribution MarpaX-Simple), released on 2015-09-03.
+This document describes version 0.07 of MarpaX::Simple (from Perl distribution MarpaX-Simple), released on 2017-07-10.
 
 =head1 SYNOPSIS
 
@@ -219,7 +219,11 @@ function call: C<gen_parser>.
 =head1 FUNCTIONS
 
 
-=head2 gen_parser(%args) -> code
+=head2 gen_parser
+
+Usage:
+
+ gen_parser(%args) -> code
 
 Generate Marpa-based parser.
 
@@ -232,6 +236,8 @@ can check line numbers from error messages more easily. The C<slif_grammar> has
 the lowest overhead since you specify SLIF grammar that are already
 instantiated. See also the related Dist::Zilla plugin
 C<Dist::Zilla::Plugin::InsertMarpaSLIFGrammar>.
+
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -282,10 +288,6 @@ Will be passed to recognizer's constructor.
 
 Return value:  (code)
 
-=head1 SEE ALSO
-
-L<Marpa::R2>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/MarpaX-Simple>.
@@ -302,13 +304,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Marpa::R2>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

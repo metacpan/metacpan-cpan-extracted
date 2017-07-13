@@ -10,6 +10,7 @@ dist.ini
 lib/Log/ger.pm
 lib/Log/ger/Format.pm
 lib/Log/ger/Format/None.pm
+lib/Log/ger/Heavy.pm
 lib/Log/ger/Layout.pm
 lib/Log/ger/Output.pm
 lib/Log/ger/Output/Array.pm

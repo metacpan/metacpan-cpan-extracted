@@ -7,7 +7,7 @@ use Catmandu::Fix::Has;
 
 with 'Catmandu::Fix::Inlineable';
 
-our $VERSION = '1.161';
+our $VERSION = '1.171';
 
 has path   => (fix_arg => 1);
 has at     => (fix_opt => 1);
@@ -90,7 +90,9 @@ This Fix can be used inline in a Perl script:
 
 =over
 
-=item * L<Catmandu::Fix::marc_struc>
+=item * L<Catmandu::Fix::marc_copy>
+
+=item * L<Catmandu::Fix::marc_cut>
 
 =back
 

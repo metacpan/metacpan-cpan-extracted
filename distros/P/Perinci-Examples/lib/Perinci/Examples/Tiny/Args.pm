@@ -1,7 +1,7 @@
 package Perinci::Examples::Tiny::Args;
 
-our $DATE = '2017-01-12'; # DATE
-our $VERSION = '0.79'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.80'; # VERSION
 
 our %SPEC;
 
@@ -131,7 +131,7 @@ Perinci::Examples::Tiny::Args - Tests related to function arguments
 
 =head1 VERSION
 
-This document describes version 0.79 of Perinci::Examples::Tiny::Args (from Perl distribution Perinci-Examples), released on 2017-01-12.
+This document describes version 0.80 of Perinci::Examples::Tiny::Args (from Perl distribution Perinci-Examples), released on 2017-07-11.
 
 =head1 DESCRIPTION
 
@@ -142,7 +142,11 @@ Perinci::CmdLine frameworks.
 =head1 FUNCTIONS
 
 
-=head2 as_is(%args) -> [status, msg, result, meta]
+=head2 as_is
+
+Usage:
+
+ as_is(%args) -> [status, msg, result, meta]
 
 This function returns the argument as-is.
 
@@ -168,7 +172,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 has_date_and_duration_args(%args) -> [status, msg, result, meta]
+=head2 has_date_and_duration_args
+
+Usage:
+
+ has_date_and_duration_args(%args) -> [status, msg, result, meta]
 
 This function contains a date and a duration argument.
 
@@ -196,7 +204,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 has_date_arg(%args) -> [status, msg, result, meta]
+=head2 has_date_arg
+
+Usage:
+
+ has_date_arg(%args) -> [status, msg, result, meta]
 
 This function contains a date argument.
 
@@ -222,7 +234,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 has_dot_args(%args) -> [status, msg, result, meta]
+=head2 has_dot_args
+
+Usage:
+
+ has_dot_args(%args) -> [status, msg, result, meta]
 
 This function contains arguments with dot in their names.
 
@@ -250,7 +266,11 @@ that contains extra information.
 Return value: Return the two numbers multiplied (any)
 
 
-=head2 has_duration_arg(%args) -> [status, msg, result, meta]
+=head2 has_duration_arg
+
+Usage:
+
+ has_duration_arg(%args) -> [status, msg, result, meta]
 
 This function contains a duration argument.
 
@@ -297,7 +317,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

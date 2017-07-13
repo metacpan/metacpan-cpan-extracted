@@ -1,10 +1,10 @@
 package Perl::Stripper;
 
-our $DATE = '2015-08-18'; # DATE
-our $VERSION = '0.09'; # VERSION
+our $DATE = '2017-07-11'; # DATE
+our $VERSION = '0.10'; # VERSION
 
 use 5.010001;
-use Log::Any::IfLOG qw($log);
+use Log::ger;
 
 use PPI;
 use Moo;
@@ -95,8 +95,15 @@ sub strip {
                         }
                     }
                 }
+                if ($el->isa('PPI::Statement')) {
+                    # matching 'log_trace(...);'
+                    my $c0 = $el->child(0);
+                    if (grep { $c0->content eq "log_$_" } @ll) {
+                        $match++;
+                    }
+                }
                 if ($el->isa('PPI::Statement::Compound')) {
-                    # matching 'if ($log->is_trace) { ... }'
+                    # matching 'if ($log->is_trace) { ... }' or 'if (log_is_trace()) { ... }'
                     my $c0 = $el->child(0);
                     if ($c0->content eq 'if') {
                         my $cond = $c0->snext_sibling;
@@ -113,6 +120,8 @@ sub strip {
                                             $match++;
                                         }
                                     }
+                                } elsif (grep {$c0->content eq "log_is_$_"} @ll) {
+                                    $match++;
                                 }
                             }
                         }
@@ -151,7 +160,7 @@ Perl::Stripper - Yet another PPI-based Perl source code stripper
 
 =head1 VERSION
 
-This document describes version 0.09 of Perl::Stripper (from Perl distribution Perl-Stripper), released on 2015-08-18.
+This document describes version 0.10 of Perl::Stripper (from Perl distribution Perl-Stripper), released on 2017-07-11.
 
 =head1 SYNOPSIS
 
@@ -169,7 +178,7 @@ This document describes version 0.09 of Perl::Stripper (from Perl distribution P
 =head1 DESCRIPTION
 
 This module is yet another PPI-based Perl source code stripper. Its focus is on
-costumization and stripping significant information from source code.
+costumization and stripping meaningful information from source code.
 
 =head1 ATTRIBUTES
 
@@ -203,17 +212,23 @@ replace comment with gibberish, etc.
 =head2 strip_log => BOOL (default: 1)
 
 If set to true, will strip log statements. Useful for removing debugging
-information. Currently L<Log::Any>-specific and only looks for the default
-logger C<$log>. These will be stripped:
+information. Currently supports L<Log::Any> and L<Log::ger> and only looks for
+the following statements:
 
- $log->METHOD(...);
- $log->METHODf(...);
- if ($log->is_METHOD) { ... }
+ $log->LEVEL(...);
+ $log->LEVELf(...);
+ log_LEVEL(...);
+ if ($log->is_LEVEL) { ... }
+ if (log_is_LEVEL()) { ... }
 
 Not all methods are stripped. See C<stripped_log_levels>.
 
 Can also be set to a coderef. Code will be given the L<PPI::Statement> object
 and expected to modify it.
+
+These are currently not stripped:
+
+ if (something && $log->is_LEVEL) { ... }
 
 =head2 stripped_log_levels => ARRAY_OF_STR (default: ['debug', 'trace'])
 
@@ -274,34 +289,18 @@ into:
  $src = base64_decode(...); # optionally multiple rounds
  eval $src;
 
-This does not really remove significant (meaningful) parts of a source code, so
-I am not very interested in this approach. You can send a patch if you want.
+This does not really remove meaningful parts of a source code, so I am not very
+interested in this approach. You can send a patch if you want.
 
 =head2 How about changing string into hexadecimal characters? How about ...?
 
 Other examples similar in spirit would be adding extra parentheses to
 expressions, changing constant numbers into mathematical expressions.
 
-Again, this does not I<remove> significant (meaningful) parts of a source code
-(instead, they just transform stuffs). The effect can be reversed trivially
-using L<Perl::Tidy> or L<B::Deparse>. So I am not very interested in doing this,
-but you can send a patch if you want.
-
-=head1 SEE ALSO
-
-There are at least two approaches when analyzing/modifying/producing Perl code:
-L<B>-based and L<PPI>-based. In general, B-based modules are orders of magnitude
-faster than PPI-based ones, but each approach has its strengths and weaknesses.
-
-L<B::Deparse> - strips comments and extra newlines
-
-L<B::Deobfuscate> - like B::Deparse, but can also rename variables. Despite its
-name, if applied to a "normal" Perl code, the effect is obfuscation because it
-removes the original names (and meaning) of variables.
-
-L<Perl::Strip> - PPI-based, focus on compression.
-
-L<Perl::Squish> - PPI-based, focus on compression.
+Again, this does not I<remove> meaningful parts of a source code (instead, they
+just transform stuffs). The effect can be reversed trivially using L<Perl::Tidy>
+or L<B::Deparse>. So I am not very interested in doing this, but you can send a
+patch if you want.
 
 =head1 HOMEPAGE
 
@@ -319,13 +318,29 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+There are at least two approaches when analyzing/modifying/producing Perl code:
+L<B>-based and L<PPI>-based. In general, B-based modules are orders of magnitude
+faster than PPI-based ones, but each approach has its strengths and weaknesses.
+
+L<B::Deparse> - strips comments and extra newlines
+
+L<B::Deobfuscate> - like B::Deparse, but can also rename variables. Despite its
+name, if applied to a "normal" Perl code, the effect is obfuscation because it
+removes the original names (and meaning) of variables.
+
+L<Perl::Strip> - PPI-based, focus on compression.
+
+L<Perl::Squish> - PPI-based, focus on compression.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
