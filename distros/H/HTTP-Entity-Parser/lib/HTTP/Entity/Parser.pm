@@ -6,7 +6,7 @@ use warnings;
 use Stream::Buffered;
 use Module::Load;
 
-our $VERSION = "0.19";
+our $VERSION = "0.20";
 
 our $BUFFER_LENGTH = 65536;
 
@@ -64,6 +64,10 @@ sub parse {
 
 
     my $input = $env->{'psgi.input'};
+    if (!$input) {
+        # no input
+        return ([], []);
+    }
 
     my $buffer;
     if ($env->{'psgix.input.buffered'}) {
@@ -90,8 +94,14 @@ sub parse {
     elsif ($chunked) {
         my $chunk_buffer = '';
         my $length;
+        my $spin = 0;
         DECHUNK: while(1) {
             $input->read(my $chunk, $buffer_length);
+            my $read = length $chunk;
+            if ($read == 0 ) {
+                Carp::croak "Malformed chunked request" if $spin++ > 2000;
+                next;
+            }
             $chunk_buffer .= $chunk;
             while ( $chunk_buffer =~ s/^(([0-9a-fA-F]+).*\015\012)// ) {
                 my $trailer   = $1;
@@ -198,7 +208,7 @@ C<$uploads> is an ArrayRef of HashRef.
        "name" => "upload", #field name
        "headers" => [
            "Content-Type" => "application/octet-stream",
-           "Content-Disposition" => "form-data; name=\"upload\"; filename=\"hello.pl\""           
+           "Content-Disposition" => "form-data; name=\"upload\"; filename=\"hello.pl\""
        ],
        "size" => 78, #size of upload content
        "filename" => "hello.png", #original filename in the client
@@ -223,7 +233,7 @@ When used with L<Plack::Request::Upload>:
 
 =item OctetStream
 
-Default parser, This parser does not parse entity, always return empty list. 
+Default parser, This parser does not parse entity, always return empty list.
 
 =item UrlEncoded
 
@@ -281,4 +291,3 @@ Tokuhiro Matsuno E<lt>tokuhirom@gmail.comE<gt>
 This module is based on tokuhirom's code, see L<https://github.com/plack/Plack/pull/434>
 
 =cut
-

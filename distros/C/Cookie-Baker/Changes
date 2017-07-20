@@ -1,5 +1,10 @@
 Revision history for Perl extension Cookie-Baker
 
+0.08 2017-07-18T03:36:55Z
+
+   - Disallow , as a delimiter
+   - accept max-age=0 #5 (Thank you skaji)
+
 0.07 2016-09-21T01:35:56Z
 
    - Allow quoted cookie values, as per RFC 6265. #8

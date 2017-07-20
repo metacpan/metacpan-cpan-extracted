@@ -7,7 +7,10 @@ use FindBin;
 
 use File::Find;
 use Test::More;
-use Perl::Critic;
+
+unless (eval { require Perl::Critic; }) {
+    plan skip_all => 'perlcritic is missing';
+}
 
 unless (-d "$FindBin::Bin/../.git") {
     plan skip_all => 'perlcritic tests broken by Dist::Zilla';

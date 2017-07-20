@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Pages';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-# VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.005'; # VERSION
+my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
 
 use POSIX qw(floor);
 
@@ -29,6 +29,8 @@ PDF::Builder::Page - Methods to interact with individual pages
 =item $page = PDF::Builder::Page->new($pdf, $parent, $index)
 
 Returns a page object (called from $pdf->page()).
+
+=back
 
 =cut
 
@@ -331,6 +333,7 @@ This may most easily be done by using $I<type>->restore() and ->save() just
 after creating $I<type>:
 
 =over
+
 =item $text1 = $page->text(); 
 =item   $text1->save();
 =item $grfx1 = $page->gfx();
@@ -341,6 +344,7 @@ after creating $I<type>:
 =item   $text2->save();
 =item $grfx2 = $page->gfx();
 =item   $grfx1->restore();
+
 =back
 
 =cut

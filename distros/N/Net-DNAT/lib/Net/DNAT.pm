@@ -8,7 +8,7 @@ use Net::Ping 2.29;
 use IO::Socket;
 use Carp ();
 
-$VERSION = '0.13';
+$VERSION = '0.15';
 @ISA = qw(Net::Server::Multiplex);
 
 $listen_port = getservbyname("http", "tcp");
@@ -254,8 +254,8 @@ sub mux_input {
 
       # Add headers for Apache::DNAT
       $self->{request_headers_block} .=
-        "Remote-Addr: $self->{peeraddr}\n".
-          "Remote-Port: $self->{peerport}\n";
+        "Remote-Addr: $self->{peeraddr}\r\n".
+        "Remote-Port: $self->{peerport}\r\n";
 
       $self->{state} = "CONTENT";
       # Determine correct pool destination
@@ -521,7 +521,7 @@ are run before to the host_switch_table.
 
  Example: switch_filters => [
     qr%^Cookie:.*magic%im => "dev",
-    sub { s/^(Host: )www\.%$1%im; 0; } => "dev",
+    sub { s%^(Host: )www\.%$1%im; 0; } => "dev",
   ]
 
 =head2 connect_timeout

@@ -78,7 +78,7 @@ package Params::Classify;
 use warnings;
 use strict;
 
-our $VERSION = "0.013";
+our $VERSION = "0.014";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -95,6 +95,10 @@ our @EXPORT_OK = qw(
 );
 
 eval { local $SIG{__DIE__};
+	require Devel::CallChecker;
+	Devel::CallChecker->VERSION(0.003);
+};
+eval { local $SIG{__DIE__};
 	require XSLoader;
 	XSLoader::load(__PACKAGE__, $VERSION);
 };
@@ -104,7 +108,7 @@ if($@ eq "") {
 } else {
 	(my $filename = __FILE__) =~ tr# -~##cd;
 	local $/ = undef;
-	my $pp_code = "#line 128 \"$filename\"\n".<DATA>;
+	my $pp_code = "#line 137 \"$filename\"\n".<DATA>;
 	close(DATA);
 	{
 		local $SIG{__DIE__};
@@ -583,7 +587,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004, 2006, 2007, 2009, 2010
+Copyright (C) 2004, 2006, 2007, 2009, 2010, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 Copyright (C) 2009, 2010 PhotoBox Ltd

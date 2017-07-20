@@ -1,3 +1,32 @@
+version 0.014; 2017-07-16
+
+  * port to Perl 5.19.4, where the C type of array indices has changed
+
+  * update to accommodate PERL_OP_PARENT builds of Perl 5.21.11 or later
+    (which is the default from Perl 5.25.1)
+
+  * trigger custom op generation via Devel::CallChecker rather than by
+    hooking the underlying op checker
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * no longer include a Makefile.PL in the distribution
+
+  * correct dynamic_config setting to 0
+
+  * use boolSV() where appropriate in XS code
+
+  * use cBOOL() where appropriate
+
+  * consistently use THX_ prefix on internal function names
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
 version 0.013; 2010-11-16
 
   * bugfix: avoid triggering a core assertion on debugging builds,

@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "Alien::Build",
   "PM" => {
+    "lib/Alien/Base/Wrapper.pm" => "\$(INST_LIB)/Alien/Base/Wrapper.pm",
     "lib/Alien/Build.pm" => "\$(INST_LIB)/Alien/Build.pm",
     "lib/Alien/Build/CommandSequence.pm" => "\$(INST_LIB)/Alien/Build/CommandSequence.pm",
     "lib/Alien/Build/Interpolate.pm" => "\$(INST_LIB)/Alien/Build/Interpolate.pm",
@@ -104,7 +105,7 @@ my %WriteMakefileArgs = (
     "Test2::Require::Module" => "0.000060",
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "0.61",
+  "VERSION" => "0.66",
   "test" => {
     "TESTS" => "t/*.t"
   }

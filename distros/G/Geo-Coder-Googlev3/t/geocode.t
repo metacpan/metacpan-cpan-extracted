@@ -6,8 +6,8 @@ use lib "$FindBin::RealBin";
 
 use Test::More 'no_plan';
 
-sub within ($$$$$$);
-sub safe_geocode (&);
+sub within ($$$$$$;$);
+sub safe_geocode (&;$);
 
 use_ok 'Geo::Coder::Googlev3';
 
@@ -15,6 +15,13 @@ my $geocoder = Geo::Coder::Googlev3->new;
 isa_ok $geocoder, 'Geo::Coder::Googlev3';
 
 SKIP: {
+
+{ # key
+    my $geocoder = Geo::Coder::Googlev3->new(key => "INVALID_KEY");
+    my %info;
+    safe_geocode { $geocoder->geocode(location => 'Berlin') } \%info;
+    like $info{err}, qr{REQUEST_DENIED}, 'invalid api key';
+}
 
 { # list context
     ## There are eight hits in Berlin. Google uses to know seven of them.
@@ -102,16 +109,18 @@ SKIP: {
 }
 
 { # bounds
+    local $TODO = "Started to fail (RT #122485)"; # XXX check!
+
     my $location_chicago = safe_geocode { $geocoder->geocode(location => 'Winnetka') };
     within $location_chicago->{geometry}->{location}->{lat}, $location_chicago->{geometry}->{location}->{lng},
-	42.1080830, 42.1080840, -87.735900, -87.735890;
+	42.1080830, 42.1080840, -87.735900, -87.735890, 'Winnetka without bounds';
 
     my $bounds = [{lat=>34.172684,lng=>-118.604794},{lat=>34.236144,lng=>-118.500938}];
     my $geocoder_la = Geo::Coder::Googlev3->new(bounds => $bounds);
     is_deeply $geocoder_la->bounds, $bounds, 'bounds accessor';
     my $location_la = safe_geocode { $geocoder_la->geocode(location => 'Winnetka') };
     within $location_la->{geometry}->{location}->{lat}, $location_la->{geometry}->{location}->{lng},
-	34.172684, 34.236144, -118.604794, -118.500938;
+	34.172684, 34.236144, -118.604794, -118.500938, 'Winnetka with bounds';
 }
 
 { # invalid bounds
@@ -155,9 +164,9 @@ SKIP: {
 
 	my $geocoder_default = Geo::Coder::Googlev3->new();
 	ok $geocoder_default;
-	is $geocoder_default->sensor, 'false', 'Default is false';
+	is $geocoder_default->sensor, undef, "There's no default";
 	my $url_default = $geocoder_default->geocode_url(location => 'Hauptstr., Berlin');
-	like $url_default, qr{sensor=false}, 'sensor=false detected in URL without explicit sensor setting';
+	unlike $url_default, qr{sensor=false}, 'no sensor=false required anymore in URL without explicit sensor setting';
     }
 
     {
@@ -174,18 +183,39 @@ SKIP: {
     like $@, qr{sensor argument has to be either 'false' or 'true'}, 'expected error message for unsupported sensor argument';
 }
 
+{ # https
+    my $geocoder = Geo::Coder::Googlev3->new(use_https => 1);
+
+    # Probably should not use nested SKIP blocks here
+    if ($geocoder->ua->is_protocol_supported('https')) {
+	my $location = safe_geocode {
+	    $geocoder->geocode(location => 'Berlin')
+	};
+	like $location->{formatted_address}, qr{berlin}i, 'https query';
+    } else {
+	# but here is OK
+    SKIP: {
+	    skip "UA does not support https (maybe you have to install LWP::Protocol::https or so", 1;
+	}
+    }
 }
 
-sub within ($$$$$$) {
-    my($lat,$lng,$lat_min,$lat_max,$lng_min,$lng_max) = @_;
-    cmp_ok $lat, ">=", $lat_min;
-    cmp_ok $lat, "<=", $lat_max;
-    cmp_ok $lng, ">=", $lng_min;
-    cmp_ok $lng, "<=", $lng_max;
+} # SKIP
+
+sub within ($$$$$$;$) {
+    my($lat,$lng,$lat_min,$lat_max,$lng_min,$lng_max,$testname_prefix) = @_;
+    my $testname = sub ($) {
+	(defined $testname_prefix ? "$testname_prefix (" : "") . $_[0] . (defined $testname_prefix ? ")" : "");
+    };
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    cmp_ok $lat, ">=", $lat_min, $testname->("southern latitude");
+    cmp_ok $lat, "<=", $lat_max, $testname->("northern latitude");
+    cmp_ok $lng, ">=", $lng_min, $testname->("western longitude");
+    cmp_ok $lng, "<=", $lng_max, $testname->("eastern longitude");
 }
 
-sub safe_geocode (&) {
-    my($code0) = @_;
+sub safe_geocode (&;$) {
+    my($code0, $inforef) = @_;
     my @locations;
     my $code;
     if (wantarray) {
@@ -211,6 +241,10 @@ sub safe_geocode (&) {
 	diag "Fetch failed, probably network connection problems, skipping remaining tests";
 	no warnings 'exiting';
 	last SKIP;
+    }
+
+    if ($inforef) {
+	$inforef->{err} = $@;
     }
 
     if (wantarray) {

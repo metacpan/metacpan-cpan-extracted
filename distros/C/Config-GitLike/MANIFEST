@@ -17,8 +17,13 @@ META.yml
 t/00_use.t
 t/casing.t
 t/comment.t
+t/dos.conf
 t/encoding.t
+t/get_regexp_filter_multiple.t
 t/lib/TestConfig.pm
+t/mac.conf
+t/platforms.t
 t/t1300-repo-config.t
+t/unix.conf
 t/util/translate.pl
 SIGNATURE                                Public-key signature (added by MakeMaker)

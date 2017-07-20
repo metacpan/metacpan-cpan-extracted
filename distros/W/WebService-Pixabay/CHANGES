@@ -1,0 +1,254 @@
+==================================================
+Changes from 2016-07-14 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 2.0.2 at 2017-07-14 03:18:36 +0000
+------------------------------------------
+
+  Change: 5d3a5f83af078a382f3f2995dfa9526dbd300e8f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-14 11:17:40 +0000
+
+    - add LWP::Online depend 
+
+  Change: 19890c0f88d3b1a4be2b7ef00846fc2740f6c409
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-14 11:13:54 +0000
+
+    - remove manual Changes file 
+
+  Change: f97b35617f4da384cd025e77fcac4ddf94cb9670
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-14 11:12:27 +0000
+
+    - improve distribution 
+
+  Change: e3288889375e9d81c67b8f6c51a6bec3f928962c
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-10 01:35:55 +0000
+
+    - change to install level test option 
+
+  Change: a2c014770d8d959139edec727400184bc2a9ea63
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-10 01:34:57 +0000
+
+    - patch update 
+
+  Change: b6baecdc966660f763a69efa9be9a4564f7f1f06
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-10 01:23:39 +0000
+
+    - major update 
+
+  Change: e8e97410705666fdc690b7f16a17628558ad6098
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-10 00:28:59 +0000
+
+    - updated 
+
+  Change: 42fb565b815f678dfb23b428edd4e2fe8b1f5dff
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-09 13:29:02 +0000
+
+    - change prequisite version 
+
+  Change: 81412aab083a4619b3269610c10dfea9a0248fe9
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-09 13:28:31 +0000
+
+    - update bugfix 
+
+  Change: c0992fc0f311dbc0167a20e3cea79d32f2645d52
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-09 00:21:36 +0000
+
+    - update doc 
+
+  Change: 5f58fa7c7b8d52fc3c4c50fff782d63143c6be93
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-09 00:18:22 +0000
+
+    - bugfix update 
+
+  Change: 301eaea5a46addbbd273dd8c6f85e69571c1ea9f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-08 22:29:51 +0000
+
+    - update module version prequisite 
+
+  Change: 0eb2e81870f9c3ce3171928cb2e130c5d660e739
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-06-08 22:26:37 +0000
+
+    - major update
+
+    more docs, fixed malformed bug (for now until WebService::Client is
+    fixed), method chaining functionality (no more repetitive invoking) 
+
+  Change: 09742c812c746f2ecec69fb654d66d7ae7d9a190
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-05-25 15:40:08 +0000
+
+    - updated 
+
+  Change: aaffc4ea5d2f6d4226ddf417056f9cc85f4f3b9f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-05-25 15:39:33 +0000
+
+    - fix typo 
+
+  Change: 03157c8c8d4dfd88b8274d31df6b134eb5896d0f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-05-25 15:32:08 +0000
+
+    - added doc 
+
+  Change: 1ec6ef960f3e9cfffc5380fa005a1723c8959384
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-05-12 20:05:04 +0000
+
+    - added Modern::Perl module 
+
+  Change: 8eb79b7a3e23cd78ecac0e4a9293cfdf653c2320
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-25 11:59:46 +0000
+
+    commited 
+
+  Change: 0206d1a1a70368fdaf38d1a11afd103e844c0f62
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 18:03:28 +0000
+
+    commited 
+
+  Change: b92f64f0a669942adb4bd3a46d3c4e17bbdc9a78
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 18:01:59 +0000
+
+    commited 
+
+  Change: b36db6a5a20fd1c1f21847c3c0d5e887247bf56a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 18:01:36 +0000
+
+    commited 
+
+  Change: 7fd13cf9608ea2fff9825ae979e08f0e53e989fa
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 17:31:24 +0000
+
+    commited 
+
+  Change: 023651ffd6193bbe8c116cc4d826231448846d44
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 17:25:55 +0000
+
+    commited 
+
+  Change: 48d84123b264e909a1f3d24c04a48fea9f5f3f2f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 17:22:40 +0000
+
+    commited 
+
+  Change: 3b575769cece5c2f6533c09425e652b9c483cc4b
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 17:10:20 +0000
+
+    commited 
+
+  Change: 5249ca81ade51bc9288ca389d287991863366cdd
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 17:09:07 +0000
+
+    commited 
+
+  Change: 5e35c785aee7e2388fabe47b239ea229b5036e99
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 17:01:44 +0000
+
+    commited 
+
+  Change: 0259a596e1fe9dd6afb51690a6ccc0dbd1d4a6f0
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 17:01:11 +0000
+
+    commited 
+
+  Change: bd04d915e3e0930a60340287f850f729836a674f
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 16:56:03 +0000
+
+    commited 
+
+  Change: e8ac5c32638eb474b2ce330923f39ebd2b79d8a3
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 16:54:24 +0000
+
+    commited 
+
+  Change: 2646ad13ae0b6102828e7bba9ef2f9e630e3a408
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 16:30:43 +0000
+
+    First release 
+
+  Change: c15437d2fc1b63a84a50483dd72222ab4195ce0b
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 12:35:25 +0000
+
+    commited 
+
+  Change: c109da1b6fd4e3b2243caa8c441033f6bcf49cb7
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 02:34:39 +0000
+
+    commited 
+
+  Change: 4d10430ce77ee60881052df7588b5e1c6c8e9b32
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 02:23:16 +0000
+
+    commited 
+
+  Change: 591eb067a87a2184d077faac3f711b2bc2679179
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 02:22:34 +0000
+
+    commited 
+
+  Change: 305cd60e5f8bc88e893ca6d2e86ce2d4597982d9
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 02:19:28 +0000
+
+    commited 
+
+  Change: 59fd7a57d08ed7652eb751695fb07d4d348b7220
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 02:16:57 +0000
+
+    commited 
+
+  Change: 21ee747dd0ef10aef8a75f574ef09caf408281a2
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 02:02:50 +0000
+
+    commited 
+
+  Change: 39a83633fdb76e7e2a7b91f481daabbad952e8fa
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 01:53:54 +0000
+
+    commited 
+
+  Change: 77dfdf60b3b4f3acaa90afe2051d94ac4965fb5a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-23 01:03:04 +0000
+
+    added 
+
+================
+End of releases.
+================

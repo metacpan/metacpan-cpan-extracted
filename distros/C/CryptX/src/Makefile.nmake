@@ -42,16 +42,17 @@ ltc/mac/pmac/pmac_ntz.obj ltc/mac/pmac/pmac_process.obj ltc/mac/pmac/pmac_shift_
 ltc/mac/poly1305/poly1305.obj ltc/mac/poly1305/poly1305_file.obj ltc/mac/poly1305/poly1305_memory.obj \
 ltc/mac/poly1305/poly1305_memory_multi.obj ltc/mac/xcbc/xcbc_done.obj ltc/mac/xcbc/xcbc_file.obj \
 ltc/mac/xcbc/xcbc_init.obj ltc/mac/xcbc/xcbc_memory.obj ltc/mac/xcbc/xcbc_memory_multi.obj \
-ltc/mac/xcbc/xcbc_process.obj ltc/math/ltm_desc.obj ltc/math/multi.obj ltc/math/rand_bn.obj \
-ltc/math/rand_prime.obj ltc/math/tfm_desc.obj ltc/math/fp/ltc_ecc_fp_mulmod.obj ltc/misc/adler32.obj \
-ltc/misc/burn_stack.obj ltc/misc/crc32.obj ltc/misc/error_to_string.obj ltc/misc/mem_neq.obj \
-ltc/misc/pk_get_oid.obj ltc/misc/zeromem.obj ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj \
-ltc/misc/crypt/crypt.obj ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj \
-ltc/misc/crypt/crypt_cipher_is_valid.obj ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj \
-ltc/misc/crypt/crypt_find_cipher_id.obj ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj \
-ltc/misc/crypt/crypt_find_hash_id.obj ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj \
-ltc/misc/crypt/crypt_fsa.obj ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj \
-ltc/misc/crypt/crypt_inits.obj ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
+ltc/mac/xcbc/xcbc_process.obj ltc/math/ltm_desc.obj ltc/math/multi.obj ltc/math/radix_to_bin.obj \
+ltc/math/rand_bn.obj ltc/math/rand_prime.obj ltc/math/tfm_desc.obj ltc/math/fp/ltc_ecc_fp_mulmod.obj \
+ltc/misc/adler32.obj ltc/misc/burn_stack.obj ltc/misc/compare_testvector.obj ltc/misc/crc32.obj \
+ltc/misc/error_to_string.obj ltc/misc/mem_neq.obj ltc/misc/pk_get_oid.obj ltc/misc/zeromem.obj \
+ltc/misc/base64/base64_decode.obj ltc/misc/base64/base64_encode.obj ltc/misc/crypt/crypt.obj \
+ltc/misc/crypt/crypt_argchk.obj ltc/misc/crypt/crypt_cipher_descriptor.obj ltc/misc/crypt/crypt_cipher_is_valid.obj \
+ltc/misc/crypt/crypt_find_cipher.obj ltc/misc/crypt/crypt_find_cipher_any.obj ltc/misc/crypt/crypt_find_cipher_id.obj \
+ltc/misc/crypt/crypt_find_hash.obj ltc/misc/crypt/crypt_find_hash_any.obj ltc/misc/crypt/crypt_find_hash_id.obj \
+ltc/misc/crypt/crypt_find_hash_oid.obj ltc/misc/crypt/crypt_find_prng.obj ltc/misc/crypt/crypt_fsa.obj \
+ltc/misc/crypt/crypt_hash_descriptor.obj ltc/misc/crypt/crypt_hash_is_valid.obj ltc/misc/crypt/crypt_inits.obj \
+ltc/misc/crypt/crypt_ltc_mp_descriptor.obj ltc/misc/crypt/crypt_prng_descriptor.obj \
 ltc/misc/crypt/crypt_prng_is_valid.obj ltc/misc/crypt/crypt_register_cipher.obj ltc/misc/crypt/crypt_register_hash.obj \
 ltc/misc/crypt/crypt_register_prng.obj ltc/misc/crypt/crypt_unregister_cipher.obj \
 ltc/misc/crypt/crypt_unregister_hash.obj ltc/misc/crypt/crypt_unregister_prng.obj \
@@ -89,9 +90,12 @@ ltc/pk/asn1/der/teletex_string/der_decode_teletex_string.obj ltc/pk/asn1/der/tel
 ltc/pk/asn1/der/utctime/der_decode_utctime.obj ltc/pk/asn1/der/utctime/der_encode_utctime.obj \
 ltc/pk/asn1/der/utctime/der_length_utctime.obj ltc/pk/asn1/der/utf8/der_decode_utf8_string.obj \
 ltc/pk/asn1/der/utf8/der_encode_utf8_string.obj ltc/pk/asn1/der/utf8/der_length_utf8_string.obj \
-ltc/pk/dh/dh.obj ltc/pk/dh/dh_static.obj ltc/pk/dh/dh_sys.obj ltc/pk/dsa/dsa_decrypt_key.obj \
+ltc/pk/dh/dh.obj ltc/pk/dh/dh_check_pubkey.obj ltc/pk/dh/dh_export.obj ltc/pk/dh/dh_export_key.obj \
+ltc/pk/dh/dh_free.obj ltc/pk/dh/dh_generate_key.obj ltc/pk/dh/dh_import.obj ltc/pk/dh/dh_set.obj \
+ltc/pk/dh/dh_set_pg_dhparam.obj ltc/pk/dh/dh_shared_secret.obj ltc/pk/dsa/dsa_decrypt_key.obj \
 ltc/pk/dsa/dsa_encrypt_key.obj ltc/pk/dsa/dsa_export.obj ltc/pk/dsa/dsa_free.obj \
-ltc/pk/dsa/dsa_import.obj ltc/pk/dsa/dsa_import_radix.obj ltc/pk/dsa/dsa_make_key.obj \
+ltc/pk/dsa/dsa_generate_key.obj ltc/pk/dsa/dsa_generate_pqg.obj ltc/pk/dsa/dsa_import.obj \
+ltc/pk/dsa/dsa_make_key.obj ltc/pk/dsa/dsa_set.obj ltc/pk/dsa/dsa_set_pqg_dsaparam.obj \
 ltc/pk/dsa/dsa_shared_secret.obj ltc/pk/dsa/dsa_sign_hash.obj ltc/pk/dsa/dsa_verify_hash.obj \
 ltc/pk/dsa/dsa_verify_key.obj ltc/pk/ecc/ecc.obj ltc/pk/ecc/ecc_ansi_x963_export.obj \
 ltc/pk/ecc/ecc_ansi_x963_import.obj ltc/pk/ecc/ecc_decrypt_key.obj ltc/pk/ecc/ecc_dp_clear.obj \
@@ -111,8 +115,8 @@ ltc/pk/pkcs1/pkcs_1_oaep_encode.obj ltc/pk/pkcs1/pkcs_1_os2ip.obj ltc/pk/pkcs1/p
 ltc/pk/pkcs1/pkcs_1_pss_encode.obj ltc/pk/pkcs1/pkcs_1_v1_5_decode.obj ltc/pk/pkcs1/pkcs_1_v1_5_encode.obj \
 ltc/pk/rsa/rsa_decrypt_key.obj ltc/pk/rsa/rsa_encrypt_key.obj ltc/pk/rsa/rsa_export.obj \
 ltc/pk/rsa/rsa_exptmod.obj ltc/pk/rsa/rsa_free.obj ltc/pk/rsa/rsa_get_size.obj ltc/pk/rsa/rsa_import.obj \
-ltc/pk/rsa/rsa_import_pkcs8.obj ltc/pk/rsa/rsa_import_radix.obj ltc/pk/rsa/rsa_import_x509.obj \
-ltc/pk/rsa/rsa_make_key.obj ltc/pk/rsa/rsa_sign_hash.obj ltc/pk/rsa/rsa_sign_saltlen_get.obj \
+ltc/pk/rsa/rsa_import_pkcs8.obj ltc/pk/rsa/rsa_import_x509.obj ltc/pk/rsa/rsa_make_key.obj \
+ltc/pk/rsa/rsa_set.obj ltc/pk/rsa/rsa_sign_hash.obj ltc/pk/rsa/rsa_sign_saltlen_get.obj \
 ltc/pk/rsa/rsa_verify_hash.obj ltc/prngs/chacha20.obj ltc/prngs/fortuna.obj ltc/prngs/rc4.obj \
 ltc/prngs/rng_get_bytes.obj ltc/prngs/rng_make_prng.obj ltc/prngs/sober128.obj ltc/prngs/sprng.obj \
 ltc/prngs/yarrow.obj ltc/stream/chacha/chacha_crypt.obj ltc/stream/chacha/chacha_done.obj \
@@ -163,5 +167,5 @@ clean:
 	$(RM_F) $(OBJS) liballinone.lib
 
 .c.obj:
-        cl $(CFLAGS) /c $< /Fo$@
+        cl /Iltm /Iltc/headers /DLTC_SOURCE /DLTC_NO_TEST /DLTC_NO_PROTOTYPES /DLTM_DESC $(CFLAGS) /c $< /Fo$@
  

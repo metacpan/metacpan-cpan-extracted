@@ -8,12 +8,18 @@ use Path::Tiny 'path';
 use Sort::filevercmp 'fileversort';
 use sort 'stable';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 our @EXPORT = 'ls';
 
 sub ls {
-  my ($dir, $options) = @_;
+  my ($dir, $options);
+  if (ref $_[0] eq 'HASH') {
+    ($options) = @_;
+  } else {
+    ($dir, $options) = @_;
+  }
+  $dir = '.' unless defined $dir and length $dir;
   $options ||= {};
   
   $dir = path($dir); # do glob expansion
@@ -101,7 +107,7 @@ Dir::ls - List the contents of a directory
 
   use Dir::ls;
   
-  print "$_\n" for ls '.';
+  print "$_\n" for ls; # defaults to current working directory
   
   print "$_: ", -s "/foo/bar/$_", "\n" for ls '/foo/bar', {all => 1, sort => 'size'};
 
@@ -118,7 +124,8 @@ similar manner to the GNU coreutils command L<ls(1)>.
 
 Takes a directory path and optional hashref of options, and returns a list of
 items in the directory. Home directories represented by C<~> will be expanded
-by L<Path::Tiny/"path">. Like in L<ls(1)>, the returned names are relative to
+by L<Path::Tiny/"path">. If no directory path is passed, the current working
+directory will be used. Like in L<ls(1)>, the returned names are relative to
 the passed directory path, so if you want to use a filename (such as passing it
 to C<open> or C<stat>), you must prefix it with the directory path, with C<~>
 expanded if present.

@@ -1,7 +1,7 @@
 package Log::ger;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -54,6 +54,9 @@ my $default_null_routines = [
         [$sub0, "log_$_", $Levels{$_}, 'log_sub'],
             [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "log_is_$_",
              $Levels{$_}, 'is_sub'],
+        [$sub0, $_, $Levels{$_}, 'log_method'],
+            [$Levels{$_} > $Current_Level ? $sub0 : $sub1, "is_$_",
+             $Levels{$_}, 'is_method'],
          } keys %Levels),
 ];
 
@@ -159,7 +162,7 @@ Log::ger - A lightweight, flexible logging framework
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -203,11 +206,16 @@ L<Log::ger::Manual> on why you might prefer Log::ger to Log::Any).
 B<Slim distribution.> No non-core dependencies, extra functionalities are
 provided in separate distributions to be pulled as needed.
 
-B<Low startup overhead.> Only around 1-1.5ms or less, comparable with Log::Any
-0.15, less than Log::Any 1.0x at around 4-10ms, and certainly less than
-L<Log::Log4perl> at 20-30ms. This is measured on a 2014-2015 PC and before doing
-any output configuration. For more benchmarks, see
-L<Bencher::Scenarios::LogGer>.
+B<Low startup overhead.> Only ~0.5-1ms. For comparison, L<strict> ~0.2-0.5ms,
+L<warnings> ~2ms, L<Log::Any> 0.15 ~2-3ms, Log::Any 1.049 ~8-10ms,
+L<Log::Log4perl> ~35ms. This is measured on a 2014-2015 PC and before doing any
+output configuration. For more benchmarks, see L<Bencher::Scenarios::LogGer> or
+try yourself e.g. with L<bencher-code>:
+
+ % bencher-code 'use Log::ger' 'use Log::Any' --startup
+
+B<Fast>. Low null-/stealth-logging overhead, about 1.5x faster than Log::Any, 3x
+faster than Log4perl, and 5x faster than L<Log::Fast>.
 
 B<Conditional compilation.> There is a plugin to optimize away unneeded logging
 statements, like assertion/conditional compilation, so they have zero runtime

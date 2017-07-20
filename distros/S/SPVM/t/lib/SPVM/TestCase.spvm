@@ -1,6 +1,680 @@
 package TestCase {
-  has x : int;
-  has y : int;
+  has x_byte : byte;
+  has x_short : short;
+  has x_int : int;
+  has x_long : long;
+  has x_int_array : int[];
+  has x_string : string;
+  
+  # Convert type - widning convertion
+  sub convert_byte_to_short_plus() : int {
+    my $value = (short)(byte)0x7F;
+    
+    if ($value == (short)0x007F) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_byte_to_short_minus() : int {
+    my $value = (short)(byte)0xFF;
+    
+    if ($value == (short)0xFFFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_byte_to_int_plus() : int {
+    my $value = (int)(byte)0x7F;
+    
+    if ($value == 0x0000007F) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_byte_to_int_minus() : int {
+    my $value = (int)(byte)0xFF;
+    
+    if ($value == 0xFFFFFFFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_byte_to_long_plus() : int {
+    my $value = (long)(byte)0x7F;
+    
+    if ($value == 0x000000000000007FL) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_byte_to_long_minus() : int {
+    my $value = (long)(byte)0xFF;
+    
+    if ($value == 0xFFFFFFFFFFFFFFFFL) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_short_to_int_plus() : int {
+    my $value = (int)(short)0x7FFF;
+    
+    if ($value == 0x0000007FFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_short_to_int_minus() : int {
+    my $value = (int)(short)0xFFFF;
+    
+    if ($value == 0xFFFFFFFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_short_to_long_plus() : int {
+    my $value = (long)(short)0x7FFF;
+    
+    if ($value == 0x000000000000007FFFL) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_short_to_long_minus() : int {
+    my $value = (long)(short)0xFFFF;
+    
+    if ($value == 0xFFFFFFFFFFFFFFFFL) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_int_to_long_plus() : int {
+    my $value = (long)0x7FFFFFFF;
+    
+    if ($value == 0x000000007FFFFFFFL) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_int_to_long_minus() : int {
+    my $value = (long)0xFFFFFFFF;
+    
+    if ($value == 0xFFFFFFFFFFFFFFFFL) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  # Convert type - convert to same type
+  sub convert_long_to_long() : int {
+    my $value = (long)0xFFFFFFFFFFFFFFFFL;
+    
+    if ($value == 0xFFFFFFFFFFFFFFFFL) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_int_to_int() : int {
+    my $value = (int)0xFFFFFFFF;
+    
+    if ($value == 0xFFFFFFFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_short_to_short() : int {
+    my $value = (short)(short)0xFFFF;
+    
+    if ($value == (short)0xFFFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_byte_to_byte() : int {
+    my $value = (byte)(byte)0xFF;
+    
+    if ($value == (byte)0xFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_float_to_float() : int {
+    my $value = (float)0.5f;
+    
+    if ($value == 0.5f) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_double_to_double() : int {
+    my $value = (double)0.5;
+    
+    if ($value == 0.5) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  # Convert type - integral narrowing convertion
+  sub convert_long_to_int() : int {
+    my $value = (int)0xFFFFFFFFFFFFFFFFL;
+    
+    if ($value == 0xFFFFFFFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_long_to_short() : int {
+    my $value = (short)0xFFFFFFFFFFFFFFFFL;
+    
+    if ($value == (short)0xFFFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_long_to_byte() : int {
+    my $value = (byte)0xFFFFFFFFFFFFFFFFL;
+    
+    if ($value == (byte)0xFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_int_to_short() : int {
+    my $value = (short)0xFFFFFFFF;
+    
+    if ($value == (short)0xFFFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_int_to_byte() : int {
+    my $value = (byte)0xFFFFFFFF;
+    
+    if ($value == (byte)0xFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  sub convert_short_to_byte() : int {
+    my $value = (byte)(short)0xFFFF;
+    
+    if ($value == (byte)0xFF) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  sub spvm_object_set_object($obj : TestCase) : int {
+    my $nums = $obj->{x_int_array};
+    my $bytes = (byte[])($obj->{x_string});
+    
+    # [INT_MAX, INT_MAX]
+    if (@$nums == 2) {
+      if ($nums->[0] == 2147483647) {
+        if ($nums->[1] == 2147483647) {
+          # abc
+          if ($bytes->[0] == (byte)97) {
+            if ($bytes->[1] == (byte)98) {
+              if ($bytes->[2] == (byte)99) {
+                if (@$bytes == 3) {
+                  return 1;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub spvm_object_set($obj : TestCase) : int {
+    if ($obj->{x_byte} == (byte)127) {
+      if ($obj->{x_short} == (short)32767) {
+        if ($obj->{x_int} == 2147483647) {
+          if ($obj->{x_long} == 9223372036854775807L) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+  
+  sub logical_not_true() : int {
+    if (!1) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  sub logical_not_false() : int {
+    if (!0) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
+  # logical or
+  sub logical_or_both_true() : int {
+    if (1 || 1) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  sub logical_or_left_true() : int {
+    if (1 || 0) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
+  sub logical_or_right_true() : int {
+    if (0 || 1) {
+      return 1;
+    }
+    
+    return 0;
+  }
+
+  sub logical_or_both_false() : int {
+    if (0 || 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  # logical and
+  sub logical_and_both_true() : int {
+    if (1 && 1) {
+      return 1;
+    }
+    
+    return 0;
+  }
+  
+  sub logical_and_left_true() : int {
+    if (1 && 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  sub logical_and_right_true() : int {
+    if (1 && 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  sub logical_and_both_false() : int {
+    if (0 && 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  # call_sub return value
+  sub call_sub_return_byte_array() : byte[] {
+    my $nums = malloc byte[3];
+    
+    $nums->[0] = (byte)1;
+    $nums->[1] = (byte)2;
+    $nums->[2] = (byte)3;
+    
+    return $nums;
+  }
+  sub call_sub_return_byte_array_check($nums : byte[]) : int {
+    
+    if ($nums->[0] == (byte)1) {
+      if ($nums->[1] == (byte)2) {
+        if ($nums->[2] == (byte)3) {
+          if (@$nums == 3) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub call_sub_return_short_array() : short[] {
+    my $nums = malloc short[3];
+    
+    $nums->[0] = (short)1;
+    $nums->[1] = (short)2;
+    $nums->[2] = (short)3;
+    
+    return $nums;
+  }
+  sub call_sub_return_short_array_check($nums : short[]) : int {
+    
+    if ($nums->[0] == (short)1) {
+      if ($nums->[1] == (short)2) {
+        if ($nums->[2] == (short)3) {
+          if (@$nums == 3) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub call_sub_return_int_array() : int[] {
+    my $nums = malloc int[3];
+    
+    $nums->[0] = (int)1;
+    $nums->[1] = (int)2;
+    $nums->[2] = (int)3;
+    
+    return $nums;
+  }
+  sub call_sub_return_int_array_check($nums : int[]) : int {
+    
+    if ($nums->[0] == (int)1) {
+      if ($nums->[1] == (int)2) {
+        if ($nums->[2] == (int)3) {
+          if (@$nums == 3) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub call_sub_return_long_array() : long[] {
+    my $nums = malloc long[3];
+    
+    $nums->[0] = (long)1;
+    $nums->[1] = (long)2;
+    $nums->[2] = (long)3;
+    
+    return $nums;
+  }
+  sub call_sub_return_long_array_check($nums : long[]) : int {
+    
+    if ($nums->[0] == (long)1) {
+      if ($nums->[1] == (long)2) {
+        if ($nums->[2] == (long)3) {
+          if (@$nums == 3) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub call_sub_return_float_array() : float[] {
+    my $nums = malloc float[3];
+    
+    $nums->[0] = (float)1;
+    $nums->[1] = (float)2;
+    $nums->[2] = (float)3;
+    
+    return $nums;
+  }
+  sub call_sub_return_float_array_check($nums : float[]) : int {
+    
+    if ($nums->[0] == (float)1) {
+      if ($nums->[1] == (float)2) {
+        if ($nums->[2] == (float)3) {
+          if (@$nums == 3) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub call_sub_return_double_array() : double[] {
+    my $nums = malloc double[3];
+    
+    $nums->[0] = (double)1;
+    $nums->[1] = (double)2;
+    $nums->[2] = (double)3;
+    
+    return $nums;
+  }
+  sub call_sub_return_double_array_check($nums : double[]) : int {
+    
+    if ($nums->[0] == (double)1) {
+      if ($nums->[1] == (double)2) {
+        if ($nums->[2] == (double)3) {
+          if (@$nums == 3) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+  
+  # Add
+  sub add_byte_max() : byte {
+    return (byte)126 + (byte)1;
+  }
+  
+  sub add_byte_min() : byte {
+    return (byte)-128 + (byte)1;
+  }
+  
+  sub add_byte_overflow() : byte {
+    return (byte)127 + (byte)1;
+  }
+  
+  sub add_short_max() : short {
+    return (short)32766 + (short)1;
+  }
+  
+  sub add_short_min() : short {
+    return (short)-32768 + (short)1;
+  }
+  
+  sub add_short_overflow() : short {
+    return (short)32767 + (short)1;
+  }
+
+  sub add_int_max() : int {
+    return (int)2147483646 + (int)1;
+  }
+  
+  sub add_int_min() : int {
+    return (int)-2147483648 + (int)1;
+  }
+  
+  sub add_int_overflow() : int {
+    return (int)2147483647 + (int)1;
+  }
+
+  sub add_long_max() : long {
+    return (long)9223372036854775806L + (long)1;
+  }
+  
+  sub add_long_min() : long {
+    return (long)-9223372036854775808L + (long)1;
+  }
+  
+  sub add_long_overflow() : long {
+    return (long)9223372036854775807L + (long)1;
+  }
+
+  # Subtract
+  sub subtract_byte_max() : byte {
+    return (byte)127 - (byte)1;
+  }
+  
+  sub subtract_byte_min() : byte {
+    return (byte)-127 - (byte)1;
+  }
+  
+  sub subtract_byte_underflow() : byte {
+    return (byte)-128 - (byte)1;
+  }
+  
+  sub subtract_short_max() : short {
+    return (short)32767 - (short)1;
+  }
+  
+  sub subtract_short_min() : short {
+    return (short)-32767 - (short)1;
+  }
+  
+  sub subtract_short_underflow() : short {
+    return (short)-32768 - (short)1;
+  }
+
+  sub subtract_int_max() : int {
+    return (int)2147483647 - (int)1;
+  }
+  
+  sub subtract_int_min() : int {
+    return (int)-2147483647 - (int)1;
+  }
+  
+  sub subtract_int_underflow() : int {
+    return (int)-2147483648 - (int)1;
+  }
+
+  sub subtract_long_max() : long {
+    return (long)9223372036854775807L - (long)1;
+  }
+  
+  sub subtract_long_min() : long {
+    return (long)-9223372036854775807L - (long)1;
+  }
+  
+  sub subtract_long_underflow() : long {
+    return (long)-9223372036854775808L - (long)1;
+  }
+
+  # Multiply
+  sub multiply_byte_plus() : byte {
+    return (byte)32 * (byte)2;
+  }
+  
+  sub multiply_byte_minus() : byte {
+    return (byte)32 * (byte)-2;
+  }
+  
+  sub multiply_byte_overflow() : byte {
+    return (byte)64 * (byte)2;
+  }
+
+  sub multiply_short_plus() : short {
+    return (short)8192 * (short)2;
+  }
+  
+  sub multiply_short_minus() : short {
+    return (short)8192 * (short)-2;
+  }
+  
+  sub multiply_short_overflow() : short {
+    return (short)16384 * (short)2;
+  }
+  
+  sub multiply_int_plus() : int {
+    return (int)536870912 * (int)2;
+  }
+  
+  sub multiply_int_minus() : int {
+    return (int)536870912 * (int)-2;
+  }
+  
+  sub multiply_int_overflow() : int {
+    return (int)1073741824 * (int)2;
+  }
+  
+  sub multiply_long_plus() : long {
+    return (long)2305843009213693952L * (long)2L;
+  }
+  
+  sub multiply_long_minus() : long {
+    return (long)2305843009213693952L * (long)-2L;
+  }
+  
+  sub multiply_long_overflow() : long {
+    return (long)4611686018427387904L * (long)2L;
+  }
+  
+  # SPVM::string
+  sub call_sub_string($string : string) : int {
+    
+    my $bytes = (byte[])$string;
+    
+    if ($bytes->[0] == (byte)0xE3) {
+      if ($bytes->[1] == (byte)0x81) {
+        if ($bytes->[2] == (byte)0x82) {
+          if (@$bytes == 3) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  # SPVM::string_raw
+  sub call_sub_string_raw($string : string) : int {
+    
+    my $bytes = (byte[])$string;
+    
+    if ($bytes->[0] == (byte)97) {
+      if ($bytes->[1] == (byte)98) {
+        if ($bytes->[2] == (byte)99) {
+           if (@$bytes == 3) {
+             return 1;
+           }
+        }
+      }
+    }
+    
+    return 0;
+  }
 
   # byte array argument
   sub call_sub_byte_array($nums : byte[]) : byte {
@@ -237,6 +911,31 @@ package TestCase {
     # LOAD_CONSTANT
     return 0.5f;
   }
+  sub load_constant_float_exponent_E_plus() : float {
+    return 0.5E+3f;
+  }
+  sub load_constant_float_exponent_e_plus() : float {
+    return 0.5e3f;
+  }
+  sub load_constant_float_exponent_E_minus() : float {
+    return 62.5E-3f;
+  }
+  sub load_constant_float_exponent_e_minus() : float {
+    return 62.5e-3f;
+  }
+
+  sub load_constant_double_exponent_E_plus() : double {
+    return 0.5E+3;
+  }
+  sub load_constant_double_exponent_e_plus() : double {
+    return 0.5e3;
+  }
+  sub load_constant_double_exponent_E_minus() : double {
+    return 62.5E-3;
+  }
+  sub load_constant_double_exponent_e_minus() : double {
+    return 62.5e-3;
+  }
   
   # constant double
   sub load_constant_double_0() : double {
@@ -253,11 +952,13 @@ package TestCase {
   }
   
   # call_sub
-  sub call_sub_args_int($var1 : int, $var2 : int, $var3 : int) : int {
+  sub call_sub_args_int($var1 : int, $var2 : int, $var3 : int, $var4 : int) : int {
     if ($var1 == 1) {
       if ($var2 == 2147483647) {
         if ($var3 == -2147483647) {
-          return 1;
+          if ($var4 == 0) {
+            return 1;
+          }
         }
       }
     }
@@ -265,11 +966,13 @@ package TestCase {
     return 0;
   }
   
-  sub call_sub_args_long($var1 : long, $var2 : long, $var3 : long) : int {
+  sub call_sub_args_long($var1 : long, $var2 : long, $var3 : long, $var4 : long) : int {
     if ($var1 == 1L) {
       if ($var2 == 9223372036854775807L) {
         if ($var3 == -9223372036854775808L) {
-          return 1;
+          if ($var4 == 0L) {
+            return 1;
+          }
         }
       }
     }

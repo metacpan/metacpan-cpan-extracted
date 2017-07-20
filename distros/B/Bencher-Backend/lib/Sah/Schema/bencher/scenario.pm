@@ -1,7 +1,7 @@
 package Sah::Schema::bencher::scenario;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '1.039'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '1.040'; # VERSION
 
 use strict;
 use warnings;
@@ -65,7 +65,7 @@ Sah::Schema::bencher::scenario - Bencher scenario
 
 =head1 VERSION
 
-This document describes version 1.039 of Sah::Schema::bencher::scenario (from Perl distribution Bencher-Backend), released on 2017-07-02.
+This document describes version 1.040 of Sah::Schema::bencher::scenario (from Perl distribution Bencher-Backend), released on 2017-07-13.
 
 =head1 HOMEPAGE
 

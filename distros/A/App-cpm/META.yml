@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -50,8 +50,9 @@ resources:
   bugtracker: https://github.com/skaji/cpm/issues
   homepage: https://github.com/skaji/cpm
   repository: https://github.com/skaji/cpm.git
-version: '0.901'
+version: '0.911'
 x_contributors:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Shoichi Kaji <skaji@outlook.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

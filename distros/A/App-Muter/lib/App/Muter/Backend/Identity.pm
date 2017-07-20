@@ -1,6 +1,6 @@
 package App::Muter::Backend::Identity;
 # ABSTRACT: an identity transform for App::Muter
-$App::Muter::Backend::Identity::VERSION = '0.002000';
+$App::Muter::Backend::Identity::VERSION = '0.002001';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ App::Muter::Backend::Identity - an identity transform for App::Muter
 
 =head1 VERSION
 
-version 0.002000
+version 0.002001
 
 =head1 AUTHOR
 

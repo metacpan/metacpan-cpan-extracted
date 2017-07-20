@@ -419,7 +419,7 @@ _irand()
     _irand64 = 1
   CODE:
     if (ix == 0)
-      RETVAL = mt_lrand(state);
+      RETVAL = mt_lrand();
     else
       XSRETURN_UNDEF;
   OUTPUT:

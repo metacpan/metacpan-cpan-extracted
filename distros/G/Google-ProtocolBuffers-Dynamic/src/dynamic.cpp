@@ -1,5 +1,6 @@
 #include "dynamic.h"
 #include "mapper.h"
+#include "servicedef.h"
 
 #include <google/protobuf/dynamic_message.h>
 
@@ -30,7 +31,8 @@ MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
         check_enum_values(true),
         generic_extension_methods(true),
         implicit_maps(false),
-        accessor_style(GetAndSet) {
+        accessor_style(GetAndSet),
+        client_services(Disable) {
     if (options_ref == NULL || !SvOK(options_ref))
         return;
     if (!SvROK(options_ref) || SvTYPE(SvRV(options_ref)) != SVt_PVHV)
@@ -64,6 +66,19 @@ MappingOptions::MappingOptions(pTHX_ SV *options_ref) :
             accessor_style = Plain;
         else
             croak("Invalid value '%s' for 'accessor_style' option", buf);
+    }
+
+    if (SV **value = hv_fetchs(options, "client_services", 0)) {
+        const char *buf = SvPV_nolen(*value);
+
+        if (strEQ(buf, "disable"))
+            client_services = Disable;
+        else if (strEQ(buf, "noop"))
+            client_services = Noop;
+        else if (strEQ(buf, "grpc_xs"))
+            client_services = GrpcXS;
+        else
+            croak("Invalid value '%s' for 'client_services' option", buf);
     }
 
 #undef BOOLEAN_OPTION
@@ -182,6 +197,20 @@ namespace {
             return false;
         return true;
     }
+
+    void push_method_def(ServiceDef *service_def, const MethodDescriptor *descriptor, const MessageDef *input_message, const MessageDef *output_message) {
+        service_def->methods.push_back(
+            MethodDef(
+                descriptor->name(),
+                descriptor->full_name(),
+                service_def,
+                input_message,
+                output_message,
+                descriptor->client_streaming(),
+                descriptor->server_streaming()
+            )
+        );
+    }
 }
 
 void Dynamic::map_message(pTHX_ const string &message, const string &perl_package, const MappingOptions &options) {
@@ -249,6 +278,14 @@ void Dynamic::map_package_or_prefix(pTHX_ const string &pb_package_or_prefix, bo
 
             map_enum(aTHX_ descriptor, perl_package + "::" + descriptor->name(), options);
         }
+
+        for (int i = 0, max = file->service_count(); i < max; ++i) {
+            const ServiceDescriptor *descriptor = file->service(i);
+            if (mapped_services.find(descriptor->full_name()) != mapped_services.end())
+                continue;
+
+            map_service(aTHX_ descriptor, perl_package + "::" + descriptor->name(), options);
+        }
     }
 }
 
@@ -261,6 +298,20 @@ void Dynamic::map_enum(pTHX_ const string &enum_name, const string &perl_package
     }
 
     map_enum(aTHX_ descriptor, perl_package, options);
+}
+
+void Dynamic::map_service(pTHX_ const string &service_name, const string &perl_package, const MappingOptions &options) {
+    const DescriptorPool *pool = descriptor_loader.pool();
+    const ServiceDescriptor *descriptor = pool->FindServiceByName(service_name);
+
+    if (descriptor == NULL) {
+        croak("Unable to find a descriptor for service '%s'", service_name.c_str());
+    }
+    if (options.client_services == MappingOptions::Disable) {
+        croak("Explicit service mapping for '%s' with mapping type 'disable'", service_name.c_str());
+    }
+
+    map_service(aTHX_ descriptor, perl_package, options);
 }
 
 void Dynamic::map_message_recursive(pTHX_ const Descriptor *descriptor, const string &perl_package, const MappingOptions &options) {
@@ -295,7 +346,7 @@ void Dynamic::map_message(pTHX_ const Descriptor *descriptor, const string &perl
     if (descriptor_map.find(descriptor->full_name()) != descriptor_map.end())
         croak("Message '%s' has already been mapped", descriptor->full_name().c_str());
     if (options.use_bigints)
-        eval_pv("require Math::BigInt", 1);
+        load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Math::BigInt"), NULL);
     HV *stash = gv_stashpvn(perl_package.data(), perl_package.size(), GV_ADD);
     const MessageDef *message_def = def_builder.GetMessageDef(descriptor);
     if (is_map_entry(message_def, options.implicit_maps))
@@ -327,6 +378,10 @@ void Dynamic::map_message(pTHX_ const Descriptor *descriptor, const string &perl
     copy_and_bind(aTHX_ "new", perl_package, mapper);
     copy_and_bind(aTHX_ "new_and_check", perl_package, mapper);
     copy_and_bind(aTHX_ "message_descriptor", perl_package, mapper);
+
+    // for Grpc::Client
+    copy_and_bind(aTHX_ "static_decode", "_static_decode", perl_package, mapper);
+    copy_and_bind(aTHX_ "static_encode", "_static_encode", perl_package, mapper);
 
     bool has_extensions = false;
     for (int i = 0, max = mapper->field_count(); i < max; ++i) {
@@ -418,7 +473,7 @@ void Dynamic::map_message(pTHX_ const Descriptor *descriptor, const string &perl
 void Dynamic::map_enum(pTHX_ const EnumDescriptor *descriptor, const string &perl_package, const MappingOptions &options) {
     check_package(aTHX_ perl_package, descriptor->full_name());
     if (mapped_enums.find(descriptor->full_name()) != mapped_enums.end())
-        croak("Message '%s' has already been mapped", descriptor->full_name().c_str());
+        croak("Enum '%s' has already been mapped", descriptor->full_name().c_str());
 
     const EnumDef *enum_def = def_builder.GetEnumDef(descriptor);
     EnumMapper *mapper = new EnumMapper(aTHX_ this, enum_def);
@@ -438,12 +493,78 @@ void Dynamic::map_enum(pTHX_ const EnumDescriptor *descriptor, const string &per
     }
 }
 
+void Dynamic::map_service(pTHX_ const ServiceDescriptor *descriptor, const string &perl_package, const MappingOptions &options) {
+    if (options.client_services == MappingOptions::Disable)
+        return;
+
+    check_package(aTHX_ perl_package, descriptor->full_name());
+    if (mapped_services.find(descriptor->full_name()) != mapped_services.end())
+        croak("Service '%s' has already been mapped", descriptor->full_name().c_str());
+
+    mapped_services.insert(descriptor->full_name());
+    used_packages.insert(perl_package);
+
+    ServiceDef *service_def = new ServiceDef(descriptor->full_name());
+
+    switch (options.client_services) {
+    case MappingOptions::Noop:
+        map_service_noop(aTHX_ descriptor, perl_package, options, service_def);
+        break;
+    case MappingOptions::GrpcXS:
+        map_service_grpc_xs(aTHX_ descriptor, perl_package, options, service_def);
+        break;
+    default:
+        croak("Unhandled client_service option %d", options.client_services);
+    }
+
+    ServiceMapper *mapper = new ServiceMapper(aTHX_ this, service_def);
+
+    copy_and_bind(aTHX_ "service_descriptor", perl_package, mapper);
+}
+
+void Dynamic::map_service_noop(pTHX_ const ServiceDescriptor *descriptor, const string &perl_package, const MappingOptions &options, ServiceDef *service_def) {
+    for (int i = 0, max = descriptor->method_count(); i < max; ++i) {
+        const MethodDescriptor *method = descriptor->method(i);
+        const Descriptor *input = method->input_type(), *output = method->output_type();
+        const MessageDef *input_def = def_builder.GetMessageDef(input);
+        const MessageDef *output_def = def_builder.GetMessageDef(output);
+
+        push_method_def(service_def, method, input_def, output_def);
+    }
+}
+
+void Dynamic::map_service_grpc_xs(pTHX_ const ServiceDescriptor *descriptor, const string &perl_package, const MappingOptions &options, ServiceDef *service_def) {
+    string isa_name = perl_package + "::ISA";
+    AV *isa = get_av(isa_name.c_str(), 1);
+    SV *base_stub_package = newSVpvs("Grpc::Client::BaseStub");
+
+    SvREFCNT_inc(base_stub_package);
+    av_push(isa, base_stub_package);
+    load_module(PERL_LOADMOD_NOIMPORT, base_stub_package, NULL);
+
+    for (int i = 0, max = descriptor->method_count(); i < max; ++i) {
+        const MethodDescriptor *method = descriptor->method(i);
+        string full_method = "/" + descriptor->full_name() + "/" + method->name().c_str();
+        const Descriptor *input = method->input_type(), *output = method->output_type();
+        const MessageDef *input_def = def_builder.GetMessageDef(input);
+        const MessageDef *output_def = def_builder.GetMessageDef(output);
+        MethodMapper *mapper = new MethodMapper(aTHX_ this, full_method, input_def, output_def, method->client_streaming(), method->server_streaming());
+
+        copy_and_bind(aTHX_ "grpc_xs_call_service_passthrough", method->name().c_str(), perl_package, mapper);
+
+        pending_methods.push_back(mapper);
+        push_method_def(service_def, method, input_def, output_def);
+    }
+}
+
 void Dynamic::resolve_references() {
     for (std::vector<Mapper *>::iterator it = pending.begin(), en = pending.end(); it != en; ++it)
         (*it)->resolve_mappers();
     for (std::vector<Mapper *>::iterator it = pending.begin(), en = pending.end(); it != en; ++it)
         (*it)->create_encoder_decoder();
     pending.clear();
+    for (std::vector<MethodMapper *>::iterator it = pending_methods.begin(), en = pending_methods.end(); it != en; ++it)
+        (*it)->resolve_input_output();
 }
 
 const Mapper *Dynamic::find_mapper(const MessageDef *message_def) const {

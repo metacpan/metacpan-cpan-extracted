@@ -6,9 +6,11 @@ use warnings;
 use Mail::Box::POP3::Test;
 use Mail::Box::Test;
 
-use Test::More tests => 7;
 use File::Basename qw(dirname);
 use File::Spec;
+
+use Test::More;
+$ENV{MARKOV_DEVEL} or plan skip_all => "tests are fragile, skipped";
 
 use_ok('Mail::Transport::POP3');
 
@@ -44,3 +46,5 @@ STAT 1
 UIDL 1
 USER 1
 EOD
+
+done_testing;

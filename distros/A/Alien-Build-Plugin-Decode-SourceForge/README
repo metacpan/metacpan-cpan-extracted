@@ -1,0 +1,46 @@
+NAME
+
+    Alien::Build::Plugin::Decode::SourceForge - Alien::Build plugin to
+    handle SourceForge links
+
+VERSION
+
+    version 0.01
+
+SYNOPSIS
+
+     use alinfile;
+     
+     plugin 'Decode::SourceForge';
+
+DESCRIPTION
+
+    SourceForge is a website that offers software developers a centralized
+    online location to manage their Open Source projects. One of the
+    challenges it presents is that projects hosted by SourceForge add the
+    unnecessary suffix /download to links of tarballs, which confuses the
+    way Alien::Base computes the filename based on URLs. This plugin solves
+    this problem by rewriting the filenames returned by the
+    Alien::Build::Plugin::Decode::HTML plugin.
+
+SEE ALSO
+
+    Alien
+
+    alienfile
+
+    Alien::Build
+
+    Alien::Base
+
+AUTHOR
+
+    Graham Ollis <plicease@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Graham Ollis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

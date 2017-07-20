@@ -10,6 +10,7 @@ requires 'XML::LibXML' , '1.60';
 requires 'XML::LibXML::SAX' , '0';
 requires 'XML::SAX::Base' , '1.04';
 requires 'XML::SAX' , '0';
+requires 'XML::NamespaceSupport', '0';
 requires 'URI' , '0';
 requires 'HTTP::Request' , '0';
 requires 'HTTP::Response', '0';

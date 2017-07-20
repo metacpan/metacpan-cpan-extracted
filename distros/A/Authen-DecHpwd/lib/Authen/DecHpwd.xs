@@ -3,6 +3,10 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef Newx
 # define Newx(v,n,t) New(0,v,n,t)
 #endif /* !Newx */
@@ -659,13 +663,13 @@ CODE:
 	if(alg > UAIC_PURDY_S)
 		croak("algorithm value %u is not recognised", alg);
 	username_str = (U8*)SvPV(username_sv, username_len);
-	is_utf8 = !!SvUTF8(username_sv);
+	is_utf8 = cBOOL(SvUTF8(username_sv));
 	username_octs = bytes_from_utf8(username_str, &username_len, &is_utf8);
 	if(username_octs != username_str) SAVEFREEPV(username_octs);
 	if(is_utf8)
 		croak("input must contain only octets");
 	password_str = (U8*)SvPV(password_sv, password_len);
-	is_utf8 = !!SvUTF8(password_sv);
+	is_utf8 = cBOOL(SvUTF8(password_sv));
 	password_octs = bytes_from_utf8(password_str, &password_len, &is_utf8);
 	if(is_utf8)
 		croak("input must contain only octets");

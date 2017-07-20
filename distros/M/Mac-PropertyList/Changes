@@ -1,125 +1,132 @@
-# Changes for Mac::PropertyList
+Revision history for Perl module Mac::PropertyList
 
-1.41 - Fri Sep 12 06:15:56 2014
-	* Fix up some metadata (GitHub #4)
+1.411 2017-07-19T02:10:42Z
+	* Bram Stappers fixed a regression with XML comments
 
-1.40 - Fri Jan  3 13:57:08 2014
-	* Get rid of MYMETA
+1.41_01 2015-01-29T04:41:09Z
+	- RT #101795: Mis-parse or hang while parsing non-pretty XML (Tom Wyant)
+	- RT #101796: Wide character in print warning in t/read_binary.t (Tom Wyant)
 
-1.39 - Fri Sep 27 16:28:21 2013
-	* Bump to full release
+1.41 2014-09-12
+	- Fix up some metadata (GitHub #4)
 
-1.38_02 - Mon Sep 23 19:52:20 2013
-	* Fix non-portable strftime format (RT #83460)
+1.40 2014-01-03
+	- Get rid of MYMETA
 
-1.38_01 - Sun Feb 10 17:08:57 2013
-	* Wim Lewis improved the binary reader / writer and made better
+1.39 2013-09-27
+	- Bump to full release
+
+1.38_02 2013-09-23
+	- Fix non-portable strftime format (RT #83460)
+
+1.38_01 2013-02-10
+	- Wim Lewis improved the binary reader / writer and made better
 	tests for it.
 
-1.38 - Tue Oct 23 15:44:26 2012
-	* Wim Lewis <wiml@cpan.org> added WriteBinary. Great work!
+1.38 2012-10-23
+	- Wim Lewis <wiml@cpan.org> added WriteBinary. Great work!
 
-1.37 - Thu Aug 30 11:39:39 2012
-	* fix plist_as_perl to be the same as as_perl (and as
+1.37 2012-08-30
+	- fix plist_as_perl to be the same as as_perl (and as
 	documented)
 
-1.36 - Sat Jun 16 16:10:01 2012
-	* Update the docs, and make the previous dev releases official
+1.36 2012-06-16
+	- Update the docs, and make the previous dev releases official
 
-1.35 - Fri Mar  9 19:38:59 2012
-	* Document the as_perl method, which undecorates that internal
+1.35 2012-03-09
+	- Document the as_perl method, which undecorates that internal
 	data structure
 
-1.34 - Mon Jul 11 18:10:36 2011
-	* In ReadBinary, handle the data as big-endian. This means you
+1.34 2011-07-11
+	- In ReadBinary, handle the data as big-endian. This means you
 	need the > pack modifier introduced in 5.10.
 
-1.33_02 - Sat Jul  9 13:17:15 2011
-	* Require 5.10 because I need the > pack modifier
+1.33_02 2011-07-09
+	- Require 5.10 because I need the > pack modifier
 
-1.33_01 - Sat Jul  2 18:06:19 2011
-	* Ensure binary reads are for big endian
-	* Various cleanups for format and whitespace
+1.33_01 2011-07-02
+	- Ensure binary reads are for big endian
+	- Various cleanups for format and whitespace
 
-1.33 - Tue Nov 24 08:00:33 2009
-	* Hey, you have to decode those XML entities as you read
+1.33 2009-11-24
+	- Hey, you have to decode those XML entities as you read
 	them.
 
-1.32 - Wed Sep 16 23:03:57 CDT 2009
-	* Things seen to work, so lets release it.
+1.32 2009-09-16
+	- Things seen to work, so lets release it.
 
-1.31_01 - Sun May  3 06:40:14 2009
-	* Added initial support for reading binary property lists
+1.31_01 2009-05-03
+	- Added initial support for reading binary property lists
 
-1.31 - Wed Jan 16 05:28:00 2008
-	* Clean up for move from CVS to SVN. No need to upgrade.
+1.31 2008-01-16
+	- Clean up for move from CVS to SVN. No need to upgrade.
 
-1.30 - Tue Jan  9 22:32:27 2007
-	* updated copyright and license info
-	* no code changes, so no need to upgrade
+1.30 2007-01-09
+	- updated copyright and license info
+	- no code changes, so no need to upgrade
 
-1.29 - Wed May 17 19:25:09 2006
-	* Added a parse_plist_fh function so you can open the files 
+1.29 2006-05-17
+	- Added a parse_plist_fh function so you can open the files
 	any way that you like (for instance, as ":utf8").
-	* Added pod_coverage.t to MANIFEST. I use it so I might as
+	- Added pod_coverage.t to MANIFEST. I use it so I might as
 	well distribute it.
 
-1.28 - Tue May 16 01:15:52 2006
-	* This change actually makes the change I claimed in the last version.
-	* I added parse_plist_file to @EXPORT_OK, where it should have been.
+1.28 2006-05-16
+	- This change actually makes the change I claimed in the last version.
+	- I added parse_plist_file to @EXPORT_OK, where it should have been.
 
-1.26 - Tue May 16 01:02:29 2006
-	* Added parse_plist_file to the export list. Why was it missing?
-	* There are no other code changes, and you should upgrade
+1.26 2006-05-16
+	- Added parse_plist_file to the export list. Why was it missing?
+	- There are no other code changes, and you should upgrade
 	if your users expect the documentation to be right. :)
 
-1.24 - Tue Jan 17 21:19:40 2006
-	* Ricardo Signes added as_basic_data() methods to turn the plist
+1.24 2006-01-17
+	- Ricardo Signes added as_basic_data() methods to turn the plist
 	stuff into a Perl data structure without all the plist
 	tracking. That's probably what most people want if they
 	simply want to get data.
 
-1.23 - Sun Jun  5 19:34:38 2005
-	* Mike Ciul added some code to handle input differently for different
+1.23 2005-06-05
+	- Mike Ciul added some code to handle input differently for different
 	sources (file, string, etc). It's a lot faster for very large files.
-	* Most everything else is the same, so unless you need to work with
+	- Most everything else is the same, so unless you need to work with
 	very large files, you don't need to rush to upgrade.
 
-1.21 - Fri Mar 11 22:49:28 2005
-	* Added POD coverage tests
-	* Bumped version past the 1.0 barrier
-	* No code changes: no need to upgrade
+1.21 2005-03-11
+	- Added POD coverage tests
+	- Bumped version past the 1.0 barrier
+	- No code changes: no need to upgrade
 
-0.95 - Fri Mar 11 22:45:21 2005
-	* Added POD coverage tests, fixed issues
-	* no code changes: no need to upgrade
+0.95 2005-03-11
+	- Added POD coverage tests, fixed issues
+	- no code changes: no need to upgrade
 
-0.95 - Thu Dec  2 03:23:26 2004
-	* added Exporter support so you can import the functions, just
+0.95 2004-12-02
+	- added Exporter support so you can import the functions, just
 	like the examples showed.  Nothing is imported without you asking
 	for it.
 
-0.9 - Thu Sep  2 20:15:28 2004
-	* fixed from with Time::HiRes tests
-	* cleaned up distribution
-	* No need to upgrade if you have the previous version (0.11)
+0.9 2004-09-02
+	- fixed from with Time::HiRes tests
+	- cleaned up distribution
+	- No need to upgrade if you have the previous version (0.11)
 
-0.51 - Tue Feb  3 16:39:39 2004
-    * Refactored the module to get rid of goofy data structure—if you
+0.51 2004-02-03
+	- Refactored the module to get rid of goofy data structure—if you
     peeked behind-the-scenes this will bite you
-    * Each type in the plist now has its own class, with methods to affect it
+	- Each type in the plist now has its own class, with methods to affect it
 
-0.11 - Sat Jan 31 11:24:53 CST 2004
-	* No code changes.
-	* Removed requirements on Test::Manifest and Test::Pod
-	* Fixed warnings that show up under -w
+0.11 2004-01-31
+	- No code changes.
+	- Removed requirements on Test::Manifest and Test::Pod
+	- Fixed warnings that show up under -w
 
-0.10 - Mon Feb  3 19:53:24 2003
-	* No code changes
-	* added missing modules to PREREQ_PM
-	* tweaked false_key test
-	* no need to upgrade from 0.09 if you already have it installed
+0.10 2003-02-03
+	- No code changes
+	- added missing modules to PREREQ_PM
+	- tweaked false_key test
+	- no need to upgrade from 0.09 if you already have it installed
 
-0.09 - Fri Jan 31 11:20:53 2003
-	* fixed bug in which a dict key named "0" would kill the program
+0.09 2003-01-31
+	- fixed bug in which a dict key named "0" would kill the program
 

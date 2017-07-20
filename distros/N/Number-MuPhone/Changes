@@ -1,5 +1,15 @@
 Revision history for Number::MuPhone
 
+0.06    2018-07-17
+        accidentally pushed file I was roking on in previous release
+        (still learning CPAN best practices :D
+
+0.05    2017-07-14
+        fixed NANP "international" dial/display
+
+0.04    2017-07-13
+        Cleaned up strictures
+
 0.03    2017-07-12
         Fixed error caused by $ENV{HOME} not existing
 

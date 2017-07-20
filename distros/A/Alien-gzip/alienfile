@@ -1,0 +1,25 @@
+use alienfile;
+
+plugin 'Probe::CommandLine' => (
+  command => 'gzip',
+  args    => [ '--version' ],
+  match   => qr/gzip/,
+  version => qr/gzip ([0-9\.]+)/,
+);
+
+share {
+
+  plugin Download => (
+    url     => 'ftp://ftp.gnu.org/gnu/gzip/',
+    filter  => qr/^gzip-.*\.tar\.xz$/,
+    version => qr/([0-9\.]+)/,
+  );
+
+  # So.  Gnu Not Understandable apparently
+  # does not distribute gzip as a tarball
+  # anymore.  So yeah.  You need xz.  
+  plugin Extract => 'tar.xz';
+  
+  plugin 'Build::Autoconf' => ();
+
+};

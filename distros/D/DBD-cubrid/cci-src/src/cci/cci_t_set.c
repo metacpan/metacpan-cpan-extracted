@@ -114,12 +114,11 @@ t_set_size (T_SET * set)
 int
 t_set_element_type (T_SET * set)
 {
-  return (CCI_GET_COLLECTION_DOMAIN (set->type));
+  return set->type;
 }
 
 int
-t_set_get (T_SET * set, int index, T_CCI_A_TYPE a_type, void *value,
-	   int *indicator)
+t_set_get (T_SET * set, int index, T_CCI_A_TYPE a_type, void *value, int *indicator)
 {
   char *ele_value_p;
   char u_type;
@@ -136,6 +135,10 @@ t_set_get (T_SET * set, int index, T_CCI_A_TYPE a_type, void *value,
   if (data_size <= 0)
     {
       *indicator = -1;
+      if (a_type == CCI_A_TYPE_STR)
+	{
+	  *((void **) value) = NULL;
+	}
       return 0;
     }
 
@@ -146,32 +149,28 @@ t_set_get (T_SET * set, int index, T_CCI_A_TYPE a_type, void *value,
     {
     case CCI_A_TYPE_STR:
       err_code =
-	qe_get_data_str (&(set->conv_value_buffer), (T_CCI_U_TYPE) u_type,
-			 ele_value_p, data_size, value, indicator);
+	qe_get_data_str (&(set->conv_value_buffer), (T_CCI_U_TYPE) u_type, ele_value_p, data_size, value, indicator);
       break;
     case CCI_A_TYPE_INT:
       err_code = qe_get_data_int ((T_CCI_U_TYPE) u_type, ele_value_p, value);
       break;
     case CCI_A_TYPE_BIGINT:
-      err_code =
-	qe_get_data_bigint ((T_CCI_U_TYPE) u_type, ele_value_p, value);
+      err_code = qe_get_data_bigint ((T_CCI_U_TYPE) u_type, ele_value_p, value);
       break;
     case CCI_A_TYPE_FLOAT:
-      err_code =
-	qe_get_data_float ((T_CCI_U_TYPE) u_type, ele_value_p, value);
+      err_code = qe_get_data_float ((T_CCI_U_TYPE) u_type, ele_value_p, value);
       break;
     case CCI_A_TYPE_DOUBLE:
-      err_code =
-	qe_get_data_double ((T_CCI_U_TYPE) u_type, ele_value_p, value);
+      err_code = qe_get_data_double ((T_CCI_U_TYPE) u_type, ele_value_p, value);
       break;
     case CCI_A_TYPE_BIT:
-      err_code =
-	qe_get_data_bit ((T_CCI_U_TYPE) u_type, ele_value_p, data_size,
-			 value);
+      err_code = qe_get_data_bit ((T_CCI_U_TYPE) u_type, ele_value_p, data_size, value);
       break;
     case CCI_A_TYPE_DATE:
       err_code = qe_get_data_date ((T_CCI_U_TYPE) u_type, ele_value_p, value);
       break;
+    case CCI_A_TYPE_UINT:
+    case CCI_A_TYPE_UBIGINT:
     default:
       return CCI_ER_TYPE_CONVERSION;
     }
@@ -212,7 +211,9 @@ t_set_make (T_SET * set, char ele_type, int size, void *value, int *indicator)
     }
 
   if (ele_type == CCI_U_TYPE_SHORT)
-    ele_type = CCI_U_TYPE_INT;
+    {
+      ele_type = CCI_U_TYPE_INT;
+    }
 
   for (i = 0; i < size; i++)
     {
@@ -226,6 +227,11 @@ t_set_make (T_SET * set, char ele_type, int size, void *value, int *indicator)
 
       switch (u_type)
 	{
+	case CCI_U_TYPE_NULL:
+	  {
+	    ADD_ARG_BYTES (&net_buf, NULL, 0);
+	  }
+	  break;
 	case CCI_U_TYPE_CHAR:
 	case CCI_U_TYPE_STRING:
 	case CCI_U_TYPE_NCHAR:
@@ -286,6 +292,17 @@ t_set_make (T_SET * set, char ele_type, int size, void *value, int *indicator)
 	    ADD_ARG_DATETIME (&net_buf, &ele_value);
 	  }
 	  break;
+	case CCI_U_TYPE_TIMETZ:
+	case CCI_U_TYPE_TIMESTAMPTZ:
+	case CCI_U_TYPE_TIMESTAMPLTZ:
+	case CCI_U_TYPE_DATETIMETZ:
+	case CCI_U_TYPE_DATETIMELTZ:
+	  {
+	    T_CCI_DATE_TZ ele_value;
+	    ele_value = ((T_CCI_DATE_TZ *) value)[i];
+	    ADD_ARG_DATETIMETZ (&net_buf, &ele_value);
+	  }
+	  break;
 	case CCI_U_TYPE_OBJECT:
 	  {
 	    char *tmp_str;
@@ -300,9 +317,14 @@ t_set_make (T_SET * set, char ele_type, int size, void *value, int *indicator)
 	    ADD_ARG_OBJECT (&net_buf, &ele_value);
 	  }
 	  break;
+	case CCI_U_TYPE_USHORT:
+	case CCI_U_TYPE_UINT:
+	case CCI_U_TYPE_UBIGINT:
+	case CCI_U_TYPE_BLOB:
+	case CCI_U_TYPE_CLOB:
 	default:
-	  ADD_ARG_BYTES (&net_buf, NULL, 0);
-	  break;
+	  err_code = CCI_ER_TYPE_CONVERSION;
+	  goto set_make_error;
 	}
     }
 
@@ -409,8 +431,7 @@ t_set_to_str (T_SET * set, T_VALUE_BUF * conv_val)
 	}
 
       buf = NULL;
-      err_code =
-	t_set_get (set, i, CCI_A_TYPE_STR, (void *) &buf, &indicator);
+      err_code = t_set_get (set, i, CCI_A_TYPE_STR, (void *) &buf, &indicator);
       if (err_code < 0)
 	{
 	  net_buf_clear (&net_buf);

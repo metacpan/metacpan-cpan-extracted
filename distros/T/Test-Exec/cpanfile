@@ -1,9 +1,9 @@
 requires "Return::MultiLevel" => "0";
+requires "Test2::API" => "1.302015";
 requires "perl" => "5.006";
 
 on 'test' => sub {
-  requires "Test2::Suite" => "0.000060";
-  requires "Test::More" => "0.94";
+  requires "Test2::V0" => "0.000060";
   requires "perl" => "5.006";
 };
 

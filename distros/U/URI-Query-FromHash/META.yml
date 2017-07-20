@@ -2,11 +2,12 @@
 abstract: 'Construct a query string from a hash ref'
 author:
   - 'James Raspass <jraspass@gmail.com>'
-build_requires: {}
+build_requires:
+  Test::More: '0'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,11 +16,13 @@ name: URI-Query-FromHash
 provides:
   URI::Query::FromHash:
     file: lib/URI/Query/FromHash.pm
-    version: '0.005'
+    version: '0.006'
 requires:
   perl: '5.014'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/JRaspass/URI-Query-FromHash/issues
   repository: git://github.com/JRaspass/URI-Query-FromHash.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.69'

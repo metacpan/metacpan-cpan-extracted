@@ -3,7 +3,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.03";
 
 =encoding utf-8
 
@@ -82,7 +82,7 @@ sub _bless {
   my $hinthash = (caller(0))[10];
   return $hinthash->{acme_undead} ? die('blessed') : do {
     my $arg = shift;
-    my $pkg = shift;
+    my $pkg = shift || (caller(0))[0];
     bless($arg, $pkg);
   }
 }

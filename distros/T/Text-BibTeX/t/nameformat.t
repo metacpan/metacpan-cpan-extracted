@@ -2,7 +2,7 @@
 use strict;
 use vars qw($DEBUG);
 use IO::Handle;
-use Test::More tests=>26;
+use Test::More tests=>27;
 use utf8;
 use Encode 'decode';
 use Unicode::Normalize;
@@ -185,4 +185,13 @@ $DEBUG = 1;
     # OK, but spaces back in to the first name
     $format->set_options (BTN_FIRST, 0, BTJ_SPACE, BTJ_NOTHING);
     is $format->apply($name), "de la Vall{\\'e}e~Poussin, Charles Louis Xavier Joseph";
+}
+
+{
+    # test 27
+    my $entry = new Text::BibTeX::Entry;
+    $entry->parse_s('@' . "article{key,\n author = {Firstlastname Secondlastname, Firstname and others},\n}");
+    my @authors = $entry->names("author");
+    my $format = new Text::BibTeX::NameFormat("vl");
+    is $format->apply($authors[0]), "Firstlastname~Secondlastname";
 }

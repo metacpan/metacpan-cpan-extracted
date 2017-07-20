@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package JSON::Path;
-$JSON::Path::VERSION = '0.310';
+$JSON::Path::VERSION = '0.400';
 # VERSION
 
 use Exporter::Tiny ();
@@ -48,30 +48,10 @@ sub to_string {
     return $$self;
 }
 
-sub _get {
-    my ( $self, $object, $type ) = @_;
-    confess qq{Unsupported result type "$type"} unless $type eq 'PATH';
-
-    $object = decode_json($object) unless ref $object;
-
-    my $helper = JSON::Path::Helper->new;
-    $helper->{'resultType'} = $type;
-    my $norm = $helper->normalize($$self);
-    $helper->{'obj'} = $object;
-    if ( $$self && $object ) {
-        $norm =~ s/^\$;//;
-        $helper->trace( $norm, $object, '$' );
-        if ( @{ $helper->{'result'} } ) {
-            return @{ $helper->{'result'} };
-        }
-    }
-
-    return;
-}
-
 sub paths {
     my ( $self, $object ) = @_;
-    return $self->_get( $object, 'PATH' );
+    my @paths = JSON::Path::Evaluator::evaluate_jsonpath( $object, "$self", want_path => 1);
+    return @paths;
 }
 
 sub get {
@@ -116,7 +96,7 @@ sub values {
 sub map {
     my ( $self, $object, $coderef ) = @_;
     my $count;
-    foreach my $path ( $self->_get( $object, 'PATH' ) ) {
+    foreach my $path ( $self->paths( $object ) ) {
         my $ref = JSON::Path::Evaluator::evaluate_jsonpath( $object, $path, want_ref => 1 );
         ++$count;
         my $value = do {
@@ -128,237 +108,6 @@ sub map {
         ${$ref} = $value;
     }
     return $count;
-}
-
-BEGIN {
-
-    package JSON::Path::Helper;
-$JSON::Path::Helper::VERSION = '0.310';
-use 5.008;
-    use strict qw(vars refs);
-    no warnings;
-
-    our $AUTHORITY = 'cpan:POPEFELIX';
-    # VERSION
-
-    use Carp;
-    use Scalar::Util qw[blessed];
-
-    sub new {
-        bless {
-            obj        => undef,
-            resultType => 'VALUE',
-            result     => [],
-            subx       => [],
-            },
-            $_[0];
-    }
-
-    sub normalize {
-        my ( $self, $x ) = @_;
-        $x =~ s/[\['](\??\(.*?\))[\]']/_callback_01($self,$1)/eg;
-        $x =~ s/'?\.'?|\['?/;/g;
-        $x =~ s/;;;|;;/;..;/g;
-        $x =~ s/;\$|'?\]|'$//g;
-        $x =~ s/#([0-9]+)/_callback_02($self,$1)/eg;
-        $self->{'result'} = [];    # result array was temporarily used as a buffer
-        return $x;
-    }
-
-    sub _callback_01 {
-        my ( $self, $m1 ) = @_;
-        push @{ $self->{'result'} }, $m1;
-        my $last_index = scalar @{ $self->{'result'} } - 1;
-        return "[#${last_index}]";
-    }
-
-    sub _callback_02 {
-        my ( $self, $m1 ) = @_;
-        return $self->{'result'}->[$m1];
-    }
-
-    sub asPath {
-        my ( $self, $path ) = @_;
-        my @x = split /\;/, $path;
-        my $p = '$';
-        my $n = scalar(@x);
-        for ( my $i = 1; $i < $n; $i++ ) {
-            $p .= /^[0-9]+$/ ? ( "[" . $x[$i] . "]" ) : ( "['" . $x[$i] . "']" );
-        }
-        return $p;
-    }
-
-    sub store {
-        my ( $self, $p, $v ) = @_;
-        push @{ $self->{'result'} }, ( $self->{'resultType'} eq "PATH" ? $self->asPath($p) : $v )
-            if $p;
-        return !!$p;
-    }
-
-    sub trace {
-        my ( $self, $expr, $val, $path ) = @_;
-
-        return $self->store( $path, $val ) if "$expr" eq '';
-
-        #return $self->store($path, $val) unless $expr;
-
-        my ( $loc, $x );
-        {
-            my @x = split /\;/, $expr;
-            $loc = shift @x;
-            $x = join ';', @x;
-        }
-
-        # in Perl need to distinguish between arrays and hashes.
-        if (    isArray($val)
-            and $loc =~ /^\-?[0-9]+$/
-            and exists $val->[$loc] )
-        {
-            $self->trace( $x, $val->[$loc], sprintf( '%s;%s', $path, $loc ) );
-        }
-        elsif ( isObject($val)
-            and exists $val->{$loc} )
-        {
-            $self->trace( $x, $val->{$loc}, sprintf( '%s;%s', $path, $loc ) );
-        }
-        elsif ( $loc eq '*' ) {
-            $self->walk( $loc, $x, $val, $path, \&_callback_03 );
-        }
-        elsif ( $loc eq '..' ) {
-            $self->trace( $x, $val, $path );
-            $self->walk( $loc, $x, $val, $path, \&_callback_04 );
-        }
-        elsif ( $loc =~ /\,/ )    # [name1,name2,...]
-        {
-            $self->trace( $_ . ';' . $x, $val, $path ) foreach split /\,/, $loc;
-        }
-        elsif ( $loc =~ /^\(.*?\)$/ )    # [(expr)]
-        {
-            my $evalx = $self->evalx( $loc, $val, substr( $path, rindex( $path, ";" ) + 1 ) );
-            $self->trace( $evalx . ';' . $x, $val, $path );
-        }
-        elsif ( $loc =~ /^\?\(.*?\)$/ )    # [?(expr)]
-        {
-            # my $evalx = $self->evalx($loc, $val, substr($path, rindex($path,";")+1));
-            $self->walk( $loc, $x, $val, $path, \&_callback_05 );
-        }
-        elsif ( $loc =~ /^(-?[0-9]*):(-?[0-9]*):?(-?[0-9]*)$/ )    # [start:end:step]  python slice syntax
-        {
-            $self->slice( $loc, $x, $val, $path );
-        }
-    }
-
-    sub _callback_03 {
-        my ( $self, $m, $l, $x, $v, $p ) = @_;
-        $self->trace( $m . ";" . $x, $v, $p );
-    }
-
-    sub _callback_04 {
-        my ( $self, $m, $l, $x, $v, $p ) = @_;
-
-        if (    isArray($v)
-            and isArray( $v->[$m] ) || isObject( $v->[$m] ) )
-        {
-            $self->trace( "..;" . $x, $v->[$m], $p . ";" . $m );
-        }
-        elsif ( isObject($v)
-            and isArray( $v->{$m} ) || isObject( $v->{$m} ) )
-        {
-            $self->trace( "..;" . $x, $v->{$m}, $p . ";" . $m );
-        }
-    }
-
-    sub _callback_05 {
-        my ( $self, $m, $l, $x, $v, $p ) = @_;
-
-        $l =~ s/^\?\((.*?)\)$/$1/g;
-
-        my $evalx;
-        if ( isArray($v) ) {
-            $evalx = $self->evalx( $l, $v->[$m] );
-        }
-        elsif ( isObject($v) ) {
-            $evalx = $self->evalx( $l, $v->{$m} );
-        }
-
-        $self->trace( $m . ";" . $x, $v, $p )
-            if $evalx;
-    }
-
-    sub walk {
-        my ( $self, $loc, $expr, $val, $path, $f ) = @_;
-
-        if ( isArray($val) ) {
-            map { $f->( $self, $_, $loc, $expr, $val, $path ); } 0 .. scalar @$val;
-        }
-
-        elsif ( isObject($val) ) {
-            map { $f->( $self, $_, $loc, $expr, $val, $path ); } keys %$val;
-        }
-
-        else {
-            croak('walk called on non hashref/arrayref value, died');
-        }
-    }
-
-    sub slice {
-        my ( $self, $loc, $expr, $v, $path ) = @_;
-
-        $loc =~ s/^(-?[0-9]*):(-?[0-9]*):?(-?[0-9]*)$/$1:$2:$3/;
-        my @s = split /\:/, $loc;
-        my $len = scalar @$v;
-
-        my $start = $s[0] + 0 ? $s[0] + 0 : 0;
-        my $end   = $s[1] + 0 ? $s[1] + 0 : $len;
-        my $step  = $s[2] + 0 ? $s[2] + 0 : 1;
-
-        $start = ( $start < 0 ) ? max( 0, $start + $len ) : min( $len, $start );
-        $end   = ( $end < 0 )   ? max( 0, $end + $len )   : min( $len, $end );
-
-        for ( my $i = $start; $i < $end; $i += $step ) {
-            $self->trace( $i . ";" . $expr, $v, $path );
-        }
-    }
-
-    sub max {
-        return $_[0] > $_[1] ? $_[0] : $_[1];
-    }
-
-    sub min {
-        return $_[0] < $_[1] ? $_[0] : $_[1];
-    }
-
-    sub evalx {
-        my ( $self, $x, $v, $vname ) = @_;
-        croak('non-safe evaluation, died') if $JSON::Path::Safe;
-
-        my $expr = $x;
-        $expr =~ s/\$root/\$self->{'obj'}/g;
-        $expr =~ s/\$_/\$v/g;
-
-        local $@ = undef;
-        my $res = eval $expr;
-
-        if ($@) {
-            croak("eval failed: `$expr`, died");
-        }
-
-        return $res;
-    }
-
-    sub isObject {
-        my $obj = shift;
-        return 1 if ref($obj) eq 'HASH';
-        return 1 if blessed($obj) && $obj->can('typeof') && $obj->typeof eq 'HASH';
-        return;
-    }
-
-    sub isArray {
-        my $obj = shift;
-        return 1 if ref($obj) eq 'ARRAY';
-        return 1 if blessed($obj) && $obj->can('typeof') && $obj->typeof eq 'ARRAY';
-        return;
-    }
 }
 
 1;
@@ -375,7 +124,7 @@ JSON::Path
 
 =head1 VERSION
 
-version 0.310
+version 0.400
 
 =head1 SYNOPSIS
 

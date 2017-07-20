@@ -1,0 +1,15 @@
+Revision history for fastQ_brew
+
+1.0     01/16/2017 
+        First version, released on an unsuspecting world.
+
+1.0.2   05/10/2017 
+        Added new features to chain options.
+        
+1.0.3   06/02/2017 
+        Added Getopt::Long features.
+        
+1.0.4   07/17/2017 
+        Added File::Copy features.
+
+

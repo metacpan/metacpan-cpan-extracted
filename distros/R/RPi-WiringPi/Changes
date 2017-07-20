@@ -1,5 +1,32 @@
 Revision history for Perl extension RPi::WiringPi.
 
+2.3620  2017-07-13
+        - worked around issue where bbdispatch/brewbuild was causing havoc on
+          pin cleanup due to the LCD. After trial and headache, I just disabled
+          those pins from being checked (closes #41)
+        - added new FAQ test section for the list of env vars with descriptions
+        - fix issue where in dac(), we weren't registering the CS pin correctly
+        - alphabeticalized public methods within the code
+        - added full support for the HCSR04 ultrasonic distance measurement
+          sensor (closes #42)
+        - Util now exposes pwm_mode() and pwm_clock()
+        - added test/sg90_servo.pl as a baseline test for controllerless servo
+          control
+        - added servo(), sets up PWM and returns a RPi::Pin object tied to the
+          PWM GPIO pin, after all frequency modifications are made to the PI
+          (closes #43)
+        - added _pwm_in_use(), sets a flag that we need to reset PWM frequencies
+          on the board back to default at cleanup()
+        - modified t/15-pwm.t. We now use an ADS1115 ADC to test the PWM
+          functionality (closes #46)
+        - added t/41 and t/42; we now test falling, rising and both for
+          interrupts
+        - added t/90-servo.t to test the actual PWM cleanup() routine
+        - removed sudo requirements for the interrupt tests, as root isn't
+          needed for PUD or interrupts
+        - bumped ::Pin, ::API and ::Constant up to coincide with the new PWM
+          functionality
+
 2.3619  2017-07-04
         - hid all of the setup() tests. Somewhere in the last commits we broke
           it, but that's actually ok

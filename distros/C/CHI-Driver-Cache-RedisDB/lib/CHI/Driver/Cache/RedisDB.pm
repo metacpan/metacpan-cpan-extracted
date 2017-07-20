@@ -3,7 +3,7 @@ package CHI::Driver::Cache::RedisDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Moo;
 extends 'CHI::Driver';

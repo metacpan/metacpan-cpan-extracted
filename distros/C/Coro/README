@@ -536,7 +536,7 @@ STATIC METHODS
            };
 
         This can be used to localise about any resource (locale, uid,
-        current working directory etc.) to a block, despite the existance of
+        current working directory etc.) to a block, despite the existence of
         other coros.
 
         Another interesting example implements time-sliced multitasking
@@ -628,7 +628,7 @@ CORO OBJECT METHODS
         yet. Those states basically consist of only the code reference to
         call and the arguments, but consumes very little other resources.
         New states will automatically get assigned a perl interpreter when
-        they are transfered to.
+        they are transferred to.
 
     $state->is_zombie
         Returns true iff the Coro object has been cancelled, i.e. it's
@@ -909,7 +909,7 @@ HOW TO WAIT FOR A CALLBACK
     program, or when you use event-based libraries.
 
     These typically register a callback for some event, and call that
-    callback when the event occured. In a coro, however, you typically want
+    callback when the event occurred. In a coro, however, you typically want
     to just wait for the event, simplyifying things.
 
     For example "AnyEvent->child" registers a callback to be called when a
@@ -1038,7 +1038,7 @@ WINDOWS PROCESS EMULATION
     evidenced by the forks module, which gives you the (i-) threads API,
     just much faster).
 
-    Sharing data is in the i-threads model is done by transfering data
+    Sharing data is in the i-threads model is done by transferring data
     structures between threads using copying semantics, which is very slow -
     shared data simply does not exist. Benchmarks using i-threads which are
     communication-intensive show extremely bad behaviour with i-threads (in

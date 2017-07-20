@@ -102,6 +102,7 @@ do { my $x = {
                                       'Parse::PMFile' => '0',
                                       'Path::Class' => '0',
                                       'Path::Iterator::Rule' => '0',
+                                      'Perl::Critic::Freenode' => '0.021',
                                       'Perl::Critic::Moose' => '1.05',
                                       'Pod::Elemental::Transformer::List' => '0',
                                       'Pod::Elemental::Transformer::Verbatim' => '0',

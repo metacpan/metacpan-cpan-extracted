@@ -1,6 +1,13 @@
 Changes
 =======
 
+0.15  Mon Jul 17 21:30 2017
+	- Comply with HTTP RFC 2616 to prevent
+	  400 Bad Request errors on httpd >= 2.2.15
+
+0.14  Thu Mar 17 12:00 2005
+	- Fix switch_filters documentation
+
 0.13  Sat Apr 12 13:00 2003
 	- Allow numbers in domains for host_switch_table.
 	- Newer Net::Ping avoids this rare but fatal crash:

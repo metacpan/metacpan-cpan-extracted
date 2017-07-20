@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 1;
 
@@ -21,7 +21,7 @@ Alien::ProtoBuf - find Google ProtoBuf library
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -11,6 +11,7 @@ BEGIN {
 use Test::More tests => 5;
 
 BEGIN { use_ok "Lexical::SealRequireHints"; }
+BEGIN { unshift @INC, "./t/lib"; }
 
 use t::eval_0;
 

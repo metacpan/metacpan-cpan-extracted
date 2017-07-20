@@ -2,8 +2,8 @@ NAME
     Data::Check::Structure - Check structure of data
 
 VERSION
-    This document describes version 0.03 of Data::Check::Structure (from
-    Perl distribution Data-Check-Structure), released on 2014-07-14.
+    This document describes version 0.04 of Data::Check::Structure (from
+    Perl distribution Data-Check-Structure), released on 2017-07-18.
 
 SYNOPSIS
 DESCRIPTION
@@ -12,7 +12,9 @@ DESCRIPTION
     array of scalars ("aos"), and so on.
 
 FUNCTIONS
-  is_aos($data, \%opts) => bool
+    None exported by default, but they are exportable.
+
+  is_aos($data[, \%opts]) => bool
     Check that data is an array of scalars. Examples:
 
      is_aos([]);                     # true
@@ -23,7 +25,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_aoa($data, \%opts) => bool
+  is_aoa($data[, \%opts]) => bool
     Check that data is an array of arrays. Examples:
 
      is_aoa([]);                          # true
@@ -34,7 +36,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_aoaos($data, \%opts) => bool
+  is_aoaos($data[, \%opts]) => bool
     Check that data is an array of arrays of scalars. Examples:
 
      is_aoaos([]);                           # true
@@ -45,7 +47,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_aoh($data, \%opts) => bool
+  is_aoh($data[, \%opts]) => bool
     Check that data is an array of hashes. Examples:
 
      is_aoh([]);                             # true
@@ -56,7 +58,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_aohos($data, \%opts) => bool
+  is_aohos($data[, \%opts]) => bool
     Check that data is an array of hashes of scalars. Examples:
 
      is_aohos([]);                                 # true
@@ -67,7 +69,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_hos($data, \%opts) => bool
+  is_hos($data[, \%opts]) => bool
     Check that data is a hash of scalars. Examples:
 
      is_hos({});                                   # true
@@ -78,7 +80,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_hoa($data, \%opts) => bool
+  is_hoa($data[, \%opts]) => bool
     Check that data is a hash of arrays. Examples:
 
      is_hoa({}) );       # true
@@ -88,7 +90,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_hoaos($data, \%opts) => bool
+  is_hoaos($data[, \%opts]) => bool
     Check that data is a hash of arrays of scalars. Examples:
 
      is_hoaos({}) );         # true
@@ -100,7 +102,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_hoh($data, \%opts) => bool
+  is_hoh($data[, \%opts]) => bool
     Check that data is a hash of hashes. Examples:
 
      is_hoh({}) );       # true
@@ -110,7 +112,7 @@ FUNCTIONS
     Known options: "max" (maximum number of items to check, undef means
     check all items).
 
-  is_hohos($data, \%opts) => bool
+  is_hohos($data[, \%opts]) => bool
     Check that data is a hash of hashes of scalrs. Examples:
 
      is_hohos({}) );            # true
@@ -128,7 +130,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-Data-Check-Structure>.
+    <https://github.com/perlancar/perl-Data-Check-Structure>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -138,10 +140,10 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
+    perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Steven Haryanto.
+    This software is copyright (c) 2017, 2014 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

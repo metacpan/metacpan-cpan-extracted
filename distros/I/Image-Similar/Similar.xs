@@ -96,7 +96,9 @@ SV *
 signature (image)
 	Image::Similar::Image image
 CODE:
-	SIMAGE_CALL (simage_signature (image));
+        if (! image->signature) {
+        	SIMAGE_CALL (simage_signature (image));
+	}
 	RETVAL = newSVpv (image->signature, (STRLEN) image->signature_length);
 OUTPUT:
 	RETVAL

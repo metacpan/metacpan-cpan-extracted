@@ -5,6 +5,7 @@ author:
 build_requires:
   Alien::Build: '0.40'
   Alien::Build::MM: '0.40'
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '6.52'
   Test::More: '0'
 configure_requires:
@@ -26,5 +27,5 @@ requires:
 resources:
   homepage: https://github.com/mountaintom/Alien-Google-GRPC
   repository: https://github.com/mountaintom/Alien-Google-GRPC.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

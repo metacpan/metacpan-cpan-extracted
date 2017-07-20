@@ -16,6 +16,7 @@ examples/blog/lib/Blog/Controller/Posts.pm
 examples/blog/lib/Blog/Model/Posts.pm
 examples/blog/migrations/blog.sql
 examples/blog/script/blog
+examples/blog/t/blog.t
 examples/blog/templates/layouts/blog.html.ep
 examples/blog/templates/posts/_form.html.ep
 examples/blog/templates/posts/create.html.ep
@@ -39,5 +40,3 @@ t/results.t
 t/sqlite_lite_app.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t
-xt/deprecated/database.t
-xt/deprecated/pubsub.t

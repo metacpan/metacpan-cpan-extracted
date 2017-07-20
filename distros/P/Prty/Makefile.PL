@@ -1,10 +1,9 @@
-use 5.010001;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME => 'Prty',
     VERSION_FROM => 'lib/Prty.pm',
-    MIN_PERL_VERSION => 5.10.1,
+    MIN_PERL_VERSION => 5.10.0,
     BUILD_REQUIRES => {
         ExtUtils::MakeMaker => 6.48, # wg. MIN_PERL_VERSION
     },
@@ -13,7 +12,7 @@ WriteMakefile(
         DB_File => 0,
         DBD::SQLite => 0,
         DBI => 0,
-        File::Rsync => 0,
+        File::Rsync => 0.49,
         HTTP::Request => 0,
         Image::Size => 0,
         JSON => 0,

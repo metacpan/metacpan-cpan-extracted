@@ -14,7 +14,7 @@ use Module::Load   qw( load );
 use Module::Loaded qw( is_loaded );
 use POSIX          qw( strftime tzset );
 
-our $VERSION = '3.7';
+our $VERSION = '4.0';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -403,7 +403,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 3.7
+version 4.0
 
 =head1 SYNOPSIS
 
@@ -628,7 +628,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Brad Lhotsky.
+This software is Copyright (c) 2017 by Brad Lhotsky.
 
 This is free software, licensed under:
 

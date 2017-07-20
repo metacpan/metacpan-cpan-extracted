@@ -1,5 +1,12 @@
 Revision history for Perl extension Geo::Coder::Googlev3.
 
+0.16  2017-07-14
+	- new parameter key
+	- new parameter use_https
+	- no default for sensor is set anymore
+	- failing bounds test is now marked as TODO (RT #122485)
+	- improved test diagnostics
+
 0.15
 	- fixed test for changed results (Brandenburger Tor vs Pariser Platz)
 

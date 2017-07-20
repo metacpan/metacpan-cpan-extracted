@@ -1,5 +1,5 @@
 package Number::MuPhone::Config;
-use strictures 2;
+use 5.012;
 use Exporter;
 use Carp;
 

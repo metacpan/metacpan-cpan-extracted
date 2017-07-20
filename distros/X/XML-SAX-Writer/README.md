@@ -9,13 +9,13 @@ This module has been developed by Robin Berjon <robin@knowscape.com>.
 Since version 0.50, it is maintained by means of the Perl XML 
 project [perl-xml.sourceforge.net]:
 
- - The sources are stored in the SourceForge Subversion repository:
-   repository: https://svn.sourceforge.net/svnroot/perl-xml
+ - The sources are stored in the Github repository at
+   https://github.com/perigrin/xml-sax-writer
 
  - Requests and comments should be sent to the 
    Perl-XML@listserv.ActiveState.com mailing list
 
- - Bugs should be reported to RT.cpan.org
+ - Bugs should be reported to RT.cpan.org or the Github issue tracker.
 
 Robin considered this module alpha but after years of testing on
 humans we believe it can be considered beta now.

@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution Plack-Test-AnyEvent,
-version 0.07:
+version 0.08:
 
   Run Plack::Test on AnyEvent-based PSGI applications
 
-This software is copyright (c) 2015 by Rob Hoelz.
+This software is copyright (c) 2017 by Rob Hoelz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

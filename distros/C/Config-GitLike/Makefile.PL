@@ -1,3 +1,4 @@
+BEGIN { push @INC, '.' }
 use inc::Module::Install;
 name('Config-GitLike');
 all_from('lib/Config/GitLike.pm');

@@ -13,7 +13,7 @@ package PDF::Builder::Matrix;
 use strict;
 use warnings;
 
-# VERSION
+our $VERSION = '3.005'; # VERSION
 my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
 
 =head1 NAME

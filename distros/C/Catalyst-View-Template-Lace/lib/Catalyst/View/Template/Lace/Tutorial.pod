@@ -421,6 +421,32 @@ Here's a sample of the actual result, rendering all the components (you can peek
 
 So even though we have a page with a lot happening, we can write a view class that focuses just on the primary task (display the list of Todos) and let components handle the other work.  A complex template can be logically divided into clear chunks, each dedicated to one function. I believe this leads to well organized and concise templates that are maintainable over the long term.
 
+B<NOTE> Currently when calling a view as a component, the naming standard is 'view-' + lowercased version of the Catalyst view namespace.  For eexample the View:
+
+    package MyApp::View::User;
+
+Would be:
+
+    <view-user>
+
+Whereas View:
+
+    package MyApp::View::User::Profile;
+
+Would be:
+
+    <view-user-profile>
+
+You can use snake case in your view component declaration to indicate camel casing in the package name:
+
+    <view-user_profile>
+
+Would indicate:
+
+    package MyApp::View::UserProfile;
+
+This casing issue is currently a limitation in the HTML parser and might change / improve in the future.
+
 =head1 Summary
 
 This has been an overview of L<Template::Lace>.  There's a ton more you can do with this, but this is the essential bits.  If interested see the Github repository; feel free to fork and contribute!  

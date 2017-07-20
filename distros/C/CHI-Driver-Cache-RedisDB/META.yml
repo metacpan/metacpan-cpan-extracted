@@ -5,6 +5,7 @@ author:
 build_requires:
   Test::Class: '0.50'
   Test::Most: '0.35'
+  Test::RedisDB: '2.35'
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
@@ -31,5 +32,5 @@ resources:
   bugtracker: https://github.com/Inspire-com/perl-CHI-Driver-Cache-RedisDB/issues
   homepage: https://github.com/Inspire-com/perl-CHI-Driver-Cache-RedisDB
   repository: https://github.com/Inspire-com/perl-CHI-Driver-Cache-RedisDB.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

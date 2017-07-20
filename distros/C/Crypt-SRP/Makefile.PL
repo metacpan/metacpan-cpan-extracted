@@ -21,7 +21,7 @@ WriteMakefile(
       },
     },
     dist => {
-      PREOP    => 'pod2text lib/Crypt/SRP.pm > README',
+      PREOP    => 'perldoc -u lib/Crypt/SRP.pm | pod2markdown > README.md',
       TAR      => 'ptar',
       TARFLAGS => '-c -C -f'
       #TARFLAGS => '--owner=0 --group=0 -cvf',

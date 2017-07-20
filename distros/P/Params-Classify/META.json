@@ -1,0 +1,64 @@
+{
+   "abstract" : "argument type classification",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4222",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Params-Classify",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::ParseXS" : "2.2006",
+            "Module::Build" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "perl" : "5.006001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Devel::CallChecker" : "0.003",
+            "XSLoader" : "0"
+         },
+         "requires" : {
+            "Exporter" : "0",
+            "Scalar::Util" : "1.01",
+            "parent" : "0",
+            "perl" : "5.006001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Params::Classify" : {
+         "file" : "lib/Params/Classify.pm",
+         "version" : "0.014"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.014",
+   "x_serialization_backend" : "JSON::PP version 2.93"
+}

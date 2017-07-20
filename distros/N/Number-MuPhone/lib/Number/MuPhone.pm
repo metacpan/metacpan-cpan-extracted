@@ -1,10 +1,10 @@
 package Number::MuPhone;
-use strictures 2;
+use 5.012;
 use Number::MuPhone::Parser;
 use Number::MuPhone::Data;
 use Number::MuPhone::Config;
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 # need this non-Moo encapsulation to allow backwards compatability with Number::Phone
 
@@ -126,7 +126,8 @@ version 0,01
 
 =head1 SYNOPSIS
 
-  use strictures 2;
+  use strict;
+  use warnings;
   use Number::MuPhone;
 
   my $num_us = Number::MuPhone->new({number => '+12035031111'});

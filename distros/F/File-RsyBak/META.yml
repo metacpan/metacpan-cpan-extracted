@@ -25,7 +25,7 @@ requires:
   File::Path: '2.08'
   File::Which: '0'
   File::chdir: '0'
-  Log::ger: '0.011'
+  Log::ger: '0.015'
   POSIX: '0'
   String::ShellQuote: '0'
   Time::Local: '0'
@@ -36,7 +36,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-RsyBak
   homepage: https://metacpan.org/release/File-RsyBak
   repository: git://github.com/perlancar/perl-File-RsyBak.git
-version: '0.32'
+version: '0.34'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -356,7 +356,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Depak
       name: Depak
-      version: '0.20'
+      version: '0.21'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -432,16 +432,10 @@ x_Dist_Zilla:
     version: '6.009'
 x_Dist_Zilla_Plugin_Depak:
   packed_dists:
-    B-Hooks-EndOfScope: 0
-    Border-Style: 0
     Capture-Tiny: 0
-    Class-Data-Inheritable: 0
     Class-Inspector: 0
-    Class-Method-Modifiers: 0
     Clone-PP: 0
     Color-ANSI-Util: 0
-    Color-RGB-Util: 0
-    Color-Theme: 0
     Complete-Bash: 0
     Complete-Common: 0
     Complete-Env: 0
@@ -458,103 +452,49 @@ x_Dist_Zilla_Plugin_Depak:
     Data-Clean-JSON: 0
     Data-Dmp: 0
     Data-Dump: 0
-    Data-Dump-OneLine: 0
-    Data-Dump-Partial: 0
-    Data-Format-Pretty: 0
-    Data-Format-Pretty-Console: 0
-    Data-Format-Pretty-HTML: 0
-    Data-Format-Pretty-JSON: 0
     Data-ModeMerge: 0
     Data-Sah: 0
     Data-Sah-Coerce: 0
     Data-Sah-Normalize: 0
     Data-Sah-Resolve: 0
     Data-Sah-Util-Type: 0
-    Devel-GlobalDestruction: 0
-    Devel-StackTrace: 0
-    Dist-CheckConflicts: 0
-    Encode-Locale: 0
-    Eval-Closure: 0
-    Exception-Class: 0
     File-Flock-Retry: 0
-    File-HomeDir: 0
-    File-Listing: 0
     File-RsyBak: 0
     File-ShareDir: 0
     File-ShareDir-Tarball: 0
-    File-Slurp-Tiny: 0
     File-Slurper: 0
     File-Which: 0
-    File-Write-Rotate: 0
     File-chdir: 0
     Function-Fallback-CoreOrPP: 0
     Getopt-Long-Negate-EN: 0
     Getopt-Long-Util: 0
-    HTML-Parser: 0
-    HTML-Tagset: 0
-    HTTP-Cookies: 0
-    HTTP-Daemon: 0
-    HTTP-Date: 0
-    HTTP-Message: 0
-    HTTP-Negotiate: 0
     HTTP-Tiny: 0
     HTTP-Tiny-UNIX: 0
-    IO-HTML: 0
-    IO-Socket-UNIX-Util: 0
     IO-Tty: 0
     IPC-Run: 0
     IPC-System-Options: 0
-    JSON: 0
-    JSON-Color: 0
-    JSON-MaybeXS: 0
     JSON-PP: 0
-    LWP-MediaTypes: 0
-    LWP-Protocol-http-SocketUnixAlt: 0
     Lingua-EN-Numbers-Ordinate: 0
     Lingua-EN-PluralToSingular: 0
-    Locale-TextDomain-UTF8: 0
-    Log-Any: 0
-    Log-Any-Adapter-Log4perl: 0
-    Log-Any-App: 0
-    Log-Any-IfLOG: 0
-    Log-Dispatch: 0
-    Log-Dispatch-ArrayWithLimits: 0
-    Log-Dispatch-Dir: 0
-    Log-Dispatch-FileWriteRotate: 0
-    Log-Log4perl: 0
     Log-ger: 0
-    Log-ger-LevelFromEnv: 0
+    Log-ger-App: 0
+    Log-ger-Layout-Pattern: 0
+    Log-ger-Output-Composite: 0
+    Log-ger-Output-File: 0
     Log-ger-Output-Screen: 0
-    MRO-Compat: 0
+    Log-ger-Output-Syslog: 0
     Mo: 0
-    Module-Implementation: 0
     Module-Installed-Tiny: 0
-    Module-List: 0
-    Module-Path-More: 0
-    Module-Runtime: 0
     Monkey-Patch-Action: 0
-    Moo: 0
-    Net-HTTP: 0
     Nodejs-Util: 0
+    PERLANCAR-File-HomeDir: 0
     PERLANCAR-Module-List: 0
-    Package-MoreUtil: 0
-    Package-Stash: 0
-    Params-Validate: 0
-    Params-ValidationCompiler: 0
-    Parse-VarName: 0
-    Perinci-Access: 0
-    Perinci-Access-Base: 0
-    Perinci-Access-HTTP-Client: 0
     Perinci-Access-Lite: 0
-    Perinci-Access-Perl: 0
-    Perinci-Access-Simple-Client: 0
     Perinci-AccessUtil: 0
-    Perinci-CmdLine-Classic: 0
     Perinci-CmdLine-Help: 0
     Perinci-CmdLine-Lite: 0
     Perinci-CmdLine-Util-Config: 0
     Perinci-Object: 0
-    Perinci-Result-Format: 0
     Perinci-Result-Format-Lite: 0
     Perinci-Sub-Complete: 0
     Perinci-Sub-ConvertArgs-Argv: 0
@@ -565,66 +505,33 @@ x_Dist_Zilla_Plugin_Depak:
     Perinci-Sub-Normalize: 0
     Perinci-Sub-To-CLIDocData: 0
     Perinci-Sub-Util: 0
-    Perinci-Sub-Wrapper: 0
     Proc-ChildError: 0
-    Proc-PID-File: 0
     Progress-Any: 0
     Progress-Any-Output-TermProgressBarColor: 0
     Regexp-Stringify: 0
     Role-Tiny: 0
     Sah-Schemas-Rinci: 0
     Scalar-Util-Numeric-PP: 0
-    Specio: 0
     String-Elide-Parts: 0
     String-LineNumber: 0
     String-PerlQuote: 0
     String-ShellQuote: 0
     String-Wildcard-Bash: 0
     Sub-Delete: 0
-    Sub-Exporter-Progressive: 0
-    Sub-Identify: 0
-    Sub-Quote: 0
-    Term-App-Roles: 0
-    Term-Detect-Software: 0
-    Test-Fatal: 0
     Text-ANSI-Util: 0
-    Text-ANSITable: 0
     Text-Table-Any: 0
     Text-Table-Tiny: 0
     Text-sprintfn: 0
-    Tie-Cache: 0
     Tie-IxHash: 0
     Time-Duration: 0
-    Try-Tiny: 0
-    URI: 0
-    URI-Find: 0
-    UUID-Random: 0
-    WWW-RobotRules: 0
-    YAML: 0
     YAML-Old: 0
     experimental: 0
-    libintl-perl: 0
-    libwww-perl: 0
-    namespace-autoclean: 0
-    namespace-clean: 0
   packed_modules:
-    B::Hooks::EndOfScope: '0.21'
-    B::Hooks::EndOfScope::PP: '0.21'
-    B::Hooks::EndOfScope::XS: '0.21'
-    Border::Style: '0.01'
-    Border::Style::Role: '0.01'
     Capture::Tiny: '0.46'
-    Class::Data::Inheritable: '0.08'
     Class::Inspector: '1.31'
     Class::Inspector::Functions: '1.31'
-    Class::Method::Modifiers: '2.12'
     Clone::PP: 1.07
     Color::ANSI::Util: '0.15'
-    Color::RGB::Util: '0.58'
-    Color::Theme: '0.01'
-    Color::Theme::Role: '0.01'
-    Color::Theme::Role::ANSI: '0.01'
-    Color::Theme::Util: '0.01'
     Complete::Bash: '0.31'
     Complete::Common: '0.22'
     Complete::Env: '0.39'
@@ -646,16 +553,7 @@ x_Dist_Zilla_Plugin_Depak:
     Data::Dump: '1.23'
     Data::Dump::FilterContext: ~
     Data::Dump::Filtered: ~
-    Data::Dump::OneLine: '0.07'
-    Data::Dump::Partial: '0.05'
     Data::Dump::Trace: '0.02'
-    Data::Format::Pretty: '0.04'
-    Data::Format::Pretty::CompactJSON: '0.12'
-    Data::Format::Pretty::Console: '0.38'
-    Data::Format::Pretty::HTML: '0.11'
-    Data::Format::Pretty::JSON: '0.12'
-    Data::Format::Pretty::SimpleText: '0.38'
-    Data::Format::Pretty::Text: '0.38'
     Data::ModeMerge: '0.35'
     Data::ModeMerge::Config: '0.35'
     Data::ModeMerge::Mode::ADD: '0.35'
@@ -768,67 +666,20 @@ x_Dist_Zilla_Plugin_Depak:
     Data::Sah::Util::Type: '0.46'
     Data::Sah::Util::Type::Date: '0.88'
     Data::Sah::Util::TypeX: '0.88'
-    Devel::GlobalDestruction: '0.14'
-    Devel::StackTrace: '2.02'
-    Devel::StackTrace::Frame: '2.02'
-    Dist::CheckConflicts: '0.11'
-    Encode::Locale: '1.05'
-    Eval::Closure: '0.14'
-    Exception::Class: '1.42'
-    Exception::Class::Base: '1.42'
     File::Flock::Retry: '0.62'
-    File::HomeDir: '1.002'
-    File::HomeDir::Darwin: '1.002'
-    File::HomeDir::Darwin::Carbon: '1.002'
-    File::HomeDir::Darwin::Cocoa: '1.002'
-    File::HomeDir::Driver: '1.002'
-    File::HomeDir::FreeDesktop: '1.002'
-    File::HomeDir::MacOS9: '1.002'
-    File::HomeDir::Test: '1.002'
-    File::HomeDir::Unix: '1.002'
-    File::HomeDir::Windows: '1.002'
-    File::Listing: '6.04'
-    File::RsyBak: '0.32'
-    File::RsyBak::Packed: '0.32'
+    File::RsyBak: '0.34'
+    File::RsyBak::Packed: '0.34'
     File::ShareDir: '1.102'
     File::ShareDir::Tarball: 0.2.2
-    File::Slurp::Tiny: '0.004'
     File::Slurper: '0.009'
     File::Which: '1.21'
-    File::Write::Rotate: '0.31'
     File::chdir: '0.1010'
     Function::Fallback::CoreOrPP: '0.08'
     Getopt::Long::Negate::EN: '0.05'
     Getopt::Long::Util: '0.88'
-    HTML::Entities: '3.69'
-    HTML::Filter: '3.72'
-    HTML::HeadParser: '3.71'
-    HTML::LinkExtor: '3.69'
-    HTML::Parser: '3.72'
-    HTML::PullParser: '3.57'
-    HTML::Tagset: '3.20'
-    HTML::TokeParser: '3.69'
-    HTTP::Config: '6.11'
-    HTTP::Cookies: '6.03'
-    HTTP::Cookies::Microsoft: '6.03'
-    HTTP::Cookies::Netscape: '6.03'
-    HTTP::Daemon: '6.01'
-    HTTP::Date: '6.02'
-    HTTP::Headers: '6.11'
-    HTTP::Headers::Auth: '6.11'
-    HTTP::Headers::ETag: '6.11'
-    HTTP::Headers::Util: '6.11'
-    HTTP::Message: '6.11'
-    HTTP::Negotiate: '6.01'
-    HTTP::Request: '6.11'
-    HTTP::Request::Common: '6.11'
-    HTTP::Response: '6.11'
-    HTTP::Status: '6.11'
     HTTP::Tiny: '0.070'
     HTTP::Tiny::UNIX: '0.04'
-    IO::HTML: '1.001'
     IO::Pty: '1.12'
-    IO::Socket::UNIX::Util: '0.05'
     IO::Tty: '1.12'
     IPC::Run: '0.96'
     IPC::Run::Debug: '0.96'
@@ -837,294 +688,29 @@ x_Dist_Zilla_Plugin_Depak:
     IPC::Run::Win32Helper: '0.96'
     IPC::Run::Win32IO: '0.96'
     IPC::Run::Win32Pump: '0.96'
-    IPC::System::Options: 0.31_001
-    JSON: '2.94'
-    JSON::Color: '0.12'
-    JSON::MaybeXS: '1.003009'
+    IPC::System::Options: '0.32'
     JSON::PP: 2.27400_02
     JSON::PP::Boolean: ~
-    LWP: '6.26'
-    LWP::Authen::Basic: '6.26'
-    LWP::Authen::Digest: '6.26'
-    LWP::Authen::Ntlm: '6.26'
-    LWP::ConnCache: '6.26'
-    LWP::Debug: '6.26'
-    LWP::Debug::TraceHTTP: '6.26'
-    LWP::DebugFile: '6.26'
-    LWP::MediaTypes: '6.02'
-    LWP::MemberMixin: '6.26'
-    LWP::Protocol: '6.26'
-    LWP::Protocol::cpan: '6.26'
-    LWP::Protocol::data: '6.26'
-    LWP::Protocol::file: '6.26'
-    LWP::Protocol::ftp: '6.26'
-    LWP::Protocol::gopher: '6.26'
-    LWP::Protocol::http: '6.26'
-    LWP::Protocol::http::SocketUnixAlt: '0.0204'
-    LWP::Protocol::loopback: '6.26'
-    LWP::Protocol::mailto: '6.26'
-    LWP::Protocol::nntp: '6.26'
-    LWP::Protocol::nogo: '6.26'
-    LWP::RobotUA: '6.26'
-    LWP::Simple: '6.26'
-    LWP::UserAgent: '6.26'
     Lingua::EN::Numbers::Ordinate: '1.04'
     Lingua::EN::PluralToSingular: '0.19'
-    Locale::Messages: '1.26'
-    Locale::Recode: ~
-    Locale::Recode::_Aliases: ~
-    Locale::Recode::_Conversions: ~
-    Locale::RecodeData: ~
-    Locale::RecodeData::ASMO_449: ~
-    Locale::RecodeData::ATARI_ST: ~
-    Locale::RecodeData::ATARI_ST_EURO: ~
-    Locale::RecodeData::CP10007: ~
-    Locale::RecodeData::CP1250: ~
-    Locale::RecodeData::CP1251: ~
-    Locale::RecodeData::CP1252: ~
-    Locale::RecodeData::CP1253: ~
-    Locale::RecodeData::CP1254: ~
-    Locale::RecodeData::CP1256: ~
-    Locale::RecodeData::CP1257: ~
-    Locale::RecodeData::CSN_369103: ~
-    Locale::RecodeData::CWI: ~
-    Locale::RecodeData::DEC_MCS: ~
-    Locale::RecodeData::EBCDIC_AT_DE: ~
-    Locale::RecodeData::EBCDIC_AT_DE_A: ~
-    Locale::RecodeData::EBCDIC_CA_FR: ~
-    Locale::RecodeData::EBCDIC_DK_NO: ~
-    Locale::RecodeData::EBCDIC_DK_NO_A: ~
-    Locale::RecodeData::EBCDIC_ES: ~
-    Locale::RecodeData::EBCDIC_ES_A: ~
-    Locale::RecodeData::EBCDIC_ES_S: ~
-    Locale::RecodeData::EBCDIC_FI_SE: ~
-    Locale::RecodeData::EBCDIC_FI_SE_A: ~
-    Locale::RecodeData::EBCDIC_FR: ~
-    Locale::RecodeData::EBCDIC_IS_FRISS: ~
-    Locale::RecodeData::EBCDIC_IT: ~
-    Locale::RecodeData::EBCDIC_PT: ~
-    Locale::RecodeData::EBCDIC_UK: ~
-    Locale::RecodeData::EBCDIC_US: ~
-    Locale::RecodeData::ECMA_CYRILLIC: ~
-    Locale::RecodeData::GEORGIAN_ACADEMY: ~
-    Locale::RecodeData::GEORGIAN_PS: ~
-    Locale::RecodeData::GOST_19768_74: ~
-    Locale::RecodeData::GREEK7: ~
-    Locale::RecodeData::GREEK7_OLD: ~
-    Locale::RecodeData::GREEK_CCITT: ~
-    Locale::RecodeData::HP_ROMAN8: ~
-    Locale::RecodeData::IBM037: ~
-    Locale::RecodeData::IBM038: ~
-    Locale::RecodeData::IBM1004: ~
-    Locale::RecodeData::IBM1026: ~
-    Locale::RecodeData::IBM1047: ~
-    Locale::RecodeData::IBM256: ~
-    Locale::RecodeData::IBM273: ~
-    Locale::RecodeData::IBM274: ~
-    Locale::RecodeData::IBM275: ~
-    Locale::RecodeData::IBM277: ~
-    Locale::RecodeData::IBM278: ~
-    Locale::RecodeData::IBM280: ~
-    Locale::RecodeData::IBM281: ~
-    Locale::RecodeData::IBM284: ~
-    Locale::RecodeData::IBM285: ~
-    Locale::RecodeData::IBM290: ~
-    Locale::RecodeData::IBM297: ~
-    Locale::RecodeData::IBM420: ~
-    Locale::RecodeData::IBM423: ~
-    Locale::RecodeData::IBM424: ~
-    Locale::RecodeData::IBM437: ~
-    Locale::RecodeData::IBM500: ~
-    Locale::RecodeData::IBM850: ~
-    Locale::RecodeData::IBM851: ~
-    Locale::RecodeData::IBM852: ~
-    Locale::RecodeData::IBM855: ~
-    Locale::RecodeData::IBM857: ~
-    Locale::RecodeData::IBM860: ~
-    Locale::RecodeData::IBM861: ~
-    Locale::RecodeData::IBM862: ~
-    Locale::RecodeData::IBM863: ~
-    Locale::RecodeData::IBM864: ~
-    Locale::RecodeData::IBM865: ~
-    Locale::RecodeData::IBM866: ~
-    Locale::RecodeData::IBM868: ~
-    Locale::RecodeData::IBM869: ~
-    Locale::RecodeData::IBM870: ~
-    Locale::RecodeData::IBM871: ~
-    Locale::RecodeData::IBM874: ~
-    Locale::RecodeData::IBM875: ~
-    Locale::RecodeData::IBM880: ~
-    Locale::RecodeData::IBM891: ~
-    Locale::RecodeData::IBM903: ~
-    Locale::RecodeData::IBM904: ~
-    Locale::RecodeData::IBM905: ~
-    Locale::RecodeData::IBM918: ~
-    Locale::RecodeData::IEC_P27_1: ~
-    Locale::RecodeData::INIS: ~
-    Locale::RecodeData::INIS_8: ~
-    Locale::RecodeData::INIS_CYRILLIC: ~
-    Locale::RecodeData::ISO_10367_BOX: ~
-    Locale::RecodeData::ISO_2033_1983: ~
-    Locale::RecodeData::ISO_5427: ~
-    Locale::RecodeData::ISO_5427_EXT: ~
-    Locale::RecodeData::ISO_5428: ~
-    Locale::RecodeData::ISO_8859_1: ~
-    Locale::RecodeData::ISO_8859_10: ~
-    Locale::RecodeData::ISO_8859_11: ~
-    Locale::RecodeData::ISO_8859_13: ~
-    Locale::RecodeData::ISO_8859_14: ~
-    Locale::RecodeData::ISO_8859_15: ~
-    Locale::RecodeData::ISO_8859_16: ~
-    Locale::RecodeData::ISO_8859_2: ~
-    Locale::RecodeData::ISO_8859_3: ~
-    Locale::RecodeData::ISO_8859_4: ~
-    Locale::RecodeData::ISO_8859_5: ~
-    Locale::RecodeData::ISO_8859_6: ~
-    Locale::RecodeData::ISO_8859_7: ~
-    Locale::RecodeData::ISO_8859_8: ~
-    Locale::RecodeData::ISO_8859_9: ~
-    Locale::RecodeData::KOI8_R: ~
-    Locale::RecodeData::KOI8_RU: ~
-    Locale::RecodeData::KOI8_T: ~
-    Locale::RecodeData::KOI8_U: ~
-    Locale::RecodeData::KOI_8: ~
-    Locale::RecodeData::LATIN_GREEK: ~
-    Locale::RecodeData::LATIN_GREEK_1: ~
-    Locale::RecodeData::MACARABIC: ~
-    Locale::RecodeData::MACCROATIAN: ~
-    Locale::RecodeData::MACCYRILLIC: ~
-    Locale::RecodeData::MACGREEK: ~
-    Locale::RecodeData::MACHEBREW: ~
-    Locale::RecodeData::MACICELAND: ~
-    Locale::RecodeData::MACINTOSH: ~
-    Locale::RecodeData::MACROMANIA: ~
-    Locale::RecodeData::MACTHAI: ~
-    Locale::RecodeData::MACTURKISH: ~
-    Locale::RecodeData::MACUKRAINE: ~
-    Locale::RecodeData::MAC_IS: ~
-    Locale::RecodeData::MAC_SAMI: ~
-    Locale::RecodeData::MAC_UK: ~
-    Locale::RecodeData::NATS_DANO: ~
-    Locale::RecodeData::NATS_SEFI: ~
-    Locale::RecodeData::NEXTSTEP: ~
-    Locale::RecodeData::SAMI_WS2: ~
-    Locale::RecodeData::TIS_620: ~
-    Locale::RecodeData::US_ASCII: ~
-    Locale::RecodeData::UTF_8: ~
-    Locale::RecodeData::VISCII: ~
-    Locale::RecodeData::_Encode: ~
-    Locale::TextDomain: '1.26'
-    Locale::TextDomain::UTF8: '0.01'
-    Locale::Util: ~
-    Locale::gettext_dumb: ~
-    Locale::gettext_pp: ~
-    Locale::gettext_xs: ~
-    Log::Any: '1.049'
-    Log::Any::Adapter: '1.049'
-    Log::Any::Adapter::Base: '1.049'
-    Log::Any::Adapter::File: '1.049'
-    Log::Any::Adapter::Log4perl: '0.08'
-    Log::Any::Adapter::Null: '1.049'
-    Log::Any::Adapter::Stderr: '1.049'
-    Log::Any::Adapter::Stdout: '1.049'
-    Log::Any::Adapter::Test: '1.049'
-    Log::Any::Adapter::Util: '1.049'
-    Log::Any::App: '0.53'
-    Log::Any::IfLOG: '0.08'
-    Log::Any::Manager: '1.049'
-    Log::Any::Proxy: '1.049'
-    Log::Any::Proxy::Null: '1.049'
-    Log::Any::Proxy::Test: '1.049'
-    Log::Any::Test: '1.049'
-    Log::Dispatch: '2.65'
-    Log::Dispatch::ApacheLog: '2.65'
-    Log::Dispatch::ArrayWithLimits: '0.04'
-    Log::Dispatch::Base: '2.65'
-    Log::Dispatch::Code: '2.65'
-    Log::Dispatch::Dir: '0.14'
-    Log::Dispatch::Email: '2.65'
-    Log::Dispatch::Email::MIMELite: '2.65'
-    Log::Dispatch::Email::MailSend: '2.65'
-    Log::Dispatch::Email::MailSender: '2.65'
-    Log::Dispatch::Email::MailSendmail: '2.65'
-    Log::Dispatch::File: '2.65'
-    Log::Dispatch::File::Locked: '2.65'
-    Log::Dispatch::FileWriteRotate: '0.05'
-    Log::Dispatch::Handle: '2.65'
-    Log::Dispatch::Null: '2.65'
-    Log::Dispatch::Output: '2.65'
-    Log::Dispatch::Screen: '2.65'
-    Log::Dispatch::Syslog: '2.65'
-    Log::Dispatch::Types: '2.65'
-    Log::Dispatch::Vars: '2.65'
-    Log::Log4perl: '1.49'
-    Log::Log4perl::Appender: ~
-    Log::Log4perl::Appender::Buffer: ~
-    Log::Log4perl::Appender::DBI: ~
-    Log::Log4perl::Appender::File: ~
-    Log::Log4perl::Appender::Limit: ~
-    Log::Log4perl::Appender::RRDs: ~
-    Log::Log4perl::Appender::Screen: ~
-    Log::Log4perl::Appender::ScreenColoredLevels: ~
-    Log::Log4perl::Appender::Socket: ~
-    Log::Log4perl::Appender::String: ~
-    Log::Log4perl::Appender::Synchronized: ~
-    Log::Log4perl::Appender::TestArrayBuffer: ~
-    Log::Log4perl::Appender::TestBuffer: ~
-    Log::Log4perl::Appender::TestFileCreeper: ~
-    Log::Log4perl::Catalyst: ~
-    Log::Log4perl::Config: ~
-    Log::Log4perl::Config::BaseConfigurator: ~
-    Log::Log4perl::Config::DOMConfigurator: 0.03
-    Log::Log4perl::Config::PropertyConfigurator: ~
-    Log::Log4perl::Config::Watch: ~
-    Log::Log4perl::DateFormat: ~
-    Log::Log4perl::Filter: ~
-    Log::Log4perl::Filter::Boolean: ~
-    Log::Log4perl::Filter::LevelMatch: ~
-    Log::Log4perl::Filter::LevelRange: ~
-    Log::Log4perl::Filter::MDC: ~
-    Log::Log4perl::Filter::StringMatch: ~
-    Log::Log4perl::InternalDebug: ~
-    Log::Log4perl::JavaMap: ~
-    Log::Log4perl::JavaMap::ConsoleAppender: ~
-    Log::Log4perl::JavaMap::FileAppender: ~
-    Log::Log4perl::JavaMap::JDBCAppender: ~
-    Log::Log4perl::JavaMap::NTEventLogAppender: ~
-    Log::Log4perl::JavaMap::RollingFileAppender: ~
-    Log::Log4perl::JavaMap::SyslogAppender: ~
-    Log::Log4perl::JavaMap::TestBuffer: ~
-    Log::Log4perl::Layout: ~
-    Log::Log4perl::Layout::NoopLayout: ~
-    Log::Log4perl::Layout::PatternLayout: ~
-    Log::Log4perl::Layout::PatternLayout::Multiline: ~
-    Log::Log4perl::Layout::SimpleLayout: ~
-    Log::Log4perl::Level: ~
-    Log::Log4perl::Logger: ~
-    Log::Log4perl::MDC: ~
-    Log::Log4perl::NDC: ~
-    Log::Log4perl::Resurrector: ~
-    Log::Log4perl::Util: ~
-    Log::Log4perl::Util::Semaphore: ~
-    Log::Log4perl::Util::TimeTracker: ~
-    Log::ger: '0.012'
-    Log::ger::Format: '0.012'
-    Log::ger::Format::None: '0.012'
-    Log::ger::Layout: '0.012'
-    Log::ger::LevelFromEnv: '0.001'
-    Log::ger::Output: '0.012'
-    Log::ger::Output::Array: '0.012'
-    Log::ger::Output::Null: '0.012'
+    Log::ger: '0.019'
+    Log::ger::App: '0.003'
+    Log::ger::Format: '0.019'
+    Log::ger::Format::None: '0.019'
+    Log::ger::Heavy: '0.019'
+    Log::ger::Layout: '0.019'
+    Log::ger::Layout::Pattern: '0.001'
+    Log::ger::Output: '0.019'
+    Log::ger::Output::Array: '0.019'
+    Log::ger::Output::Composite: '0.007'
+    Log::ger::Output::File: '0.002'
+    Log::ger::Output::Null: '0.019'
     Log::ger::Output::Screen: '0.005'
-    Log::ger::Output::String: '0.012'
-    Log::ger::Plugin: '0.012'
-    Log::ger::Plugin::MultilevelLog: '0.012'
-    Log::ger::Util: '0.012'
-    MRO::Compat: '0.13'
-    Method::Generate::Accessor: ~
-    Method::Generate::BuildAll: ~
-    Method::Generate::Constructor: ~
-    Method::Generate::DemolishAll: ~
+    Log::ger::Output::String: '0.019'
+    Log::ger::Output::Syslog: '0.001'
+    Log::ger::Plugin: '0.019'
+    Log::ger::Plugin::MultilevelLog: '0.019'
+    Log::ger::Util: '0.019'
     Mo: '0.40'
     Mo::Golf: '0.40'
     Mo::Inline: '0.40'
@@ -1143,54 +729,17 @@ x_Dist_Zilla_Plugin_Depak:
     Mo::option: '0.40'
     Mo::required: '0.40'
     Mo::xs: '0.40'
-    Module::Implementation: '0.09'
     Module::Installed::Tiny: '0.003'
-    Module::List: '0.003'
-    Module::Path::More: '0.33'
-    Module::Runtime: '0.014'
     Monkey::Patch::Action: '0.05'
     Monkey::Patch::Action::Handle: '0.05'
-    Moo: '2.003002'
-    Moo::HandleMoose: ~
-    Moo::HandleMoose::FakeMetaClass: ~
-    Moo::HandleMoose::_TypeMap: ~
-    Moo::Object: ~
-    Moo::Role: '2.003002'
-    Moo::_Utils: ~
-    Moo::_mro: ~
-    Moo::_strictures: ~
-    Moo::sification: ~
-    Net::HTTP: '6.16'
-    Net::HTTP::Methods: '6.16'
-    Net::HTTP::NB: '6.16'
-    Net::HTTPS: '6.16'
     Nodejs::Util: '0.006'
+    PERLANCAR::File::HomeDir: '0.05'
     PERLANCAR::Module::List: '0.003005'
-    Package::MoreUtil: '0.58'
-    Package::Stash: '0.37'
-    Package::Stash::PP: '0.37'
-    Params::Validate: '1.29'
-    Params::Validate::Constants: '1.29'
-    Params::Validate::PP: '1.29'
-    Params::Validate::XS: '1.29'
-    Params::ValidationCompiler: '0.24'
-    Params::ValidationCompiler::Compiler: '0.24'
-    Params::ValidationCompiler::Exceptions: '0.24'
-    Parse::VarName: '0.03'
-    Perinci::Access: '0.44'
-    Perinci::Access::Base: '0.33'
-    Perinci::Access::HTTP::Client: '0.24'
     Perinci::Access::Lite: '0.14'
-    Perinci::Access::Perl: '0.87'
-    Perinci::Access::Schemeless: '0.87'
-    Perinci::Access::Simple::Client: '0.23'
     Perinci::AccessUtil: '0.06'
-    Perinci::CmdLine::Base: '1.75'
-    Perinci::CmdLine::Classic: '1.73'
-    Perinci::CmdLine::Classic::ColorTheme::Default: '1.73'
-    Perinci::CmdLine::Classic::Role::Help: '1.73'
+    Perinci::CmdLine::Base: '1.76'
     Perinci::CmdLine::Help: '0.14'
-    Perinci::CmdLine::Lite: '1.75'
+    Perinci::CmdLine::Lite: '1.76'
     Perinci::CmdLine::Util::Config: '1.71'
     Perinci::Object: '0.30'
     Perinci::Object::EnvResult: '0.30'
@@ -1201,9 +750,8 @@ x_Dist_Zilla_Plugin_Depak:
     Perinci::Object::Package: '0.30'
     Perinci::Object::ResMeta: '0.30'
     Perinci::Object::Variable: '0.30'
-    Perinci::Result::Format: '0.45'
     Perinci::Result::Format::Lite: '0.25'
-    Perinci::Sub::Complete: '0.91'
+    Perinci::Sub::Complete: '0.92'
     Perinci::Sub::ConvertArgs::Argv: '0.10'
     Perinci::Sub::ConvertArgs::Array: '0.08'
     Perinci::Sub::DepChecker: '0.11'
@@ -1215,9 +763,7 @@ x_Dist_Zilla_Plugin_Depak:
     Perinci::Sub::Util::Args: '0.46'
     Perinci::Sub::Util::ResObj: '0.46'
     Perinci::Sub::Util::Sort: '0.46'
-    Perinci::Sub::Wrapper: '0.83'
     Proc::ChildError: '0.04'
-    Proc::PID::File: '1.28'
     Progress::Any: '0.20'
     Progress::Any::Output: '0.20'
     Progress::Any::Output::Null: '0.20'
@@ -1233,146 +779,23 @@ x_Dist_Zilla_Plugin_Depak:
     Sah::SchemaR::rinci::result_meta: 1.1.82.2
     Sah::Schemas::Rinci: 1.1.82.2
     Scalar::Util::Numeric::PP: '0.04'
-    Specio: '0.37'
-    Specio::Coercion: '0.37'
-    Specio::Constraint::AnyCan: '0.37'
-    Specio::Constraint::AnyDoes: '0.37'
-    Specio::Constraint::AnyIsa: '0.37'
-    Specio::Constraint::Enum: '0.37'
-    Specio::Constraint::Intersection: '0.37'
-    Specio::Constraint::ObjectCan: '0.37'
-    Specio::Constraint::ObjectDoes: '0.37'
-    Specio::Constraint::ObjectIsa: '0.37'
-    Specio::Constraint::Parameterizable: '0.37'
-    Specio::Constraint::Parameterized: '0.37'
-    Specio::Constraint::Role::CanType: '0.37'
-    Specio::Constraint::Role::DoesType: '0.37'
-    Specio::Constraint::Role::Interface: '0.37'
-    Specio::Constraint::Role::IsaType: '0.37'
-    Specio::Constraint::Simple: '0.37'
-    Specio::Constraint::Structurable: '0.37'
-    Specio::Constraint::Structured: '0.37'
-    Specio::Constraint::Union: '0.37'
-    Specio::Declare: '0.37'
-    Specio::DeclaredAt: '0.37'
-    Specio::Exception: '0.37'
-    Specio::Exporter: '0.37'
-    Specio::Helpers: '0.37'
-    Specio::Library::Builtins: '0.37'
-    Specio::Library::Numeric: '0.37'
-    Specio::Library::Perl: '0.37'
-    Specio::Library::String: '0.37'
-    Specio::Library::Structured: '0.37'
-    Specio::Library::Structured::Dict: '0.37'
-    Specio::Library::Structured::Map: '0.37'
-    Specio::Library::Structured::Tuple: '0.37'
-    Specio::OO: '0.37'
-    Specio::PartialDump: '0.37'
-    Specio::Registry: '0.37'
-    Specio::Role::Inlinable: '0.37'
-    Specio::Subs: '0.37'
-    Specio::TypeChecks: '0.37'
     String::Elide::Parts: '0.07'
     String::LineNumber: '0.01'
     String::PerlQuote: '0.02'
     String::ShellQuote: '1.04'
     String::Wildcard::Bash: '0.03'
-    Sub::Defer: '2.004000'
     Sub::Delete: '1.00002'
-    Sub::Exporter::Progressive: '0.001013'
-    Sub::Identify: '0.14'
-    Sub::Quote: '2.004000'
-    Term::App::Role::Attrs: '0.01'
-    Term::App::Roles: '0.01'
-    Term::Detect::Software: '0.21'
     Test::Config::IOD::Common: '0.32'
     Test::Data::Sah: '0.88'
     Test::Data::Sah::Human: '0.88'
     Test::Data::Sah::Perl: '0.88'
-    Test::Fatal: '0.014'
-    Test::Perinci::Sub::Wrapper: '0.83'
-    Test::Specio: '0.37'
     Text::ANSI::BaseUtil: '0.22'
     Text::ANSI::Util: '0.22'
-    Text::ANSITable: '0.48'
-    Text::ANSITable::BorderStyle::Default: '0.48'
-    Text::ANSITable::ColorTheme::Default: '0.48'
-    Text::ANSITable::StyleSet::AltRow: '0.48'
     Text::Table::Any: '0.08'
     Text::Table::Tiny: '0.04'
     Text::sprintfn: '0.08'
-    Tie::Cache: 0.21
     Tie::IxHash: '1.23'
     Time::Duration: '1.20'
-    Try::Tiny: '0.28'
-    URI: '1.71'
-    URI::Escape: '3.31'
-    URI::Find: 20160806
-    URI::Find::Schemeless: 20160806
-    URI::Heuristic: '4.20'
-    URI::IRI: '1.71'
-    URI::QueryParam: '1.71'
-    URI::Split: '1.71'
-    URI::URL: '5.04'
-    URI::WithBase: '2.20'
-    URI::_foreign: '1.71'
-    URI::_generic: '1.71'
-    URI::_idna: '1.71'
-    URI::_ldap: '1.71'
-    URI::_login: '1.71'
-    URI::_punycode: '1.71'
-    URI::_query: '1.71'
-    URI::_segment: '1.71'
-    URI::_server: '1.71'
-    URI::_userpass: '1.71'
-    URI::data: '1.71'
-    URI::file: '4.21'
-    URI::file::Base: '1.71'
-    URI::file::FAT: '1.71'
-    URI::file::Mac: '1.71'
-    URI::file::OS2: '1.71'
-    URI::file::QNX: '1.71'
-    URI::file::Unix: '1.71'
-    URI::file::Win32: '1.71'
-    URI::ftp: '1.71'
-    URI::gopher: '1.71'
-    URI::http: '1.71'
-    URI::https: '1.71'
-    URI::ldap: '1.71'
-    URI::ldapi: '1.71'
-    URI::ldaps: '1.71'
-    URI::mailto: '1.71'
-    URI::mms: '1.71'
-    URI::news: '1.71'
-    URI::nntp: '1.71'
-    URI::pop: '1.71'
-    URI::rlogin: '1.71'
-    URI::rsync: '1.71'
-    URI::rtsp: '1.71'
-    URI::rtspu: '1.71'
-    URI::sftp: '1.71'
-    URI::sip: '1.71'
-    URI::sips: '1.71'
-    URI::snews: '1.71'
-    URI::ssh: '1.71'
-    URI::telnet: '1.71'
-    URI::tn3270: '1.71'
-    URI::urn: '1.71'
-    URI::urn::isbn: ~
-    URI::urn::oid: '1.71'
-    UUID::Random: '0.04'
-    WWW::RobotRules: '6.02'
-    WWW::RobotRules::AnyDBM_File: '6.00'
-    YAML: '1.23'
-    YAML::Any: '1.23'
-    YAML::Dumper: ~
-    YAML::Dumper::Base: ~
-    YAML::Error: ~
-    YAML::Loader: ~
-    YAML::Loader::Base: ~
-    YAML::Marshall: ~
-    YAML::Mo: ~
-    YAML::Node: ~
     YAML::Old: '1.23'
     YAML::Old::Dumper: ~
     YAML::Old::Dumper::Base: ~
@@ -1384,12 +807,7 @@ x_Dist_Zilla_Plugin_Depak:
     YAML::Old::Node: ~
     YAML::Old::Tag: ~
     YAML::Old::Types: ~
-    YAML::Tag: ~
-    YAML::Types: ~
     experimental: '0.016'
-    namespace::autoclean: '0.28'
-    namespace::clean: '0.27'
-    oo: ~
 x_authority: cpan:PERLANCAR
 x_serialization_backend: 'YAML::Tiny version 1.70'
 x_static_install: 1

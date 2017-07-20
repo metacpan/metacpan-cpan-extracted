@@ -9,6 +9,10 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef croak
 # define croak Perl_croak_nocontext
 #endif /* !croak */
@@ -25,6 +29,16 @@ typedef OP *(*Perl_check_t)(pTHX_ OP *);
 # if !PERL_VERSION_GE(5,10,1)
 typedef unsigned Optype;
 # endif /* <5.10.1 */
+
+# ifndef OpMORESIB_set
+#  define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+#  define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
+#  define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
+# endif /* !OpMORESIB_set */
+# ifndef OpSIBLING
+#  define OpHAS_SIBLING(o) (cBOOL((o)->op_sibling))
+#  define OpSIBLING(o) (0 + (o)->op_sibling)
+# endif /* !OpSIBLING */
 
 # ifndef wrap_op_checker
 #  define wrap_op_checker(c,n,o) THX_wrap_op_checker(aTHX_ c,n,o)
@@ -55,9 +69,13 @@ static OP *THX_newDEFSVOP(pTHX)
 	OP *dop = newOP(OP_DEFINED, 0);
 	if(dop->op_type == OP_DEFINED && (dop->op_flags & OPf_KIDS)) {
 		OP *op = cUNOPx(dop)->op_first;
-		cUNOPx(dop)->op_first = op->op_sibling;
-		if(!op->op_sibling) dop->op_flags &= ~OPf_KIDS;
-		op->op_sibling = NULL;
+		if(OpHAS_SIBLING(op)) {
+			cUNOPx(dop)->op_first = OpSIBLING(op);
+		} else {
+			cUNOPx(dop)->op_first = NULL;
+			dop->op_flags &= ~OPf_KIDS;
+		}
+		OpLASTSIB_set(op, NULL);
 		op_free(dop);
 		return op;
 	}
@@ -73,9 +91,13 @@ static OP *THX_op_scalar(pTHX_ OP *op)
 	if(!(sop->op_type == OP_SCALAR && (sop->op_flags & OPf_KIDS)))
 		return sop;
 	op = cUNOPx(sop)->op_first;
-	cUNOPx(sop)->op_first = op->op_sibling;
-	if(!op->op_sibling) sop->op_flags &= ~OPf_KIDS;
-	op->op_sibling = NULL;
+	if(OpHAS_SIBLING(op)) {
+		cUNOPx(sop)->op_first = OpSIBLING(op);
+	} else {
+		cUNOPx(sop)->op_first = NULL;
+		sop->op_flags &= ~OPf_KIDS;
+	}
+	OpLASTSIB_set(op, NULL);
 	op_free(sop);
 	return op;
 }
@@ -108,8 +130,8 @@ static OP *THX_pp_squashhints(pTHX)
 	return PL_op->op_next;
 }
 
-# define gen_squashhints_op() THX_gen_squashhints_op(aTHX)
-static OP *THX_gen_squashhints_op(pTHX)
+# define newOP_squashhints() THX_newOP_squashhints(aTHX)
+static OP *THX_newOP_squashhints(pTHX)
 {
 	OP *squashhints_op = newOP(OP_PUSHMARK, 0);
 	squashhints_op->op_type = OP_RAND;
@@ -126,8 +148,8 @@ static OP *THX_pp_maybesquashhints(pTHX)
 		PL_op->op_next : pp_squashhints();
 }
 
-# define gen_maybesquashhints_op(argop) THX_gen_maybesquashhints_op(aTHX_ argop)
-static OP *THX_gen_maybesquashhints_op(pTHX_ OP *argop)
+# define newOP_maybesquashhints(argop) THX_newOP_maybesquashhints(aTHX_ argop)
+static OP *THX_newOP_maybesquashhints(pTHX_ OP *argop)
 {
 	OP *msh_op = newUNOP(OP_NULL, 0, argop);
 	msh_op->op_type = OP_RAND;
@@ -135,9 +157,9 @@ static OP *THX_gen_maybesquashhints_op(pTHX_ OP *argop)
 	return msh_op;
 }
 
-static OP *(*nxck_require)(pTHX_ OP *op);
+static OP *(*THX_nxck_require)(pTHX_ OP *op);
 
-static OP *myck_require(pTHX_ OP *op)
+static OP *THX_myck_require(pTHX_ OP *op)
 {
 	OP *argop;
 	if(!(op->op_flags & OPf_KIDS)) {
@@ -161,8 +183,8 @@ static OP *myck_require(pTHX_ OP *op)
 		 * name, so we definitely want to squash hints at runtime.
 		 * So build op tree with an unconditional squashhints op.
 		 */
-		op = nxck_require(aTHX_ op);
-		op = append_list(OP_LINESEQ, (LISTOP*)gen_squashhints_op(),
+		op = THX_nxck_require(aTHX_ op);
+		op = append_list(OP_LINESEQ, (LISTOP*)newOP_squashhints(),
 						(LISTOP*)op);
 	} else {
 		/*
@@ -171,10 +193,10 @@ static OP *myck_require(pTHX_ OP *op)
 		 * So we wrap the argument op, separating it from the
 		 * require op.
 		 */
-		OP *sib = argop->op_sibling;
-		argop->op_sibling = NULL;
-		argop = gen_maybesquashhints_op(op_scalar(argop));
-		argop->op_sibling = sib;
+		OP *sib = OpSIBLING(argop);
+		OpLASTSIB_set(argop, NULL);
+		argop = newOP_maybesquashhints(op_scalar(argop));
+		OpMAYBESIB_set(argop, sib, op);
 		cUNOPx(op)->op_first = argop;
 	}
 	op = prepend_elem(OP_LINESEQ, newOP(OP_ENTER, 0), op);
@@ -195,7 +217,7 @@ import(SV *classname)
 CODE:
 	PERL_UNUSED_VAR(classname);
 #if Q_MUST_WORKAROUND
-	wrap_op_checker(OP_REQUIRE, myck_require, &nxck_require);
+	wrap_op_checker(OP_REQUIRE, THX_myck_require, &THX_nxck_require);
 #endif /* Q_MUST_WORKAROUND */
 
 void

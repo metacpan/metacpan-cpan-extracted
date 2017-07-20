@@ -16,6 +16,7 @@ lib/RPi/WiringPi/Util.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
+out
 README
 t/00-load.t
 t/01-setup.t.norun
@@ -24,11 +25,13 @@ t/03-setup_phys.t.norun
 t/04-setup_uninit.t.norun
 t/05-pin.t
 t/10-register.t
-t/15-pwm.t
+t/15-pwm_adc_ads1115.t
 t/20-cleanup.t
 t/25-sig_die.t
 t/35-pin_map.t
-t/40-interrupt_and_pud.t
+t/40-interrupt_rising_and_pud.t
+t/41-interrupt_falling_and_pud.t
+t/42-interrupt_both_and_pud.t
 t/45-shift_reg_adc.t
 t/55-dac.t
 t/60-lcd.t
@@ -36,16 +39,21 @@ t/65-i2c.t
 t/70-alt_modes.t
 t/75-serial.t
 t/80-mode_state_all_pins.t
+t/85-pwm_hw_mods.t
+t/90-servo.t
 t/manifest.t
 t/pod-coverage.t
 t/RPiTest.pm
 test/adc.pl
+test/alt_mode.pl
+test/api_servo.pl
 test/baseline_setup.pl
 test/bmp.pl
 test/i2c.pl
 test/images/after.jpg
 test/images/before.jpg
 test/registered_pins.pl
+test/sg90_servo.pl
 test/shift.pl
 test/spi.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

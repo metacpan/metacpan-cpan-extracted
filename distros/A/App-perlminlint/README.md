@@ -13,10 +13,10 @@ SYNOPSIS
 #  => This tests "perl -wc myscript.pl"
 
 % perlminlint  MyModule.pm
-#  => This tests "perl -MMyModule -we0"
+#  => This tests "perl -we 'require MyModule'"
 
 % perlminlint  MyInnerModule.pm
-#  => This tests "perl -I.. -MMyApp::MyInnerModule -we0"
+#  => This tests "perl -I.. -we 'require MyApp::MyInnerModule'"
 
 % perlminlint  cpanfile
 #  => This tests Module::CPANfile->load

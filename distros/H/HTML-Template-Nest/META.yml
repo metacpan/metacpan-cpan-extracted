@@ -1,14 +1,14 @@
 ---
 abstract: 'manipulate a nested html template structure via a perl hash'
 author:
-  - 'tom <tom@>'
+  - 'Tom Gracey <tomgracey@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -17,5 +17,9 @@ no_index:
   directory:
     - t
     - inc
-requires: {}
-version: '0.02'
+requires:
+  Carp: '1.22'
+  Data::Dumper: '2.101'
+  File::Spec: '3.26'
+  HTML::Template: '2.1'
+version: '0.03'

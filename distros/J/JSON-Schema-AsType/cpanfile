@@ -1,4 +1,3 @@
-requires "Class::Load" => "0";
 requires "Clone" => "0";
 requires "JSON" => "0";
 requires "LWP::Simple" => "0";

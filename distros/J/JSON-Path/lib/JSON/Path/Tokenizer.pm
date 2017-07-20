@@ -1,30 +1,24 @@
 package JSON::Path::Tokenizer;
-$JSON::Path::Tokenizer::VERSION = '0.310';
+$JSON::Path::Tokenizer::VERSION = '0.400';
 use strict;
 use warnings;
 use 5.008;
 
 use Carp;
 use Readonly;
-use JSON::Path::Constants qw(:symbols);
-use Exporter::Easy ( OK => [ 'tokenize' ] );
+use JSON::Path::Constants qw(:symbols :operators);
+use Exporter::Easy ( OK => ['tokenize'] );
 
-Readonly my $ESCAPE_CHAR => qq{\\};
-Readonly my %RESERVED_SYMBOLS => (
-    $DOLLAR_SIGN          => 1,
-    $COMMERCIAL_AT        => 1,
-    $FULL_STOP            => 1,
-    $LEFT_SQUARE_BRACKET  => 1,
-    $RIGHT_SQUARE_BRACKET => 1,
-    $ASTERISK             => 1,
-    $COLON                => 1,
-    $LEFT_PARENTHESIS     => 1,
-    $RIGHT_PARENTHESIS    => 1,
-    $COMMA                => 1,
-    $EQUAL_SIGN           => 1,
-    $EXCLAMATION_MARK     => 1,
-    $GREATER_THAN_SIGN    => 1,
-    $LESS_THAN_SIGN       => 1,
+Readonly my $ESCAPE_CHAR      => qq{\\};
+Readonly my %OPERATORS => (
+    $TOKEN_ROOT                => 1,    # $
+    $TOKEN_RECURSIVE           => 1,    # ..
+    $TOKEN_CHILD               => 1,    # .
+    $TOKEN_FILTER_OPEN         => 1,    # [?(
+    $TOKEN_FILTER_SCRIPT_CLOSE => 1,    # )]
+    $TOKEN_SCRIPT_OPEN         => 1,    # [(
+    $TOKEN_SUBSCRIPT_OPEN      => 1,    # [
+    $TOKEN_SUBSCRIPT_CLOSE     => 1,    # ]
 );
 
 # ABSTRACT: Helper class for JSON::Path::Evaluator. Do not call directly.
@@ -33,109 +27,88 @@ Readonly my %RESERVED_SYMBOLS => (
 sub tokenize {
     my $expression = shift;
 
-    # $expression = normalize($expression);
+    my $chars = [ split //, $expression ];
+
     my @tokens;
-    my @chars = split //, $expression;
-    my $char;
-    while ( defined( my $char = shift @chars ) ) {
-        my $token = $char;
-
-        if ($char eq $ESCAPE_CHAR) { 
-            my $next_char = shift @chars;
-            $token .= $next_char;
-        }
-        elsif ( $RESERVED_SYMBOLS{$char}) {
-            if ( $char eq $FULL_STOP ) {    # distinguish between the '.' and '..' tokens
-                my $next_char = shift @chars;
-                if ( $next_char eq $FULL_STOP ) {
-                    $token .= $next_char;
-                }
-                else {
-                    unshift @chars, $next_char;
-                }
-            }
-            elsif ( $char eq $LEFT_SQUARE_BRACKET ) {
-                my $next_char = shift @chars;
-
-                # $.addresses[?(@.addresstype.id == D84002)]
-
-                if ( $next_char eq $LEFT_PARENTHESIS ) {
-                    $token .= $next_char;
-                }
-                elsif ( $next_char eq $QUESTION_MARK ) {
-                    $token .= $next_char;
-                    my $next_char = shift @chars;
-                    if ( $next_char eq $LEFT_PARENTHESIS ) {
-                        $token .= $next_char;
-                    }
-                    else {
-                        die qq{filter operator "$token" must be followed by '('\n};
-                    }
-                }
-                else {
-                    unshift @chars, $next_char;
-                }
-            }
-            elsif ( $char eq $RIGHT_PARENTHESIS ) {
-                my $next_char = shift @chars;
-                no warnings qw/uninitialized/;
-                die qq{Unterminated expression: '[(' or '[?(' without corresponding ')]'\n}
-                    unless $next_char eq $RIGHT_SQUARE_BRACKET;
-                use warnings qw/uninitialized/;
-                $token .= $next_char;
-            }
-            elsif ( $char eq $EQUAL_SIGN ) {    # Build '=', '==', or '===' token as appropriate
-                my $next_char = shift @chars;
-                if ( !defined $next_char ) {
-                    die qq{Unterminated comparison: '=', '==', or '===' without predicate\n};
-                }
-                if ( $next_char eq $EQUAL_SIGN ) {
-                    $token .= $next_char;
-                    $next_char = shift @chars;
-                    if ( !defined $next_char ) {
-                        die qq{Unterminated comparison: '==' or '===' without predicate\n};
-                    }
-                    if ( $next_char eq $EQUAL_SIGN ) {
-                        $token .= $next_char;
-                    }
-                    else {
-                        unshift @chars, $next_char;
-                    }
-                }
-                else {
-                    unshift @chars, $next_char;
-                }
-            }
-            elsif ( $char eq $LESS_THAN_SIGN || $char eq $GREATER_THAN_SIGN ) {
-                my $next_char = shift @chars;
-                if ( !defined $next_char ) {
-                    die qq{Unterminated comparison: '=', '==', or '===' without predicate\n};
-                }
-                if ( $next_char eq $EQUAL_SIGN ) {
-                    $token .= $next_char;
-                }
-                else {
-                    unshift @chars, $next_char;
-                }
-            }
-        }
-        else {
-            # Read from the character stream until we have a valid token
-            while ( defined( $char = shift @chars ) ) {
-                if ( $char eq $ESCAPE_CHAR ) { 
-                    $char = shift @chars;
-                }
-                elsif ( $RESERVED_SYMBOLS{$char} ) {
-                    unshift @chars, $char;
-                    last;
-                }
-                $token .= $char;
-            }
-        }
+    while ( defined( my $token = _read_to_next_token($chars) ) ) {
         push @tokens, $token;
+        if ( $token eq $TOKEN_SCRIPT_OPEN || $token eq $TOKEN_FILTER_OPEN ) {
+            push @tokens, _read_to_filter_script_close($chars);
+        }
     }
-
     return @tokens;
+}
+
+sub _read_to_filter_script_close {
+    my $chars = shift;
+
+    my $filter;
+    while ( defined( my $char = shift @{$chars} ) ) {
+        $filter .= $char;
+
+        last unless @{$chars};
+        last if $chars->[0] eq $RIGHT_PARENTHESIS;
+    }
+    return $filter;
+}
+
+sub _read_to_next_token {
+    my $chars = shift;
+
+    my $in_quote;
+    my $token;
+    while ( defined( my $char = shift @{$chars} ) ) {
+        if ( $char eq $APOSTROPHE || $char eq $QUOTATION_MARK ) {
+            if ( $in_quote && $in_quote eq $char ) {
+                $in_quote = '';
+                last;
+            }
+            $in_quote = $char;
+            next;
+        }
+
+        if ( $char eq $ESCAPE_CHAR && !$in_quote ) {
+            $token .= shift @{$chars};
+            next;
+        }
+
+        $token .= $char;
+
+        next if $in_quote;
+
+        # Break out of the loop if the current character is the last one in the stream.
+        last unless @{$chars};
+
+        if ( $char eq $LEFT_SQUARE_BRACKET ) {    # distinguish between '[', '[(', and '[?('
+            if ( $chars->[0] eq $LEFT_PARENTHESIS ) {
+                next;
+            }
+            if ( $chars->[0] eq $QUESTION_MARK ) {
+
+                # The below appends the '?'. The '(' will be appended in the next iteration of the loop
+                $token .= shift @{$chars};
+                next;
+            }
+        }
+        elsif ( $char eq $RIGHT_PARENTHESIS ) {
+
+            # A right parenthesis should be followed by a right square bracket, which itself is a token.
+            # Append the next character and proceed.
+            $token .= shift @{$chars};
+        }
+        elsif ( $char eq $FULL_STOP ) {
+
+            # A full stop (i.e. a period, '.') may be the child operator '.' or the recursive operator '..'
+            $token .= shift @{$chars} if $chars->[0] eq $FULL_STOP;
+        }
+
+        # If we've assembled an operator, we're done.
+        last if $OPERATORS{$token};
+
+        # Similarly, if the next character is an operator, we're done
+        last if $OPERATORS{ $chars->[0] };
+    }
+    return $token;
 }
 
 1;
@@ -152,7 +125,7 @@ JSON::Path::Tokenizer - Helper class for JSON::Path::Evaluator. Do not call dire
 
 =head1 VERSION
 
-version 0.310
+version 0.400
 
 =head1 AUTHOR
 

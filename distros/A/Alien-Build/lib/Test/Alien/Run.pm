@@ -5,7 +5,7 @@ use warnings;
 use Test2::API qw( context );
 
 # ABSTRACT: Run object
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
 sub out    { shift->{out} }
@@ -172,11 +172,11 @@ Test::Alien::Run - Run object
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 
- use Test2::Extended::Bundle;
+ use Test2::V0;
  use Test::Alien;
  
  run_ok([ $^X, -e => 'print "some output"; exit 22'])

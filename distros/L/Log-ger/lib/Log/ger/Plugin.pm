@@ -1,7 +1,7 @@
 package Log::ger::Plugin;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 use strict;
 use warnings;
@@ -39,9 +39,15 @@ sub set_for_current_package {
     set($pkg, \%args);
 }
 
+sub _import_sets_for_current_package { 0 }
+
 sub import {
     if (@_ > 1) {
-        goto &set;
+        if ($_[0]->_import_sets_for_current_package) {
+            goto &set_for_current_package;
+        } else {
+            goto &set;
+        }
     }
 }
 
@@ -60,7 +66,7 @@ Log::ger::Plugin - Use a plugin
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 SYNOPSIS
 

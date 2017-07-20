@@ -6,7 +6,7 @@ use base qw( Alien::Build::Interpolate );
 use File::chdir;
 
 # ABSTRACT: Default interpolator for Alien::Build
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 sub _config
 {
@@ -32,7 +32,7 @@ sub new
   $self->add_helper( cc => sub { _config 'cc' }, 'Config' );
 
 
-  $self->add_helper( cmake => 'cmake', 'Alien::CMake' => '0.07' );
+  $self->add_helper( cmake => sub { 'cmake' }, 'Alien::CMake' => '0.07' );
 
 
   $self->add_helper( cp => sub { _config 'cp' }, 'Config' );
@@ -108,7 +108,7 @@ Alien::Build::Interpolate::Default - Default interpolator for Alien::Build
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 CONSTRUCTOR
 

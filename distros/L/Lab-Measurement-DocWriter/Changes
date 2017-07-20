@@ -1,0 +1,23 @@
+History for Lab-Measurement-DocWriter
+
+1.000 2017-07-18
+
+  * Fix internal links. All looks good now.
+
+0.993 2017-07-15
+
+  * Fix installed module names in the main script
+
+0.992 2017-07-14
+
+  * Also install the main script...
+
+0.991 2017-07-14
+
+  * Fix directory structure for the CPAN indexer
+
+0.990 2017-07-14
+
+  * Extract files from the Lab::Measurement git repository into a
+    separate directory
+  * Prepare as standalone Perl distribution

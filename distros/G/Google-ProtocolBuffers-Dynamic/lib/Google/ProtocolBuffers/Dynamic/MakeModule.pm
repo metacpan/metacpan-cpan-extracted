@@ -129,6 +129,7 @@ sub generate_codegen_request {
     for my $file (@{$request->get_proto_file_list}) {
         next unless $files{$file->get_name};
         $pb_packages{$file->get_package} = 1;
+        $file->clear_source_code_info;
         $descriptors->add_file($file);
     }
 
@@ -199,7 +200,7 @@ Google::ProtocolBuffers::Dynamic::MakeModule
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 AUTHOR
 

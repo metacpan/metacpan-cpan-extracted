@@ -29,6 +29,8 @@ use Test::More tests => 3;
 use Thread::Semaphore ();
 use threads::shared;
 
+BEGIN { unshift @INC, "./t/lib"; }
+
 alarm 10;   # failure mode may involve an infinite loop
 
 my $done1 = Thread::Semaphore->new(0);

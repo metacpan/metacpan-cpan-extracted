@@ -6,6 +6,7 @@ examples/plist-visitor.pl
 examples/README
 hacks/plist-timer.pl
 hacks/plist.pl
+INSTALL.SKIP
 lib/Mac/PropertyList.pm
 lib/Mac/PropertyList/ReadBinary.pm
 lib/Mac/PropertyList/WriteBinary.pm
@@ -19,8 +20,9 @@ plists/com.apple.iPhoto.plist
 plists/com.apple.iTunes.plist
 plists/com.apple.systempreferences.plist
 plists/com.unsanity.windowshadex.plist
+plists/comments.plist
 plists/the_perl_review.abcdp
-README
+README.pod
 t/array.t
 t/as_perl.t
 t/bad_plist.t
@@ -43,5 +45,6 @@ t/test_manifest
 t/time.t
 t/write.t
 t/write_binary.t
+xt/changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

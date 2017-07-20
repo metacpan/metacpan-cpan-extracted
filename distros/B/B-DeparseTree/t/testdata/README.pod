@@ -1,0 +1,20 @@
+L<B::Deparse> is pretty extensively tested. Here we have the tests
+taken from the Perl distirbution. I the distribution the data and
+the test for the data are in one file.
+
+We have separated out the data from the driver for a couple of
+reasons.  First, I think it is just cleaner.
+
+Also I believe that we can write one test driver that works on multiple
+versions of Perl.  As the test driver gets better, multiple versions
+can take advantage of that.
+
+The same possbily can be said for the data too. We should be able to
+find common parts of tests and separate use them across several
+different versions of Perl.
+
+Right now when a bug is found in L<B::Deparse>, it is fixed in that
+version and future versions. But in reality we could also see if it is
+relevant in previous versions of Perl and fix the prior versions as well.
+
+Modularity is a wonderful thing that way.

@@ -7,8 +7,6 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0'
   Test::NoWarnings: '0'
-configure_requires:
-  Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -19,7 +17,7 @@ name: Locale-Utils-PlaceholderBabelFish
 provides:
   Locale::Utils::PlaceholderBabelFish:
     file: lib/Locale/Utils/PlaceholderBabelFish.pm
-    version: '0.004'
+    version: '0.006'
 recommends:
   Test::Pod: '1.14'
   Test::Pod::Coverage: '1.04'
@@ -36,5 +34,5 @@ requires:
   perl: '5.006'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.004'
+version: '0.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

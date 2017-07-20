@@ -1,7 +1,7 @@
 package App::CPAN::Changes;
 
-our $DATE = '2016-10-11'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 #use 5.010001;
 use strict;
@@ -224,7 +224,7 @@ App::CPAN::Changes - CLI for CPAN::Changes
 
 =head1 VERSION
 
-This document describes version 0.002 of App::CPAN::Changes (from Perl distribution App-CPAN-Changes), released on 2016-10-11.
+This document describes version 0.003 of App::CPAN::Changes (from Perl distribution App-CPAN-Changes), released on 2017-07-14.
 
 =head1 SYNOPSIS
 
@@ -233,7 +233,11 @@ See included script L<cpan-changes>.
 =head1 FUNCTIONS
 
 
-=head2 add_release(%args) -> [status, msg, result, meta]
+=head2 add_release
+
+Usage:
+
+ add_release(%args) -> [status, msg, result, meta]
 
 Add a new release.
 
@@ -282,7 +286,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 check(%args) -> [status, msg, result, meta]
+=head2 check
+
+Usage:
+
+ check(%args) -> [status, msg, result, meta]
 
 Check for parsing errors in Changes file.
 
@@ -310,7 +318,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 dump(%args) -> [status, msg, result, meta]
+=head2 dump
+
+Usage:
+
+ dump(%args) -> [status, msg, result, meta]
 
 Dump Changes as JSON structure.
 
@@ -338,7 +350,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 preamble(%args) -> [status, msg, result, meta]
+=head2 preamble
+
+Usage:
+
+ preamble(%args) -> [status, msg, result, meta]
 
 Get/set preamble.
 
@@ -370,7 +386,11 @@ that contains extra information.
 Return value:  (any)
 
 
-=head2 release(%args) -> [status, msg, result, meta]
+=head2 release
+
+Usage:
+
+ release(%args) -> [status, msg, result, meta]
 
 Return information (JSON object dump) of a specific release.
 
@@ -427,7 +447,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

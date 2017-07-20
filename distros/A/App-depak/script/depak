@@ -1,7 +1,9 @@
 #!perl
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.55'; # VERSION
+# FRAGMENT id=shcompgen-hint command=depak
+
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.57'; # VERSION
 
 use 5.010001;
 use strict;
@@ -29,7 +31,7 @@ depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.55 of depak (from Perl distribution App-depak), released on 2017-07-10.
+This document describes version 0.57 of depak (from Perl distribution App-depak), released on 2017-07-14.
 
 =head1 SYNOPSIS
 
@@ -74,6 +76,24 @@ is also an Indonesian word.
 =head1 OPTIONS
 
 C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--put-hook-at-the-end>
+
+Prefer modules from other sources (filesystem) first.
+
+Normally, the `fatpack` or `datapack` require hook will be put at the front of
+`@INC`. If this option is set to true, the require hook will be put at the end.
+This means Perl will search modules from the regular sources (filesystem) first.
+This is useful for example if you want your application to use the possibly
+newer version of modules on the filesystem before using the packed version as
+the fallback when some modules are not installed.
+
+
+=back
 
 =head2 Configuration options
 
@@ -696,6 +716,7 @@ List of available configuration parameters:
  overwrite (see --overwrite)
  pack_method (see --pack-method)
  perl_version (see --perl-version)
+ put_hook_at_the_end (see --put-hook-at-the-end)
  shebang (see --shebang)
  skip_not_found (see --skip-not-found)
  squish (see --squish)

@@ -212,6 +212,18 @@ function build_autogen ()
     (cd $source_dir && sh ./autogen.sh)
     [ $? -eq 0 ] && print_result "OK" || print_fatal "Result failed"
   fi
+  
+  # run autogen of cubrid manager if needed
+  print_check "Checking manager server directory"
+  if [ -d "$source_dir/cubridmanager" -a -d "$source_dir/cubridmanager/server" ]; then 
+    print_result "OK"
+    
+    print_check "Running autogen.sh of cubrid manager" 
+    (cd $source_dir/cubridmanager/server && sh ./autogen.sh) 
+    [ $? -eq 0 ] && print_result "OK" || print_fatal "Result failed"
+  else
+    print_info "Manager server source path is not exist. It will not be built"
+  fi
 }
 
 
@@ -245,9 +257,9 @@ function build_configure ()
 
   # set up target
   case "$build_target" in
-    i386);;
-    x86_64)
-      configure_options="--enable-64bit $configure_options" ;;
+    i386)
+      configure_options="--disable-64bit $configure_options" ;;
+    x86_64);;
     *)
       print_fatal "Build target [$build_target] is not valid target" ;;
   esac
@@ -262,8 +274,6 @@ function build_configure ()
     *)
       print_fatal "Build mode [$build_mode] is not valid build mode" ;;
   esac
-
-  configure_options="$configure_options --enable-dbgw --with-nbase-t=yes --enable-nclavis"
 
   if [ $build_mode = "release" ]; then
     # check conflict
@@ -936,132 +946,13 @@ function build_package ()
 	  fi
 	fi
       ;;
-      dbgwci)
-	if [ ! -d "$install_dir" ]; then
-	  print_fatal "Installed directory not found"
-	fi
-
-	package_basename="$product_name-DBGWCI-$build_number-$build_target"
+      owfs)
+	package_basename="$product_name-owfs-$build_number-$build_target"
 	if [ ! "$build_mode" = "release" ]; then
 	  package_name="$package_basename-$build_mode.tar.gz"
 	else
 	  package_name="$package_basename.tar.gz"
 	fi
-	cci_headers="include/cas_cci.h include/cas_error.h"
-	dbgw_headers="
-		include/cci_log.h
-		include/DBGWClient.h
-		include/DBGWConnector3.h
-		include/dbgw3/Common.h
-		include/dbgw3/Exception.h
-		include/dbgw3/Lob.h
-		include/dbgw3/Logger.h
-		include/dbgw3/Value.h
-		include/dbgw3/ValueSet.h
-		include/dbgw3/SynchronizedResource.h
-		include/dbgw3/system/ThreadEx.h
-		include/dbgw3/system/DBGWPorting.h
-		include/dbgw3/sql/CallableStatement.h
-		include/dbgw3/sql/Connection.h
-		include/dbgw3/sql/DatabaseInterface.h
-		include/dbgw3/sql/DriverManager.h
-		include/dbgw3/sql/PreparedStatement.h
-		include/dbgw3/sql/ResultSet.h
-		include/dbgw3/sql/ResultSetMetaData.h
-		include/dbgw3/sql/Statement.h
-		include/dbgw3/client/Interface.h
-		include/dbgw3/client/Mock.h
-		include/dbgw3/client/ConfigurationObject.h
-		include/dbgw3/client/Configuration.h
-		include/dbgw3/client/ClientResultSet.h
-		include/dbgw3/client/Resource.h
-		include/dbgw3/client/QueryMapper.h
-		include/dbgw3/client/Client.h
-		"
-	cci_libs="lib/libcascci.a lib/libcascci.so*"
-	dbgw_libs="lib/libdbgw3.a"
-	dbgw_libs="lib/libdbgw3.so* $dbgw_libs"
-	if [ "$build_target" == "x86_64" ]; then
-		dbgw_libs="lib/libdbgw3_all.a $dbgw_libs"
-		dbgw_libs="lib/libdbgw3_mysql.a $dbgw_libs"
-		dbgw_libs="lib/libdbgw3_oracle.a $dbgw_libs"
-		dbgw_libs="lib/libdbgw3_nbase_t.a* $dbgw_libs"
-		dbgw_libs="lib/libdbgw3_all.so* $dbgw_libs"
-		dbgw_libs="lib/libdbgw3_mysql.so* $dbgw_libs"
-		dbgw_libs="lib/libdbgw3_oracle.so* $dbgw_libs"		
-		dbgw_libs="lib/libdbgw3_nbase_t.so* $dbgw_libs"
-	fi
-	for file in $cci_headers $dbgw_headers $cci_libs $dbgw_libs; do
-	  pack_file_list="$pack_file_list $product_name/$file"
-	done
-	(cd $install_dir && tar czf $output_dir/$package_name $pack_file_list)
-	[ $? -eq 0 ] && output_packages="$output_packages $package_name"
-      ;;
-        dbgwci_nclavis)
-  	if [ ! -d "$install_dir" ]; then
-  	  print_fatal "Installed directory not found"
-  	fi
-  
-  	package_basename="$product_name-DBGWCI_NCLAVIS-$build_number-$build_target"
-  	if [ ! "$build_mode" = "release" ]; then
-  	  package_name="$package_basename-$build_mode.tar.gz"
-  	else
-  	  package_name="$package_basename.tar.gz"
-  	fi
-  	cci_headers="include/cas_cci.h include/cas_error.h"
-  	dbgw_headers="
-  		include/cci_log.h
-  		include/DBGWClient.h
-  		include/DBGWConnector3.h
-  		include/dbgw3/Common.h
-  		include/dbgw3/Exception.h
-  		include/dbgw3/Lob.h
-  		include/dbgw3/Logger.h
-  		include/dbgw3/Value.h
-  		include/dbgw3/ValueSet.h
-  		include/dbgw3/SynchronizedResource.h
-  		include/dbgw3/system/ThreadEx.h
-  		include/dbgw3/system/DBGWPorting.h
-  		include/dbgw3/sql/CallableStatement.h
-  		include/dbgw3/sql/Connection.h
-  		include/dbgw3/sql/DatabaseInterface.h
-  		include/dbgw3/sql/DriverManager.h
-  		include/dbgw3/sql/PreparedStatement.h
-  		include/dbgw3/sql/ResultSet.h
-  		include/dbgw3/sql/ResultSetMetaData.h
-  		include/dbgw3/sql/Statement.h
-  		include/dbgw3/client/Interface.h
-  		include/dbgw3/client/Mock.h
-  		include/dbgw3/client/ConfigurationObject.h
-  		include/dbgw3/client/Configuration.h
-  		include/dbgw3/client/ClientResultSet.h
-  		include/dbgw3/client/Resource.h
-  		include/dbgw3/client/QueryMapper.h
-  		include/dbgw3/client/Client.h
-  		"
-  	cci_libs="lib/libcascci.a lib/libcascci.so*"
-  	dbgw_libs="lib/libdbgw3_nclavis.a"
-  	dbgw_libs="lib/libdbgw3_nclavis.so* $dbgw_libs"
-  	if [ "$build_target" == "x86_64" ]; then
-  		dbgw_libs="lib/libdbgw3_nclavis_all.a $dbgw_libs"
-  		dbgw_libs="lib/libdbgw3_nclavis_mysql.a $dbgw_libs"
-  		dbgw_libs="lib/libdbgw3_nclavis_oracle.a $dbgw_libs"
-  		dbgw_libs="lib/libdbgw3_nclavis_nbase_t.a* $dbgw_libs"
-  		dbgw_libs="lib/libdbgw3_nclavis_all.so* $dbgw_libs"
-  		dbgw_libs="lib/libdbgw3_nclavis_mysql.so* $dbgw_libs"
-  		dbgw_libs="lib/libdbgw3_nclavis_oracle.so* $dbgw_libs"
-  		dbgw_libs="lib/libdbgw3_nclavis_nbase_t.so* $dbgw_libs"
-  	fi
-  	pack_file_list=""
-  	for file in $cci_headers $dbgw_headers $cci_libs $dbgw_libs; do
-  	  pack_file_list="$pack_file_list $product_name/$file"
-  	done
-  	(cd $install_dir && tar czf $output_dir/$package_name $pack_file_list)
-  	[ $? -eq 0 ] && output_packages="$output_packages $package_name"
-        ;;
-      owfs)
-	package_basename="$product_name-owfs-$build_number-$build_target"
-	package_name="$package_basename.tar.gz"
 	owfs_build_dir="$build_dir/$package_basename"
 	owfs_install_dir="$owfs_build_dir/$package_basename"
 	if [ -d "$owfs_build_dir" ]; then
@@ -1128,7 +1019,7 @@ function show_usage ()
   else
     echo "  -j path Set JAVA_HOME path; [default: $JAVA_HOME]"
   fi
-  echo "  -z arg  Package to generate (src,zip_src,cci_src,php_src,shell,tarball,cci,jdbc,srpm,rpm,dbgwci,dbgwci_nclavis,owfs);"
+  echo "  -z arg  Package to generate (src,zip_src,cci_src,php_src,shell,tarball,cci,jdbc,srpm,rpm,owfs);"
   echo "          [default: all]"
   echo "  -? | -h Show this help message and exit"
   echo ""
@@ -1216,7 +1107,7 @@ function get_options ()
     fi
   done
   if [ "$packages" = "all" -o "$packages" = "ALL" ]; then
-    packages="src zip_src cci_src php_src tarball shell cci jdbc srpm rpm dbgwci dbgwci_nclavis owfs"
+    packages="src zip_src cci_src php_src tarball shell cci jdbc srpm rpm owfs"
   fi
 
   if [ "x$output_dir" = "x" ]; then

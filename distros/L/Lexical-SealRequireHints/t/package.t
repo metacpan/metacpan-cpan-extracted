@@ -3,6 +3,8 @@ use strict;
 
 use Test::More tests => 2;
 
+BEGIN { unshift @INC, "./t/lib"; }
+
 our $native_package;
 
 BEGIN {

@@ -8,8 +8,6 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0'
   Test::NoWarnings: '0'
-configure_requires:
-  Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -20,7 +18,7 @@ name: Locale-Utils-Autotranslator
 provides:
   Locale::Utils::Autotranslator:
     file: lib/Locale/Utils/Autotranslator.pm
-    version: '1.004'
+    version: '1.007'
   Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet:
     file: lib/Locale/Utils/Autotranslator/ApiMymemoryTranslatedNet.pm
     version: '1.002'
@@ -48,5 +46,5 @@ requires:
   perl: '5.008'
 resources:
   license: http://dev.perl.org/licenses/
-version: '1.004'
+version: '1.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

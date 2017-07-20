@@ -1,5 +1,14 @@
 The following logs changes for the CPAN distribution Catalyst::View::Template::Lace
 
+0.006   16 July 2017
+        - Use the $_ variable less
+        - Dependency version update to fixed errors
+
+0.005   16 July 2017
+        - Dependency version update to fixed errors
+        - let you use components in namespaces other than the current one.  Improved
+          ability to match view package case.
+
 0.004   22 June 2017
         - Dependency version update to fixed errors
 

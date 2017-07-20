@@ -9,7 +9,6 @@ README
 dist.ini
 inc/AP/Build.pm
 inc/AP/check_protobuf.cpp
-inc/AP/test
 lib/Alien/ProtoBuf.pm
 t/001_load.t
 t/010_found_library.t

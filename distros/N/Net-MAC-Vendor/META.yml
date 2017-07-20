@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::Spec::Functions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,6 +19,8 @@ no_index:
     - t
     - inc
 requires:
+  Compress::Bzip2: '0'
+  Compress::Zlib: '0'
   File::Temp: '0'
   Mojo::URL: '0'
   Mojo::UserAgent: '0'
@@ -27,4 +29,5 @@ resources:
   bugtracker: https://github.com/briandfoy/net-mac-vendor/issues
   homepage: https://github.com/briandfoy/net-mac-vendor
   repository: https://github.com/briandfoy/net-mac-vendor.git
-version: '1.26'
+version: '1.261'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

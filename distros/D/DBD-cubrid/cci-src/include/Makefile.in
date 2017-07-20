@@ -87,34 +87,14 @@ BIT_MODEL = @BIT_MODEL@
 BROKER_ADMIN_LIB = @BROKER_ADMIN_LIB@
 BUILD_64_FALSE = @BUILD_64_FALSE@
 BUILD_64_TRUE = @BUILD_64_TRUE@
-BUILD_CAS_FOR_MYSQL51_FALSE = @BUILD_CAS_FOR_MYSQL51_FALSE@
-BUILD_CAS_FOR_MYSQL51_TRUE = @BUILD_CAS_FOR_MYSQL51_TRUE@
-BUILD_CAS_FOR_MYSQL_FALSE = @BUILD_CAS_FOR_MYSQL_FALSE@
-BUILD_CAS_FOR_MYSQL_TRUE = @BUILD_CAS_FOR_MYSQL_TRUE@
-BUILD_CAS_FOR_ORACLE_FALSE = @BUILD_CAS_FOR_ORACLE_FALSE@
-BUILD_CAS_FOR_ORACLE_TRUE = @BUILD_CAS_FOR_ORACLE_TRUE@
 BUILD_CMSERVER_FALSE = @BUILD_CMSERVER_FALSE@
 BUILD_CMSERVER_FOR_AIX_FALSE = @BUILD_CMSERVER_FOR_AIX_FALSE@
 BUILD_CMSERVER_FOR_AIX_TRUE = @BUILD_CMSERVER_FOR_AIX_TRUE@
 BUILD_CMSERVER_TRUE = @BUILD_CMSERVER_TRUE@
 BUILD_COVERAGE_FALSE = @BUILD_COVERAGE_FALSE@
 BUILD_COVERAGE_TRUE = @BUILD_COVERAGE_TRUE@
-BUILD_DBGW_ALL_FALSE = @BUILD_DBGW_ALL_FALSE@
-BUILD_DBGW_ALL_TRUE = @BUILD_DBGW_ALL_TRUE@
-BUILD_DBGW_FALSE = @BUILD_DBGW_FALSE@
-BUILD_DBGW_MYSQL51_FALSE = @BUILD_DBGW_MYSQL51_FALSE@
-BUILD_DBGW_MYSQL51_TRUE = @BUILD_DBGW_MYSQL51_TRUE@
-BUILD_DBGW_MYSQL_FALSE = @BUILD_DBGW_MYSQL_FALSE@
-BUILD_DBGW_MYSQL_TRUE = @BUILD_DBGW_MYSQL_TRUE@
-BUILD_DBGW_NBASE_T_FALSE = @BUILD_DBGW_NBASE_T_FALSE@
-BUILD_DBGW_NBASE_T_TRUE = @BUILD_DBGW_NBASE_T_TRUE@
-BUILD_DBGW_ORACLE_FALSE = @BUILD_DBGW_ORACLE_FALSE@
-BUILD_DBGW_ORACLE_TRUE = @BUILD_DBGW_ORACLE_TRUE@
-BUILD_DBGW_TRUE = @BUILD_DBGW_TRUE@
 BUILD_DEBUG_FALSE = @BUILD_DEBUG_FALSE@
 BUILD_DEBUG_TRUE = @BUILD_DEBUG_TRUE@
-BUILD_NCLAVIS_FALSE = @BUILD_NCLAVIS_FALSE@
-BUILD_NCLAVIS_TRUE = @BUILD_NCLAVIS_TRUE@
 BUILD_NUMBER = @BUILD_NUMBER@
 BUILD_SUBDIRS = @BUILD_SUBDIRS@
 CAS_LIB = @CAS_LIB@
@@ -138,22 +118,26 @@ CUBRID_LOCALEDIR = @CUBRID_LOCALEDIR@
 CUBRID_LOGDIR = @CUBRID_LOGDIR@
 CUBRID_SHLOCALESDIR = @CUBRID_SHLOCALESDIR@
 CUBRID_TMPDIR = @CUBRID_TMPDIR@
+CUBRID_TZ_DIR = @CUBRID_TZ_DIR@
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
 CYGPATH_W = @CYGPATH_W@
-DBGW_DEFS = @DBGW_DEFS@
 DEFS = @DEFS@
 DEPDIR = @DEPDIR@
+DIFF = @DIFF@
 DIR_DEFS = @DIR_DEFS@
 DISABLE_CUBRIDENV_FALSE = @DISABLE_CUBRIDENV_FALSE@
 DISABLE_CUBRIDENV_TRUE = @DISABLE_CUBRIDENV_TRUE@
+DTRACE = @DTRACE@
 ECHO = @ECHO@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
+ENABLE_SYSTEMTAP_FALSE = @ENABLE_SYSTEMTAP_FALSE@
+ENABLE_SYSTEMTAP_TRUE = @ENABLE_SYSTEMTAP_TRUE@
 ESQL_LIB = @ESQL_LIB@
 EXEEXT = @EXEEXT@
 EXPAT_LIBS = @EXPAT_LIBS@
@@ -182,15 +166,9 @@ LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
 LT_VERSION = @LT_VERSION@
 MAKEINFO = @MAKEINFO@
-MYSQL51_INC_PATH = @MYSQL51_INC_PATH@
-MYSQL51_LIB_PATH = @MYSQL51_LIB_PATH@
-MYSQL_INC_PATH = @MYSQL_INC_PATH@
-MYSQL_LIB_PATH = @MYSQL_LIB_PATH@
 NBASE_T_INC_PATH = @NBASE_T_INC_PATH@
 NBASE_T_LIB_PATH = @NBASE_T_LIB_PATH@
 OBJEXT = @OBJEXT@
-ORACLE_INC_PATH = @ORACLE_INC_PATH@
-ORACLE_LIB_PATH = @ORACLE_LIB_PATH@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -210,6 +188,8 @@ SRC_INC = @SRC_INC@
 STRIP = @STRIP@
 SYS_DEFS = @SYS_DEFS@
 SYS_LIBS = @SYS_LIBS@
+USE_BISON_NEWDIRECTIVE_FALSE = @USE_BISON_NEWDIRECTIVE_FALSE@
+USE_BISON_NEWDIRECTIVE_TRUE = @USE_BISON_NEWDIRECTIVE_TRUE@
 VERSION = @VERSION@
 VERSION_DEFS = @VERSION_DEFS@
 XOPEN_DEFS = @XOPEN_DEFS@
@@ -263,8 +243,22 @@ target_cpu = @target_cpu@
 target_os = @target_os@
 target_vendor = @target_vendor@
 SRC = $(top_srcdir)/src
+BASE_DIR = $(SRC)/base
+COMPAT_DIR = $(SRC)/compat
+CCI_DIR = $(SRC)/cci
+API_DIR = $(SRC)/api
+AM_CPPFLAGS = -I. -I$(srcdir) -I$(top_builddir) -I@SRC_INC@ @EXT_INC@ @JAVA_INC@ \
+	@SYS_DEFS@ @SA_DEFS@ @COMMON_DEFS@ @VERSION_DEFS@
+
 noinst_HEADERS = system.h
-all: all-am
+BUILT_SOURCES = er_in_error_code_h.out er_in_dbi_compat_h.out \
+	er_code_check stmt_types_in_cas_cci_h.out \
+	stmt_types_in_dbi_compat_h.out stmt_type_check \
+	isolation_types_in_dbi_compat_h.out \
+	isolation_types_in_cubrid_api_h.out isolation_type_check
+CLEANFILES = $(BUILT_SOURCES)
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -383,10 +377,12 @@ distdir: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(HEADERS)
 installdirs:
-install: install-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -403,6 +399,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -410,6 +407,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libtool mostlyclean-am
@@ -468,6 +466,39 @@ uninstall-am: uninstall-info-am
 	mostlyclean-libtool pdf pdf-am ps ps-am tags uninstall \
 	uninstall-am uninstall-info-am
 
+
+.PHONY: er_code_check stmt_type_check isolation_type_check
+er_in_error_code_h.out: $(BASE_DIR)/error_code.h
+	@echo "Extracting error codes from $<"
+	@$(CPP) $(AM_CPPFLAGS) -dD $< | $(SED) -n 's/#define \(ER_.*\)/\1/p' | sort -rnk2 > $@
+er_in_dbi_compat_h.out: $(COMPAT_DIR)/dbi_compat.h
+	@echo "Extracting error codes from $<"
+	@$(CPP) $(AM_CPPFLAGS) -dD $< | $(SED) -n 's/#define \(ER_.*\)/\1/p' | sort -rnk2 > $@
+er_code_check: er_in_error_code_h.out er_in_dbi_compat_h.out
+	@echo "Checking error codes in $(BASE_DIR)/error_code.h and $(COMPAT_DIR)/dbi_compat.h"
+	$(DIFF) -U0 er_in_error_code_h.out er_in_dbi_compat_h.out || (echo "Please check error codes!"; exit 1)
+stmt_types_in_cas_cci_h.out: $(CCI_DIR)/cas_cci.h
+	@echo "Extracting enum T_CCI_CUBRID_STMT from $<"
+	@$(CPP) $(AM_CPPFLAGS) -dD $(AM_CPPFLAGS) -dD $< \
+	  | $(SED) -n '/typedef enum/{:r;/;/!{N;s/[[:blank:]]//g;s/=\n/=/;s/\n\n/\n/;br}; /T_CCI_CUBRID_STMT/{s/\/\*[^\*\/]*\*\///g;/{/,/}/{:a;$!N;/}/!{$!ba};s/.*{\([^)]*\)}.*/\1/p}}}' > $@
+stmt_types_in_dbi_compat_h.out: $(COMPAT_DIR)/dbi_compat.h
+	@echo "Extracting enum CUBRID_STMT_TYPE from $<"
+	@$(CPP) $(AM_CPPFLAGS) -dD $(AM_CPPFLAGS) -dD $< \
+	  | $(SED) -n '/typedef enum/{:r;/;/!{N;s/[[:blank:]]//g;s/=\n/=/;s/\n\n/\n/;br}; /CUBRID_STMT_TYPE/{s/\/\*[^\*\/]*\*\///g;/{/,/}/{:a;$!N;/}/!{$!ba};s/.*{\([^)]*\)}.*/\1/p}}}' > $@
+stmt_type_check: stmt_types_in_cas_cci_h.out stmt_types_in_dbi_compat_h.out
+	@echo "Checking statement type codes in $(CCI_DIR)/cas_cci.h and $(COMPAT_DIR)/dbi_compat.h"
+	$(DIFF) -U0 stmt_types_in_cas_cci_h.out stmt_types_in_dbi_compat_h.out || (echo "Please check statement codes!"; exit 1)
+isolation_types_in_dbi_compat_h.out: $(COMPAT_DIR)/dbi_compat.h
+	@echo "Extracting enum DB_TRAN_ISOLATION from $<"
+	@$(CPP) $(AM_CPPFLAGS) -dD $(AM_CPPFLAGS) -dD $< \
+	  | $(SED) -n '/typedef enum/{:r;/;/!{N;s/[[:blank:]]//g;s/=\n/=/;s/\n\n/\n/;br}; /DB_TRAN_ISOLATION/{s/\/\*[^\*\/]*\*\///g;/{/,/}/{:a;$!N;/}/!{$!ba};s/.*{\([^)]*\)}.*/\1/p}}}' > $@
+isolation_types_in_cubrid_api_h.out: $(API_DIR)/cubrid_api.h
+	@echo "Extracting enum DB_TRAN_ISOLATION from $<"
+	@$(CPP) $(AM_CPPFLAGS) -dD $(AM_CPPFLAGS) -dD $< \
+	  | $(SED) -n '/typedef enum/{:r;/;/!{N;s/[[:blank:]]//g;s/=\n/=/;s/\n\n/\n/;br}; /DB_TRAN_ISOLATION/{s/\/\*[^\*\/]*\*\///g;/{/,/}/{:a;$!N;/}/!{$!ba};s/.*{\([^)]*\)}.*/\1/p}}}' > $@
+isolation_type_check: isolation_types_in_dbi_compat_h.out isolation_types_in_cubrid_api_h.out
+	@echo "Checking transaction isolation type codes in $(COMPAT_DIR)/dbi_compat.h and $(API_DIR)/cubrid_api.h"
+	$(DIFF) -U0 isolation_types_in_dbi_compat_h.out isolation_types_in_cubrid_api_h.out || (echo "Please check isolation codes!"; exit 1)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

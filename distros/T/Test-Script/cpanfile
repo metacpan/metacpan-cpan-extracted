@@ -1,21 +1,18 @@
+requires "Capture::Tiny" => "0";
 requires "File::Spec" => "0.80";
-requires "IPC::Run3" => "0.034";
+requires "IO::Handle" => "0";
 requires "Probe::Perl" => "0.01";
-requires "Test::Builder" => "0.32";
-requires "Test::More" => "0.96";
-requires "perl" => "5.006";
+requires "Test2::API" => "1.302015";
+requires "perl" => "5.008001";
 
 on 'test' => sub {
-  requires "Test::Builder" => "0.32";
-  requires "Test::Builder::Tester" => "1.02";
-  requires "Test::More" => "0.96";
-  requires "Test::Tester" => "0";
-  requires "perl" => "5.006";
+  requires "Test2::V0" => "0.000060";
+  requires "perl" => "5.008001";
 };
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
-  requires "perl" => "5.006";
+  requires "perl" => "5.008001";
 };
 
 on 'develop' => sub {

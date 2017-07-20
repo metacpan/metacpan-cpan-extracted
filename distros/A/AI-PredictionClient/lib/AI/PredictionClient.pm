@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient;
-$AI::PredictionClient::VERSION = '0.01';
+$AI::PredictionClient::VERSION = '0.03';
 
 use AI::PredictionClient::Predict;
 use AI::PredictionClient::InceptionClient;
@@ -22,7 +22,7 @@ AI::PredictionClient - A Perl Prediction client for Google TensorFlow Serving.
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -128,7 +128,7 @@ A longer article on setting up a server is here:
 =head1 ADDITIONAL INFO
 
 The design of this client is to be fairly easy for a developer to see how the data is formed and received. 
-The TensorFlow interface is based on Protocol Buffers ad gRPC. 
+The TensorFlow interface is based on Protocol Buffers and gRPC. 
 That implementation is built on a complex architecture of nested protofiles.
 
 In this design I flattened the architecture out and where the native data handling of Perl is best, 
@@ -154,9 +154,7 @@ The following dependencies need to be installed in order for gRPC to build:
 
  $ [sudo] apt-get install git
  $ [sudo] apt-get install build-essential autoconf libtool
- $ [sudo] apt-get install automake curl make g++ unzip pkg-config
- $ [sudo] apt-get install libgflags-dev libgtest-dev
- $ [sudo] apt-get install clang libc++-dev
+ $ [sudo] apt-get install automake curl make g++
 
 If gRPC is already installed on your system, the dependencies should reduce to:
 
@@ -166,6 +164,13 @@ If gRPC is going to be built (The module Alien::Google::GRPC will automatically 
 be prepared for a long build, as gRPC is a big library.
 
 At this time only Linux builds are supported.
+
+=head2 CPAN Testers Note
+
+It is normal for this module to fail the CPAN Testers' tests. 
+The build support tools needed by this module and especially the 
+Alien::Google::GRPC module are not normally installed on the 
+CPAN Testers' machines.
 
 =head2 NOTE
 

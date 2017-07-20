@@ -46,9 +46,10 @@ sub repeat {
   my @nodes = map {
     my $cloned_dom = $self->clone;
     $index++;
-    $cb->($cloned_dom, $_, $index);
-    $cloned_dom;
+    my $returned_dom = $cb->($cloned_dom, $_, $index);
+    $returned_dom;
   } @items;
+
 
   # Might be a faster way to do this...
   $self->replace(join '', @nodes);
@@ -86,7 +87,7 @@ sub smart_content {
     } else {
       warn "optgroup with no options."
     }
-  }else {
+  } else {
     $self->content(escape_html($data));
   }
   return $self;
@@ -119,6 +120,7 @@ sub fill {
       $self->repeat(sub {
         my ($dom, $datum, $index) = @_;
         $dom->fill($datum, 1);
+        return $dom;
       }, @$data);
     }
   } elsif(ref $data eq 'HASH') {
@@ -176,16 +178,20 @@ sub fill {
       }
     }
   } elsif(Scalar::Util::blessed $data) {
-    my @fields = $data->meta->get_attribute_list;
-    foreach my $match (@fields) {
-      if(!$is_loop) {
-        my $dom = $self->at("#$match");
-        $dom->fill($data->$match, $is_loop) if $dom;
+    if($data->isa('Template::Lace::DOM')) {
+      $self->content($data);
+    } else {
+      my @fields = $data->meta->get_attribute_list;
+      foreach my $match (@fields) {
+        if(!$is_loop) {
+          my $dom = $self->at("#$match");
+          $dom->fill($data->$match, $is_loop) if $dom;
+        }
+        $self->find(".$match")->each(sub {
+            my ($dom, $count) = @_;
+            $dom->fill($data->$match, $is_loop);
+        });
       }
-      $self->find(".$match")->each(sub {
-          my ($dom, $count) = @_;
-          $dom->fill($data->$match, $is_loop);
-      });
     }
   } else {
     die "method 'fill' does not recognize these arguments.";
@@ -579,7 +585,7 @@ for the template.  You can specify an alternative match point by passing it as a
 argument to C<wrap_with>.
 
 
-=repeat
+=head2 repeat
 
 Repeat a match as in a loop.  Example:
 
@@ -593,6 +599,7 @@ Repeat a match as in a loop.  Example:
           # each repeat gets that (as a lone of the original) and you can
           # modify it.
           $li->content($item);
+          return $li;
       }, @items);
 
     print $dom->to_string;
@@ -604,6 +611,11 @@ Returns:
       <li>bbb</li>
       <li>ccc</li>
     <ul>
+
+Basically you have a coderef that gets a cloned copy of the matched DOM and you
+need to return a new DOM that replaces it.  Generally you might just modify the
+current comment (as in the given example) but you are permitted to replace the
+DOM totally.
 
 You might want to see L</LIST HELPERS> and L</fill> as well.
 
@@ -1289,7 +1301,7 @@ Would return:
       </optgroup>
     </select>
 
-=head1 radio
+=head2 radio
 
 List helper for a radio input type.  Example
 

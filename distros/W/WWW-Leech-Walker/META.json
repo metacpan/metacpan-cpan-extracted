@@ -23,12 +23,12 @@
          "requires" : {
             "LWP" : "6.08",
             "URI::URL" : "5.04",
-            "WWW::Leech::Parser" : "0.02"
+            "WWW::Leech::Parser" : "0.03"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::XS version 2.34"
 }
 

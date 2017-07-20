@@ -1,0 +1,29 @@
+---
+abstract: 'iTransact backend module for Business::OnlinePayment'
+author:
+  - 'Bill Gerrard <bill@gerrard.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-iTransact
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::OnlinePayment: '3'
+  Business::OnlinePayment::HTTPS: '0'
+  Digest::HMAC_SHA1: '0'
+  XML::Hash::LX: '0'
+  perl: '5.008004'
+  strict: '0'
+resources:
+  repository: https://github.com/billgerrard/Business-OnlinePayment-iTransact.git
+version: '1.00'

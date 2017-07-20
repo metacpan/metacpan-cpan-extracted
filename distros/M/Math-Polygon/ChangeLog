@@ -4,6 +4,15 @@ Revision history for Perl extension Math::Polygon
    paper with nice algorithm: http://citeseer.ist.psu.edu/cache/papers/cs/25021/http:zSzzSzfractal.dam.fmph.uniba.skzSz~sccgzSzproceedingszSz1998zSzZalik.pdf/zalik98quick.pdf
 20121024 Request by Rick Rutgers: widening polygon contour
 
+version 1.06: Sun 16 Jul 13:04:43 CEST 2017
+
+	Fixes:
+	- missed a spelling fix.  rt.cpan.org#118297 [Gregor Herrmann]
+	- fix $obj->mirror rt.cpan.org#122487 [Michael Scott]
+
+	Improvements:
+	- remove dependency to Test::Pod
+
 version 1.05: Wed Dec 28 12:55:41 CET 2016
 
 	Fixes:

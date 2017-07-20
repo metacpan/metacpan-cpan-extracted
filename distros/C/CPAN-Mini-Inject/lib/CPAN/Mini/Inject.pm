@@ -22,11 +22,11 @@ CPAN::Mini::Inject - Inject modules into a CPAN::Mini mirror.
 
 =head1 VERSION
 
-Version 0.33
+Version 0.35
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.35';
 our @ISA     = qw( CPAN::Mini );
 
 =head1 Synopsis
@@ -457,7 +457,7 @@ sub updpackages {
     $packages{$pkg} = $line;
   };
 
-  $self->_writepkgs( [ sort values %packages ] );
+  $self->_writepkgs( [ sort { lc $a cmp lc $b } values %packages ] );
 }
 
 =head2 C<updauthors>

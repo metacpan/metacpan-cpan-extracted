@@ -24,7 +24,7 @@ use parent qw(Exporter);
 	'all' => \@EXPORT_OK,
 	);
 
-$VERSION = '1.41';
+$VERSION = '1.411';
 
 =encoding utf8
 
@@ -194,6 +194,7 @@ sub parse_plist {
 
 	my $plist = do {
 		if( $text =~ /\A<\?xml/ ) { # XML plists
+			$text =~ s/<!--(?:[\d\D]*?)-->//g;
 			# we can handle either 0.9 or 1.0
 			$text =~ s|^<\?xml.*?>\s*<!DOC.*>\s*<plist.*?>\s*||;
 			$text =~ s|\s*</plist>\s*$||;
@@ -379,6 +380,11 @@ sub read_next {
 			$value = $Readers{$1}->( $2 );
 			}
 	    elsif( s[^\s* < (dict|array) > ][]x ) {
+			# We need to put back the unprocessed text if
+			# any because the <dict> and <array> readers
+			# need to see it.
+			$source->put_line( $_ ) if defined $_ && '' ne $_;
+			$_ = '';
 			$value = $Readers{$1}->( $source );
 			}
 	    # these next two are some wierd cases i found in the iPhoto Prefs
@@ -840,7 +846,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2014 brian d foy.  All rights reserved.
+Copyright © 2004-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

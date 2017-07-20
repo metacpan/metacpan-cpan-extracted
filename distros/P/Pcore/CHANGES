@@ -1,3 +1,15 @@
+v0.44.0 2017-07-14T23:45:47Z
+ - nssm removed
+ - [l10n] do not add empty transaltions on read .po
+ - fix upstream repo path for git
+ - remove possibility to release when docker base image version is not
+   specified
+ - disable issues tracker support during release
+
+v0.43.3 2017-07-14T08:15:25Z
+ - No issues on bugtracker were closed since the last release
+ - dbi prepare query ORDER BY context added
+
 v0.43.2 2017-07-13T08:22:22Z
  - No issues on bugtracker were closed since the last release
  - api role order sql method now accepts array

@@ -4,7 +4,7 @@
       "Masahiro Nagano <kazeburo@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.4",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -68,7 +68,7 @@
    "provides" : {
       "HTTP::Entity::Parser" : {
          "file" : "lib/HTTP/Entity/Parser.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "HTTP::Entity::Parser::JSON" : {
          "file" : "lib/HTTP/Entity/Parser/JSON.pm"
@@ -94,11 +94,11 @@
          "web" : "https://github.com/kazeburo/HTTP-Entity-Parser"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
-      "moznion <moznion@gmail.com>",
       "Karen Etheridge <ether@cpan.org>",
-      "Todd Rinaldo <toddr@cpan.org>"
+      "Todd Rinaldo <toddr@cpan.org>",
+      "moznion <moznion@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

@@ -16,7 +16,8 @@ meta-spec:
 name: Tie-FileSection
 requires:
   Tie::Handle: '0'
+  perl: v5.10.0
   strict: '0'
 resources:
   repository: git://github.com/xlat/tie-filesection.git
-version: '0.171861'
+version: '0.171950'

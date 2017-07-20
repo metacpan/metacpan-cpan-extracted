@@ -3,6 +3,7 @@
 # Write data in tabular text format
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2016
 #-------------------------------------------------------------------------------
+# podDocumentation
 
 package Data::Table::Text;
 require v5.16.0;
@@ -14,7 +15,7 @@ use File::Glob qw(:bsd_glob);
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 use Data::Dump qw(dump);
 
-our $VERSION = '2017.514';
+our $VERSION = '2017.718';
 
 &saveToS3('DataTableText') if 0;                                                # Save code
 
@@ -44,7 +45,6 @@ sub fileSize($)
  {my ($file) = @_;
   (stat($file))[7]
  }
-
 
 #-------------------------------------------------------------------------------
 # Get the modified time of a file in seconds since epoch
@@ -116,6 +116,14 @@ sub currentDirectory()                                                          
   $f.'/'
  }
 
+sub currentDirectoryAbove()                                                     # The path to the folder containing the current folder
+ {my @p = split m(/)s, currentDirectory;
+  @p or confess "No directory above\n:".currentDirectory;
+  pop @p;
+  my $r = shift @p;
+  filePathDir("/$r", @p)
+ }
+
 sub containingFolder($)                                                         # Path to folder containing a file
  {my ($file) = @_;
   return './' unless $file =~ m/\//;
@@ -135,7 +143,7 @@ sub xxx(@)                                                                      
   say STDERR timeStamp, " ", $c unless $check;                                  # Print the command unless there is a check in place
   my $r = qx($c 2>&1);                                                          # Execute command
   $r =~ s/\s+\Z//s;                                                             # Remove trailing white space from response
-  say STDERR $r if $r and !$check;                                            # Print non blank error message
+  say STDERR $r if $r and !$check;                                              # Print non blank error message
   confess $r if $r and $check and $r !~ m/$success/;                            # Error check if an error checking regular expression has been supplied
   $r
  }
@@ -194,6 +202,8 @@ sub fileList($)
 sub readFile($)
  {my ($file) = @_;
   my $f = $file;
+  defined($f) or confess "Cannot read undefined file";
+  $f =~ m(\n) and confess "File name contains a new line:\n=$file=";
   -e $f or confess "Cannot read file $f because it does not exist";
   open(my $F, "<:encoding(UTF-8)", $f) or confess
     "Cannot open $f for unicode input";
@@ -635,8 +645,8 @@ sub javaPackage($)
 sub extractDocumentation()                                                      # Extract documentation from a perl script between lines marked with \A#n and \A# as illustrated just above this line - sections are marked with #n, sub name and parameters are on two lines, private methods are marked with ##
  {my %methodParms;                                                              # Method names including parameters
   my %methods;                                                                  # Method names not including parameters
-  my @d;                                                                        # Documentation
-  my $level = 0; my $off = 0;                                                   # Header levels
+  my @d = (qq(=head1 Description));                                             # Documentation
+  my $level = 0; my $off = 1;                                                   # Header levels
   my @l = split /\n/, readFile($0);                                             # Read this file
   for my $l(keys @l)
    {my $L = $l[$l];                                                             # This line
@@ -654,27 +664,79 @@ sub extractDocumentation()                                                      
     elsif ($level and $L =~ /\A\s*sub\s*(.+?)\s*#\s*(.+?)\s*\Z/)                # Documentation for a method = sub name comment
      {my ($n, $d) = ($1, $2);                                                   # Name from sub, description from comment
       next if $d =~ /\A#/;                                                      # Private method if ##
-      $n =~ s/\(.+?\)//;                                                        # Method name
+      my $signature = $n =~ s/\A\s*\w+//gsr =~                                  # Signature
+                            s/\A\(//gsr     =~
+                            s/\)\s*(:lvalue\s*)?\Z//gsr =~
+                            s/;//gsr;                                           # Remove optional parameters marker from signature
+      $n =~ s/\(.+?\)//;                                                        # Method name after removing parameters
       my $D = eval '"'.$d.'"'; confess $@ if $@;                                # Evaluate the description
       my ($p, $c) = $M =~ /\A\s*(.+?)\s*#\s*(.+?)\s*\Z/;                        # Parameters, parameter descriptions from comment
           $p //= ''; $c //= '';                                                 # No parameters
-      my @p = split /,\s*/, $p =~ s/\A\s*\{my\s*\(//r =~ s/\)\s*=\s*\@_;//r;
-      my @c = split /,\s*/, $c;
+      my @p = split /,\s*/, $p =~ s/\A\s*\{my\s*\(//r =~ s/\)\s*=\s*\@_;//r;    # Parameter names
+      @p == length($signature) or confess "Signature $signature for method: $n".# Check signature length
+        " has wrong number of parameters";
+      my @c = map {ucfirst()} split /,\s*/, $c;                                 # Parameter descriptions with first  letter uppercased
       my $P = join ', ', @p;
-      my $h = $level+$off+1;
-      my $N = "$n($P)";                                                         # Method
-      $methodParms{$N}++;                                                       # Method names including parameters
+      my $h = $level+$off+1;                                                    # Heading level
+      my $N = "$n($P)";                                                         # Method(signature)
+#     $methodParms{$N} = $n;                                                    # Method names including parameters
+      $methodParms{$n} = $n;                                                    # Method names not including parameters
       $methods{$n}++;                                                           # Method names not including parameters
-      push @d, "\n=head$h $N\n\n$D\n";                                          # Method description
-      push @d, indentString(formatTable([[qw(Parameter Description)], map{[$p[$_], $c[$_]]} keys @p]), '  ')
+#     push @d, "\n=head$h $N\n\n$D\n";                                          # Method description
+      push @d, "\n=head$h $n\n\n$D\n";                                          # Method description
+      push @d, indentString(formatTable([[qw(Parameter Description)],
+        map{[$p[$_], $c[$_]]} keys @p]), '  ')
         if $p and $c and $c !~ /\A#/;                                           # Add parameter description if present
      }
+    elsif ($level and $L =~                                                     # Documentation for a generated lvalue * method = sub name comment
+     /\A\s*genLValue(?:\w+?)Methods\s*\(qw\((\w+)\)\);\s*#\s*(.+?)\s*\Z/)
+     {my ($n, $d) = ($1, $2);                                                   # Name from sub, description from comment
+      next if $d =~ /\A#/;                                                      # Private method if ##
+      my $h = $level+$off+1;                                                    # Heading level
+      $methodParms{$n} = $n;                                                    # Method names not including parameters
+      $methods{$n}++;                                                           # Method names not including parameters
+      push @d, "\n=head$h $n :lvalue\n\n$d\n";                                  # Method description
+     }
    }
-  push @d, "=head1 Index\n\n";
-  push @d, "L</$_>" for sort keys %methodParms;                                 # Alphabetic listing of methods
-  push @d, "\n";
-  writeFile("doc.data",     join "\n", @d);                                     # Write documentation file
+
+  push @d, "\n\n=head1 Index\n\n";
+  for my $s(sort {lc($a) cmp lc($b)} keys %methodParms)                         # Alphabetic listing of methods
+   {my $n = $methodParms{$s};
+    push @d, "L<$n|/$s>\n"
+   }
+  push @d, <<END =~ s/`/=/gsr;                                                     # Standard stuff
+`head1 Installation
+
+This module is written in 100% Pure Perl and is thus easy to read, use, modify
+and install.
+
+Standard Module::Build process for building and installing modules:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+`head1 Author
+
+philiprbrenan\@gmail.com
+
+http://www.appaapps.com
+
+`head1 Copyright
+
+Copyright (c) 2016-2017 Philip R Brenan.
+
+This module is free software. It may be used, redistributed and/or modified
+under the same terms as Perl itself.
+
+`cut
+END
+
+  writeFile(my $d = "doc.data",     join "\n", @d);                             # Write documentation file
   writeFile("methods.data", join "\n", sort keys %methods);                     # Write methods file
+  my $D = filePath(currentDirectory, $d);
+  say STDERR "Documentation in:\n$D";
  }
 
 #-------------------------------------------------------------------------------
@@ -716,7 +778,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT       = qw(formatTable);
 @EXPORT_OK    = qw(appendFile
 checkKeys containingPowerOfTwo
-containingFolder convertImageToJpx currentDirectory
+containingFolder convertImageToJpx currentDirectory currentDirectoryAbove
 dateStamp dateTimeStamp
 extractDocumentation
 fileList fileModTime fileOutOfDate
@@ -733,6 +795,10 @@ xxx);
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
 1;
+
+# podDocumentation
+
+=pod
 
 =encoding utf-8
 
@@ -838,9 +904,14 @@ This module is free software. It may be used, redistributed and/or
 modified under the same terms as Perl itself.
 
 =cut
+# podDocumentation
+## pod2html --infile=lib/Data/Table/Text.pm --outfile=zzz.html
 
 __DATA__
 use Test::More tests => 61;
+
+#Test::More->builder->output("/dev/null");
+
 if (1)                                                                          # File paths
  {ok filePath   (qw(/aaa bbb ccc ddd.eee)) eq "/aaa/bbb/ccc/ddd.eee";
   ok filePathDir(qw(/aaa bbb ccc ddd))     eq "/aaa/bbb/ccc/ddd/";

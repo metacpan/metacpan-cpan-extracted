@@ -1,0 +1,15 @@
+Changes
+lib/PGObject/Util/PGConfig.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-store-api.t
+t/02-fileparsing.t
+t/03-dbsessions.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

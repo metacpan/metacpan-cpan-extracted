@@ -12,5 +12,5 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: WWW-Leech-Parser
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.64'

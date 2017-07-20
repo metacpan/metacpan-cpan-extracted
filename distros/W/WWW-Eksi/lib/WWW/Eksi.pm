@@ -1,5 +1,5 @@
 package WWW::Eksi;
-$WWW::Eksi::VERSION = '0.26';
+$WWW::Eksi::VERSION = '0.27';
 =head1 NAME
 
 WWW::Eksi - Interface for Eksisozluk.com
@@ -53,9 +53,9 @@ sub new{
   my $today = DateTime->now->ymd;
 
   my $eksi = {
-    base     => 'https://www.eksisozluk.com',
-    entry    => 'https://www.eksisozluk.com/entry/',
-    ghebe    => 'https://www.eksisozluk.com/istatistik/gecen-haftanin-en-begenilen-entryleri',
+    base     => 'https://eksisozluk.com',
+    entry    => 'https://eksisozluk.com/entry/',
+    ghebe    => 'https://eksisozluk.com/istatistik/gecen-haftanin-en-begenilen-entryleri',
     strp_dt  => DateTime::Format::Strptime->new( pattern => '%d.%m.%Y%H:%M'),
     strp_d   => DateTime::Format::Strptime->new( pattern => '%d.%m.%Y'),
     doludolu => 'https://eksisozluk.com/basliklar/ara?SearchForm.When.From='.$today.'T00:00:00&SearchForm.When.To='.$today.'T23:59:59&SearchForm.SortOrder=Count',
@@ -296,13 +296,30 @@ sub _process_entry{
 
 }
 
+sub _entry_not_found{
+
+  return {
+    topic_title    => '?',
+    topic_url      => '?',
+    topic_channels => [],
+    author_name    => '?',
+    author_id      => 0,
+    body_raw       => "<i>bu entry silinmi&#351;.</i>",
+    body_text      => "bu entry silinmi&#351;.",
+    body_processed => "<i>bu entry silinmi&#351;.</i>",
+    fav_count      => '?',
+    create_time    => 0,
+    update_time    => 0,
+  };
+}
+
 1;
 
 __END__
 
 =head1 AUTHOR
 
-Kivanc Yazan E<lt>kyzn@cpan.orgE<gt>
+Kivanc Yazan C<< <kyzn at cpan.org> >>
 
 =head1 CONTRIBUTORS
 

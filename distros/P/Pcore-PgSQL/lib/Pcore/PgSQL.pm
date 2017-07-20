@@ -1,4 +1,4 @@
-package Pcore::PgSQL v0.10.0;
+package Pcore::PgSQL v0.10.4;
 
 use Pcore -dist, -class;
 
@@ -46,7 +46,7 @@ sub run ( $self, $cb ) {
             "$db_dir/postgresql.conf",
             [                                     #
                 q[listen_addresses='*'],
-                q[unix_socket_directories='/tmp/pgsql.sock'],
+                q[unix_socket_directories='/var/run/postgresql'],
             ]
         );
     }

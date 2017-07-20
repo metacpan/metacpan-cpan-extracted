@@ -1,4 +1,10 @@
-Revision history for Data-Check-Structure
+0.04    2017-07-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Allow running in perl < 5.10, improve startup overhead by not
+	  using warnings.
+
 
 0.03    2014-07-14 (SHARYANTO)
 

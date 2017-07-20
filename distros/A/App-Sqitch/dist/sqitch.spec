@@ -1,5 +1,5 @@
 Name:           sqitch
-Version:        0.9995
+Version:        0.9996
 Release:        1%{?dist}
 Summary:        Sane database change management
 License:        MIT
@@ -40,7 +40,6 @@ BuildRequires:  perl(Locale::TextDomain) >= 1.20
 BuildRequires:  perl(Module::Build) >= 0.35
 BuildRequires:  perl(Moo) >= 1.002000
 BuildRequires:  perl(Moo::Role)
-BuildRequires:  perl(Moo::sification)
 BuildRequires:  perl(namespace::autoclean) >= 0.16
 BuildRequires:  perl(parent)
 BuildRequires:  perl(overload)
@@ -106,7 +105,6 @@ Requires:       perl(List::MoreUtils)
 Requires:       perl(Locale::TextDomain) >= 1.20
 Requires:       perl(Moo) => 1.002000
 Requires:       perl(Moo::Role)
-Requires:       perl(Moo::sification)
 Requires:       perl(namespace::autoclean) >= 0.16
 Requires:       perl(parent)
 Requires:       perl(overload)
@@ -284,6 +282,9 @@ Sqitch Vertica support.
 # No additional files required.
 
 %changelog
+* Mon Jul 17 2017 David E. Wheeler <david.wheeler@iovation.com> 0.9996-1
+- Upgrade to v0.9996.
+
 * Tue Jul 27 2016 David E. Wheeler <david.wheeler@iovation.com> 0.9995-1
 - Require DateTime v1.04.
 - Upgrade to v0.9995.

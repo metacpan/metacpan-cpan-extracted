@@ -26,6 +26,29 @@
 # define SVfARG(p) ((void*)(p))
 #endif /* !SVfARG */
 
+#if !PERL_VERSION_GE(5,9,3)
+typedef OP *(*Perl_check_t)(pTHX_ OP *);
+#endif /* <5.9.3 */
+
+#if !PERL_VERSION_GE(5,10,1)
+typedef unsigned Optype;
+#endif /* <5.10.1 */
+
+#ifndef wrap_op_checker
+# define wrap_op_checker(c,n,o) THX_wrap_op_checker(aTHX_ c,n,o)
+static void THX_wrap_op_checker(pTHX_ Optype opcode,
+	Perl_check_t new_checker, Perl_check_t *old_checker_p)
+{
+	if(*old_checker_p) return;
+	OP_REFCNT_LOCK;
+	if(!*old_checker_p) {
+		*old_checker_p = PL_check[opcode];
+		PL_check[opcode] = new_checker;
+	}
+	OP_REFCNT_UNLOCK;
+}
+#endif /* !wrap_op_checker */
+
 #ifndef qerror
 # define qerror(m) Perl_qerror(aTHX_ m)
 #endif /* !qerror */
@@ -39,7 +62,7 @@
 
 static SV *hint_key_sv;
 static U32 hint_key_hash;
-static OP *(*nxck_rv2cv)(pTHX_ OP *o);
+static OP *(*THX_nxck_rv2cv)(pTHX_ OP *o);
 
 #define in_strictdecl() THX_in_strictdecl(aTHX)
 static bool THX_in_strictdecl(pTHX)
@@ -48,11 +71,11 @@ static bool THX_in_strictdecl(pTHX)
 	return ent && SvTRUE(HeVAL(ent));
 }
 
-static OP *myck_rv2cv(pTHX_ OP *op)
+static OP *THX_myck_rv2cv(pTHX_ OP *op)
 {
 	OP *aop;
 	GV *gv;
-	op = nxck_rv2cv(aTHX_ op);
+	op = THX_nxck_rv2cv(aTHX_ op);
 	if(op->op_type == OP_RV2CV && (op->op_flags & OPf_KIDS) &&
 			(aop = cUNOPx(op)->op_first) && aop->op_type == OP_GV &&
 			PL_parser_exists && PL_expect == XOPERATOR &&
@@ -74,7 +97,7 @@ BOOT:
 
 	hint_key_sv = newSVpvs_share("Sub::StrictDecl/strict");
 	hint_key_hash = SvSHARED_HASH(hint_key_sv);
-	nxck_rv2cv = PL_check[OP_RV2CV]; PL_check[OP_RV2CV] = myck_rv2cv;
+	wrap_op_checker(OP_RV2CV, THX_myck_rv2cv, &THX_nxck_rv2cv);
 
 void
 import(SV *classname)

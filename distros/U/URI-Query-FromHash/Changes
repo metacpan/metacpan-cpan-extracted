@@ -1,3 +1,6 @@
+0.006 2017-07-17
+    - Escape backslash in query params too.
+
 0.005 2017-04-11
     - Treat undef param value as empty string. (MCRayRay)
 

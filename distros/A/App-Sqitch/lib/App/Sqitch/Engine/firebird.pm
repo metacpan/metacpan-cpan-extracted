@@ -18,7 +18,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9995';
+our $VERSION = '0.9996';
 
 has registry_uri => (
     is       => 'ro',
@@ -563,7 +563,7 @@ sub name_for_change_id {
               JOIN tags ON c2.change_id = tags.change_id
              WHERE c2.committed_at >= c.committed_at
                AND c2.project = c.project
-        ), '')
+        ), '@HEAD')
           FROM changes c
          WHERE change_id = ?
     }, undef, $change_id)->[0];
@@ -675,13 +675,16 @@ sub change_id_for {
         }
 
         # Find earliest by change name.
-        return $dbh->selectcol_arrayref(qq{
+        my $ids = $dbh->selectcol_arrayref(qq{
             SELECT FIRST 1 change_id
               FROM changes
              WHERE project = ?
                AND changes.change  = ?
              ORDER BY changes.committed_at ASC
-        }, undef, $project, $change)->[0];
+        }, undef, $project, $change);
+
+        # Return the ID.
+        return $self->_handle_lookup_index($change, $ids);
     }
 
     if ( my $tag = $p{tag} ) {

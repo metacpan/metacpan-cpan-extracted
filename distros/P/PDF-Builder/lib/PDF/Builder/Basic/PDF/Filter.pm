@@ -15,7 +15,7 @@ package PDF::Builder::Basic::PDF::Filter;
 use strict;
 use warnings;
 
-# VERSION
+our $VERSION = '3.005'; # VERSION
 my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Filter::ASCII85Decode;

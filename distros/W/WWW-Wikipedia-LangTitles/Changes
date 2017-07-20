@@ -1,5 +1,10 @@
 Revision history for Perl module WWW::Wikipedia::LangTitles
 
+0.04 2017-07-20 BKB
+
+- Add example of use of Locale::Codes
+- Fix broken links in documentation
+
 0.03 2016-12-27 BKB
 
 - Document

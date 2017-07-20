@@ -5,6 +5,7 @@ author:
 build_requires:
   Module::Build: '0.28'
 configure_requires:
+  Alien::Base: '0'
   Alien::Base::ModuleBuild: '0.023'
   ExtUtils::CppGuess: '0.11'
   Module::Build: '0.28'
@@ -18,4 +19,4 @@ name: Alien-ProtoBuf
 resources:
   homepage: https://github.com/mbarbon/alien-protobuf
   repository: https://github.com/mbarbon/alien-protobuf.git
-version: '0.05'
+version: '0.06'

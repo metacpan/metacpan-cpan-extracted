@@ -5,17 +5,17 @@ author:
 build_requires:
   Alien::Build: '0.40'
   Alien::Build::MM: '0.40'
-  Alien::Google::GRPC: '0'
+  ExtUtils::MakeMaker: '6.52'
+  Test::More: '0'
+configure_requires:
+  Alien::Build: '0.40'
+  Alien::Build::MM: '0.40'
+  Alien::Google::GRPC: '0.03'
   Archive::Extract: '0'
   Env: '0'
   ExtUtils::MakeMaker: '6.52'
   File::Copy: '0'
   File::Copy::Recursive: '0'
-  Test::More: '0'
-configure_requires:
-  Alien::Build: '0.40'
-  Alien::Build::MM: '0.40'
-  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
 license: perl
@@ -33,5 +33,5 @@ requires:
 resources:
   homepage: https://github.com/mountaintom/AI-PredictionClient-Alien-TensorFlowServingProtos
   repository: https://github.com/mountaintom/AI-PredictionClient-Alien-TensorFlowServingProtos.git
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.70'

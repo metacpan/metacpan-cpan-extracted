@@ -23,7 +23,7 @@ B::DeparseTree
     # create a coderef "none"
     sub none() { return };
 
-    # Get full depars tree after deparsing
+    # Get full parse tree after deparsing
     $deparse->coderef2info(\&none);
 
     # returns:

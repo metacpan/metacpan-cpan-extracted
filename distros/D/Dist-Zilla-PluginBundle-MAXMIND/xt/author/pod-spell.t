@@ -16,6 +16,7 @@ CheckChangesHasContent
 CheckFor
 Contributors
 CorrectBranch
+Cronin
 Dave
 Dist
 Eilam
@@ -33,6 +34,8 @@ MaxMind's
 Olaf
 Oschwald
 Oschwald's
+Patrick
+PatrickCronin
 PayPal
 Plugin
 PluginBundle
@@ -54,6 +57,7 @@ mailmap
 mark
 oalders
 optimizations
+pcronin
 perlcriticrc
 perltidyrc
 tidyall

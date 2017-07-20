@@ -1,5 +1,18 @@
 The following logs changes for the CPAN distribution Template::Lace
 
+0.009   July 16, 2017
+        - improved the regexp for detecting components so that you can have componenets
+          with 'deep' namespacing "aaa-bbb-ccc".
+
+0.008   July 16 2017
+        - BREAKING CHANGE: calling ->repeat on Template::Lace::DOM now requires
+          that you return the new DOM object, rather than changing the existing
+          one.  Sorry, just was the only way I could fix some serious repeat issues.
+          Think of repeat as if its like 'map'.  Depending on how your are using
+          this you might actually get away with no changes, you'll have to test.
+        - POD Fixes.
+        - More extensive example application in the /examples directory FWIW.
+
 0.007   June 28 2017
         - Fixed a bug where certain input types got a value even where there
           wasn't one.

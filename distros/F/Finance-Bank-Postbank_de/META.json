@@ -27,7 +27,7 @@
          "web" : "https://github.com/Corion/Finance-Bank-Postbank_de"
       }
    },
-   "version" : "0.45",
+   "version" : "0.47",
    "x_serialization_backend" : "JSON::PP version 2.27202",
    "x_static_install" : 1
 }

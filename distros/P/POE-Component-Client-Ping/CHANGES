@@ -1,18 +1,34 @@
 ================================
-2013-11-26 09:14:34 -0500 v1_174
+2017-07-18 22:40:01 -0400 v1_175
 ================================
 
-  commit e1adebfc39c6a164b5245fd5d6fbf68c0c3554a5
+  commit 7c36f0b95c611c9d68a7aeb98efa38f1085c5cd9
   Author: Rocco Caputo <rcaputo@cpan.org>
-  Date:   Tue Nov 26 09:14:34 2013 -0500
+  Date:   Tue Jul 18 22:40:01 2017 -0400
   
-    Bump version for release.
+    Bump version to 1.175.
 
-  commit 903d4561a669e934b4f66ccab4a5271b3be88b38
-  Author: Rocco Caputo <rcaputo@cpan.org>
-  Date:   Tue Nov 26 09:04:06 2013 -0500
+  commit b40afdba90e65396a2e909e44fc65d7b75172099
+  Author: Alexander Hartmaier <abraxxa@cpan.org>
+  Date:   Tue Jul 4 15:28:27 2017 +0200
   
-    [github #2] Add Chris Prather's example to the MANIFEST. 
+    fix broken retry (RT#122131)
+
+    remove retry codepath which failed due to fix in commit 108c17d
+
+  commit 108c17dd27a25892457d142e02f19945535d47f3
+  Author: Alexander Hartmaier <abraxxa@cpan.org>
+  Date:   Tue Jul 4 10:59:59 2017 +0200
+  
+    fix missing timeout parameter
+
+    start of fix for RT#122131 with test
+
+  commit 68a1de54d9e6d8fb6c164d7ba33d217cc1015ca5
+  Author: Brian Fraser <fraserbn@gmail.com>
+  Date:   Tue Aug 19 21:32:05 2014 +0200
+  
+    Handle systems without getprotobyname() 
 
 ==============
 End of Excerpt

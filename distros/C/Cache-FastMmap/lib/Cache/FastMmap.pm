@@ -293,7 +293,7 @@ use strict;
 use warnings;
 use bytes;
 
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 
 require XSLoader;
 XSLoader::load('Cache::FastMmap', $VERSION);
@@ -303,6 +303,9 @@ XSLoader::load('Cache::FastMmap', $VERSION);
 our %LiveCaches;
 
 use constant FC_ISDIRTY => 1;
+
+use File::Spec;
+
 # }}}
 
 =item I<new(%Opts)>
@@ -552,13 +555,13 @@ sub new {
   # Work out cache file and whether to init
   my $share_file = $Args{share_file};
   if (!$share_file) {
-    my $tmp_dir = $ENV{TMPDIR} || "/tmp";
-    my $win_tmp_dir = $ENV{TEMP} || "c:\\";
-    $share_file = ($^O eq "MSWin32" ? "$win_tmp_dir\\sharefile" : "$tmp_dir/sharefile");
+    my $tmp_dir = File::Spec->tmpdir;
+    $share_file = File::Spec->catfile($tmp_dir, "sharefile");
     $share_file .= "-" . $$ . "-" . time . "-" . int(rand(100000));
   }
   !ref($share_file) || die "share_file argument was a reference";
   $Self->{share_file} = $share_file;
+  my $permissions = $Args{permissions};
 
   my $init_file = $Args{init_file} ? 1 : 0;
   my $test_file = $Args{test_file} ? 1 : 0;
@@ -706,12 +709,12 @@ sub new {
 
   # Setup cache parameters
   fc_set_param($Cache, 'init_file', $init_file);
-  fc_set_param($Cache, 'init_file', $init_file);
   fc_set_param($Cache, 'test_file', $test_file);
   fc_set_param($Cache, 'page_size', $page_size);
   fc_set_param($Cache, 'num_pages', $num_pages);
   fc_set_param($Cache, 'expire_time', $expire_time);
   fc_set_param($Cache, 'share_file', $share_file);
+  fc_set_param($Cache, 'permissions', $permissions) if defined $permissions;
   fc_set_param($Cache, 'start_slots', $start_slots);
   fc_set_param($Cache, 'catch_deadlocks', $catch_deadlocks);
   fc_set_param($Cache, 'enable_stats', $enable_stats);
@@ -913,7 +916,7 @@ sub get_and_set {
   my $DidStore = 0;
   if (@NewValue) {
     ($Value) = @NewValue;
-    my $DidStore = $Self->set($_[1], $Value, { skip_lock => \$Unlock });
+    $DidStore = $Self->set($_[1], $Value, { skip_lock => \$Unlock });
   }
 
   return wantarray ? ($Value, $DidStore) : $Value;
@@ -1458,7 +1461,7 @@ Rob Mueller L<mailto:cpan@robm.fastmail.fm>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2015 by FastMail Pty Ltd
+Copyright (C) 2003-2017 by FastMail Pty Ltd
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

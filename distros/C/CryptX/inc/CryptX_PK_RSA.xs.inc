@@ -44,7 +44,25 @@ _import(Crypt::PK::RSA self, SV * key_data)
     }
 
 void
-_import_pkcs8(Crypt::PK::RSA self, SV * key_data)
+_import_pkcs8(Crypt::PK::RSA self, SV * key_data, SV * passwd)
+    PPCODE:
+    {
+        int rv;
+        unsigned char *data=NULL, *pwd=NULL;
+        STRLEN data_len=0, pwd_len=0;
+
+        data = (unsigned char *)SvPVbyte(key_data, data_len);
+        if (SvOK(passwd)) {
+          pwd = (unsigned char *)SvPVbyte(passwd, pwd_len);
+        }
+        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
+        rv = rsa_import_pkcs8(data, (unsigned long)data_len, pwd, pwd_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: rsa_import_pkcs8 failed: %s", error_to_string(rv));
+        XPUSHs(ST(0)); /* return self */
+    }
+
+void
+_import_x509(Crypt::PK::RSA self, SV * key_data)
     PPCODE:
     {
         int rv;
@@ -53,8 +71,8 @@ _import_pkcs8(Crypt::PK::RSA self, SV * key_data)
 
         data = (unsigned char *)SvPVbyte(key_data, data_len);
         if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
-        rv = rsa_import_pkcs8(data, (unsigned long)data_len, NULL, 0, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: rsa_import_pkcs8 failed: %s", error_to_string(rv));
+        rv = rsa_import_x509(data, (unsigned long)data_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: rsa_import_x509 failed: %s", error_to_string(rv));
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -63,9 +81,50 @@ _import_hex(Crypt::PK::RSA self, char *N, char *e, char *d=NULL, char *p=NULL, c
     PPCODE:
     {
         int rv;
-        if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
-        rv = rsa_import_radix(16, N, e, d, p, q, dP, dQ, qP, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: rsa_import_radix failed: %s", error_to_string(rv));
+        unsigned char Nbin[1024], ebin[128], dbin[1024], pbin[512], qbin[512], dPbin[512], dQbin[512], qPbin[512];
+        unsigned long Nlen=sizeof(Nbin), elen=sizeof(ebin), dlen=sizeof(dbin), plen=sizeof(pbin),
+                      qlen=sizeof(qbin), dPlen=sizeof(dPbin), dQlen=sizeof(dQbin), qPlen=sizeof(qPbin);
+
+        rv = radix_to_bin(N,  16,  Nbin,  &Nlen);
+        if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(N) failed: %s", error_to_string(rv));
+        rv = radix_to_bin(e,  16,  ebin,  &elen);
+        if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(e) failed: %s", error_to_string(rv));
+
+        if (d && strlen(d) > 0) {
+          /* private */
+          rv = radix_to_bin(d,  16,  dbin,  &dlen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(d) failed: %s", error_to_string(rv));
+          rv = rsa_set_key(Nbin, Nlen, ebin, elen, dbin, dlen, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: rsa_set_key failed: %s", error_to_string(rv));
+        }
+        else {
+          /* public */
+          rv = rsa_set_key(Nbin, Nlen, ebin, elen, NULL, 0, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: rsa_set_key failed: %s", error_to_string(rv));
+        }
+
+        if (p && strlen(p) > 0 && q && strlen(q) > 0) {
+          /* private only */
+          rv = radix_to_bin(p,  16,  pbin,  &plen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(p) failed: %s", error_to_string(rv));
+          rv = radix_to_bin(q,  16,  qbin,  &qlen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(q) failed: %s", error_to_string(rv));
+          rv = rsa_set_factors(pbin, plen, qbin, qlen, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: rsa_set_factors failed: %s", error_to_string(rv));
+        }
+
+        if (dP && strlen(dP) > 0 && dQ && strlen(dQ) > 0 && qP && strlen(qP) > 0) {
+          /* private only */
+          rv = radix_to_bin(dP, 16, dPbin, &dPlen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(dP) failed: %s", error_to_string(rv));
+          rv = radix_to_bin(dQ, 16, dQbin, &dQlen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(dQ) failed: %s", error_to_string(rv));
+          rv = radix_to_bin(qP, 16, qPbin, &qPlen);
+          if (rv != CRYPT_OK) croak("FATAL: radix_to_bin(qP) failed: %s", error_to_string(rv));
+          rv = rsa_set_crt_params(dPbin, dPlen, dQbin, dQlen, qPbin, qPlen, &self->key);
+          if (rv != CRYPT_OK) croak("FATAL: rsa_set_crt_params failed: %s", error_to_string(rv));
+        }
+
         XPUSHs(ST(0)); /* return self */
     }
 
@@ -207,7 +266,7 @@ export_key_der(Crypt::PK::RSA self, char * type)
     {
         int rv;
         unsigned char out[4096];
-        unsigned long int out_len = 4096;
+        unsigned long out_len = 4096;
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
         if (strnEQ(type, "private", 7)) {
@@ -416,4 +475,3 @@ DESTROY(Crypt::PK::RSA self)
     CODE:
         if (self->key.type != -1) { rsa_free(&self->key); self->key.type = -1; }
         Safefree(self);
-

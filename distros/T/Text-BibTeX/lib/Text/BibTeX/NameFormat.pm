@@ -23,7 +23,7 @@ require 5.004;
 use strict;
 use Carp;
 use vars qw'$VERSION';
-$VERSION = 0.80;
+$VERSION = 0.81;
 
 =head1 NAME
 
@@ -123,7 +123,7 @@ sub new
    $parts ||= "fvlj";
    $abbrev_first = defined($abbrev_first)? $abbrev_first : 0;
 
-   die unless $parts =~ /[fvlj]{1,4}/;
+   die unless $parts =~ /^[fvlj]{1,4}$/;
 
    $class = ref ($class) || $class;
    my $self = bless {}, $class;

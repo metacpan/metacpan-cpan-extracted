@@ -64,9 +64,6 @@
 /************************************************************************
  * PRIVATE DEFINITIONS							*
  ************************************************************************/
-#if defined(WINDOWS)
-#define strtoll	_strtoi64
-#endif
 
 /************************************************************************
  * PRIVATE TYPE DEFINITIONS						*
@@ -76,14 +73,12 @@
  * PRIVATE FUNCTION PROTOTYPES						*
  ************************************************************************/
 
-#ifdef UNICODE_DATA
-static char *wstr2str (WCHAR * wstr, UINT CodePage);
-static WCHAR *str2wstr (char *str, UINT CodePage);
-#endif
 static char is_float_str (char *str);
 static void *cci_reg_malloc (void *dummy, size_t s);
 static void *cci_reg_realloc (void *dummy, void *p, size_t s);
 static void cci_reg_free (void *dummy, void *p);
+static int skip_ampm_chars (char *str);
+static int get_pm_offset (char *str, int hh);
 
 /************************************************************************
  * INTERFACE VARIABLES							*
@@ -108,10 +103,20 @@ static void cci_reg_free (void *dummy, void *p);
 int
 ut_str_to_bigint (char *str, INT64 * value)
 {
-  char *end_p;
-  INT64 bi_val;
+  int error = 0;
+  INT64 bi_val = 0;
+  char *end_p = NULL;
 
-  bi_val = strtoll (str, &end_p, 10);
+  assert (value != NULL);
+
+  *value = 0;
+
+  error = str_to_int64 (&bi_val, &end_p, str, 10);
+  if (error < 0)
+    {
+      return (CCI_ER_TYPE_CONVERSION);
+    }
+
   if (*end_p == 0 || *end_p == '.' || isspace ((int) *end_p))
     {
       *value = bi_val;
@@ -122,12 +127,48 @@ ut_str_to_bigint (char *str, INT64 * value)
 }
 
 int
+ut_str_to_ubigint (char *str, UINT64 * value)
+{
+  int error = 0;
+  UINT64 ubi_val = 0;
+  char *end_p = NULL;
+
+  assert (value != NULL);
+
+  *value = 0;
+
+  error = str_to_uint64 (&ubi_val, &end_p, str, 10);
+  if (error < 0)
+    {
+      return (CCI_ER_TYPE_CONVERSION);
+    }
+
+  if (*end_p == 0 || *end_p == '.' || isspace ((int) *end_p))
+    {
+      *value = ubi_val;
+      return 0;
+    }
+
+  return (CCI_ER_TYPE_CONVERSION);
+}
+
+int
 ut_str_to_int (char *str, int *value)
 {
-  char *end_p;
-  int i_val;
+  int error = 0;
+  int i_val = 0;
+  char *end_p = NULL;
 
-  i_val = strtol (str, &end_p, 10);
+  assert (value != NULL);
+
+  *value = 0;
+
+  error = str_to_int32 (&i_val, &end_p, str, 10);
+  if (error < 0)
+    {
+      return (CCI_ER_TYPE_CONVERSION);
+    }
+
   if (*end_p == 0 || *end_p == '.' || isspace ((int) *end_p))
     {
       *value = i_val;
@@ -138,11 +179,56 @@ ut_str_to_int (char *str, int *value)
 }
 
 int
+ut_str_to_uint (char *str, unsigned int *value)
+{
+  int error = 0;
+  unsigned int ui_val = 0;
+  char *end_p = NULL;
+
+  assert (value != NULL);
+
+  *value = 0;
+
+  error = str_to_uint32 (&ui_val, &end_p, str, 10);
+  if (error < 0)
+    {
+      return (CCI_ER_TYPE_CONVERSION);
+    }
+
+  if (*end_p == 0 || *end_p == '.' || isspace ((int) *end_p))
+    {
+      *value = ui_val;
+      return 0;
+    }
+
+  return (CCI_ER_TYPE_CONVERSION);
+}
+
+int
 ut_str_to_float (char *str, float *value)
 {
-  if (is_float_str (str))
+  int error = 0;
+  float f_val = 0;
+  char *end_p = NULL;
+
+  assert (value != NULL);
+
+  *value = 0;
+
+  if (!is_float_str (str))
     {
-      sscanf (str, "%f", value);
+      return (CCI_ER_TYPE_CONVERSION);
+    }
+
+  error = str_to_float (&f_val, &end_p, str);
+  if (error < 0)
+    {
+      return (CCI_ER_TYPE_CONVERSION);
+    }
+
+  if (*end_p == 0 || isspace ((int) *end_p))
+    {
+      *value = f_val;
       return 0;
     }
 
@@ -152,9 +238,28 @@ ut_str_to_float (char *str, float *value)
 int
 ut_str_to_double (char *str, double *value)
 {
-  if (is_float_str (str))
+  int error = 0;
+  double d_val = 0;
+  char *end_p = NULL;
+
+  assert (value != NULL);
+
+  *value = 0;
+
+  if (!is_float_str (str))
     {
-      sscanf (str, "%lf", value);
+      return (CCI_ER_TYPE_CONVERSION);
+    }
+
+  error = str_to_double (&d_val, &end_p, str);
+  if (error < 0)
+    {
+      return (CCI_ER_TYPE_CONVERSION);
+    }
+
+  if (*end_p == 0 || isspace ((int) *end_p))
+    {
+      *value = d_val;
       return 0;
     }
 
@@ -164,41 +269,58 @@ ut_str_to_double (char *str, double *value)
 int
 ut_str_to_date (char *str, T_CCI_DATE * value)
 {
-  char *p, *q;
-  int yr, mon, day;
+  int error = 0;
+  int yr = 0, mon = 0, day = 0;
+  char *p = NULL;
+  char *end_p = NULL;
+  char delimiter = '\0';
+
+  assert (value != NULL);
+
+  if (str == NULL)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
 
   p = str;
-  q = strchr (p, '/');
-  if (q == NULL)
-    {
-      q = strchr (p, '-');
-      if (q == NULL)
-      	{
-      	  return CCI_ER_TYPE_CONVERSION;
-      	}
-      yr = atoi (p);
-      p = q + 1;
 
-      q = strchr (p, '-');
-      if (q == NULL)
-      	{
-      	  return CCI_ER_TYPE_CONVERSION;
-      	}
-    }
-  else
+  error = str_to_int32 (&yr, &end_p, p, 10);
+  if (error < 0)
     {
-      yr = atoi (p);
-      p = q + 1;
-      
-      q = strchr (p, '/');
-      if (q == NULL)
-      	{
-      	  return CCI_ER_TYPE_CONVERSION;
-      	}
+      return CCI_ER_TYPE_CONVERSION;
     }
-  mon = atoi (p);
 
-  day = atoi (q + 1);
+  delimiter = *end_p;
+  if (delimiter != '-' && delimiter != '/')
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  p = end_p + 1;
+
+  error = str_to_int32 (&mon, &end_p, p, 10);
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  if (*end_p != delimiter)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  p = end_p + 1;
+
+  error = str_to_int32 (&day, &end_p, p, 10);
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  if (*end_p != 0 && !isspace ((int) *end_p))
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
 
   memset (value, 0, sizeof (T_CCI_DATE));
   value->yr = yr;
@@ -209,6 +331,74 @@ ut_str_to_date (char *str, T_CCI_DATE * value)
 
 int
 ut_str_to_time (char *str, T_CCI_DATE * value)
+{
+  int error = 0, offset = 0;
+  int hh = 0, mm = 0, ss = 0;
+  char *p = NULL;
+  char *end_p = NULL;
+
+  assert (value != NULL);
+
+  if (str == NULL)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  p = str;
+
+  error = str_to_int32 (&hh, &end_p, p, 10);
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  if (*end_p != ':')
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  p = end_p + 1;
+
+  error = str_to_int32 (&mm, &end_p, p, 10);
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  if (*end_p != ':')
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  p = end_p + 1;
+
+  error = str_to_int32 (&ss, &end_p, p, 10);
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  if (*end_p != '\0' && !isspace ((int) *end_p))
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  if (*end_p != '\0')
+    {
+      p = end_p + 1;
+      offset = get_pm_offset (p, hh);
+      hh += offset;
+    }
+
+  memset (value, 0, sizeof (T_CCI_DATE));
+  value->hh = hh;
+  value->mm = mm;
+  value->ss = ss;
+  return 0;
+}
+
+int
+ut_str_to_timetz (char *str, T_CCI_DATE_TZ * value)
 {
   char *p, *q;
   int hh, mm, ss;
@@ -235,20 +425,37 @@ ut_str_to_time (char *str, T_CCI_DATE * value)
     }
 
   mm = atoi (p);
-  ss = atoi (q + 1);
+  p = q + 1;
+  ss = atoi (p);
+  q = strchr (p, ' ');
+
+  if (q != NULL)
+    {
+      strncpy (value->tz, q + 1, sizeof (value->tz) - 1);
+    }
+  else
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
 
   memset (value, 0, sizeof (T_CCI_DATE));
   value->hh = hh;
   value->mm = mm;
   value->ss = ss;
+
   return 0;
 }
 
 int
 ut_str_to_mtime (char *str, T_CCI_DATE * value)
 {
-  char *p, *q;
-  int hh, mm, ss, ms;
+  int error = 0, offset = 0;
+  int hh = 0, mm = 0, ss = 0, ms = 0;
+  char *p = NULL;
+  char *end_p = NULL;
+  double ms_tmp = 0;
+
+  assert (value != NULL);
 
   if (str == NULL)
     {
@@ -256,36 +463,66 @@ ut_str_to_mtime (char *str, T_CCI_DATE * value)
     }
 
   p = str;
-  q = strchr (p, ':');
-  if (q == NULL)
+
+  error = str_to_int32 (&hh, &end_p, p, 10);
+  if (error < 0)
     {
       return CCI_ER_TYPE_CONVERSION;
     }
 
-  hh = atoi (p);
-  p = q + 1;
-
-  q = strchr (p, ':');
-  if (q == NULL)
+  if (*end_p != ':')
     {
       return CCI_ER_TYPE_CONVERSION;
     }
-  mm = atoi (p);
 
-  q = strchr (p, '.');
-  if (q == NULL)
+  p = end_p + 1;
+
+  error = str_to_int32 (&mm, &end_p, p, 10);
+  if (error < 0)
     {
-      ss = atoi (p);
-      ms = 0;
+      return CCI_ER_TYPE_CONVERSION;
     }
-  else
+
+  if (*end_p != ':')
     {
-      ss = atoi (p);
-      ms = (int) (strtod (q, &p) * 1000 + 0.5);
-      if (q == p)
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  p = end_p + 1;
+
+  error = str_to_int32 (&ss, &end_p, p, 10);
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  if (*end_p == '.')
+    {
+      p = end_p;
+      ms_tmp = 0;
+
+      error = str_to_double (&ms_tmp, &end_p, p);
+      if (error < 0)
 	{
 	  return CCI_ER_TYPE_CONVERSION;
 	}
+      ms = (int) (ms_tmp * 1000 + 0.5);
+    }
+  else
+    {
+      ms = 0;
+    }
+
+  if (*end_p != 0 && !isspace ((int) *end_p))
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+
+  if (*end_p != '\0')
+    {
+      p = end_p + 1;
+      offset = get_pm_offset (p, hh);
+      hh += offset;
     }
 
   memset (value, 0, sizeof (T_CCI_DATE));
@@ -302,8 +539,8 @@ ut_str_to_timestamp (char *str, T_CCI_DATE * value)
 {
   T_CCI_DATE date;
   T_CCI_DATE time;
-  char *p;
-  int err_code;
+  char *p = NULL;
+  int err_code = 0;
 
   p = strchr (str, ' ');
 
@@ -314,6 +551,54 @@ ut_str_to_timestamp (char *str, T_CCI_DATE * value)
   if ((err_code = ut_str_to_time (p, &time)) < 0)
     {
       return err_code;
+    }
+
+  memset (value, 0, sizeof (T_CCI_DATE));
+  value->yr = date.yr;
+  value->mon = date.mon;
+  value->day = date.day;
+  value->hh = time.hh;
+  value->mm = time.mm;
+  value->ss = time.ss;
+
+  return 0;
+}
+
+int
+ut_str_to_timestamptz (char *str, T_CCI_DATE_TZ * value)
+{
+  T_CCI_DATE date;
+  T_CCI_DATE time;
+  char *p;
+  int err_code, ampm_skipped_chars = 0;
+
+  p = strchr (str, ' ');
+
+  if ((err_code = ut_str_to_date (str, &date)) < 0)
+    {
+      return err_code;
+    }
+  if ((err_code = ut_str_to_time (p, &time)) < 0)
+    {
+      return err_code;
+    }
+
+  p = p + 1;
+  p = strchr (p, ' ');
+
+  if (p != NULL)
+    {
+      ampm_skipped_chars = skip_ampm_chars (p);
+      p += ampm_skipped_chars;
+    }
+
+  if (p != NULL)
+    {
+      strncpy (value->tz, p, sizeof (value->tz) - 1 - ampm_skipped_chars);
+    }
+  else
+    {
+      return CCI_ER_TYPE_CONVERSION;
     }
 
   value->yr = date.yr;
@@ -331,8 +616,8 @@ ut_str_to_datetime (char *str, T_CCI_DATE * value)
 {
   T_CCI_DATE date;
   T_CCI_DATE mtime;
-  char *p;
-  int err_code;
+  char *p = NULL;
+  int err_code = 0;
 
   p = strchr (str, ' ');
 
@@ -343,6 +628,55 @@ ut_str_to_datetime (char *str, T_CCI_DATE * value)
   if ((err_code = ut_str_to_mtime (p, &mtime)) < 0)
     {
       return err_code;
+    }
+
+  memset (value, 0, sizeof (T_CCI_DATE));
+  value->yr = date.yr;
+  value->mon = date.mon;
+  value->day = date.day;
+  value->hh = mtime.hh;
+  value->mm = mtime.mm;
+  value->ss = mtime.ss;
+  value->ms = mtime.ms;
+
+  return 0;
+}
+
+int
+ut_str_to_datetimetz (char *str, T_CCI_DATE_TZ * value)
+{
+  T_CCI_DATE date;
+  T_CCI_DATE mtime;
+  char *p;
+  int err_code, ampm_skipped_chars = 0;
+
+  p = strchr (str, ' ');
+
+  if ((err_code = ut_str_to_date (str, &date)) < 0)
+    {
+      return err_code;
+    }
+  if ((err_code = ut_str_to_mtime (p, &mtime)) < 0)
+    {
+      return err_code;
+    }
+
+  p = p + 1;
+  p = strchr (p, ' ');
+
+  if (p != NULL)
+    {
+      ampm_skipped_chars = skip_ampm_chars (p);
+      p += ampm_skipped_chars;
+    }
+
+  if (p != NULL)
+    {
+      strncpy (value->tz, p, sizeof (value->tz) - 1 - ampm_skipped_chars);
+    }
+  else
+    {
+      return CCI_ER_TYPE_CONVERSION;
     }
 
   value->yr = date.yr;
@@ -359,9 +693,12 @@ ut_str_to_datetime (char *str, T_CCI_DATE * value)
 int
 ut_str_to_oid (char *str, T_OBJECT * value)
 {
+  int error = 0;
+  int id = 0;
   char *p = str;
-  char *end_p;
-  int id;
+  char *end_p = NULL;
+
+  memset (value, 0, sizeof (T_OBJECT));
 
   if (p == NULL)
     {
@@ -374,7 +711,11 @@ ut_str_to_oid (char *str, T_OBJECT * value)
     }
 
   p++;
-  id = strtol (p, &end_p, 10);	/* page id */
+  error = str_to_int32 (&id, &end_p, p, 10);	/* page id */
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
   if (*end_p != '|')
     {
       return CCI_ER_TYPE_CONVERSION;
@@ -382,14 +723,24 @@ ut_str_to_oid (char *str, T_OBJECT * value)
   value->pageid = id;
 
   p = end_p + 1;
-  id = strtol (p, &end_p, 10);	/* slot id */
+  error = str_to_int32 (&id, &end_p, p, 10);	/* slot id */
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
   if (*end_p != '|')
-    return CCI_ER_TYPE_CONVERSION;
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
   value->slotid = id;
 
   p = end_p + 1;
-  id = strtol (p, &end_p, 10);	/* vol id */
-  if (*end_p != '\0')
+  error = str_to_int32 (&id, &end_p, p, 10);	/* vol id */
+  if (error < 0)
+    {
+      return CCI_ER_TYPE_CONVERSION;
+    }
+  if (*end_p != 0)
     {
       return CCI_ER_TYPE_CONVERSION;
     }
@@ -402,6 +753,12 @@ void
 ut_int_to_str (INT64 value, char *str, int size)
 {
   snprintf (str, size, "%lld", (long long) value);
+}
+
+void
+ut_uint_to_str (UINT64 value, char *str, int size)
+{
+  snprintf (str, size, "%llu", (unsigned long long) value);
 }
 
 void
@@ -421,8 +778,7 @@ ut_date_to_str (T_CCI_DATE * value, T_CCI_U_TYPE u_type, char *str, int size)
 {
   if (u_type == CCI_U_TYPE_DATE)
     {
-      snprintf (str, size, "%04d-%02d-%02d", value->yr, value->mon,
-		value->day);
+      snprintf (str, size, "%04d-%02d-%02d", value->yr, value->mon, value->day);
     }
   else if (u_type == CCI_U_TYPE_TIME)
     {
@@ -430,15 +786,36 @@ ut_date_to_str (T_CCI_DATE * value, T_CCI_U_TYPE u_type, char *str, int size)
     }
   else if (u_type == CCI_U_TYPE_TIMESTAMP)
     {
-      snprintf (str, size, "%04d-%02d-%02d %02d:%02d:%02d",
-		value->yr, value->mon, value->day,
-		value->hh, value->mm, value->ss);
+      snprintf (str, size, "%04d-%02d-%02d %02d:%02d:%02d", value->yr, value->mon, value->day, value->hh, value->mm,
+		value->ss);
     }
   else
     {				/* u_type == CCI_U_TYPE_DATETIME */
-      snprintf (str, size, "%04d-%02d-%02d %02d:%02d:%02d.%03d",
-		value->yr, value->mon, value->day,
-		value->hh, value->mm, value->ss, value->ms);
+      snprintf (str, size, "%04d-%02d-%02d %02d:%02d:%02d.%03d", value->yr, value->mon, value->day, value->hh,
+		value->mm, value->ss, value->ms);
+    }
+}
+
+void
+ut_date_tz_to_str (T_CCI_DATE_TZ * value, T_CCI_U_TYPE u_type, char *str, int size)
+{
+  int len;
+
+  if (u_type == CCI_U_TYPE_DATETIMETZ || u_type == CCI_U_TYPE_DATETIMELTZ || u_type == CCI_U_TYPE_TIMESTAMPTZ
+      || u_type == CCI_U_TYPE_TIMESTAMPLTZ || u_type == CCI_U_TYPE_TIMETZ)
+    {
+      int remain_size;
+      ut_date_to_str ((T_CCI_DATE *) value, u_type, str, size);
+
+      len = strlen (str);
+      remain_size = size - len;
+      if (remain_size > 1)
+	{
+	  str += len;
+	  *str++ = ' ';
+	  *str = '\0';
+	  strncat (str, value->tz, remain_size - 1);
+	}
     }
 }
 
@@ -452,10 +829,8 @@ void
 ut_lob_to_str (T_LOB * lob, char *str, int size)
 {
 #if 0
-  sprintf (str, "%s:%s",
-	   (lob->type == CCI_U_TYPE_BLOB
-	    ? "BLOB" : (lob->type == CCI_U_TYPE_CLOB
-			? "CLOB" : "????")), lob->handle + 16);
+  sprintf (str, "%s:%s", (lob->type == CCI_U_TYPE_BLOB ? "BLOB" : (lob->type == CCI_U_TYPE_CLOB ? "CLOB" : "????")),
+	   lob->handle + 16);
 #else
   strncpy (str, lob->handle + 16, size);
 #endif
@@ -506,8 +881,7 @@ ut_is_deleted_oid (T_OBJECT * oid)
 
   memset (&del_oid, 0xff, sizeof (del_oid));
 
-  if (oid->pageid == del_oid.pageid &&
-      oid->slotid == del_oid.slotid && oid->volid == del_oid.volid)
+  if (oid->pageid == del_oid.pageid && oid->slotid == del_oid.slotid && oid->volid == del_oid.volid)
     {
       return CCI_ER_DELETED_TUPLE;
     }
@@ -516,74 +890,9 @@ ut_is_deleted_oid (T_OBJECT * oid)
 }
 
 
-#ifdef UNICODE_DATA
-char *
-ut_ansi_to_unicode (char *str)
-{
-  WCHAR *wstr;
-
-  wstr = str2wstr (str, CP_ACP);
-  str = wstr2str (wstr, CP_UTF8);
-  FREE_MEM (wstr);
-  return str;
-}
-
-char *
-ut_unicode_to_ansi (char *str)
-{
-  WCHAR *wstr;
-
-  wstr = str2wstr (str, CP_UTF8);
-  str = wstr2str (wstr, CP_ACP);
-  FREE_MEM (wstr);
-  return str;
-}
-#endif
-
 /************************************************************************
  * IMPLEMENTATION OF PRIVATE FUNCTIONS	 				*
  ************************************************************************/
-
-#ifdef UNICODE_DATA
-static WCHAR *
-str2wstr (char *str, UINT CodePage)
-{
-  int len;
-  WCHAR *wstr;
-
-  if (str == NULL)
-    return NULL;
-
-  len = (int) strlen (str) + 1;
-  wstr = (WCHAR *) MALLOC (sizeof (WCHAR) * len);
-  if (wstr == NULL)
-    return NULL;
-  memset (wstr, 0, sizeof (WCHAR) * len);
-
-  MultiByteToWideChar (CodePage, 0, str, len, wstr, len);
-  return wstr;
-}
-
-static char *
-wstr2str (WCHAR * wstr, UINT CodePage)
-{
-  int len, buf_len;
-  char *str;
-
-  if (wstr == NULL)
-    return NULL;
-
-  len = wcslen (wstr) + 1;
-  buf_len = len * 2 + 10;
-  str = (char *) MALLOC (buf_len);
-  if (str == NULL)
-    return NULL;
-  memset (str, 0, buf_len);
-
-  WideCharToMultiByte (CodePage, 0, wstr, len, str, buf_len, NULL, NULL);
-  return str;
-}
-#endif
 
 static char
 is_float_str (char *str)
@@ -770,4 +1079,50 @@ ut_timeval_diff_msec (struct timeval *start, struct timeval *end)
   diff_msec += ((end->tv_usec - start->tv_usec) / 1000);
 
   return diff_msec;
+}
+
+static int
+get_pm_offset (char *str, int hh)
+{
+  int len;
+
+  while ((*str) == ' ')
+    {
+      str++;
+    }
+
+  len = strlen (str);
+
+  if ((((len > 2) && (*(str + 2) == ' ')) || (len == 2))
+      && ((((*str) == 'p') || ((*str) == 'P')) && ((*(str + 1) == 'm') || (*(str + 1) == 'M'))) && (hh < 12))
+    {
+      return 12;
+    }
+
+  return 0;
+}
+
+static int
+skip_ampm_chars (char *str)
+{
+  int ampm_skipped_chars = 0, len = 0;
+
+  while ((*str) == ' ')
+    {
+      str++;
+      ampm_skipped_chars++;
+    }
+
+  len = strlen (str);
+  if ((len > 2 && (*(str + 2) == ' ')) || (len == 2))
+    {
+      if (((*str == 'a') || (*str == 'A') || (*str == 'p') || (*str == 'P'))
+	  && (((*(str + 1) == 'm') || (*(str + 1) == 'M')) && (*(str + 2) == ' ')))
+	{
+	  str += 2;
+	  ampm_skipped_chars += 2;
+	}
+    }
+
+  return ampm_skipped_chars;
 }

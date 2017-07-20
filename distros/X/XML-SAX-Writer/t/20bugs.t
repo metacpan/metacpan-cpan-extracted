@@ -7,7 +7,7 @@
 
 use strict;
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 use XML::SAX::Writer qw();
 
 my $isoL1 = ($^O eq 'VMS') ? 'iso8859-1' : 'iso-8859-1';
@@ -66,3 +66,33 @@ $w->end_element({Name	=> 'root',
 $w->end_document;
 
 ok($out eq "<root>_LOST_DATA_</root>", 'Latin2 characters');
+
+##################################################
+# Whitespace not properly escaped in attribute values #11
+# https://github.com/perigrin/xml-sax-writer/issues/11
+
+$w = XML::SAX::Writer->new({Output => \$out})->{Handler};
+$w->start_document;
+$w->start_element({
+    Name	=> 'root', 
+    Prefix => '', 
+    LocalName => 'root',
+    NamespaceURI => '',
+    Attributes => {
+        whitespace => {
+            Name	=> 'whitespace', 
+            Prefix => '', 
+            LocalName => 'whitespace',
+            NamespaceURI => '',
+            Value => "tab=[\t],newline=[\n],carriage_return=[\r]"
+        }
+    }
+});
+$w->end_element({Name	=> 'root', 
+		 Prefix => '', 
+		 LocalName => 'root',
+		 NamespaceURI => ''});
+$w->end_document;
+is($out, 
+    "<root whitespace='tab=[&#x9;],newline=[&#xA;],carriage_return=[&#xD;]' />", 
+    'attributes with whitespace');

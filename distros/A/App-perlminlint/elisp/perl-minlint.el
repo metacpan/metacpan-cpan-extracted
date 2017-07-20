@@ -1,13 +1,22 @@
-;;; perl-minlint.el -- minor mode for automatic lint whenever you save.
+;;; perl-minlint.el --- minor mode to run perlminlint from after-save-hook
+;;; Commentary:
 
-;;; Copyright (C) 2014 KOBAYASI Hiroaki
+;;; Copyright (C) 2017 Kobayasi Hiroaki
 
-;; Author: KOBAYASI Hiroaki <hkoba@cpan.org>
+;;; Author: Kobayasi Hiroaki <hkoba@cpan.org>
 
-(require 'cl)
+;;; Code:
+
+(eval-when-compile
+  (require 'cl))
+
+(defgroup perl-minlint nil
+  "Minor mode to run perlminlint from after-save-hook"
+  :prefix "perl-minlint-"
+  :group 'language)
 
 (defcustom perl-minlint-script "perlminlint"
-  "Default command to test a Perl script")
+  "Default command to test a Perl script.")
 
 (defcustom perl-minlint-script-for-tramp-host-alist ()
   "Alist of tramp hostname vs perlminlint path.
@@ -31,6 +40,49 @@ Use like this:
 (defvar perl-minlint-mode-map (make-sparse-keymap))
 (define-key perl-minlint-mode-map [f5] 'perl-minlint-run)
 
+(defvar perl-minlint-alert-face '(mode-line mode-line-inactive)
+				;; 'fringe
+				"Target face to notify alert.")
+
+(defvar perl-minlint-alert-color "orange" "Default color for alert.")
+
+(make-variable-buffer-local
+ (defvar perl-minlint-saved-color-cookie nil
+   "cookie to revert original mode-line color"))
+
+
+;;========================================
+(defmacro perl-minlint-plist-bind (vars form &rest body)
+  "Extract specified VARS from FORM result and evaluate BODY.
+
+\(perl-minlint-plist-bind (file line err) (somecode...)
+	    body)
+
+is expanded into:
+
+\(let* ((result (somecode...))
+       (file (plist-get result 'file))
+       (line (plist-get result 'line))
+       (err  (plist-get result 'err)))
+  body)"
+
+  (declare (debug ((&rest symbolp) form &rest form)))
+
+  ;; This code is heavily borrowed from cl-macs.el:multiple-value-bind
+  (let ((temp (make-symbol "--perl-minlint-plist-bind-var--")))
+    (list* 'let* (cons (list temp form)
+		       (mapcar (function
+				(lambda (v)
+				  (list v (list 'plist-get temp `(quote ,v)))))
+			       vars))
+	   body)))
+
+(unless (get 'perl-minlint-plist-bind 'edebug-form-spec)
+  (put 'perl-minlint-plist-bind 'edebug-form-spec
+       '((&rest symbolp) form &rest form)))
+
+(put 'perl-minlint-plist-bind 'lisp-indent-function 2)
+
 ;;;###autoload
 (define-minor-mode perl-minlint-mode
   "Run perlminlint in after-save-hook."
@@ -48,7 +100,7 @@ Use like this:
 	   (setq perl-minlint-is-available
 		 (perl-minlint-find-executable buf))
 	   (when (not perl-minlint-is-available)
-	     (error "perlminlint: Can't find executable for %s"
+	     (error "FATAL: perlminlint: Can't find executable for %s"
 		    perl-minlint-script))
 	   (message "enabling perl-minlint-mode for %s" buf)
 	   (add-hook hook fn nil t))
@@ -60,8 +112,7 @@ Use like this:
 (defun perl-minlint-run (&optional force)
   "Run perlminlint for current buffer.
 By default, this runs only in perl-minlint-mode.
-To use this in other mode, please give t for optional argument FORCE.
-"
+To use this in other mode, please give t for optional argument FORCE."
   (interactive "P")
   (let ((buf (current-buffer)))
     (if (or force perl-minlint-mode)
@@ -73,6 +124,7 @@ To use this in other mode, please give t for optional argument FORCE.
       (perl-minlint-run-and-parse-lint-result buffer)
     (unless (eq rc 0)
       (beep))
+
     (when (and file
 	       (not (equal (expand-file-name file)
 			   (perl-minlint-tramp-localname buffer)))
@@ -81,6 +133,8 @@ To use this in other mode, please give t for optional argument FORCE.
 	(find-file-other-window file))
     (when (and file line)
       (goto-line (string-to-number line)))
+    (if perl-minlint-alert-face
+        (perl-minlint-set-mode-line-alert (not (eq rc 0))))
     (message "%s"
 	     (cond ((> (length err) 0)
 		    err)
@@ -88,6 +142,20 @@ To use this in other mode, please give t for optional argument FORCE.
 		    "Unknown error")
 		   (t
 		    "lint OK")))))
+
+(defun perl-minlint-set-mode-line-alert (err)
+  (cond (err
+         (setq perl-minlint-saved-color-cookie
+               (mapc (lambda (f)
+                         (face-remap-add-relative f
+                                                  ':background "orange"))
+                       perl-minlint-alert-face)))
+        (t
+         (when perl-minlint-saved-color-cookie
+           (mapc (lambda (ck)
+                     (face-remap-remove-relative ck))
+                   perl-minlint-saved-color-cookie)
+           (setq perl-minlint-saved-color-cookie nil)))))
 
 (defun perl-minlint-run-and-parse-lint-result (buffer)
   (perl-minlint-plist-bind (rc err)
@@ -180,36 +248,6 @@ To use this in other mode, please give t for optional argument FORCE.
 	  (setq key-offset (cddr key-offset)))
 	(append `(pos ,pos end ,end) res)))))
 
-;;========================================
-(defmacro perl-minlint-plist-bind (vars form &rest body)
-  "Extract specified VARS from FORM result
-and evaluate BODY.
+(provide 'perl-minlint)
 
-\(perl-minlint-plist-bind (file line err) (somecode...)
-	    body)
-
-is expanded into:
-
-\(let* ((result (somecode...))
-       (file (plist-get result 'file))
-       (line (plist-get result 'line))
-       (err  (plist-get result 'err)))
-  body)"
-
-  (declare (debug ((&rest symbolp) form &rest form)))
-
-  ;; This code is heavily borrowed from cl-macs.el:multiple-value-bind
-  (let ((temp (make-symbol "--perl-minlint-plist-bind-var--")))
-    (list* 'let* (cons (list temp form)
-		       (mapcar (function
-				(lambda (v)
-				  (list v (list 'plist-get temp `(quote ,v)))))
-			       vars))
-	   body)))
-
-(unless (get 'perl-minlint-plist-bind 'edebug-form-spec)
-  (put 'perl-minlint-plist-bind 'edebug-form-spec
-       '((&rest symbolp) form &rest form)))
-
-(put 'perl-minlint-plist-bind 'lisp-indent-function 2)
-;;========================================
+;;; perl-minlint.el ends here

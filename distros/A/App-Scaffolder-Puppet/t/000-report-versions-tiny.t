@@ -65,6 +65,7 @@ eval { $v .= pmver('Test::File','any version') };
 eval { $v .= pmver('Test::File::ShareDir','any version') };
 eval { $v .= pmver('Test::MockObject','any version') };
 eval { $v .= pmver('Test::More','0.88') };
+eval { $v .= pmver('lib','any version') };
 eval { $v .= pmver('parent','any version') };
 eval { $v .= pmver('strict','any version') };
 eval { $v .= pmver('warnings','any version') };

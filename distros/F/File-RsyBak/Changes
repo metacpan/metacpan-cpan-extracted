@@ -1,3 +1,18 @@
+0.34    2017-07-14 (PERLANCAR)
+
+	- [Regression] Previous release did not recognize per_arg_yaml
+	  because it defaults to off in Perinci::CmdLine::Lite and needs to
+	  be explicitly turned on.
+
+
+0.33    2017-07-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Perinci::CmdLine::Classic to ::Lite, fix/tweak depak
+	  configuration.
+
+
 0.32    2017-07-10 (PERLANCAR)
 
 	- No functional changes.

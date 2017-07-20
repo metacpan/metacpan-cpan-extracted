@@ -4,6 +4,7 @@ use strict;
 use Test::More tests => 14;
 
 BEGIN { use_ok "Lexical::SealRequireHints"; }
+BEGIN { unshift @INC, "./t/lib"; }
 
 my $retval;
 

@@ -15,6 +15,31 @@ has _schema_patch => ( is => 'ro', isa => HashRef, init_arg => undef );
 
 const our $SCHEMA_PATCH_TABLE_NAME => '__schema_patch';
 
+const our $SQL_FILTER_OPERATOR => {
+    '<'    => '<',
+    '<='   => '<=',
+    '='    => '=',
+    '>='   => '>=',
+    '>'    => '>',
+    '!='   => '!=',
+    'like' => 'LIKE',
+
+    # TODO not yet supported
+    # 'is null'     => 'IS NULL', # automatically use this operator, if value in undef
+    # 'is not null' => 'IS NOT NULL',
+    # 'in'          => 'IN',
+    # 'notin'       => 'NOT IN',
+    # 'not in'      => 'NOT IN',
+};
+
+# WHERE context:
+# { field => value }
+# { field => [ value ] }
+# { field => [ operator, value ] }
+#
+# ORDER BY context
+# [ [field1, 'ASC'], [field2, 'DESC'], ... ]
+#
 # VALUES context:
 # { aa => 1, bb => 2 },
 # [ { aa => 1, bb => 2 }, { aa => 3, bb => 4 } ],
@@ -23,30 +48,45 @@ const our $SCHEMA_PATCH_TABLE_NAME => '__schema_patch';
 # [ \['col1', 'col2', 'col3'], [ 1, 2 ], [ 3, 4, 5 ], [6] ],
 sub prepare_query ( $self, $query ) {
     state $context_re = do {
-        my @keywords = qw[SET VALUES WHERE];
+        my @keywords = ( 'SET', 'VALUES', 'WHERE', 'ORDER BY' );
 
         my $context_keywords_prepared = join q[|], sort { length $b <=> length $a } map {s/\s+/\\s+/smgr} @keywords;
 
         qr/(?:(?<=\A)|(?<=\s))(?:$context_keywords_prepared)(?=\s|\z)/smi;
     };
 
-    my ( @sql, $bind, $i, $last_not_ref, $context );
+    my ( @sql, $bind, $i, $last_not_ref, $concat, $context );
 
     for my $arg ( $query->@* ) {
         if ( !is_ref $arg ) {
-            die q[SQL query builder doesn't allow several consecutive non-ref argument] if $last_not_ref;
+            if ( $arg eq '' ) {
+                $concat = 1;
+
+                next;
+            }
+
+            if ($concat) {
+                $concat = 0;
+            }
+            else {
+                die q[SQL query builder doesn't allow several consecutive non-ref argument] if $last_not_ref;
+            }
 
             $last_not_ref = 1;
 
             # trim
-            push @sql, $arg =~ s/\A\s+|\s+\z//smgr;
+            my $str = $arg =~ s/\A\s+|\s+\z//smgr;
+
+            push @sql, $str;
 
             # analyse context
-            if ( my $last_kw = ( $arg =~ /$context_re/smgi )[-1] ) {
+            if ( my $last_kw = ( $str =~ /$context_re/smgi )[-1] ) {
                 $context = uc $last_kw =~ s/\s+/ /smgr;
             }
         }
         else {
+            die q[SQL query builder doesn't allow to pass params after concat operator] if $concat;
+
             $last_not_ref = 0;
 
             if ( is_plain_scalarref $arg) {
@@ -75,9 +115,27 @@ sub prepare_query ( $self, $query ) {
                         my @fields;
 
                         for my $field ( keys $arg->%* ) {
-                            push @fields, $self->quote_id($field) . ' = $' . ++$i;
+                            my ( $op, $val );
 
-                            push $bind->@*, $arg->{$field};
+                            if ( !is_ref $arg->{$field} ) {
+                                ( $op, $val ) = ( '=', $arg->{$field} );
+                            }
+                            elsif ( is_plain_arrayref $arg->{$field} ) {
+                                if ( $arg->{$field}->@* == 1 ) {
+                                    ( $op, $val ) = ( '=', $arg->{$field}->[0] );
+                                }
+                                else {
+                                    ( $op, $val ) = $arg->{$field}->@*;
+                                }
+                            }
+                            else {
+                                die q[SQL field type is invalid];
+                            }
+
+                            die q[SQL operator is invalid] unless exists $SQL_FILTER_OPERATOR->{ lc $op };
+
+                            push @fields, $self->quote_id($field) . q[ ] . $SQL_FILTER_OPERATOR->{ lc $op } . ' $' . ++$i;
+                            push $bind->@*, $val;
                         }
 
                         push @sql, '(' . join( ' AND ', @fields ) . ')';
@@ -89,6 +147,29 @@ sub prepare_query ( $self, $query ) {
                     }
                     else {
                         die q[SQL "WHERE" context support only HashRef or ArrayReh arguments];
+                    }
+                }
+
+                # ORDER BY context
+                elsif ( $context eq 'ORDER BY' ) {
+                    if ( is_plain_arrayref $arg) {
+                        my @fields;
+
+                        state $SORT_ORDER = {
+                            asc  => 'ASC',
+                            desc => 'DESC',
+                        };
+
+                        for my $cond ( $arg->@* ) {
+                            die q[SQL sort order is invalid] unless my $order = $SORT_ORDER->{ lc $cond->[1] };
+
+                            push @fields, $self->quote_id( $cond->[0] ) . q[ ] . $order;
+                        }
+
+                        push @sql, join q[, ], @fields;
+                    }
+                    else {
+                        die q[SQL "ORDER BY" context support only ArrayRef argument];
                     }
                 }
 
@@ -276,11 +357,14 @@ sub _apply_patch ( $self, $dbh, $cb ) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 24                   | Subroutines::ProhibitExcessComplexity - Subroutine "prepare_query" with high complexity score (29)             |
+## |    3 | 49                   | Subroutines::ProhibitExcessComplexity - Subroutine "prepare_query" with high complexity score (44)             |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 77, 106, 110, 120    | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 117, 120, 124, 163,  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |      | 187, 191, 201        |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 28                   | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    2 | 62                   | ValuesAndExpressions::ProhibitEmptyQuotes - Quotes used with a string containing no non-whitespace characters  |
+## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
+## |    1 | 53                   | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

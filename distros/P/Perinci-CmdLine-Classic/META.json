@@ -41,8 +41,7 @@
             "File::HomeDir" : "0",
             "JSON::MaybeXS" : "0",
             "Locale::TextDomain::UTF8" : "0",
-            "Log::Any::App" : "0.52",
-            "Log::ger" : "0.011",
+            "Log::ger" : "0.015",
             "Monkey::Patch::Action" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
@@ -51,7 +50,7 @@
             "Perinci::Access::Perl" : "0.87",
             "Perinci::Access::Schemeless" : "0.87",
             "Perinci::Access::Simple::Client" : "0.18",
-            "Perinci::CmdLine::Base" : "1.75",
+            "Perinci::CmdLine::Base" : "1.76",
             "Perinci::Object" : "0.26",
             "Perinci::Result::Format" : "0.42",
             "Perinci::Sub::To::CLIDocData" : "0.28",
@@ -91,7 +90,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Classic"
       }
    },
-   "version" : "1.74",
+   "version" : "1.76",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

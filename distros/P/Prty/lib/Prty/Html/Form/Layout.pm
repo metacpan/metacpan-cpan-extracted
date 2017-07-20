@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Prty::Html::Widget::Hidden;
 use Prty::Template;
@@ -248,7 +248,7 @@ sub html {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

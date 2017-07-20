@@ -1,14 +1,12 @@
 package Data::Check::Structure;
 
-our $DATE = '2014-07-14'; # DATE
-our $VERSION = '0.03'; # VERSION
+our $DATE = '2017-07-18'; # DATE
+our $VERSION = '0.04'; # VERSION
 
-use 5.010001;
 use strict;
-use warnings;
+#use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
 our @EXPORT_OK = qw(
                        is_aoa
                        is_aoaos
@@ -24,7 +22,7 @@ our @EXPORT_OK = qw(
 
 sub is_aos {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'ARRAY';
@@ -37,7 +35,7 @@ sub is_aos {
 
 sub is_aoa {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'ARRAY';
@@ -50,7 +48,7 @@ sub is_aoa {
 
 sub is_aoaos {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'ARRAY';
@@ -64,7 +62,7 @@ sub is_aoaos {
 
 sub is_aoh {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'ARRAY';
@@ -77,7 +75,7 @@ sub is_aoh {
 
 sub is_aohos {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'ARRAY';
@@ -91,7 +89,7 @@ sub is_aohos {
 
 sub is_hos {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'HASH';
@@ -105,7 +103,7 @@ sub is_hos {
 
 sub is_hoa {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'HASH';
@@ -119,7 +117,7 @@ sub is_hoa {
 
 sub is_hoaos {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'HASH';
@@ -133,7 +131,7 @@ sub is_hoaos {
 
 sub is_hoh {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'HASH';
@@ -147,7 +145,7 @@ sub is_hoh {
 
 sub is_hohos {
     my ($data, $opts) = @_;
-    $opts //= {};
+    $opts ||= {};
     my $max = $opts->{max};
 
     return 0 unless ref($data) eq 'HASH';
@@ -174,7 +172,7 @@ Data::Check::Structure - Check structure of data
 
 =head1 VERSION
 
-This document describes version 0.03 of Data::Check::Structure (from Perl distribution Data-Check-Structure), released on 2014-07-14.
+This document describes version 0.04 of Data::Check::Structure (from Perl distribution Data-Check-Structure), released on 2017-07-18.
 
 =head1 SYNOPSIS
 
@@ -186,7 +184,9 @@ and so on.
 
 =head1 FUNCTIONS
 
-=head2 is_aos($data, \%opts) => bool
+None exported by default, but they are exportable.
+
+=head2 is_aos($data[, \%opts]) => bool
 
 Check that data is an array of scalars. Examples:
 
@@ -198,7 +198,7 @@ Check that data is an array of scalars. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_aoa($data, \%opts) => bool
+=head2 is_aoa($data[, \%opts]) => bool
 
 Check that data is an array of arrays. Examples:
 
@@ -210,7 +210,7 @@ Check that data is an array of arrays. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_aoaos($data, \%opts) => bool
+=head2 is_aoaos($data[, \%opts]) => bool
 
 Check that data is an array of arrays of scalars. Examples:
 
@@ -222,7 +222,7 @@ Check that data is an array of arrays of scalars. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_aoh($data, \%opts) => bool
+=head2 is_aoh($data[, \%opts]) => bool
 
 Check that data is an array of hashes. Examples:
 
@@ -234,7 +234,7 @@ Check that data is an array of hashes. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_aohos($data, \%opts) => bool
+=head2 is_aohos($data[, \%opts]) => bool
 
 Check that data is an array of hashes of scalars. Examples:
 
@@ -246,7 +246,7 @@ Check that data is an array of hashes of scalars. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_hos($data, \%opts) => bool
+=head2 is_hos($data[, \%opts]) => bool
 
 Check that data is a hash of scalars. Examples:
 
@@ -258,7 +258,7 @@ Check that data is a hash of scalars. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_hoa($data, \%opts) => bool
+=head2 is_hoa($data[, \%opts]) => bool
 
 Check that data is a hash of arrays. Examples:
 
@@ -269,7 +269,7 @@ Check that data is a hash of arrays. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_hoaos($data, \%opts) => bool
+=head2 is_hoaos($data[, \%opts]) => bool
 
 Check that data is a hash of arrays of scalars. Examples:
 
@@ -282,7 +282,7 @@ Check that data is a hash of arrays of scalars. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_hoh($data, \%opts) => bool
+=head2 is_hoh($data[, \%opts]) => bool
 
 Check that data is a hash of hashes. Examples:
 
@@ -293,7 +293,7 @@ Check that data is a hash of hashes. Examples:
 Known options: C<max> (maximum number of items to check, undef means check all
 items).
 
-=head2 is_hohos($data, \%opts) => bool
+=head2 is_hohos($data[, \%opts]) => bool
 
 Check that data is a hash of hashes of scalrs. Examples:
 
@@ -312,7 +312,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Check
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Check-Structure>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Check-Structure>.
 
 =head1 BUGS
 
@@ -324,11 +324,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2017, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

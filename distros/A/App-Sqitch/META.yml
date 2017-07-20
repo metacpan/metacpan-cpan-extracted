@@ -5,10 +5,12 @@ author:
 build_requires:
   Capture::Tiny: '0.12'
   Carp: '0'
+  File::Find: '0'
   File::Spec: '0'
   File::Spec::Functions: '0'
   FindBin: '0'
   Module::Build: '0.35'
+  Module::Runtime: '0'
   Path::Class: '0.33'
   Test::Deep: '0'
   Test::Dir: '0'
@@ -61,7 +63,6 @@ requires:
   Locale::TextDomain: '1.20'
   Moo: '1.002000'
   Moo::Role: '0'
-  Moo::sification: '0'
   POSIX: '0'
   Path::Class: '0.33'
   PerlIO::utf8_strict: '0'
@@ -100,4 +101,4 @@ resources:
   bugtracker: http://github.com/theory/sqitch/issues/
   homepage: http://sqitch.org/
   repository: http://github.com/theory/sqitch/
-version: '0.9995'
+version: '0.9996'

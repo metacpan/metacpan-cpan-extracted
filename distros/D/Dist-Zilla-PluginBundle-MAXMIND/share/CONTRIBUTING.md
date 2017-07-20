@@ -7,8 +7,7 @@ Please note that if you have any questions or difficulties, you can reach the
 maintainer(s) through the bug queue described later in this document
 (preferred), or by emailing the releaser directly. You are not required to
 follow any of the steps in this document to submit a patch or bug report;
-these are just recommendations, intended to help you (and help us help you
-faster).
+these are recommendations, intended to help you (and help us help you faster).
 {{
 !$ENV{AUTOMATED_TESTING} && -d '.git' && `git ls-files TODO` eq "TODO\n"
   ? "\nThis distribution has a TODO file in the repository; you may want to check
@@ -27,6 +26,7 @@ However, you can still compile and test the code with the `Makefile.PL` or
     make test
 
 or
+
     perl Build.PL
     ./Build
     ./Build test
@@ -64,7 +64,7 @@ or
 
     $ dzil authordeps --missing | cpanm
 
-They may also be additional requirements not needed by the dzil build which
+There may also be additional requirements not needed by the dzil build which
 are needed for tests or other development:
 
     $ cpan `dzil listdeps --author --missing`
@@ -110,7 +110,7 @@ https://help.github.com/articles/creating-a-pull-request' }
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
 can submit an issue report [via the web]({{ $dist->distmeta->{resources}{bugtracker}{web} // 'WARNING: bugtracker data not set!' }})
-{{ $dist->distmeta->{resources}{bugtracker}{mailto} ? 'or [via email](' . $dist->distmeta->{resources}{bugtracker}{mailto} : ')' }}.
+{{ $dist->distmeta->{resources}{bugtracker}{mailto} ? ' or [via email](' . $dist->distmeta->{resources}{bugtracker}{mailto} . ')' : '' }}.
 {{
 my $extra = $dist->distmeta->{resources}{x_MailingList}
     ? "\n" . 'There is a mailing list available for users of this distribution,' . "\n" . $dist->distmeta->{resources}{x_MailingList}
@@ -152,6 +152,8 @@ included in the documentation as a contributor (using the attribution on the
 commit or patch), unless you specifically request for it not to be. If you
 wish to be listed under a different name or address, you should submit a pull
 request to the .mailmap file to contain the correct mapping.
+[Check here](https://github.com/git/git/blob/master/Documentation/mailmap.txt)
+for more information on git's .mailmap files.
 
 This file was generated via {{ ref($plugin) . ' ' . ($plugin->VERSION || '<self>') }} from a
 template file originating in {{

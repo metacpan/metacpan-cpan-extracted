@@ -1,4 +1,4 @@
-use strictures 2;
+use 5.012;
 use Test::More;
 use lib 'lib';
 
@@ -51,5 +51,18 @@ use Number::MuPhone;
   isa_ok($num,'Number::MuPhone::Parser::US');
   ok( ! $num->error, 'No error');
 }
+
+
+{ # Call Canadian number from US number - confirm treated as local
+  my $num_us = Number::MuPhone->new('+13104524522');
+  my $num_ca = Number::MuPhone->new('+12042042044');
+  is( $num_us->country, 'US', 'Got US number');
+  is( $num_ca->country, 'CA', 'Got CA number');
+
+  is( $num_us->dial_from($num_ca),     '13104524522',     'Dial US from CA' );
+  is( $num_us->display_from($num_ca),  '(310) 452-4522',  'Display US from CA' );
+
+}
+
 
 done_testing();

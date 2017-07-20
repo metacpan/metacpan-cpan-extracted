@@ -1,5 +1,10 @@
 Revision history for App-jenkins-cli
 
+0.009   2017-07-17
+        Updating for release of version 0.009
+        Fixing up not processing sub-commands properly (Ivan Wills)
+        Fixing issue with builds that have never run (Ivan Wills)
+
 0.008   2017-05-07
         Updating for release of version 0.008
         Added missing new dependency (Ivan Wills)

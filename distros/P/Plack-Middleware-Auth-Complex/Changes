@@ -1,5 +1,14 @@
 Revision history for Perl extension Plack::Middleware::Auth::Complex.
 
+0.003001 2017-07-18T08:20+01:00
+ - Fix tests when Authen::Passphrase::Scrypt is not installed
+
+0.003 2017-07-15T16:55+01:00
+ - Use Data::Entropy instead of Bytes::Random::Secure (since
+   Authen::Passphrase already uses Data::Entropy)
+ - Add support for the scrypt password hashing algorithm using
+   Authen::Passphrase::Scrypt
+
 0.002 2017-03-25T21:13+03:00
  - Prevent blocking (use /dev/urandom instead of /dev/random)
  - Add a script to change user password (/usr/bin/passwd lookalike)

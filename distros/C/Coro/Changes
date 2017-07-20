@@ -6,6 +6,24 @@ TODO: __GCC_HAVE_DWARF2_CFI_ASM
 TODO: swap_sv, maybe add scope_swap_sv?
 TODO: croak when async_pool tries to run canceled thread?
 
+6.513 Sat Jul 15 01:18:51 CEST 2017
+	- experimental 5.22 comaptibility changes (PadlistNAMES).
+	- removed attributes example and made sure the other examples
+          still work.
+        - fix some statevar types for newer perls, should be of no consequence.
+
+6.512 Fri Jul 14 05:03:17 CEST 2017
+        - seems to pass test suite down till 5.8.9, so make this the
+          minimum requirement in Makefile.PL.
+	- experimental 5.24 compatibility changes (SUB_ARGARRAY).
+        - experimental 5.26 compatibility changes (PL_comppad -> PADOFFSET).
+        - disable FORTIFY_SOURCE to avoid broken (but well-intentioned)
+          fortified longjmp variants in some libcs.
+	- re-try JIT allocation without PROT_EXEC, to hopefully improve
+          portability (still doesn't seem to work around broken selinux
+          mmap everywhere).
+        - speling fixes (Xavier Guimard).
+
 6.511 Sun Jun 26 23:44:50 CEST 2016
 	- make it compile with threaded perls again.
 	- simplify and speed up __DIE__ and __WARN__ handling.

@@ -18,7 +18,7 @@ WriteMakefile(
 	PREREQ_PM         => {
 		qw/Authen::Passphrase                0
 		   Authen::Passphrase::BlowfishCrypt 0
-		   Bytes::Random::Secure             0
+		   Data::Entropy                     0
 		   DBI                               0
 		   Email::Simple                     0
 		   Email::Sender::Simple             0
@@ -28,6 +28,9 @@ WriteMakefile(
 	},
 	META_MERGE         => {
 		dynamic_config => 0,
+		recommends     => {
+			qw/Authen::Passphrase::Scrypt 0/,
+		},
 		resources      => {
 			repository => 'https://git.ieval.ro/?p=plack-middleware-auth-complex.git',
 		}

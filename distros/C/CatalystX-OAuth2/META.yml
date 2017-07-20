@@ -11,10 +11,10 @@ build_requires:
   Catalyst::Plugin::ConfigLoader: '0'
   Catalyst::Plugin::Session: '0'
   Catalyst::Plugin::Session::State::Cookie: '0'
-  CatalystX::Test::MockContext: '0'
+  Catalyst::Test: '0'
+  Devel::Dwarn: '0'
   File::Spec: '0'
   HTTP::Request: '0'
-  HTTP::Request::Common: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Plack::Builder: '0'
@@ -24,6 +24,7 @@ build_requires:
   Test::MockObject: '0'
   Test::More: '0'
   Test::WWW::Mechanize::PSGI: '0'
+  blib: '1.01'
   lib: '0'
   namespace::autoclean: '0'
   perl: '5.006'
@@ -31,7 +32,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,6 +43,7 @@ requires:
   DBIx::Class: '0'
   DBIx::Class::ResultSet: '0'
   DBIx::Class::Schema: '0'
+  HTTP::Request::Common: '0'
   JSON::Any: '0'
   LWP::UserAgent: '0'
   Moose: '0'
@@ -61,4 +63,5 @@ requires:
 resources:
   homepage: https://github.com/perl-catalyst/CatalystX-OAuth2
   repository: https://github.com/perl-catalyst/CatalystX-OAuth2.git
-version: '0.001004'
+version: '0.001006'
+x_serialization_backend: 'YAML::Tiny version 1.69'

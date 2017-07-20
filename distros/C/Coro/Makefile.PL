@@ -1,6 +1,6 @@
 use ExtUtils::MakeMaker;
 
-use Canary::Stability Coro => 1, 5.010;
+use Canary::Stability Coro => 1, 5.008009;
 
 unless (-e "Coro/libcoro/coro.c") {
    print <<EOF;

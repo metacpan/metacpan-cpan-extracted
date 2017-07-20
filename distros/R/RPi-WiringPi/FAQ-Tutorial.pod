@@ -130,6 +130,8 @@ interrupts.
 
 =head2 Pulse Width Modulation (PWM)
 
+=head3 Basics
+
 Pulse Width Modulation kind of acts like a potentiometer (or a variable
 switch... like a light dimmer). They are used to send pulses of electricity
 to a device across time. It is required for things like stepper motors, or
@@ -154,6 +156,38 @@ hardware-based PWM (GPIO #18).
         $pin->pwm($_);
         usleep 50000;
     }
+
+=head3 PWM Clock
+
+The PWM clock can be set to control the PWM pulse widths. The PWM clock is
+derived from a 19.2MHz clock. You can set any divider.
+
+For example, say you wanted to drive a DC motor with PWM at about 1kHz, and
+control the speed in 1/1024 increments from 0/1024 (stopped) through to
+1024/1024 (full on). In that case you might set the clock divider to be 16, and
+the RANGE to 1024. The pulse repetition frequency will be
+1.2MHz/1024 = 1171.875Hz.
+
+Example:
+
+    $pi->pwm_clock(16);
+
+=head3 PWM Mode
+
+Each PWM channel can run in either Balanced or Mark-Space mode. In Balanced
+mode, the hardware sends a combination of clock pulses that results in an
+overall DATA pulses per RANGE pulses. In Mark-Space mode, the hardware sets the
+output HIGH for DATA clock pulses wide, followed by LOW for RANGE-DATA clock
+pulses.
+
+The Raspberry Pi default is balanced mode.
+
+C<0> for Mark-Space or C<1> for balanced. If you're using
+C<RPi::WiringPi::Constant>, you can also use C<PWM_MODE_MS> or C<PWM_MODE_BAL>.
+
+Example:
+
+    $pi->pwm_mode(0);
 
 =head2 Interrupt usage
 
@@ -536,6 +570,39 @@ L<RPi::DHT11> distribution.
     my $temp      = $env->temp; # celcius
     my $farenheit = $env->temp('f');
 
+=head1 ULTRASONIC DISTANCE SENSOR
+
+We provide access to the C<HCSR04> ultrasonic distance measurement sensor
+through the L<RPi::HCSR04> distribution.
+
+=head2 Usage
+
+    my $trig_pin = 23;
+    my $echo_pin = 24;
+
+    my $ruler = $pi->hcsr04($trig_pin, $echo_pin);
+
+    my $inches = $sensor->inch;
+    my $cm     = $sensor->cm;
+    my $raw    = $sensor->raw;
+
+=head1 SERVO
+
+=head2 Description
+
+This method configures PWM clock and divisor to operate a typical 50Hz servo,
+and returns a special L<RPi::Pin> object. These servos have a C<left> pulse of
+C<50>, a C<centre> pulse of C<150> and a C<right> pulse of C<250>. On exit of
+your program (or a crash), we reset everything back to default.
+
+=head2 Example
+
+    my $servo = $pi->servo(18);
+
+    $servo->pwm(150); # centre position
+    $servo->pwm(50);  # all the way left
+    $servo->pwm(250); # all the way right
+
 =head1 UTIL LIBRARY
 
 =head2 Overview
@@ -563,7 +630,7 @@ Before running the tests, you need to set a special environment variable so that
 we know we're on a Pi board. This ensures CPAN testers won't run the tests
 across all of its platforms:
 
-    export RPI_BOARD=1
+    export PI_BOARD=1
 
 Personally, I set all the environment variables in my C</etc/environment> file.
 
@@ -639,6 +706,17 @@ restart the dispatcher with the C<--rpi> or the equivalent C<-R> flag:
 
 The C<--rpi> flag is rather hidden (but it *is* documented subtly), as this is
 a feature that most likely I'll be the only consumer of.
+
+=head2 Testing Environment Variable List
+
+Here's the contents of my C</etc/environment> file, setting the various testing
+environment variables for the full test platform.
+
+    PI_BOARD=1                  # It's a Pi
+    RPI_ARDUINO=1               # Arduino I2C connected
+    RPI_SERIAL=1                # Serial enabled, and loopback
+    BB_RPI_LCD=5,6,4,17,27,22   # Auto-testing LCD enabled
+    RELEASE_TESTING=1           # Author tests (POD, manifest etc)
 
 =head1 DEVELOPMENT
 

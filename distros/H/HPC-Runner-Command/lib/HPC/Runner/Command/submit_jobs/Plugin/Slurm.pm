@@ -141,7 +141,7 @@ sub submit_jobs {
 
     sleep(3);
 
-    if ( $exitcode != 0 ) {
+    if ( ! defined $exitcode || $exitcode != 0 ) {
         $self->log->fatal("Job was not submitted successfully");
         $self->log->warn( "STDERR: " . $stderr ) if $stderr;
         $self->log->warn( "STDOUT: " . $stdout ) if $stdout;

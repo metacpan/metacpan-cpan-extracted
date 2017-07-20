@@ -4,14 +4,18 @@ use strict;
 use warnings;
 use Test::More 0.98;
 
-use Log::ger::Util;
-
 package My::P1;
 use Log::ger;
+BEGIN { log_trace(""); } # just to test that sub exists
 
 package My::P2;
 
+package My::P3; # test get_logger
+use Log::ger ();
+BEGIN { my $log = Log::ger->get_logger; $log->trace(""); } # just to test that method exists
+
 package main;
+use Log::ger::Util;
 
 subtest numeric_level => sub {
     is(Log::ger::Util::numeric_level(1), 1);

@@ -1,5 +1,17 @@
 Revision history for Perl module Net::MAC::Vendor
 
+1.261 2017-07-18T18:54:10Z
+	* Pete Houston (openstrike) improved fetch_oui_from_custom
+
+1.260_03 2017-06-17T07:48:56Z
+	* Try harder not to blow up tests when the network is not available
+
+1.260_02 2017-06-09T09:00:20Z
+	* Fix an errant get() call (GitHub #19 - openstrike)
+
+1.260_01 2016-11-14T16:07:53Z
+	* Fix issue with cache loading (Github #11 https://github.com/briandfoy/net-mac-vendor/issues/11)
+
 1.26 2015-11-23T04:38:00Z
 	* Bump to stable release
 

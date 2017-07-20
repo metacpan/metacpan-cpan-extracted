@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,26 +15,25 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 cc3839c92756ae1b6885caaa8ef982d9a625b154 .gitignore
-SHA1 4fbcb36ca379efabd6883bfad18a31176dbea59f Build.PL
-SHA1 fcbac6e54e74ff0febfe12203f38e630c8211933 Changes
-SHA1 bce2570870864d2591448ad9cda50b030fe33c11 MANIFEST
-SHA1 67b12e6fe025f2cddc9b3c7b5929a55d24dca390 META.json
-SHA1 2cafb50180e539bb740623f0671e02a661d470cc META.yml
-SHA1 94823f40b300188c2e44ea2197ce43b3ae315d91 Makefile.PL
-SHA1 1bd75a6c8f5de1f12281e641e7db660f73d68b89 README
-SHA1 08efb4512e621be81f49d436f88a9b176058b163 lib/Sub/StrictDecl.pm
-SHA1 aec2536992c5d5975541231e9d42ec1dbf0c0794 lib/Sub/StrictDecl.xs
+SHA1 33a3a1b9cd9bed269b42e7abc1bca24b54f5c6e2 Build.PL
+SHA1 cb43e1e71c9eab2ff2c55afd35638343b20bf87c Changes
+SHA1 ae343a3a592abba22ff62ad4a64fa81823a7ff0c MANIFEST
+SHA1 21a88785e2fdff6c17b27b07818a79f2a8ce3bef META.json
+SHA1 b8381ffba2282a6046bffcf0b007439a7ce64a9f META.yml
+SHA1 6d5210afafde7b3f0f1a459854292df23520a7a7 README
+SHA1 a74399e9d3432e222238f3e19a6ba35f5f33b0a8 lib/Sub/StrictDecl.pm
+SHA1 a0a71e15a256c10e2ffab6cbf1afce836c12fb5e lib/Sub/StrictDecl.xs
 SHA1 ae2223e39954d57ed2237bb5c829be683eb3c166 t/check.t
 SHA1 79a650c98b43542ae1f362b8d94500ef29a1730b t/devel_callparser.t
 SHA1 29c8399c43665e88d8da7778623ab92f235c0c4b t/lexicalsub.t
+SHA1 86beeeb5c754c1f08ed85316e06aa8dd70c3fa9a t/lib/t/scope_0.pm
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
-SHA1 c82e811c6284e69cd2eae034aa28ba7a101596bd t/scope.t
-SHA1 86beeeb5c754c1f08ed85316e06aa8dd70c3fa9a t/scope_0.pm
+SHA1 33a6d76fefd27578cfe5a301629ff4c58ba9126f t/scope.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAlUMrvMACgkQOV9mt2VyAVH4RQCgqlfZyt8mDZRD4rKsaEGA5DQB
-/U8Ani1n1zKaZSODDHbfnvCDBuaRaJ6k
-=hzBg
+iEYEARECAAYFAllvLz0ACgkQOV9mt2VyAVFPgACfR8TrIiGZ3ynQS4THV9QsCYHP
+4fIAmwXeJV6O45obsGwMFjURJrOlbovX
+=xgce
 -----END PGP SIGNATURE-----

@@ -1,7 +1,7 @@
 package JSON::Schema::AsType::Draft6;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Role processing draft6 JSON Schema 
-$JSON::Schema::AsType::Draft6::VERSION = '0.4.2';
+$JSON::Schema::AsType::Draft6::VERSION = '0.4.3';
 
 use strict;
 use warnings;
@@ -127,7 +127,7 @@ JSON::Schema::AsType::Draft6 - Role processing draft6 JSON Schema
 
 =head1 VERSION
 
-version 0.4.2
+version 0.4.3
 
 =head1 DESCRIPTION
 
@@ -143,7 +143,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

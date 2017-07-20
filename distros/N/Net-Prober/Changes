@@ -1,5 +1,10 @@
 Revision history for Net::Prober
 
+0.17 - Sat Jul 15 11:14:44 Europe/Oslo 2017
+
+    Removed tests using Opera Software hosts.
+    Fixes #120113 and #122313.
+
 0.15 - Mon Mar 21 17:02:00 Europe/Oslo 2016
 
     Fixed use of "scheme" and "port" arguments together in the same probe

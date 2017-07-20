@@ -11,9 +11,9 @@
 # <tt>service</tt>:: Name of the service.
 #
 class [% name %]::service (
-    $ensure  = hiera('[% name %]::service::ensure', 'present'),
-    $service = hiera('[% name %]::service::service', $[% name %]::params::service),
-) {
+    $ensure  = 'present',
+    $service = $[% name %]::params::service,
+) inherits ::[% name %]::params {
     $service_ensure = $ensure ? {
         'present' => 'running',
         'absent'  => 'stopped',

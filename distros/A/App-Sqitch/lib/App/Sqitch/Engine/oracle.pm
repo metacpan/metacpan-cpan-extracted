@@ -15,7 +15,7 @@ use namespace::autoclean;
 
 extends 'App::Sqitch::Engine';
 
-our $VERSION = '0.9995';
+our $VERSION = '0.9996';
 
 BEGIN {
     # We tell the Oracle connector which encoding to use. The last part of the
@@ -136,7 +136,7 @@ sub _log_conflicts_param {
 }
 
 sub _ts2char_format {
-    q{to_char(%1$s AT TIME ZONE 'UTC', '"year":YYYY:"month":MM:"day":DD') || to_char(%1$s AT TIME ZONE 'UTC', ':"hour":HH24:"minute":MI:"second":SS:"time_zone":"UTC"')}
+    q{CAST(to_char(%1$s AT TIME ZONE 'UTC', '"year":YYYY:"month":MM:"day":DD') || to_char(%1$s AT TIME ZONE 'UTC', ':"hour":HH24:"minute":MI:"second":SS:"time_zone":"UTC"')  AS VARCHAR2(92 char))}
 }
 
 sub _ts_default { 'current_timestamp' }
@@ -335,7 +335,7 @@ sub name_for_change_id {
                    ROW_NUMBER() OVER (partition by project ORDER BY committed_at) AS rnk
               FROM tags
         )
-        SELECT change || COALESCE(t.tag, '')
+        SELECT change || COALESCE(t.tag, '@HEAD')
           FROM changes c
           LEFT JOIN tag t ON c.project = t.project AND t.committed_at >= c.committed_at
          WHERE change_id = ?

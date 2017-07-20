@@ -1,9 +1,11 @@
 package Log::ger::Format;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 use parent qw(Log::ger::Plugin);
+
+sub _import_sets_for_current_package { 1 }
 
 1;
 # ABSTRACT: Use a format plugin
@@ -20,23 +22,28 @@ Log::ger::Format - Use a format plugin
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 SYNOPSIS
+
+To set for current package only:
+
+ use Log::ger::Format 'Block';
+
+or:
+
+ use Log::ger::Format;
+ Log::ger::Format->set_for_current_package('Block');
 
 To set globally:
 
  use Log::ger::Format;
  Log::ger::Format->set('Block');
 
-or:
+=head1 DESCRIPTION
 
- use Log::ger::Format 'Block';
-
-To set for current package only:
-
- use Log::ger::Format;
- Log::ger::Format->set_for_current_package('Block');
+Note: Since format plugins affect log-producing code, the import syntax defaults
+to setting for current package instead of globally.
 
 =for Pod::Coverage ^(.+)$
 

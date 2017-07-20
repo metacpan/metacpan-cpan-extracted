@@ -1,5 +1,14 @@
 Revision history for JSON-Schema-AsType
 
+0.4.3 2017-07-16
+  [ BUG FIXES ]
+    - Generating the schema from an url was causing infinite recursion.
+      (GH#17, reported by William Cox)
+    - Remove dependency on Class::Load.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 30 insertions(+), 34 deletions(-)
+
 0.4.2 2017-05-01
   [ BUG FIXES ]
     - add 'allow-nonref' for JSON serializing (GH#14, Ben Hutton)

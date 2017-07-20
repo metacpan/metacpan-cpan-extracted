@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended;
+use Test2::V0 -no_srand => 1;
 use Test::Clustericious::Blocking;
 use HTTP::Tiny;
 use JSON::PP qw( decode_json );

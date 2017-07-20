@@ -3,28 +3,35 @@ use Mojo::Base 'Mojolicious::Plugin';
 
 use Template::Mustache;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub register {
-    my ($self, $app, $args) = @_;
+    my (undef, $app, $args) = @_;
 
     $args //= {};
-    my $mustache = Template::Mustache->new(%$args);
-    $Template::Mustache::template_path = '';
 
     $app->renderer->add_handler(mustache => sub {
-        my ($renderer, $c, $output, $options) = @_;
+        my Mojolicious::Renderer $renderer = shift;
+        my Mojolicious::Controller $c = shift;
+        my ($output, $options) = @_;
 
-        if ($options->{inline}) {
-            my $inline_template = $options->{inline};
-            $$output = $mustache->render($inline_template, $c->stash) if $inline_template;
+        if ($options->{inline} and (my $inline_template = $options->{inline})) {
+            my $mustache = Template::Mustache->new(
+                   template => $inline_template,
+               );
+            $$output = $mustache->render($c->stash);
         }
         elsif (my $template_name = $renderer->template_path($options)) {
-            $Template::Mustache::template_file = $template_name;
+            my $mustache = Template::Mustache->new(
+                    template_path => $template_name
+                );
             $$output = $mustache->render($c->stash);
         } else {
             my $data_template = $renderer->get_data_template($options);
-            $$output = $mustache->render($data_template, $c->stash) if $data_template;
+            my $mustache = Template::Mustache->new(
+                    template => $data_template
+                );
+            $$output = $mustache->render($c->stash) if $data_template;
         }
         return $$output ? 1 : 0;
     });

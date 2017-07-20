@@ -12,11 +12,11 @@ lib/Dist/Surveyor.pm
 lib/Dist/Surveyor/DB_File.pm
 lib/Dist/Surveyor/Inquiry.pm
 lib/Dist/Surveyor/MakeCpan.pm
-t/00-compile.t
 t/01-makecpan.t
 t/02-inquery.t
 t/03-scanlib.t
 t/scanlib.tar
+xt/author/00-compile.t
 xt/author/pod-syntax.t
 xt/author/portability.t
 xt/release/distmeta.t

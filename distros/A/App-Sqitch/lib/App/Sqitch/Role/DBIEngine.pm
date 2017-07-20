@@ -11,7 +11,7 @@ use App::Sqitch::X qw(hurl);
 use Locale::TextDomain qw(App-Sqitch);
 use namespace::autoclean;
 
-our $VERSION = '0.9995';
+our $VERSION = '0.9996';
 
 requires 'dbh';
 requires 'sqitch';
@@ -21,6 +21,7 @@ requires '_ts2char_format';
 requires '_char2ts';
 requires '_listagg_format';
 requires '_no_table_error';
+requires '_handle_lookup_index';
 
 sub _dt($) {
     require App::Sqitch::DateTime;
@@ -618,7 +619,7 @@ sub name_for_change_id {
              WHERE c2.committed_at >= c.committed_at
                AND c2.project = c.project
              LIMIT 1
-        ), '')
+        ), '@HEAD')
           FROM changes c
          WHERE change_id = ?
     }, undef, $change_id)->[0];
@@ -901,14 +902,16 @@ sub change_id_for {
         }
 
         # Find earliest by change name.
-        my $limit = $self->_can_limit ? "\n             LIMIT 1" : '';
-        return $dbh->selectcol_arrayref(qq{
+        my $ids = $dbh->selectcol_arrayref(qq{
             SELECT change_id
               FROM changes
              WHERE project = ?
                AND changes.change  = ?
-             ORDER BY changes.committed_at ASC$limit
-        }, undef, $project, $change)->[0];
+             ORDER BY changes.committed_at ASC
+        }, undef, $project, $change);
+
+        # Return the ID.
+        return $self->_handle_lookup_index($change, $ids);
     }
 
     if ( my $tag = $p{tag} ) {

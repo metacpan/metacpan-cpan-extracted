@@ -19,10 +19,17 @@ my %xs_ctor= (
         chomp;
         if ($_ =~ /^\w/) {
             push @constant_sets, [ $_ ];
-        } elsif ($_ =~ /^ (\w) (\w+)/) {
-            die "Unhandled type code $1" unless $xs_ctor{$1};
-            $xs_boot .= sprintf('  newCONSTSUB(stash, "%s", '.$xs_ctor{$1}.");\n", $2, $2);
-            push @{$constant_sets[-1]}, $2;
+        } elsif (my ($type, $sym)= ($_ =~ /^ (\w) (\w+)/)) {
+            die "Unhandled type code $type" unless $xs_ctor{$type};
+            my $newsv= sprintf($xs_ctor{$type}, $sym);
+            $xs_boot .= <<"@";
+#ifdef $sym
+  newCONSTSUB(stash, "$sym", $newsv);
+#else
+  newXS(\"X11::GLX::$sym\", XS_X11__GLX__const_unavailable, file);
+#endif
+@
+            push @{$constant_sets[-1]}, $sym;
         } else {
             die "parse error: $_\n" if $_ =~ /\S/;
         }

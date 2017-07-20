@@ -9,5 +9,4 @@ my $links = get_wiki_titles ($title);
 print "$title is '$links->{de}' in German.\n";
 my $film = '東京物語';
 my $flinks = get_wiki_titles ($film, lang => 'ja');
-print "映画「$film」はイタリア語で'$flinks->{it}'と名付けた。\n";
-
+print "映画「$film」はイタリア語で「$flinks->{it}」と名付けた。\n";

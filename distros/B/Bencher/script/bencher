@@ -1,0 +1,1081 @@
+#!perl
+
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '1.040'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+binmode(STDOUT, ":utf8");
+Perinci::CmdLine::Any->new(
+    url => '/Bencher/Backend/bencher',
+    extra_urls_for_version => ['/Bencher/Backend/', '/Bencher/'],
+    log => 1,
+    pass_cmdline_object => 1,
+)->run;
+
+# ABSTRACT: A benchmark framework (CLI)
+# PODNAME: bencher
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bencher - A benchmark framework (CLI)
+
+=head1 VERSION
+
+This document describes version 1.040 of bencher (from Perl distribution Bencher), released on 2017-07-13.
+
+=head1 SYNOPSIS
+
+List all scenario modules (Bencher::Scenario::*) installed locally on your
+system:
+
+ % bencher --list-scenario-modules
+ % bencher -L
+
+Run benchmark described by a scenario module:
+
+ % bencher -m Example
+
+Run benchmark described by a scenario file:
+
+ % bencher -f scenario.pl
+
+Add participants from the command-line instead of (or in addition to) those
+specified in a scenario file/module:
+
+ % bencher -p '{"fcall_template":"Bar::func(<arg>)"}'
+
+Run module startup overhead benchmark instead of the normal benchmark:
+
+ % bencher -m Example --module-startup
+
+Show/dump scenario instead of running benchmark:
+
+ % bencher -m Example --show-scenario
+
+List participants instead of running benchmark:
+
+ % bencher ... --list-participants
+ % bencher ... --list-participants -l ;# show detail
+
+List participating Perl modules (modules mentioned by all the participants):
+
+ % bencher ... --list-participant-modules
+ % bencher ... --list-participant-modules -l ;# show detail
+
+List datasets instead of running benchmark:
+
+ % bencher ... --list-datasets
+ % bencher ... --list-datasets -l ;# show detail
+
+List items instead of running benchmark:
+
+ % bencher ... --list-items
+ % bencher ... --list-items -l ;# show detail
+
+Show items' codes instead of running benchmark:
+
+ % bencher ... --show-items-codes
+
+Show items' results instead of running benchmark:
+
+ % bencher ... --show-items-results
+
+Select (include/exclude) participants before running benchmark (you can also
+select datasets/modules/items):
+
+ % bencher ... --include-participant-pattern 'Tiny|Lite' --exclude-participant 'HTTP::Tiny'
+
+=head2 Benchmarking against multiple perls
+
+You need to install L<App::perlbrew> first and then install some perls. Also,
+install at least L<Bencher::Backend> to each perl you want to run the benchmark
+on.
+
+To list available perls (same as C<perlbrew list>, but also shows whether a perl
+has Bencher):
+
+ % bencher --list-perls
+ % bencher --list-perls -l
+
+To run a scenario against all perls which have Bencher:
+
+ % bencher -m ScenarioModule --multiperl ...
+
+To run a scenario against some perls:
+
+ % bencher -m ScenarioModule --multiperl --include-perl perl-5.20.3 --include-perl perl-5.22.1 ...
+
+=head2 Benchmarking multiple versions of a module
+
+For example, if version 0.02 of a module is installed and you want to benchmark
+against version 0.01 (in C</my/home/lib>):
+
+ % bencher -m ScenarioModule --multimodver Module::Name -I /my/home/lib ...
+
+Note that C<Module::Name> must be among the modules that are being benchmarked
+(according to the scenario).
+
+=head1 DESCRIPTION
+
+Bencher is a benchmark framework. You specify a I<scenario> (either in a
+C<Bencher::Scenario::*> Perl module, or a Perl script, or over the command-line)
+containing list of I<participants> and I<datasets>. Participants are codes or
+commands to run, and datasets are arguments for the codes/commands. Bencher will
+permute the participants and datasets into benchmark items, ready to run.
+
+You can choose to include only some participants, datasets, or items. And there
+are options to view your scenario's participants/datasets/items/mentioned
+modules, run benchmark against multiple perls and module versions, and so on.
+Bencher comes as a CLI script as well as Perl module. See the
+L<Bencher::Backend> documentation for more information.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--capture-stderr>
+
+Trap output to stderr.
+
+=item B<--capture-stdout>
+
+Trap output to stdout.
+
+=item B<--dataset>=I<s>
+
+Add a dataset.
+
+See C<--datasets>.
+
+=item B<--datasets-json>=I<s>
+
+Add datasets (JSON-encoded).
+
+See C<--datasets>.
+
+=item B<--datasets>=I<s>
+
+Add datasets.
+
+=item B<--detail>, B<-l>
+
+=item B<--env-hash>=I<s>
+
+Add an environment hash.
+
+See C<--env-hashes>.
+
+=item B<--env-hashes-json>=I<s>
+
+Add environment hashes (JSON-encoded).
+
+See C<--env-hashes>.
+
+=item B<--env-hashes>=I<s>
+
+Add environment hashes.
+
+=item B<--include-path-json>=I<s>, B<-I>
+
+Additional module search paths (JSON-encoded).
+
+See C<--include-path>.
+
+=item B<--include-path>=I<s@>
+
+Add path to module search path.
+
+Used when searching for scenario module, or when in multimodver mode.
+
+
+Can be specified multiple times.
+
+=item B<--multimodver>=I<s>
+
+Benchmark multiple module versions.
+
+If set to a module name, will search for all (instead of the first occurrence)
+of the module in `@INC`. Then will generate items for each version.
+
+Currently only one module can be multi version.
+
+
+=item B<--multiperl>
+
+Benchmark against multiple perls.
+
+Requires <pm:App::perlbrew> to be installed. Will use installed perls from the
+perlbrew installation. Each installed perl must have <pm:Bencher::Backend>
+module installed (in addition to having all modules that you want to benchmark,
+obviously).
+
+By default, only perls having Bencher::Backend will be included. Use
+`--include-perl` and `--exclude-perl` to include and exclude which perls you
+want.
+
+Also note that due to the way this is currently implemented, benchmark code that
+contains closures (references to variables outside the code) won't work.
+
+
+=item B<--on-failure>=I<s>
+
+What to do when there is a failure.
+
+Valid values:
+
+ ["die","skip"]
+
+For a command participant, failure means non-zero exit code. For a Perl-code
+participant, failure means Perl code dies or (if expected result is specified)
+the result is not equal to the expected result.
+
+The default is "die". When set to "skip", will first run the code of each item
+before benchmarking and trap command failure/Perl exception and if that happens,
+will "skip" the item.
+
+
+=item B<--on-result-failure>=I<s>
+
+What to do when there is a result failure.
+
+Valid values:
+
+ ["die","skip","warn"]
+
+This is like `on_failure` except that it specifically refer to the failure of
+item's result not being equal to expected result.
+
+There is an extra choice of `warn` for this type of failure, which is to print a
+warning to STDERR and continue.
+
+
+=item B<--participant>=I<s>
+
+Add a participant.
+
+See C<--participants>.
+
+=item B<--participants-json>=I<s>
+
+Add participants (JSON-encoded).
+
+See C<--participants>.
+
+=item B<--participants>=I<s>
+
+Add participants.
+
+=item B<--precision-limit>=I<f>
+
+Set precision limit.
+
+Instead of setting `precision` which forces a single value, you can also set
+this `precision_limit` setting. If the precision in the scenario is higher
+(=number is smaller) than this limit, then this limit is used. For example, if
+the scenario specifies `default_precision` 0.001 and `precision_limit` is set to
+0.005 then 0.005 is used.
+
+This setting is useful on slower computers which might not be able to reach the
+required precision before hitting maximum number of iterations.
+
+
+=item B<--precision>=I<f>
+
+Precision.
+
+When benchmarking with the default <pm:Benchmark::Dumb> runner, will pass the
+precision to it. The value is a fraction, e.g. 0.5 (for 5% precision), 0.01 (for
+1% precision), and so on. Or, it can also be a positive integer to speciify
+minimum number of iterations, usually need to be at least 6 to avoid the "Number
+of initial runs is very small (<6)" warning. The default precision is 0, which
+is to let Benchmark::Dumb determine the precision, which is good enough for most
+cases.
+
+When benchmarking with <pm:Benchmark> runner, will pass this value as the
+C<$count> argument. Which can be a positive integer to mean the number of
+iterations to do (e.g. 10, or 100). Or, can also be set to a negative number
+(e.g. -0.5 or -2) to mean minimum number of CPU seconds. The default is -0.5.
+
+When benchmarking with <pm:Benchmark::Dumb::SimpleTime>, this value is a
+positive integer which means the number of iterations to perform.
+
+This setting overrides `default_precision` property in the scenario.
+
+
+=item B<--raw>
+
+Show "raw" data.
+
+When action=show-items-result, will print result as-is instead of dumping as
+Perl.
+
+
+=item B<--runner>=I<s>
+
+Runner module to use.
+
+Valid values:
+
+ ["Benchmark::Dumb","Benchmark","Benchmark::Dumb::SimpleTime"]
+
+The default is `Benchmark::Dumb` which should be good enough for most cases.
+
+You can use `Benchmark` runner (`Benchmark.pm`) if you are accustomed to it and
+want to see its output format.
+
+You can use `Benchmark::Dumb::SimpleTime` if your participant code runs for at
+least a few to many seconds and you want to use very few iterations (like 1 or
+2) because you don't want to wait for too long.
+
+
+=item B<--save-result>
+
+Whether to save benchmark result to file.
+
+Will also be turned on automatically if `BENCHER_RESULT_DIR` environment
+variabl is defined.
+
+When this is turned on, will save a JSON file after benchmark, containing the
+result along with metadata. The directory of the JSON file will be determined
+from the `results_dir` option, while the filename from the `results_filename`
+option.
+
+
+=item B<--scenario-file>=I<s>, B<-f>
+
+Load a scenario from a Perl file.
+
+Perl file will be do()'ed and the last expression should be a hash containing
+the scenario specification.
+
+
+=item B<--scenario-module>=I<s>, B<-m>
+
+Load a scenario from a Bencher::Scenario:: Perl module.
+
+Will try to load module `Bencher::Scenario::<NAME>` and expect to find a package
+variable in the module called `$scenario` which should be a hashref containing
+the scenario specification.
+
+
+=item B<--test>
+
+Whether to test participant code once first before benchmarking.
+
+By default, participant code is run once first for testing (e.g. whether it dies
+or return the correct result) before benchmarking. If your code runs for many
+seconds, you might want to skip this test and set this to 0.
+
+
+=item B<--with-args-size>
+
+Also return memory usage of item's arguments.
+
+Memory size is measured using <pm:Devel::Size>.
+
+
+=item B<--with-process-size>
+
+Also return process size information for each item.
+
+This is done by dumping each item's code into a temporary file and running the
+file with a new perl interpreter process and measuring the process size at the
+end (so it does not need to load Bencher itself or the other items). Currently
+only works on Linux because process size information is retrieved from
+`/proc/PID/smaps`. Not all code can work, e.g. if the code tries to access a
+closure or outside data or extra modules (modules not specified in the
+participant or loaded by the code itself). Usually does not make sense to use
+this on external command participants.
+
+
+=item B<--with-result-size>
+
+Also return memory usage of each item code's result (return value).
+
+Memory size is measured using <pm:Devel::Size>.
+
+
+=item B<-d>=I<s>
+
+Add a dataset.
+
+See C<--datasets>.
+
+=item B<-p>=I<s>
+
+Add a participant.
+
+See C<--participants>.
+
+=back
+
+=head2 Action options
+
+=over
+
+=item B<--action>=I<s>, B<-a>
+
+Default value:
+
+ "bench"
+
+Valid values:
+
+ ["list-perls","list-scenario-modules","show-scenario","list-participants","list-participant-modules","list-datasets","list-items","show-items-codes","show-items-results","show-items-results-sizes","show-items-outputs","dump-items","dump-parsed-scenario","profile","bench"]
+
+=item B<--code-startup>
+
+Benchmark code startup overhead instead of normal benchmark.
+
+=item B<--dump-items>
+
+Shortcut for -a dump-items.
+
+See C<--action>.
+
+=item B<--dump-parsed-scenario>
+
+Shortcut for -a dump-parsed-scenario.
+
+See C<--action>.
+
+=item B<--list-datasets>
+
+Shortcut for -a list-datasets.
+
+See C<--action>.
+
+=item B<--list-items>
+
+Shortcut for -a list-items.
+
+See C<--action>.
+
+=item B<--list-participant-modules>
+
+Shortcut for -a list-participant-modules.
+
+See C<--action>.
+
+=item B<--list-participants>
+
+Shortcut for -a list-participants.
+
+See C<--action>.
+
+=item B<--list-perls>
+
+Shortcut for -a list-perls.
+
+See C<--action>.
+
+=item B<--list-permutes>
+
+Shortcut for -a list-permutes.
+
+See C<--action>.
+
+=item B<--list-scenario-modules>
+
+Shortcut for -a list-scenario-modules.
+
+See C<--action>.
+
+=item B<--module-startup>
+
+Benchmark module startup overhead instead of normal benchmark.
+
+=item B<--profile>
+
+Shortcut for -a profile.
+
+See C<--action>.
+
+=item B<--show-items-codes>
+
+Shortcut for -a show-items-codes.
+
+See C<--action>.
+
+=item B<--show-items-outputs>
+
+Shortcut for -a show-items-outputs.
+
+See C<--action>.
+
+=item B<--show-items-results>
+
+Shortcut for -a show-items-results.
+
+See C<--action>.
+
+=item B<--show-items-results-sizes>
+
+Shortcut for -a show-items-results-sizes.
+
+See C<--action>.
+
+=item B<--show-scenario>
+
+Shortcut for -a show-scenario.
+
+See C<--action>.
+
+=item B<-L>
+
+Shortcut for -a list-scenario-modules.
+
+See C<--action>.
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--exclude-dataset-names>=I<s>
+
+Exclude datasets whose name matches this.
+
+=item B<--exclude-dataset-pattern>=I<s>
+
+Exclude datasets matching this regex pattern.
+
+=item B<--exclude-dataset-seqs>=I<s>
+
+Exclude datasets whose sequence number matches this.
+
+=item B<--exclude-dataset-tags>=I<s>
+
+Exclude datasets whose tag matches this.
+
+You can specify `A & B` to exclude datasets that have _both_ tags A and B.
+
+
+=item B<--exclude-datasets>=I<s>
+
+Exclude datasets whose seq/name matches this.
+
+=item B<--exclude-function-pattern>=I<s>
+
+Exclude function(s) matching this regex pattern.
+
+=item B<--exclude-functions>=I<s>
+
+Exclude functions specified in this list.
+
+=item B<--exclude-item-names>=I<s>
+
+Exclude items whose name matches this.
+
+=item B<--exclude-item-pattern>=I<s>
+
+Exclude items matching this regex pattern.
+
+=item B<--exclude-item-seqs>=I<s>
+
+Exclude items whose sequence number matches this.
+
+=item B<--exclude-items>=I<s>
+
+Exclude items whose seq/name matches this.
+
+=item B<--exclude-module-pattern>=I<s>
+
+Exclude module(s) matching this regex pattern.
+
+=item B<--exclude-modules>=I<s>
+
+Exclude modules specified in this list.
+
+=item B<--exclude-participant-names>=I<s>
+
+Exclude participants whose name matches this.
+
+=item B<--exclude-participant-pattern>=I<s>
+
+Exclude participants matching this regex pattern.
+
+=item B<--exclude-participant-seqs>=I<s>
+
+Exclude participants whose sequence number matches this.
+
+=item B<--exclude-participant-tags>=I<s>
+
+Exclude participants whose tag matches this.
+
+You can specify `A & B` to exclude participants that have _both_ tags A and B.
+
+
+=item B<--exclude-participants>=I<s>
+
+Exclude participants whose seq/name matches this.
+
+=item B<--exclude-perls>=I<s>
+
+Exclude some perls.
+
+=item B<--exclude-pp-modules>, B<--nopp>
+
+Exclude PP (pure-Perl) modules.
+
+=item B<--exclude-xs-modules>, B<--noxs>
+
+Exclude XS modules.
+
+=item B<--include-dataset-names>=I<s>
+
+Only include datasets whose name matches this.
+
+=item B<--include-dataset-pattern>=I<s>
+
+Only include datasets matching this regex pattern.
+
+=item B<--include-dataset-seqs>=I<s>
+
+Only include datasets whose sequence number matches this.
+
+=item B<--include-dataset-tags>=I<s>
+
+Only include datasets whose tag matches this.
+
+You can specify `A & B` to include datasets that have _both_ tags A and B.
+
+
+=item B<--include-datasets>=I<s>
+
+Only include datasets whose seq/name matches this.
+
+=item B<--include-function-pattern>=I<s>
+
+Only include functions matching this regex pattern.
+
+=item B<--include-functions>=I<s>
+
+Only include functions specified in this list.
+
+=item B<--include-item-names>=I<s>
+
+Only include items whose name matches this.
+
+=item B<--include-item-pattern>=I<s>
+
+Only include items matching this regex pattern.
+
+=item B<--include-item-seqs>=I<s>
+
+Only include items whose sequence number matches this.
+
+=item B<--include-items>=I<s>
+
+Only include items whose seq/name matches this.
+
+=item B<--include-module-pattern>=I<s>
+
+Only include modules matching this regex pattern.
+
+=item B<--include-modules>=I<s>
+
+Only include modules specified in this list.
+
+=item B<--include-participant-names>=I<s>
+
+Only include participants whose name matches this.
+
+=item B<--include-participant-pattern>=I<s>
+
+Only include participants matching this regex pattern.
+
+=item B<--include-participant-seqs>=I<s>
+
+Only include participants whose sequence number matches this.
+
+=item B<--include-participant-tags>=I<s>
+
+Only include participants whose tag matches this.
+
+You can specify `A & B` to include participants that have _both_ tags A and B.
+
+
+=item B<--include-participants>=I<s>
+
+Only include participants whose seq/name matches this.
+
+=item B<--include-perls>=I<s>
+
+Only include some perls.
+
+=back
+
+=head2 Format options
+
+=over
+
+=item B<--scientific-notation>
+
+=item B<--sorts>=I<s>
+
+Default value:
+
+ ["-time"]
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Result options
+
+=over
+
+=item B<--note>=I<s>
+
+Put additional note in the result.
+
+=item B<--result-dir>=I<dirname>
+
+Directory to use when saving benchmark result.
+
+Default is from `BENCHER_RESULT_DIR` environment variable, or the home
+directory.
+
+
+=item B<--result-filename>=I<filename>
+
+Filename to use when saving benchmark result.
+
+Default is:
+
+    <NAME>.<yyyy-dd-dd-"T"HH-MM-SS>.json
+
+or, when running in module startup mode:
+
+    <NAME>.module_startup.<yyyy-dd-dd-"T"HH-MM-SS>.json
+
+or, when running in code startup mode:
+
+    <NAME>.code_startup.<yyyy-dd-dd-"T"HH-MM-SS>.json
+
+where <NAME> is scenario module name, or `NO_MODULE` if scenario is not from a
+module. The `::` (double colon in the module name will be replaced with `-`
+(dash).
+
+
+=item B<--return-meta>
+
+Whether to return extra metadata.
+
+When set to true, will return extra metadata such as platform information, CPU
+information, system load before & after the benchmark, system time, and so on.
+This is put in result metadata under `func.*` keys.
+
+The default is to true (return extra metadata) unless when run as CLI and format
+is text (where the extra metadata is not shown).
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bencher bencher
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bencher 'p/*/`bencher`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/bencher.conf>, F<~/bencher.conf>, or F</etc/bencher.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+ action (see --action)
+ capture_stderr (see --capture-stderr)
+ capture_stdout (see --capture-stdout)
+ code_startup (see --code-startup)
+ datasets (see --datasets)
+ detail (see --detail)
+ env_hashes (see --env-hashes)
+ exclude_dataset_names (see --exclude-dataset-names)
+ exclude_dataset_pattern (see --exclude-dataset-pattern)
+ exclude_dataset_seqs (see --exclude-dataset-seqs)
+ exclude_dataset_tags (see --exclude-dataset-tags)
+ exclude_datasets (see --exclude-datasets)
+ exclude_function_pattern (see --exclude-function-pattern)
+ exclude_functions (see --exclude-functions)
+ exclude_item_names (see --exclude-item-names)
+ exclude_item_pattern (see --exclude-item-pattern)
+ exclude_item_seqs (see --exclude-item-seqs)
+ exclude_items (see --exclude-items)
+ exclude_module_pattern (see --exclude-module-pattern)
+ exclude_modules (see --exclude-modules)
+ exclude_participant_names (see --exclude-participant-names)
+ exclude_participant_pattern (see --exclude-participant-pattern)
+ exclude_participant_seqs (see --exclude-participant-seqs)
+ exclude_participant_tags (see --exclude-participant-tags)
+ exclude_participants (see --exclude-participants)
+ exclude_perls (see --exclude-perls)
+ exclude_pp_modules (see --exclude-pp-modules)
+ exclude_xs_modules (see --exclude-xs-modules)
+ format (see --format)
+ include_dataset_names (see --include-dataset-names)
+ include_dataset_pattern (see --include-dataset-pattern)
+ include_dataset_seqs (see --include-dataset-seqs)
+ include_dataset_tags (see --include-dataset-tags)
+ include_datasets (see --include-datasets)
+ include_function_pattern (see --include-function-pattern)
+ include_functions (see --include-functions)
+ include_item_names (see --include-item-names)
+ include_item_pattern (see --include-item-pattern)
+ include_item_seqs (see --include-item-seqs)
+ include_items (see --include-items)
+ include_module_pattern (see --include-module-pattern)
+ include_modules (see --include-modules)
+ include_participant_names (see --include-participant-names)
+ include_participant_pattern (see --include-participant-pattern)
+ include_participant_seqs (see --include-participant-seqs)
+ include_participant_tags (see --include-participant-tags)
+ include_participants (see --include-participants)
+ include_path (see --include-path)
+ include_perls (see --include-perls)
+ log_level (see --log-level)
+ module_startup (see --module-startup)
+ multimodver (see --multimodver)
+ multiperl (see --multiperl)
+ naked_res (see --naked-res)
+ note (see --note)
+ on_failure (see --on-failure)
+ on_result_failure (see --on-result-failure)
+ participants (see --participants)
+ precision (see --precision)
+ precision_limit (see --precision-limit)
+ raw (see --raw)
+ result_dir (see --result-dir)
+ result_filename (see --result-filename)
+ return_meta (see --return-meta)
+ runner (see --runner)
+ save_result (see --save-result)
+ scenario_file (see --scenario-file)
+ scenario_module (see --scenario-module)
+ scientific_notation (see --scientific-notation)
+ sorts (see --sorts)
+ test (see --test)
+ with_args_size (see --with-args-size)
+ with_process_size (see --with-process-size)
+ with_result_size (see --with-result-size)
+
+=head1 ENVIRONMENT
+
+=head2 BENCHER_OPT => str
+
+Specify additional command-line options.
+
+=head2 BENCHER_RESULT_DIR => str
+
+Set default for C<--results-dir>.
+
+=head1 FILES
+
+F<~/.config/bencher.conf>
+
+F<~/bencher.conf>
+
+F</etc/bencher.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Bencher>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Bencher>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<bencher-tiny> if you want a simpler CLI with no non-core dependencies.
+
+L<Bencher>
+
+L<Bencher::Backend>
+
+C<Bencher::Manual::*>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

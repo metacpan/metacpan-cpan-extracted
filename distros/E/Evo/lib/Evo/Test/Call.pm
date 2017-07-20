@@ -24,7 +24,7 @@ Evo::Test::Call
 
 =head1 VERSION
 
-version 0.0403
+version 0.0405
 
 =head1 AUTHOR
 

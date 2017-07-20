@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# TODO support --lang=...
+
+exec "testml-${TESTML_LANG:-perl5}" "$@"

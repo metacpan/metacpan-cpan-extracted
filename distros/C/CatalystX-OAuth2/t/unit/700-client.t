@@ -1,7 +1,6 @@
 use strictures 1;
 use Test::More;
 use Test::MockObject;
-use CatalystX::Test::MockContext;
 use HTTP::Request::Common;
 use JSON::Any;
 use lib 't/lib';
@@ -30,10 +29,11 @@ sub store        { push @called, [ 'store',        [@_] ]; $store }
 
 package main;
 
-my $mock = mock_context('ClientApp');
+use Catalyst::Test 'ClientApp';
 
 {
-  my $c     = $mock->( GET '/' );
+  my ($res2, $c) = ctx_request('/');
+
   my $realm = Test::Mock::Realm->new;
   my $cred  = Catalyst::Authentication::Credential::OAuth2->new(
     { grant_uri     => 'http://server.foo/grant',
@@ -95,9 +95,11 @@ my $j = JSON::Any->new;
     }
   );
   $ua->mock( get => sub {$res} );
+  $ua->mock( request => sub {$res} );
   my $uri = URI->new('/');
   $uri->query_form( { code => 'foocode' } );
-  my $c    = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
+
   my $user = Test::MockObject->new;
   $user->mock( for_session => sub { { foo => 'bar' } } );
   my $realm = Test::Mock::Realm->new;
@@ -112,9 +114,9 @@ my $j = JSON::Any->new;
     ClientApp => $realm
   );
   is_deeply( [ map { $_->name } $realm->meta->calculate_all_roles ],
-    [qw(CatalystX::OAuth2::ClientInjector)] );
+    [qw(CatalystX::OAuth2::ClientInjector)], 'fff' );
 
-  ok( my $oauth2_user = $cred->authenticate( $c, $realm, {} ) );
+  ok( my $oauth2_user = $cred->authenticate( $c, $realm, {} ), 'dddd' );
   is_deeply( [ map { $_->name } $user->meta->calculate_all_roles ],
     [qw(CatalystX::OAuth2::ClientContainer)] );
   isa_ok( $oauth2_user->oauth2, 'CatalystX::OAuth2::Client' );

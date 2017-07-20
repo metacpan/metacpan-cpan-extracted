@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Prty::Database::Connection;
+
 # -----------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
@@ -16,7 +18,7 @@ sub initMethod : Init(1) {
 
     # FIXME: Test sollte anders aussehen: Je UDL, einen Foreach-Zweig abbrechen
 
-    eval { require DBI };
+    eval {require DBI};
     if ($@) {
         $self->skipAllTests('DBI nicht installiert');
         return;

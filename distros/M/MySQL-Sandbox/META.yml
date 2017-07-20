@@ -8,7 +8,7 @@ generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: MySQL-Sandbox
 no_index:
   directory:
@@ -16,4 +16,4 @@ no_index:
     - inc
 resources:
   repository: git://github.com/datacharmer/mysql-sandbox.git
-version: v3.2.10
+version: v3.2.12

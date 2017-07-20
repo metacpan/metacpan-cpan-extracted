@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Prty::Database::Connection;
+
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {
@@ -14,11 +16,6 @@ sub test_loadClass : Init(1) {
 }
 
 # -----------------------------------------------------------------------------
-
-# DER FOLGENDE CODE IST EINE VORBEREITUNG AUF EINEN UNIT-TEST
-# DIESER IST NOCH NICHT IMPLEMENTIERT
-
-# Tests der Klasse über verschiedenen DBMSen laufen lassen
 
 sub udls : Foreach {
     my $self = shift;

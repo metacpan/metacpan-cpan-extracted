@@ -118,11 +118,10 @@ extern const char* const SPVM_OP_C_CODE_NAMES[];
 
 enum {
   // Block flag
-  SPVM_OP_C_FLAG_BLOCK_IF_TURE = 1,
+  SPVM_OP_C_FLAG_BLOCK_IF_TRUE = 1,
   SPVM_OP_C_FLAG_BLOCK_IF_FALSE = 2,
   SPVM_OP_C_FLAG_BLOCK_LOOP = 4,
   SPVM_OP_C_FLAG_BLOCK_SWITCH = 8,
-  SPVM_OP_C_FLAG_BLOCK_HAS_ELSE = 16,
   SPVM_OP_C_FLAG_BLOCK_SUB = 32,
   SPVM_OP_C_FLAG_BLOCK_EVAL = 64,
 };
@@ -228,13 +227,8 @@ SPVM_OP* SPVM_OP_new_op_constant_double(SPVM_COMPILER* compiler, double value, c
 SPVM_OP* SPVM_OP_new_op_var_from_op_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_my_var);
 SPVM_OP* SPVM_OP_new_op_list(SPVM_COMPILER* compiler, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op(SPVM_COMPILER* compiler, int32_t code, const char* file, int32_t line);
+void SPVM_OP_insert_child(SPVM_COMPILER* compiler, SPVM_OP* parent, SPVM_OP* start, SPVM_OP* insert);
 
-SPVM_OP* SPVM_OP_sibling_splice(SPVM_COMPILER* compiler, SPVM_OP* parent, SPVM_OP* start, int32_t del_count, SPVM_OP *insert);
 SPVM_OP* SPVM_OP_sibling(SPVM_COMPILER* compiler, SPVM_OP* o);
-void SPVM_OP_moresib_set(SPVM_COMPILER* compiler, SPVM_OP* o, SPVM_OP* sib);
-void SPVM_OP_lastsib_set(SPVM_COMPILER* compiler, SPVM_OP* o, SPVM_OP* parent);
-void SPVM_OP_maybesib_set(SPVM_COMPILER* compiler, SPVM_OP* o, SPVM_OP* sib, SPVM_OP* parent);
-SPVM_OP* SPVM_OP_append_elem(SPVM_COMPILER* compiler, SPVM_OP *first, SPVM_OP *last, const char* file, int32_t line);
-
 
 #endif

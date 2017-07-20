@@ -4,11 +4,10 @@ use B;
 
 require 5.005_62;
 use strict;
-use warnings;
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 bootstrap B::Flags $VERSION;
 

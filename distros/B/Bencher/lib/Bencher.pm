@@ -1,7 +1,7 @@
 package Bencher;
 
-our $DATE = '2017-01-25'; # DATE
-our $VERSION = '1.028'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '1.040'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -18,7 +18,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.028 of Bencher (from Perl distribution Bencher), released on 2017-01-25.
+This document describes version 1.040 of Bencher (from Perl distribution Bencher), released on 2017-07-13.
 
 =head1 SYNOPSIS
 
@@ -339,6 +339,8 @@ seconds, you might want to skip this test and set this to 0.
 
 =item * module_startup (bool)
 
+=item * code_startup (bool)
+
 =item * default_precision (float, between=>[0,1])
 
 Precision to pass to Benchmark::Dumb. Default is 0. Can be overriden via
@@ -530,6 +532,29 @@ You can use this hook to, e.g.: modify the result in some way.
 
 =head2 Running benchmark
 
+=head2 Running benchmark in code startup mode
+
+Code startup mode can be activated either by specifying C<--code-startup> option
+from the command-line, or by setting C<code_startup> property to true in the
+scenario.
+
+In this mode, instead of running participant's perl code, it runs a perl
+command:
+
+ perl -e 'YOUR_PERL_CODE'
+
+or if there are modules to be loaded:
+
+ perl -MModule1 -MModule2 ... -e 'YOUR_PERL_CODE'
+
+and then comparing the time with the baseline:
+
+ perl -e1
+
+and measure the startup overhead of each code.
+
+See also C<module_startup> mode.
+
 =head2 Running benchmark in module startup mode
 
 Module startup mode can be activated either by specifying C<--module-startup>
@@ -621,7 +646,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

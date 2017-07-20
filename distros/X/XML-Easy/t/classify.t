@@ -11,6 +11,7 @@ BEGIN {
 	);
 }
 
+BEGIN { unshift @INC, "./t/lib"; }
 use t::DataSets (map { ("COUNT_$_", "foreach_$_") }
 			map { ("yes_$_", "no_$_") } @things);
 use t::ErrorCases (map { ("COUNT_error_$_", "test_error_$_") } @things);

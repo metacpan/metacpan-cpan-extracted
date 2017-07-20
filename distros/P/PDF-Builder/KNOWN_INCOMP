@@ -7,7 +7,7 @@ Bug fixes to PDF::API2 (in PDF::Builder) are not mentioned if they correct
 an error (that produces an error message and/or incorrect output) and do not 
 affect the operation or results of otherwise correct code.
 
-3.004     2017-06-17
+3.004     2017-07-12
 
    No known incompatibilities added.
 

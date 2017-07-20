@@ -4,13 +4,13 @@
       "Cosimo Streppone <cosimo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.142690",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Net-Prober",
    "prereqs" : {
@@ -52,6 +52,7 @@
          "web" : "http://github.com/cosimo/perl5-net-prober"
       }
    },
-   "version" : "0.16"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

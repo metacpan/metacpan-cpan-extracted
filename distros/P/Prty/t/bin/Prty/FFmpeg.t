@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Prty::ExampleCode;
+
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {

@@ -41,6 +41,25 @@ INSTALLATION
 
     Restart your webserver
 
+METHODS
+  ProcessAssetSearchFormatConfig
+    Process the $AssetSearchFormat configuration value.
+
+    AssetSQL uses the search formats defined via $AssetSearchFormat to
+    format search results. This option accepts one format to use for all
+    assets or a hashref with formats defined per catalog. This function
+    processes the configuration option and returns the appropriate format.
+
+    For the hashref version, AssetSQL looks only for the key
+    AssetSearchFormat for the default search format. To customize the format
+    of the search results for individual searches, use the Advanced tab in
+    the Query Builder.
+
+    See RT's documentation for $AssetSearchFormat in RT_Config.pm for
+    details on setting the search format.
+
+    Returns: string with a search format
+
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
 

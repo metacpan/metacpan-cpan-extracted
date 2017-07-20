@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Core Alien::Build plugin to maintain compatibility with legacy Alien::Base
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
 sub init
@@ -52,7 +52,7 @@ Alien::Build::Plugin::Core::Legacy - Core Alien::Build plugin to maintain compat
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 

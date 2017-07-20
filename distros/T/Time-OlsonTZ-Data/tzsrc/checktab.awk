@@ -1,6 +1,6 @@
 # Check tz tables for consistency.
 
-# Contributed by Paul Eggert.
+# Contributed by Paul Eggert.  This file is in the public domain.
 
 BEGIN {
 	FS = "\t"
@@ -8,43 +8,6 @@ BEGIN {
 	if (!iso_table) iso_table = "iso3166.tab"
 	if (!zone_table) zone_table = "zone1970.tab"
 	if (!want_warnings) want_warnings = -1
-
-	# A special (and we hope temporary) case.
-	tztab["America/Montreal"] = 1
-
-	# Some more special cases; these are zones that should probably
-	# be turned into links.
-	if (zone_table == "zone1970.tab") {
-	  tztab["Africa/Addis_Ababa"] = 1
-	  tztab["Africa/Asmara"] = 1
-	  tztab["Africa/Blantyre"] = 1
-	  tztab["Africa/Bujumbura"] = 1
-	  tztab["Africa/Dar_es_Salaam"] = 1
-	  tztab["Africa/Djibouti"] = 1
-	  tztab["Africa/Gaborone"] = 1
-	  tztab["Africa/Harare"] = 1
-	  tztab["Africa/Kampala"] = 1
-	  tztab["Africa/Kigali"] = 1
-	  tztab["Africa/Lubumbashi"] = 1
-	  tztab["Africa/Lusaka"] = 1
-	  tztab["Africa/Maseru"] = 1
-	  tztab["Africa/Mbabane"] = 1
-	  tztab["Africa/Mogadishu"] = 1
-	  tztab["America/Antigua"] = 1
-	  tztab["America/Cayman"] = 1
-	  tztab["Asia/Aden"] = 1
-	  tztab["Asia/Bahrain"] = 1
-	  tztab["Asia/Ho_Chi_Minh"] = 1
-	  tztab["Asia/Kuwait"] = 1
-	  tztab["Asia/Muscat"] = 1
-	  tztab["Asia/Phnom_Penh"] = 1
-	  tztab["Asia/Vientiane"] = 1
-	  tztab["Indian/Antananarivo"] = 1
-	  tztab["Indian/Comoro"] = 1
-	  tztab["Indian/Mayotte"] = 1
-	  tztab["Pacific/Midway"] = 1
-	  tztab["Pacific/Saipan"] = 1
-	}
 
 	while (getline <iso_table) {
 		iso_NR++
@@ -75,7 +38,7 @@ BEGIN {
 		}
 		cc0 = cc
 		if (name2cc[name]) {
-			printf "%s:%d: '%s' and '%s' have the sname name\n", \
+			printf "%s:%d: '%s' and '%s' have the same name\n", \
 				iso_table, iso_NR, name2cc[name], cc \
 				>>"/dev/stderr"
 			status = 1
@@ -149,6 +112,7 @@ BEGIN {
 	    printf "%s:%d: missing comment for %s\n", \
 	      zone_table, tz2NR[tz], comments_needed[tz] \
 	      >>"/dev/stderr"
+	    tz2comments[tz] = 1
 	    status = 1
 	  }
 	}

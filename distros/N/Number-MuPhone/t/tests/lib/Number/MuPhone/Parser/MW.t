@@ -1,4 +1,4 @@
-use strictures 2;
+use 5.012;
 use Test::More;
 
 use_ok('Number::MuPhone::Parser::MW');

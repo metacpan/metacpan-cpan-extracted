@@ -199,6 +199,7 @@ t/lib/upgradable_registries/vertica.sql
 t/linelist.t
 t/local.conf
 t/log.t
+t/mooseless.t
 t/multiplan.conf
 t/mysql.t
 t/options.t

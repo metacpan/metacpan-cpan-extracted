@@ -26,30 +26,30 @@ no_index:
 provides:
   Mojo::SQLite:
     file: lib/Mojo/SQLite.pm
-    version: '2.002'
+    version: '3.000'
   Mojo::SQLite::Database:
     file: lib/Mojo/SQLite/Database.pm
-    version: '2.002'
+    version: '3.000'
   Mojo::SQLite::Migrations:
     file: lib/Mojo/SQLite/Migrations.pm
-    version: '2.002'
+    version: '3.000'
   Mojo::SQLite::PubSub:
     file: lib/Mojo/SQLite/PubSub.pm
-    version: '2.002'
+    version: '3.000'
     x_deprecated: 1
   Mojo::SQLite::Results:
     file: lib/Mojo/SQLite/Results.pm
-    version: '2.002'
+    version: '3.000'
   Mojo::SQLite::Transaction:
     file: lib/Mojo/SQLite/Transaction.pm
-    version: '2.002'
+    version: '3.000'
 requires:
   Carp: '0'
   DBD::SQLite: '1.50'
   DBI: '1.627'
   File::Spec::Functions: '0'
   File::Temp: '0'
-  Mojolicious: '7.15'
+  Mojolicious: '7.32'
   SQL::Abstract: '1.81'
   Scalar::Util: '0'
   URI: '1.69'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-SQLite/issues
   homepage: https://github.com/Grinnz/Mojo-SQLite
   repository: https://github.com/Grinnz/Mojo-SQLite.git
-version: '2.002'
+version: '3.000'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -113,7 +113,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.5.5
+          git_version: 2.9.4
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -145,7 +145,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
       version: '2.042'
@@ -198,7 +198,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -211,11 +211,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.002
+          tag: v3.000
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -246,7 +246,7 @@ x_Dist_Zilla:
             - (?^:^(?:lib|script|bin)/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -260,7 +260,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
       version: '2.042'

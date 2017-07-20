@@ -1,6 +1,7 @@
 .cvsignore$
 ^.lwpcookies
 ^.releaserc
+^.travis.yml
 ^.git/
 ^blib/
 ^Finance-Bank-Postbank_de-.*

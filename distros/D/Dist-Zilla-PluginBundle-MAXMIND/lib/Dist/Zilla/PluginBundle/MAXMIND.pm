@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 use Dist::Zilla 6.0;
 
@@ -822,7 +822,7 @@ Dist::Zilla::PluginBundle::MAXMIND - MAXMIND's plugin bundle
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =head1 SYNOPSIS
 
@@ -1108,7 +1108,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Greg Oschwald Mark Fowler Olaf Alders
+=for stopwords Dave Rolsky Greg Oschwald Mark Fowler Olaf Alders Patrick Cronin
 
 =over 4
 
@@ -1127,6 +1127,14 @@ Mark Fowler <mark@twoshortplanks.com>
 =item *
 
 Olaf Alders <oalders@maxmind.com>
+
+=item *
+
+Patrick Cronin <PatrickCronin@users.noreply.github.com>
+
+=item *
+
+Patrick Cronin <pcronin@maxmind.com>
 
 =back
 

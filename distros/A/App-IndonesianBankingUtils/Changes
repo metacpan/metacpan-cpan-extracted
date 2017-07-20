@@ -1,3 +1,15 @@
+0.12    2017-07-18 (PERLANCAR)
+
+	- Make log level configurable using Log::ger::LevelFromEnv.
+
+
+0.11    2017-07-14 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with packing updated modules.
+
+
 0.10    2017-07-01 (PERLANCAR)
 
 	- Replace Log::Any with Log::ger.

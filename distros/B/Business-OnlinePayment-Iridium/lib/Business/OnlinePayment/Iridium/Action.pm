@@ -6,8 +6,12 @@ use LWP::UserAgent ();
 use HTTP::Request  ();
 use XML::Simple    ();
 
+# PODNAME: Business::OnlinePayment::Iridium::Action
+# ABSTRACT: Send / receive data to / from PayVector
+
+
 sub SERVERS {
-    return ( 'https://gw1.iridiumcorp.net/', 'https://gw2.iridiumcorp.net/' );
+    return ( 'https://gw1.iridiumcorp.net/', 'https://gw2.iridiumcorp.net/', 'https://gw3.iridiumcorp.net/' );
 }
 
 has 'MerchantID' => (
@@ -67,6 +71,7 @@ sub _build_req_content {
     return $output;
 }
 
+
 sub request {
     my $self       = shift;
     my $content    = $self->_build_req_content;
@@ -97,6 +102,7 @@ sub request {
     }
 }
 
+
 sub parse_response {
     my ( $self, $content ) = @_;
     my $parser = XML::Simple->new;
@@ -104,3 +110,42 @@ sub parse_response {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Business::OnlinePayment::Iridium::Action - Send / receive data to / from PayVector
+
+=head1 VERSION
+
+version 1.01
+
+=head2 SERVERS
+
+List of 3 servers to send payment attempts to
+
+=head2 request
+
+Send our request to PayVector
+
+=head2 parse_response
+
+Turn the PayVector response into XML
+
+=head1 AUTHOR
+
+[ 'Gavin Henry <ghenry@surevoip.co.uk>', 'Wallace Reis <reis.wallace@gmail.com>' ]
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by [ 'Gavin Henry', 'Wallace Reis' ].
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

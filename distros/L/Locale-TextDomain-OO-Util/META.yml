@@ -8,8 +8,6 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0'
   Test::NoWarnings: '0'
-configure_requires:
-  Module::Build: '0.42'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
 license: perl
@@ -20,7 +18,7 @@ name: Locale-TextDomain-OO-Util
 provides:
   Locale::TextDomain::OO::Util:
     file: lib/Locale/TextDomain/OO/Util.pm
-    version: '3.006'
+    version: '3.008'
   Locale::TextDomain::OO::Util::Constants:
     file: lib/Locale/TextDomain/OO/Util/Constants.pm
     version: '3.004'
@@ -38,7 +36,6 @@ recommends:
   Test::Pod::Coverage: '1.04'
 requires:
   Carp: '0'
-  Clone: '0'
   English: '0'
   Safe: '0'
   charnames: '0'
@@ -46,5 +43,5 @@ requires:
   perl: '5.006'
 resources:
   license: http://dev.perl.org/licenses/
-version: '3.006'
+version: '3.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

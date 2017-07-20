@@ -1,5 +1,5 @@
 ---
-abstract: 'Class library in Perl'
+abstract: 'Class library'
 author:
   - 'Frank Seitz <fs@fseitz.de>'
 build_requires:
@@ -22,7 +22,7 @@ requires:
   DBI: '0'
   DB_File: '0'
   Data::Printer: '0'
-  File::Rsync: '0'
+  File::Rsync: '0.49'
   HTTP::Request: '0'
   Image::Size: '0'
   JSON: '0'
@@ -33,8 +33,8 @@ requires:
   WWW::Mechanize: '0'
   XML::LibXML: '0'
   XML::Twig: '0'
-  perl: '5.010001'
+  perl: '5.010000'
 resources:
   repository: https://github.com/s31tz/Prty.git
-version: 1.117
+version: 1.119
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

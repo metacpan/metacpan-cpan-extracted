@@ -1,7 +1,7 @@
 package App::depak;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.55'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.57'; # VERSION
 
 use 5.010001;
 use strict;
@@ -350,6 +350,7 @@ sub _pack {
     my $res;
     $pack_args{preamble}  = "$shebang\n\n";
     $pack_args{postamble} = "\n$script";
+    $pack_args{put_hook_at_the_end} = $self->{put_hook_at_the_end};
     if ($self->{pack_method} eq 'datapack') {
         require Module::DataPack;
         $res = Module::DataPack::datapack_modules(
@@ -395,7 +396,7 @@ sub _test {
         my $output = Capture::Tiny::capture_merged(
             sub {
                 IPC::System::Options::system({log=>0, shell=>0}, @cmd);
-                $exit = $?;
+                $exit = $? >> 8;
             }
         );
         my $expected_exit = $case->{exit_code} // 0;
@@ -591,6 +592,20 @@ contain data section of its own.
 
 _
             tags => ['category:packing'],
+        },
+        put_hook_at_the_end => {
+            summary => 'Prefer modules from other sources (filesystem) first',
+            schema => 'bool*',
+            description => <<'_',
+
+Normally, the `fatpack` or `datapack` require hook will be put at the front of
+`@INC`. If this option is set to true, the require hook will be put at the end.
+This means Perl will search modules from the regular sources (filesystem) first.
+This is useful for example if you want your application to use the possibly
+newer version of modules on the filesystem before using the packed version as
+the fallback when some modules are not installed.
+
+_
         },
         trace_method => {
             summary => "Which method to use to trace dependencies",
@@ -850,6 +865,11 @@ sub depak {
         File::Path::remove_tree($tempdir);
     }
 
+    if ($self->{test}) {
+        log_info("Testing ...");
+        $self->_test;
+    }
+
     if ($self->{input_file_is_stdin}) {
         unlink $self->{abs_input_file};
     }
@@ -860,98 +880,17 @@ sub depak {
         unlink $self->{abs_output_file};
     }
 
-    if ($self->{test}) {
-        log_info("Testing ...");
-        $self->_test;
-    }
-
     [200, "OK", undef, {
         'func.included_modules' => $self->{_included_modules},
     }];
 }
 
 # IFBUILT
-sub _add_stripper_args_to_meta {
-    my $meta = shift;
-
-    # already added
-    $meta->{args}{stripper} and return [304];
-
-    $meta->{args}{stripper} = {
-        summary => 'Whether to strip included modules using Perl::Stripper',
-        'summary.alt.bool.yes' => 'Strip included modules using Perl::Stripper',
-        schema => ['bool' => default=>0],
-        tags => ['category:stripping'],
-    };
-
-    $meta->{args}{stripper_maintain_linum} = {
-        summary => "Set maintain_linum=1 in Perl::Stripper",
-        schema => ['bool'],
-        default => 0,
-        tags => ['category:stripping'],
-    };
-
-    $meta->{args}{stripper_ws} = {
-        summary => "Set strip_ws=1 (strip whitespace) in Perl::Stripper",
-        'summary.alt.bool.not' => "Set strip_ws=0 (don't strip whitespace) in Perl::Stripper",
-        schema => ['bool'],
-        default => 1,
-        tags => ['category:stripping'],
-    };
-
-    $meta->{args}{stripper_comment} = {
-        summary => "Set strip_comment=1 (strip comments) in Perl::Stripper",
-        'summary.alt.bool.not' => "Set strip_comment=0 (don't strip comments) in Perl::Stripper",
-        schema => ['bool'],
-        default => 1,
-        tags => ['category:stripping'],
-    };
-
-    $meta->{args}{stripper_pod} = {
-        summary => "Set strip_pod=1 (strip POD) in Perl::Stripper",
-        'summary.alt.bool.not' => "Set strip_pod=0 (don't strip POD) in Perl::Stripper",
-        schema => ['bool'],
-        default => 1,
-        tags => ['category:stripping'],
-    };
-
-    $meta->{args}{stripper_log} = {
-        summary => "Set strip_log=1 (strip log statements) in Perl::Stripper",
-        'summary.alt.bool.not' => "Set strip_log=0 (don't strip log statements) in Perl::Stripper",
-        schema => ['bool'],
-        default => 0,
-        tags => ['category:stripping'],
-    };
-
-    # XXX strip_log_levels
-
-    $meta->{args_rels} //= {};
-    my $ar = $meta->{args_rels};
-    my $prop;
-    if ($ar->{'dep_any&'}) {
-        $prop = $ar->{'dep_any&'};
-    } elsif (ref($ar->{'dep_any'}) eq 'ARRAY' && ($ar->{'dep_any.op'} // '') eq 'and') {
-        $prop = $ar->{'dep_any'};
-    } elsif (!$ar->{'dep_any'}) {
-        $ar->{'dep_any'} = [];
-        $ar->{'dep_any.op'} = 'and';
-        $prop = $ar->{'dep_any'};
-    }
-    if ($prop) {
-        push @$prop, [stripper_maintain_linum => [qw/stripper/]];
-        push @$prop, [stripper_ws             => [qw/stripper/]];
-        push @$prop, [stripper_log            => [qw/stripper/]];
-        push @$prop, [stripper_pod            => [qw/stripper/]];
-        push @$prop, [stripper_comment        => [qw/stripper/]];
-    }
-
-    [200];
-}
-
-_add_stripper_args_to_meta($SPEC{depak});
+## INSERT_BLOCK: PERLANCAR::AppUtil::PerlStripper _add_stripper_args_to_meta
+#_add_stripper_args_to_meta($SPEC{depak});
 # END IFBUILT
 # IFUNBUILT
-# require PERLANCAR::AppUtil::PerlStripper; PERLANCAR::AppUtil::PerlStripper::_add_stripper_args_to_meta($SPEC{depak});
+require PERLANCAR::AppUtil::PerlStripper; PERLANCAR::AppUtil::PerlStripper::_add_stripper_args_to_meta($SPEC{depak});
 # END IFUNBUILT
 
 1;
@@ -969,7 +908,7 @@ App::depak - Pack your dependencies onto your script file
 
 =head1 VERSION
 
-This document describes version 0.55 of App::depak (from Perl distribution App-depak), released on 2017-07-10.
+This document describes version 0.57 of App::depak (from Perl distribution App-depak), released on 2017-07-14.
 
 =head1 SYNOPSIS
 
@@ -1132,6 +1071,17 @@ Perl version to target, defaults to current running version.
 This is for determining which modules are considered core and should be skipped
 by default (when C<exclude_core> option is enabled). Different perl versions have
 different sets of core modules as well as different versions of the modules.
+
+=item * B<put_hook_at_the_end> => I<bool>
+
+Prefer modules from other sources (filesystem) first.
+
+Normally, the C<fatpack> or C<datapack> require hook will be put at the front of
+C<@INC>. If this option is set to true, the require hook will be put at the end.
+This means Perl will search modules from the regular sources (filesystem) first.
+This is useful for example if you want your application to use the possibly
+newer version of modules on the filesystem before using the packed version as
+the fallback when some modules are not installed.
 
 =item * B<shebang> => I<str> (default: "/usr/bin/perl")
 

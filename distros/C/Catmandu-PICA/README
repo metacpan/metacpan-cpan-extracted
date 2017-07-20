@@ -23,11 +23,17 @@ CATMANDU MODULES
 
       * Catmandu::Fix::pica_map
 
+      * Catmandu::Fix::pica_add
+
+      * Catmandu::Fix::pica_set
+
 CONTRIBUTORS
 
     Johann Rolschewski, <jorol@cpan.org>
 
     Jakob Voß <voss@gbv.de>
+
+    Carsten Klee <klee@cpan.org>
 
 COPYRIGHT
 

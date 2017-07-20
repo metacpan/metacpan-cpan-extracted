@@ -7,7 +7,7 @@ use XML::LibXML::XPathContext;
 
 use strict;
 
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 
 sub new {
 	my $class = shift;

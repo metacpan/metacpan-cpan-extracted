@@ -1,5 +1,15 @@
 Revision history for App-perlminlint
 
+0.24   2017-07-16
+     - Add elisp mode-line alert coloring.
+     - Add sigtrap
+     - [GH #10] Use `perl -Mstrict` by default.
+     - [GH #9] Use `perl -C` by default.
+     - [GH #7] set x_static_install
+     - [GH #8] add local/lib/perl5 to @INC
+     - [GH #6] Add Widechar ModuleName handling.
+     - [GH #5] correct docs for `*.pm` case.
+
 0.23   2016-04-20
      - Add --dryrun(-n) and --verbose(-v) options
      - [GH #4] per-directory config file (.perlminlint.yml)

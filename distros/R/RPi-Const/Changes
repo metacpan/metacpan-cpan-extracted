@@ -1,0 +1,21 @@
+Revision history for RPi-Const
+
+1.02    2017-07-13
+        - re-released RPi::WiringPi::Constant as RPi::Const
+
+1.01    2017-07-08
+        - added new tag :pwm_mode that contains the values for setting the PWM
+          mode to either MS (mark-space) or BAL (balanced) mode
+
+1.00    2017-06-24
+        - added new tag :altmode that contains the value for the Pi pin ALT
+          modes
+
+0.02    unknown
+        - added edge detection constants
+        - added PUD constants
+        - added setup mode constants
+
+0.01    unknown
+        - first version, released on an unsuspecting world.
+

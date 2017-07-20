@@ -1,0 +1,30 @@
+
+PDF::Builder is a fork (July, 2017) of the popular PDF::API2 Perl 
+software for PDF creation and manipulation. 
+
+Why does it start with version 3.004? The owner of PDF::API2 requested 
+that the name of the fork be changed from API2 to something else to 
+avoid confusion. The author of Builder had originally offered this
+software as another version of API2, and had already jumped the version
+from 2.xxx (API2) to 3.xxx (now Builder) and had made three releases
+(served from the catskilltech.com website). Rather than reset to 1.000, 
+it seemed cleaner just to continue with the 3.xxx version.
+
+Currently, PDF::Builder source is hosted on GitHub
+(https://github.com/PhilterPaper/Perl-PDF-Builder), with the Perl
+installable module download offered on CPAN (PDF::Builder).
+
+Please raise issues (bug reports, etc.) on GitHub. Feature Requests
+should be tagged "enhancement". The maintainer will close (and tag
+as appropriate) resolved or rejected issues. Please do NOT use the
+CPAN RT ticket system -- it is not being regularly monitored by the
+owner.
+
+General discussions not pertaining to a specific issue (bug) may be
+conducted on the forum at http://www.catskilltech.com/forum/index.html
+in the PDF::Builder/General Discussions board. It is possible that at
+some time, this board will be renamed and moved to the "Free Software"
+category, so look there if the "PDF::Builder" category seems to have
+disappeared.
+
+

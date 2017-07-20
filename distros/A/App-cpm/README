@@ -81,6 +81,17 @@ COPYRIGHT AND LICENSE
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
 
+COMMUNITY
+
+    https://github.com/skaji/cpm
+
+      Code repository and issue tracker
+
+    https://gitter.im/skaji/cpm
+
+      Chat room. I would like to hear your thoughts about CPAN clients (not
+      necessary about cpm)
+
 SEE ALSO
 
     Perl Advent Calendar 2015

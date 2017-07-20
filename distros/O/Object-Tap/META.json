@@ -4,24 +4,53 @@
       "Matt S Trout (mst) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Object-Tap",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30",
-            "Module::Build::Tiny" : "0.036"
+            "Module::Build::Tiny" : "0.039",
+            "perl" : "5.006"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "5.006"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.000004"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Object-Tap@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Object-Tap"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/p5sagit/Object-Tap.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Object-Tap.git"
+      }
+   },
+   "version" : "1.000006",
+   "x_contributors" : [
+      "Dagfinn Ilmari Manns\u00e5ker <ilmari@ilmari.org>",
+      "Karen Etheridge <ether@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

@@ -25,7 +25,7 @@ different event-based API.
 Makes LWP use L<AnyEvent::HTTP>. Does not make LWP event-based, but allows
 Coro threads to schedule unimpeded through its AnyEvent integration.
 
-Let's you use the LWP API normally.
+Lets you use the LWP API normally.
 
 =item L<LWP::Protocol::Coro::http>
 
@@ -89,7 +89,7 @@ at least some of the time.
 
 =back
 
-All this likely makes other libraries than just LWP not block, but thats
+All this likely makes other libraries than just LWP not block, but that's
 just a side effect you cannot rely on.
 
 Increases parallelism is not supported by all libraries, some might cache
@@ -126,7 +126,7 @@ use Net::HTTP ();
 use Net::FTP ();
 use Net::NNTP ();
 
-our $VERSION = 6.511;
+our $VERSION = 6.513;
 
 *Socket::inet_aton = \&Coro::Util::inet_aton;
 

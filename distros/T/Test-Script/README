@@ -4,15 +4,17 @@ NAME
 
 VERSION
 
-    version 1.18
+    version 1.23
 
 SYNOPSIS
 
-     use Test::More tests => 2;
+     use Test2::V0;
      use Test::Script;
      
      script_compiles('script/myscript.pl');
      script_runs(['script/myscript.pl', '--my-argument']);
+     
+     done_testing;
 
 DESCRIPTION
 
@@ -44,7 +46,7 @@ FUNCTIONS
     The "script_compiles" test calls the script with "perl -c script.pl",
     and checks that it returns without error.
 
-    The path it should be passed is a relative unix-format script name.
+    The path it should be passed is a relative Unix-format script name.
     This will be localised when running perl -c and if the test fails the
     local name used will be shown in the diagnostic output.
 
@@ -97,7 +99,8 @@ FUNCTIONS
 	the referenced scalar.
 
       The behavior for any other types is undefined (the current
-      implementation uses IPC::Run3, but that may change in the future).
+      implementation uses Capture::Tiny). Any already opened stdin will be
+      closed.
 
     stdout
 
@@ -115,7 +118,7 @@ FUNCTIONS
       scalar
 
       The behavior for any other types is undefined (the current
-      implementation uses IPC::Run3, but that may change in the future).
+      implementation uses Capture::Tiny).
 
     stderr
 
@@ -179,23 +182,18 @@ FUNCTIONS
 
 CAVEATS
 
-    This module is fully supported back to Perl 5.8.1. It may work on
-    5.8.0. It should work on Perl 5.6.x and I may even test on 5.6.2. I
-    will accept patches to maintain compatibility for such older Perls, but
-    you may need to fix it on 5.6.x / 5.8.0 and send me a patch.
+    This module is fully supported back to Perl 5.8.1. In the near future,
+    support for the older pre-Test2 Test::Builer will be dropped.
 
-    This module uses IPC::Run3 to compile and run scripts. There are a
-    number of outstanding issues with this module, and maintenance for
-    IPC::Run3 is not swift. One of these is that IPC::Run3 incorrectly
-    throws an exception on Windows when you feed it a Perl script with a
-    compile error. Currently Test::Script probes for this bug (it checks
-    for the bug, not for a specific version) and applies a workaround in
-    that case. I am hoping to remove the work around once the bug is fixed
-    in IPC::Run3.
+    The STDIN handle will be closed when using script_runs with the stdin
+    option. An older version used IPC::Run3, which attempted to save STDIN,
+    but apparently this cannot be done consistently or portably. We now use
+    Capture::Tiny instead and explicitly do not support saving STDIN
+    handles.
 
 SEE ALSO
 
-    Test::Script::Run, Test::More
+    Test::Script::Run, Test2::Suite
 
 AUTHOR
 
@@ -209,7 +207,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2006 by Adam Kennedy.
+    This software is copyright (c) 2017 by Adam Kennedy.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

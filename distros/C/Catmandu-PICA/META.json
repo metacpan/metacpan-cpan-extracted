@@ -4,7 +4,7 @@
       "Johann Rolschewski <rolschewski@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,30 +27,22 @@
       "configure" : {
          "requires" : {
             "Module::Build::Tiny" : "0.034"
-         },
-         "suggests" : {
-            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.17",
+            "Dist::Milla" : "v1.0.18",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
-         "conflicts" : {
-            "Catmandu::SRU" : "< 0.032"
-         },
-         "recommends" : {
-            "Catmandu::SRU" : "0.032"
-         },
          "requires" : {
             "Catmandu" : "1.0601",
+            "Catmandu::SRU" : "0.41",
             "Moo" : "1.0",
-            "PICA::Data" : "0.30",
+            "PICA::Data" : "0.33",
             "PICA::Parser" : "0.585",
-            "PICA::Path" : "0.31"
+            "perl" : "v5.12.0"
          }
       },
       "test" : {
@@ -58,7 +50,8 @@
             "File::Temp" : "0.2304",
             "IO::File" : "1.14",
             "Test::Exception" : "0.43",
-            "Test::More" : "1.001003"
+            "Test::More" : "1.001003",
+            "Test::XML" : "0.08"
          }
       }
    },
@@ -74,14 +67,15 @@
          "web" : "https://github.com/gbv/Catmandu-PICA"
       }
    },
-   "version" : "0.20",
+   "version" : "0.23",
    "x_contributors" : [
       "Carsten Klee <carsten.klee@sbb.spk-berlin.de>",
+      "Carsten Klee <cKlee@users.noreply.github.com>",
       "E. Choroba <choroba@matfyz.cz>",
       "Jakob Vo\u00df <jakob.voss@gbv.de>",
       "Johann Rolschewski <jorol@cpan.org>",
       "Julian Ladisch <julianladisch@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0221"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

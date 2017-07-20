@@ -48,7 +48,9 @@
             "IO::Handle" : "0",
             "Plack" : "0",
             "autodie" : "0",
-            "perl" : "v5.8.8"
+            "perl" : "v5.8.8",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -66,7 +68,7 @@
    "provides" : {
       "Plack::Test::AnyEvent" : {
          "file" : "lib/Plack/Test/AnyEvent.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -81,7 +83,7 @@
          "web" : "https://github.com/hoelzro/plack-test-anyevent"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

@@ -14,7 +14,7 @@ Alien::Build::Plugin::Core - Core Alien::Build plugins
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 

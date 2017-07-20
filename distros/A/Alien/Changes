@@ -1,5 +1,9 @@
 Revision history for Perl module Alien
 
+0.95      2017-07-13 12:10:25 +0000
+  - Fix some broken links
+  - Fix some typos
+
 0.94      2017-03-10 11:08:52 -0500
   - Add references to alienfile + Alien::Build
   - Migrate to Dist::Zilla

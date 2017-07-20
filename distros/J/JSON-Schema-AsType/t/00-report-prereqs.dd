@@ -12,7 +12,6 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Class::Load' => '0',
                                       'Clone' => '0',
                                       'JSON' => '0',
                                       'LWP::Simple' => '0',

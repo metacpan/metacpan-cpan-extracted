@@ -15,6 +15,6 @@ name: WWW-Leech-Walker
 requires:
   LWP: '6.08'
   URI::URL: '5.04'
-  WWW::Leech::Parser: '0.02'
-version: '0.02'
+  WWW::Leech::Parser: '0.03'
+version: '0.03'
 x_serialization_backend: 'YAML::Tiny version 1.64'

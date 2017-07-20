@@ -1,6 +1,6 @@
 package Twitter::API::Error;
 # ABSTRACT: Twitter API exception
-$Twitter::API::Error::VERSION = '0.0112';
+$Twitter::API::Error::VERSION = '0.0113';
 use Moo;
 use Ref::Util qw/is_arrayref is_hashref/;
 use Try::Tiny;
@@ -224,7 +224,7 @@ Twitter::API::Error - Twitter API exception
 
 =head1 VERSION
 
-version 0.0112
+version 0.0113
 
 =head1 SYNOPSIS
 

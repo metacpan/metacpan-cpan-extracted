@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -92,6 +92,26 @@ sub load
 {
   my(undef, $alienfile, @args) = @_;
 
+  my $rcfile = Path::Tiny->new($ENV{ALIEN_BUILD_RC} || '~/.alienbuild/rc.pl')->absolute;
+  if(-r $rcfile)
+  {
+    package Alien::Build::rc;
+    sub logx ($)
+    {
+      unshift @_, 'Alien::Build';
+      goto &Alien::Build::log;
+    };
+    sub preload ($)
+    {
+      push @Alien::Build::rc::PRELOAD, $_[0];
+    }
+    sub postload ($)
+    {
+      push @Alien::Build::rc::POSTLOAD, $_[0];
+    }
+    require $rcfile;
+  }
+
   unless(-r $alienfile)
   {
     require Carp;
@@ -115,10 +135,12 @@ sub load
   }};
 
   my @preload = qw( Core::Setup Core::Download Core::FFI );
+  push @preload, @Alien::Build::rc::PRELOAD;
   push @preload, split ';', $ENV{ALIEN_BUILD_PRELOAD}
     if defined $ENV{ALIEN_BUILD_PRELOAD};
   
   my @postload = qw( Core::Legacy Core::Gather );
+  push @postload, @Alien::Build::rc::POSTLOAD;
   push @postload, split ';', $ENV{ALIEN_BUILD_POSTLOAD}
     if defined $ENV{ALIEN_BUILD_POSTLOAD};
 
@@ -131,10 +153,14 @@ sub load
 
   eval '# line '. __LINE__ . ' "' . __FILE__ . qq("\n) . qq{
     package ${class}::Alienfile;
-    alienfile::plugin(\$_) for \@preload;
+    foreach my \$preload (\@preload) {
+      ref \$preload eq 'CODE' ? \$preload->(meta()) : alienfile::plugin(\$preload);
+    }
     do '@{[ $file->absolute->stringify ]}';
     die \$\@ if \$\@;
-    alienfile::plugin(\$_) for \@postload;
+    foreach my \$postload (\@postload) {
+      ref \$postload eq 'CODE' ? \$postload->(meta()) : alienfile::plugin(\$postload);
+    }
   };
   die $@ if $@;
   
@@ -604,6 +630,8 @@ sub system
   ($command, @args) = map { 
     $self->meta->interpolator->interpolate($_, $prop)
   } ($command, @args);
+
+  $self->log("+ $command @args");
   
   scalar @args
     ? system $command, @args
@@ -919,7 +947,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 
@@ -987,8 +1015,8 @@ C<plugin_fetch_newprotocol>:
    $meta->register_hook(
      some_hook => sub {
        my($build) = @_;
-       $build->install_prop->{plugin_fetch_newprotocol_bar => 'some other value' );
-       $build->runtime_prop->{plugin_fetch_newprotocol_baz => 'and another value' );
+       $build->install_prop->{plugin_fetch_newprotocol_bar} = 'some other value';
+       $build->runtime_prop->{plugin_fetch_newprotocol_baz} = 'and another value';
      }
    );
  }
@@ -1082,6 +1110,10 @@ The main difference is that with Visual C++ C<-LIBPATH> should be used instead
 of C<-L>, and static libraries should have the C<.LIB> suffix instead of C<.a>.
 
 =back
+
+=item start_url
+
+The default or start URL used by fetch plugins.
 
 =back
 
@@ -1521,6 +1553,11 @@ L<Alien::Build> responds to these environment variables:
 =item ALIEN_INSTALL_TYPE
 
 If set to C<share> or C<system>, it will override the system detection logic.
+
+=item ALIEN_BUILD_RC
+
+Perl source file which can override some global defaults for L<Alien::Build>,
+by, for example, setting preload and postload plugins.
 
 =item ALIEN_BUILD_PRELOAD
 

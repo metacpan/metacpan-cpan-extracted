@@ -13,7 +13,7 @@ use Scalar::Util 'weaken';
 use POSIX ':errno_h';
 
 # ABSTRACT: Template Toolkit renderer for Mojolicious
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '1.59'; # VERSION
 
 __PACKAGE__->attr('tt');
 
@@ -35,7 +35,7 @@ sub _init {
     if($dir=$args{cache_dir}) {
 
       if($app && substr($dir,0,1) ne '/') {
-        $dir=$app->home->rel_dir($dir);
+        $dir=$app->home->rel_file($dir);
       }
     }
 
@@ -230,7 +230,7 @@ Mojolicious::Plugin::TtRenderer::Engine - Template Toolkit renderer for Mojolici
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 SYNOPSIS
 
@@ -372,6 +372,8 @@ spleenjack
 uwisser
 
 Dinis Lage
+
+jay mortensen (GMORTEN)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -25,12 +25,20 @@ option 'project' => (
     cmd_aliases => ['p'],
 );
 
-option 'verbose' => (
-    is      => 'rw',
-    isa     => 'Bool',
-    default => 0,
-);
+# option 'verbose' => (
+#     is      => 'rw',
+#     isa     => 'Bool',
+#     default => 0,
+# );
 
+option 'no_log_json' => (
+    traits        => ['Bool'],
+    is            => 'rw',
+    isa           => 'Bool',
+    default       => 0,
+    documentation => 'Opt out of writing the tar archive of JSON stats. '
+      . 'This may be desirable for especially large workflows.',
+);
 
 has 'submission_uuid' => (
     is        => 'rw',
@@ -39,7 +47,7 @@ has 'submission_uuid' => (
     predicate => 'has_submissions_uuid',
 );
 
-our $VERSION = '3.2.7';
+our $VERSION = '3.2.8';
 
 app_strict 0;
 

@@ -4,7 +4,7 @@
       "brian d foy <bdfoy@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -21,13 +21,12 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
          }
       },
       "runtime" : {
@@ -37,26 +36,28 @@
             "Scalar::Util" : "1.11",
             "Time::Local" : "0",
             "XML::Entities" : "0",
-            "parent" : "0"
+            "parent" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0.94"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-MacPropertyList@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Mac-PropertyList"
+         "web" : "https://github.com/briandfoy/mac-propertylist/issues"
       },
+      "homepage" : "https://github.com/briandfoy/mac-propertylist",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/briandfoy/mac-propertylist.git",
+         "url" : "https://github.com/briandfoy/mac-propertylist.git",
          "web" : "https://github.com/briandfoy/mac-propertylist"
       }
    },
-   "version" : "1.41"
+   "version" : "1.411",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,5 +1,9 @@
 Revision history for Dist-Surveyor
 
+0.020     2017-07-13 21:02:03-04:00 America/New_York
+	- Update documentation to use cpanm --from instead of --mirror for local installation
+	- Move compile test to author-only tests
+
 0.019     2017-06-09 01:32:40-04:00 America/New_York
 	- Bump HTTP::Tiny requirement to 0.056 for can_ssl
 

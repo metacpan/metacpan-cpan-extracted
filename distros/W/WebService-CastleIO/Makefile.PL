@@ -10,7 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/WebService/CastleIO.pm',
     LICENSE          => 'mit',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.10,
+    MIN_PERL_VERSION => 5.010001,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -24,8 +24,12 @@ WriteMakefile(
 	'MooseX::Params::Validate' => 0
     },
     PREREQ_PM => {
-        #'ABC'              => 1.6,
-        #'Foo::Bar::Module' => 5.0401,
+        'JSON' => 0,
+        'REST::Client' => 0,
+        'MIME::Base64' => 0,
+        'Moose' => 0,
+        'Moose::Util::TypeConstraints' => 0,
+        'MooseX::Params::Validate' => 0	    
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WebService-CastleIO-*' },

@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+#PODNAME: make-lm-doku
+#ABSTRACT: Compile documentation for Lab::Measurement
+
+use strict;
+use Lab::Measurement::DocWriter::LaTeX;
+use Lab::Measurement::DocWriter::HTML;
+use Getopt::Long;
+use Pod::Usage;
+
+my %options = (
+    toc     => "dokutoc.yml",
+    docdir  => "Homepage/docs",
+    tempdir => "Homepage/temp",
+    keeptemp=> "",
+);
+GetOptions( \%options, "docdir=s", "tempdir=s", "keeptemp", 'help|?' );
+
+my @jobs;
+for (@ARGV) {
+    push @jobs, "LaTeX" if /pdf|all/i;
+    push @jobs, "HTML"  if /html|web|all/i;
+}
+
+pod2usage(
+    -verbose  => 99,
+    -sections => "SYNOPSIS|DESCRIPTION|COMMANDS|OPTIONS"
+  )
+  if ( $options{help} || !@jobs );
+
+for ( map "Lab::Measurement::DocWriter::$_", @jobs ) {
+    my $processor = new { $_ }( $options{docdir}, $options{tempdir}, $options{keeptemp} );
+    $processor->process( $options{toc} );
+}
+
+#copy('Homepage/index.html', 'Homepage/index.php');
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+make-lm-doku - Compile documentation for Lab::Measurement
+
+=head1 VERSION
+
+version 1.000
+
+=head1 SYNOPSIS
+
+makedoku.pl [options] command [command..]
+
+=head1 DESCRIPTION
+
+This program compiles HTML and PDF Documentation for Lab::VISA from various sources. The actual
+contents are defined in the file specified with option --toc.
+
+=head1 COMMANDS
+
+Command names are case insensitive.
+
+=over
+
+=item html
+
+Create documentation in HTML format.
+
+=item pdf
+
+Create documentation in PDF format.
+
+=item all
+
+Create documentation in html and pdf.
+
+=back
+
+=head1 OPTIONS
+
+All option names can be abbreviated as long as they remain unique.
+
+=over
+
+=item --toc=FILE
+
+The table of contents, defined in YAML. Defaults to C<dokutoc.yml>.
+
+=item --docdir=DIRECTORY
+
+Directory to create the documentation in. Defaults to C<Homepage/docs>.
+
+=item --tempdir=DIRECTORY
+
+Directory to create temporary trash in. Will be deleted after execution. Defaults to C<Homepage/temp>.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by the Lab::Measurement team; in detail:
+
+  Copyright 2005-2006  Daniel Schroeer
+            2007       Daniela Taubert
+            2010       Andreas K. Huettel, Daniel Schroeer
+            2011-2012  Andreas K. Huettel
+            2017       Andreas K. Huettel
+
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

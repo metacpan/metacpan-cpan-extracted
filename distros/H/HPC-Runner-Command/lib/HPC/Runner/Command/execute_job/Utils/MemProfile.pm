@@ -6,6 +6,7 @@ use Number::Bytes::Human qw(format_bytes parse_bytes);
 use Memoize;
 use Path::Tiny;
 use DateTime;
+use Try::Tiny;
 
 has 'task_start_time' => (
     is       => 'rw',
@@ -50,27 +51,20 @@ sub get_cmd_stats {
     foreach my $cmdpid (@cmdpids) {
         my $stats_file = path("/proc/$cmdpid/status");
 
-        if ( $stats_file->exists ) {
-            my $data = $stats_file->slurp_utf8;
+        next unless $stats_file->exists;
 
-            # if ( $data =~ m/State: Z/ || $data =~ m/State.*zombine/ ) {
-            #     next;
-            # }
-            # elsif ( $data =~ m/State:  S/ || $data =~ m/State.*sleeping/ ) {
-            #     next;
-            # }
-            if ( $data =~ m/State:  R/ || $data =~ m/State.*run/ ) {
+        my $data;
+        try {
+            $data = $stats_file->slurp_utf8;
+        };
 
-                my $stats = parse_proc_file_data($data);
-                ##Add up the procs of all the children
-                $total_stats_data = add_proc_stats( $total_stats_data, $stats );
-                $found_stats = 1;
-            }
+        next unless $data;
+        if ( $data =~ m/State:  R/ || $data =~ m/State.*run/ ) {
 
-            # else {
-            #     ##This probably means that the file was deleted mid slurp
-            #     next;
-            # }
+            my $stats = parse_proc_file_data($data);
+            ##Add up the procs of all the children
+            $total_stats_data = add_proc_stats( $total_stats_data, $stats );
+            $found_stats = 1;
         }
     }
 

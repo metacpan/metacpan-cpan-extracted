@@ -1,6 +1,6 @@
 package Twitter::API::Trait::AppAuth;
 # ABSTRACT: App-only (OAuth2) Authentication
-$Twitter::API::Trait::AppAuth::VERSION = '0.0112';
+$Twitter::API::Trait::AppAuth::VERSION = '0.0113';
 use Moo::Role;
 use Carp;
 use URL::Encode qw/url_encode url_decode/;
@@ -103,7 +103,7 @@ Twitter::API::Trait::AppAuth - App-only (OAuth2) Authentication
 
 =head1 VERSION
 
-version 0.0112
+version 0.0113
 
 =head1 SYNOPSIS
 

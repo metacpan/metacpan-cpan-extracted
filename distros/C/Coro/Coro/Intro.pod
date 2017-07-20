@@ -30,7 +30,7 @@ variable or location.
 Cooperative means that these threads must cooperate with each other, when
 it comes to CPU usage - only one thread ever has the CPU, and if another
 thread wants the CPU, the running thread has to give it up. The latter
-is either explicitly, by calling a function to do so, or implicity, when
+is either explicitly, by calling a function to do so, or implicitly, when
 waiting on a resource (such as a Semaphore, or the completion of some I/O
 request). This threading model is popular in scripting languages (such as
 python or ruby), and this implementation is typically far more efficient

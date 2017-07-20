@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.66.
+signed via the Module::Signature module, version 0.73.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,34 +14,33 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 2f6a77cc1af0bc60cf87ec5335a995defa3e6eaf .cvsignore
-SHA1 a433f32fb0d0334e4001ec04741f776c4199379d Build.PL
-SHA1 22cbe81208a74303ace05ff63a9243c3cb87221d Changes
-SHA1 2e0cd1c1b78fb8591fde383f023acb4a579cb4dc MANIFEST
-SHA1 1463aa8b2d472d2dca1d6f601e28e874ef95e502 META.yml
-SHA1 0e23f901a8f88cc5f8fd6f9aa29c9122db1c00e4 Makefile.PL
-SHA1 00ef56b107920b1bb435a80247d50dded3c1eace README
-SHA1 91978573e906c90b93752e0733ef8e875f0d1b89 lib/Params/.cvsignore
-SHA1 615202f9e823f139fbfcb4fe46fc7cc8989da9b0 lib/Params/Classify.pm
-SHA1 40b5ef7d1c03d951912097973ecd6b2e095a3c32 lib/Params/Classify.xs
+SHA1 23fe160a5180101b0c60d58b6348de332b8008b9 .gitignore
+SHA1 3b74ca7f199177440df3034cd3b3a0383f4420e8 Build.PL
+SHA1 e10194be1af32d55db1af5590aa5021f67b02304 Changes
+SHA1 54793f1da593406ac164e4dd2ff190f3211c0062 MANIFEST
+SHA1 c07120ac77bfe367a3e3d1453b6b9aaf16ace15a META.json
+SHA1 3e44dfcaf2d1bc85e7f8ce226ea222d9e2621774 META.yml
+SHA1 bb0e036b5c11cb7e0e07f909776fb2b973e891cb README
+SHA1 6edfc340b684f26ff467ec4484d7c4c8d598abe8 lib/Params/Classify.pm
+SHA1 15ec6063f87686d5c172784f798e29b682baa411 lib/Params/Classify.xs
 SHA1 497c90b7b470f8c3a4594265c4a97376000fc2aa t/blessed.t
-SHA1 a3d9a389510faf3bfecb4860a14813988a0eddcd t/blessed_pp.t
+SHA1 7217d9cfb3ff600005ea54634f3776da43b88e4a t/blessed_pp.t
 SHA1 e05666c5b2480ce441116ff26e55fa5bb07fb741 t/check.t
-SHA1 ec88f98f2f29c1a6999db46666e5eb7cf9fa46b1 t/check_pp.t
+SHA1 2107a86bccaeb55e02dbc51f79cfcabc657d06de t/check_pp.t
 SHA1 071b996f6953fd005472b99a0ed867404425239a t/classify.t
-SHA1 22c8bb9af38f3eaa604350884e3fcc9c200b5f1b t/classify_pp.t
+SHA1 0fef2e6f108aeb7cdcfacbbc201fa6c2e32e688d t/classify_pp.t
 SHA1 29b6f328b7b3c928d455f82d1a0708d821445554 t/error.t
-SHA1 fc008cb61eb02798d6ec02df230ef4d59bcdca12 t/error_pp.t
+SHA1 a1db817b20659750c1acc66816815e9604286b3a t/error_pp.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
-SHA1 3f447b1d0b8a6247c3a311087f8d66da1c3ca5db t/pod_cvg_pp.t
+SHA1 8b0ef0af30cd5064cf1b3d57c5fdbab11f8c567c t/pod_cvg_pp.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 8a817d64d2098a5dfa7b65ba87b38314f9b3241e t/ref.t
-SHA1 4a19b745e2bcdfb8db18b149e79fcf8c235b24f8 t/ref_pp.t
+SHA1 a79c42e5e482fbf0c47a40fa4d20db975854fa89 t/ref_pp.t
 SHA1 97157325ac601fe786026cdc319f958c8ea785ae t/setup_pp.pl
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
+Version: GnuPG v1
 
-iEYEARECAAYFAkzi6yMACgkQOV9mt2VyAVE+hQCeOJemX8bpRvhEK7XBeB3YBmkF
-ZhIAoI/InODHqUDzt2Aryvc6tZH1SFNb
-=kZIC
+iEYEARECAAYFAllqrPEACgkQOV9mt2VyAVGl8ACeMsjblsdJApJyFh3uioNjhRA6
+xwcAn2Txm0djYIO4k8DV6Jf2c82T0tix
+=GrPy
 -----END PGP SIGNATURE-----

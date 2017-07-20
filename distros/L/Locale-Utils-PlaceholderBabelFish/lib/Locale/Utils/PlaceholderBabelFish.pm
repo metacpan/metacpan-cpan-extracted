@@ -11,7 +11,7 @@ use MooX::Types::MooseLike::Base qw(Bool CodeRef);
 use Scalar::Util qw(looks_like_number);
 use namespace::autoclean;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 has is_strict => (
     is  => 'rw',
@@ -171,13 +171,13 @@ __END__
 
 Locale::Utils::PlaceholderBabelFish - Utils to expand BabelFish palaceholders
 
-$Id: PlaceholderBabelFish.pm 631 2015-11-02 08:09:16Z steffenw $
+$Id: PlaceholderBabelFish.pm 663 2017-07-16 09:59:32Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-Utils-PlaceholderBabelFish/trunk/lib/Locale/Utils/PlaceholderBabelFish.pm $
 
 =head1 VERSION
 
-0.004
+0.006
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,46 @@
 Revision history for Perl extension Test-Script
 
+1.23      2017-07-18 03:12:24 -0400
+  - Production release identical to 1.22_01 release.
+
+1.22_01   2017-07-14 07:21:00 -0400
+  - Fix testing failures on Windows introduced in 1.21_01
+
+1.21_01   2017-07-13 13:37:09 -0400
+  - Migrate to using Test2::V0 internally
+
+1.20      2017-07-13 11:17:42 -0400
+  - Production release identical to 1.19_08 release.
+
+1.19_08   2017-07-12 08:22:41 -0400
+  - Diagnostic release
+
+1.19_07   2017-07-12 07:53:55 -0400
+  - Diagnostic release
+
+1.19_06   2017-07-11 05:34:30 -0400
+  - Diagnostic release
+
+1.19_05   2017-07-09 11:35:59 -0400
+  - Diagnostic release
+
+1.19_04   2017-07-07 16:26:41 -0400
+  - Add support for stdin option that was lost in the Capture::Tiny migration
+  - Officially drop support for Perl 5.6 (support for 5.6 was already
+    implicitly dropped when we migrated to Capture::Tiny).
+  - A near term future version will also drop support for the old pre-Test2
+    Test::Builder.
+
+1.19_03   2017-07-07 10:14:25 -0400
+  - Use Test2::V0 instead of Test2::Bundle::Extended for Test2 tests
+
+1.19_02   2017-06-21 17:06:47 -0400
+  - Identical to 1.19_01
+
+1.19_01   2017-05-01 06:12:01 -0400
+  - Use Capture::Tiny instead of IPC::Run3 (Paul Cochrane/PTC++ gh#4, gh#15)
+  - Minor documentation fixes (Paul Cochrane/PTC++)
+
 1.18      2017-04-12 07:01:14 -0400
   - Production release identical to 1.17_02 release.
 
@@ -33,11 +74,11 @@ Revision history for Perl extension Test-Script
   - Check for IO errors on temporary .pm file
 
 1.11_02   2016-04-27 13:15:35 -0400
-  - One possible fix for gh#5 
+  - One possible fix for gh#5
     (see https://github.com/plicease/Test-Script/issues/5)
 
 1.11_01   2016-04-27 12:28:33 -0400
-  - Including some optional Test2 based tests that should 
+  - Including some optional Test2 based tests that should
     only be run with a merged Test2 / Test::Builder
     (currently a dev release as Test::Simple on CPAN)
 

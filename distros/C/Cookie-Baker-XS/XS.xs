@@ -112,7 +112,7 @@ crush_cookie(cookie)
         src = (char *)SvPV(cookie,src_len);
         prev = src;
         for ( i=0; i<src_len; i++ ) {
-            if ( src[i] == ';' || src[i] == ','  ) {
+            if ( src[i] == ';' ) {
                 while ( prev[0] == ' ' ) {
                     prev++;
                     prev_s++;

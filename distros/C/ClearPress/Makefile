@@ -1,6 +1,6 @@
-MAJOR    ?= 475
-MINOR    ?= 3
-SUB      ?= 3
+MAJOR    ?= 476
+MINOR    ?= 1
+SUB      ?= 1
 PATCH    ?= 1
 MD5SUM    = md5sum
 SEDI      = sed -i
@@ -26,13 +26,18 @@ manifest: setup
 clean:	setup
 	./Build clean
 	touch tmp
-	rm -rf build.tap MYMETA.yml MYMETA.json _build Build rpmbuild spec tmp *rpm *deb *tar.gz test.db MANIFEST.bak
+	rm -rf build.tap MYMETA.yml MYMETA.json _build Build rpmbuild spec tmp *rpm *deb *tar.gz test.db MANIFEST.bak nytprof*
 
 test:	setup
 	TEST_AUTHOR=1 ./Build test verbose=1
 
 cover:	setup
 	./Build testcover verbose=1
+
+nytcover: setup
+	TEST_AUTHOR=1 perl -d:NYTProf Build test
+	nytprofmerge nytprof.out*
+	nytprofhtml --file nytprof-merged.out
 
 install:	setup
 	./Build install
@@ -46,7 +51,7 @@ deb:	manifest
 	rm -rf tmp
 	mkdir -p tmp/usr/share/perl5
 	cp -pR deb-src/* tmp/
-	cp tmp/DEBIAN/control.tt2 tmp/DEBIAN/control
+	cp tmp/DEBIAN/control.tmpl tmp/DEBIAN/control
 	$(SEDI) "s/MAJOR/$(MAJOR)/g" tmp/DEBIAN/control
 	$(SEDI) "s/MINOR/$(MINOR)/g" tmp/DEBIAN/control
 	$(SEDI) "s/SUB/$(SUB)/g"     tmp/DEBIAN/control

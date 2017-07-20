@@ -7,4 +7,3 @@ my $conv = Convert::Moji->new (["table", \%crazyhash]);
 my $out = $conv->convert ("a b c");
 my $back = $conv->invert ($out);
 print "$out, $back\n";
-

@@ -1,3 +1,22 @@
+libclearpress-perl (476.1.1) stable; urgency=low
+
+  * Do not overwrite the status code if it's already been set during
+    model + view instantiation
+
+libclearpress-perl (476.1.0) stable; urgency=low
+
+  * Correction to per-request "singleton" util object management to
+    support execution under Apache mpm_worker and mpm_event.
+  * modifications to tests to support latest perl lib paths.
+
+libclearpress-perl (475.5.0) stable; urgency=low
+
+  * experimental OPTIONS support
+
+libclearpress-perl (475.3.4) stable; urgency=low
+
+  * applied tests for JSON-based POSTDATA (curl -d instead of curl -F)
+
 libclearpress-perl (475.3.3) stable; urgency=low
 
   * uncovered a buffer overflow problem when combined with Apache +

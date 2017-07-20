@@ -8,7 +8,7 @@ use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(Bool CodeRef);
 use namespace::autoclean;
 
-our $VERSION = '1.002';
+our $VERSION = '1.004';
 
 has is_strict => (
     is  => 'rw',
@@ -78,13 +78,13 @@ __END__
 
 Locale::Utils::PlaceholderNamed - Utils to expand named placeholders
 
-$Id: PlaceholderNamed.pm 587 2015-04-16 05:58:10Z steffenw $
+$Id: PlaceholderNamed.pm 667 2017-07-16 10:46:35Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-Utils-PlaceholderNamed/trunk/lib/Locale/Utils/PlaceholderNamed.pm $
 
 =head1 VERSION
 
-1.002
+1.004
 
 =head1 SYNOPSIS
 

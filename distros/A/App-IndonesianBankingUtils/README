@@ -1,13 +1,65 @@
+NAME
+    App::IndonesianBankingUtils - CLIs related to Indonesian banking
+
+VERSION
+    This document describes version 0.12 of App::IndonesianBankingUtils
+    (from Perl distribution App-IndonesianBankingUtils), released on
+    2017-07-18.
+
 
     This distribution contains several CLI's related to Indonesian banking:
 
-    # INSERT_EXECS_LIST
+    *   download-bca
+
+    *   download-mandiri
+
+    *   list-bca-branches
+
+    *   list-id-bank-cards
+
+    *   list-id-banks
+
+    *   list-mandiri-branches
+
+    *   parse-bca-account
+
+    *   parse-bca-statement
+
+    *   parse-bprks-statement
+
+    *   parse-mandiri-account
+
+    *   parse-mandiri-statement
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-IndonesianBankingUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-IndonesianBankingUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-IndonesianBanking
+    Utils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Finance::Bank::ID::BCA
 
     Finance::Bank::ID::BPRKS
 
     Finance::Bank::ID::Mandiri
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

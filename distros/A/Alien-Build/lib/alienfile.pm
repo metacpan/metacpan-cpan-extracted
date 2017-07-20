@@ -10,7 +10,7 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
 our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log );
@@ -71,11 +71,8 @@ sub plugin
       "Alien/Build/Plugin/$name.pm";
     };
   }
-  
-  unless($INC{$pm})
-  {
-    require $pm;
-  }
+
+  require $pm unless $class->can('new');  
   my $caller = caller;
   my $plugin = $class->new(@args);
   $plugin->init($caller->meta);
@@ -309,7 +306,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 
@@ -641,7 +638,17 @@ Prints the given log to stdout.
 
 =head1 SEE ALSO
 
-L<Alien::Build>, L<Alien::Build::MM>, L<Alien::Base>
+=over 4
+
+=item L<Alien>
+
+=item L<Alien::Build>
+
+=item L<Alien::Build::MM>
+
+=item L<Alien::Base>
+
+=back
 
 =head1 AUTHOR
 

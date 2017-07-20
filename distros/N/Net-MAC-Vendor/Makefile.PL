@@ -68,6 +68,8 @@ my %WriteMakefile = (
 		'File::Temp'       => '0',
 		'Mojo::URL'        => '0',
 		'Mojo::UserAgent'  => '0',
+		'Compress::Bzip2'  => '0',
+		'Compress::Zlib'   => '0',
 		},
 
 	'META_MERGE' => {

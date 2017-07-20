@@ -1,11 +1,127 @@
-SYNOPSIS
+NAME
+    Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application
+    framework
 
-    #RENDER_TEMPLATE: file=>"share/templates/synopsis.txt",
-    context=>{module=>"Perinci::CmdLine::Lite"}
+VERSION
+    This document describes version 1.76 of Perinci::CmdLine::Lite (from
+    Perl distribution Perinci-CmdLine-Lite), released on 2017-07-14.
+
+SYNOPSIS
+    In "gen-random-num" script:
+
+     use Perinci::CmdLine::Lite;
+
+     our %SPEC;
+
+     $SPEC{gen_random_num} = {
+         v => 1.1,
+         summary => 'Generate some random numbers',
+         args => {
+             count => {
+                 summary => 'How many numbers to generate',
+                 schema => ['int*' => min=>0],
+                 default => 1,
+                 cmdline_aliases=>{n=>{}},
+                 req => 1,
+                 pos => 0,
+             },
+             min => {
+                 summary => 'Lower limit of random number',
+                 schema => 'float*',
+                 default => 0,
+             },
+             max => {
+                 summary => 'Upper limit of random number',
+                 schema => 'float*',
+                 default => 1,
+             },
+         },
+         result_naked => 1,
+     };
+     sub gen_random_num {
+         my %args = @_;
+
+         my @res;
+         for (1..$args{count}) {
+             push @res, $args{min} + rand()*($args{max}-$args{min});
+         }
+         \@res;
+     }
+
+     Perinci::CmdLine::Lite->new(url => '/main/gen_random_num')->run;
+
+    Run your script:
+
+     % ./gen-random-num
+     0.999473691060306
+
+     % ./gen-random-num --min 1 --max 10 5
+     1.27390166158969
+     1.69077475473679
+     8.97748327778684
+     5.86943773494068
+     8.34341298182493
+
+    JSON output support out of the box:
+
+     % ./gen-random-num -n3 --json
+     [200,"OK (envelope added by Perinci::Access::Lite)",[0.257073684902029,0.393782991540746,0.848740540017513],{}]
+
+    Automatic help message:
+
+     % ./gen-random-num -h
+     gen-random-num - Generate some random numbers
+
+     Usage:
+       gen-random-num --help (or -h, -?)
+       gen-random-num --version (or -v)
+       gen-random-num [options] [count]
+     Options:
+       --config-path=s     Set path to configuration file
+       --config-profile=s  Set configuration profile to use
+       --count=i, -n       How many numbers to generate (=arg[0]) [1]
+       --format=s          Choose output format, e.g. json, text [undef]
+       --help, -h, -?      Display this help message
+       --json              Set output format to json
+       --max=f             Upper limit of random number [1]
+       --min=f             Lower limit of random number [0]
+       --naked-res         When outputing as JSON, strip result envelope [0]
+       --no-config         Do not use any configuration file
+       --version, -v
+
+    Automatic configuration file support:
+
+     % cat ~/gen-random-num.conf
+     count=5
+     max=0.01
+
+     % ./gen-random-num
+     0.00105268954838724
+     0.00701443611501844
+     0.0021247476506154
+     0.00813872824513005
+     0.00752832346491306
+
+    Automatic tab completion support:
+
+     % complete -C gen-random-num gen-random-num
+     % gen-random-num --mi<tab>
+
+    See Perinci::CmdLine::Manual for details on other available features
+    (subcommands, automatic formatting of data structures, automatic schema
+    validation, dry-run mode, automatic POD generation, remote function
+    support, automatic CLI generation, automatic --version, automatic HTTP
+    API, undo/transactions, configurable output format, logging, progress
+    bar, colors/Unicode, and more).
 
 DESCRIPTION
+    Perinci::CmdLine is a command-line application framework. It allows you
+    to create full-featured CLI applications easily and quickly.
 
-    #RENDER_TEMPLATE: file=>"share/templates/description.txt"
+    See Perinci::CmdLine::Manual for more details.
+
+    There is also a blog post series on Perinci::CmdLine tutorial:
+    <https://perlancar.wordpress.com/category/pericmd-tut/>
 
     Perinci::CmdLine::Lite is the default backend implementation. Another
     implementation is the heavier Perinci::CmdLine::Classic which has a
@@ -16,84 +132,78 @@ DESCRIPTION
     switch backend on the fly.
 
 REQUEST KEYS
-
     All those supported by Perinci::CmdLine::Base, plus:
 
-ATTRIBUTES
+RESULT METADATA
+    All those supported by Perinci::CmdLine::Base, plus:
 
+  x.hint.result_binary => bool
+    If set to true, then when formatting to "text" formats, this class won't
+    print any newline to keep the data being printed unmodified.
+
+ATTRIBUTES
     All the attributes of Perinci::CmdLine::Base, plus:
 
- log => bool (default: from env or 0)
-
-    Whether to enable logging. This currently means calling
-    Log::ger::Output to set logging output to Screen (set in
-    hook_after_parse_argv, so tab completion skips this step). To produce
-    log, you use Log::ger in your code.
-
-    The default is off. If you set LOG_LEVEL or TRACE/DEBUG/VERBOSE/QUIET,
-    then the default will be on. It defaults to off if you set
-    LOG_LEVEL=off.
-
- log_level => str (default: from env, or 'warning')
-
-    Set default log level. The default can also be set via
-    LOG_LEVEL/TRACE/DEBUG/VERBOSE/QUIET.
-
- validate_args => bool (default: 1)
-
+  validate_args => bool (default: 1)
 METHODS
-
     All the methods of Perinci::CmdLine::Base, plus:
 
 ENVIRONMENT
-
     All the environment variables that Perinci::CmdLine::Base supports,
     plus:
 
- DEBUG
-
+  DEBUG
     Set log level to 'debug'.
 
- VERBOSE
-
+  VERBOSE
     Set log level to 'info'.
 
- QUIET
-
+  QUIET
     Set log level to 'error'.
 
- TRACE
-
+  TRACE
     Set log level to 'trace'.
 
- LOG_LEVEL
-
+  LOG_LEVEL
     Set log level.
 
- PROGRESS => BOOL
-
+  PROGRESS => BOOL
     Explicitly turn the progress bar on/off.
 
- FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
-
-    Set the default of table_column_orders in format_options in result
+  FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
+    Set the default of "table_column_orders" in "format_options" in result
     metadata, similar to what's implemented in Perinci::Result::Format and
     Data::Format::Pretty::Console.
 
-RESULT METADATA
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-Lite>.
 
-    All those supported by Perinci::CmdLine::Base, plus:
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-Lite>.
 
- x.hint.result_binary => bool
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Lite>
 
-    If set to true, then when formatting to text formats, this class won't
-    print any newline to keep the data being printed unmodified.
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Perinci::CmdLine::Any
 
     Perinci::CmdLine::Classic
 
     Perinci::CmdLine::Inline
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

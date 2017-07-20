@@ -9,9 +9,9 @@
 # <tt>package</tt>:: Name of the package.
 #
 class [% name %]::install (
-    $ensure  = hiera('[% name %]::install::ensure', 'present'),
-    $package = hiera('[% name %]::install::package', $[% name %]::params::package),
-) {
+    $ensure  = 'present',
+    $package = $[% name %]::params::package,
+) inherits ::[% name %]::params {
     if $package {
         package {
             $package:

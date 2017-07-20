@@ -1,5 +1,16 @@
 Revision history for App-Scaffolder-Puppet
 
+0.003001  2017-07-16 17:08:04+02:00 Europe/Zurich
+
+ - Add workaround for catdir() behaviour difference between Cygwin and Unix.
+
+0.003000  2017-07-13 21:15:42+02:00 Europe/Zurich
+
+ - Remove explicit hiera() calls, they are not required by current Puppet
+   versions anymore.
+ - Inherit from the parameter class in all sub-classes. Should make it a little
+   easier to reuse them in another setting.
+
 0.002001  2015-02-28 14:35:04 Europe/Zurich
 
  - Fix tests on Windows

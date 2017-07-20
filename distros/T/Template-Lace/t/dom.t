@@ -58,6 +58,7 @@ use Scalar::Util 'refaddr';
       ->repeat(sub {
           my ($li, $item, $index) = @_;
           $li->content($item);
+          return $li;
       }, @items);
 
     is $dom->find('li')->[0]->content, 'aaa';

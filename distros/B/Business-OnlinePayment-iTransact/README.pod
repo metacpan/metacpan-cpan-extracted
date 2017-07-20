@@ -1,0 +1,171 @@
+=head1 NAME
+
+Business::OnlinePayment::iTransact - iTransact backend module for Business::OnlinePayment
+
+=head1 SYNOPSIS
+
+  use Business::OnlinePayment;
+
+  my $tx = new Business::OnlinePayment( 'iTransact',
+      login          => 'api_username', # iTransact API Username
+      password       => 'apiKey', # iTransact API Key
+      email_customer => 'TRUE', # send email to customer
+      email_merchant => 'TRUE', # send email to merchant
+  );
+
+  $tx->content(
+      action         => 'Normal Authorization',
+      type           => 'cc',
+      description    => 'Business::OnlinePayment::iTransact XML Test',
+      amount         => '20.17',
+      customer_id    => '123-CUST',
+      first_name     => 'John',
+      last_name      => 'Doe',
+      card_number    => '5454545454545454',
+      expiration     => '12/18',
+      cvv2           => '123',
+      email          => 'user@example.com',
+      ### optional; include address fields to perform AVS check
+      address        => '123 Main St',
+      city           => 'Salt Lake City',
+      state          => 'UT',
+      zip            => '84001',
+      country        => 'US',
+      phone          => '801-555-1212',
+  );
+
+  $tx->submit();
+
+  if($tx->is_success()) {
+      print "Card processed successfully.\n\n";
+      print "Authorization Code: " . $tx->authorization . "\n";
+      print "Transaction ID: " . $tx->order_number . "\n";
+      print "CVV Result Code: " . $tx->cvv2_response . "\n";
+      print "AVS Result Code: " . $tx->avs_code . "\n";
+      print "AVS Result Category: " . $tx->avs_category . "\n";
+      print "Date and Time of Transaction: " . $tx->timestamp . "\n";
+      print "Authorized Amount: " . $tx->total . "\n";
+      print "Card Type: " . $tx->card_type . "\n";
+  } else {
+      print "Card was rejected.\n\n";
+      print "Error Message: ".$tx->error_message."\n";
+      print "Error Category: " . $tx->error_category . "\n";
+  }
+
+=head1 DESCRIPTION
+
+Process Credit Card transactions via iTransact's XML API Connection.
+
+This is a plugin for the Business::OnlinePayment interface. Please refer to
+that documentation for general usage, and here for iTransact specific usage.
+
+=head1 SUPPORTED TRANSACTION TYPES
+
+=head2 CC, Visa, MasterCard, American Express, Discover
+
+Content required: type, login, password, action, amount, description,
+first_name, last_name, card_number, expiration.
+
+=head1 SUPPORTED TRANSACTION ACTIONS
+
+=head2 Normal Authorization
+
+An action of 'Normal Authorization' will send a 'AuthTransaction' sale request to iTransact. 
+
+A sale request is the default authorization type performed which is an authorization that will automatically be captured during the settlement process. An AVSOnly credit card transaction request is a sale request run with a zero amount and can be used to validate the AVS and CVV information on a card without actually running an authorization.
+
+=head1 METHODS AND FUNCTIONS
+
+See L<Business::OnlinePayment> for the complete list. The following methods either override the methods in L<Business::OnlinePayment> or provide additional functions.
+
+=head2 order_number
+
+Unique transaction identifier assigned by the gateway (XID)
+
+=head2 cvv2_response
+
+Security code verification response (CVV2Response)
+
+=head2 avs_code
+
+Address verification response (AVSResponse)
+
+=head2 avs_category
+
+Address verification response category (AVSCategory)
+
+=head2 timestamp
+
+Date and time of transactioni (TimeStamp)
+
+=head2 total
+
+Total transaction amount (Total)
+
+=head2 card_type
+
+Type of credit card used, i.e. VISA, MasterCard, etc. (CardName)
+
+=head2 error_code
+
+Returns the iTransact error code when an error occurs.
+
+=head2 error_message
+
+Returns the response error description text.
+
+=head2 server_response
+
+The raw XML response from the iTransact XML Gateway
+
+=head1 UNIMPLEMENTED FEATURES
+
+Certain features are not yet implemented (no current personal business need), such as check processing
+and other transaction action types supported by iTransact. 
+
+=head1 PREREQUISITES
+
+  Business::OnlinePayment
+  Business::OnlinePayment::HTTPS
+  XML::Hash::LX
+  Digest::HMAC_SHA1
+
+=head1 SEE ALSO
+
+Refer to iTransact's documentation for more info
+L<https://itransact.com/support/toolkit/xml-connection/api/>
+
+For detailed information about Business::OnlinePayment see L<Business::OnlinePayment>.
+
+The latest version of Business::OnlinePayment::iTransact can be found at
+L<https://github.com/billgerrard/Business-OnlinePayment-iTransact>
+
+=head1 AUTHOR
+
+Original Author
+Bill Gerrard <bill@gerrard.org>
+
+Business::OnlinePayment Implementation
+Bill Gerrard <bill@gerrard.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 Bill Gerrard
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+Disclaimer of warranty: This program is provided by the copyright holder
+and contributors "As is" and without any express or implied warranties.
+The implied warranties of merchantability, fitness for a particular purpose,
+or non-infringement are disclaimed to the extent permitted by your local
+law. Unless required by law, no copyright holder or contributor will be
+liable for any direct, indirect, incidental, or consequential damages
+arising in any way out of the use of the package, even if advised of the
+possibility of such damage.
+
+=head1 SEE ALSO
+
+perl(1). L<Business::OnlinePayment>.
+

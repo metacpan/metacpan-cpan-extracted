@@ -49,7 +49,8 @@ $m->callback( ARGSRef => \%ARGS, CallbackName => 'Initial' );
 
 # These variables are what define a search_hash; this is also
 # where we give sane defaults.
-$Format ||= RT->Config->Get('AssetSearchFormat');
+
+$Format ||= ProcessAssetSearchFormatConfig;
 
 # Some forms pass in "RowsPerPage" rather than "Rows"
 # We call it RowsPerPage everywhere else.

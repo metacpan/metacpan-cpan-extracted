@@ -1,0 +1,12 @@
+Changes
+lib/App/rmspaces.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/rmspaces
+'t/data/has space'
+t/data/no_space
+t/test_script.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

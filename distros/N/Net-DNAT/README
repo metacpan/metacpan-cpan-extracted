@@ -15,27 +15,23 @@ DESCRIPTION
 
 SETTINGS
   port
-
-    Specify which port or ports to listen on. See the Net::Server manpage
-    for more details on the port setting and other Net::Server settings
-    which may also be used with Net::DNAT.
+    Specify which port or ports to listen on. See Net::Server for more
+    details on the port setting and other Net::Server settings which may
+    also be used with Net::DNAT.
 
      Example: port => 80
 
   user
-
     User to switch to once the server starts. (Just used by Net::Server)
 
      Example: user => "nobody"
 
   group
-
     Group to switch to once the server starts. (Just used by Net::Server)
 
      Example: group => "nobody"
 
   pools
-
     Supply a hash ref of pool definitions. The key in the hash is the pool
     name. Its value is either one destination scalar or an array ref of one
     or more destinations. If you just specify the destination value instead
@@ -53,7 +49,6 @@ SETTINGS
      Example: pools => "web.server.com"
 
   default_pool
-
     Specify which key in the pools hash ref should be used if no specific
     pool could be determined based on the request information. If only one
     pool is specified in the pools hash, that pool is assumed to be the
@@ -62,7 +57,6 @@ SETTINGS
      Example: default_pool => www
 
   host_switch_table
-
     Specify which hosts go to which pools.
 
      Example: host_switch_table => {
@@ -71,7 +65,6 @@ SETTINGS
       }
 
   switch_filters
-
     Supply special header modifications or provide ability to compute
     destination pool based on arbitrary code. It takes an array ref of
     destination pairs. The first in the pair is either a regex or a code
@@ -89,18 +82,16 @@ SETTINGS
 
      Example: switch_filters => [
         qr%^Cookie:.*magic%im => "dev",
-        sub { s/^(Host: )www\.%$1%im; 0; } => "dev",
+        sub { s%^(Host: )www\.%$1%im; 0; } => "dev",
       ]
 
   connect_timeout
-
     Specify the maximum number of seconds that a destination node can take
     before it will be considered down. The default is 3 seconds.
 
      Example: connect_timeout => 10
 
   check_for_dequeue
-
     Net::DNAT can periodically perform service checks on the destination
     node of each pool. This setting specifies this interval in seconds. To
     disable these checks, set this to 0. The default is 60 seconds.

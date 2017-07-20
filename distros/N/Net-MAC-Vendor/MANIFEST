@@ -1,6 +1,5 @@
 Changes
 examples/README
-extras/oui-20150808.txt
 extras/oui-20151113.txt
 extras/oui-small.txt
 INSTALL.SKIP
@@ -13,6 +12,7 @@ README.pod
 t/compile.t
 t/extract_oui_from_html.t
 t/fetch_oui.t
+t/fetch_oui_from_custom.t
 t/fetch_oui_from_ieee.t
 t/load_cache.t
 t/normalize_mac.t

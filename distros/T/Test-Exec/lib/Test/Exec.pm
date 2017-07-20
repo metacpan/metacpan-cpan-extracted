@@ -2,14 +2,15 @@ package Test::Exec;
 
 use strict;
 use warnings;
+use Test2::API qw( context );
 use Return::MultiLevel qw( with_return );
 use base 'Exporter';
 
 # ABSTRACT: Test that some code calls exec without terminating testing
-our $VERSION = '0.03'; # VERSION
+our $VERSION = '0.04'; # VERSION
 
 
-our @EXPORT = qw( exec_arrayref );
+our @EXPORT = qw( exec_arrayref never_exec_ok );
 
 our $exec_handler = sub {
   CORE::exec(@_);
@@ -19,15 +20,45 @@ BEGIN {
 }
 
 
+my $last;
+
 sub exec_arrayref(&)
 {
   my($code) = @_;
+  
+  undef $last;
+  
   return with_return {
     my($return) = @_;
-    local $exec_handler = sub { $return->([@_]) };
+    local $exec_handler = sub {
+      $last = [caller(1)];
+      $return->([@_]);
+    };
     $code->();
     undef;
   };
+}
+
+
+sub never_exec_ok (&;$)
+{
+  my($code, $name) = @_;
+  
+  $name ||= 'does not call exec';
+  
+  my $ret = exec_arrayref { $code->() };
+  my $ok = !defined $ret;
+  
+  my $ctx = context();
+  $ctx->ok($ok, $name);
+  
+  if(!$ok && $last)
+  {
+    my($package, $filename, $line) = @$last;
+    $ctx->diag("exec at $filename line $line");
+  }
+  
+  $ctx->release;
 }
 
 1;
@@ -44,7 +75,7 @@ Test::Exec - Test that some code calls exec without terminating testing
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -70,6 +101,13 @@ The concept was implementation was based on L<Test::Exit>, but applied to C<exec
 
 runs the given code.  If the code calls C<exec>, then this function will return an arrayref with its
 arguments.  If the code never calls C<exec>, it will return C<undef>.
+
+=head2 never_exec_ok
+
+ never_exec_ok { ... }
+
+Runs the given code.  If the code calls C<exec>, then the test will fail (but exec will be intercepted
+and not performed).
 
 =head1 CAVEATS
 

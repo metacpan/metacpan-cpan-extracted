@@ -26,7 +26,7 @@ my %pos = (
 
 for my $test ( @tests ) {
 	my $F = Tie::FileSection->new( filename => $input, first_line => $test->[0], last_line => $test->[1] );
-	cmp_ok join(' ', map{ s/[\r\n]+//r; } <$F>), 'eq', $test->[2], $test->[3].' data';
+	cmp_ok join(' ', map{ s/[\r\n]+//; $_; } <$F>), 'eq', $test->[2], $test->[3].' data';
 	ok eof($F), $test->[3] . ' EOF';
 	close($F);
 	

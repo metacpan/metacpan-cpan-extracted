@@ -148,7 +148,41 @@ DBIx::SchemaChecksum::Driver::Pg - Pg driver for DBIx::SchemaChecksum
 
 =head1 VERSION
 
-version 1.101
+version 1.102
+
+=head1 DESCRIPTION
+
+Get various extra schema info from postgres, if specified via C<driveropts>
+
+=over
+
+=item * enum values
+
+=item * sequences
+
+=item * index definitions
+
+=item * triggers
+
+=item * functions
+
+=back
+
+=head1 OPTIONS
+
+=head2 driveropts
+
+=head3 triggers
+
+If set to a true value, add info about triggers to the dump.
+
+=head3 sequences
+
+If set to a true value, add info about sequences to the dump.
+
+=head3 functions
+
+If set to a true value, add info about functions to the dump.
 
 =head1 AUTHORS
 

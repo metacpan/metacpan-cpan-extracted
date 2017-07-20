@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.105';
+$Config::Model::BackendMgr::VERSION = '2.106';
 use Mouse;
 use strict;
 use warnings;
@@ -144,6 +144,7 @@ sub get_cfg_file_path {
         return (0);
     }
 
+    # constructing config file name with >instance name>.<suffix>
     my $i    = $self->node->instance;
     my $name = $dir . $i->name;
 
@@ -817,7 +818,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.105
+version 2.106
 
 =head1 SYNOPSIS
 
@@ -1074,7 +1075,7 @@ mandatory C<config_dir> parameter. For instance:
    },
 
 When C<file> is not specified, a file name is constructed with
-C<< <config_class_name>.<suffix> >> where suffix is C<pl> or C<cds>.
+C<< <instance_name>.<suffix> >> where suffix is C<pl> or C<cds>.
 
 =head2 Custom backend
 

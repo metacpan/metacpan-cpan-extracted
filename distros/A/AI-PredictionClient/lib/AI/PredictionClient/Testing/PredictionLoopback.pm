@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::Testing::PredictionLoopback;
-$AI::PredictionClient::Testing::PredictionLoopback::VERSION = '0.01';
+$AI::PredictionClient::Testing::PredictionLoopback::VERSION = '0.03';
 
 # ABSTRACT: A loopback interface for client testing and development
 
@@ -59,7 +59,7 @@ AI::PredictionClient::Testing::PredictionLoopback - A loopback interface for cli
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

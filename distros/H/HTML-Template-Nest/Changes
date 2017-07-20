@@ -4,3 +4,6 @@ Revision history for Perl extension HTML::Template::Nest.
 	- original version; created by h2xs 1.23 with options
 		-AX HTML::Template::Nest
 
+0.03  Sun Jul 17 19:29:05 2017
+	- updated POD, corrected missing dependencies in
+		Makefile.PL

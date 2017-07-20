@@ -23,7 +23,6 @@
          "requires" : {
             "Carp" : "0",
             "Data::Table::Text" : "0",
-            "POSIX" : "0",
             "XML::Parser" : "0"
          }
       }
@@ -31,7 +30,7 @@
    "provides" : {
       "Data::Edit::Xml" : {
          "file" : "lib/Data/Edit/Xml.pm",
-         "version" : "2017.714"
+         "version" : "20170719"
       }
    },
    "release_status" : "stable",
@@ -40,5 +39,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2017.714"
+   "version" : "20170719"
 }

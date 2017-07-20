@@ -1,0 +1,444 @@
+NAME
+    Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
+
+VERSION
+    This document describes version 0.47 of Perinci::CmdLine::Gen (from Perl
+    distribution Perinci-CmdLine-Gen), released on 2017-07-14.
+
+FUNCTIONS
+  gen_pericmd_script
+    Usage:
+
+     gen_pericmd_script(%args) -> [status, msg, result, meta]
+
+    Generate Perinci::CmdLine CLI script.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_prereq => *array[perl::modname]*
+
+        Allow script to depend on these modules.
+
+        Sometimes, as in the case of using "Perinci::CmdLine::Inline",
+        dependency to some modules (e.g. non-core XS modules) are prohibited
+        because the goal is to have a free-standing script. This option
+        allows whitelisting some extra modules.
+
+        If you use "Perinci::CmdLine::Inline", this option will be passed to
+        it.
+
+    *   cmdline => *perl::modname* (default: "Perinci::CmdLine::Any")
+
+        Specify module to use.
+
+    *   code_after_end => *str*
+
+    *   code_before_instantiate_cmdline => *str*
+
+    *   config_dirs => *array[str]*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   config_filename => *str|hash|array[str|hash]*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   default_dry_run => *bool*
+
+        Whether to set default_dry_run, will be passed to Perinci::CmdLine
+        constructor.
+
+    *   default_format => *str*
+
+        Set default format.
+
+    *   default_log_level => *str*
+
+    *   default_subcommand => *str*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   env_name => *str*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   exclude_package_functions_match => *re*
+
+        Exclude package functions matching this pattern.
+
+    *   extra_urls_for_version => *array[str]*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   include_package_functions_match => *re*
+
+        Only include package functions matching this pattern.
+
+    *   interpreter_path => *str*
+
+        What to put on shebang line.
+
+    *   load_module => *array[perl::modname]*
+
+        Load extra modules.
+
+    *   log => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   output_file => *filename* (default: "-")
+
+        Path to output file.
+
+    *   overwrite => *bool* (default: 0)
+
+        Whether to overwrite output if previously exists.
+
+    *   pack_deps => *bool*
+
+        Whether to pack dependencies in Perinci::CmdLine::Inline script.
+
+        Will be passed to Perinci::CmdLine's "gen_inline_pericmd_script"'s
+        "pack_deps" option.
+
+    *   pass_cmdline_object => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+        Currently irrelevant when generating with Perinci::CmdLine::Inline.
+
+    *   per_arg_json => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   per_arg_yaml => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   pod => *bool* (default: 1)
+
+        Whether to generate POD or not.
+
+        Currently only Perinci::CmdLine::Inline generates POD.
+
+    *   prefer_lite => *bool* (default: 1)
+
+        Prefer Perinci::CmdLine::Lite backend.
+
+    *   read_config => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   read_env => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   script_name => *str*
+
+    *   script_summary => *str*
+
+    *   script_version => *str*
+
+        Use this for version number instead.
+
+    *   skip_format => *bool*
+
+        Assume that function returns raw text which needs no formatting.
+
+    *   ssl_verify_hostname => *bool* (default: 1)
+
+        If set to 0, will add: $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;' to
+        code.
+
+    *   subcommands => *hash*
+
+        Hash of subcommand entries, where each entry is "url[:summary]".
+
+        An optional summary can follow the URL, e.g.:
+
+         URL[:SUMMARY]
+
+        Example (on CLI):
+
+         --subcommand add=/My/App/add_item --subcommand bin='/My/App/bin_item:Delete an item'
+
+    *   subcommands_from_package_functions => *bool*
+
+        Form subcommands from functions under package's URL.
+
+        This is an alternative to the "subcommands" option. Instead of
+        specifying each subcommand's name and URL, you can also specify that
+        subcommand names are from functions under the package URL in "url".
+        So for example if "url" is "/My/App/", hen all functions under
+        "/My/App" are listed first. If the functions are:
+
+         foo
+         bar
+         baz_qux
+
+        then the subcommands become:
+
+         foo => /My/App/foo
+         bar => /My/App/bar
+         "baz-qux" => /My/App/baz_qux
+
+    *   url* => *riap::url*
+
+        URL to function (or package, if you have subcommands).
+
+    *   use_cleanser => *bool*
+
+        Whether to use data cleansing before outputting to JSON.
+
+    *   use_utf8 => *bool*
+
+        Whether to set utf8 flag on output, will be passed to
+        Perinci::CmdLine constructor.
+
+    *   validate_args => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  gen_perinci_cmdline_script
+    Usage:
+
+     gen_perinci_cmdline_script(%args) -> [status, msg, result, meta]
+
+    Generate Perinci::CmdLine CLI script.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_prereq => *array[perl::modname]*
+
+        Allow script to depend on these modules.
+
+        Sometimes, as in the case of using "Perinci::CmdLine::Inline",
+        dependency to some modules (e.g. non-core XS modules) are prohibited
+        because the goal is to have a free-standing script. This option
+        allows whitelisting some extra modules.
+
+        If you use "Perinci::CmdLine::Inline", this option will be passed to
+        it.
+
+    *   cmdline => *perl::modname* (default: "Perinci::CmdLine::Any")
+
+        Specify module to use.
+
+    *   code_after_end => *str*
+
+    *   code_before_instantiate_cmdline => *str*
+
+    *   config_dirs => *array[str]*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   config_filename => *str|hash|array[str|hash]*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   default_dry_run => *bool*
+
+        Whether to set default_dry_run, will be passed to Perinci::CmdLine
+        constructor.
+
+    *   default_format => *str*
+
+        Set default format.
+
+    *   default_log_level => *str*
+
+    *   default_subcommand => *str*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   env_name => *str*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   exclude_package_functions_match => *re*
+
+        Exclude package functions matching this pattern.
+
+    *   extra_urls_for_version => *array[str]*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   include_package_functions_match => *re*
+
+        Only include package functions matching this pattern.
+
+    *   interpreter_path => *str*
+
+        What to put on shebang line.
+
+    *   load_module => *array[perl::modname]*
+
+        Load extra modules.
+
+    *   log => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   output_file => *filename* (default: "-")
+
+        Path to output file.
+
+    *   overwrite => *bool* (default: 0)
+
+        Whether to overwrite output if previously exists.
+
+    *   pack_deps => *bool*
+
+        Whether to pack dependencies in Perinci::CmdLine::Inline script.
+
+        Will be passed to Perinci::CmdLine's "gen_inline_pericmd_script"'s
+        "pack_deps" option.
+
+    *   pass_cmdline_object => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+        Currently irrelevant when generating with Perinci::CmdLine::Inline.
+
+    *   per_arg_json => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   per_arg_yaml => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   pod => *bool* (default: 1)
+
+        Whether to generate POD or not.
+
+        Currently only Perinci::CmdLine::Inline generates POD.
+
+    *   prefer_lite => *bool* (default: 1)
+
+        Prefer Perinci::CmdLine::Lite backend.
+
+    *   read_config => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   read_env => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    *   script_name => *str*
+
+    *   script_summary => *str*
+
+    *   script_version => *str*
+
+        Use this for version number instead.
+
+    *   skip_format => *bool*
+
+        Assume that function returns raw text which needs no formatting.
+
+    *   ssl_verify_hostname => *bool* (default: 1)
+
+        If set to 0, will add: $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;' to
+        code.
+
+    *   subcommands => *hash*
+
+        Hash of subcommand entries, where each entry is "url[:summary]".
+
+        An optional summary can follow the URL, e.g.:
+
+         URL[:SUMMARY]
+
+        Example (on CLI):
+
+         --subcommand add=/My/App/add_item --subcommand bin='/My/App/bin_item:Delete an item'
+
+    *   subcommands_from_package_functions => *bool*
+
+        Form subcommands from functions under package's URL.
+
+        This is an alternative to the "subcommands" option. Instead of
+        specifying each subcommand's name and URL, you can also specify that
+        subcommand names are from functions under the package URL in "url".
+        So for example if "url" is "/My/App/", hen all functions under
+        "/My/App" are listed first. If the functions are:
+
+         foo
+         bar
+         baz_qux
+
+        then the subcommands become:
+
+         foo => /My/App/foo
+         bar => /My/App/bar
+         "baz-qux" => /My/App/baz_qux
+
+    *   url* => *riap::url*
+
+        URL to function (or package, if you have subcommands).
+
+    *   use_cleanser => *bool*
+
+        Whether to use data cleansing before outputting to JSON.
+
+    *   use_utf8 => *bool*
+
+        Whether to set utf8 flag on output, will be passed to
+        Perinci::CmdLine constructor.
+
+    *   validate_args => *bool*
+
+        Will be passed to Perinci::CmdLine constructor.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perinci-CmdLine-Gen>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perinci-CmdLine-Gen>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Gen>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

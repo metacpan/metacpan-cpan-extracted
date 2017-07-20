@@ -4,7 +4,7 @@
       "Simon Cozens <simon@cpan.org>, Reini Urban <rurban@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 8.0404, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -43,6 +43,6 @@
          "url" : "http://github.com/rurban/b-flags"
       }
    },
-   "version" : "0.16",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

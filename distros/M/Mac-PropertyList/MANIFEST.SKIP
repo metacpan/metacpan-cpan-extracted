@@ -59,7 +59,9 @@
 
 
 \.travis\.yml
+\.appveyor\.yml
 \.releaserc
 \.lwpcookies
 Mac-\.*
 \.swp$
+\.patch$

@@ -5,12 +5,15 @@ author:
 build_requires:
   Module::Build: '0.28'
 configure_requires:
+  Alien::Base: '0'
   Alien::Base::ModuleBuild: '0.023'
   Alien::ProtoBuf: '0.01'
+  Alien::gmake: '0'
+  Archive::Zip: '0'
   ExtUtils::CppGuess: '0.11'
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,4 +22,4 @@ name: Alien-uPB
 resources:
   homepage: https://github.com/mbarbon/alien-upb
   repository: https://github.com/mbarbon/alien-upb.git
-version: '0.09'
+version: '0.10'

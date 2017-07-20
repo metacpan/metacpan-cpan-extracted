@@ -1,4 +1,10 @@
-#!/usr/local/bin/perl
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '3.005'; # VERSION
+my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::File;
 use PDF::Builder::Basic::PDF::Utils;
@@ -69,9 +75,9 @@ if(scalar @ARGV<2) {
     print "usage: $0 infile outfile\n";
     exit(1);
 }
-$spdf=PDF::Builder::Basic::PDF::File->open($ARGV[0]);
-$tpdf=PDF::Builder::Basic::PDF::File->_new;
-$mycache={};
+my $spdf=PDF::Builder::Basic::PDF::File->open($ARGV[0]);
+my $tpdf=PDF::Builder::Basic::PDF::File->_new;
+my $mycache={};
 $tpdf->{Root}=walk_obj($mycache,$spdf,$tpdf,$spdf->{Root});
 $tpdf->{Info}=walk_obj($mycache,$spdf,$tpdf,$spdf->{Info}) if $spdf->{Info};
 

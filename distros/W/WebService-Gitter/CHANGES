@@ -1,0 +1,157 @@
+==================================================
+Changes from 2016-07-16 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.1.0 at 2017-07-16 04:41:11 +0000
+------------------------------------------
+
+  Change: b8df41f85e987defdc1a727afa72d51cd67b5c4d
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 12:38:33 +0000
+
+    - removed command line program 
+
+  Change: 411634ddf058ee5facbbe58ce11226d8b94814b9
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 12:34:04 +0000
+
+    - Merge branch 'dev' 
+
+  Change: bb91113a8897e9891047b38876a0dbaddba32d69
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 12:32:31 +0000
+
+    - improved 
+
+  Change: cf38383eb60a0bce2e229aa6ccf0b21d7a512b88
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 01:05:41 +0000
+
+    - improved dist 
+
+  Change: 33fc8915b25dc9e17ffb75e404269c7549529d3a
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 01:01:51 +0000
+
+    - add more methods 
+
+  Change: b3d4be733285202d406d95536bf4f18352d755c8
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-16 00:19:06 +0000
+
+    - add more methods and quick patch 
+
+  Change: bc5d791473c3904d5fe0985fe83a173147fc8ac7
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-07-15 11:18:35 +0000
+
+    - refactored 
+
+  Change: d5f0a38b742d05da64404f7ec2727f0934c2cbfb
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 21:02:39 +0000
+
+    commited 
+
+  Change: b1bf1fcf1a8135de8380c73900f42dad0c199a6e
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 21:00:33 +0000
+
+    v0.5.2
+
+    - fixed documentation - updated missing module 
+
+  Change: 038a601f5bf6c40be826f0afec611242618f0ee5
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 15:25:25 +0000
+
+    commited 
+
+  Change: e39067aaae6b59482a4ec17287a6e32333025acf
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 15:23:07 +0000
+
+    0.5.1
+
+    - added documentations for bin/ws-gitter 
+
+  Change: 0caf71314a49807386b0d87a5e989ff204429436
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 11:20:56 +0000
+
+    commited 
+
+  Change: 0ae583d5bf1d8fffe7c67dd3f3ae926409839dc7
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 11:20:01 +0000
+
+    commited 
+
+  Change: 8129f005bb0a3a485350dd25728e2305cd7ccd3b
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-04-05 11:18:50 +0000
+
+    0.5.0
+
+    - added executable that handle common API calling operations. 
+
+  Change: b9f8016c0b8b542800f42fa4b2e639739969cff8
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-03-20 15:48:48 +0000
+
+    0.4.3 
+
+  Change: c1d5e12d19338a3eff37f7c3aa955c7d328f64e6
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-02-09 03:39:01 +0000
+
+    v0.4.2
+
+    - Tidy up 
+
+  Change: 5ebdb747cf0bfd66f707a62adfc3a14eed7ae906
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-21 17:00:35 +0000
+
+    v0.4.1 
+
+  Change: c840daadcc78705ce3e2703d71029c8484bffcd5
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-21 16:57:45 +0000
+
+    v0.4.0 
+
+  Change: 21942a6d12e082fb68db5356bf7d893684dd298e
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-21 12:36:58 +0000
+
+    added messages method 
+
+  Change: 8159b532a4ea91c92863191100d53832ddecc543
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-19 23:41:45 +0000
+
+    v.0.3.1 
+
+  Change: 5b9faea3b0337640bdba1c3f85a572d0f3b52dcb
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-19 23:01:54 +0000
+
+    v0.3.0 
+
+  Change: aace1fa78e9fa355c29f4a9fdfdd94e818c70fe8
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-18 13:30:13 +0000
+
+    v0.2.0 
+
+  Change: 74b0d6b95739a1cdea1dec5e0239ab4515a3d123
+  Author: faraco <skelic3@gmail.com>
+  Date : 2017-01-17 23:57:16 +0000
+
+    v0.0.1 
+
+================
+End of releases.
+================

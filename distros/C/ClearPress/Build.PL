@@ -15,6 +15,7 @@ my $builder = Module::Build->new(
 							 'Class::Accessor'      => '0.31',
 							 'Config::IniFiles'     => '2.38',
 							 'CGI'                  => '3.20',
+                                                         'Data::UUID'           => '1.220',
 							 'DBI'                  => '1.51',
 							 'English'              => '1.01',
 							 'Carp'                 => '1.02',

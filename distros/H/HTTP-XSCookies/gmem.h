@@ -106,7 +106,7 @@ void gmem_fini(void);
   } while (0)
 #define GMEM_NEWARR(array, type, count, size) \
   do { \
-    Newxz(array, count, type);
+    Newxz(array, count, type); \
     gmem_new_called(__FILE__, __LINE__, array, count, size); \
   } while (0)
 #define GMEM_DELARR(array, type, count, size)   \

@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Prty::Option;
 use Prty::FileHandle;
@@ -150,6 +150,15 @@ Kopiere Datei $srcPath nach $destPath.
 
 Erzeuge Zielverzeichnis, falls es nicht existiert.
 
+=item -move => $bool (Default: 0)
+
+Lösche Quelldatei $srcPath nach dem Kopieren.
+
+=item -overwrite => $bool (Default: 1)
+
+Wenn gesetzt, wird die Zieldatei $destPath überschrieben, falls sie
+existiert. Andernfalls wird eine Exception geworfen.
+
 =item -preserve => $bool (Default: 0)
 
 Behalte den Zeitpunkt der letzten Änderung bei.
@@ -169,16 +178,27 @@ sub copy {
     # Optionen
 
     my $createDir = 0;
+    my $move = 0;
+    my $overwrite = 1;
     my $preserve = 0;
 
     if (@_) {
         Prty::Option->extract(\@_,
-            -createDir=>\$createDir,
-            -preserve=>\$preserve,
+            -createDir => \$createDir,
+            -move => \$move,
+            -overwrite => \$overwrite,
+            -preserve => \$preserve,
         );
     }
 
     # Operation ausführen
+
+    if (!$overwrite && -e $destPath) {
+        $class->throw(
+            q{PATH-00099: Zieldatei existiert bereits},
+            Path => $destPath,
+        );
+    }
 
     if ($createDir) {
         my ($destDir) = $class->split($destPath);
@@ -199,6 +219,10 @@ sub copy {
 
     if ($preserve) {
         $class->mtime($destPath,$class->mtime($srcPath));
+    }
+
+    if ($move) {
+        $class->delete($srcPath);
     }
 
     return;
@@ -1787,7 +1811,7 @@ sub symlinkRelative {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

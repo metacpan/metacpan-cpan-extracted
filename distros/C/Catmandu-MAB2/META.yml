@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/jorol/Catmandu-MAB2/issues
   homepage: https://github.com/jorol/Catmandu-MAB2
   repository: https://github.com/jorol/Catmandu-MAB2.git
-version: '0.19'
+version: '0.20'
 x_contributors:
   - 'Johann Rolschewski <rolschewski@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

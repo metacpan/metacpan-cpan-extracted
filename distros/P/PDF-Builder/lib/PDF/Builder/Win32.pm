@@ -3,7 +3,7 @@ package PDF::Builder::Win32;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-# VERSION
+our $VERSION = '3.005'; # VERSION
 my $LAST_UPDATE = '3.002'; # manually update whenever code is changed
 
 use Win32::TieRegistry;

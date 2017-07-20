@@ -27,7 +27,7 @@ my $const = Locale::TextDomain::OO::Util::Constants->instance;
     ->Useqq(1)
     ->Dump;
 
-# $Id: 01_constants.pl 527 2014-10-18 11:01:51Z steffenw $
+# $Id: 01_constants.pl 635 2017-02-23 06:54:16Z steffenw $
 
 __END__
 

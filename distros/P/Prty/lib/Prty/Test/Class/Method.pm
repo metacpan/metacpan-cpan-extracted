@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 # -----------------------------------------------------------------------------
 
@@ -207,7 +207,7 @@ sub type {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

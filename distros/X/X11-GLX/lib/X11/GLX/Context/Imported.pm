@@ -1,6 +1,7 @@
 package X11::GLX::Context::Imported;
-$X11::GLX::Context::Imported::VERSION = '0.02';
-require X11::GLX;
+$X11::GLX::Context::Imported::VERSION = '0.03';
+# All details are handled by XS or parent class
+require X11::GLX::Context;
 
 # ABSTRACT: Wrapper for GLXContext which were imported using glXImportContextEXT
 
@@ -19,12 +20,12 @@ X11::GLX::Context::Imported - Wrapper for GLXContext which were imported using g
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
-A GLXContext imported using L<X11::GLX::glXImportContextEXT>, since it needs
-special cleanup.
+A GLXContext imported using L<X11::GLX::glXImportContextEXT>.
+Imported contexts need special cleanup.
 
 =head1 AUTHOR
 

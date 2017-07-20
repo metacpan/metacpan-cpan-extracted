@@ -1,3 +1,12 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ */
+
 #ifndef TOMCRYPT_H_
 #define TOMCRYPT_H_
 #include <assert.h>
@@ -17,8 +26,8 @@ extern "C" {
 #endif
 
 /* version */
-#define CRYPT   0x0117
-#define SCRYPT  "1.17"
+#define CRYPT   0x0118
+#define SCRYPT  "1.18.0-rc2"
 
 /* max size of either a cipher/hash block or symmetric key [largest of the two] */
 #define MAXBLOCKSIZE  128
@@ -88,6 +97,6 @@ enum {
 #endif /* TOMCRYPT_H_ */
 
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

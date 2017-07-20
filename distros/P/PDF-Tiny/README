@@ -1,4 +1,4 @@
-PDF::Tiny, version 0.08
+PDF::Tiny, version 0.09
 
 A tiny, hopefully super-fast, PDF parser for very simple PDF manipula-
 tion, such as counting and extracting pages or changing metadata.

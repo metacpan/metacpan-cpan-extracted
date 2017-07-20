@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: External libraries wrapped up for your viewing pleasure!
-our $VERSION = '0.94'; # VERSION
+our $VERSION = '0.95'; # VERSION
 
 
 1;
@@ -21,7 +21,7 @@ Alien - External libraries wrapped up for your viewing pleasure!
 
 =head1 VERSION
 
-version 0.94
+version 0.95
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ L<Alien::MSYS> as a requirement on Windows when it is needed.
 
 The original Alien documentation recommends the use of L<Module::Build> 
 (MB), which at the time was recommended over L<ExtUtils::MakeMaker> 
-(EUMM).  May Alien distributions have been written using MB.  Including 
+(EUMM).  Many Alien distributions have been written using MB.  Including 
 the original installer that came with L<Alien::Base>, 
 L<Alien::Base::ModuleBuild>.  I believe this is because it is an easier 
 build system to adapt to the Alien concept.  MB is no longer universally 
@@ -189,10 +189,10 @@ for details on how to create your own L<Alien::Build> based Alien.
 
 An (optional) base class and framework for creating Alien distributions.
 
-=item L<Alien::Build::FAQ>
+=item L<Alien::Base::FAQ>
 
-Frequently Asked Questions for L<Alien::Build>.  Mostly specific to 
-L<Alien::Build>, but also addresses some challenges for Alien in 
+Frequently Asked Questions for L<Alien::Base>.  Mostly specific to 
+L<Alien::Base>, but also addresses some challenges for Alien in 
 general.
 
 =item L<#native on irc.perl.org|http://chat.mibbit.com/#native@irc.perl.org>

@@ -527,7 +527,9 @@ flagspv(sv, type=-1)
                                     sv_catpv(RETVAL, "PCS_IMPORTED,");
           else
 #endif
+#ifdef SVp_SCREAM
           if (flags & SVp_SCREAM)   sv_catpv(RETVAL, "SCREAM,");
+#endif
 #ifdef SVpav_REAL
           if ((flags & SVpav_REAL) && (sv_type == SVt_PVAV))
                                     sv_catpv(RETVAL, "REAL,");
@@ -601,10 +603,16 @@ flagspv(sv, type=-1)
             break;
 #endif
         case SVt_PVBM: /* == PVMG */
+#ifdef SVpbm_TAIL
             if (!(flags & SVp_SCREAM)) {
                 if (SvTAIL(sv))         sv_catpv(RETVAL, "TAIL,");
+#endif
+#ifdef SvVALID_on
                 if (SvVALID(sv))        sv_catpv(RETVAL, "VALID,");
+#endif
+#ifdef SVpbm_TAIL
             }
+#endif
             break;
 #if SVt_PVBM != SVt_PVMG
         case SVt_PVMG:

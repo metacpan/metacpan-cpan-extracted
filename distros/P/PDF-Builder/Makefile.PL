@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008005",
   "NAME" => "PDF::Builder",
   "PREREQ_PM" => {
+    "Test::Exception" => 0,
     "Compress::Zlib" => "1.0",
     "Font::TTF" => 0,
     "utf8" => 0,
@@ -32,7 +33,8 @@ my %WriteMakefileArgs = (
     "List::Util" => 0,
     "POSIX" => 0
   },
-  "VERSION" => "3.004",
+  "VERSION" => "3.005",
+# "VERSION_FROM" => "lib/PDF/Builder.pm",  can't get to work
   "test" => {
     "TESTS" => "t/*.t"
   }

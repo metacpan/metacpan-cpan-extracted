@@ -5,7 +5,7 @@
 #include <limits.h>
 
 #include "utils.h"
-//#include "include/regex38a.h"
+#include "include/regex38a.h"
 #include "regex2.h"
 #include "cclass.h"
 #include "regmem.ih"

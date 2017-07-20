@@ -1,0 +1,17 @@
+Changes
+GraphViz-Diagram-ClassDiagram-0.01.tar.gz
+ignore.txt
+lib/GraphViz/Diagram/ClassDiagram.pm
+lib/GraphViz/Diagram/ClassDiagram/Attribute.pm
+lib/GraphViz/Diagram/ClassDiagram/Class.pm
+lib/GraphViz/Diagram/ClassDiagram/ClassElement.pm
+lib/GraphViz/Diagram/ClassDiagram/GlobalVar.pm
+lib/GraphViz/Diagram/ClassDiagram/Method.pm
+lib/GraphViz/Diagram/ClassDiagram/Node_.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.md
+t/001-load-module.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

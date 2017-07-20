@@ -40,6 +40,10 @@ is $config->original_key( 'core.foobar' ), "core.FooBar",
 is $config->original_key( 'core.FOObar' ), "core.FooBar",
     "Find original case when asked in different case";
 
+eval { $config->get( key => 'core') };
+ok my $err = $@, 'Should get an error when no section passed to get().';
+like $err, qr/No section given in key: core/,
+    'The missing section error should be correct';
 
 my $other_filename = File::Spec->catfile( $config_dirname, 'other' );
 $config->set(

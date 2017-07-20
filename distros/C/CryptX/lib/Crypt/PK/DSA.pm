@@ -2,7 +2,7 @@ package Crypt::PK::DSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.048';
+our $VERSION = '0.050';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw( dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash )] );
@@ -20,6 +20,27 @@ sub new {
   my $self = _new();
   $self->import_key($f, $p) if $f;
   return  $self;
+}
+
+sub generate_key {
+  my $self = shift;
+  return $self->_generate_key_size(@_) if @_ == 2;
+  if (@_ == 1 && ref $_[0] eq 'HASH') {
+    my $param = shift;
+    my $p = $param->{p} or croak "FATAL: 'p' param not specified";
+    my $q = $param->{q} or croak "FATAL: 'q' param not specified";
+    my $g = $param->{g} or croak "FATAL: 'g' param not specified";
+    $p =~ s/^0x//;
+    $q =~ s/^0x//;
+    $g =~ s/^0x//;
+    return $self->_generate_key_pqg($p, $q, $g);
+  }
+  elsif (@_ == 1 && ref $_[0] eq 'SCALAR') {
+    my $data = ${$_[0]};
+    $data = pem_to_der($data) if $data =~ /-----BEGIN DSA PARAMETERS-----\s*(.+)\s*-----END DSA PARAMETERS-----/s;
+    return $self->_generate_key_dsaparam($data);
+  }
+  croak "FATAL: DSA generate_key - invalid args";
 }
 
 sub export_key_pem {
@@ -252,6 +273,14 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  # L = 2048, N = 256 => generate_key(32, 256)
  # L = 3072, N = 256 => generate_key(32, 384)
 
+ $pk->generate_key($param_hash)
+ # $param_hash is { d => $d, p => $p, q => $q }
+ # where $d, $p, $q are hex strings
+
+ $pk->generate_key(\$dsa_param)
+ # $dsa_param is the content of DER or PEM file with DSA params
+ # e.g. openssl dsaparam 2048
+ 
 =head2 import_key
 
 Loads private or public key in DER or PEM format.

@@ -59,7 +59,7 @@ sub import {
 }
 
 
-our $VERSION = '0.0403';    # VERSION
+our $VERSION = '0.0405';    # VERSION
 
 1;
 
@@ -77,7 +77,7 @@ Evo - Evo - the next generation development framework
 
 =head1 VERSION
 
-version 0.0403
+version 0.0405
 
 =head1 DESCRIPTION
 

@@ -222,6 +222,8 @@ sub _on_error ( $self, $reason, $fatal ) {
         $self->{state} = $STATE_DISCONNECTED;
     }
 
+    warn "DBI: $reason";
+
     if ( $state == $STATE_BUSY ) {
         $self->{sth}->{error} = $reason;
     }
@@ -473,6 +475,12 @@ sub _ON_COMMAND_COMPLETE ( $self, $dataref ) {
             rows => 0,
         };
     }
+    elsif ( $val[0] eq 'ALTER' ) {
+        $tag = {
+            tag  => $val[0],
+            rows => 0,
+        };
+    }
     else {
         $tag = {
             tag  => $val[0],
@@ -516,6 +524,8 @@ sub _flush ( $self ) {
 
 sub _execute ( $self, $query, $bind, $cb, %args ) {
     if ( $self->{state} != $STATE_READY ) {
+        warn 'DBI: DBH is busy';
+
         $cb->( result( [ 500, 'DBH is busy' ] ), undef );
 
         return;
@@ -731,6 +741,8 @@ sub selectall ( $self, $query, @args ) {
                 for my $key_field ( is_plain_arrayref $args->{key_field} ? $args->{key_field}->@* : $args->{key_field} ) {
                     if ( looks_like_number $key_field) {
                         if ( $key_field + 1 > $num_of_fields ) {
+                            warn qq[DBI: Invalid field index "$key_field"];
+
                             $cb->( result( [ 500, qq[Invalid field index "$key_field"] ] ), $self, undef );
 
                             return;
@@ -742,6 +754,8 @@ sub selectall ( $self, $query, @args ) {
                         my $idx = $name2idx->{$key_field};
 
                         if ( !defined $idx ) {
+                            warn qq[DBI: Invalid field name "$key_field"];
+
                             $cb->( result( [ 500, qq[Invalid field name "$key_field"] ] ), $self, undef );
 
                             return;
@@ -862,7 +876,13 @@ sub selectcol ( $self, $query, @args ) {
             else {
                 for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
                     if ( looks_like_number $col) {
-                        if ( $col > $num_of_fields ) { $cb->( result( [ 500, qq[Invalid column index: "$col"] ] ), $self, undef ); return }
+                        if ( $col > $num_of_fields ) {
+                            warn qq[DBI: Invalid column index: "$col"];
+
+                            $cb->( result( [ 500, qq[Invalid column index: "$col"] ] ), $self, undef );
+
+                            return;
+                        }
 
                         push @slice, $col;
                     }
@@ -879,7 +899,13 @@ sub selectcol ( $self, $query, @args ) {
                             }
                         }
 
-                        if ( !exists $name2idx->{$col} ) { $cb->( result( [ 500, qq[Invalid column name: "$col"] ] ), $self, undef ); return }
+                        if ( !exists $name2idx->{$col} ) {
+                            warn qq[DBI: Invalid column name: "$col"];
+
+                            $cb->( result( [ 500, qq[Invalid column name: "$col"] ] ), $self, undef );
+
+                            return;
+                        }
 
                         push @slice, $name2idx->{$col};
                     }
@@ -939,11 +965,12 @@ sub rollback ( $self, $cb ) {
 }
 
 # QUOTE
-# https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html
 sub quote_id ( $self, $id ) {
-    $id =~ s/"/""/smg;
+    return $self->{handle}->quote_id($id);
+}
 
-    return qq["$id"];
+sub quote ( $self, $var, $type = undef ) {
+    return $self->{handle}->quote( $var, $type );
 }
 
 1;
@@ -955,18 +982,18 @@ sub quote_id ( $self, $id ) {
 ## |======+======================+================================================================================================================|
 ## |    3 | 179                  | ControlStructures::ProhibitCascadingIfElse - Cascading if-elsif chain                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 517                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (27)                  |
+## |    3 | 525                  | Subroutines::ProhibitExcessComplexity - Subroutine "_execute" with high complexity score (27)                  |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 877                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 897                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 25, 148, 356, 508,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
-## |      | 572, 582, 598, 603,  |                                                                                                                |
-## |      | 608, 614, 623, 630,  |                                                                                                                |
-## |      | 634, 638, 642, 645   |                                                                                                                |
+## |    2 | 25, 148, 358, 516,   | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
+## |      | 582, 592, 608, 613,  |                                                                                                                |
+## |      | 618, 624, 633, 640,  |                                                                                                                |
+## |      | 644, 648, 652, 655   |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 724, 877             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 734, 897             | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 759                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
+## |    2 | 773                  | ControlStructures::ProhibitPostfixControls - Postfix control "for" used                                        |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

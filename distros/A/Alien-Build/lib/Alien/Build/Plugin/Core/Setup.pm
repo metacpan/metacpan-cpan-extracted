@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Config;
 
 # ABSTRACT: Core setup plugin
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 sub init
 {
@@ -36,7 +36,7 @@ Alien::Build::Plugin::Core::Setup - Core setup plugin
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 

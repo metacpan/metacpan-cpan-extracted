@@ -89,7 +89,7 @@ BEGIN {
 # In order to test modulie, we run this over Perl test suite.
 # Then we run the test on the deparsed code. Slick, eh?
 
-# Here are B::Deparse failure notes:
+# Here are B::DeparseTree failure notes:
 
 # Current test.deparse failures
 # comp/hints 6 - location of BEGIN blocks wrt. block openings

@@ -5,7 +5,6 @@ MANIFEST
 MANIFEST.base
 META.json
 META.yml
-Makefile.PL
 README
 lib/Time/OlsonTZ/Data.pm
 lib/Time/OlsonTZ/Data.pm.tpl

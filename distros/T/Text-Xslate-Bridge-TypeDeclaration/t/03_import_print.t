@@ -7,6 +7,29 @@ use Test::More;
 
 use Text::Xslate;
 
+subtest 'default(html)' => sub {
+    my $xslate = Text::Xslate->new(
+        path         => path,
+        cache_dir    => cache_dir,
+        warn_handler => sub {},
+
+        module => [
+            'Text::Xslate::Bridge::TypeDeclaration' => [
+                print => 1,
+            ],
+        ],
+    );
+
+    my $res = $xslate->render('a.tx', { a => "hoge" });
+    is $res, <<EOS;
+<pre class="type-declaration-mismatch">
+Declaration mismatch for `a`
+  Value &quot;hoge&quot; did not pass type constraint &quot;Int&quot;
+</pre>
+hoge
+EOS
+};
+
 subtest 'html' => sub {
     my $xslate = Text::Xslate->new(
         type         => 'html',
@@ -16,7 +39,7 @@ subtest 'html' => sub {
 
         module => [
             'Text::Xslate::Bridge::TypeDeclaration' => [
-                print => 'html',
+                print => 1,
             ],
         ],
     );
@@ -25,8 +48,7 @@ subtest 'html' => sub {
     is $res, <<EOS;
 <pre class="type-declaration-mismatch">
 Declaration mismatch for `a`
-  declaration: &#39;Int&#39;
-        value: &#39;hoge&#39;
+  Value &quot;hoge&quot; did not pass type constraint &quot;Int&quot;
 </pre>
 hoge
 EOS
@@ -41,7 +63,7 @@ subtest 'text' => sub {
 
         module => [
             'Text::Xslate::Bridge::TypeDeclaration' => [
-                print => 'text',
+                print => 1,
             ],
         ],
     );
@@ -49,31 +71,30 @@ subtest 'text' => sub {
     my $res = $xslate->render('a.tx', { a => "hoge" });
     is $res, <<EOS;
 Declaration mismatch for `a`
-  declaration: 'Int'
-        value: 'hoge'
+  Value "hoge" did not pass type constraint "Int"
 hoge
 EOS
 };
 
-subtest 'none' => sub {
-    my $warned = 0;
+subtest 'disabled' => sub {
+    my $died = 0;
 
     my $xslate = Text::Xslate->new(
         type         => 'html' ,
         path         => path,
         cache_dir    => cache_dir,
-        warn_handler => sub { $warned += 1},
+        die_handler => sub { $died += 1},
 
         module => [
             'Text::Xslate::Bridge::TypeDeclaration' => [
-                print => 'none',
+                print => 0,
             ],
         ],
     );
 
     my $res = $xslate->render('a.tx', { a => "hoge" });
     is $res, "hoge\n";
-    is $warned, 1;
+    is $died, 1;
 };
 
 done_testing;

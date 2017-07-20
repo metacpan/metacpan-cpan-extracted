@@ -14,6 +14,7 @@ META.json
 META.yml
 PATENTS
 README
+SUPPORT
 t-tests.bat
 contrib/combine_pdfs.pl
 contrib/pdf-debug.pl

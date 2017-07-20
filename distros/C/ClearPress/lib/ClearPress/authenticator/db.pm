@@ -1,11 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Last Modified: $Date: 2015-09-21 10:19:13 +0100 (Mon, 21 Sep 2015) $
-# Id:            $Id: db.pm 470 2015-09-21 09:19:13Z zerojinx $
-# Source:        $Source$
-# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/authenticator/db.pm $
+# Author: rmp
 #
 package ClearPress::authenticator::db;
 use strict;
@@ -15,7 +11,7 @@ use Readonly;
 use Carp;
 use English qw(-no_match_vars);
 
-our $VERSION = q[475.3.3];
+our $VERSION = q[476.1.1];
 
 __PACKAGE__->mk_accessors(qw(dbh));
 

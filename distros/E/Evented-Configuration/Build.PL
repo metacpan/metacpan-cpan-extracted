@@ -8,51 +8,18 @@ my $class = Module::Build->subclass(
     class => 'Evented::Configuration::Builder',
     code => q{
         sub ACTION_distmeta {
+            use Pod::Readme;
+            use Pod::Select;
+
             my $self = shift;
-            if (eval { require Pod::Markdown; 1 }) {
 
-                $self->log_info("Creating README.md using Pod::Markdown\n");
-                open my $fh, '>', 'README.md' or return $self->SUPER::ACTION_distmeta(@_);
+            podselect({ -output => 'README.pod' },
+                'lib/Evented/Configuration.pm');
 
-                my $p = Pod::Markdown->new;
-                my $markdown;
-                $p->output_string(\$markdown);
-                $p->parse_file('lib/Evented/Configuration.pm') or return $self->SUPER::ACTION_distmeta(@_);
+            my $parser = Pod::Readme->new();
+            $parser->parse_from_file('README.pod', 'README');
 
-                my (@lines, $in_block);
-                foreach my $line (split "\n", $markdown) {
-
-                    # indented code.
-                    if (substr($line, 0, 4) eq '    ') {
-                        my $code = substr($line, 4, length($line) - 4);
-                        if ($in_block) {
-                            push @lines, $code;
-                            next;
-                        }
-
-                        push @lines, '````perl', $code;
-                        $in_block = 1;
-                        next;
-                    }
-
-                    # not indented.
-                    if ($in_block) {
-                        push @lines, '```', $line;
-                        $in_block = 0;
-                        next;
-                    }
-
-                    push @lines, $line;
-                }
-
-                print $fh $_, "\n" foreach @lines;
-                close $fh;
-                $self->_add_to_manifest('MANIFEST', 'README.md');
-            }
-            else {
-                $self->log_warn("Cannot create README.md; Pod::Markdown unavailable\n");
-            }
-            return $self->SUPER::ACTION_distmeta(@_);
+            return $self->SUPER::ACTION_docs;
         }
     }
 );
@@ -65,8 +32,13 @@ my $build = $class->new(
         'perl'              => '5.010',
         'Evented::Object'   => '5.55'
     },
+    build_requires      => {
+        'Test::More'    => 0,
+    },
     configure_requires  => {
-        'Module::Build'     => '0.42'
+        'Module::Build'     => '0.42',
+        'Pod::Readme'       => 0,
+        'Pod::Select'       => 0
     },
     recommends          => {},
     build_requires      => {},

@@ -1,10 +1,10 @@
 {
    "abstract" : "IO::All to Larry Wall!",
    "author" : [
-      "Ingy döt Net <ingy@cpan.org>"
+      "Ingy d\u00f6t Net <ingy@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -15,10 +15,10 @@
    "name" : "IO-All",
    "no_index" : {
       "directory" : [
+         "example",
          "inc",
          "t",
-         "xt",
-         "example"
+         "xt"
       ]
    },
    "prereqs" : {
@@ -56,6 +56,7 @@
          "web" : "https://github.com/ingydotnet/io-all-pm"
       }
    },
-   "version" : "0.86"
+   "version" : "0.87",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

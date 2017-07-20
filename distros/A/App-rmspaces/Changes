@@ -1,0 +1,17 @@
+Revision history for Perl module App::rmspaces
+
+0.4 2017-07-19
+  * Fix license fields for metadata.
+  * Include test suite in distribution.
+
+0.3 2017-07-18
+  * Document mass moving files feature.
+  * rmspaces is now under the App::rmspaces module.
+
+0.2 2017-07-05
+  * Verbose option.
+
+0.1 2017-07-05
+  * Option to select which char be replaced.
+  * Option to select which char to replace spaces.
+  * Help option.

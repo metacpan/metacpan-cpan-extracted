@@ -4,10 +4,6 @@ author:
   - 'Tim Bunce <Tim.Bunce@pobox.com>'
 build_requires:
   Archive::Tar: '0'
-  File::Spec: '0'
-  File::Temp: '0'
-  IO::Handle: '0'
-  IPC::Open3: '0'
   Test::More: '0.88'
   Test::RequiresInternet: '0'
   perl: '5.006'
@@ -30,16 +26,16 @@ no_index:
 provides:
   Dist::Surveyor:
     file: lib/Dist/Surveyor.pm
-    version: '0.019'
+    version: '0.020'
   Dist::Surveyor::DB_File:
     file: lib/Dist/Surveyor/DB_File.pm
-    version: '0.019'
+    version: '0.020'
   Dist::Surveyor::Inquiry:
     file: lib/Dist/Surveyor/Inquiry.pm
-    version: '0.019'
+    version: '0.020'
   Dist::Surveyor::MakeCpan:
     file: lib/Dist/Surveyor/MakeCpan.pm
-    version: '0.019'
+    version: '0.020'
 requires:
   CPAN::DistnameInfo: '0'
   Compress::Zlib: '0'
@@ -58,7 +54,7 @@ requires:
 resources:
   homepage: https://github.com/Grinnz/Dist-Surveyor
   repository: https://github.com/Grinnz/Dist-Surveyor.git
-version: '0.019'
+version: '0.020'
 x_contributors:
   - 'Dan Book <grinnz@grinnz.com>'
   - 'Naveed Massjouni <naveedm9@gmail.com>'

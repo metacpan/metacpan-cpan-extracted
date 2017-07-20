@@ -6,7 +6,6 @@ In order of priority:
   - Parse AMA-type topic pages, with questions + answers
   - Make entries WWW::Eksi::Entry objects
   - Make authors WWW::Eksi::Author objects
-  - Write an explanation why there is no time zone
 
 Future:
   - login, post, vote

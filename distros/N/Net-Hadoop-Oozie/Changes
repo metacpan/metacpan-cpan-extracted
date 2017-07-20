@@ -1,5 +1,8 @@
 Revision history for Net-Hadoop-Oozie
 
+0.110 2017-07-18 BURAK
+    - Detect secure clusters.
+
 0.109 2016-11-24 BURAK
     - Remove the next as it can't be used to skip the iteration and causing weird errors in return.
 

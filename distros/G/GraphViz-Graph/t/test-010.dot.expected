@@ -1,0 +1,44 @@
+digraph {
+  nd_0001 [
+    shape=none
+    
+  label="A"
+  ];
+
+  nd_0002 [
+    shape=none
+    
+  label="B"
+  ];
+
+  nd_0003 [
+    shape=none
+    
+  label="C"
+  ];
+
+  nd_0004 [
+    shape=none
+    
+  label="D"
+  ];
+
+  nd_0005 [
+    shape=none
+    
+  label="E"
+  ];
+
+  nd_0006 [
+    shape=none
+    
+  label="F"
+  ];
+
+nd_0001 -> nd_0002;
+nd_0002 -> nd_0003;
+nd_0006 -> nd_0005;
+nd_0005 -> nd_0004;
+  {rank=same; nd_0002 nd_0003 nd_0004}
+  {rank=same; nd_0001 nd_0006}
+}

@@ -2,28 +2,33 @@
 abstract: 'An interface to Gitter REST API via Perl 5.'
 author:
   - 'faraco <skelic3@gmail.com>'
-build_requires: {}
+build_requires:
+  Modern::Perl: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: WebService-Gitter
 requires:
-  Data::Dumper: '2.161'
-  Getopt::Long::Descriptive: '0.100'
-  JSON::MaybeXS: '1.003008'
-  LWP::UserAgent: '6.15'
-  Moo: '2.003000'
-  Net::Ping: '2.58'
-  Test::More: '1.302075'
-  perl: '5.012'
+  Data::Dumper: '0'
+  Function::Parameters: '0'
+  LWP::Online: '0'
+  Moo: '0'
+  WebService::Client: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: https://github.com/faraco/WebService-Gitter/issues
+  bugtracker: https://github.com/faraco/WebService-Pixabay/issues
   homepage: https://github.com/faraco/WebService-Gitter
   repository: https://github.com/faraco/WebService-Gitter.git
-version: 0.5.2
+version: 1.1.0
 x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -3,7 +3,7 @@ package Prty::Object;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -55,18 +55,17 @@ Der Aufruf ist äquivalent zu:
 sub bless {
     my ($class,$ref) = @_;
 
-    my $isLocked;
-    if (Scalar::Util::reftype($ref) eq 'HASH') {
-        $isLocked = !Hash::Util::hash_unlocked(%$ref);
-        if ($isLocked) {
-            Hash::Util::unlock_keys(%$ref);
-        }
+    if (Scalar::Util::reftype($ref) ne 'HASH') {
+        CORE::bless $ref,$class;
     }
-
-    CORE::bless $ref,$class;
-
-    if ($isLocked) {
-        Hash::Util::lock_keys(%$ref);
+    else { # HASH
+        local $@;
+        eval {CORE::bless $ref,$class};
+        if ($@) { # Restricted Hash gelocked
+            Hash::Util::unlock_keys(%$ref);
+            CORE::bless $ref,$class;
+            Hash::Util::lock_keys(%$ref);
+        }
     }
 
     return $ref;
@@ -414,7 +413,7 @@ sub this {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

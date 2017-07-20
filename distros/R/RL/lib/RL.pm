@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use XSLoader;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 XSLoader::load();
 
 sub completion_helper {
@@ -81,7 +81,10 @@ includes an interface to the history library functions.
 
 If you're using a Mac, you may notice bash reads .inputrc since
 bash is statically linked with GNU readline, but this library isnt
-available for linking into other programs.
+available for linking into other programs. I've also noticed libedit
+doesn't handle ansi escape codes in the prompt well, even though
+it mentions \1 and \2 in its header file (the codes are used around
+ansi escape codes in readline to specify they are 0 width).
 
 No subroutines are exported, you must access all within the RL
 namespace. for example, instead of C<readline($prompt)>, you
@@ -91,6 +94,18 @@ This package also comes with a script called pl, which is a repl
 for the Perl language, to quickly test commands, or do mathematical
 calculations, etc.
 
+Recommendation: Add the following to your .editrc file to get
+previous and next history entries that match your partially typed
+command (only for OS X's readline):
+
+    bind ^[[A ed-search-prev-history
+    bind ^[[B ed-search-next-history
+
+For Linux, you would put this into your .inputrc:
+
+    "\e[A": history-search-backward
+    "\e[B": history-search-forward
+
 =head1 MAIN INTERFACE
 
 =head2 readline($prompt)
@@ -98,6 +113,9 @@ calculations, etc.
 Prompts the user for input and returns the string they gave you.
 
 =head1 READLINE VARIABLES
+
+These variables in the readline library are exported to Perl space
+as getter/setter functions. Readonly variables do not take arguments.
 
 =head2 line_buffer([$string])
 

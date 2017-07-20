@@ -5,7 +5,7 @@ package Cisco::Reconfig;
 @EXPORT = qw(readconfig);
 @EXPORT_OK = qw(readconfig stringconfig $minus_one_indent_rx);
 
-$VERSION = '0.911';
+$VERSION = '0.912';
 
 require Exporter;
 use strict;
@@ -16,7 +16,7 @@ use IO::File;
 use Scalar::Util qw(weaken);
 my $iostrings;
 our $allow_minus_one_indent = qr/class /;
-our $allow_plus_one_indent = qr/service-policy /;
+our $allow_plus_one_indent = qr/service-policy |quit$/;
 our $bad_indent_policy = 'DIE';
 
 

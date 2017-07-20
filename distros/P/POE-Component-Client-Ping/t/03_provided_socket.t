@@ -124,8 +124,7 @@ sub client_stop {
 use Symbol qw(gensym);
 use Socket;
 
-my $protocol = (getprotobyname('icmp'))[2]
-  or die "can't get icmp protocol by name: $!";
+my $protocol = Socket::IPPROTO_ICMP;
 
 my $socket = gensym();
 socket($socket, PF_INET, SOCK_RAW, $protocol)

@@ -10,12 +10,19 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: WWW-Eksi
+provides:
+  WWW::Eksi:
+    file: lib/WWW/Eksi.pm
+    version: '0.27'
+  WWW::Eksisozluk:
+    file: lib/WWW/Eksisozluk.pm
+    version: '0.27'
 requires:
   Carp: '0'
   DateTime: '0'
@@ -33,7 +40,7 @@ resources:
   bugtracker: https://github.com/kyzn/WWW-Eksi/issues
   homepage: https://github.com/kyzn/WWW-Eksi
   repository: https://github.com/kyzn/WWW-Eksi.git
-version: '0.26'
+version: '0.27'
 x_contributors:
   - 'Kivanc Yazan <kivancyazan@gmail.com>'
   - 'Kivanc Yazan <kyzn@users.noreply.github.com>'

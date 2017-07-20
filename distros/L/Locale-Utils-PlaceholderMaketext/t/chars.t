@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use File::Find;
 use Test::More;
 
 $ENV{AUTHOR_TESTING}
-    or plan skip_all => 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
+    or plan( skip_all => 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.' );
 
 my $UNTAINT_FILENAME_PATTERN = qr{\A (
     (?:
@@ -47,7 +47,7 @@ find(
     $PATH,
 );
 
-plan tests => 6 * scalar @list;
+plan( tests => 6 * scalar @list );
 
 my @ignore_non_ascii = (
 );

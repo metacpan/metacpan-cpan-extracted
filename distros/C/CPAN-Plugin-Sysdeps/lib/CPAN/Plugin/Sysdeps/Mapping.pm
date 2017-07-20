@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 # shortcuts
 #  os and distros
@@ -1803,6 +1803,13 @@ sub mapping {
        ],
        [package => 'libnanomsg-dev']]],
 
+     [cpanmod => 'Net::Bluetooth',
+      [like_debian,
+       [package => 'libbluetooth-dev']],
+      [like_fedora,
+       [package => 'bluez-libs-devel']],
+     ],
+
      [cpanmod => 'Net::CDP',
       [os_freebsd,
        [package => 'libnet']], # but build failure with Net-CDP-0.09
@@ -2392,7 +2399,10 @@ sub mapping {
        [package => 'fribidi']],
       [like_debian,
        # on wheezy the library is too old, so tests are anyway skipped
-       [package => 'libfribidi-dev']]],
+       [package => 'libfribidi-dev']],
+      [like_fedora,
+       [package => 'fribidi-devel']],
+     ],
 
      [cpanmod => 'Text::CSV::LibCSV',
       [os_freebsd,
@@ -2664,7 +2674,9 @@ sub mapping {
       [os_freebsd,
        [package => 'libzmq4']], # seems to hang with nonthreaded perls on freebsd, wait-and-kill rule exists
       [like_debian,
-       [package => 'libzmq-dev']],
+       [linuxdistrocodename => [qw(squeeze wheezy jessie xenial)],
+	[package => 'libzmq-dev']],
+       [package => 'libzmq3-dev']], # e.g. stretch
       [os_darwin,
        [package => 'zmq']],
      ],

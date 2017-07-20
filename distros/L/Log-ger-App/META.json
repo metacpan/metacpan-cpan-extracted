@@ -29,6 +29,7 @@
       "runtime" : {
          "requires" : {
             "Log::ger" : "0.015",
+            "Log::ger::Layout::Pattern" : "0",
             "Log::ger::Output" : "0.005",
             "Log::ger::Output::Composite" : "0.005",
             "Log::ger::Output::File" : "0.002",
@@ -61,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-App"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

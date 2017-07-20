@@ -1,5 +1,10 @@
 Revision history for Perl extension HTTP-Entity-Parser
 
+0.20 2017-07-18T03:54:04Z
+
+   - [fixed] Throws exception when psgi.input is undef #6
+   - [fixed] dechunk loop can stuck on empty chunked post #7
+
 0.19 2017-02-07T08:19:45Z
 
    - Adjust tests for module load from a relative path when . is not in @INC (Thank you toddr)

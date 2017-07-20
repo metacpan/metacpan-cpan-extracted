@@ -38,11 +38,17 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.1"
+            "JSON" : "0",
+            "MIME::Base64" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Params::Validate" : "0",
+            "REST::Client" : "0",
+            "perl" : "5.010001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

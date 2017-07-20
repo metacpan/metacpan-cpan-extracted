@@ -1,6 +1,7 @@
 package XML::SAX::Writer::XML;
-$XML::SAX::Writer::XML::VERSION = '0.56';
+$XML::SAX::Writer::XML::VERSION = '0.57';
 use strict;
+use warnings;
 use XML::NamespaceSupport   qw();
 @XML::SAX::Writer::XML::ISA = qw(XML::SAX::Writer);
 
@@ -19,6 +20,7 @@ sub start_document {
 
     $self->setConverter;
     $self->setEscaperRegex;
+    $self->setAttributeEscaperRegex;
     $self->setCommentEscaperRegex;
 
     $self->{NSDecl} = [];
@@ -98,7 +100,7 @@ sub start_element {
     # build a string from what we have, and buffer it
     my $el = '<' . $data->{Name};
     for my $k (keys %attr_hash) {
-        $el .= ' ' . $k . qq[=$self->{QuoteCharacter}] . $self->escape($attr_hash{$k}) . qq[$self->{QuoteCharacter}];
+        $el .= ' ' . $k . qq[=$self->{QuoteCharacter}] . $self->escapeAttribute($attr_hash{$k}) . qq[$self->{QuoteCharacter}];
     }
 
     $self->{BufferElement} = $el;
@@ -479,14 +481,14 @@ sub xml_decl {
     # also, there's order in the pseudo-attr
     my $xd = '';
     if ($data->{Version}) {
-        $xd .= "<?xml version='$data->{Version}'";
+        $xd .= "<?xml version=\"$data->{Version}\"";
         if ($data->{Encoding}) {
-            $xd .= " encoding='$data->{Encoding}'";
+            $xd .= " encoding=\"$data->{Encoding}\"";
         }
         if ($data->{Standalone}) {
-            $xd .= " standalone='$data->{Standalone}'";
+            $xd .= " standalone=\"$data->{Standalone}\"";
         }
-        $xd .= '?>';
+        $xd .= "?>\n";
     }
 
     #$xd = $self->{Encoder}->convert($xd); # this may blow up
@@ -546,7 +548,7 @@ XML::SAX::Writer::XML - XML::SAX::Writer's SAX Handler
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -555,20 +557,6 @@ version 0.56
 =head1 DESCRIPTION
 
 ...
-
-=head1 NAME
-
-XML::SAX::Writer::XML - SAX2 XML Writer
-
-=head1 AUTHOR
-
-Robin Berjon, robin@knowscape.com
-
-=head1 COPYRIGHT
-
-Copyright (c) 2001-2006 Robin Berjon and Perl XML project. All rights reserved. 
-This program is free software; you can redistribute it and/or modify it under 
-the same terms as Perl itself.
 
 =head1 SEE ALSO
 

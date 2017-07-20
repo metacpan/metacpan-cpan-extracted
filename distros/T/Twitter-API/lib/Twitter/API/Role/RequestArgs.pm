@@ -1,6 +1,6 @@
 package Twitter::API::Role::RequestArgs;
 # ABSTRACT: API request method helpers
-$Twitter::API::Role::RequestArgs::VERSION = '0.0112';
+$Twitter::API::Role::RequestArgs::VERSION = '0.0113';
 use 5.14.1;
 use warnings;
 use Carp;
@@ -197,7 +197,7 @@ Twitter::API::Role::RequestArgs - API request method helpers
 
 =head1 VERSION
 
-version 0.0112
+version 0.0113
 
 =head1 SYNOPSIS
 

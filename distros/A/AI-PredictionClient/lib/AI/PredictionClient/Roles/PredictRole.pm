@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::Roles::PredictRole;
-$AI::PredictionClient::Roles::PredictRole::VERSION = '0.01';
+$AI::PredictionClient::Roles::PredictRole::VERSION = '0.03';
 # ABSTRACT: Implements the Predict service specific interface
 
 use AI::PredictionClient::Classes::SimpleTensor;
@@ -63,7 +63,7 @@ AI::PredictionClient::Roles::PredictRole - Implements the Predict service specif
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

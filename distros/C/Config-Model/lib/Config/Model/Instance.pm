@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.105';
+$Config::Model::Instance::VERSION = '2.106';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -509,7 +509,7 @@ sub write_back {
 
     if ($self->has_no_write_back ) {
         my $info = $self->application ? "the model of application ".$self->application
-            : "model ".$self->root_cladd_name ;
+            : "model ".$self->root_class_name ;
         croak "Don't know how to save data of $self->{name} instance. ",
             "Either $info has no configured ",
             "read/write backend or no node containing a backend was loaded. ",
@@ -633,7 +633,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.105
+version 2.106
 
 =head1 SYNOPSIS
 
@@ -689,7 +689,9 @@ model. This model can be specified by its application name:
 
 The directory (or directories) holding configuration files is
 specified within the configuration model. For test purpose you can
-change the "root" directory with C<root_dir> parameter:
+change the "root" directory with C<root_dir> parameter.
+
+Constructor parameters are:
 
 =over
 

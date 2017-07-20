@@ -1,3 +1,16 @@
+version 0.005; 2017-07-19
+
+  * port to Perl 5.19.4, where the C type of array indices has changed
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * use cBOOL() where appropriate
+
 version 0.004; 2012-02-05
 
   * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation

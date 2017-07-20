@@ -1,6 +1,14 @@
 Revision history for Perl extension Text-Xslate-Bridge-TypeDeclaration
 
+0.11 2017-07-17T08:20:48Z
+    - Update POD
+
+0.10 2017-07-17T06:15:04Z
+    [BREAKING RELEASE]
+    - Using Type::Tiny in #3.
+    - ArrayRef no longer treat as a Tuple type.
+    - Detecting the ouput format to escape. The `print` option will not take format.
+
 0.01 2017-06-26T09:15:56Z
 
     - original version
-

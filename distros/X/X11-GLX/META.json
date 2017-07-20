@@ -4,13 +4,13 @@
       "Michael Conrad <mike@nrdvana.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "X11-GLX",
    "prereqs" : {
@@ -19,12 +19,13 @@
             "Devel::CheckLib" : "1.03",
             "ExtUtils::Depends" : "0.405",
             "ExtUtils::MakeMaker" : "0",
-            "X11::Xlib" : "0.12"
+            "X11::Xlib" : "0.15"
          }
       },
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0.88",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08"
          }
@@ -34,9 +35,11 @@
             "Carp" : "0",
             "Exporter" : "0",
             "Log::Any" : "0",
-            "Moo" : "0",
+            "Moo" : "2",
             "OpenGL" : "0",
+            "Scalar::Util" : "0",
             "X11::Xlib" : "0.11",
+            "X11::Xlib::Opaque" : "0",
             "X11::Xlib::Pixmap" : "0",
             "XSLoader" : "0",
             "parent" : "0",
@@ -46,9 +49,13 @@
       },
       "test" : {
          "requires" : {
+            "FindBin" : "0",
             "Log::Any::Adapter" : "0",
             "Log::Any::Adapter::TAP" : "0",
-            "Test::More" : "0"
+            "POSIX" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "lib" : "0"
          }
       }
    },
@@ -63,6 +70,6 @@
          "web" : "https://github.com/nrdvana/perl-X11-GLX"
       }
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }
 

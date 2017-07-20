@@ -1,5 +1,11 @@
 Revision history for Perl module Regexp::Common::time.
 
+0.12  2017-07-19 MANWAR
+      - Added key 'provides' to the Makefile.PL script.
+
+0.11  2017-07-14 MANWAR
+      - Added key 'dist' to the Makefile.PL script.
+
 0.10  2017-07-08 MANWAR
       - Added key 'clean' to the Makefile.PL script.
 

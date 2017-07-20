@@ -33,13 +33,13 @@ produces output
     secret
 
 
-(This example is included as L<F<rot13.pl>|https://api.metacpan.org/source/BKB/Convert-Moji-0.09/examples/rot13.pl> in the distribution.)
+(This example is included as L<F<rot13.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.10/examples/rot13.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Convert::Moji version 0.09
-corresponding to git commit L<3715d9fda9f4eebccce92de4d9bbbcf94fbb1f28|https://github.com/benkasminbullock/Convert-Moji/commit/3715d9fda9f4eebccce92de4d9bbbcf94fbb1f28> released on Sun Mar 26 11:44:22 2017 +0900.
+This documents Convert::Moji version 0.10
+corresponding to git commit L<d50903a067cce1095da4b872fa65afa550d69e6b|https://github.com/benkasminbullock/Convert-Moji/commit/d50903a067cce1095da4b872fa65afa550d69e6b> released on Thu Jul 20 11:44:58 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ used for converting between various Japanese methods of writing. It
 was split out of that module to be a general-purpose converter for any
 alphabets.
 
-=head1 FUNCTIONS
+=head1 METHODS
 
 =head2 new
 
@@ -84,7 +84,6 @@ the table. For example
     my $out = $conv->convert ("a b c");
     my $back = $conv->invert ($out);
     print "$out, $back\n";
-    
 
 
 produces output
@@ -92,7 +91,7 @@ produces output
     apple banana c, a b c
 
 
-(This example is included as L<F<crazyhash.pl>|https://api.metacpan.org/source/BKB/Convert-Moji-0.09/examples/crazyhash.pl> in the distribution.)
+(This example is included as L<F<crazyhash.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.10/examples/crazyhash.pl> in the distribution.)
 
 
 The hash keys and values can be any length.
@@ -135,9 +134,9 @@ module when you create the object using a keyword "oneway":
 
     my $uninvertible = Convert::Moji->new (["oneway", "table", $mytable]);
 
-Then the method C<$uninvertible->invert> doesn't do anything. You can
-also selectively choose which operations of a list are invertible and
-which aren't, so that only the invertible ones do something.
+Then the method C<< $uninvertible->invert >> doesn't do anything. You
+can also selectively choose which operations of a list are invertible
+and which aren't, so that only the invertible ones do something.
 
 =head3 Load from a file
 
@@ -244,7 +243,7 @@ produces output
     max, bad, and trombone to know
 
 
-(This example is included as L<F<trombone.pl>|https://api.metacpan.org/source/BKB/Convert-Moji-0.09/examples/trombone.pl> in the distribution.)
+(This example is included as L<F<trombone.pl>|https://fastapi.metacpan.org/source/BKB/Convert-Moji-0.10/examples/trombone.pl> in the distribution.)
 
 
 For more examples, see the "joke" program at
@@ -275,6 +274,15 @@ Uses this module.
 =item L<Data::Munge/list2re>
 
 This is similar to L</make_regex> in this module.
+
+=item L<Lingua::Translit>
+
+Transliterates text between writing systems
+
+=item L<Match a dictionary against a string|https://www.lemoda.net/perl/match-dictionary-modules/index.html>
+
+A list of various other CPAN modules for matching a dictionary of
+words against strings.
 
 =back
 

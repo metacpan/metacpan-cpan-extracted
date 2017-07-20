@@ -326,6 +326,7 @@ sub sign {
 	my $signature = $hmac->digest;
 	$signature = encode_base64($signature, '');
 	$signature =~ s/=//;
+	$signature =~ s/[^A-Za-z0-9]//g;
 	$log->debugf ("signature :: ".$signature);
 	return $signature;
 }

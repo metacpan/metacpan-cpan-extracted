@@ -4,10 +4,10 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/Time/OlsonTZ/Download.pm
 t/pod_cvg.t
 t/pod_syn.t
 t/use.t
+xt/latest.t
 SIGNATURE    Added here by Module::Build

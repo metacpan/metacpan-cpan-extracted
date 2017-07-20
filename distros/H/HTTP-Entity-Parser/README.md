@@ -63,7 +63,7 @@ This module supports application/x-www-form-urlencoded, multipart/form-data and 
             "name" => "upload", #field name
             "headers" => [
                 "Content-Type" => "application/octet-stream",
-                "Content-Disposition" => "form-data; name=\"upload\"; filename=\"hello.pl\""           
+                "Content-Disposition" => "form-data; name=\"upload\"; filename=\"hello.pl\""
             ],
             "size" => 78, #size of upload content
             "filename" => "hello.png", #original filename in the client
@@ -84,7 +84,7 @@ This module supports application/x-www-form-urlencoded, multipart/form-data and 
 
 - OctetStream
 
-    Default parser, This parser does not parse entity, always return empty list. 
+    Default parser, This parser does not parse entity, always return empty list.
 
 - UrlEncoded
 

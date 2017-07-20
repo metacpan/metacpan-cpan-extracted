@@ -19,11 +19,13 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Authen::Passphrase::Scrypt: '0'
 requires:
   Authen::Passphrase: '0'
   Authen::Passphrase::BlowfishCrypt: '0'
-  Bytes::Random::Secure: '0'
   DBI: '0'
+  Data::Entropy: '0'
   Email::Sender::Simple: '0'
   Email::Simple: '0'
   IO::Prompter: '0'
@@ -32,5 +34,5 @@ requires:
   perl: '5.014000'
 resources:
   repository: https://git.ieval.ro/?p=plack-middleware-auth-complex.git
-version: '0.002'
+version: '0.003001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

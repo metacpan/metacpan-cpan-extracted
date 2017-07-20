@@ -1,5 +1,7 @@
 use Mojo::Base -strict;
 
+use lib('lib');
+
 use Test::More;
 use Mojolicious::Lite;
 use Test::Mojo;

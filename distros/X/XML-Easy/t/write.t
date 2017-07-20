@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Encode qw(decode);
 use IO::File ();
 use Params::Classify qw(scalar_class);

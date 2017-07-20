@@ -1,5 +1,12 @@
-SYNOPSIS
+NAME
+    Dist::Zilla::Plugin::Depak - Pack dependencies onto scripts during build
+    using 'depak'
 
+VERSION
+    This document describes version 0.21 of Dist::Zilla::Plugin::Depak (from
+    Perl distribution Dist-Zilla-Plugin-Depak), released on 2017-07-14.
+
+SYNOPSIS
     In dist.ini:
 
      [Depak]
@@ -8,13 +15,13 @@ SYNOPSIS
      ;include_script=bin/script1
      ;include_script=bin/script2
 
-    In depak.conf in dist top-level directory, put your depak
+    In "depak.conf" in dist top-level directory, put your depak
     configuration.
 
     During build, your scripts will be replaced with the packed version.
 
-    Also, you should also have a module named Something::Packed (i.e. whose
-    name ends in ::Packed), which contains:
+    Also, you should also have a module named "Something::Packed" (i.e.
+    whose name ends in "::Packed"), which contains:
 
      # PACKED_MODULES
      # PACKED_DISTS
@@ -25,16 +32,15 @@ SYNOPSIS
      our @PACKED_DISTS = (...); # PACKED_DISTS
 
 DESCRIPTION
-
     This plugin will replace your scripts with the packed version (that is,
     scripts that have their dependencies packed onto themselves). Packing
     will be done using depak.
 
-    If depak.conf exists in your dist's top-level directory, it will be
-    used as the depak configuration.
+    If depak.conf exists in your dist's top-level directory, it will be used
+    as the depak configuration.
 
     In addition to replacing scripts with the packed version, it will also
-    search for directives # PACKED_MODULES and # PACKED_DISTS in module
+    search for directives "# PACKED_MODULES" and "# PACKED_DISTS" in module
     files and replace them with %PACKED_MODULES and @PACKED_DISTS. The
     %PACKED_MODULES hash lists all the modules that are included in the one
     of the scripts. This can be useful for tools that might need it.
@@ -42,22 +48,46 @@ DESCRIPTION
     scripts. This also can be useful for tools that might need it, like
     Dist::Zilla::Plugin::PERLANCAR::CheckDepDists.
 
-    There is also # PACKED_CONTENTS_POD which you can put in your script.
+    There is also "# PACKED_CONTENTS_POD" which you can put in your script.
     It will be replaced with POD that list the packed modules/dists.
 
 CONFIGURATION
-
- include_script = str+
-
+  include_script = str+
     Explicitly include only specified script. Can be specified multiple
-    times. The default, when no include_script configuration is specified,
+    times. The default, when no "include_script" configuration is specified,
     is to include all scripts in the distribution.
 
- exclude_script = str+
-
+  exclude_script = str+
     Exclude a script. Can be specified multiple times.
 
-SEE ALSO
+  put_hook_at_the_end => bool
+    Will be passed to "depak".
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-Depak>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-Depak>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Dep
+    ak>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     depak
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

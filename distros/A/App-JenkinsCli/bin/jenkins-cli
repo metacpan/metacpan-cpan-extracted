@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use FindBin qw/$Bin/;
 use App::JenkinsCli;
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 exit main();
@@ -32,7 +32,7 @@ sub main {
                     notbuilt => 'grey12',
                 },
             },
-            sub_command => [
+            sub_command => {
                 ls      => [],
                 list    => [
                     'long|l',
@@ -59,7 +59,7 @@ sub main {
                     'sleep|s=i',
                     'verbose|v+',
                 ],
-            ],
+            },
             auto_complete => sub {
                 my ($option, $auto, $errors) = @_;
                 my $sub_command = $option->cmd;
@@ -112,7 +112,7 @@ jenkins-cli - Operate Jenkins from the command line
 
 =head1 VERSION
 
-This documentation refers to jenkins-cli version 0.008
+This documentation refers to jenkins-cli version 0.009
 
 =head1 SYNOPSIS
 

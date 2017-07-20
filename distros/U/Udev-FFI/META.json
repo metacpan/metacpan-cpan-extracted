@@ -1,0 +1,91 @@
+{
+   "abstract" : "Perl bindings for libudev using ffi.",
+   "author" : [
+      "Ilya Pavlov, <iluxz@mail.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Udev-FFI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::Platypus" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Udev::FFI" : {
+         "file" : "lib/Udev/FFI.pm",
+         "version" : "0.097002"
+      },
+      "Udev::FFI::Device" : {
+         "file" : "lib/Udev/FFI/Device.pm"
+      },
+      "Udev::FFI::Devnum" : {
+         "file" : "lib/Udev/FFI/Devnum.pm"
+      },
+      "Udev::FFI::Enumerate" : {
+         "file" : "lib/Udev/FFI/Enumerate.pm"
+      },
+      "Udev::FFI::FFIFunctions" : {
+         "file" : "lib/Udev/FFI/FFIFunctions.pm"
+      },
+      "Udev::FFI::Monitor" : {
+         "file" : "lib/Udev/FFI/Monitor.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Ilya33/udev-ffi/issues"
+      },
+      "homepage" : "https://github.com/Ilya33/udev-ffi",
+      "repository" : {
+         "url" : "git://github.com/Ilya33/udev-ffi.git",
+         "web" : "https://github.com/Ilya33/udev-ffi"
+      }
+   },
+   "version" : "0.097002",
+   "x_contributors" : [
+      "Ilya <ilya@orz1e1.mydomain>"
+   ]
+}

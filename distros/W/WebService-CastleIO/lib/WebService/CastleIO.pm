@@ -22,12 +22,12 @@ WebService::CastleIO - Castle.io API client
 
 =head1 VERSION
 
-Version 1.01
+Version 1.03
 
 =cut
 
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 
 
@@ -313,9 +313,6 @@ L<http://cpanratings.perl.org/d/WebService-CastleIO>
 L<http://search.cpan.org/dist/WebService-CastleIO/>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT

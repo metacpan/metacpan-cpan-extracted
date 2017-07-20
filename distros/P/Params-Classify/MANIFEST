@@ -1,11 +1,10 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
+META.json
 META.yml
-Makefile.PL
 README
-lib/Params/.cvsignore
 lib/Params/Classify.pm
 lib/Params/Classify.xs
 t/blessed.t

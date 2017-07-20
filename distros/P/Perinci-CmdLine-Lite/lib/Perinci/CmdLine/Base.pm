@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2017-06-28'; # DATE
-our $VERSION = '1.75'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '1.76'; # VERSION
 
 use 5.010001;
 use strict;
@@ -49,6 +49,8 @@ has subcommands => (is=>'rw');
 has summary => (is=>'rw');
 has tags => (is=>'rw');
 has url => (is=>'rw');
+has log => (is=>'rw', default => 0);
+has log_level => (is=>'rw');
 
 has read_env => (is=>'rw', default=>1);
 has env_name => (
@@ -1421,6 +1423,15 @@ sub run {
         # set defaults
         $r->{action} //= 'call';
 
+        # activate logging
+        if ($self->log) {
+            require Log::ger::App;
+            Log::ger::App->import(
+                level => $r->{log_level} // $self->log_level,
+                name  => $self->program_name,
+            );
+        }
+
         log_trace("[pericmd] Running hook_after_parse_argv ...");
         $self->hook_after_parse_argv($r);
 
@@ -1541,7 +1552,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.75 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-06-28.
+This document describes version 1.76 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-07-14.
 
 =head1 DESCRIPTION
 
@@ -2405,6 +2416,15 @@ environment. If that is also undef, will default to 0.
 
 If set to 1, then dry-mode will be turned on by default unless user uses
 DRY_RUN=0 or C<--no-dry-run>.
+
+=head2 log => bool
+
+Whether to enable logging. Default is off. If true, will load L<Log::ger::App>.
+
+=head2 log_level => str
+
+Set default log level. Will be overriden by C<< $r->{log_level} >> which is set
+from command-line options like C<--log-level>, C<--trace>, etc.
 
 =head1 METHODS
 

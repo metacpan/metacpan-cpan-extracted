@@ -6,10 +6,10 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
-has '+url' => sub { Carp::croak "url is a required property" };
+has '+url' => '';
 
 
 has ssl => 0;
@@ -20,6 +20,10 @@ sub init
 
   $meta->add_requires('share' => 'LWP::UserAgent' => 0 );
   
+  $meta->prop->{start_url} ||= $self->url;
+  $self->url($meta->prop->{start_url});
+  $self->url || Carp::croak('url is a required property');
+
   if($self->url =~ /^https:/ || $self->ssl)
   {
     $meta->add_requires('share' => 'LWP::Protocol::https' => 0 );
@@ -85,14 +89,13 @@ Alien::Build::Plugin::Fetch::LWP - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 
  use alienfile;
- plugin 'Fetch::LWP' => (
-   url => 'http://ftp.gnu.org/gnu/make',
- );
+ meta->prop->{start_url} = 'http://ftp.gnu.org/gnu/make';
+ plugin 'Fetch::LWP' => ();
 
 =head1 DESCRIPTION
 

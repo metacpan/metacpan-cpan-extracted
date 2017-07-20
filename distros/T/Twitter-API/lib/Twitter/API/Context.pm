@@ -1,6 +1,6 @@
 package Twitter::API::Context;
 # ABSTRACT: Encapsulated state for a request/response
-$Twitter::API::Context::VERSION = '0.0112';
+$Twitter::API::Context::VERSION = '0.0113';
 use Moo;
 use namespace::clean;
 
@@ -57,7 +57,7 @@ Twitter::API::Context - Encapsulated state for a request/response
 
 =head1 VERSION
 
-version 0.0112
+version 0.0113
 
 =head1 SYNOPSIS
 

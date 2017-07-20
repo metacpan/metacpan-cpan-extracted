@@ -9,7 +9,7 @@ use Exporter ();
 # @EXPORT_OK/%EXPORT_TAGS are set up in XS
 *import = \&Exporter::import;
 
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 XSLoader::load(__PACKAGE__);
 
@@ -17,6 +17,7 @@ my $REQUIRED_MAP_PACKAGE_PREFIX = [qw(pb_prefix prefix)];
 my $REQUIRED_MAP_PACKAGE = [qw(package prefix)];
 my $REQUIRED_MAP_MESSAGE = [qw(message to)];
 my $REQUIRED_MAP_ENUM = [qw(enum to)];
+my $REQUIRED_MAP_SERVICE = [qw(service to)];
 
 sub map {
     my ($self, @mappings) = @_;
@@ -34,6 +35,9 @@ sub map {
         } elsif (exists $mapping->{enum}) {
             _check_keys($mapping, $REQUIRED_MAP_ENUM);
             $self->map_enum($mapping->{enum}, $mapping->{to}, $mapping->{options});
+        } elsif (exists $mapping->{service}) {
+            _check_keys($mapping, $REQUIRED_MAP_SERVICE);
+            $self->map_service($mapping->{service}, $mapping->{to}, $mapping->{options});
         } else {
             die "Unrecognized mapping ", _dump($mapping);
         }
@@ -79,7 +83,7 @@ Google::ProtocolBuffers::Dynamic - fast and complete protocol buffer implementat
 
 =head1 VERSION
 
-version 0.18
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -117,6 +121,9 @@ This module uses Google C++ Protocol Buffers parser and the uPB
 serialization/deserialization library to provide a fast and complete
 mapping of Protocol Buffers for Perl.
 
+There is builtin support for creating gRPC clients for RPC services,
+using L<Grpc::XS> as transport.
+
 Protocol Buffers objects are normal blessed hashes, with
 auto-generated accessors for message fields. Accessing the hash
 directly is possible but not recommended (it will skip validation, it
@@ -135,7 +142,7 @@ In general, there is no direct correspondence between Protocol Buffer
 packages and Perl packages (each Protocol Buffer message can be mapped
 independently to an arbitrary Perl package).
 
-That being said, it simler to map each Protocol Buffer package to a
+That being said, it is simpler to map each Protocol Buffer package to a
 Perl package prefix, and use the automated package mapping (when
 C<pb_test> is mapped to C<Perl::Test>, C<pb_test.Message> becomes
 C<Perl::Test::Message>, C<pb_test.Message.SomeEnum> becomes
@@ -277,6 +284,35 @@ In addition to per-field accessors, there is a set of generic
 extension accessors (documented in
 L<Google::ProtocolBuffers::Dynamic::Message/EXTENSION METHODS>).
 
+=head2 SERVICES
+
+Each service is mapped to a generated Perl class, with each method
+mapped to a Perl method.
+
+C<Google::ProtocolBuffers::Dynamic> does not provide an RPC
+implementation, but supports generating a gRPC client using
+L<Grpc::XS> (other implementations might be provided in the future).
+
+In addition, there is a C<noop> service mapping mode that exposes
+introspection information to simplify the mapping of external RPC
+implementation on top of C<Google::ProtocolBuffers::Dynamic>.
+
+The exact interface of mapped methods depends on the underlying RPC
+implementation (for example, for L<Grpc::XS>, the return value is a
+subclass of L<Grpc::Client::AbstractCall>) and whether the method uses
+client/server streaming.
+
+=head2 INTROSPECTION
+
+All mapped entities provide access to an introspection object that
+describes the Protocol Buffers object definition.
+
+Each mapped message has a C<message_descriptor> class method returning a L<MessageDef|Google::ProtocolBuffers::Dynamic::Introspection/Google::ProtocolBuffers::Dynamic::MessageDef> object.
+
+Each mapped enum has an C<enum_descriptor> class method returning an L<EnumDef|Google::ProtocolBuffers::Dynamic::Introspection/Google::ProtocolBuffers::Dynamic::EnumDef> object.
+
+Each mapped service has a C<service_descriptor> class method returning a L<ServiceDef|Google::ProtocolBuffers::Dynamic::Introspection/Google::ProtocolBuffers::Dynamic::ServiceDef> object.
+
 =head1 METHODS
 
 This section describes methods used to load/map Protocol Buffer
@@ -333,8 +369,12 @@ format produced by C<protoc> C<--descriptor_set_out> option.
         { package => $pb_package, prefix => $perl_prefix, options => $options },
         # uses map_message
         { message => $pb_message, to    => $perl_package, options => $options },
-        # uses map_enum
-        { enum    => $pb_enum,    to    => $perl_package, options => $options },
+        # uses map_service
+        { service => $pb_enum,    to    => $perl_package,
+          options => {
+              client_services => $mapping_mode,
+              # other options
+          },
     );
 
 Applies the mappings in order and then calls L</resolve_references>.
@@ -403,6 +443,16 @@ skips any already mapped inner types.
 
 Maps the specified enumeration to the specified Perl package. It
 throws an error if the enumeration has already been mapped.
+
+=head2 map_service
+
+    $dynamic->map_service($pb_service, $perl_package, options => {
+        client_services => $mapping_mode,
+        # other options
+    });
+
+Maps the specified service to the specified Perl package. It
+throws an error if the service has already been mapped.
 
 =head2 resolve_references
 
@@ -525,6 +575,26 @@ Getter does not have any prefix, setter with C<set_>.
 
 Generates a single method without a prefix that acts as a setter when
 a value is passed, as a getter otherwise.
+
+=back
+
+=head2 client_services
+
+Defaults to C<disable>.
+
+=over 4
+
+=item disable
+
+Silently ignore all service definitions.
+
+=item noop
+
+Only provide introspection information for services (see L</INTROSPECTION>).
+
+=item grpc_xs
+
+Generate a client implementation using L<Grpc::XS>.
 
 =back
 

@@ -3,13 +3,10 @@ Math-Random-MTwist
 
 PREREQUISITES
 
-Perl >= 5.10.0
+Perl >= 5.8
 Test::More
 
-Why Perl 5.10? mtwist needs a fairly "modern" compiler (see mtwist.h). Now
-what's the oldest Perl shipped together with a sufficiently recent compiler?
-When it comes to "old", Debian is the first choice. The oldest Debian capable
-of compiling mtwist is Lenny. Lenny ships Perl 5.10.0.
+mtwist needs a fairly "modern" C compiler (see IMPORANT NOTE in mtwist.h).
 
 
 INSTALLATION

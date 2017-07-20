@@ -1,3 +1,17 @@
+v0.10.4 2017-07-19T16:05:03Z
+ - use DBI quote
+
+v0.10.3 2017-07-18T22:19:26Z
+ - warn on errors
+
+v0.10.2 2017-07-18T10:35:03Z
+ - postgres-contrib repository added
+ - fixed invalid rows count for ALTER TABLE
+ - use standard path for unix socket
+
+v0.10.1 2017-07-14T23:48:04Z
+ - TODO
+
 v0.10.0 2017-07-11T13:07:24Z
  - No issues on bugtracker were closed since the last release
  - check, that handle defined before destroy

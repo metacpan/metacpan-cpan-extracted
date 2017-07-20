@@ -3,37 +3,39 @@ abstract: 'Perl-based open notation for data'
 author:
   - 'Andrew Main (Zefram) <zefram@fysh.org>'
 build_requires:
-  Module::Build: 0
-  Test::More: 0
-  perl: 5.008
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  Test::More: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
 configure_requires:
-  Module::Build: 0
-  perl: 5.008
-  strict: 0
-  warnings: 0
+  Module::Build: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-Pond
 provides:
   Data::Pond:
     file: lib/Data/Pond.pm
-    version: 0.004
+    version: '0.005'
 recommends:
-  XSLoader: 0
+  XSLoader: '0'
 requires:
-  Carp: 0
-  Exporter: 0
-  Params::Classify: 0
-  parent: 0
-  perl: 5.008
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Exporter: '0'
+  Params::Classify: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Pond
   license: http://dev.perl.org/licenses/
-version: 0.004
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,11 +1,11 @@
 package Catalyst::View::Template::Lace;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
-use Moo;
 use Module::Runtime;
 use Catalyst::View::Template::Lace::Renderer;
 use Template::Lace::Utils;
+use Moo;
 
 extends 'Catalyst::View';
 
@@ -61,8 +61,11 @@ sub view_components {
     },
     view => sub {
       my ($name, $args, %attrs) = @_;
-      $name = ucfirst $name; #Maybe too simple...
-      return $app->view($name);
+      my $view_name = join '::', map {
+        $_=~s/[_-]([a-z])/\u$1/g;
+        ucfirst $_; 
+      } split '-', $name;
+      return $app->view($view_name);
     },
   };
 }

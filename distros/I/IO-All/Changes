@@ -1,3 +1,8 @@
+0.87 Tue Jul 18 14:05:40 PDT 2017
+ - Fix io($dir)->all when files have unicode in names (GH#95)
+ - Stop trampling $!
+ - Add cmp overload to fix some windows problems (GH#74)
+
 0.86 Thu Jan  1 18:44:25 PST 2015
  - Revamp docs
 
@@ -295,4 +300,3 @@
 
 0.10 Sat Feb  7 00:55:42 PST 2004
  - Initial release.
-

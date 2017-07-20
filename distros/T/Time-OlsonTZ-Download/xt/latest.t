@@ -1,0 +1,119 @@
+use warnings;
+use strict;
+
+use Params::Classify qw(is_blessed is_ref is_string);
+use Test::More tests => 57;
+
+BEGIN { use_ok "Time::OlsonTZ::Download"; }
+
+my $lv = Time::OlsonTZ::Download->latest_version;
+ok is_string($lv), "latest_version well formed";
+like $lv, qr/\A[0-9]{4}[a-z]\z/, "latest_version well formed";
+
+my $ld = Time::OlsonTZ::Download->new;
+ok is_blessed($ld), "constructor returns object";
+my $v = $ld->version;
+ok is_string($v), "version well formed";
+like $v, qr/\A[0-9]{4}[a-z]\z/, "version well formed";
+is $v, $lv, "version is latest version";
+my $cv = $ld->code_version;
+ok is_string($cv), "code_version well formed";
+like $cv, qr/\A[0-9]{4}[a-z]\z/, "code_version well formed";
+ok $cv le $lv, "code_version is no later than latest version";
+my $dv = $ld->data_version;
+ok is_string($dv), "data_version well formed";
+like $dv, qr/\A[0-9]{4}[a-z]\z/, "data_version well formed";
+ok $dv eq $lv, "data_version is latest version";
+
+my $dir = $ld->dir;
+ok is_string($dir), "dir well formed";
+like $dir, qr#\A/#, "dir well formed";
+my $udir = $ld->unpacked_dir;
+ok is_string($udir), "unpacked_dir well formed";
+is $udir, $dir, "unpacked_dir is dir";
+ok(-f "$dir/zic.c", "code (zic.c) unpacked");
+ok(-f "$dir/iso3166.tab", "data (iso3166.tab) unpacked");
+if($dir =~ m#\A/# && $udir eq $dir) {
+	# date.c is a copyrighted file; check that we can go on without it
+	unlink "$dir/date.c";
+}
+
+my $zname_rx = qr#[A-Za-z0-9\-\+_]{1,14}(?:/[A-Za-z0-9\-\+_]{1,14})*|Canada/East-Saskatchewan#;
+
+my $cn = $ld->canonical_names;
+ok is_ref($cn, "HASH"), "canonical_names well formed";
+ok !(grep { !/\A$zname_rx\z/ } keys %$cn), "canonical_names well formed";
+ok !(grep { defined } values %$cn), "canonical_names well formed";
+ok keys(%$cn) >= 100, "at least 100 canonical zones";
+note "have @{[scalar keys %$cn]} canonical zones";
+my $ln = $ld->link_names;
+ok is_ref($ln, "HASH"), "link_names well formed";
+ok !(grep { !/\A$zname_rx\z/ } keys %$ln), "link_names well formed";
+ok !(grep { defined } values %$ln), "link_names well formed";
+ok keys(%$ln) >= 1, "at least 1 link";
+note "have @{[scalar keys %$ln]} links";
+ok !(grep { exists $ln->{$_} } keys %$cn), "no link names in canonical_names";
+ok !(grep { exists $cn->{$_} } keys %$ln), "no canonical names in link_names";
+my $an = $ld->all_names;
+ok is_ref($an, "HASH"), "all_names well formed";
+ok !(grep { defined } values %$an), "all_names well formed";
+is_deeply $an, { %$cn, %$ln }, "all_names is canonical_names plus link_names";
+ok exists($an->{"Europe/London"}), "Europe/London zone defined";
+
+my $rl = $ld->raw_links;
+ok is_ref($rl, "HASH"), "raw_links well formed";
+ok !(grep { !/\A$zname_rx\z/ } keys %$rl), "raw_links well formed";
+ok !(grep { !(is_string($_) && /\A$zname_rx\z/) } values %$rl), "raw_links well formed";
+is_deeply [ sort keys %$rl ], [ sort keys %$ln ], "raw_links keys match link_names";
+my $tl = $ld->threaded_links;
+ok is_ref($tl, "HASH"), "threaded_links well formed";
+ok !(grep { !/\A$zname_rx\z/ } keys %$tl), "threaded_links well formed";
+ok !(grep { !(is_string($_) && /\A$zname_rx\z/) } values %$tl), "threaded_links well formed";
+is_deeply [ sort keys %$tl ], [ sort keys %$ln ], "threaded_links keys match link_names";
+ok !(grep { !exists($cn->{$_}) } values %$tl), "threaded_links refer to canonical zones";
+
+my $cs = $ld->country_selection;
+ok is_ref($cs, "HASH"), "country_selection well formed";
+ok keys(%$cs) >= 100, "at least 100 countries";
+my $failures = 0;
+foreach(keys %$cs) {
+	/\A[A-Z]{2}\z/ or $failures++;
+	my $cnt = $cs->{$_};
+	is_ref($cnt, "HASH") or $failures++;
+	is_string($cnt->{alpha2_code}) or $failures++;
+	$cnt->{alpha2_code} eq $_ or $failures++;
+	is_string($cnt->{olson_name}) or $failures++;
+	my $regs = $cnt->{regions};
+	is_ref($regs, "HASH") or $failures++;
+	scalar(keys %$regs) != 0 or $failures++;
+	(scalar(keys %$regs) != 1 xor exists($regs->{""})) or $failures++;
+	foreach(keys %$regs) {
+		my $reg = $regs->{$_};
+		is_string($reg->{olson_description}) or $failures++;
+		$reg->{olson_description} eq $_ or $failures++;
+		is_string($reg->{timezone_name}) or $failures++;
+		exists $an->{$reg->{timezone_name}} or $failures++;
+		is_string($reg->{location_coords}) or $failures++;
+		is_string($reg->{location_coords}) or $failures++;
+	}
+}
+is $failures, 0, "country_selection well formed";
+
+my $df = $ld->data_files;
+ok is_ref($df, "ARRAY"), "data_files well formed";
+ok @$df >= 1, "at least one data file";
+ok !(grep { !(is_string($_) && m#\A/#) } @$df), "data_files well formed";
+ok !(grep { !m#\A\Q$dir\E/[A-Za-z0-9\-\+_]{1,14}\z# } @$df), "data files in right place";
+my $zx = $ld->zic_exe;
+ok is_string($zx), "zic_exe well formed";
+like $zx, qr#\A/#, "zic_exe well formed";
+is $zx, "$dir/zic", "zic executable in right place";
+ok(-f $zx, "zic executable exists");
+
+my $zd = $ld->zoneinfo_dir;
+ok is_string($zd), "zoneinfo_dir well formed";
+like $zd, qr#\A/#, "zoneinfo_dir well formed";
+like $zd, qr#\A\Q$dir\E/#, "zoneinfo dir in right place";
+ok !(grep { !(-f "$zd/$_") } keys %$cn), "zoneinfo files exist";
+
+1;

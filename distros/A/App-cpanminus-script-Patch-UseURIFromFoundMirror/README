@@ -1,0 +1,49 @@
+NAME
+    App::cpanminus::script::Patch::UseURIFromFoundMirror - Only use URI from
+    mirror where we found the module
+
+VERSION
+    This document describes version 0.001 of
+    App::cpanminus::script::Patch::UseURIFromFoundMirror (from Perl
+    distribution App-cpanminus-script-Patch-UseURIFromFoundMirror), released
+    on 2017-07-14.
+
+SYNOPSIS
+    In the command-line:
+
+     % perl -MModule::Load::In::INIT=App::cpanminus::script::Patch::UseURIFromFoundMirror `which cpanm` ...
+
+DESCRIPTION
+    This is
+    <https://github.com/perlancar/operl-App-cpanminus/commit/09fc2da14bc19da
+    508375b8c75a0156e39f5931c> in patch form, so it can be used with stock
+    cpanm.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-cpanminus-script-Patch-UseURIFromFound
+    Mirror>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-cpanminus-script-Patch-UseURIFrom
+    FoundMirror>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-cpanminus-script-
+    Patch-UseURIFromFoundMirror>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

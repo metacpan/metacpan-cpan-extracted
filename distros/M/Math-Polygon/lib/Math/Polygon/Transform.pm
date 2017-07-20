@@ -1,4 +1,4 @@
-# Copyrights 2004,2006-2016 by [Mark Overmeer].
+# Copyrights 2004-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -7,7 +7,7 @@ use warnings;
 
 package Math::Polygon::Transform;
 use vars '$VERSION';
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 use base 'Exporter';
 

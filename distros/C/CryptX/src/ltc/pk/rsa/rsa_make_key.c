@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -99,7 +97,7 @@ int rsa_make_key(prng_state *prng, int wprng, int size, long e, rsa_key *key)
    err       = CRYPT_OK;
    goto cleanup;
 errkey:
-   mp_clear_multi(key->q, key->p, key->qP, key->dP, key->dQ, key->N, key->d, key->e, NULL);
+   rsa_free(key);
 cleanup:
    mp_clear_multi(tmp3, tmp2, tmp1, q, p, NULL);
    return err;
@@ -107,6 +105,6 @@ cleanup:
 
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

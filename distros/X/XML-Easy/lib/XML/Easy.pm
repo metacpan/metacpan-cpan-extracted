@@ -125,7 +125,7 @@ package XML::Easy;
 use warnings;
 use strict;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -155,7 +155,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 Copyright (C) 2008, 2009 PhotoBox Ltd
 
-Copyright (C) 2009, 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2009, 2010, 2011, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

@@ -200,7 +200,7 @@ sub do_test
 	chomp($counter1);
 	like($counter1, qr/^\d+$/, "counter1 - $name");
 
-	expect { -e "$tmp/log" };
+	expect { -s "$tmp/log" };
 	like(read_file("$tmp/log"), qr/START LOG/, "logged output");
 
 	expect { my @l = read_file("$tmp/log"); @l > 1 };

@@ -3,25 +3,27 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.20';
 
 use CPAN::Meta;
 use CPAN::Mirror::Tiny::Archive;
 use CPAN::Mirror::Tiny::Tempdir;
+use CPAN::Mirror::Tiny::Util 'safe_system';
 use Capture::Tiny ();
 use Cwd ();
+use Digest::MD5 ();
 use File::Basename ();
 use File::Copy ();
 use File::Copy::Recursive ();
 use File::Path ();
-use File::Spec;
 use File::Spec::Unix;
+use File::Spec;
 use File::Temp ();
+use File::Which ();
 use HTTP::Tinyish;
+use JSON ();
 use Parse::LocalDistribution;
 use Parse::PMFile;
-use Digest::MD5 ();
-use JSON ();
 
 my $JSON = JSON->new->canonical(1)->utf8(1);
 my $CACHE_VERSION = 1;
@@ -34,12 +36,22 @@ sub new {
     $base = Cwd::abs_path($base);
     my $archive = CPAN::Mirror::Tiny::Archive->new;
     my $http = HTTP::Tinyish->new;
-    bless {
+    my $self = bless {
         base => $base,
         archive => $archive,
         http => $http,
         tempdir => $tempdir,
     }, $class;
+    $self->init_tools;
+}
+
+sub init_tools {
+    my $self = shift;
+    for my $cmd (qw(git tar gzip)) {
+        $self->{$cmd} = File::Which::which($cmd)
+            or die "Couldn't find $cmd; CPAN::Mirror::Tiny needs it";
+    }
+    $self;
 }
 
 sub archive { shift->{archive} }
@@ -63,7 +75,7 @@ sub pushd_tempdir { CPAN::Mirror::Tiny::Tempdir->pushd(shift->{tempdir}) }
 sub _author_dir {
     my ($self, $author) = @_;
     my ($a2, $a1) = $author =~ /^((.).)/;
-    $self->base("authors/id/$a1/$a2/$author");
+    $self->base("authors", "id", $a1, $a2, $author);
 }
 
 sub _locate_tarball {
@@ -74,12 +86,6 @@ sub _locate_tarball {
     my $dest = File::Spec->catfile($dir, $basename);
     File::Copy::move($file, $dest);
     return -f $dest ? $dest : undef;
-}
-
-sub _system {
-    my ($self, @command) = @_;
-    my ($merged, $exit) = Capture::Tiny::capture_merged(sub { system @command });
-    return (!$exit, $merged || "");
 }
 
 sub inject {
@@ -154,8 +160,8 @@ sub inject_local_directory {
     my $guard = $self->pushd_tempdir;
     File::Path::rmtree($distvname) if -d $distvname;
     File::Copy::Recursive::dircopy($dir, $distvname) or die;
-    my ($ok, $err) = $self->_system("tar", "czf", "$distvname.tar.gz", $distvname);
-    die "Failed to create tarball: $err" unless $ok;
+    my ($out, $err, $exit) = safe_system [$self->{tar}, "czf", "$distvname.tar.gz", $distvname];
+    die "Failed to create tarball: $err" unless $exit == 0;
     my $author = ($option ||= {})->{author} || "VENDOR";
     return $self->_locate_tarball("$distvname.tar.gz", $author);
 }
@@ -167,7 +173,7 @@ sub inject_http {
     }
     my $basename = File::Basename::basename($url);
     my $tempdir = $self->tempdir;
-    my $file = "$tempdir/$basename";
+    my $file = File::Spec->catfile($tempdir->as_string, $basename);
     my $res = $self->http->mirror($url => $file);
     if ($res->{success}) {
         my $author = ($option ||= {})->{author};
@@ -204,33 +210,38 @@ sub inject_git {
     if ($url =~ /(.*)\@(.*)$/) {
         # take care of git@github.com:skaji/repo@tag, http://user:pass@example.com/foo@tag
         my ($leading, $remove) = ($1, $2);
-        my ($ok, $error) = $self->_system("git", "ls-remote", $leading);
-        if ($ok) {
+        my ($out, $err, $exit) = safe_system [$self->{git}, "ls-remote", $leading];
+        if ($exit == 0) {
             $ref = $remove;
             $url =~ s/\@$remove$//;
         }
     }
 
     my $guard = $self->pushd_tempdir;
-    my ($ok, $error) = $self->_system("git", "clone", $url, ".");
-    die "Couldn't git clone $url: $error" unless $ok;
+    my (undef, $err, $exit) = safe_system [$self->{git}, "clone", $url, "."];
+    die "Couldn't git clone $url: $err" unless $exit == 0;
     if ($ref) {
-        my ($ok, $error) = $self->_system("git", "checkout", $ref);
-        die "Couldn't git checkout $ref: $error" unless $ok;
+        my (undef, $err, $exit) = safe_system [$self->{git}, "checkout", $ref];
+        die "Couldn't git checkout $ref: $err" unless $exit == 0;
     }
     my $metafile = "META.json";
     die "Couldn't find $metafile in $url" unless -f $metafile;
     my $meta = CPAN::Meta->load_file($metafile);
-    chomp(my $rev = `git rev-parse --short HEAD`);
+    my ($rev) = safe_system [$self->{git}, "rev-parse", "--short", "HEAD"];
+    chomp $rev;
     my $distvname = sprintf "%s-%s-%s", $meta->name, $meta->version, $rev;
-    ($ok, $error) = $self->_system(
-        "git archive --format=tar --prefix=$distvname/ HEAD | gzip > $distvname.tar.gz"
+    (undef, $err, $exit) = safe_system(
+        [$self->{git}, "archive", "--format=tar", "--prefix=$distvname/", "HEAD"],
+        "|",
+        [$self->{gzip}],
+        ">",
+        ["$distvname.tar.gz"],
     );
-    if ($ok && -f "$distvname.tar.gz") {
+    if ($exit == 0 && -f "$distvname.tar.gz") {
         my $author = ($option || +{})->{author} || "VENDOR";
         return $self->_locate_tarball("$distvname.tar.gz", $author);
     } else {
-        die "Couldn't archive $url: $error";
+        die "Couldn't archive $url: $err";
     }
 }
 
@@ -277,21 +288,40 @@ sub _extract_provides {
     $parser->parse($dir) || +{};
 }
 
+sub index_path {
+    my ($self, %option) = @_;
+    my $file = $self->base("modules", "02packages.details.txt");
+    $option{compress} ? "$file.gz" : $file;
+}
+
 sub index {
-    my $self = shift;
-    my $base = $self->base("authors/id");
+    my ($self, %option) = @_;
+    my $base = $self->base("authors", "id");
     return unless -d $base;
-    my %packages;
+
+    my @dist;
     my $wanted = sub {
         return unless -f;
         return unless /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
         my $path = $_;
-        my $mtime = (stat $path)[9];
-        my $provides = $self->extract_provides($path);
-        my $relative = File::Spec::Unix->abs2rel($path, $base);
-        $self->_update_packages(\%packages, $provides, $relative, $mtime);
+        push @dist, {
+            path => $path,
+            mtime => (stat $path)[9],
+            relative => File::Spec::Unix->abs2rel($path, $base),
+        };
     };
     File::Find::find({wanted => $wanted, no_chdir => 1}, $base);
+
+    my %packages;
+    for my $i (0..$#dist) {
+        my $dist = $dist[$i];
+        if ($option{show_progress}) {
+            warn sprintf "%d/%d examining %s\n",
+                $i+1, scalar @dist, $dist->{relative};
+        }
+        my $provides = $self->extract_provides($dist->{path});
+        $self->_update_packages(\%packages, $provides, $dist->{relative}, $dist->{mtime});
+    }
 
     my @line;
     for my $package (sort { lc $a cmp lc $b } keys %packages) {
@@ -305,16 +335,20 @@ sub index {
 
 sub write_index {
     my ($self, %option) = @_;
-    my $file = $self->base("modules", "02packages.details.txt");
+    my $file = $self->index_path;
     my $dir  = File::Basename::dirname($file);
     File::Path::mkpath($dir) unless -d $dir;
     open my $fh, ">", "$file.tmp" or die "Couldn't open $file: $!";
     printf {$fh} "Written-By: %s %s\n\n", ref $self, $self->VERSION;
-    print {$fh} $self->index;
+    print {$fh} $self->index(%option);
     close $fh;
     if ($option{compress}) {
-        my ($ok, $error) = $self->_system("gzip --stdout --no-name $file.tmp > $file.gz.tmp");
-        if ($ok) {
+        my (undef, $err, $exit) = safe_system(
+            [$self->{gzip}, "--stdout", "--no-name", "$file.tmp"],
+            ">",
+            ["$file.gz.tmp"],
+        );
+        if ($exit == 0) {
             rename "$file.gz.tmp", "$file.gz"
                 or die "Couldn't rename $file.gz.tmp to $file.gz: $!";
             unlink "$file.tmp";

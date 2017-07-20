@@ -1,5 +1,9 @@
 Revision history for Perl module Text::BibTeX
 
+0.81 2017-07-19
+ * Fix issue with NameFormat and unitialized join-tokens.
+   (thanks to Karl Wette for the bug report).
+
 0.80 2017-03-25
  * Fix tests in order to work without dot in @INC (thanks Kent Fredric for the bug report)
 

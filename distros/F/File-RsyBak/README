@@ -2,8 +2,8 @@ NAME
     File::RsyBak - Backup files/directories with histories, using rsync
 
 VERSION
-    This document describes version 0.32 of File::RsyBak (from Perl
-    distribution File-RsyBak), released on 2017-07-10.
+    This document describes version 0.34 of File::RsyBak (from Perl
+    distribution File-RsyBak), released on 2017-07-14.
 
 SYNOPSIS
     From your Perl program:

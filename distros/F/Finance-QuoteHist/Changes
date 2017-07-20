@@ -1,5 +1,8 @@
 Revision history for Perl extension Finance::QuoteHist.
 
+1.27  Tue Jul 18 10:46:49 EDT 2017
+    - Updated yahoo test data
+
 1.26  Tue Jun 27 14:19:13 EDT 2017
     - Fixed Yahoo module to handle the site's obfuscation
     - updated test data

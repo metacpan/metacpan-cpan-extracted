@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "File::Path" => "2.08",
     "File::Which" => 0,
     "File::chdir" => 0,
-    "Log::ger" => "0.011",
+    "Log::ger" => "0.015",
     "POSIX" => 0,
     "String::ShellQuote" => 0,
     "Time::Local" => 0,
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.32",
+  "VERSION" => "0.34",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -60,7 +60,7 @@ my %FallbackPrereqs = (
   "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Log::ger" => "0.011",
+  "Log::ger" => "0.015",
   "POSIX" => 0,
   "String::ShellQuote" => 0,
   "Test::More" => "0.96",

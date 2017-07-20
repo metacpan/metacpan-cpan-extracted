@@ -1,21 +1,21 @@
 package Test::Script;
 
 # ABSTRACT: Basic cross-platform tests for scripts
-our $VERSION = '1.18'; # VERSION
+our $VERSION = '1.23'; # VERSION
 
 
-use 5.006;
+use 5.008001;
 use strict;
 use warnings;
-use Carp             ();
-use Exporter         ();
-use File::Spec       ();
-use File::Spec::Unix ();
-use Probe::Perl      ();
-use IPC::Run3        qw( run3 );
-use Test::Builder    ();
-use File::Temp       ();
-use File::Path       ();
+use Carp qw( croak );
+use Exporter;
+use File::Spec;
+use File::Spec::Unix;
+use Probe::Perl;
+use Capture::Tiny qw( capture );
+use Test2::API qw( context );
+use File::Temp qw( tempdir );
+use IO::Handle;
 
 our @ISA     = 'Exporter';
 our @EXPORT  = qw{
@@ -35,11 +35,24 @@ our @EXPORT  = qw{
 sub import {
   my $self = shift;
   my $pack = caller;
-  my $test = Test::Builder->new;
-  $test->exported_to($pack);
   if(defined $_[0] && $_[0] =~ /^(?:no_plan|skip_all|tests)$/)
   {
-    $test->plan(@_);
+    # icky back compat.
+    # do not use.
+    my $ctx = context();
+    if($_[0] eq 'tests')
+    {
+      $ctx->plan($_[1]);
+    }
+    elsif($_[0] eq 'skip_all')
+    {
+      $ctx->plan(0, 'SKIP', $_[1]);
+    }
+    else
+    {
+      $ctx->hub->plan('NO PLAN');
+    }
+    $ctx->release;
   }
   foreach ( @EXPORT ) {
     $self->export_to_level(1, $self, $_);
@@ -56,33 +69,15 @@ sub perl () {
 sub path ($) {
   my $path = shift;
   unless ( defined $path ) {
-    Carp::croak("Did not provide a script name");
+    croak("Did not provide a script name");
   }
   if ( File::Spec::Unix->file_name_is_absolute($path) ) {
-    Carp::croak("Script name must be relative");
+    croak("Script name must be relative");
   }
   File::Spec->catfile(
     File::Spec->curdir,
     split /\//, $path
   );
-}
-
-## This can and should be removed if/when IPC::Run3 is fixed on MSWin32
-## See rt94685, rt46333, rt95308 and IPC-Run3/gh#9"
-sub _borked_ipc_run3 () {
-  $^O eq 'MSWin32' &&
-  ! eval { IPC::Run3::run3 [ perl, -e => 'BEGIN {die}' ], \undef, \undef, \undef; 1 }
-}
-
-if(_borked_ipc_run3())
-{
-  no warnings 'redefine';
-  *run3 = sub {
-    $! = 0;
-    my $r = IPC::Run3::run3(@_, { return_if_system_error => 1 });
-    Carp::croak($!) if $! && $! !~ /Inappropriate I\/O control operation/;
-    $r;
-  };
 }
 
 #####################################################################
@@ -94,45 +89,46 @@ sub script_compiles {
   my $unix   = shift @$args;
   my $path   = path( $unix );
   my $pargs  = _perl_args($path);
-  my @libs   = map { "-I$_" } grep {!ref($_)} @INC;
   my $dir    = _preload_module();
   my $cmd    = [ perl, @$pargs, "-I$dir", '-M__TEST_SCRIPT__', '-c', $path, @$args ];
-  my $stdin  = '';
-  my $stdout = '';
-  my $stderr = '';
-  my $rv     = eval { run3( $cmd, \$stdin, \$stdout, \$stderr ) };
+  my ($stdout, $stderr) = capture { system(@$cmd) };
   my $error  = $@;
   my $exit   = $? ? ($? >> 8) : 0;
   my $signal = $? ? ($? & 127) : 0;
   my $ok     = !! (
-    $error eq '' and $rv and $exit == 0 and $signal == 0 and $stderr =~ /syntax OK\s+\z/si
+    $error eq '' and $exit == 0 and $signal == 0 and $stderr =~ /syntax OK\s+\z/si
   );
 
-  File::Path::rmtree($dir);
-
-  my $test = Test::Builder->new;
-  $test->ok( $ok, $_[0] || "Script $unix compiles" );
-  $test->diag( "$exit - $stderr" ) unless $ok;
-  $test->diag( "exception: $error" ) if $error;
-  $test->diag( "signal: $signal" ) if $signal;
+  my $ctx = context();
+  $ctx->ok( $ok, $_[0] || "Script $unix compiles" );
+  $ctx->diag( "$exit - $stderr" ) unless $ok;
+  $ctx->diag( "exception: $error" ) if $error;
+  $ctx->diag( "signal: $signal" ) if $signal;
+  $ctx->release;
 
   return $ok;
 }
 
-# this is noticably slower for long @INC lists (sometimes present in cpantesters
+# this is noticeably slower for long @INC lists (sometimes present in cpantesters
 # boxes) than the previous implementation, which added a -I for every element in
-# @INC.  (also slower for more reasonable @INCs, but not noticably).  But it is
+# @INC.  (also slower for more reasonable @INCs, but not noticeably).  But it is
 # safer as very long argument lists can break calls to system
 sub _preload_module
 {
-  my $dir = File::Temp::tempdir( CLEANUP => 1 );
+  my @opts = ( '.test-script-XXXXXXXX', CLEANUP => 1);
+  if(-w File::Spec->curdir)
+  { push @opts, DIR => File::Spec->curdir }
+  else
+  { push @opts, DIR => File::Spec->tmpdir }
+  my $dir = tempdir(@opts);
+  $dir = File::Spec->rel2abs($dir);
   # this is hopefully a pm file that nobody would use
   my $filename = File::Spec->catfile($dir, '__TEST_SCRIPT__.pm');
   my $fh;
-  open($fh, '>', $filename) 
+  open($fh, '>', $filename)
     || die "unable to open $filename: $!";
   print($fh 'unshift @INC, ',
-    join ',', 
+    join ',',
     # quotemeta is overkill, but it will make sure that characters
     # like " are quoted
     map { '"' . quotemeta($_) . '"' }
@@ -154,21 +150,51 @@ sub script_runs {
   my $pargs  = _perl_args($path);
   my $dir    = _preload_module();
   my $cmd    = [ perl, @$pargs, "-I$dir", '-M__TEST_SCRIPT__', $path, @$args ];
-     $stdout = '';
-     $stderr = '';
-  my $rv     = eval { run3( $cmd, $opt->{stdin}, $opt->{stdout}, $opt->{stderr} ) };
+  $stdout = '';
+  $stderr = '';
+
+  if($opt->{stdin})
+  {
+    my $filename;
+
+    if(ref($opt->{stdin}) eq 'SCALAR')
+    {
+      $filename = File::Spec->catfile(
+        tempdir(CLEANUP => 1),
+        'stdin.txt',
+      );
+      my $tmp;
+      open($tmp, '>', $filename) || die "unable to write to $filename";
+      print $tmp ${ $opt->{stdin} };
+      close $tmp;
+    }
+    elsif(ref($opt->{stdin}) eq '')
+    {
+      $filename = $opt->{stdin};
+    }
+    else
+    {
+      croak("stdin MUST be either a scalar reference or a string filename");
+    }
+
+    my $fh;
+    open($fh, '<', $filename) || die "unable to open $filename $!";
+    STDIN->fdopen( $fh, 'r' ) or die "unable to reopen stdin to $filename $!";
+  }
+
+  (${$opt->{stdout}}, ${$opt->{stderr}}) = capture { system(@$cmd) };
+  
   my $error  = $@;
   my $exit   = $? ? ($? >> 8) : 0;
   my $signal = $? ? ($? & 127) : 0;
-  my $ok     = !! ( $error eq '' and $rv and $exit == $opt->{exit} and $signal == $opt->{signal} );
+  my $ok     = !! ( $error eq '' and $exit == $opt->{exit} and $signal == $opt->{signal} );
 
-  File::Path::rmtree($dir);
-
-  my $test = Test::Builder->new;
-  $test->ok( $ok, $_[0] || "Script $unix runs" );
-  $test->diag( "$exit - $stderr" ) unless $ok;
-  $test->diag( "exception: $error" ) if $error;
-  $test->diag( "signal: $signal" ) unless $signal == $opt->{signal};
+  my $ctx = context();
+  $ctx->ok( $ok, $_[0] || "Script $unix runs" );
+  $ctx->diag( "$exit - $stderr" ) unless $ok;
+  $ctx->diag( "exception: $error" ) if $error;
+  $ctx->diag( "signal: $signal" ) unless $signal == $opt->{signal};
+  $ctx->release;
 
   return $ok;
 }
@@ -176,23 +202,24 @@ sub script_runs {
 sub _like
 {
   my($text, $pattern, $regex, $not, $name) = @_;
-  
+
   my $ok = $regex ? $text =~ $pattern : $text eq $pattern;
   $ok = !$ok if $not;
-  
-  my $test = Test::Builder->new;
-  $test->ok( $ok, $name );
+
+  my $ctx = context;
+  $ctx->ok( $ok, $name );
   unless($ok) {
-    $test->diag( "The output" );
-    $test->diag( "  $_") for split /\n/, $text;
-    $test->diag( $not ? "does match" : "does not match" );
+    $ctx->diag( "The output" );
+    $ctx->diag( "  $_") for split /\n/, $text;
+    $ctx->diag( $not ? "does match" : "does not match" );
     if($regex) {
-      $test->diag( "  $pattern" );
+      $ctx->diag( "  $pattern" );
     } else {
-      $test->diag( "  $_" ) for split /\n/, $pattern;
+      $ctx->diag( "  $_" ) for split /\n/, $pattern;
     }
   }
-  
+  $ctx->release;
+
   $ok;
 }
 
@@ -215,7 +242,7 @@ sub script_stdout_isnt
 
 sub script_stdout_like
 {
-  my($pattern, $name) = @_;  
+  my($pattern, $name) = @_;
   @_ = ($stdout, $pattern, 1, 0, $name || 'stdout matches' );
   goto &_like;
 }
@@ -247,7 +274,7 @@ sub script_stderr_isnt
 
 sub script_stderr_like
 {
-  my($pattern, $name) = @_;  
+  my($pattern, $name) = @_;
   @_ = ($stderr, $pattern, 1, 0, $name || 'stderr matches' );
   goto &_like;
 }
@@ -275,7 +302,7 @@ sub _script {
       return [ @$in ];
     }
   }
-  Carp::croak("Invalid command parameter");
+  croak("Invalid command parameter");
 }
 
 # Determine any extra arguments that need to be passed into Perl.
@@ -296,11 +323,11 @@ sub _perl_args {
 
 sub _options {
   my %options = ref($_[0]->[0]) eq 'HASH' ? %{ shift @{ $_[0] } }: ();
-  
+
   $options{exit}   = 0        unless defined $options{exit};
   $options{signal} = 0        unless defined $options{signal};
   my $stdin = '';
-  $options{stdin}  = \$stdin  unless defined $options{stdin};
+  #$options{stdin}  = \$stdin  unless defined $options{stdin};
   $options{stdout} = \$stdout unless defined $options{stdout};
   $options{stderr} = \$stderr unless defined $options{stderr};
 
@@ -334,15 +361,17 @@ Test::Script - Basic cross-platform tests for scripts
 
 =head1 VERSION
 
-version 1.18
+version 1.23
 
 =head1 SYNOPSIS
 
- use Test::More tests => 2;
+ use Test2::V0;
  use Test::Script;
  
  script_compiles('script/myscript.pl');
  script_runs(['script/myscript.pl', '--my-argument']);
+ 
+ done_testing;
 
 =head1 DESCRIPTION
 
@@ -373,7 +402,7 @@ platform safety, this module will err on the side of platform safety.
 The L</script_compiles> test calls the script with "perl -c script.pl",
 and checks that it returns without error.
 
-The path it should be passed is a relative unix-format script name. This
+The path it should be passed is a relative Unix-format script name. This
 will be localised when running C<perl -c> and if the test fails the local
 name used will be shown in the diagnostic output.
 
@@ -431,13 +460,13 @@ scalar.
 =back
 
 The behavior for any other types is undefined (the current implementation uses
-L<IPC::Run3>, but that may change in the future).
+L<Capture::Tiny>).  Any already opened stdin will be closed.
 
 =item stdout
 
 Where to send the standard output to.  If you use this option, then the the
 behavior of the C<script_stdout_> functions below are undefined.  The value
-may be one of 
+may be one of
 
 =over 4
 
@@ -452,7 +481,7 @@ Is considered to be a filename.
 In which case the standard output will be places into the referenced scalar
 
 The behavior for any other types is undefined (the current implementation uses
-L<IPC::Run3>, but that may change in the future).
+L<Capture::Tiny>).
 
 =item stderr
 
@@ -464,14 +493,14 @@ Same as C<stdout> above, except for stderr.
 
  script_stdout_is $expected_stdout, $test_name;
 
-Tests if the output to stdout from the previous L</script_runs> matches the 
+Tests if the output to stdout from the previous L</script_runs> matches the
 expected value exactly.
 
 =head2 script_stdout_isnt
 
  script_stdout_is $expected_stdout, $test_name;
 
-Tests if the output to stdout from the previous L</script_runs> does NOT match the 
+Tests if the output to stdout from the previous L</script_runs> does NOT match the
 expected value exactly.
 
 =head2 script_stdout_like
@@ -492,14 +521,14 @@ expression.
 
  script_stderr_is $expected_stderr, $test_name;
 
-Tests if the output to stderr from the previous L</script_runs> matches the 
+Tests if the output to stderr from the previous L</script_runs> matches the
 expected value exactly.
 
 =head2 script_stderr_isnt
 
  script_stderr_is $expected_stderr, $test_name;
 
-Tests if the output to stderr from the previous L</script_runs> does NOT match the 
+Tests if the output to stderr from the previous L</script_runs> does NOT match the
 expected value exactly.
 
 =head2 script_stderr_like
@@ -518,22 +547,17 @@ expression.
 
 =head1 CAVEATS
 
-This module is fully supported back to Perl 5.8.1.  It may work on 5.8.0.
-It should work on Perl 5.6.x and I may even test on 5.6.2.  I will accept
-patches to maintain compatibility for such older Perls, but you may
-need to fix it on 5.6.x / 5.8.0 and send me a patch.
+This module is fully supported back to Perl 5.8.1.  In the near future, support
+for the older pre-Test2 Test::Builer will be dropped.
 
-This module uses L<IPC::Run3> to compile and run scripts.  There are a number of
-outstanding issues with this module, and maintenance for L<IPC::Run3> is not swift.
-One of these is that L<IPC::Run3> incorrectly throws an exception on Windows when
-you feed it a Perl script with a compile error.  Currently L<Test::Script> probes
-for this bug (it checks for the bug, not for a specific version) and applies a
-workaround in that case.  I am hoping to remove the work around once the bug is
-fixed in L<IPC::Run3>.
+The STDIN handle will be closed when using script_runs with the stdin option.
+An older version used L<IPC::Run3>, which attempted to save STDIN, but
+apparently this cannot be done consistently or portably.  We now use
+L<Capture::Tiny> instead and explicitly do not support saving STDIN handles.
 
 =head1 SEE ALSO
 
-L<Test::Script::Run>, L<Test::More>
+L<Test::Script::Run>, L<Test2::Suite>
 
 =head1 AUTHOR
 
@@ -547,7 +571,7 @@ Brendan Byrd
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2006 by Adam Kennedy.
+This software is copyright (c) 2017 by Adam Kennedy.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

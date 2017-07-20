@@ -1,4 +1,13 @@
 Revision History for POE-Component-Server-eris
+2.2     2017-07-15 Brad Lhotsky <brad@divisionbyzero.net>
+        - Minor performance optimizations in the regex
+          and program flow.
+
+2.1     2017-07-14 Brad Lhotsky <brad@divisionbyzero.net>
+        - Make reference implementations usable with
+          Getopt::Long::Descriptive
+        - Fix the graphite handler
+
 2.0     2016-11-28 Brad Lhotsky <brad@divisionbyzero.net>
         - Fix program matching regex to support ISO8601 Dates
         - Optimize on the program matching regex

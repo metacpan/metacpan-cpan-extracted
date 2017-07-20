@@ -19,5 +19,5 @@ requires:
 resources:
   bugtracker: http://github.com/alexbyk/perl-evo/issues
   repository: http://github.com/alexbyk/perl-evo
-version: '0.0403'
+version: '0.0405'
 x_serialization_backend: 'YAML::Tiny version 1.69'

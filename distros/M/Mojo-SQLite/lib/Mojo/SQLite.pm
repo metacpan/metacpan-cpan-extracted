@@ -8,19 +8,18 @@ use File::Spec::Functions 'catfile';
 use File::Temp;
 use Mojo::SQLite::Database;
 use Mojo::SQLite::Migrations;
-use Mojo::SQLite::PubSub;
-use Scalar::Util 'weaken';
+use Scalar::Util qw(blessed weaken);
 use SQL::Abstract;
 use URI;
 use URI::db;
 
-our $VERSION = '2.002';
+our $VERSION = '3.000';
 
 has abstract => sub { SQL::Abstract->new(name_sep => '.', quote_char => '"') };
 has 'auto_migrate';
 has database_class  => 'Mojo::SQLite::Database';
 has dsn             => sub { _url_from_file(shift->_tempfile)->dbi_dsn };
-has max_connections => 5;
+has max_connections => 1;
 has migrations      => sub {
   my $migrations = Mojo::SQLite::Migrations->new(sqlite => shift);
   weaken $migrations->{sqlite};
@@ -35,21 +34,19 @@ has options => sub {
     sqlite_unicode      => 1,
   };
 };
-has pubsub => sub {
-  my $pubsub = Mojo::SQLite::PubSub->new(sqlite => shift);
-  weaken $pubsub->{sqlite};
-  return $pubsub;
-};
+has 'parent';
 
 sub new { @_ > 1 ? shift->SUPER::new->from_string(@_) : shift->SUPER::new }
 
-sub db { $_[0]->database_class->new(dbh => $_[0]->_dequeue, sqlite => $_[0]) }
+sub db { $_[0]->database_class->new(dbh => $_[0]->_prepare, sqlite => $_[0]) }
 
 sub from_filename { shift->from_string(_url_from_file(shift, shift)) }
 
 sub from_string {
   my ($self, $str) = @_;
   return $self unless $str;
+  return $self->parent($str) if blessed $str and $str->isa('Mojo::SQLite');
+
   my $url = URI->new($str);
 
   # Options
@@ -96,9 +93,6 @@ sub _dequeue {
     $weakdbh->{private_mojo_last_insert_id} = $_[3] if $_[0] == DBD::SQLite::INSERT;
   });
 
-  # Automatic migrations
-  ++$self->{migrated} and $self->migrations->migrate
-    if !$self->{migrated} && $self->auto_migrate;
   $self->emit(connection => $dbh);
 
   return $dbh;
@@ -106,9 +100,23 @@ sub _dequeue {
 
 sub _enqueue {
   my ($self, $dbh) = @_;
+
+  if (my $parent = $self->parent) { return $parent->_enqueue($dbh) }
+
   my $queue = $self->{queue} ||= [];
   push @$queue, $dbh if $dbh->{Active};
   shift @$queue while @$queue > $self->max_connections;
+}
+
+sub _prepare {
+  my $self = shift;
+
+  # Automatic migrations
+  ++$self->{migrated} and $self->migrations->migrate
+    if !$self->{migrated} && $self->auto_migrate;
+
+  my $parent = $self->parent;
+  return $parent ? $parent->_prepare : $self->_dequeue;
 }
 
 sub _tempfile { catfile(shift->{tempdir} = File::Temp->newdir, 'sqlite.db') }
@@ -184,7 +192,9 @@ Mojo::SQLite - A tiny Mojolicious wrapper for SQLite
 
 L<Mojo::SQLite> is a tiny wrapper around L<DBD::SQLite> that makes
 L<SQLite|https://www.sqlite.org/> a lot of fun to use with the
-L<Mojolicious|https://mojolico.us> real-time web framework.
+L<Mojolicious|https://mojolico.us> real-time web framework. Use all
+L<SQL features|http://sqlite.org/lang.html> SQLite has to offer, generate CRUD
+queries from data structures, and manage your database schema with migrations.
 
 Database and statement handles are cached automatically, so they can be reused
 transparently to increase performance. And you can handle connection timeouts
@@ -216,7 +226,9 @@ All I/O and queries are performed synchronously. However, the "Write-Ahead Log"
 journal is enabled for all connections, allowing multiple processes to read and
 write concurrently to the same database file (but only one can write at a
 time). You can prevent this mode from being enabled by passing the option
-C<no_wal>. See L<http://sqlite.org/wal.html> for more information.
+C<no_wal>, but note that this is incompatible with SQLite databases that have
+already had WAL mode enabled. See L<http://sqlite.org/wal.html> and
+L<DBD::SQLite/"journal_mode"> for more information.
 
   # Performed concurrently
   my $pid = fork || die $!;
@@ -251,7 +263,7 @@ L<additional temporary files|https://www.sqlite.org/tempfiles.html> safely.
 =head1 EXAMPLES
 
 This distribution also contains a well-structured example
-L<blog application|https://github.com/kraih/mojo-pg/tree/master/examples/blog>
+L<blog application|https://github.com/Grinnz/Mojo-SQLite/tree/master/examples/blog>
 you can use for inspiration. This application shows how to apply the MVC design
 pattern in practice.
 
@@ -291,7 +303,7 @@ C<quote_char> to C<">.
   $sql     = $sql->auto_migrate($bool);
 
 Automatically migrate to the latest database schema with L</"migrations">, as
-soon as the first database connection has been established.
+soon as L</"db"> has been called for the first time.
 
 =head2 database_class
 
@@ -315,7 +327,7 @@ temporary file.
   $sql    = $sql->max_connections(3);
 
 Maximum number of idle database handles to cache for future use, defaults to
-C<5>.
+C<1>.
 
 =head2 migrations
 
@@ -341,9 +353,13 @@ L<DBI/"ATTRIBUTES COMMON TO ALL HANDLES"> and
 L<DBD::SQLite/"DRIVER PRIVATE ATTRIBUTES"> for more information on available
 options.
 
-=head2 pubsub
+=head2 parent
 
-This attribute is L<DEPRECATED|Mojo::SQLite::PubSub/"DESCRIPTION">.
+  my $parent = $sql->parent;
+  $sql       = $sql->parent(Mojo::SQLite->new);
+
+Another L<Mojo::SQLite> object to use for connection management, instead of
+establishing and caching our own database connections.
 
 =head1 METHODS
 
@@ -355,6 +371,7 @@ the following new ones.
   my $sql = Mojo::SQLite->new;
   my $sql = Mojo::SQLite->new('file:test.db);
   my $sql = Mojo::SQLite->new('sqlite:test.db');
+  my $sql = Mojo::SQLite->new(Mojo::SQLite->new);
 
 Construct a new L<Mojo::SQLite> object and parse connection string with
 L</"from_string"> if necessary.
@@ -412,15 +429,17 @@ passed as the second argument.
   $sql = $sql->from_string('file:test.db');
   $sql = $sql->from_string('file:///C:/foo/bar.db');
   $sql = $sql->from_string('sqlite:C:%5Cfoo%5Cbar.db');
+  $sql = $sql->from_string(Mojo::SQLite->new);
 
-Parse configuration from connection string. Connection strings are parsed as
-URLs, so you should construct them using a module like L<Mojo::URL>,
-L<URI::file>, or L<URI::db>. For portability on non-Unix-like systems, either
-construct the URL with the C<sqlite> scheme, or use L<URI::file/"new"> to
-construct a URL with the C<file> scheme. A URL with no scheme will be parsed as
-a C<file> URL, and C<file> URLs are parsed according to the current operating
-system. If specified, the hostname must be C<localhost>. If the URL has a query
-string, it will be parsed and applied to L</"options">.
+Parse configuration from connection string or use another L<Mojo::SQLite>
+object as L</"parent">. Connection strings are parsed as URLs, so you should
+construct them using a module like L<Mojo::URL>, L<URI::file>, or L<URI::db>.
+For portability on non-Unix-like systems, either construct the URL with the
+C<sqlite> scheme, or use L<URI::file/"new"> to construct a URL with the C<file>
+scheme. A URL with no scheme will be parsed as a C<file> URL, and C<file> URLs
+are parsed according to the current operating system. If specified, the
+hostname must be C<localhost>. If the URL has a query string, it will be parsed
+and applied to L</"options">.
 
   # Absolute filename
   $sql->from_string('sqlite:////home/fred/data.db');

@@ -3,37 +3,52 @@ GLXContext            O_GLXContext
 GLXContextOrNull      O_GLXContextOrNull
 GLXContextImported    O_GLXContextImported
 GLXContextID          O_X11_Xlib_XID
+GLXFBConfig           O_GLXFBConfig
 
 INPUT
 O_GLXContext
-	if (sv_isa($arg, \"X11::GLX::Context\") || sv_isa($arg, \"X11::GLX::Context::Imported\")) {
-		$var= ($type) SvIV((SV*)SvRV($arg));
+	if (sv_derived_from($arg, \"X11::GLX::Context\")) {
+		$var= ($type) PerlXlib_get_magic_dpy_innerptr($arg, 1);
 	} else {
 		croak( \"%s is not a %s\", \"$var\", \"X11::GLX::Context\" );
 	}
 
 OUTPUT
 O_GLXContext
-	sv_setref_pv($arg, \"X11::GLX::Context\", (void*) $var);
+	sv_setsv($arg, $var?
+		PerlXlib_obj_for_display_innerptr(dpy, $var, "X11::GLX::Context", SVt_PVHV, 1)
+		: &PL_sv_undef
+	);
 
 INPUT
 O_GLXContextOrNull
 	if (!SvOK($arg))
 		$var= NULL;
-	else if (sv_isa($arg, \"X11::GLX::Context\") || sv_isa($arg, \"X11::GLX::Context::Imported\")) {
-		$var= ($type) SvIV((SV*)SvRV($arg));
+	else if (sv_derived_from($arg, \"X11::GLX::Context\")) {
+		$var= ($type) PerlXlib_get_magic_dpy_innerptr($arg, 0);
 	} else {
 		croak( \"%s is not a %s\", \"$var\", \"X11::GLX::Context\" );
 	}
 
 INPUT
 O_GLXContextImported
-	if (sv_isa($arg, \"X11::GLX::Context::Imported\")) {
-		$var= ($type) SvIV((SV*)SvRV($arg));
+	if (sv_derived_from($arg, \"X11::GLX::Context::Imported\")) {
+		$var= ($type) PerlXlib_get_magic_dpy_innerptr($arg, 1);
 	} else {
 		croak( \"%s is not a %s\", \"$var\", \"X11::GLX::Context::Imported\" );
 	}
 
 OUTPUT
 O_GLXContextImported
-	sv_setref_pv($arg, \"X11::GLX::Context::Imported\", (void*) $var);
+	sv_setsv($arg, $var?
+		PerlXlib_obj_for_display_innerptr(dpy, $var, "X11::GLX::Context::Imported", SVt_PVHV, 1)
+		: &PL_sv_undef
+	);
+
+INPUT
+O_GLXFBConfig
+	if (sv_derived_from($arg, \"X11::GLX::FBConfig\")) {
+		$var= ($type) SvIV((SV*)SvRV($arg));
+	} else {
+		croak( \"%s is not a %s\", \"$var\", \"X11::GLX::FBConfig\" );
+	}

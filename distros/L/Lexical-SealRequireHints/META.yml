@@ -16,7 +16,7 @@ configure_requires:
 conflicts:
   B::Hooks::OP::Check: '< 0.19'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,11 +25,12 @@ name: Lexical-SealRequireHints
 provides:
   Lexical::SealRequireHints:
     file: lib/Lexical/SealRequireHints.pm
-    version: '0.010'
+    version: '0.011'
 recommends:
   XSLoader: '0'
 requires:
   perl: '5.006'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.010'
+version: '0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

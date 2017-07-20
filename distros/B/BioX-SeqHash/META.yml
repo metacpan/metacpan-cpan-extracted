@@ -1,0 +1,31 @@
+---
+abstract: 'get one or more sequences from a FASTA file quickly.'
+author:
+  - 'Yan Xueqing <yanxueqing621@163.com>'
+build_requires:
+  IO::All: '0'
+  Modern::Perl: '0'
+  Module::Build: '0.28'
+  Test::More: '0.88'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BioX-SeqHash
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Exporter: '0'
+  strict: '0'
+  warnings: '0'
+version: 0.1.1
+x_serialization_backend: 'YAML::Tiny version 1.70'

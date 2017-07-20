@@ -13,6 +13,7 @@ lib/AI/PredictionClient.pm
 lib/AI/PredictionClient/CPP/PredictionGrpcCpp.pm
 lib/AI/PredictionClient/CPP/Typemaps/more_typemaps_STL_String.txt
 lib/AI/PredictionClient/Classes/SimpleTensor.pm
+lib/AI/PredictionClient/Docs/Overview.pod
 lib/AI/PredictionClient/InceptionClient.pm
 lib/AI/PredictionClient/Predict.pm
 lib/AI/PredictionClient/Roles/PredictRole.pm

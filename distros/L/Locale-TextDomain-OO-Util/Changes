@@ -1,6 +1,13 @@
 Revision history for Perl extension Locale::TextDomain:OO::Util.
 
-3.006  hu Feb 23 07:22:51 2017
+3.008  Wed Jul 19 12:48:01 2017
+- remove Module::Build from dist dependencies (2nd try)
+
+3.007  Sun Jul 16 10:52:11 2017
+- fixed dependency (1st try)
+  https://rt.cpan.org/Ticket/Display.html?id=122436 
+
+3.006  Thu Feb 23 07:22:51 2017
 - extract header key X-Lexicon-Class to lexicon_class
 
 3.005  Wed Jul  1 06:58:29 2015

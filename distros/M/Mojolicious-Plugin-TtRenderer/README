@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.58
+    version 1.59
 
 SYNOPSIS
 
@@ -228,6 +228,8 @@ AUTHOR
     uwisser
 
     Dinis Lage
+
+    jay mortensen (GMORTEN)
 
 COPYRIGHT AND LICENSE
 

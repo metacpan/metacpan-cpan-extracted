@@ -5,7 +5,7 @@ use warnings;
 use Test::More tests => 7;
 
 eval {
-  require "bin/clearpress";
+  require "./bin/clearpress";
 };
 
 {

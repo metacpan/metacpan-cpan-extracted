@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -15,6 +15,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Tie-FileSection",
   "EXE_FILES" => [],
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Tie::FileSection",
   "PREREQ_PM" => {
     "Tie::Handle" => 0,
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
     "File::Basename" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.171861",
+  "VERSION" => "0.171950",
   "test" => {
     "TESTS" => "t/*.t"
   }

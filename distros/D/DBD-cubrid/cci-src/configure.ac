@@ -46,10 +46,10 @@ AM_CONDITIONAL([BUILD_CMSERVER_FOR_AIX], [test $(uname) = "AIX"])
 
 # Checks bit model feature.
 AC_ARG_ENABLE([64bit],
-	[AS_HELP_STRING([--enable-64bit],
-		[build 64 bit code @<:@default=no (32 bit code)@:>@])],
+	[AS_HELP_STRING([--disable-64bit],
+		[Disable 64-bit support (on 64-bit platforms)])],
 	[enable_64bit=$enableval],
-	[enable_64bit=no])
+	[enable_64bit=yes])
 AM_CONDITIONAL([BUILD_64], [test "$enable_64bit" = "yes"])
 
 OBJECT_MODE=""
@@ -95,6 +95,18 @@ case $SYSTEM_TYPE in
 esac
 export BIT_MODEL CC CXX OBJECT_MODE
 
+AS_IF([test "$GCC" = "yes" -a "$BIT_MODEL" = "-m32"],
+	[AC_MSG_CHECKING([for gcc version])
+	gcc_version=`$CC -dumpversion 2>/dev/null`
+	case "$gcc_version" in
+		[[0-3]].* | 4.[[0-2]].* | 4.3.[[0-3]])
+	    		AC_MSG_ERROR([Cannot compile 32-bit program with this gcc version ($gcc_version).]
+			[gcc 4.3.4 or higher version is required. (ref. https://gcc.gnu.org/bugzilla/show_bug.cgi?id=16185)]);;
+		*)
+			AC_MSG_RESULT([$gcc_version])
+	esac
+	])
+
 LT_INIT
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
@@ -102,6 +114,10 @@ AC_PROG_RANLIB
 AC_PROG_INSTALL
 AC_PROG_YACC
 AC_PROG_LEX
+AC_PROG_EGREP
+AC_PROG_AWK
+AC_CHECK_PROG(DIFF, diff, diff, diff-is-missing)
+
 CFLAGS="$remember_CFLAGS"
 CXXFLAGS="$remember_CXXFLAGS"
 LDFLAGS="$remember_LDFLAGS"
@@ -220,7 +236,7 @@ AC_C_BIGENDIAN
 AS_IF([test "$GCC" = "yes"],
 	[AC_MSG_CHECKING([for --hash-style=both linker support])
 	remember_LDFLAGS="$LDFLAGS"
-	hashstyle=`gcc -dumpspecs | grep hash-style=gnu`
+	hashstyle=`$CC -dumpspecs | $EGREP 'hash-style=gnu'`
 	if test "x$hashstyle" != "x"
 	then
 		LDFLAGS="$LDFLAGS -Wl,--hash-style=both"
@@ -361,10 +377,10 @@ AC_ARG_ENABLE([debug],
 	[enable_debug=$enableval],
 	[enable_debug=no])
 AS_IF([test "$enable_debug" = "yes"],
-	[CFLAGS="$CFLAGS -ggdb -fno-inline"
-	CXXFLAGS="$CXXFLAGS -ggdb -fno-inline"],
-	[CFLAGS="$CFLAGS -ggdb -O2 -DNDEBUG -finline-functions"
-	CXXFLAGS="$CXXFLAGS -ggdb -O2 -DNDEBUG -finline-functions"])
+	[CFLAGS="$CFLAGS -ggdb -fno-inline -fno-omit-frame-pointer"
+	CXXFLAGS="$CXXFLAGS -ggdb -fno-inline -fno-omit-frame-pointer"],
+	[CFLAGS="$CFLAGS -ggdb -O2 -DNDEBUG -finline-functions -fno-omit-frame-pointer"
+	CXXFLAGS="$CXXFLAGS -ggdb -O2 -DNDEBUG -finline-functions -fno-omit-frame-pointer"])
 AM_CONDITIONAL([BUILD_DEBUG], [test "$enable_debug" = "yes"])
 
 AC_ARG_ENABLE([profile],
@@ -375,6 +391,15 @@ AC_ARG_ENABLE([profile],
 AS_IF([test "$enable_profile" = "yes"],
 	[CFLAGS="$CFLAGS -g -pg"
 	CXXFLAGS="$CXXFLAGS -g -pg"])
+
+AC_ARG_ENABLE([duma],
+	[AS_HELP_STRING([--enable-duma],
+		[use Detect Unintended Memory Access library @<:@default=no@:>@])],
+	[enable_duma=$enableval],
+	[enable_duma=no])
+AS_IF([test "$enable_duma" = "yes"],
+	[AC_CHECK_LIB([duma], [main], [], AC_MSG_ERROR(duma library was not found. check or install duma))
+	SYS_LIBS="$SYS_LIBS -lduma"])
 
 AC_MSG_CHECKING([whether build cci library only])
 AC_ARG_WITH(cci-only,
@@ -409,28 +434,26 @@ AS_IF([test "$enable_owfs" = "yes"],
 	SYS_DEFS="$SYS_DEFS -DCUBRID_OWFS"
 	SYS_LIBS="$SYS_LIBS -L\$(top_builddir)/external/lib -lowfsclient -ldl -lpthread"])
 
-AC_ARG_ENABLE([mock],
-	[AS_HELP_STRING([--enable-mock],
-		[build as dbgw lib to use cci mock @<:@default=no@:>@])],
-	[enable_mock=$enableval],
-	[enable_mock=no])
-AS_IF([test "$enable_mock" = "yes"],
-	[DBGW_DEFS="$DBGW_DEFS -DBUILD_MOCK"])
-
-AC_ARG_ENABLE([nclavis],
-  [AS_HELP_STRING([--enable-nclavis],
-    [build as dbgw lib to use nclavis feature @<:@default=no@:>@])],
-  [enable_nclavis=$enableval],
-  [enable_nclavis=no])
-AM_CONDITIONAL([BUILD_NCLAVIS], [test "$enable_nclavis" != "no"])
+AC_ARG_ENABLE([systemtap],
+	[AS_HELP_STRING([--enable-systemtap],
+		[Enable dynamic tracing support using systemtap @<:@default=no@:>@])],
+	[enable_systemtap=$enableval],
+	[enable_systemtap=no])
+AS_IF([test "$enable_systemtap" = "yes"], 
+	[AC_CHECK_PROG(DTRACE, dtrace, dtrace)
+	AS_IF([test "x$DTRACE" = "x"],
+		[AC_MSG_ERROR(dtrace was not found. check PATH or install dtrace)])
+        AC_CHECK_HEADER([sys/sdt.h],,[AC_MSG_ERROR([systemtap support needs sys/sdt.h header])])
+	AC_DEFINE([ENABLE_SYSTEMTAP], [1], [Enable dynamic tracing support using systemtap]) ])
+AM_CONDITIONAL([ENABLE_SYSTEMTAP], [test "x$enable_systemtap" = xyes])
 
 AC_MSG_CHECKING(for java home)
 AS_IF([test "$with_cci_only" = "no"],
       	[AS_IF([test "x$JAVA_HOME" != "x"],
 	[JAVA_BIN=$JAVA_HOME/bin
-	JAVAC=$JAVA_HOME/bin/javac
-	AC_MSG_RESULT($JAVA_HOME)],
+	JAVAC=$JAVA_HOME/bin/javac],
 	[AC_MSG_ERROR(set your JAVA_HOME environment variable.)])])
+AC_MSG_RESULT($JAVA_HOME)
 
 AC_ARG_WITH(jdbc,
 	AS_HELP_STRING([--without-jdbc],
@@ -440,7 +463,7 @@ AC_ARG_WITH(jdbc,
 AS_IF([test "$with_cci_only" = "yes"], [with_jdbc=no])
 AS_IF([test "x$with_jdbc" = "xyes"],
 	[AC_MSG_CHECKING([for javac version])
-		JAVAC_VERSION=`$JAVAC -version 2>&1 | head -1 | awk '{ print $2 }' | awk -F\. '{ print $1 "." $2 }'`
+		JAVAC_VERSION=`$JAVAC -version 2>&1 | head -1 | $AWK '{ print $2 }' | $AWK -F\. '{ print $1 "." $2 }'`
 		AC_MSG_RESULT($JAVAC_VERSION)
 		if test -n "$JAVAC_VERSION"; then
 			if expr 1.5 \> $JAVAC_VERSION > /dev/null; then
@@ -467,12 +490,9 @@ AS_IF([test "x$with_jdbc" = "xyes"],
 			mddir=""
 	esac
 
-	if test "x$mddir" != "xaix"
-	then  
-		AC_CHECK_FILE($JAVA_HOME/include/$mddir/jni_md.h,
-			[JAVA_INC="$JAVA_INC -I$JAVA_HOME/include/$mddir"],
-			AC_MSG_ERROR(jni_md.h is required.))
-	fi
+	AC_CHECK_FILE($JAVA_HOME/include/$mddir/jni_md.h,
+		[JAVA_INC="$JAVA_INC -I$JAVA_HOME/include/$mddir"],
+		AC_CHECK_FILE($JAVA_HOME/include/jniport.h,,AC_MSG_ERROR(jni_md.h or jniport.h is required.)))
 
 	AC_MSG_CHECKING([whether JNI programs can be compiled with $JAVA_INC])
 	CFLAGS="$CFLAGS $JAVA_INC"
@@ -484,29 +504,21 @@ AS_IF([test "x$with_jdbc" = "xyes"],
 	AC_SUBST(JAVA_INC)
 	AC_SUBST(JAVA_HOME)])
 
-AC_MSG_CHECKING([for bison library])
+AC_MSG_CHECKING([for bison])
 AC_ARG_WITH([bison],
 	AS_HELP_STRING([--with-bison=PATH],
-		[prefix for installed bison @<:@default=builtin@:>@]),
+		[prefix for installed bison @<:@default=check@:>@]),
 	[with_bison=$withval],
-	[with_bison=builtin])
+	[with_bison=check])
 AS_IF([test "$with_cci_only" = "yes"], [with_bison=no],
-	[AS_IF([test "$with_bison" = "builtin"],
-		[AC_CONFIG_SUBDIRS([external/bison-2.3])
-		BISON="\$(top_builddir)/external/bin/bison"
-		EXTERNAL_PKGS="$EXTERNAL_PKGS bison-2.3"],
-		[BISON="$with_bison/bin/bison"
-		if test ! -x $BISON
-		then
-			AC_MSG_ERROR([Invalid bison path($BISON) or permission denied.])
-		fi
-		BISON_EXPECTED_VERSION="2.3"
-		BISON_VERSION=`$BISON --version 2> /dev/null | grep 'GNU Bison' | cut -d ' ' -f 4 | tr -d a-z`
-		if [[ -z "$BISON_VERSION" ]] || [[ "$BISON_VERSION" != "$BISON_EXPECTED_VERSION" ]]
-		then
-			AC_MSG_ERROR([Unsupported bison version($BISON_VERSION). It should be $BISON_EXPECTED_VERSION.])
-		fi
-		EXTERNAL_DIST="$EXTERNAL_DIST bison-2.3"])])
+	[AS_IF([test "$with_bison" = "check"],[BISON="${YACC% -y}"],[BISON="$with_bison/bin/bison"])
+	AS_IF([$BISON --version 2>/dev/null | $EGREP -qw '^bison'],
+	      [BISON_VERSION=`$BISON --version 2> /dev/null | $EGREP '^bison' | cut -d ' ' -f 4 | tr -d a-z`],
+	      [AC_MSG_ERROR([Cannot find GNU Bison.])])
+	with_bison="$BISON ($BISON_VERSION)"
+	AX_COMPARE_VERSION([$BISON_VERSION], [gt], [2.3],
+			   [USE_BISON_NEWDIRECTIVE="yes"])])
+AM_CONDITIONAL([USE_BISON_NEWDIRECTIVE], [test "x$USE_BISON_NEWDIRECTIVE" = "xyes"])
 AC_MSG_RESULT([$with_bison])
 
 AC_MSG_CHECKING([for libedit library])
@@ -543,23 +555,6 @@ AS_IF([test "$with_cci_only" = "yes"], [with_lzo2=no],
 		EXTERNAL_DIST="$EXTERNAL_DIST lzo-2.03"])])
 AC_MSG_RESULT([$with_lzo2])
 
-AC_MSG_CHECKING([for gc library])
-AC_ARG_WITH([gc],
-	AS_HELP_STRING([--with-gc=PATH],
-		[prefix for installed GC @<:@default=builtin@:>@]),
-	[with_gc=$withval],
-	[with_gc=builtin])
-AS_IF([test "$with_cci_only" = "yes"], [with_gc=no],
-	[AS_IF([test "$with_gc" = "builtin"],
-		[AC_CONFIG_SUBDIRS([external/gc6.7])
-		GC_LIBS="\$(top_builddir)/external/lib/libgc.la"
-		GC_INC="-I\$(top_builddir)/external/include/gc"
-		EXTERNAL_PKGS="$EXTERNAL_PKGS gc6.7"],
-		[GC_LIBS="-L$with_gc/lib -lgc"
-		GC_INC="-I$with_gc/include/gc"
-		EXTERNAL_DIST="$EXTERNAL_DIST gc6.7"])])
-AC_MSG_RESULT([$with_gc])
-
 AC_MSG_CHECKING([for libgcrypt library])
 AC_ARG_WITH([libgcrypt],
 	AS_HELP_STRING([--with-libgcrypt=PATH],
@@ -575,14 +570,13 @@ AS_IF([test "$with_cci_only" = "yes"], [with_libgcrypt=no],
 		[GCRYPT_LIBS="-L$with_libgcrypt/lib -lgcrypt"
 		GCRYPT_INC="-I$with_libgcrypt/include/"
 		EXTERNAL_DIST="$EXTERNAL_DIST libgcrypt-1.5.2"])])
-
+AC_MSG_RESULT([$with_libgcrypt])
 if test "$with_libgcrypt" = "no"
 then	
   AC_CHECK_LIB([gcrypt], [main])
 else  
   AC_DEFINE([HAVE_LIBGCRYPT], [1], [There is libgcyprt])
 fi
-AC_MSG_RESULT([$with_libgcrypt])
 
 AC_MSG_CHECKING([for libgpg-error library])
 AC_ARG_WITH([libgpg_error],
@@ -599,13 +593,13 @@ AS_IF([test "$with_cci_only" = "yes"], [with_libgpg_error=no],
 		[GPG_ERROR_LIBS="-L$with_libgpg_error/lib -lgpg-error"
 		GPG_ERROR_INC="-I$with_libgpg_error/include/"
 		EXTERNAL_DIST="$EXTERNAL_DIST libgpg-error-1.11"])])
+AC_MSG_RESULT([$with_libgpg_error])
 if test "$with_libgpg_error" = "no"
 then	
   AC_CHECK_LIB([gpg-error], [main])
 else  
   AC_DEFINE([HAVE_LIBGPG_ERROR], [1], [There is libgpg-error])
 fi
-AC_MSG_RESULT([$with_libgpg-error])
 
 AC_MSG_CHECKING([for aio library])
 AC_ARG_WITH([aio],
@@ -618,145 +612,6 @@ AS_IF([test "$with_aio" = "yes"],
 	[SYS_DEFS="$SYS_DEFS -DUSE_AIO"
 	SYS_LIBS="$SYS_LIBS -lrt"])
 AC_MSG_RESULT([$with_aio])
-
-AC_MSG_CHECKING([for DBGW3.0 nbase-t support])
-AC_ARG_WITH([nbase_t],
-	AS_HELP_STRING([--with-nbase-t=PATH],
-	  [build as dbgw lib to use nbase-t @<:@default=builtin@:>@])],
-	[with_nbase_t=$withval],
-	[with_nbase_t=no])
-	
-case "$with_nbase_t" in
-	yes|builtin)
-		if test -d "$srcdir/external/nbase" && test "$enable_64bit" == "yes"; then
-			AC_CONFIG_SUBDIRS([external/nbase])
-			NBASE_T_LIB_PATH="-L\$(top_builddir)/external/nbase/lib"
-			NBASE_T_INC_PATH="-I\$(top_builddir)/external/nbase/include"
-		else
-			with_nbase_t=no
-		fi
-		;;
-	no)
-		;;
-	*)
-		NBASE_T_LIB_PATH="-L$with_nbase_t/lib"
-		NBASE_T_INC_PATH="-I$with_nbase_t/include"
-		;;
-esac
-
-if test "$with_nbase_t" != "no" || test "$enable_nclavis" != "no"
-then
-  if test -d "$srcdir/ndbgw"
-  then
-    #AC_CONFIG_FILES([ndbgw/Makefile])
-    #OPTIONAL_DIR="$OPTIONAL_DIR ndbgw"
-    OPTIONAL_DIR="$OPTIONAL_DIR"
-  else
-    AC_MSG_ERROR(cannot support nbase_t or nclavis feature)
-  fi
-fi
-
-AC_MSG_RESULT([$with_nbase_t])
-
-AC_MSG_CHECKING([for mysql client library version 5.1])
-AC_ARG_WITH([mysql51],
-	AS_HELP_STRING([--with-mysql51=PATH],
-		[for CAS for MySQL @<:@default=builtin@:>@]),
-	[with_mysql51=$withval],
-	[with_mysql51=builtin])
-
-case "$with_mysql51" in
-	yes|builtin)
-		if test -d "$srcdir/external/mysqlclient/5.1" && test "$enable_64bit" == "yes"; then
-			AC_CONFIG_SUBDIRS([external/mysqlclient/5.1])
-			MYSQL51_LIB_PATH="-L\$(top_builddir)/external/mysqlclient/5.1/lib"
-			MYSQL51_INC_PATH="-I\$(top_builddir)/external/mysqlclient/5.1/include"
-		else
-			with_mysql51=no
-		fi
-		;;
-	no)
-		;;
-	*)
-		MYSQL51_LIB_PATH="-L$with_mysql/lib"
-		MYSQL51_INC_PATH="-I$with_mysql/include"
-		;;
-esac
-AM_CONDITIONAL([BUILD_CAS_FOR_MYSQL51], [test "$with_mysql51" != "no"])
-AC_MSG_RESULT([$with_mysql51])
-
-AC_MSG_CHECKING([for mysql client library version 6.1])
-AC_ARG_WITH([mysql],
-	AS_HELP_STRING([--with-mysql=PATH],
-		[for CAS for MySQL @<:@default=builtin@:>@]),
-	[with_mysql=$withval],
-	[with_mysql=builtin])
-
-case "$with_mysql" in
-	yes|builtin)
-		if test -d "$srcdir/external/mysqlclient/6.1" && test "$enable_64bit" == "yes"; then
-			AC_CONFIG_SUBDIRS([external/mysqlclient/6.1])
-			MYSQL_LIB_PATH="-L\$(top_builddir)/external/mysqlclient/6.1/lib"
-			MYSQL_INC_PATH="-I\$(top_builddir)/external/mysqlclient/6.1/include"
-		else
-			with_mysql=no
-		fi
-		;;
-	no)
-		;;
-	*)
-		MYSQL_LIB_PATH="-L$with_mysql/lib"
-		MYSQL_INC_PATH="-I$with_mysql/include"
-		;;
-esac
-AM_CONDITIONAL([BUILD_CAS_FOR_MYSQL], [test "$with_mysql" != "no"])
-AC_MSG_RESULT([$with_mysql])
-
-AC_MSG_CHECKING([for oracle client library])
-AC_ARG_WITH([oracle],
-	AS_HELP_STRING([--with-oracle=PATH],
-		[for CAS for Oracle @<:@default=builtin@:>@]),
-	[with_oracle=$withval],
-	[with_oracle=builtin])
-AS_IF([test "$with_cci_only" = "yes"], [with_oracle=no])
-case "$with_oracle" in
-	yes|builtin)
-		if test -d "$srcdir/external/oracleclient" -a "$enable_64bit" = "yes"; then
-			AC_CONFIG_SUBDIRS([external/oracleclient])
-			ORACLE_LIB_PATH="-L\$(top_builddir)/external/lib"
-			ORACLE_INC_PATH="-I\$(top_builddir)/external/include/oracleclient"
-		else
-			with_oracle=no
-		fi
-		;;
-	no)
-		;;
-	*)
-		ORACLE_LIB_PATH="-L$with_oracle/lib"
-		ORACLE_INC_PATH="-I$with_oracle/include"
-		;;
-esac
-AM_CONDITIONAL([BUILD_CAS_FOR_ORACLE], [test "$with_oracle" != "no"])
-AC_MSG_RESULT([$with_oracle])
-
-AC_ARG_ENABLE([dbgw],
-       [AS_HELP_STRING([--enable-dbgw],
-               [build as dbgw lib @<:@default=no@:>@])],
-       [enable_dbgw=$enableval],
-       [enable_dbgw=no])
-AM_CONDITIONAL([BUILD_DBGW], [test "$enable_dbgw" != "no"])
-AS_IF([test "$with_cci_only" = "yes"], [enable_dbgw=no])
-AM_CONDITIONAL([BUILD_DBGW_ORACLE], [test "$enable_dbgw" != "no" && test "$with_oracle" != "no"])
-AM_CONDITIONAL([BUILD_DBGW_MYSQL51], [test "$enable_dbgw" != "no" && test "$with_mysql51" != "no"])
-AM_CONDITIONAL([BUILD_DBGW_MYSQL], [test "$enable_dbgw" != "no" && test "$with_mysql" != "no"])
-AM_CONDITIONAL([BUILD_DBGW_NBASE_T], [test "$enable_dbgw" != "no" && test "$with_nbase_t" != "no"])
-AM_CONDITIONAL([BUILD_DBGW_ALL], [test "$enable_dbgw" != "no" && test "$with_oracle" != "no" && test "$with_mysql" != "no"])
-if test "$enable_dbgw" = "yes"
-then
-	AC_LANG_PUSH([C++])
-	AC_CHECK_HEADERS([boost/property_tree/ptree.hpp], [], [AC_MSG_ERROR(Boost library is required.(version 1.41.0 or higher))])
-	AC_LANG_POP([C++])
-fi
 
 AC_MSG_CHECKING([for cubrid manager server])
 AC_ARG_WITH([cmserver],
@@ -772,20 +627,20 @@ case "$with_cmserver" in
 		    (cd "$srcdir/cubridmanager/server" && sh ./autogen.sh)
 		  fi
 		  if test "$enable_64bit" = "yes"
-                  then
-		    build_64="--enable-64bit"
+		  then
+		    build_mode="--enable-64bit"
 		  else
-                    build_64=""
+		    build_mode="--disable-64bit"
 		  fi
-		    cm_common_libdir=`readlink -f $PWD/cm_common`
-		    cm_common_includedir=`readlink -f $srcdir/src/cm_common`
-		    cci_includedir=`readlink -f $srcdir/src/cci`
-		    cci_libdir=`readlink -f $PWD/cci`
-		    cs_libdir=`readlink -f $PWD/cs`
-		    broker_includedir=`readlink -f $srcdir/src/broker`
-		    ac_configure_args="$ac_configure_args $build_64 --prefix='$prefix' CXXFLAGS='$CXXFLAGS -I$cci_includedir -I$broker_includedir' LDFLAGS='-L$cci_libdir -L$cs_libdir' --with-cubrid-libdir=$cm_common_libdir --with-cubrid-includedir=$cm_common_includedir" AC_CONFIG_SUBDIRS([cubridmanager/server])
-		    OPTIONAL_DIR="$OPTIONAL_DIR cubridmanager/server"
-		    with_cmserver=builtin
+		  cm_common_libdir=`readlink -f $PWD/cm_common`
+		  cm_common_includedir=`readlink -f $srcdir/src/cm_common`
+		  cci_includedir=`readlink -f $srcdir/src/cci`
+		  cci_libdir=`readlink -f $PWD/cci`
+		  cs_libdir=`readlink -f $PWD/cs`
+		  broker_includedir=`readlink -f $srcdir/src/broker`
+		  ac_configure_args="$ac_configure_args $build_mode --prefix='$prefix' CXXFLAGS='$CXXFLAGS -I$cci_includedir -I$broker_includedir' LDFLAGS='-L$cci_libdir -L$cs_libdir' --with-cubrid-libdir=$cm_common_libdir --with-cubrid-includedir=$cm_common_includedir" AC_CONFIG_SUBDIRS([cubridmanager/server])
+		  OPTIONAL_DIR="$OPTIONAL_DIR cubridmanager/server"
+		  with_cmserver=builtin
 		else
 		  if test "$with_cmserver" != "check"; then
 		    AC_MSG_ERROR([there is no server in $srcdir/cubridmanager])
@@ -817,7 +672,7 @@ AC_ARG_WITH([expat],
 AS_IF([test "$with_cci_only" = "yes"], [with_expat=no],
 	[AS_IF([test "$with_expat" = "builtin"],
 		[AC_CONFIG_SUBDIRS([external/expat-2.0.1])
-		EXPAT_LIBS="\$(top_builddir)/external/lib/libexpat.la"
+		EXPAT_LIBS="\$(top_builddir)/external/expat-2.0.1/libexpat.la"
 		EXPAT_INC="-I\$(top_builddir)/external/include/expat"
 		EXTERNAL_PKGS="$EXTERNAL_PKGS expat-2.0.1"],
 		[EXPAT_LIBS="-L$with_expat/lib -lexpat"
@@ -831,7 +686,7 @@ AC_ARG_WITH([jansson],
                 [prefix for installed jansson @<:@default=builtin@:>@]),
         [with_jansson=$withval],
         [with_jansson=builtin])
-AS_IF([test "$with_cci_only" = "yes"], [with-jansson=no],
+AS_IF([test "$with_cci_only" = "yes"], [with_jansson=no],
 	[AS_IF([test "$with_expat" = "builtin"],
 		[AC_CONFIG_SUBDIRS([external/jansson-2.4])
         	JANSSON_LIBS="\$(top_builddir)/external/lib/libjansson.la"
@@ -859,7 +714,7 @@ VERSION_DEFS="-DMAJOR_VERSION=MAJOR_VERSION -DMINOR_VERSION=MINOR_VERSION \
 -DBUILD_OS='$BUILD_OS'"
 
 SRC_INC="-I\$(top_srcdir)/include"
-DIR_LIST=`ls -l $srcdir/src | grep ^d | awk '{ print $9}'`
+DIR_LIST=`ls -l $srcdir/src | $EGREP '^d' | $AWK '{ print $9}'`
 for D in $DIR_LIST
 do
 	SRC_INC="$SRC_INC -I\$(top_srcdir)/src/$D"
@@ -1084,6 +939,25 @@ AC_ARG_WITH([tmpdir],
 AC_MSG_RESULT($CUBRID_TMPDIR)
 DIR_DEFS="$DIR_DEFS -DCUBRID_TMPDIR=\\\"$CUBRID_TMPDIR\\\""
 
+AC_MSG_CHECKING([for tzlibdir])
+AC_ARG_WITH([shtzdir],
+	AS_HELP_STRING([--with-tzlibdir=PATH],
+		       [Directory containing timezone files @<:@default=PREFIX/timezones@:>@]),
+	[case "$withval" in
+	   no)
+	    AC_MSG_ERROR(Need TZDIR.)
+	    ;;
+	  yes)
+	    CUBRID_TZ_DIR="\$(prefix)/timezones"
+	    ;;
+	  *)
+	    CUBRID_TZ_DIR="$withval"
+	    ;;
+	  esac],
+	[CUBRID_TZ_DIR="\$(prefix)/timezones"])
+AC_MSG_RESULT($CUBRID_TZ_DIR)
+DIR_DEFS="$DIR_DEFS -DCUBRID_TZ_DIR=\\\"$CUBRID_TZ_DIR\\\""
+
 # change PACKAGE_STRING to official version string
 PACKAGE_STRING="CUBRID VERSION_STRING"
 sed < confdefs.h > confdefs.h-2 "s/^#define PACKAGE_STRING .*$"/"#define PACKAGE_STRING \"$PACKAGE_STRING\"/"
@@ -1095,7 +969,7 @@ AS_IF([test "$with_cci_only" = "yes"],
 	EXTRA_DIST_SUBDIRS=""
 	CUBRID_LOGDIR=""
 	CUBRID_TMPDIR=""],
-	[BUILD_SUBDIRS="external include cas sa cs cubrid util cci broker cas4mysql cas4oracle cm_common conf msg demo contrib locales dbgw $OPTIONAL_DIR"
+	[BUILD_SUBDIRS="external include cas sa cs cubrid util cci broker cm_common conf msg demo contrib locales tools timezones $OPTIONAL_DIR"
 	EXTRA_DIST_SUBDIRS="debian win src"])
 
 AC_SUBST([BUILD_NUMBER])
@@ -1131,20 +1005,14 @@ AC_SUBST([CUBRID_SHLOCALESDIR])
 AC_SUBST([CUBRID_COMPATDIR])
 AC_SUBST([CUBRID_LOGDIR])
 AC_SUBST([CUBRID_TMPDIR])
+AC_SUBST([CUBRID_TZ_DIR])
 AC_SUBST([NBASE_T_LIB_PATH])
 AC_SUBST([NBASE_T_INC_PATH])
-AC_SUBST([MYSQL51_LIB_PATH])
-AC_SUBST([MYSQL51_INC_PATH])
-AC_SUBST([MYSQL_LIB_PATH])
-AC_SUBST([MYSQL_INC_PATH])
-AC_SUBST([ORACLE_LIB_PATH])
-AC_SUBST([ORACLE_INC_PATH])
 AC_SUBST([BISON])
 AC_SUBST([BUILD_SUBDIRS])
 AC_SUBST([EXTRA_DIST_SUBDIRS])
 AC_SUBST([EXPAT_LIBS])
 AC_SUBST([JANSSON_LIBS])
-AC_SUBST([DBGW_DEFS])
 
 AH_TOP([
 #ifndef _CONFIG_H_

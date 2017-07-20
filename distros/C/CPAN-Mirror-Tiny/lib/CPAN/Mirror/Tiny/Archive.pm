@@ -2,9 +2,10 @@ package CPAN::Mirror::Tiny::Archive;
 use strict;
 use warnings;
 
+use CPAN::Mirror::Tiny::Util qw(WIN32 safe_system);
+
 use File::Which 'which';
 use constant BAD_TAR => ($^O eq 'solaris' || $^O eq 'hpux');
-use constant WIN32 => $^O eq 'MSWin32';
 
 use File::pushd ();
 use File::Basename ();
@@ -23,7 +24,11 @@ sub _init {
     my $self = shift;
     my $tar = which('tar');
     my $tar_ver;
-    my $maybe_bad_tar = sub { WIN32 || BAD_TAR || (($tar_ver = `$tar --version 2>/dev/null`) =~ /GNU.*1\.13/i) };
+    my $maybe_bad_tar = sub {
+        return 1 if WIN32 || BAD_TAR;
+        ($tar_ver) = safe_system([$tar, "--version"]);
+        $tar_ver =~ /GNU.*1\.13/i;
+    };
 
     if ($tar && !$maybe_bad_tar->()) {
         chomp $tar_ver;
@@ -33,11 +38,11 @@ sub _init {
             my $xf = ($self->{verbose} ? 'v' : '')."xf";
             my $ar = $tarfile =~ /bz2$/ ? 'j' : 'z';
 
-            my($root, @others) = `$tar ${ar}tf $tarfile 2>/dev/null`
+            my ($out) = safe_system([$tar, "${ar}tf", $tarfile]);
+            my($root, @others) = split /\n/, $out
                 or return undef;
 
             FILE: {
-                chomp $root;
                 $root =~ s!^\./!!;
                 $root =~ s{^(.+?)/.*$}{$1};
 
@@ -48,7 +53,7 @@ sub _init {
                 }
             }
 
-            system "$tar $ar$xf $tarfile 2>/dev/null";
+            safe_system([$tar, "$ar$xf", $tarfile]);
             return $root if -d $root;
             return undef;
         };
@@ -58,14 +63,14 @@ sub _init {
         $self->{_backends}{untar} = sub {
             my($self, $tarfile) = @_;
 
-            my $x  = "x" . ($self->{verbose} ? 'v' : '') . "f -";
+            my $x  = "x" . ($self->{verbose} ? 'v' : '') . "f";
             my $ar = $tarfile =~ /bz2$/ ? $bzip2 : $gzip;
 
-            my($root, @others) = `$ar -dc $tarfile | $tar tf -`
+            my ($out) = safe_system([$ar, "-dc", $tarfile], "|", [$tar, "tf", "-"]);
+            my($root, @others) = split /\n/, $out
                 or return undef;
 
             FILE: {
-                chomp $root;
                 $root =~ s!^\./!!;
                 $root =~ s{^(.+?)/.*$}{$1};
 
@@ -76,7 +81,7 @@ sub _init {
                 }
             }
 
-            system "$ar -dc $tarfile | $tar $x";
+            safe_system([$ar, "-dc", $tarfile], "|", [$tar, $x, "-"]);
             return $root if -d $root;
             return undef;
         };
@@ -108,14 +113,15 @@ sub _init {
         $self->{_backends}{unzip} = sub {
             my($self, $zipfile) = @_;
 
-            my $opt = $self->{verbose} ? '' : '-q';
-            my(undef, $root, @others) = `$unzip -t $zipfile`
+            my @opt = $self->{verbose} ? () : qw(-q);
+            my $out = safe_system([$unzip, "-t", $zipfile]);
+            my(undef, $root, @others) = split /\n/, $out
                 or return undef;
 
             chomp $root;
             $root =~ s{^\s+testing:\s+([^/]+)/.*?\s+OK$}{$1};
 
-            system "$unzip $opt $zipfile";
+            safe_system([$unzip, @opt, $zipfile]);
             return $root if -d $root;
 
             return undef;

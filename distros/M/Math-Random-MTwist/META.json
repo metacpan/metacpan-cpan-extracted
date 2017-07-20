@@ -4,7 +4,7 @@
       "Carsten Gaebler"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "unknown"
    ],
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -34,10 +33,16 @@
       "runtime" : {
          "requires" : {
             "Time::HiRes" : "0",
-            "perl" : "5.010000"
+            "perl" : "5.008000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.17"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

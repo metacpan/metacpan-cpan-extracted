@@ -7,7 +7,7 @@ package Mojo::DOM58::_CSS;
 use strict;
 use warnings;
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 my $ESCAPE_RE = qr/\\[^0-9a-fA-F]|\\[0-9a-fA-F]{1,6}/;
 my $ATTR_RE   = qr/
@@ -127,8 +127,8 @@ sub _compile {
     elsif ($css =~ /\G:([\w\-]+)(?:\(((?:\([^)]+\)|[^)])+)\))?/gcs) {
       my ($name, $args) = (lc $1, $2);
 
-      # ":not" (contains more selectors)
-      $args = _compile($args) if $name eq 'not';
+      # ":matches" and ":not" (contains more selectors)
+      $args = _compile($args) if $name eq 'matches' || $name eq 'not';
 
       # ":nth-*" (with An+B notation)
       $args = _equation($args) if $name =~ /^nth-/;
@@ -190,6 +190,9 @@ sub _pc {
 
   # ":not"
   return !_match($args, $current, $current) if $class eq 'not';
+
+  # ":matches"
+  return !!_match($args, $current, $current) if $class eq 'matches';
 
   # ":empty"
   return !grep { !_empty($_) } @$current[4 .. $#$current] if $class eq 'empty';

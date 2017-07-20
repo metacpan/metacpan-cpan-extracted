@@ -1,7 +1,7 @@
 package Twitter::API;
 # ABSTRACT: A Twitter REST API library for Perl
 
-our $VERSION = '0.0112';
+our $VERSION = '0.0113';
 use 5.14.1;
 use Moo;
 use Carp;
@@ -436,7 +436,7 @@ Twitter::API - A Twitter REST API library for Perl
 
 =head1 VERSION
 
-version 0.0112
+version 0.0113
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 #!perl
 
+use strict;
+use warnings;
+
 use Test::More;
 use Data::Dumper;
 use Test::MockTime;
@@ -36,7 +39,7 @@ my %msgs = (
     'High Precision Dates'   => q|2016-11-19T20:50:01.749659+01:00 janus CROND[14400]: (root) CMD (/usr/lib64/sa/sa1 1 1)|,
 );
 
-@dtfields = qw/time datetime_obj epoch datetime_str/;
+my @dtfields = qw/time datetime_obj epoch datetime_str/;
 
 my %resps = (
   'Snort Message Parse' => {
@@ -498,11 +501,11 @@ subtest "Basic Functionality Test" => sub {
 
     foreach my $name (sort keys %msgs) {
         my $msg = parse_syslog_line($msgs{$name});
-        delete $msg->{$_} for @_delete;
+        delete $msg->{$_} for grep { exists $msg->{$_} } @_delete;
         if ( !exists $resps{$name} ) {
             diag( Dumper $msg );
         }
-        is_deeply( $msg, $resps{$name}, "$name ($set_name)" );
+        is_deeply( $msg, $resps{$name}, $name );
     }
 
     # Disable Program extraction

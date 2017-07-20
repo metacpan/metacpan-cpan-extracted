@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::LibBuilder: '0.02'
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,43 +25,43 @@ name: Text-BibTeX
 provides:
   Text::BibTeX:
     file: lib/Text/BibTeX.pm
-    version: '0.80'
+    version: '0.81'
   Text::BibTeX::BibEntry:
     file: lib/Text/BibTeX/Bib.pm
-    version: '0.80'
+    version: '0.81'
   Text::BibTeX::BibFormat:
     file: lib/Text/BibTeX/BibFormat.pm
-    version: '0.8'
+    version: '0.81'
   Text::BibTeX::BibSort:
     file: lib/Text/BibTeX/BibSort.pm
-    version: '0.8'
+    version: '0.81'
   Text::BibTeX::BibStructure:
     file: lib/Text/BibTeX/Bib.pm
-    version: '0.80'
+    version: '0.81'
   Text::BibTeX::Entry:
     file: lib/Text/BibTeX/Entry.pm
-    version: '0.8'
+    version: '0.81'
   Text::BibTeX::File:
     file: lib/Text/BibTeX/File.pm
-    version: '0.8'
+    version: '0.81'
   Text::BibTeX::Name:
     file: lib/Text/BibTeX/Name.pm
-    version: '0.8'
+    version: '0.81'
   Text::BibTeX::NameFormat:
     file: lib/Text/BibTeX/NameFormat.pm
-    version: '0.8'
+    version: '0.81'
   Text::BibTeX::SimpleValue:
     file: lib/Text/BibTeX/Value.pm
-    version: '0.80'
+    version: '0.81'
   Text::BibTeX::Structure:
     file: lib/Text/BibTeX/Structure.pm
-    version: '0.8'
+    version: '0.81'
   Text::BibTeX::StructuredEntry:
     file: lib/Text/BibTeX/Structure.pm
-    version: '0.8'
+    version: '0.81'
   Text::BibTeX::Value:
     file: lib/Text/BibTeX/Value.pm
-    version: '0.8'
+    version: '0.81'
 requires:
   Encode: '0'
   Scalar::Util: '1.42'
@@ -69,5 +69,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/ambs/Text-BibTeX
-version: '0.80'
+version: '0.81'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

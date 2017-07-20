@@ -1,5 +1,8 @@
 Revision history for Map::Tube::CLI
 
+0.29  Sat Jul 15 09:45:00 2017
+      - Upgraded dependency on Map::Tube v3.32
+
 0.28  Fri Jun 30 20:45:00 2017
       - Upgraded dependency on Map::Tube v3.31.
 

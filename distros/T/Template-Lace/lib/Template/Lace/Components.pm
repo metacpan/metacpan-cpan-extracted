@@ -81,7 +81,7 @@ sub find_components {
 
 sub find_component {
   my ($class, $child_dom, $num, $handlers, $current_container_id, %components) = @_;
-  if(my ($prefix, $component_name) = (($child_dom->tag||'') =~m/^(.+)?\-(.+)?/)) {
+  if(my ($prefix, $component_name) = (($child_dom->tag||'') =~m/^(.+?)\-(.+)?/)) {
     ## if uuid exists, that means we already processed it.
     if($class->is_a_component($handlers, $prefix, $component_name)) {
       unless($child_dom->attr('uuid')) {

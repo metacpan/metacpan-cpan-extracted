@@ -1,4 +1,4 @@
-Locale-TextDomain-OO version 1.028
+Locale-TextDomain-OO version 1.029
 ==================================
 
 Perl OO Interface to Uniforum Message Translation
@@ -16,7 +16,6 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    charnames
     namespace::autoclean
     Carp
     Class::Load
@@ -34,9 +33,8 @@ This module requires these other modules and libraries:
     Moo::Role
     MooX::Singleton
     MooX::StrictConstructor
-    MooX::Types::MooseLike
+    MooX::Types::MooseLike::Base
     Path::Tiny
-    Safe
     Tie::Sub
     Try::Tiny
 

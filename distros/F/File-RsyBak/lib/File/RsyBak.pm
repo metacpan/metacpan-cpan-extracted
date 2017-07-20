@@ -1,7 +1,7 @@
 package File::RsyBak;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.32'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.34'; # VERSION
 
 use 5.010001;
 use strict;
@@ -378,7 +378,7 @@ File::RsyBak - Backup files/directories with histories, using rsync
 
 =head1 VERSION
 
-This document describes version 0.32 of File::RsyBak (from Perl distribution File-RsyBak), released on 2017-07-10.
+This document describes version 0.34 of File::RsyBak (from Perl distribution File-RsyBak), released on 2017-07-14.
 
 =head1 SYNOPSIS
 

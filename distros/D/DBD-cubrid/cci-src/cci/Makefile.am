@@ -29,7 +29,6 @@ LIBS += @SYS_LIBS@
 
 noinst_HEADERS = \
 	$(BASE_DIR)/porting.h \
-	$(BASE_DIR)/stringl.h \
 	$(BASE_DIR)/error_code.h \
 	$(BROKER_DIR)/cas_protocol.h \
 	$(CCI_DIR)/cas_cci.h \
@@ -68,6 +67,7 @@ include_HEADERS = \
 
 lib_LTLIBRARIES = libcascci.la
 libcascci_la_SOURCES = \
+	$(BASE_DIR)/porting.c \
 	$(CCI_DIR)/cas_cci.c \
 	$(CCI_DIR)/cci_util.c \
 	$(CCI_DIR)/cci_query_execute.c \

@@ -3,34 +3,34 @@ require 5.008;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'VERSION_FROM' => 'lib/Locale/Utils/Autotranslator.pm',
   'EXE_FILES' => [],
+  'PL_FILES' => {},
+  'NAME' => 'Locale::Utils::Autotranslator',
+  'INSTALLDIRS' => 'site',
   'PREREQ_PM' => {
-                   'HTML::Entities' => 0,
-                   'HTTP::Request::Common' => 0,
-                   'Locale::TextDomain::OO::Util' => 0,
-                   'LWP::UserAgent' => 0,
                    'JSON' => 0,
                    'Locale::PO' => '0.27',
-                   'MooX::StrictConstructor' => 0,
                    'Locale::TextDomain::OO::Util::ExtractHeader' => 0,
-                   'MooX::Types::MooseLike::Numeric' => 0,
-                   'Try::Tiny' => 0,
+                   'Locale::TextDomain::OO::Util' => 0,
+                   'MooX::StrictConstructor' => 0,
                    'Path::Tiny' => 0,
+                   'Try::Tiny' => 0,
+                   'Test::Exception' => 0,
+                   'HTML::Entities' => 0,
+                   'MooX::Types::MooseLike::Numeric' => 0,
                    'URI' => 0,
-                   'Test::NoWarnings' => 0,
+                   'HTTP::Request::Common' => 0,
                    'MooX::Types::MooseLike::Base' => 0,
-                   'Test::Differences' => '0.60',
-                   'Moo' => '1.003001',
-                   'namespace::autoclean' => 0,
-                   'Encode' => 0,
+                   'Test::NoWarnings' => 0,
+                   'MooX::Types::MooseLike' => 0,
                    'Test::More' => 0,
                    'Carp' => 0,
-                   'Test::Exception' => 0,
-                   'MooX::Types::MooseLike' => 0
-                 },
-  'PL_FILES' => {},
-  'INSTALLDIRS' => 'site',
-  'NAME' => 'Locale::Utils::Autotranslator',
-  'VERSION_FROM' => 'lib/Locale/Utils/Autotranslator.pm'
+                   'LWP::UserAgent' => 0,
+                   'Encode' => 0,
+                   'Moo' => '1.003001',
+                   'Test::Differences' => '0.60',
+                   'namespace::autoclean' => 0
+                 }
 )
 ;

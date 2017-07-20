@@ -7,10 +7,10 @@ use File::Basename ();
 use Carp ();
 
 # ABSTRACT: LWP plugin for fetching files
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
-has '+url' => sub { Carp::croak "url is a required property" };
+has '+url' => '';
 
 
 has ssl => 0;
@@ -21,6 +21,10 @@ sub init
 
   $meta->add_requires('share' => 'HTTP::Tiny' => '0.044' );
   $meta->add_requires('share' => 'URI' => 0 );
+
+  $meta->prop->{start_url} ||= $self->url;
+  $self->url($meta->prop->{start_url});
+  $self->url || Carp::croak('url is a required property');
 
   if($self->url =~ /^https:/ || $self->ssl)
   {
@@ -94,14 +98,13 @@ Alien::Build::Plugin::Fetch::HTTPTiny - LWP plugin for fetching files
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 
  use alienfile;
- plugin 'Fetch::HTTPTiny' => (
-   url => 'http://ftp.gnu.org/gnu/make',
- );
+ meta->prop->{start_url} = 'http://ftp.gnu.org/gnu/make';
+ plugin 'Fetch::HTTPTiny' => ();
 
 =head1 DESCRIPTION
 

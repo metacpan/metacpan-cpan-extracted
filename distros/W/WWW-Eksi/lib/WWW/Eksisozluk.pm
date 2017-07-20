@@ -1,5 +1,5 @@
 package WWW::Eksisozluk;
-$WWW::Eksisozluk::VERSION = '0.26';
+$WWW::Eksisozluk::VERSION = '0.27';
 use warnings;
 use strict;
 

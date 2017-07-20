@@ -2,6 +2,7 @@ package App::perlminlint::Plugin::LintPM;
 use strict;
 use warnings FATAL => qw/all/;
 use autodie;
+use utf8;
 
 use App::perlminlint::Plugin -as_base, [priority => 0];
 
@@ -20,7 +21,7 @@ sub handle_test {
 
   my @inc_opt = $plugin->app->inc_opt($fn, $modname);
 
-  $plugin->app->run_perl(@inc_opt, -we => "require $modname")
+  $plugin->app->run_perl(@inc_opt, -we => "use utf8; require $modname")
     and "Module $modname is OK";
 }
 

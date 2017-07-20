@@ -6,7 +6,7 @@
                                                         |__/   
 
 
-This is the README for Convert::Moji version 0.09.
+This is the README for Convert::Moji version 0.10.
 
 Convert::Moji is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -67,11 +67,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Convert::Moji
 
-To install the module from the source file, Convert-Moji-0.09.tar.gz,
+To install the module from the source file, Convert-Moji-0.10.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Convert-Moji-0.09.tar.gz
-    cd Convert-Moji-0.09
+    tar xfz Convert-Moji-0.10.tar.gz
+    cd Convert-Moji-0.10
     perl Makefile.PL
     make
     make install
@@ -96,6 +96,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sun Mar 26 11:46:09 2017.
+This README was written on Thu Jul 20 11:45:18 2017.
 
 -----------------------------------------------------------------------------

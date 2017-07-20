@@ -18,11 +18,11 @@ Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::
 
 =head1 VERSION
 
-Version 0.64
+Version 0.70
 
 =cut
 
-our $VERSION = '0.64';
+our $VERSION = '0.70';
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,7 @@ Parse perl-style string to L<Struct::Path|Struct::Path> path
 
 =cut
 
-our $FILTERS = {
+our $HOOKS = {
     'back' => sub { # step back $count times
         my $static = defined $_[0] ? $_[0] : 1;
         return sub {
@@ -99,23 +99,24 @@ our $FILTERS = {
     },
 };
 
-$FILTERS->{'<<'} = $FILTERS->{back}; # backward compatibility ('<<' is deprecated)
+$HOOKS->{'<<'} = $HOOKS->{back}; # backward compatibility ('<<' is deprecated)
 
-sub ps_parse($) {
-    my $path = shift;
+sub ps_parse($;$);
+sub ps_parse($;$) {
+    my ($path, $opts) = @_;
     croak "Undefined path passed" unless (defined $path);
     my $doc = PPI::Lexer->lex_source($path);
     croak "Failed to parse passed path '$path'" unless (defined $doc);
-    my $out = [];
-    my $sc = 0; # step counter
+    my @out;
 
     for my $step ($doc->elements) {
-        croak "Unsupported thing '" . $step->content . "' in the path (step #$sc)" unless ($step->can('elements'));
+        croak "Unsupported thing '$step' in the path, step #" . @out
+            unless ($step->can('elements'));
         for my $item ($step->elements) {
             $item->prune('PPI::Token::Whitespace') if $item->can('prune');
 
             if ($item->isa('PPI::Structure') and $item->start->content eq '{' and $item->finish) {
-                push @{$out}, {};
+                push @out, {};
                 for my $t (map { $_->elements } $item->children) {
                     my $tmp;
                     if ($t->isa('PPI::Token::Word') or $t->isa('PPI::Token::Number')) {
@@ -131,65 +132,68 @@ sub ps_parse($) {
                         $tmp->{regs} = substr(substr($t->content, 1), 0, -1); # get rid of slashes
                         $tmp->{regs} = qr($tmp->{regs});
                     } else {
-                        croak "Unsupported thing '" . $t->content . "' in hash key specification (step #$sc)";
+                        croak "Unsupported thing '$t' for hash key, step #$#out";
                     }
-                    map { push @{$out->[-1]->{$_}}, delete $tmp->{$_} } keys %{$tmp};
+                    map { push @{$out[-1]->{$_}}, delete $tmp->{$_} } keys %{$tmp};
                 }
             } elsif ($item->isa('PPI::Structure') and $item->start->content eq '[' and $item->finish) {
-                push @{$out}, [];
+                push @out, [];
                 my $is_range;
                 for my $t (map { $_->elements } $item->children) {
                     if ($t->isa('PPI::Token::Number')) {
-                        croak "Floating-point numbers not allowed as array indexes (step #$sc)"
+                        croak "Incorrect array index '$t', step #$#out"
                             unless ($t->content == int($t->content));
                         if ($is_range) {
-                            my $start = pop(@{$out->[-1]});
-                            croak "Undefined start for range (step #$sc)" unless (defined $start);
-                            push @{$out->[-1]},
+                            my $start = pop(@{$out[-1]});
+                            croak "Range start undefided, step #$#out"
+                                unless (defined $start);
+                            push @{$out[-1]},
                                 ($start < $t->content ? $start..$t->content : reverse $t->content..$start);
                             $is_range = undef;
                         } else {
-                            push @{$out->[-1]}, int($t->content);
+                            push @{$out[-1]}, int($t->content);
                         }
                     } elsif ($t->isa('PPI::Token::Operator') and $t->content eq ',') {
                         $is_range = undef;
                     } elsif ($t->isa('PPI::Token::Operator') and $t->content eq '..') {
                         $is_range = $t;
                     } else {
-                        croak "Unsupported thing '" . $t->content . "' in array item specification (step #$sc)";
+                        croak "Unsupported thing '$t' for array index, step #$#out";
                     }
                 }
-                croak "Unfinished range secified (step #$sc)" if ($is_range);
+                croak "Unfinished range secified, step #$#out" if ($is_range);
             } elsif ($item->isa('PPI::Structure') and $item->start->content eq '(' and $item->finish) {
-                my ($flt, @args) = map { $_->elements } $item->children;
+                my ($hook, @args) = map { $_->elements } $item->children;
                 my $neg;
-                if ($flt->content eq 'not' or $flt->content eq '!') {
-                    $neg = $flt->content;
-                    $flt = shift @args;
+                if ($hook->content eq 'not' or $hook->content eq '!') {
+                    $neg = $hook->content;
+                    $hook = shift @args;
                 }
-                croak "Unsupported thing '" . $flt->content . "' as operator (step #$sc)"
-                    unless ($flt->isa('PPI::Token::Operator') or $flt->isa('PPI::Token::Word'));
-                croak "Unsupported operator '" . $flt->content . "' specified (step #$sc)"
-                    unless (exists $FILTERS->{$flt->content});
+                croak "Unsupported thing '$hook' as hook, step #" . @out
+                    unless ($hook->isa('PPI::Token::Operator') or $hook->isa('PPI::Token::Word'));
+                croak "Unsupported hook '$hook', step #" . @out unless (exists $HOOKS->{$hook->content});
                 @args = map {
                     if ($_->isa('PPI::Token::Quote::Single') or $_->isa('PPI::Token::Number')) {
                         $_->literal;
                     } elsif ($_->isa('PPI::Token::Quote::Double')) {
                         $_->string;
                     } else {
-                        croak "Unsupported thing '" . $_->content . "' as operator argument (step #$sc)"
+                        croak "Unsupported thing '$_' as hook argument, step #" . @out;
                     }
                 } @args;
-                $flt = $FILTERS->{$flt->content}->(@args); # closure with saved args
-                push @{$out}, ($neg ? sub { not $flt->(@_) } : $flt);
+                $hook = $HOOKS->{$hook->content}->(@args); # closure with saved args
+                push @out, ($neg ? sub { not $hook->(@_) } : $hook);
+            } elsif ($item->isa('PPI::Token::Symbol') and $item->raw_type eq '$') {
+                my $name = substr($item->content, 1); # cut off sigil
+                croak "Unknown alias '$name'" unless (exists $opts->{aliases}->{$name});
+                push @out, @{ps_parse($opts->{aliases}->{$name}, $opts)};
             } else {
-                croak "Unsupported thing '" . $item->content . "' in the path (step #$sc)" ;
+                croak "Unsupported thing '$item' in the path, step #" . @out;
             }
         }
-        $sc++;
     }
 
-    return $out;
+    return \@out;
 }
 
 =head2 ps_serialize
@@ -223,7 +227,7 @@ sub ps_serialize($) {
         if (ref $step eq 'ARRAY') {
             my @ranges;
             for my $i (@{$step}) {
-                croak "Incorrect array index '$i' (step #$sc)"
+                croak "Incorrect array index '$i', step #$sc"
                     unless (looks_like_number($i) and int($i) == $i);
                 if (@ranges and (
                     ($ranges[-1][-1] + 1 == $i and $ranges[-1][0] < $i) or   # ascending
@@ -240,9 +244,9 @@ sub ps_serialize($) {
             if (keys %{$step} == 1 and exists $step->{keys} and ref $step->{keys} eq 'ARRAY' or not keys %{$step}) {
                 for my $k (@{$step->{keys}}) {
                     if (not defined $k) {
-                        croak "Unsupported hash key type 'undef' (step #$sc)";
+                        croak "Unsupported hash key type 'undef', step #$sc";
                     } elsif (ref $k) {
-                        croak "Unsupported hash key type '" . (ref $k) . "' (step #$sc)";
+                        croak "Unsupported hash key type '" . (ref $k) . "', step #$sc";
                     } elsif (looks_like_number($k) or $k =~ /^[0-9a-zA-Z_]+$/) {
                         # \w doesn't fit -- PPI can't parse unquoted utf8 hash keys
                         # https://github.com/adamkennedy/PPI/issues/168#issuecomment-180506979
@@ -252,11 +256,11 @@ sub ps_serialize($) {
                     }
                 }
             } else {
-                croak "Unsupported hash definition (step #$sc)";
+                croak "Unsupported hash definition, step #$sc";
             }
             $out .= "{" . join(",", @items) . "}";
         } else {
-            croak "Unsupported thing in the path (step #$sc)";
+            croak "Unsupported thing in the path, step #$sc";
         }
         $sc++;
     }

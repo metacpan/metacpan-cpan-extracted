@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 ### after: use lib qw(@RT_LIB_PATH@);
-use lib qw(/opt/rt4/local/lib /opt/rt4/lib);
+use lib qw(/Users/jbrandt/rts/rt441/local/lib /Users/jbrandt/rts/rt441/lib);
 
 package RT::Extension::AssetSQL::Test;
 use base 'RT::Test::Assets';

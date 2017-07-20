@@ -9,6 +9,12 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#if PERL_VERSION_GE(5,19,4)
+typedef SSize_t array_ix_t;
+#else /* <5.19.4 */
+typedef I32 array_ix_t;
+#endif /* <5.19.4 */
+
 #ifndef newSVpvs
 # define newSVpvs(string) newSVpvn(""string"", sizeof(string)-1)
 #endif /* !newSVpvs */
@@ -892,7 +898,7 @@ static SV *THX_usertwine_twine(pTHX_ SV *itref)
 {
 	SV *otref;
 	AV *itwine, *otwine;
-	I32 clen, i;
+	array_ix_t clen, i;
 	if(!SvROK(itref)) throw_data_error("content array isn't an array");
 	itwine = (AV*)SvRV(itref);
 	if(SvTYPE((SV*)itwine) != SVt_PVAV || SvOBJECT((SV*)itwine))
@@ -1540,7 +1546,7 @@ static void THX_serialise_element(pTHX_ SV *out, SV *elem);
 static void THX_serialise_twine(pTHX_ SV *out, SV *tref)
 {
 	AV *twine;
-	I32 clen, i;
+	array_ix_t clen, i;
 	SV **item_ptr;
 	if(!SvROK(tref)) throw_data_error("content array isn't an array");
 	twine = (AV*)SvRV(tref);

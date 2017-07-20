@@ -1,3 +1,16 @@
+0.37    2017-07-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- Reduce startup overhead for CLI.
+
+
+0.36    2017-07-14 (PERLANCAR)
+
+	- [Bugfix] Use debug() logger method instead of debugf() to be
+	  compatible with Log::ger.
+
+
 0.35    2017-07-03 (PERLANCAR)
 
 	- No functional changes.

@@ -27,7 +27,7 @@ no_index:
 provides:
   Plack::Test::AnyEvent:
     file: lib/Plack/Test/AnyEvent.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   AnyEvent: '0'
   Carp: '0'
@@ -37,9 +37,11 @@ requires:
   Plack: '0'
   autodie: '0'
   perl: v5.8.8
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/hoelzro/plack-test-anyevent/issues
   homepage: https://github.com/hoelzro/plack-test-anyevent
   repository: https://github.com/hoelzro/plack-test-anyevent.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'YAML::Tiny version 1.70'

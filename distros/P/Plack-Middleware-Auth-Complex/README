@@ -1,5 +1,5 @@
-Plack-Middleware-Auth-Complex version 0.002
-===========================================
+Plack-Middleware-Auth-Complex version 0.003001
+==============================================
 
 AuthComplex is an authentication system for Plack applications that
 allows user registration, password changing and password reset.
@@ -29,9 +29,13 @@ This module requires these other modules and libraries:
 * Plack
 * Tie::Hash::Expire
 
+It also recommends (but does not require) these modules:
+
+* Authen::Passphrase::Scrypt
+
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2015 by Marius Gavrilescu
+Copyright (C) 2015-2017 by Marius Gavrilescu
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.1 or,

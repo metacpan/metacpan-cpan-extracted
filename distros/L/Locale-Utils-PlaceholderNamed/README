@@ -1,4 +1,4 @@
-Locale::Utils::PlaceholderNamed version 1.002
+Locale::Utils::PlaceholderNamed version 1.004
 =============================================
 
 Utils to expand placeholders in named style.
@@ -23,7 +23,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2011 - 2015,
+Copyright (c) 2011 - 2017,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

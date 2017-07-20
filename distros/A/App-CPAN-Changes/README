@@ -1,10 +1,197 @@
-SYNOPSIS
+NAME
+    App::CPAN::Changes - CLI for CPAN::Changes
 
+VERSION
+    This document describes version 0.003 of App::CPAN::Changes (from Perl
+    distribution App-CPAN-Changes), released on 2017-07-14.
+
+SYNOPSIS
     See included script cpan-changes.
 
-SEE ALSO
+FUNCTIONS
+  add_release
+    Usage:
 
+     add_release(%args) -> [status, msg, result, meta]
+
+    Add a new release.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   changes* => *array[str]*
+
+    *   date* => *date*
+
+    *   file => *str*
+
+        If not specified, will look for file called Changes/CHANGELOG/etc in
+        current directory.
+
+    *   note => *str*
+
+    *   version* => *str*
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  check
+    Usage:
+
+     check(%args) -> [status, msg, result, meta]
+
+    Check for parsing errors in Changes file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file => *str*
+
+        If not specified, will look for file called Changes/CHANGELOG/etc in
+        current directory.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  dump
+    Usage:
+
+     dump(%args) -> [status, msg, result, meta]
+
+    Dump Changes as JSON structure.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file => *str*
+
+        If not specified, will look for file called Changes/CHANGELOG/etc in
+        current directory.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  preamble
+    Usage:
+
+     preamble(%args) -> [status, msg, result, meta]
+
+    Get/set preamble.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file => *str*
+
+        If not specified, will look for file called Changes/CHANGELOG/etc in
+        current directory.
+
+    *   preamble => *str*
+
+        Set new preamble.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  release
+    Usage:
+
+     release(%args) -> [status, msg, result, meta]
+
+    Return information (JSON object dump) of a specific release.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   file => *str*
+
+        If not specified, will look for file called Changes/CHANGELOG/etc in
+        current directory.
+
+    *   version* => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CPAN-Changes>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CPAN-Changes>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPAN-Changes>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     CPAN::Changes
 
     parse-cpan-changes (from App::ParseCPANChanges)
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

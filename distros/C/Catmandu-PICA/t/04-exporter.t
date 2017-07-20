@@ -1,11 +1,14 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::XML;
 
 use Catmandu::Exporter::PICA;
 use File::Temp qw(tempfile);
 use IO::File;
 use Encode qw(encode);
+use PICA::Data qw(pica_parser);
+use PICA::Parser::PPXML;
 
 my @pica_records = (
     [
@@ -97,6 +100,26 @@ is $out, <<'XML';
     <subfield code="a">Goldman</subfield>
   </datafield>
 </record>
+</collection>
 XML
+
+# PPXML
+my $parser = pica_parser( 'PPXML' => 't/files/slim_ppxml.xml' );
+my $record;
+($fh, $filename) = tempfile();
+$exporter = Catmandu::Exporter::PICA->new(
+    fh => $fh,
+    type => 'ppxml',
+);
+while($record = $parser->next){
+    $exporter->add($record);
+}
+$exporter->commit();
+close $fh;
+
+$out = do { local (@ARGV,$/)=$filename; <> };
+my $in = do { local (@ARGV,$/)='t/files/slim_ppxml.xml'; <> };
+
+is_xml($out, $in, 'PPXML writer');
 
 done_testing;

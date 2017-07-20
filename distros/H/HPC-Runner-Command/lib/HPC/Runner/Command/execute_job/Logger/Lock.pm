@@ -1,8 +1,26 @@
 package HPC::Runner::Command::execute_job::Logger::Lock;
 
 use Moose::Role;
-use namespace::autoclean;
 
+use namespace::autoclean;
+use Try::Tiny;
+use Path::Tiny;
+use File::Slurp;
+use MooseX::Types::Path::Tiny qw/Path Paths AbsPath AbsFile/;
+
+has 'lock_file' => (
+    is       => 'rw',
+    isa      => Path,
+    lazy     => 1,
+    coerce   => 1,
+    required => 1,
+    default  => sub {
+        my $self = shift;
+        my $file =
+            File::Spec->catdir($self->data_dir,  '.lock' );
+        return $file;
+    },
+);
 
 =head3 check_lock
 
@@ -13,64 +31,33 @@ Have a max retry count to avoid infinite loops
 =cut
 
 sub check_lock {
-    my $self = shift;
-    my $data_dir = shift;
+    my $self     = shift;
 
     my $max_retries = 1000;
     my $x           = 0;
-    while ( $self->lock_exists($data_dir) ) {
+
+    while ( $self->lock_file->exists ) {
+        $self->command_log->info('Lock exists!');
         Time::HiRes::sleep(0.5);
         $x++;
         last if $x >= $max_retries;
     }
-}
-
-sub lock_exists {
-    my $self     = shift;
-    my $data_dir = shift;
-
-    return unless $data_dir;
-    my $file = File::Spec->catfile( $data_dir, '.lock' );
-
-    if ( $self->archive->contains_file($file) ) {
-        return 1;
-    }
-    else {
-        return 0;
+    if ( $x >= $max_retries ) {
+        $self->command_log->warn(
+            'Logger::JSON Error: We exited the lock!'  );
     }
 }
 
 sub write_lock {
     my $self     = shift;
-    my $data_dir = shift;
 
-    my $file = File::Spec->catfile( $data_dir, '.lock' );
-    my $json_text = '';
-
-    if ( $self->archive->contains_file($file) ) {
-        $self->archive->replace_content( $file, $json_text );
+    try {
+        $self->lock_file->touchpath;
     }
-    else {
-        $self->archive->add_data( $file, $json_text )
-          || $self->command_log->warn(
-            'We were not able to add ' . $file . ' to the archive' );
-    }
-
-    $self->archive->write( $self->data_tar )
-      || $self->command_log->warn(
-        'We were not able to write ' . $file . ' to the archive' );
-}
-
-sub remove_lock {
-    my $self     = shift;
-    my $data_dir = shift;
-
-    my $file = File::Spec->catfile( $data_dir, '.lock' );
-    $self->archive->remove($file);
-
-    $self->archive->write( $self->data_tar )
-      || $self->command_log->warn(
-        'We were not able to write ' . $file . ' to the archive' );
+    catch {
+        $self->command_log->warn(
+            'Logger::JSON Error: We were not able to write ' . $self->lock_file->stringify );
+    };
 }
 
 1;

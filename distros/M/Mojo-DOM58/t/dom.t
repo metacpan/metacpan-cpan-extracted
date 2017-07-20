@@ -1114,6 +1114,14 @@ is_deeply \@e, [qw(A C E G I)], 'found all odd elements';
 $dom->find('li:nth-of-type(odd)')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(A E H)], 'found all odd li elements';
 @e = ();
+$dom->find('ul li:not(:first-child, :last-child)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw(C E F H)], 'found all odd li elements';
+@e = ();
+$dom->find('ul li:matches(:first-child, :last-child)')
+  ->each(sub { push @e, shift->text });
+is_deeply \@e, [qw(A I)], 'found all odd li elements';
+@e = ();
 $dom->find('li:nth-last-of-type( odd )')->each(sub { push @e, shift->text });
 is_deeply \@e, [qw(C F I)], 'found all odd li elements';
 @e = ();
@@ -2223,11 +2231,18 @@ $dom = Mojo::DOM58->new(<<EOF);
     <optgroup>
       <option>H</option>
       <option selected>I</option>
+      <option selected disabled>V</option>
     </optgroup>
     <option value="J" selected>K</option>
+    <optgroup disabled>
+      <option selected>I2</option>
+    </optgroup>
   </select>
   <select name="n"><option>N</option></select>
   <select multiple name="q"><option>Q</option></select>
+  <select name="y" disabled>
+    <option selected>Y</option>
+  </select>
   <select name="d">
     <option selected>R</option>
     <option selected>D</option>
@@ -2245,14 +2260,15 @@ is_deeply $dom->at('select')->val, ['I', 'J'], 'right values';
 is $dom->at('select option')->val,                          'F', 'right value';
 is $dom->at('select optgroup option:not([selected])')->val, 'H', 'right value';
 is $dom->find('select')->[1]->at('option')->val, 'N', 'right value';
-is $dom->find('select')->[1]->val,        undef, 'no value';
-is_deeply $dom->find('select')->[2]->val, undef, 'no value';
+is $dom->find('select')->[1]->val, undef, 'no value';
+is $dom->find('select')->[2]->val, undef, 'no value';
 is $dom->find('select')->[2]->at('option')->val, 'Q', 'right value';
-is_deeply $dom->find('select')->last->val, 'D', 'right value';
-is_deeply $dom->find('select')->last->at('option')->val, 'R', 'right value';
+is $dom->at('select[disabled]')->val, 'Y', 'right value';
+is $dom->find('select')->last->val, 'D', 'right value';
+is $dom->find('select')->last->at('option')->val, 'R', 'right value';
 is $dom->at('textarea')->val, 'M', 'right value';
 is $dom->at('button')->val,   'O', 'right value';
-is $dom->find('form input')->last->val, 'P', 'right value';
+is $dom->at('form')->find('input')->last->val, 'P', 'right value';
 is $dom->at('input[name=q]')->val, 'on',  'right value';
 is $dom->at('input[name=r]')->val, 'on',  'right value';
 is $dom->at('input[name=s]')->val, undef, 'no value';

@@ -7,7 +7,7 @@ use parent 'WiringPi::API';
 use JSON;
 use RPi::WiringPi::Constant qw(:all);
 
-our $VERSION = '2.3619';
+our $VERSION = '2.3620';
 
 sub gpio_layout {
     return $_[0]->gpio_layout;
@@ -81,6 +81,25 @@ sub pwm_range {
     }
     return defined $self->{pwm_range} ? $self->{pwm_range} : 1023;
 }
+sub pwm_clock {
+    my ($self, $divisor) = @_;
+    if (defined $divisor){
+        $self->{pwm_clock} = $divisor;
+        $self->pwm_set_clock($divisor);
+    }
+    return defined $self->{pwm_clock} ? $self->{pwm_clock} : 32;
+}
+sub pwm_mode {
+    my ($self, $mode) = @_;
+    if (defined $mode && ($mode == 0 || $mode == 1)){
+        $self->{pwm_mode} = $mode;
+        $self->pwm_set_mode($mode);
+    }
+    else {
+        die "pwm_mode() requires either 0 or 1 if a param is sent in\n";
+    }
+    return defined $self->{pwm_mode} ? $self->{pwm_mode} : 1;
+}
 sub export_pin {
     my ($self, $pin) = @_;
     system "sudo", "gpio", "export", $self->pin_to_gpio($pin), "in";
@@ -94,13 +113,19 @@ sub registered_pins {
 }
 sub register_pin {
     my ($self, $pin) = @_;
-    $self->_pin_registration($pin, $pin->mode_alt, $pin->read);
+    $self->_pin_registration($pin, $pin->mode_alt, $pin->read, $pin->mode);
 }
 sub unregister_pin {
     my ($self, $pin) = @_;
     $self->_pin_registration($pin);
 }
 sub cleanup{
+    if ($ENV{PWM_IN_USE}){
+        WiringPi::API::pwm_set_mode(PWM_MODE_BAL);
+        WiringPi::API::pwm_set_clock(32);
+        WiringPi::API::pwm_set_range(1023);
+    }
+
     return if ! $ENV{RPI_PINS};
 
     my $pins = decode_json $ENV{RPI_PINS};
@@ -108,13 +133,14 @@ sub cleanup{
     for my $pin (keys %{ $pins }){
         WiringPi::API::pin_mode_alt($pin, $pins->{$pin}{alt});
         WiringPi::API::write_pin($pin, $pins->{$pin}{state});
+        WiringPi::API::pin_mode($pin, $pins->{$pin}{mode});
     }
     delete $ENV{RPI_PINS};
 }
 sub _pin_registration {
     # manages the registration duties for pins
 
-    my ($self, $pin, $alt, $state) = @_;
+    my ($self, $pin, $alt, $state, $mode) = @_;
 
     my $json = $ENV{RPI_PINS};
     my $perl = defined $json ? decode_json $json : {};
@@ -128,6 +154,7 @@ sub _pin_registration {
         if (defined $perl->{$self->pin_to_gpio($pin->num)}){
             $pin->mode_alt($perl->{$pin->num}{alt});
             $pin->write($perl->{$pin->num}{state});
+            $pin->mode($perl->{$pin->num}{mode});
             delete $perl->{$self->pin_to_gpio($pin->num)};
             $ENV{RPI_PINS} = encode_json $perl;
             return;
@@ -144,6 +171,7 @@ sub _pin_registration {
 
     $perl->{$self->pin_to_gpio($pin->num)}{alt} = $alt;
     $perl->{$self->pin_to_gpio($pin->num)}{state} = $state;
+    $perl->{$self->pin_to_gpio($pin->num)}{mode} = $mode;
 
     my @registered_pins = keys %{ $perl };
 
@@ -275,6 +303,41 @@ Mandatory: An integer specifying the high-end of the range. The range always
 starts at C<0>. Eg: if C<$range> is C<359>, if you incremented PWM by C<1>
 every second, you'd rotate a step motor one complete rotation in exactly one
 minute.
+
+=head2 pwm_mode($mode)
+
+Each PWM channel can run in either Balanced or Mark-Space mode. In Balanced
+mode, the hardware sends a combination of clock pulses that results in an
+overall DATA pulses per RANGE pulses. In Mark-Space mode, the hardware sets the
+output HIGH for DATA clock pulses wide, followed by LOW for RANGE-DATA clock
+pulses.
+
+Raspberry Pi's default mode is balanced mode.
+
+Parameters:
+
+    $mode
+
+Mandatory, Integer: C<0> for Mark-Space mode, or C<1> for Balanced mode.
+Note: If using L<RPi::WiringPi::Constant>, you can use C<PWM_MODE_MS> or
+C<PWM_MODE_BAL>.
+
+=head2 pwm_clock($divisor)
+
+The PWM clock can be set to control the PWM pulse widths. The PWM clock is
+derived from a 19.2MHz clock. You can set any divider.
+
+For example, say you wanted to drive a DC motor with PWM at about 1kHz, and
+control the speed in 1/1024 increments from 0/1024 (stopped) through to
+1024/1024 (full on). In that case you might set the clock divider to be 16, and
+the RANGE to 1024. The pulse repetition frequency will be
+1.2MHz/1024 = 1171.875Hz.
+
+Parameters:
+
+    $divisor
+
+Mandatory, Integer: An unsigned integer to set the pulse width to.
 
 =head2 export_pin($pin_num)
 

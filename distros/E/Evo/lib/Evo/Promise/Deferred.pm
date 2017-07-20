@@ -4,12 +4,12 @@ use Evo '-Class *';
 has 'promise', ro;
 has 'called',  optional;
 
-sub reject ($self, $r) {
+sub reject ($self, $r = undef) {
   return if $self->called;
   $self->called(1)->promise->d_reject_continue($r);
 }
 
-sub resolve ($self, $v) {
+sub resolve ($self, $v = undef) {
   return if $self->called;
   $self->called(1)->promise->d_resolve_continue($v);
 }
@@ -28,7 +28,7 @@ Evo::Promise::Deferred
 
 =head1 VERSION
 
-version 0.0403
+version 0.0405
 
 =head1 AUTHOR
 

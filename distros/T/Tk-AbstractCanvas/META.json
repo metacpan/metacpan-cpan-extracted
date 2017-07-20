@@ -36,11 +36,12 @@
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0"
+            "Carp" : "0",
+            "Tk" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.8",
+   "version" : "1.82",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

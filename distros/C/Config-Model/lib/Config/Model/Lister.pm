@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Lister;
-$Config::Model::Lister::VERSION = '2.105';
+$Config::Model::Lister::VERSION = '2.106';
 use strict;
 use warnings;
 use Exporter;
@@ -36,6 +36,12 @@ sub available_models {
             next if $file =~ m!/README!;
             next if $file =~ /(~|\.bak|\.orig)$/;
             my ($appli) = ( $file =~ m!.*/([\w\-]+)! );
+
+            # ensure that an appli file of a cat is not parsed twice
+            # (useful in dev, where system appli file may clobber
+            # appli file in dvelopment
+            next if $done_cat{$cat}{$appli};
+
             $appli_info{$appli}{_file} = $file;
             $appli_info{$appli}{_category} = $cat;
             open( F, $file ) || die "Can't open file $file:$!";
@@ -54,6 +60,7 @@ sub available_models {
                 $appli_info{$appli}{$k} = $v;
                 $applications{$appli} = $v if $k =~ /model/i;
             }
+            die "Missing model line in file $file\n" unless $done_cat{$cat}{$appli};
         }
     }
     return \%categories, \%appli_info, \%applications;
@@ -85,7 +92,7 @@ Config::Model::Lister - List available models and applications
 
 =head1 VERSION
 
-version 2.105
+version 2.106
 
 =head1 SYNOPSIS
 

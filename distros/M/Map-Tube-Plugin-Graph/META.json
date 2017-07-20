@@ -46,11 +46,11 @@
    "provides" : {
       "Map::Tube::Plugin::Graph" : {
          "file" : "lib/Map/Tube/Plugin/Graph.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       },
       "Map::Tube::Plugin::Graph::Utils" : {
          "file" : "lib/Map/Tube/Plugin/Graph/Utils.pm",
-         "version" : "0.25"
+         "version" : "0.26"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "web" : "https://github.com/manwar/Map-Tube-Plugin-Graph"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

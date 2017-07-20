@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use Alien::Build::Plugin;
 use Path::Tiny ();
+use Alien::Build::Util qw( _mirror );
 
 # ABSTRACT: Core download plugin
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
 sub _hook
@@ -62,12 +63,19 @@ sub _hook
     }
     elsif($res->{path})
     {
-      require File::Copy;
       my $from = Path::Tiny->new($res->{path});
       my $to   = Path::Tiny->new("$tmp/@{[ $from->basename ]}");
-      File::Copy::copy(
-        "$from" => "$to",
-      ) || die "copy $from => $to failed: $!";
+      if(-d $res->{path})
+      {
+        _mirror $from, $to;
+      }
+      else
+      {
+        require File::Copy;
+        File::Copy::copy(
+          "$from" => "$to",
+        ) || die "copy $from => $to failed: $!";
+      }
       $build->install_prop->{download} = $to->stringify;
       $build->install_prop->{complete}->{download} = 1;
       return $build;
@@ -98,7 +106,7 @@ Alien::Build::Plugin::Core::Download - Core download plugin
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 

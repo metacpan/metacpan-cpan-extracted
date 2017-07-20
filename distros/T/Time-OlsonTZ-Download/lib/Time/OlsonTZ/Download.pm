@@ -44,16 +44,18 @@ use warnings;
 use strict;
 
 use Carp qw(croak);
+use Encode 1.75 qw(decode FB_CROAK);
 use File::Path 2.07 qw(rmtree);
 use File::Temp 0.22 qw(tempdir);
 use IO::Dir 1.03 ();
 use IO::File 1.03 ();
 use IPC::Filter 0.002 qw(filter);
-use Net::FTP 1.21 ();
+use Net::FTP 3.07 ();
 use Params::Classify 0.000 qw(is_undef is_string);
 use String::ShellQuote 1.01 qw(shell_quote);
+use utf8 ();
 
-our $VERSION = "0.004";
+our $VERSION = "0.006";
 
 sub _init_ftp($$) {
 	my($self, $hostname) = @_;
@@ -217,7 +219,7 @@ sub new {
 	return $self;
 }
 
-=item Time::OlsonTZ::Download->new_from_local_source(ATTR => VALUE)
+=item Time::OlsonTZ::Download->new_from_local_source(ATTR => VALUE, ...)
 
 Acquires Olson database source locally, without downloading, and returns
 an object representing a copy of it ready to use like a download.
@@ -635,7 +637,9 @@ sub country_selection {
 		my $itabfh = IO::File->new($itabname, "r")
 			or die "data file $itabname unreadable: $!\n";
 		while(defined(my $line = $itabfh->getline)) {
-			if($line =~ /\A([A-Z]{2})\t([!-~][ -~]*[!-~])\n\z/) {
+			$line = decode("UTF-8", $line, FB_CROAK);
+			utf8::upgrade($line);
+			if($line =~ /\A([A-Z]{2})\t(\S[^\t\n]*\S)\n\z/) {
 				die "duplicate $itabname entry for $1\n"
 					if exists $itab{$1};
 				$itab{$1} = $2;
@@ -711,7 +715,7 @@ sub _ensure_standard_zonenames {
 			\nzonenames:[\ \t]+\$\(TDATA\)[\ \t]*\n
 			\t[\ \t]*\@\$\(AWK\)\ '
 			/\^Zone/\ \{\ print\ \$\$2\ \}
-			\ /\^Link/\ {\ print\ \$\$3\ }
+			\ /\^Link/\ \{\ print\ \$\$3\ \}
 			'\ \$\(TDATA\)[\ \t]*\n\n
 		#x);
 	}
@@ -725,7 +729,8 @@ sub data_files {
 		$self->_ensure_standard_zonenames;
 		$self->_ensure_unpacked;
 		my $list = filter("", "cd @{[shell_quote($self->dir)]} && ".
-					"make zonenames AWK=echo");
+					"make zonenames ".
+					"AWK=echo VERSION_DEPS=");
 		$list =~ s#\A.*\{.*\} ##s;
 		$list =~ s#\n\z##;
 		$self->{data_files} =
@@ -738,7 +743,8 @@ sub _ensure_zic_built {
 	my($self) = @_;
 	unless($self->{zic_built}) {
 		$self->_ensure_unpacked;
-		filter("", "cd @{[shell_quote($self->dir)]} && make zic");
+		filter("", "cd @{[shell_quote($self->dir)]} && ".
+				"make zic VERSION_DEPS=");
 		$self->{zic_built} = 1;
 	}
 }
@@ -814,7 +820,8 @@ sub zoneinfo_dir {
 	my $zidir = $self->dir."/zoneinfo_$type";
 	unless($self->{"zoneinfo_built_$type"}) {
 		filter("", "cd @{[shell_quote($self->unpacked_dir)]} && ".
-			"make ${type}_only TZDIR=@{[shell_quote($zidir)]}");
+			"make ${type}_only TZDIR=@{[shell_quote($zidir)]} ".
+			"VERSION_DEPS=");
 		my %expect_names = %{$self->all_names};
 		my $skiplen = length($zidir) + 1;
 		_foreach_nondir_under($zidir, sub {
@@ -859,7 +866,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010, 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2010, 2011, 2012, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

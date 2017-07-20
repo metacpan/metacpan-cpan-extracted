@@ -3,25 +3,25 @@ require 5.006;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'VERSION_FROM' => 'lib/Locale/Utils/PlaceholderBabelFish.pm',
+  'EXE_FILES' => [],
+  'PL_FILES' => {},
   'PREREQ_PM' => {
-                   'List::Util' => 0,
-                   'MooX::Types::MooseLike::Base' => 0,
-                   'Carp' => 0,
-                   'HTML::Entities' => 0,
+                   'MooX::Types::MooseLike' => 0,
+                   'Test::NoWarnings' => 0,
                    'MooX::StrictConstructor' => 0,
+                   'MooX::Types::MooseLike::Base' => 0,
+                   'Moo' => '1.003001',
+                   'Test::Exception' => 0,
+                   'namespace::autoclean' => 0,
+                   'List::Util' => 0,
+                   'HTML::Entities' => 0,
                    'Scalar::Util' => 0,
                    'Test::More' => 0,
-                   'Test::NoWarnings' => 0,
-                   'namespace::autoclean' => 0,
-                   'Test::Exception' => 0,
                    'Test::Differences' => '0.60',
-                   'Moo' => '1.003001',
-                   'MooX::Types::MooseLike' => 0
+                   'Carp' => 0
                  },
-  'PL_FILES' => {},
-  'EXE_FILES' => [],
-  'INSTALLDIRS' => 'site',
-  'NAME' => 'Locale::Utils::PlaceholderBabelFish'
+  'NAME' => 'Locale::Utils::PlaceholderBabelFish',
+  'VERSION_FROM' => 'lib/Locale/Utils/PlaceholderBabelFish.pm',
+  'INSTALLDIRS' => 'site'
 )
 ;

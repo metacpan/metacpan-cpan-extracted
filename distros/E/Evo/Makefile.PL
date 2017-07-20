@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.0403",
+  "VERSION" => "0.0405",
   "test" => {
     "TESTS" => "t/*.t t/evo/*.t t/evo/attr/*.t t/evo/class/*.t t/evo/class/attrs/*.t t/evo/di/*.t t/evo/ee/*.t t/evo/evo_import/*.t t/evo/export/*.t t/evo/fs/*.t t/evo/internal/*.t t/evo/lib/*.t t/evo/promise/*.t t/evo/promise/func/*.t t/evo/promise/promise/*.t t/evo/test/*.t t/evo/w/*.t t/evo/want/*.t t/memory/*.t t/perf/*.t"
   }

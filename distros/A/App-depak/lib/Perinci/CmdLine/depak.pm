@@ -1,7 +1,7 @@
 package Perinci::CmdLine::depak;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.55'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.57'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -65,7 +65,7 @@ Perinci::CmdLine::depak - Subclass of Perinci::CmdLine::Lite to set config_profi
 
 =head1 VERSION
 
-This document describes version 0.55 of Perinci::CmdLine::depak (from Perl distribution App-depak), released on 2017-07-10.
+This document describes version 0.57 of Perinci::CmdLine::depak (from Perl distribution App-depak), released on 2017-07-14.
 
 =head1 DESCRIPTION
 

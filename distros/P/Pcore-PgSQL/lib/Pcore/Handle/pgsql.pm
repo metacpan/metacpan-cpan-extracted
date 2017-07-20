@@ -91,7 +91,9 @@ sub _get_dbh ( $self, $cb ) {
     }
 
     if ( $self->{_get_dbh_queue}->@* > $self->{backlog} ) {
-        $cb->( result( [ 500, 'DBH is busy' ] ), undef );
+        warn 'DBI: backlog queue is full';
+
+        $cb->( result( [ 500, 'backlog queue is full' ] ), undef );
 
         return;
     }
@@ -197,13 +199,6 @@ sub quote ( $self, $var, $type = undef ) {
     }
 }
 
-# https://www.postgresql.org/docs/current/static/sql-syntax-lexical.html
-sub quote_id ( $self, $id ) {
-    $id =~ s/"/""/smg;
-
-    return qq["$id"];
-}
-
 # DBI METHODS
 for my $method (qw[do selectall selectall_arrayref selectrow selectrow_arrayref selectcol]) {
     eval <<"PERL";    ## no critic qw[BuiltinFunctions::ProhibitStringyEval]
@@ -257,9 +252,9 @@ PERL
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitUnusedPrivateSubroutines                                                                  |
 ## |      | 81                   | * Private subroutine/method '_get_dbh' declared but not used                                                   |
-## |      | 150                  | * Private subroutine/method '_get_schema_patch_table_query' declared but not used                              |
+## |      | 152                  | * Private subroutine/method '_get_schema_patch_table_query' declared but not used                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 209, 231             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 204, 226             | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

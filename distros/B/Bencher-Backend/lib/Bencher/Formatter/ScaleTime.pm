@@ -1,7 +1,7 @@
 package Bencher::Formatter::ScaleTime;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '1.039'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '1.040'; # VERSION
 
 use 5.010001;
 use strict;
@@ -78,7 +78,7 @@ Bencher::Formatter::ScaleTime - Scale time to make it convenient
 
 =head1 VERSION
 
-This document describes version 1.039 of Bencher::Formatter::ScaleTime (from Perl distribution Bencher-Backend), released on 2017-07-02.
+This document describes version 1.040 of Bencher::Formatter::ScaleTime (from Perl distribution Bencher-Backend), released on 2017-07-13.
 
 =for Pod::Coverage .*
 

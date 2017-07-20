@@ -44,7 +44,7 @@ sub load_domain_locale ( $domain, $locale ) : prototype($$) {
         # skip comments
         next if substr( $line, 0, 1 ) eq '#';
 
-        if ( $line =~ /\Amsgid\s"(.*?)"/sm ) {
+        if ( $line =~ /\Amsgid\s"(.+?)"/sm ) {
             $msgid = $1;
 
             $messages->{$msgid} = [];
@@ -52,10 +52,10 @@ sub load_domain_locale ( $domain, $locale ) : prototype($$) {
         elsif ( $line =~ /\Amsgid_plural\s/sm ) {
             next;
         }
-        elsif ( $line =~ /\Amsgstr\s"(.*?)"/sm ) {
+        elsif ( $line =~ /\Amsgstr\s"(.+?)"/sm ) {
             $messages->{$msgid}->[0] = $1;
         }
-        elsif ( $line =~ /\Amsgstr\[(\d+)\]\s"(.*?)"/sm ) {
+        elsif ( $line =~ /\Amsgstr\[(\d+)\]\s"(.+?)"/sm ) {
             $messages->{$msgid}->[$1] = $2;
         }
         elsif ( $line =~ /"(.+?):\s(.+?)\\n"/sm ) {

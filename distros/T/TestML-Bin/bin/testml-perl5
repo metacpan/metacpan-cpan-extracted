@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+use v5.10;
+use lib 't', 'lib';
+use TestML;
+use TestML::Bridge;
+
+my $file = shift;
+open INPUT, $file
+  or die "Can't open '$file' for input";
+my $input = do {local $/; <INPUT>};
+close INPUT;
+
+TestML->new(testml => $input)->run;

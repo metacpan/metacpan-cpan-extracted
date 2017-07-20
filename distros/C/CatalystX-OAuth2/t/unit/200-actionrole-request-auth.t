@@ -3,18 +3,16 @@ use Test::More;
 use Test::Exception;
 use Plack::Test;
 use HTTP::Request::Common;
-use CatalystX::Test::MockContext;
 use URI;
 use Moose::Util;
 
 use lib 't/lib';
-use AuthServer;
+use Catalyst::Test 'AuthServer';
 
-my $ctl  = AuthServer->controller('OAuth2::Provider');
-my $mock = mock_context('AuthServer');
+
 
 {
-  my $c = $mock->( GET '/request' );
+  my ($res, $c) = ctx_request('/request');
   ok( !$c->req->can('oauth2'),
     "doesn't install oauth2 accessors before the dispatch" );
   ok( !Moose::Util::does_role( $c->req, 'CatalystX::OAuth2::Request' ) );
@@ -29,7 +27,9 @@ my $mock = mock_context('AuthServer');
   # response_type or client_id missing (hashref random order I imagine).  Also
   # on newer Catalyst this error is not getting into the Log.  I don't yet know
   # why...
-  # like($c->log->_body, qr/\[error\] Attribute \(response_type\) is required/);
+  #like($c->log->_body, qr/\[error\] Attribute \(response_type\) is required/);
+  ## ^^ JNAP noted the error is still reported just not in ->error, possible some
+  ## issue with how the $c mocking works.
 
   is_deeply( $c->error, [], 'dispatches to request action cleanly' );
   ok( !$c->req->can('oauth2'),
@@ -47,7 +47,7 @@ my $mock = mock_context('AuthServer');
   };
 
   $uri->query_form($query);
-  my $c = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
   $c->dispatch;
   is_deeply( $c->error, [], 'dispatches to request action cleanly' );
   is( $c->res->body, undef, q{doesn't produce warning} );
@@ -76,7 +76,7 @@ my $mock = mock_context('AuthServer');
   };
 
   $uri->query_form($query);
-  my $c = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
   $c->dispatch;
   is_deeply( $c->error, [], 'dispatches to request action cleanly' );
   is( $c->res->body, undef, q{doesn't produce warning} );

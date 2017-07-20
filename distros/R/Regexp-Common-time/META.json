@@ -36,6 +36,12 @@
          }
       }
    },
+   "provides" : {
+      "Regexp::Common::time" : {
+         "file" : "lib/Regexp/Common/time.pm",
+         "version" : "0.12"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -44,6 +50,6 @@
          "web" : "https://github.com/manwar/Regexp-Common-time"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

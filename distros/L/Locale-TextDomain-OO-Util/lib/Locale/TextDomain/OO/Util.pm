@@ -3,7 +3,7 @@ package Locale::TextDomain::OO::Util;
 use strict;
 use warnings;
 
-our $VERSION = '3.006';
+our $VERSION = '3.008';
 
 1;
 
@@ -12,13 +12,13 @@ __END__
 =head1 NAME
 Locale::TextDomain::OO::Util - Lexicon utils
 
-$Id: Util.pm 600 2015-07-01 04:58:40Z steffenw $
+$Id: Util.pm 659 2017-07-16 09:20:52Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-TextDomain-OO-Util/trunk/lib/Locale/TextDomain/OO/Util.pm $
 
 =head1 VERSION
 
-3.006
+3.008
 
 =head1 DESCRIPTION
 

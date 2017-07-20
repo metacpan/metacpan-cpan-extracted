@@ -100,3 +100,39 @@ Revision history for Dios
 
         * Fixed parameter handling in methods with explicit return type
           but implicit invocant (thanks, Jeff!)
+
+
+0.002003  Sun Jul 16 15:17:11 2017
+
+        * Various extensions to Dios::Types (thanks Toby!)
+            - Added Hash[KEYTYPE => VALUETYPE]
+            - Extended Can[METHODNAME] to also allow Can[METHODNAME1, METHODNAME2, ETC]
+            - Added Overloads[OP, OP, ETC] to test whether value overloads operators
+
+        * Improved performance of certain typechecks in Dios::Types
+            - Int check now much faster
+
+        * Added validator_for() function to Dios::Types API
+          to allow type checks to be precompiled
+          (and thereafter 2-3 times faster)
+
+        * Made Dios::Types transparent to the Carp module
+
+        * Patched a bug in initialization of Dios hash fields
+          that was caused by core parser changes in Perl 5.22+
+          (Thanks, Jeff!)
+
+
+
+
+0.002004  Tue Jul 18 12:56:41 2017
+
+        * Fixed subtle persistence bug in
+          validator_for() description processing
+
+        * Backed off on cleverness of selecting between optional
+          scalar parameters vs tailing slurpies...due to bad effects
+          on optional typed scalars elsewhere. No documentation
+          change, since the inference behaviour was not previously
+          documented. (Thanks, Jeff)
+

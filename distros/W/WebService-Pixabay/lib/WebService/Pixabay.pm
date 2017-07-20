@@ -8,7 +8,7 @@ use Data::Dumper 'Dumper';
 with 'WebService::Client';
 
 # ABSTRACT: Perl 5 interface to Pixabay API.
-our $VERSION = '2.0.1';    our $VERSION = '2.0.1'; # VERSION
+our $VERSION = '2.0.2';    # VERSION
 
 # token key
 has api_key => (
@@ -95,7 +95,7 @@ WebService::Pixabay - Perl 5 interface to Pixabay API.
 
 =head1 VERSION
 
-version 2.0.1
+version 2.0.2
 
 =head1 SYNOPSIS
 

@@ -61,7 +61,7 @@
 #define ER_IO_RENAME_FAIL                            -16
 
 #define ER_PB_BAD_PAGEID                             -17
-#define ER_PB_ALL_BUFFERS_FIXED                      -18
+#define ER_PB_ALL_BUFFERS_FIXED                      -18	/* obsolete, I think */
 #define ER_PB_UNFIXED_PAGEPTR                        -19
 #define ER_PB_UNKNOWN_PAGEPTR                        -20
 
@@ -146,8 +146,8 @@
 #define ER_LOG_POSTPONE_INTERFACE                    -91
 #define ER_LOG_COMPENSATE_INTERFACE                  -92
 #define ER_LOG_REDO_LOGGING_DURING_RECOVERY          -93
-#define ER_LOG_POSTPONE_LOGGING_DURING_RECOVERY      -94
-#define ER_LOG_UNDO_LOGGING_DURING_RECOVERY          -95
+#define ER_LOG_POSTPONE_LOGGING_DURING_RECOVERY      -94	/* Obsolete */
+#define ER_LOG_UNDO_LOGGING_DURING_RECOVERY          -95	/* Obsolete */
 #define ER_LOG_MAYNEED_MEDIA_RECOVERY                -96
 #define ER_LOG_NOTIN_ARCHIVE                         -97
 #define ER_LOG_CREATE_LOGARCHIVE_FAIL                -98
@@ -237,11 +237,11 @@
 
 #define ER_DATE_CONVERSION                          -176
 
-#define ER_ELO_CANT_CREATE_LARGE_OBJECT             -177
+#define ER_ELO_CANT_CREATE_LARGE_OBJECT             -177	/* obsolete */
 
 #define ER_MR_TEMP_OID_WITHOUT_MOP                  -178
 
-#define ER_TP_INCOMPATIBLE_DOMAINS                  -179
+#define ER_TP_INCOMPATIBLE_DOMAINS                  -179	/* not used */
 #define ER_TP_INCOMPATIBLE_VALUE                    -180
 #define ER_TP_CANT_COERCE                           -181
 #define ER_TP_CANT_COERCE_OVERFLOW                  -182
@@ -342,7 +342,7 @@
 #define ER_SM_INVALID_NAME                          -274
 #define ER_SM_INHERITED_ATTRIBUTE                   -275
 #define ER_SM_INHERITED_METHOD                      -276
-#define ER_SM_INHERITED_ATTMETH                     -277
+#define ER_SM_INHERITED                             -277
 #define ER_SM_INCOMPATIBLE_DOMAINS                  -278
 #define ER_SM_RESOLUTION_OVERRIDE                   -279
 #define ER_SM_INCOMPATIBLE_SHADOW                   -280
@@ -360,7 +360,7 @@
 #define ER_SM_POPULATE_NOT_FOUND                    -292
 #define ER_SM_INVALID_CLASS                         -293
 #define ER_SM_INVALID_METHOD_ENV                    -294
-#define ER_SM_CATALOG_SPACE                         -295
+#define ER_SM_CATALOG_SPACE                         -295	/* Unused */
 #define ER_SM_INVALID_PROPERTY                      -296
 #define ER_SM_MULTIPLE_ALIAS                        -297
 #define ER_SM_INVALID_RESOLUTION                    -298
@@ -400,13 +400,13 @@
 #define ER_WS_OBJLIST_NOT_ALLOCATED                 -329
 #define ER_WS_PIN_VIOLATION                         -330
 
-#define ER_QF_NOSPACE                               -331
-#define ER_QF_EXTENDING                             -332
-#define ER_QF_ABORT                                 -333
-#define ER_QF_OUTRAGEOUS                            -334
-#define ER_QF_ILLEGAL_POINTER                       -335
-#define ER_QF_FREE_TWICE                            -336
-#define ER_QF_NEGATIVE_SIZE                         -337
+#define ER_AREA_NOSPACE                             -331
+#define ER_AREA_EXTENDING                           -332
+#define ER_AREA_ABORT                               -333
+#define ER_AREA_OUTRAGEOUS                          -334
+#define ER_AREA_ILLEGAL_POINTER                     -335
+#define ER_AREA_FREE_TWICE                          -336
+#define ER_AREA_NEGATIVE_SIZE                       -337
 
 #define ERR_CSS_ENTRY_OVERRUN                       -338
 #define ERR_CS_WRONG_OWNER                          -339
@@ -484,12 +484,12 @@
 #define ER_BTREE_INVALID_RANGE                      -412
 
 #define ER_CT_UNKNOWN_ATTRID                        -413
-#define ER_CT_UNKNOWN_CLASSID                       -414
+#define ER_CT_UNKNOWN_CLASSID                       -414	/* Unused */
 #define ER_CT_INVALID_CLASSID                       -415
 #define ER_CT_UNKNOWN_REPRID                        -416
 #define ER_CT_INVALID_REPRID                        -417
 #define ER_CT_NOSPACE_FOR_ATTRDIR                   -418
-#define ER_CT_REPRCNT_OVERFLOW                      -419
+#define ER_CT_REPRCNT_OVERFLOW                      -419	/* Unused */
 #define ER_CT_CLASS_HAS_REPRESENTATIONS             -420
 #define ER_CT_MISSING_REPR_DIR                      -421
 #define ER_CT_MISSING_REPR_INFO                     -422
@@ -509,7 +509,7 @@
 #define ER_IT_MULTIPLE_STATEMENT                    -435
 #define ER_IT_NOT_QUERY                             -436
 
-#define ER_LO_INVALID_LOID                          -437
+#define ER_LO_INVALID_LOID                          -437	/* Unused */
 #define ER_LO_DESCRIPTOR_CONFLICT                   -438
 #define ER_LO_OVER_OFFSET                           -439
 
@@ -531,7 +531,7 @@
 #define ER_QPROC_NOMORE_QFILE_PAGES                 -455
 #define ER_QPROC_INCOMPATIBLE_TYPES                 -456
 #define ER_QPROC_INVALID_RESTYPE                    -457
-#define ER_QPROC_OVERFLOW_HAPPENED                  -458
+#define ER_QPROC_OVERFLOW_ADDITION                  -458
 #define ER_QPROC_INVALID_QRY_SINGLE_TUPLE           -459
 
 #define ER_UCI_TOO_FEW_HOST_VARS                    -460
@@ -761,8 +761,8 @@
 #define ER_IO_NOT_A_BACKUP_OF_GIVEN_DATABASE        -633
 #define ER_IO_BKUP_DATABASE_VOLUME_OR_FILE_EXPECTED -634
 
-#define ER_LOG_BUFFER_POOL_TOO_SMALL                -635
-#define ER_LOG_NBUFFERS_TOO_SMALL                   -636
+#define ER_LOG_BUFFER_POOL_TOO_SMALL                -635	/* Obsolete */
+#define ER_LOG_NBUFFERS_TOO_SMALL                   -636	/* Obsolete */
 #define ER_LOG_FREEING_TOO_MUCH                     -637
 #define ER_LOG_FLUSHING_UNUPDATABLE                 -638
 #define ER_LOG_WRONG_FORCE_DELAYED                  -639
@@ -771,9 +771,9 @@
 #define ER_LOG_NOTACTIVE_TOPOPS                     -642
 #define ER_LOG_HAS_TOPOPS_DURING_COMMIT_ABORT       -643
 #define ER_LOG_FATAL_ERROR                          -644
-#define ER_LOG_BADSTATE_FOR_CLIENT_UNDO_OR_POSTPONE -645
+#define ER_LOG_BADSTATE_FOR_CLIENT_UNDO_OR_POSTPONE -645	/* Obsolete */
 #define ER_LOG_MISSING_COMPENSATING_RECORD          -646
-#define ER_LOG_BKUP_DOESNOT_CORRESPOND              -647
+#define ER_LOG_BKUP_DOESNOT_CORRESPOND              -647	/* Obsolete */
 #define ER_LOG_BKUP_INCOMPATIBLE                    -648
 
 #define ER_INVALID_PRECISION                        -649
@@ -837,7 +837,7 @@
 #define ER_CPLUS_INVALID_ITER                       -691
 #define ER_CPLUS_WRONG_ITER                         -692
 
-#define ER_NUM_OVERFLOW                             -693
+#define ER_NUM_OVERFLOW                             -693	/* not used */
 
 #define ER_BTREE_LOAD_FAILED			    -694
 
@@ -902,7 +902,7 @@
 #define ER_QPROC_OVERFLOW_MULTIPLICATION            -730
 #define ER_QPROC_OVERFLOW_DIVISION                  -731
 #define ER_QPROC_OVERFLOW_UMINUS                    -732
-#define ER_QPROC_OVERFLOW_COERCION                  -733
+#define ER_QPROC_OVERFLOW_COERCION                  -733	/* not used */
 
 #define ER_FILE_INCONSISTENT_HEADER                 -734
 
@@ -1039,7 +1039,7 @@
 
 #define ER_AU_USER_HAS_DATABASE_OBJECTS		    -837
 
-#define ER_NOT_ENOUGH_SCANID_BIT                    -838
+#define ER_NOT_ENOUGH_SCANID_BIT                    -838	/* Obsolete */
 
 #define ER_PRM_BAD_VALUE                            -839
 #define ER_PRM_CANNOT_CHANGE                        -840
@@ -1152,9 +1152,9 @@
 #define ER_FK_NOT_GRANTED_LOCK                      -925
 #define ER_FK_CANT_DELETE_INSTANCE                  -926
 #define ER_FK_NOT_MATCH_KEY_COUNT                   -927
-#define ER_FK_CANT_ASSIGN_CACHE_ATTR                -928
+#define ER_FK_CANT_ASSIGN_CACHE_ATTR                -928	/* not used */
 #define ER_FK_CANT_ON_VCLASS                        -929
-#define ER_FK_CANT_DROP_CACHE_ATTR                  -930
+#define ER_FK_CANT_DROP_CACHE_ATTR                  -930	/* not used */
 
 #define ER_AUTO_INCREMENT_STARTVAL_MUST_LT_MAXVAL   -931
 
@@ -1273,7 +1273,7 @@
 
 #define ER_SM_INVALID_PREFIX_LENGTH                 -1022
 
-/* Please note that error code -1023 is reserved for HA */
+#define ER_HA_LA_REPL_FILTER_GENERIC                -1023
 #define ER_HA_LW_FAILED_GET_LOG_PAGE                -1024
 #define ER_HA_REPL_DELAY_DETECTED                   -1025
 #define ER_HA_REPL_DELAY_RESOLVED                   -1026
@@ -1281,7 +1281,7 @@
 #define ER_HA_LA_UNEXPECTED_EOF_IN_ARCHIVE_LOG      -1028
 #define ER_HA_LA_INVALID_REPL_LOG_PAGEID_OFFSET     -1029
 #define ER_HA_LA_INVALID_REPL_LOG_RECORD            -1030
-#define ER_HA_LA_FAILED_TO_APPLY_SCHEMA		    -1031
+#define ER_HA_LA_FAILED_TO_APPLY_STATEMENT          -1031
 #define ER_HA_LA_FAILED_TO_APPLY_INSERT             -1032
 #define ER_HA_LA_FAILED_TO_APPLY_UPDATE             -1033
 #define ER_HA_LA_FAILED_TO_APPLY_DELETE             -1034
@@ -1435,9 +1435,13 @@
 #define ER_LOG_RECOVERY_FINISHED                    -1129
 
 #define ER_LK_ROLLBACK_ON_LOCK_ESCALATION	    -1130
+
 #define ER_SP_INVALID_HEADER                        -1131
 
-#define ER_ENCRYPTION_LIB_FAILED		    -1132
+#define ER_ENCRYPTION_LIB_FAILED                    -1132
+
+#define ERR_CSS_COPYLOG_ALREADY_EXISTS              -1133
+#define ERR_CSS_APPLYLOG_ALREADY_EXISTS             -1134
 
 #define ER_BTREE_CORRUPT_PREV_LINK                  -1135
 #define ER_BTREE_REPAIR_PREV_LINK                   -1136
@@ -1456,7 +1460,86 @@
 #define ER_AU_CANT_ALTER_OWNER_OF_SYSTEM_CLASS      -1145
 #define ER_DIAG_VOLID_NOT_EXIST                     -1146
 
-#define ER_LAST_ERROR                               -1147
+#define ER_ALL_PLAN_CACHE_ENTRIES_ARE_FIXED         -1147
+#define ER_ALL_FILTER_PRED_CACHE_ENTRIES_ARE_FIXED  -1148
+
+#define ER_DIAG_PAGE_NOT_FOUND                      -1149
+
+#define ER_QSTR_INCOMPATIBLE_COLLATIONS		    -1150
+
+#define ER_DIAG_NOT_SPAGE                           -1151
+
+#define ER_KILL_TR_NOT_ALLOWED                      -1152
+
+#define ER_ATTEMPT_TO_USE_ZERODATE                  -1153
+
+#define ER_MVCC_NOT_SATISFIED_REEVALUATION	    -1154
+#define ER_MVCC_ROW_INVALID_FOR_DELETE		    -1155
+#define ER_MVCC_CANT_GET_SNAPSHOT		    -1156
+#define ER_MVCC_LOG_INVALID_ISOLATION_LEVEL         -1157
+#define ER_MVCC_SERIALIZABLE_CONFLICT		    -1158
+
+#define ER_TZ_COMPILE_ERROR                         -1159
+#define ER_TZ_LOAD_ERROR                            -1160
+#define ER_TZ_INTERNAL_ERROR			    -1161
+#define ER_TZ_INVALID_TIMEZONE			    -1162
+#define ER_TZ_INVALID_DST			    -1163
+#define ER_TZ_DST_NOT_SUPPORTED			    -1164
+#define ER_TZ_INVALID_COMBINATION		    -1165
+#define ER_TZ_DURING_DS_LEAP                        -1166
+
+#define ER_AU_COMMENT_OVERFLOW                      -1167
+
+#define ER_UPDATE_STAT_CANNOT_GET_LOCK              -1168
+
+#define ER_SM_INVALID_UNIQUE_IDX_PARTITION	    -1169
+
+#define ER_LC_FAILED_TO_FLUSH_REPL_ITEMS            -1170
+
+#define ER_NOT_A_EMPTY_VOLUME                       -1171
+
+#define ER_PERCENTILE_FUNC_INVALID_PERCENTILE_RANGE     -1172
+#define ER_PERCENTILE_FUNC_PERCENTILE_CHANGED_IN_GROUP  -1173
+
+#define ER_INHERIT_FROM_PARTITION_TABLE		    -1174
+
+#define ER_TZ_GEOGRAPHIC_ZONE			    -1175
+
+#define ER_PAGE_LATCH_PROMOTE_FAIL		    -1176
+
+#define ER_TZ_INCOMPATIBLE_TIMEZONE_LIBRARIES       -1177
+
+#define ER_LF_BITMAP_INVALID_FREE                   -1178
+
+#define ER_HEAP_FOUND_NOT_VACUUMED		    -1179
+#define ER_INDEX_FOUND_NOT_VACUUMED		    -1180
+#define ER_VACUUM_CS_NOT_AVAILABLE		    -1181
+
+#define ER_PB_ORDERED_REFIX_FAILED                  -1182
+#define ER_PB_ORDERED_INCONSISTENCY		    -1183
+#define ER_PB_ORDERED_TOO_MANY_RETRIES		    -1184
+#define ER_PB_UNEXPECTED_PAGE_REFIX		    -1185
+
+#define ER_CHKSUM_GENERIC_ERR         		    -1186
+
+#define ER_PB_ORDERED_NO_HEAP         		    -1187
+
+#define ER_AU_NOT_ALLOW_TO_DROP_ACTIVE_USER	    -1188
+
+#define ER_TZ_DURING_OFFSET_RULE_LEAP		    -1189
+
+#define ER_STAND_ALONE_VACUUM_START		    -1190
+#define ER_STAND_ALONE_VACUUM_END		    -1191
+
+#define ER_PRECISION_OVERFLOW			    -1192
+#define ER_PARTITION_EXPRESSION_TOO_LONG            -1193
+
+#define ER_CANNOT_CHECK_FILE                        -1194
+
+#define ER_BUILDVALUE_IN_REC_CTE		    -1195
+#define ER_CTE_MAX_RECURSION_REACHED		    -1196
+
+#define ER_LAST_ERROR                               -1197
 
 /*
  * CAUTION!

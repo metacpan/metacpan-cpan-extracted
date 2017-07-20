@@ -4,7 +4,7 @@ use 5.010;
 use Moose;
 
 # ABSTRACT: Manage your datebase schema via checksums
-our $VERSION = '1.101';
+our $VERSION = '1.102';
 
 use DBI;
 use Digest::SHA1;
@@ -84,7 +84,6 @@ sub checksum {
     my $self = shift;
     return Digest::SHA1::sha1_hex($self->_schemadump);
 }
-
 
 
 sub _build_schemadump {
@@ -296,7 +295,7 @@ DBIx::SchemaChecksum - Manage your datebase schema via checksums
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -337,7 +336,8 @@ interface to make working with your schema a breeze.
 
 =head2 EXAMPLE WORKFLOW
 
-So have this genious idea for a new startup that will make you incredibly rich and famous. 
+So you have this genious idea for a new startup that will make you
+incredibly rich and famous...
 
 =head3 Collect underpants
 
@@ -450,7 +450,7 @@ Now you can finally start to collect underpants!
 
 =head3 Teamwork
 
-Some weeks later (you have now convinced a friend to join you in your quest for fortune) a C<git pull> drops a new file into your C<sql> directory. It seems that your colleague needs some teaks to the database:
+Some weeks later (you have now convinced a friend to join you in your quest for fortune) a C<git pull> drops a new file into your C<sql> directory. It seems that your colleague needs some tweaks to the database:
 
   ~/Gnomes$ cat sql/underpants_need_washing.sql
   -- preSHA1sum:  611481f7599cc286fa539dbeb7ea27f049744dc7
@@ -499,6 +499,66 @@ And it magically works:
 =head3 Profit!
 
 This section is left empty as an exercise for the reader!
+
+=head2 Anatomy of a changes-file
+
+C<sqlsnippetdir> points to a directory containing so-called C<changes
+files>. For a file to be picked up by C<dbchecksum> it needs to use
+the extension F<.sql>.
+
+The file itself has to contain a header formated as sql comments, i.e.
+starting with C<-->. The header has to contain the C<preSHA1sum> and
+should include the C<postSHA1sum>.
+
+If the C<postSHA1sum> is missing, we assume that you don't know it yet and try to apply the change. As the new checksum will not match the empty C<postSHA1sum> the change will fail. But we will report the new checksum, which you can now insert into the changes file.
+
+After the header, the changes file should list all sql commands you
+want to apply to change the schema, seperated by a semicolon C<;>,
+just as you would type them into your sql prompt.
+
+  -- preSHA1sum:  b1387d808800a5969f0aa9bcae2d89a0d0b4620b
+  -- postSHA1sum: 55df89fd956a03d637b52d13281bc252896f602f
+  
+  CREATE TABLE nochntest (foo TEXT);
+
+Not all commands need to actually alter the schema, you can also
+include sql that just updates some data. In fact, some schmema changes
+even require that: for example, if you want to add a C<NOT NULL>
+constraint to a column, you first have to make sure that the column in
+fact does not contain a C<NULL>.
+
+  -- preSHA1sum:  c50519c54300ec2670618371a06f9140fa552965
+  -- postSHA1sum: 48dd6b3710a716fb85b005077dc534a8f9c11cba
+  
+  UPDATE foo SET some_field = 42 WHERE some_field IS NULL;
+  ALTER TABLE foo ALTER some_filed SET NOT NULL;
+
+=head3 Creating functions / stored procedures
+
+Functions usually contain semicolons inside the function definition,
+so we cannot split the file on semicolon. Luckily, you can specifiy a different splitter using C<-- split-at>. We usually use C<----> (again, the SQL comment marker) so the changes file is still valid SQL.
+
+  -- preSHA1sum  c50519c54300ec2670618371a06f9140fa552965
+  -- postSHA1sum 48dd6b3710a716fb85b005077dc534a8f9c11cba
+  -- split-at ------
+
+  ALTER TABLE underpants
+        ADD COLUMN modified timestamp with time zone DEFAULT now() NOT NULL;
+  ------
+  CREATE FUNCTION update_modified() RETURNS trigger
+      LANGUAGE plpgsql
+      AS $$
+  BEGIN
+      if NEW <> OLD THEN
+        NEW.modified = now();
+      END IF;
+      RETURN NEW;
+  END;
+  $$;
+  ------
+  CREATE TRIGGER underpants_modified
+         BEFORE UPDATE ON underpants
+         FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 =head2 TIPS & TRICKS
 
@@ -603,6 +663,8 @@ Happyness!
 
 =head1 METHODS
 
+You will only need those methods if you want to use the library itself instead of using the C<dbchecksum> wrapper script.
+
 =head2 checksum
 
     my $sha1_hex = $self->checksum();
@@ -616,10 +678,6 @@ Gets the schemadump and runs it through Digest::SHA1, returning the current chec
 Returns a string representation of the whole schema (as a Data::Dumper Dump).
 
 Lazy Moose attribute.
-
-=head2 _build_schemadump
-
-Internal method to build L<schemadump>. Keep out!
 
 =head2 _build_schemadump_schema
 
@@ -725,6 +783,53 @@ Be verbose or not. Default: 0
 
 Additional options for the specific database driver.
 
+=head1 GLOBAL OPTIONS
+
+=head2 Connecting to the database
+
+These options define how to connect to your database.
+
+=head3 dsn
+
+B<Required>. The C<Data Source Name (DSN)> as used by L<DBI> to connect to your database.
+
+Some examples: C<dbi:SQLite:dbname=sqlite.db>,
+C<dbi:Pg:dbname=my_project;host=db.example.com;port=5433>,
+C<dbi:Pg:service=my_project_dbadmin>
+
+=head3 user
+
+Username to use to connect to your database.
+
+=head3 password
+
+Password to use to connect to your database.
+
+=head2 Defining the schema dump
+
+These options define which parts of the schema are relevant to the checksum
+
+=head3 catalog
+
+Default: C<%>
+
+Needed during L<DBI> introspection. C<Pg> does not need it.
+
+=head3 schemata
+
+Default: C<%> (all schemata)
+
+If you have several schemata in your database, but only want to consider some for the checksum, use C<--schemata> to list the ones you care about. Can be specified more than once to list several schemata:
+
+  dbchecksum apply --schemata foo --schemata bar
+
+=head3 driveropts
+
+Some database drivers might implement further options only relevant
+for the specific driver. As of now, this only applies to
+L<DBIx::SchemaChecksum::Driver::Pg>, which defines the driveropts
+C<triggers>, C<sequences> and C<functions>
+
 =head1 SEE ALSO
 
 L<bin/dbchecksum> for a command line frontend powered by L<MooseX::App>
@@ -745,13 +850,19 @@ Thanks to
 
 =over
 
-=item * Klaus Ita and Armin Schreger for writing the initial core code. I 
+=item * Klaus Ita and Armin Schreger for writing the initial core code. I
 just glued it together and improved it a bit over the years.
 
-=item * revdev, a nice little software company run by Koki, Domm 
-(L<http://search.cpan.org/~domm/>) and Maros (L<http://search.cpan.org/~maros/>) from 2008 to 2011. We initially wrote C<DBIx::SchemaChecksum> for our work at revdev.
+=item * revdev, a nice little software company run by Koki, domm
+(L<http://search.cpan.org/~domm/>) and Maroš (L<http://search.cpan.org/~maros/>) from 2008 to 2011. We initially wrote C<DBIx::SchemaChecksum> for our work at revdev.
 
-=item * L<validad.com|https://www.validad.com/> which grew out of revdev and still uses (and supports) C<DBIx::SchemaChecksum> every day.
+=item * L<validad.com|https://www.validad.com/> which grew out of
+revdev and still uses (and supports) C<DBIx::SchemaChecksum> every
+day.
+
+=item * L<Farhad|https://twitter.com/Grauwolf> from L<Spherical
+Elephant|https://www.sphericalelephant.com> for nagging me into
+writing proper docs.
 
 =item
 

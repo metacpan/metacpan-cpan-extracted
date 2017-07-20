@@ -7,7 +7,6 @@ README.md
 cpanfile
 lib/Pcore/Handle/redis.pm
 lib/Pcore/Redis.pm
-lib/README.md
 share/dist-id.json
 share/dist.perl
 share/docker.json

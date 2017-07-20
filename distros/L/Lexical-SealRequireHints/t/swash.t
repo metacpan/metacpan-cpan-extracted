@@ -12,6 +12,7 @@ BEGIN {
 use Test::More tests => 6;
 
 use Lexical::SealRequireHints;
+BEGIN { unshift @INC, "./t/lib"; }
 
 BEGIN {
 	SKIP: {

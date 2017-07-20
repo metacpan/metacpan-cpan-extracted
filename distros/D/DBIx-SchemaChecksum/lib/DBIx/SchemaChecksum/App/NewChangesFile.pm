@@ -58,7 +58,7 @@ DBIx::SchemaChecksum::App::NewChangesFile - Generate a new changes-file
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 

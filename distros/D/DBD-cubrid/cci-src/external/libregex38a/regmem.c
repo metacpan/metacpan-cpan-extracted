@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-//#include "include/regex38a.h"
+#include "include/regex38a.h"
 #include "regmem.ih"
 
 CUB_REG_MALLOC cub_malloc = NULL;

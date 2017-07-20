@@ -13,7 +13,7 @@ use MIME::Base64      qw(decode_base64);
 use POSIX             qw(SEEK_END SEEK_SET);
 use XML::Entities     ();
 
-$VERSION = '1.41';
+$VERSION = '1.411';
 
 __PACKAGE__->_run( @ARGV ) unless caller;
 
@@ -199,7 +199,7 @@ my $type_readers = {
 		my( $self, $length ) = @_;
 
 		return $singletons{ $length } if exists $singletons{ $length };
-		
+
 		croak ( sprintf "Unknown type byte %02X\n", $length );
     	},
 
@@ -392,7 +392,7 @@ brian d foy, C<< <bdfoy@cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2004-2014 brian d foy.  All rights reserved.
+Copyright © 2004-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

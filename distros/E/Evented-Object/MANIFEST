@@ -22,4 +22,4 @@ t/10fire-data.t
 t/11complex-priorities.t
 t/12impossible-priorities.t
 README
-README.md
+README.pod

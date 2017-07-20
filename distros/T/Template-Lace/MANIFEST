@@ -8,8 +8,10 @@ README
 README.mkdn
 TODO
 dist.ini
-examples/Page.pm
-examples/Todo.pm
+examples/Components/Master.pm
+examples/Components/TodoList.pm
+examples/TodoListApp.pm
+examples/TodoListPage.pm
 lib/Template/Lace.pm
 lib/Template/Lace/ComponentCallback.pm
 lib/Template/Lace/Components.pm

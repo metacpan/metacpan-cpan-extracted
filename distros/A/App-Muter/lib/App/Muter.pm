@@ -23,20 +23,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 package App::Muter;
-$App::Muter::VERSION = '0.002000';
+$App::Muter::VERSION = '0.002001';
 require 5.010001;
 
 use strict;
 use warnings;
+use feature ':5.10';
+
+my $experimental;
+BEGIN {
+    $experimental = 1 if exists $warnings::Offsets{'experimental::smartmatch'};
+}
+no if $experimental, warnings => 'experimental::smartmatch';
 
 
 ## no critic(ProhibitMultiplePackages)
 package App::Muter::Main;
-$App::Muter::Main::VERSION = '0.002000';
-use strict;
-use warnings;
-use experimental 'switch';
-
+$App::Muter::Main::VERSION = '0.002001';
 use App::Muter::Backend ();
 use App::Muter::Chain   ();
 use FindBin             ();
@@ -147,7 +150,7 @@ EOM
 }
 
 package App::Muter::Interface;
-$App::Muter::Interface::VERSION = '0.002000';
+$App::Muter::Interface::VERSION = '0.002001';
 sub process {
     my ($chain, $data) = @_;
 
@@ -159,7 +162,7 @@ sub process {
 }
 
 package App::Muter::Registry;
-$App::Muter::Registry::VERSION = '0.002000';
+$App::Muter::Registry::VERSION = '0.002001';
 use File::Spec;
 
 my $instance;
@@ -203,7 +206,7 @@ sub load_backends {
 }
 
 package App::Muter::Backend::Chunked;
-$App::Muter::Backend::Chunked::VERSION = '0.002000';
+$App::Muter::Backend::Chunked::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend/;
 
 sub new {
@@ -251,7 +254,7 @@ sub _with_chunk {
 }
 
 package App::Muter::Backend::ChunkedDecode;
-$App::Muter::Backend::ChunkedDecode::VERSION = '0.002000';
+$App::Muter::Backend::ChunkedDecode::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend/;
 
 sub new {
@@ -291,7 +294,7 @@ sub decode_final {
 }
 
 package App::Muter::Backend::Base64;
-$App::Muter::Backend::Base64::VERSION = '0.002000';
+$App::Muter::Backend::Base64::VERSION = '0.002001';
 use MIME::Base64 ();
 
 our @ISA = qw/App::Muter::Backend::Chunked/;
@@ -341,7 +344,7 @@ sub decode_chunk {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::URL64;
-$App::Muter::Backend::URL64::VERSION = '0.002000';
+$App::Muter::Backend::URL64::VERSION = '0.002001';
 use MIME::Base64 3.11 ();
 our @ISA = qw/App::Muter::Backend::Base64/;
 
@@ -363,7 +366,7 @@ sub decode_chunk {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::Hex;
-$App::Muter::Backend::Hex::VERSION = '0.002000';
+$App::Muter::Backend::Hex::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::Chunked/;
 
 sub new {
@@ -404,7 +407,7 @@ sub decode_chunk {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::Base16;
-$App::Muter::Backend::Base16::VERSION = '0.002000';
+$App::Muter::Backend::Base16::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::Hex/;
 
 sub new {
@@ -423,7 +426,7 @@ sub metadata {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::Base32;
-$App::Muter::Backend::Base32::VERSION = '0.002000';
+$App::Muter::Backend::Base32::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::Chunked/;
 
 sub new {
@@ -517,7 +520,7 @@ sub metadata {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::Base32Hex;
-$App::Muter::Backend::Base32Hex::VERSION = '0.002000';
+$App::Muter::Backend::Base32Hex::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::Base32/;
 
 sub new {
@@ -534,7 +537,7 @@ sub new {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::URI;
-$App::Muter::Backend::URI::VERSION = '0.002000';
+$App::Muter::Backend::URI::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::ChunkedDecode/;
 
 sub new {
@@ -577,7 +580,7 @@ sub decode_chunk {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::XML;
-$App::Muter::Backend::XML::VERSION = '0.002000';
+$App::Muter::Backend::XML::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::ChunkedDecode/;
 
 sub new {
@@ -635,7 +638,7 @@ sub decode_chunk {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::QuotedPrintable;
-$App::Muter::Backend::QuotedPrintable::VERSION = '0.002000';
+$App::Muter::Backend::QuotedPrintable::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::ChunkedDecode/;
 
 sub new {
@@ -712,7 +715,7 @@ sub metadata {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::Vis;
-$App::Muter::Backend::Vis::VERSION = '0.002000';
+$App::Muter::Backend::Vis::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::ChunkedDecode/;
 
 sub new {
@@ -849,7 +852,7 @@ sub metadata {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::Ascii85;
-$App::Muter::Backend::Ascii85::VERSION = '0.002000';
+$App::Muter::Backend::Ascii85::VERSION = '0.002001';
 our @ISA = qw/App::Muter::Backend::Chunked/;
 
 sub new {
@@ -946,7 +949,7 @@ sub decode_final {
 App::Muter::Registry->instance->register(__PACKAGE__);
 
 package App::Muter::Backend::Hash;
-$App::Muter::Backend::Hash::VERSION = '0.002000';
+$App::Muter::Backend::Hash::VERSION = '0.002001';
 use Digest::MD5;
 use Digest::SHA;
 
@@ -1011,7 +1014,7 @@ App::Muter - tool to convert between various formats and encodings
 
 =head1 VERSION
 
-version 0.002000
+version 0.002001
 
 =head1 DESCRIPTION
 

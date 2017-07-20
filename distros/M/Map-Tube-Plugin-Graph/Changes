@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Plugin::Graph
 
+0.26  2017-07-18T11:50:00+01:00
+      - Fixed line map generation code.
+
 0.25  2017-05-25T12:05:00+01:00
       - Upgraded dependency on Map::Tube::Exception v3.12.
 

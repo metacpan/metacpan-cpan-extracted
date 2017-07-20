@@ -4,7 +4,7 @@ use base qw/Prty::Database::Row/;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 # -----------------------------------------------------------------------------
 
@@ -166,7 +166,7 @@ sub isRaw {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

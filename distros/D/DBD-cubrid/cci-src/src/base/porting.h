@@ -33,19 +33,38 @@ extern "C"
 {
 #endif
 
-#if defined(AIX)
+#if defined (AIX)
 #include <sys/socket.h>
 #endif
 
-#if !defined(__GNUC__)
+#if !defined (__GNUC__)
 #define __attribute__(X)
 #endif
 
-#if defined(MAC_OS)
-#include <stdlib.h>
+#if defined (__GNUC__) && defined (NDEBUG)
+#define ALWAYS_INLINE always_inline
+#else
+#define ALWAYS_INLINE
 #endif
-    
-#if defined(WINDOWS)
+
+#if defined (__GNUC__)
+#define STATIC_INLINE static inline
+#define INLINE inline
+#elif _MSC_VER >= 1000
+#define STATIC_INLINE __forceinline static
+#define INLINE __forceinline
+#else
+#define STATIC_INLINE static
+#define INLINE
+#endif
+
+#if defined (__GNUC__) && defined (__GNUC_MINOR__) && defined (__GNUC_PATCHLEVEL__)
+#define CUB_GCC_VERSION (__GNUC__ * 10000 \
+			 + __GNUC_MINOR__ * 100 \
+			 + __GNUC_PATCHLEVEL__)
+#endif
+
+#if defined (WINDOWS)
 #define IMPORT_VAR 	__declspec(dllimport)
 #define EXPORT_VAR 	__declspec(dllexport)
 #else
@@ -53,7 +72,7 @@ extern "C"
 #define EXPORT_VAR
 #endif
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define L_cuserid 9
 #else				/* WINDOWS */
 #ifndef L_cuserid
@@ -73,7 +92,22 @@ extern "C"
 
 #define CTIME_MAX 64
 
-#if defined(WINDOWS)
+#ifndef LLONG_MAX
+#define LLONG_MAX	9223372036854775807LL
+#endif
+#ifndef LLONG_MIN
+#define LLONG_MIN	(-LLONG_MAX - 1LL)
+#endif
+#ifndef ULLONG_MAX
+#define ULLONG_MAX	18446744073709551615ULL
+#endif
+
+
+#define MEM_SIZE_IS_VALID(size) \
+  (((long long unsigned) (size) <= ULONG_MAX) \
+   || (sizeof (long long unsigned) <= sizeof (size_t)))
+
+#if defined (WINDOWS)
 #include <fcntl.h>
 #include <direct.h>
 #include <process.h>
@@ -82,16 +116,26 @@ extern "C"
 #include <sys/locking.h>
 #include <windows.h>
 #include <winbase.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <errno.h>
 #include <assert.h>
 
+#if !defined (ENOMSG)
 /* not defined errno on Windows */
 #define ENOMSG      100
+#endif
 
+#if !defined PATH_MAX
 #define PATH_MAX	256
+#endif
+#if !defined NAME_MAX
 #define NAME_MAX	256
+#endif
 
+#if !defined (_MSC_VER) || _MSC_VER < 1700
 #define log2(x)                 (log ((double) x) / log ((double) 2))
+#endif				/* !_MSC_VER || _MSC_VER < 1700 */
   extern char *realpath (const char *path, char *resolved_path);
 #define sleep(sec) Sleep(1000*(sec))
 #define usleep(usec) Sleep((usec)/1000)
@@ -122,7 +166,10 @@ extern "C"
 #define fprintf         _fprintf_p
 #define vfprintf        _vfprintf_p
 #define vprintf         _vprintf_p
-
+#define strtof		strtof_win
+#if defined (_WIN32)
+#define mktime         mktime_for_win32
+#endif
 #if (_WIN32_WINNT < 0x0600)
 #define POLLRDNORM  0x0100
 #define POLLRDBAND  0x0200
@@ -267,26 +314,26 @@ extern "C"
  */
   extern void pc_init (void);
   extern void pc_final (void);
-#if defined(ENABLE_UNUSED_FUNCTION)
+#if defined (ENABLE_UNUSED_FUNCTION)
   extern int lock_region (int fd, int cmd, long offset, long size);
 #endif
-  extern int free_space (const char *);
+  extern int free_space (const char *, int);
 
 #define _longjmp                longjmp
 /*
 #define _setjmp                 setjmp
 */
-#elif !defined(MAC_OS)  /* WINDOWS */
+#else				/* WINDOWS */
 
-#if !defined(HAVE_CTIME_R)
+#if !defined (HAVE_CTIME_R)
 #  error "HAVE_CTIME_R"
 #endif
 
-#if !defined(HAVE_LOCALTIME_R)
+#if !defined (HAVE_LOCALTIME_R)
 #  error "HAVE_LOCALTIME_R"
 #endif
 
-#if !defined(HAVE_DRAND48_R)
+#if !defined (HAVE_DRAND48_R)
 #  error "HAVE_DRAND48_R"
 #endif
 
@@ -294,7 +341,7 @@ extern "C"
 #endif				/* WINDOWS */
 
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define PATH_SEPARATOR  '\\'
 #else				/* WINDOWS */
 #define PATH_SEPARATOR  '/'
@@ -303,7 +350,7 @@ extern "C"
 
 #define IS_PATH_SEPARATOR(c) ((c) == PATH_SEPARATOR)
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define IS_ABS_PATH(p) IS_PATH_SEPARATOR((p)[0]) \
 	|| (isalpha((p)[0]) && (p)[1] == ':' && IS_PATH_SEPARATOR((p)[2]))
 #else				/* WINDOWS */
@@ -314,7 +361,7 @@ extern "C"
  * Some platforms (e.g., Solaris) evidently don't define _longjmp.  If
  * it's not available, just use regular old longjmp.
  */
-#if defined(SOLARIS) || defined(WINDOWS)
+#if defined (SOLARIS) || defined (WINDOWS)
 #define LONGJMP longjmp
 #define SETJMP setjmp
 #else
@@ -322,34 +369,34 @@ extern "C"
 #define SETJMP _setjmp
 #endif
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define GETHOSTNAME(p, l) css_gethostname(p, l)
 #else				/* ! WINDOWS */
 #define GETHOSTNAME(p, l) gethostname(p, l)
 #endif				/* ! WINDOWS */
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define FINITE(x) _finite(x)
-#elif defined(HPUX)
+#elif defined (HPUX)
 #define FINITE(x) isfinite(x)
 #else				/* ! WINDOWS && ! HPUX */
 #define FINITE(x) finite(x)
 #endif
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define difftime64(time1, time2) _difftime64(time1, time2)
 #else				/* !WINDOWS */
 #define difftime64(time1, time2) difftime(time1, time2)
 #endif				/* !WINDOWS */
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #ifndef wcswcs
 #define wcswcs(ws1, ws2)     wcsstr((ws1), (ws2))
 #endif
 #define wcsspn(ws1, ws2)     ((int) wcsspn((ws1), (ws2)))
 #endif				/* WINDOWS */
 
-#if defined(SOLARIS)
+#if defined (SOLARIS)
 #define wcslen(ws)           wslen((ws))
 #define wcschr(ws, wc)       wschr((ws), (wc))
 #define wcsrchr(ws, wc)      wsrchr((ws), (wc))
@@ -363,43 +410,43 @@ extern "C"
 #define wcsncpy(ws1, ws2, n) wsncpy((ws1), (ws2), (n))
 #endif				/* SOLARIS */
 
-#if !defined(HAVE_STRDUP)
+#if !defined (HAVE_STRDUP)
   extern char *strdup (const char *str);
 #endif				/* HAVE_STRDUP */
 
-#if !defined(HAVE_VASPRINTF)
+#if !defined (HAVE_VASPRINTF)
   extern int vasprintf (char **ptr, const char *format, va_list ap);
 #endif				/* HAVE_VASPRINTF */
-#if !defined(HAVE_ASPRINTF)
+#if !defined (HAVE_ASPRINTF)
   extern int asprintf (char **ptr, const char *format, ...);
 #endif				/* HAVE_ASPRINTF */
-#if defined(HAVE_ERR_H)
+#if defined (HAVE_ERR_H)
 #include <err.h>
 #else
 #define err(fd, ...) do { fprintf(stderr, __VA_ARGS__); exit(1); } while (0)
 #define errx(fd, ...) do { fprintf(stderr, __VA_ARGS__); exit(1); } while (0)
 #endif
   extern int cub_dirname_r (const char *path, char *pathbuf, size_t buflen);
-#if defined(AIX)
+#if defined (AIX)
   double aix_ceil (double x);
 #define ceil(x) aix_ceil(x)
 #endif
 
-#if !defined(HAVE_DIRNAME)
+#if !defined (HAVE_DIRNAME)
   char *dirname (const char *path);
 #endif				/* HAVE_DIRNAME */
   extern int basename_r (const char *path, char *pathbuf, size_t buflen);
-#if !defined(HAVE_BASENAME)
+#if !defined (HAVE_BASENAME)
   extern char *basename (const char *path);
 #endif				/* HAVE_BASENAME */
-#if defined(WINDOWS)
-#if !defined(HAVE_STRSEP)
+#if defined (WINDOWS)
+#if !defined (HAVE_STRSEP)
   extern char *strsep (char **stringp, const char *delim);
 #endif
   extern char *getpass (const char *prompt);
 #endif
 
-#if defined(ENABLE_UNUSED_FUNCTION)
+#if defined (ENABLE_UNUSED_FUNCTION)
   extern int utona (unsigned int u, char *s, size_t n);
   extern int itona (int i, char *s, size_t n);
 #endif
@@ -415,7 +462,7 @@ extern "C"
 #define OFF_T_MAX  LLONG_MAX
 #endif
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define IS_INVALID_SOCKET(socket) ((socket) == INVALID_SOCKET)
   typedef int socklen_t;
 #else
@@ -434,42 +481,42 @@ extern "C"
   extern int os_rename_file (const char *src_path, const char *dest_path);
 
 /* os_send_kill() - send the KILL signal to ourselves */
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define os_send_kill() os_send_signal(SIGABRT)
 #else
 #define os_send_kill() os_send_signal(SIGKILL)
 #endif
   typedef void (*SIGNAL_HANDLER_FUNCTION) (int sig_no);
-  extern SIGNAL_HANDLER_FUNCTION os_set_signal_handler (const int sig_no,
-							SIGNAL_HANDLER_FUNCTION
-							sig_handler);
+  extern SIGNAL_HANDLER_FUNCTION os_set_signal_handler (const int sig_no, SIGNAL_HANDLER_FUNCTION sig_handler);
   extern void os_send_signal (const int sig_no);
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 #define atoll(a)	_atoi64((a))
+#if !defined(_MSC_VER) || _MSC_VER < 1800
+/* ref: https://msdn.microsoft.com/en-us/library/a206stx2.aspx */
 #define llabs(a)	_abs64((a))
+#endif				/* _MSC_VER && _MSC_VER < 1800 */
 #endif
 
-#if defined(AIX) && !defined(NAME_MAX)
+#if defined (AIX) && !defined (NAME_MAX)
 #define NAME_MAX pathconf("/",_PC_NAME_MAX)
 #endif
 
-#if defined(AIX) && !defined(DONT_HOOK_MALLOC)
+#if defined (AIX) && !defined (DONT_HOOK_MALLOC)
   void *aix_malloc (size_t size);
 #define malloc(a) aix_malloc(a)
 #endif
 
-#if defined(AIX) && !defined(SOL_TCP)
+#if defined (AIX) && !defined (SOL_TCP)
 #define SOL_TCP IPPROTO_TCP
 #endif
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
   int setenv (const char *name, const char *value, int overwrite);
-  int cub_vsnprintf (char *buffer, size_t count, const char *format,
-		     va_list argptr);
+  int cub_vsnprintf (char *buffer, size_t count, const char *format, va_list argptr);
 #endif
 
-#if defined(WINDOWS) || defined(MAC_OS)
+#if defined (WINDOWS)
 /* The following structure is used to generate uniformly distributed
  * pseudo-random numbers reentrantly.
  */
@@ -477,9 +524,6 @@ extern "C"
   {
     unsigned short _rand48_seed[3];
   };
-#endif
-
-#if defined(WINDOWS)
 
 /* These functions are implemented in rand.c. And rand.c will be included
  * on Windows build.
@@ -492,22 +536,25 @@ extern "C"
   extern int drand48_r (struct drand48_data *buffer, double *result);
   extern int rand_r (unsigned int *seedp);
 
+#if !defined(_MSC_VER) || _MSC_VER < 1800
+  /* Ref: https://msdn.microsoft.com/en-us/library/dn353646(v=vs.140).aspx */
   extern double round (double d);
+#endif				/* !_MSC_VER || _MSC_VER < 1800 */
 
   typedef struct
   {
     CRITICAL_SECTION cs;
     CRITICAL_SECTION *csp;
+    UINT32 watermark;
   } pthread_mutex_t;
 
   typedef HANDLE pthread_mutexattr_t;
-#endif
 
-#if defined(WINDOWS) || defined(MAC_OS)
-#define PTHREAD_MUTEX_INITIALIZER	{{ NULL, 0, 0, NULL, NULL, 0 }, NULL}
-#endif
+/* Use a large prime as watermark */
+#define WATERMARK_MUTEX_INITIALIZED 0x96438AF7
 
-#if defined(WINDOWS)
+#define PTHREAD_MUTEX_INITIALIZER	{{ NULL, 0, 0, NULL, NULL, 0 }, NULL, 0}
+
   typedef union
   {
     CONDITION_VARIABLE native_cond;
@@ -531,19 +578,26 @@ extern "C"
 
   typedef HANDLE pthread_condattr_t;
 
+#if !defined (ETIMEDOUT)
 #define ETIMEDOUT WAIT_TIMEOUT
+#endif
 #define PTHREAD_COND_INITIALIZER	{ NULL }
 
+#if defined(_MSC_VER) && _MSC_VER >= 1900 && !defined(_CRT_NO_TIME_T)
+#define _TIMESPEC_DEFINED
+#endif				/* _MSC_VER && _MSC_VER >= 1900 && !_CRT_NO_TIME_T */
+#if !defined(_TIMESPEC_DEFINED)
+#define _TIMESPEC_DEFINED
   struct timespec
   {
     int tv_sec;
     int tv_nsec;
   };
+#endif				/* !_TIMESPEC_DEFINED */
 
   extern pthread_mutex_t css_Internal_mutex_for_mutex_initialize;
 
-  int pthread_mutex_init (pthread_mutex_t * mutex,
-			  pthread_mutexattr_t * attr);
+  int pthread_mutex_init (pthread_mutex_t * mutex, pthread_mutexattr_t * attr);
   int pthread_mutex_destroy (pthread_mutex_t * mutex);
 
   void port_win_mutex_init_and_lock (pthread_mutex_t * mutex);
@@ -551,7 +605,7 @@ extern "C"
 
   __inline int pthread_mutex_lock (pthread_mutex_t * mutex)
   {
-    if (mutex->csp == &mutex->cs)
+    if (mutex->csp == &mutex->cs && mutex->watermark == WATERMARK_MUTEX_INITIALIZED)
       {
 	EnterCriticalSection (mutex->csp);
       }
@@ -578,7 +632,7 @@ extern "C"
 
   __inline int pthread_mutex_trylock (pthread_mutex_t * mutex)
   {
-    if (mutex->csp == &mutex->cs)
+    if (mutex->csp == &mutex->cs && mutex->watermark == WATERMARK_MUTEX_INITIALIZED)
       {
 	if (TryEnterCriticalSection (mutex->csp))
 	  {
@@ -605,11 +659,9 @@ extern "C"
   int pthread_mutexattr_settype (pthread_mutexattr_t * attr, int type);
   int pthread_mutexattr_destroy (pthread_mutexattr_t * attr);
 
-  int pthread_cond_init (pthread_cond_t * cond,
-			 const pthread_condattr_t * attr);
+  int pthread_cond_init (pthread_cond_t * cond, const pthread_condattr_t * attr);
   int pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex);
-  int pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
-			      struct timespec *ts);
+  int pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex, struct timespec *ts);
   int pthread_cond_destroy (pthread_cond_t * cond);
   int pthread_cond_signal (pthread_cond_t * cond);
   int pthread_cond_broadcast (pthread_cond_t * cond);
@@ -625,8 +677,7 @@ extern "C"
 #define THREAD_CALLING_CONVENTION __stdcall
 
   int pthread_create (pthread_t * thread, const pthread_attr_t * attr,
-		      THREAD_RET_T (THREAD_CALLING_CONVENTION *
-				    start_routine) (void *), void *arg);
+		      THREAD_RET_T (THREAD_CALLING_CONVENTION * start_routine) (void *), void *arg);
   void pthread_exit (void *ptr);
   pthread_t pthread_self (void);
   int pthread_join (pthread_t thread, void **value_ptr);
@@ -646,7 +697,7 @@ extern "C"
 
 #endif				/* WINDOWS */
 
-#if (defined(WINDOWS) || defined(X86))
+#if (defined (WINDOWS) || defined (X86))
 #define COPYMEM(type,dst,src)   do {		\
   *((type *) (dst)) = *((type *) (src));  	\
 }while(0)
@@ -661,7 +712,7 @@ extern "C"
  *
  * Developers should check HAVE_ATOMIC_BUILTINS before using atomic builtins
  * as follows.
- *  #if defined(HAVE_ATOMIC_BUILTINS)
+ *  #if defined (HAVE_ATOMIC_BUILTINS)
  *   ... write codes with atomic builtins ...
  *  #else
  *   ... leave legacy codes or write codes without atomic builtins ...
@@ -676,24 +727,34 @@ extern "C"
  * While InterlockedXXX functions handles 32bit values, InterlockedXXX64 handles
  * 64bit values. That is why we define two types of macros.
  */
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 
 #define HAVE_ATOMIC_BUILTINS
 
 #define ATOMIC_TAS_32(ptr, new_val) \
 	InterlockedExchange(ptr, new_val)
 #define ATOMIC_CAS_32(ptr, cmp_val, swap_val) \
-	(InterlockedCompareExchange(ptr, swap_val, cmp_val) == cmp_val)
+	(InterlockedCompareExchange(ptr, swap_val, cmp_val) == (cmp_val))
 #define ATOMIC_INC_32(ptr, amount) \
-	(InterlockedExchangeAdd(ptr, amount) + amount)
+	(InterlockedExchangeAdd(ptr, amount) + (amount))
+#define MEMORY_BARRIER() \
+	MemoryBarrier()
 
-#if defined(_WIN64)
+#if defined (_WIN64)
 #define ATOMIC_TAS_64(ptr, new_val) \
 	InterlockedExchange64(ptr, new_val)
 #define ATOMIC_CAS_64(ptr, cmp_val, swap_val) \
-	(InterlockedCompareExchange64(ptr, swap_val, cmp_val) == cmp_val)
+	(InterlockedCompareExchange64(ptr, swap_val, cmp_val) == (cmp_val))
 #define ATOMIC_INC_64(ptr, amount) \
-	(InterlockedExchangeAdd64(ptr, amount) + amount)
+	(InterlockedExchangeAdd64(ptr, amount) + (amount))
+
+#define ATOMIC_TAS_ADDR(ptr, new_val) ATOMIC_TAS_64 ((long long volatile *) ptr, (long long) new_val)
+#define ATOMIC_CAS_ADDR(ptr, cmp_val, swap_val) \
+	(InterlockedCompareExchange64((long long volatile *) ptr, (long long) swap_val, (long long) cmp_val) \
+         == (long long) cmp_val)
+
+#define ATOMIC_LOAD_64(ptr) (*(ptr))
+#define ATOMIC_STORE_64(ptr, val) (*(ptr) = val)
 #else				/* _WIN64 */
 /*
  * These functions are used on Windows 32bit OS.
@@ -702,22 +763,29 @@ extern "C"
  * We provide the following functions to support atomic operations on all
  * Windows versions.
  */
-  extern UINT64 win32_compare_exchange64 (UINT64 volatile *val_ptr,
-					  UINT64 swap_val, UINT64 cmp_val);
+  extern UINT64 win32_compare_exchange64 (UINT64 volatile *val_ptr, UINT64 swap_val, UINT64 cmp_val);
   extern UINT64 win32_exchange_add64 (UINT64 volatile *ptr, UINT64 amount);
   extern UINT64 win32_exchange64 (UINT64 volatile *ptr, UINT64 new_val);
 
 #define ATOMIC_TAS_64(ptr, new_val) \
 	win32_exchange64(ptr, new_val)
 #define ATOMIC_CAS_64(ptr, cmp_val, swap_val) \
-	(win32_compare_exchange64(ptr, swap_val, cmp_val) == cmp_val)
+	(win32_compare_exchange64(ptr, swap_val, cmp_val) == (cmp_val))
 #define ATOMIC_INC_64(ptr, amount) \
-	(win32_exchange_add64(ptr, amount) + amount)
+	(win32_exchange_add64(ptr, amount) + (amount))
+
+#define ATOMIC_TAS_ADDR(ptr, new_val) ATOMIC_TAS_32 ((long volatile *) ptr, (long long) new_val)
+#define ATOMIC_CAS_ADDR(ptr, cmp_val, swap_val) \
+	(InterlockedCompareExchange((long volatile *) ptr, (long long) swap_val, (long long) cmp_val) \
+         == (long long) (cmp_val))
+
+#define ATOMIC_LOAD_64(ptr) ATOMIC_INC_64 (ptr, 0)
+#define ATOMIC_STORE_64(ptr, val) ATOMIC_TAS_64 (ptr, val)
 #endif				/* _WIN64 */
 
 #else				/* WINDOWS */
 
-#if defined(HAVE_GCC_ATOMIC_BUILTINS)
+#if defined (HAVE_GCC_ATOMIC_BUILTINS)
 
 #define HAVE_ATOMIC_BUILTINS
 
@@ -734,6 +802,29 @@ extern "C"
 	__sync_bool_compare_and_swap(ptr, cmp_val, swap_val)
 #define ATOMIC_INC_64(ptr, amount) \
 	__sync_add_and_fetch(ptr, amount)
+
+#define ATOMIC_TAS_ADDR(ptr, new_val) \
+        __sync_lock_test_and_set(ptr, new_val)
+#define ATOMIC_CAS_ADDR(ptr, cmp_val, swap_val) \
+	__sync_bool_compare_and_swap(ptr, cmp_val, swap_val)
+
+#define ATOMIC_LOAD_64(ptr) (*(ptr))
+#define ATOMIC_STORE_64(ptr, val) (*(ptr) = val)
+
+/* There is a gcc bug of __sync_synchronize in x86-64 when gcc version
+ * less than 4.4. we can replace __sync_synchronize as mfence instruction.
+ * see detail in https://gcc.gnu.org/bugzilla/show_bug.cgi?id=36793
+ */
+#if defined (X86) && defined (CUB_GCC_VERSION) && (CUB_GCC_VERSION < 40400)
+#define MEMORY_BARRIER() \
+  do { \
+    asm volatile("mfence" ::: "memory"); \
+    __sync_synchronize(); \
+  } while (0)
+#else
+#define MEMORY_BARRIER() \
+	__sync_synchronize()
+#endif
 
 #else				/* HAVE_GCC_ATOMIC_BUILTINS */
 /*
@@ -747,19 +838,16 @@ extern "C"
 }
 #endif
 
-#if defined(WINDOWS)
+#if defined (WINDOWS)
 extern double strtod_win (const char *str, char **end_ptr);
 #define string_to_double(str, end_ptr) strtod_win((str), (end_ptr));
 #else
 #define string_to_double(str, end_ptr) strtod((str), (end_ptr))
 #endif
 
-extern INT64 timeval_diff_in_msec (const struct timeval *end_time,
-				   const struct timeval *start_time);
-extern int timeval_add_msec (struct timeval *added_time,
-			     const struct timeval *start_time, int msec);
-extern int timeval_to_timespec (struct timespec *to,
-				const struct timeval *from);
+extern INT64 timeval_diff_in_msec (const struct timeval *end_time, const struct timeval *start_time);
+extern int timeval_add_msec (struct timeval *added_time, const struct timeval *start_time, int msec);
+extern int timeval_to_timespec (struct timespec *to, const struct timeval *from);
 
 extern FILE *port_open_memstream (char **ptr, size_t * sizeloc);
 
@@ -767,6 +855,33 @@ extern void port_close_memstream (FILE * fp, char **ptr, size_t * sizeloc);
 
 extern char *trim (char *str);
 
-extern int port_str_to_int (int *ret_p, const char *str_p, int base);
+extern int parse_int (int *ret_p, const char *str_p, int base);
+extern int parse_bigint (INT64 * ret_p, const char *str_p, int base);
+
+extern int str_to_int32 (int *ret_p, char **end_p, const char *str_p, int base);
+extern int str_to_uint32 (unsigned int *ret_p, char **end_p, const char *str_p, int base);
+extern int str_to_int64 (INT64 * ret_p, char **end_p, const char *str_p, int base);
+extern int str_to_uint64 (UINT64 * ret_p, char **end_p, const char *str_p, int base);
+extern int str_to_double (double *ret_p, char **end_p, const char *str_p);
+extern int str_to_float (float *ret_p, char **end_p, const char *str_p);
+
+#if defined (WINDOWS)
+extern float strtof_win (const char *nptr, char **endptr);
+#endif
+
+#ifndef HAVE_STRLCPY
+extern size_t strlcpy (char *, const char *, size_t);
+#endif
+
+#if (defined (WINDOWS) && defined (_WIN32))
+extern time_t mktime_for_win32 (struct tm *tm);
+#endif
+
+#if (defined (WINDOWS) && !defined (PRId64))
+#define PRId64 "lld"
+#define PRIx64 "llx"
+#endif
+
+extern int msleep (const long msec);
 
 #endif /* _PORTING_H_ */

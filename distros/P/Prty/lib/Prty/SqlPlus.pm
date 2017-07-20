@@ -4,7 +4,7 @@ use base qw/Prty::Object/;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Prty::Unindent;
 use Prty::Option;
@@ -311,7 +311,7 @@ sub script {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

@@ -26,7 +26,7 @@ package XML::Easy::Syntax;
 use warnings;
 use strict;
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -721,7 +721,7 @@ our $xml10_reference_rx = qr/$xml10_entityref_rx|$xml10_charref_rx/o;
 =item $xml10_chardata_rx
 
 Ordinary literal character data.  This consists of zero or more acceptable
-charaters, other than the metacharacters "B<< < >>" and "B<&>", and
+characters, other than the metacharacters "B<< < >>" and "B<&>", and
 not including "B<< ]]> >>" as a subsequence.  Such data stands for
 itself when it appears between the start and end tags of an element,
 where it can be interspersed with references, CDATA sections, comments,
@@ -748,7 +748,7 @@ our $xml10_chardata_rx = qr/(?:
 =item $xml10_cdata_rx
 
 Literal character data in a CDATA section.  This consists of zero or
-more acceptable charaters, not including "B<< ]]> >>" as a subsequence.
+more acceptable characters, not including "B<< ]]> >>" as a subsequence.
 Unlike ordinary literal character data, the characters "B<< < >>" and
 "B<&>" are not metacharacters here.  Such data stands for itself when
 it appears within a CDATA section.
@@ -1063,7 +1063,7 @@ This is either a comment, a processing instruction, or a stretch of
 whitespace.
 
 Beware in using a pattern such as C<$xml10_misc_rx*>.  It could match
-a string of whitespace charaters in many ways, leading to exponential
+a string of whitespace characters in many ways, leading to exponential
 behaviour if it becomes necessary to backtrack.  This can be avoided by
 using the C<$xml10_miscseq_rx> pattern (below).
 
@@ -1162,7 +1162,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 Copyright (C) 2008, 2009 PhotoBox Ltd
 
-Copyright (C) 2009, 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2009, 2010, 2011, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

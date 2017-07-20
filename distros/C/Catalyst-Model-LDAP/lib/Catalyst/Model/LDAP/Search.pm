@@ -1,12 +1,39 @@
 package Catalyst::Model::LDAP::Search;
+# ABSTRACT: Convenience methods for Net::LDAP::Search
 
 use strict;
 use warnings;
 use base qw/Net::LDAP::Search/;
 
+
+sub init {
+    my ( $self, $class ) = @_;
+
+    eval { require $class };
+    die $@ if $@;
+
+    foreach my $entry ( @{ $self->{entries} } ) {
+        bless $entry, $class;
+        $entry->_ldap_client( $self->parent );
+    }
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Catalyst::Model::LDAP::Search - Convenience methods for Net::LDAP::Search
+
+=head1 VERSION
+
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -19,20 +46,6 @@ information.
 =head2 init
 
 Reblesses search results as objects of the specified class.
-
-=cut
-
-sub init {
-    my ($self, $class) = @_;
-
-    eval "require $class";
-    die $@ if $@;
-
-    foreach my $entry (@{ $self->{entries} }) {
-        bless $entry, $class;
-        $entry->_ldap_client($self->parent);
-    }
-}
 
 =head1 SEE ALSO
 
@@ -57,6 +70,15 @@ sub init {
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=cut
+=head1 AUTHOR
 
-1;
+Gavin Henry <ghenry@surevoip.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gavin Henry.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

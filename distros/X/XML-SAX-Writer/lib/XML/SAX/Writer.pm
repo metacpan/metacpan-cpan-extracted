@@ -1,7 +1,8 @@
 package XML::SAX::Writer;
-$XML::SAX::Writer::VERSION = '0.56';
+$XML::SAX::Writer::VERSION = '0.57';
 use strict;
-use vars qw(%DEFAULT_ESCAPE %COMMENT_ESCAPE);
+use warnings;
+use vars qw(%DEFAULT_ESCAPE %ATTRIBUTE_ESCAPE %COMMENT_ESCAPE);
 
 # ABSTRACT: SAX2 XML Writer
 
@@ -20,6 +21,13 @@ use XML::Filter::BufferText qw();
                     "'"     => '&apos;',
                   );
 
+%ATTRIBUTE_ESCAPE = (
+                    %DEFAULT_ESCAPE,
+                    "\t"    => '&#x9;',
+                    "\n"    => '&#xA;',
+                    "\r"    => '&#xD;',
+                  );
+
 %COMMENT_ESCAPE = (
                     '--'    => '&#45;&#45;',
                   );
@@ -35,6 +43,7 @@ sub new {
     # default the options
     $opt->{Writer}          ||= 'XML::SAX::Writer::XML';
     $opt->{Escape}          ||= \%DEFAULT_ESCAPE;
+    $opt->{AttributeEscape} ||= \%ATTRIBUTE_ESCAPE;
     $opt->{CommentEscape}   ||= \%COMMENT_ESCAPE;
     $opt->{EncodeFrom}        = exists $opt->{EncodeFrom} ? $opt->{EncodeFrom} : 'utf-8';
     $opt->{EncodeTo}          = exists $opt->{EncodeTo}   ? $opt->{EncodeTo}   : 'utf-8';
@@ -126,6 +135,20 @@ sub setEscaperRegex {
 #-------------------------------------------------------------------#
 
 #-------------------------------------------------------------------#
+# setAttributeEscaperRegex
+#-------------------------------------------------------------------#
+sub setAttributeEscaperRegex {
+    my $self = shift;
+
+        $self->{AttributeEscaperRegex} = 
+            eval 'qr/'                                                         .
+            join( '|', map { $_ = "\Q$_\E" } keys %{$self->{AttributeEscape}}) .
+            '/;'                                                               ;
+    return $self;
+}
+#-------------------------------------------------------------------#
+
+#-------------------------------------------------------------------#
 # setCommentEscaperRegex
 #-------------------------------------------------------------------#
 sub setCommentEscaperRegex {
@@ -147,6 +170,18 @@ sub escape {
     my $str  = shift;
 
     $str =~ s/($self->{EscaperRegex})/$self->{Escape}->{$1}/ge;
+    return $str;
+}
+#-------------------------------------------------------------------#
+
+#-------------------------------------------------------------------#
+# escapeAttribute
+#-------------------------------------------------------------------#
+sub escapeAttribute {
+    my $self = shift;
+    my $str  = shift;
+
+    $str =~ s/($self->{AttributeEscaperRegex})/$self->{AttributeEscape}->{$1}/ge;
     return $str;
 }
 #-------------------------------------------------------------------#
@@ -189,7 +224,7 @@ sub safeConvert {
 # new methods are added to the interface
 
 package XML::SAX::Writer::ConsumerInterface;
-$XML::SAX::Writer::ConsumerInterface::VERSION = '0.56';
+$XML::SAX::Writer::ConsumerInterface::VERSION = '0.57';
 sub new {
     my $class = shift;
     my $ref = shift;
@@ -207,7 +242,7 @@ sub finalize {}
 #```````````````````````````````````````````````````````````````````#
 
 package XML::SAX::Writer::StringConsumer;
-$XML::SAX::Writer::StringConsumer::VERSION = '0.56';
+$XML::SAX::Writer::StringConsumer::VERSION = '0.57';
 @XML::SAX::Writer::StringConsumer::ISA = qw(XML::SAX::Writer::ConsumerInterface);
 
 #-------------------------------------------------------------------#
@@ -237,7 +272,7 @@ sub finalize { ${$_[0]} }
 #```````````````````````````````````````````````````````````````````#
 
 package XML::SAX::Writer::CodeConsumer;
-$XML::SAX::Writer::CodeConsumer::VERSION = '0.56';
+$XML::SAX::Writer::CodeConsumer::VERSION = '0.57';
 @XML::SAX::Writer::CodeConsumer::ISA = qw(XML::SAX::Writer::ConsumerInterface );
 
 #-------------------------------------------------------------------#
@@ -268,7 +303,7 @@ sub finalize { ${$_[0]}->('end_document', '') }
 #```````````````````````````````````````````````````````````````````#
 
 package XML::SAX::Writer::ArrayConsumer;
-$XML::SAX::Writer::ArrayConsumer::VERSION = '0.56';
+$XML::SAX::Writer::ArrayConsumer::VERSION = '0.57';
 @XML::SAX::Writer::ArrayConsumer::ISA = qw(XML::SAX::Writer::ConsumerInterface);
 
 #-------------------------------------------------------------------#
@@ -299,7 +334,7 @@ sub finalize { return ${$_[0]} }
 #```````````````````````````````````````````````````````````````````#
 
 package XML::SAX::Writer::HandleConsumer;
-$XML::SAX::Writer::HandleConsumer::VERSION = '0.56';
+$XML::SAX::Writer::HandleConsumer::VERSION = '0.57';
 @XML::SAX::Writer::HandleConsumer::ISA = qw(XML::SAX::Writer::ConsumerInterface);
 
 #-------------------------------------------------------------------#
@@ -325,14 +360,17 @@ sub finalize { return 0 }
 #```````````````````````````````````````````````````````````````````#
 
 package XML::SAX::Writer::FileConsumer;
-$XML::SAX::Writer::FileConsumer::VERSION = '0.56';
+$XML::SAX::Writer::FileConsumer::VERSION = '0.57';
 @XML::SAX::Writer::FileConsumer::ISA = qw(XML::SAX::Writer::HandleConsumer);
 
 #-------------------------------------------------------------------#
 # new
 #-------------------------------------------------------------------#
 sub new {
-    my ( $proto, $file ) = ( shift, shift );
+    my ( $proto, $file, $opt ) = @_;
+    my $enc_to = (defined $opt and ref $opt eq 'HASH'
+                  and defined $opt->{EncodeTo}) ? $opt->{EncodeTo}
+                                                : 'utf-8';
 
     XML::SAX::Writer::Exception->throw(
         Message => "No filename provided to " . ref( $proto || $proto )
@@ -340,9 +378,10 @@ sub new {
 
     local *XFH;
 
-    open XFH, ">$file" or XML::SAX::Writer::Exception->throw(
+    open XFH, ">:encoding($enc_to)", $file
+      or XML::SAX::Writer::Exception->throw(
         Message => "Error opening file $file: $!"
-    );
+      );
 
     return $proto->SUPER::new( *{XFH}{IO}, @_ );
 }
@@ -363,7 +402,7 @@ sub finalize {
 #```````````````````````````````````````````````````````````````````#
 
 package XML::SAX::Writer::NullConverter;
-$XML::SAX::Writer::NullConverter::VERSION = '0.56';
+$XML::SAX::Writer::NullConverter::VERSION = '0.57';
 sub new     { return bless [], __PACKAGE__ }
 sub convert { $_[1] }
 
@@ -373,7 +412,7 @@ sub convert { $_[1] }
 #```````````````````````````````````````````````````````````````````#
 
 package XML::SAX::Writer::Encode;
-$XML::SAX::Writer::Encode::VERSION = '0.56';
+$XML::SAX::Writer::Encode::VERSION = '0.57';
 sub new {
     my ($class, $from, $to) = @_;
     my $self = {
@@ -408,7 +447,7 @@ XML::SAX::Writer - SAX2 XML Writer
 
 =head1 VERSION
 
-version 0.56
+version 0.57
 
 =head1 SYNOPSIS
 
@@ -465,6 +504,11 @@ interface L<described later in the documentation|/THE CONSUMER
 INTERFACE>.
 
 If this parameter is not provided, then output is sent to STDOUT.
+
+Note that there is no means to set an encoding layer on filehandles
+created by this module; if this is necessary, the calling code should
+first open a filehandle with the appropriate encoding set, and pass
+that filehandle to this module.
 
 =item * Escape
 

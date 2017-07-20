@@ -2,10 +2,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Last Modified: $Date$
-# Id:            $Id$
-# $HeadURL$
+# Author: rmp
 #
 package ClearPress::Localize;
 use strict;
@@ -18,7 +15,7 @@ use Locale::Maketext::Lexicon {
   };
 use Carp;
 
-our $VERSION = q[475.3.3];
+our $VERSION = q[476.1.1];
 
 sub init {
   my ($class, $locales) = @_;

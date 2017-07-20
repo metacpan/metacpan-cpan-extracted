@@ -1,6 +1,12 @@
 Revision history for Perl extension Acme-Undead
 
+0.03 2017-07-18T05:48:39Z
+    - fixed Changes messages.
+
+0.02 2017-07-18T05:37:59Z
+    - support one-argument `bless`
+    - add requires `Test::Exception` on test.
+
 0.01 2017-07-04T10:32:43Z
 
     - original version
-

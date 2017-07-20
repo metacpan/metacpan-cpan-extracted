@@ -70,7 +70,16 @@ Module::Build->subclass(code => q{
 	needs_compiler => 0,
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Data-Pond\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Data-Pond",
+			},
+		},
+	},
 	sign => 1,
 )->create_build_script;
 

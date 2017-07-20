@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,31 +15,43 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 c0ec28fc23051a069c68dc372811801f50db53b4 Build.PL
-SHA1 a96e7f666dac2c8a75a7a65b7851a8b6b891fea5 ChangeLog
+SHA1 afb7f614593dccf09507faeea9c8f220e3f365e4 ChangeLog
 SHA1 af531d645e03eb61e9d7a83321eeabfc72e2ce78 GNUmakefile
-SHA1 9b68f24bfdca9bb3a23f2e77cad72f98b032a3a3 MANIFEST
-SHA1 3513e031b2c8cab587b6a28ba2c3ca7516f4f42d META.json
-SHA1 03ca7cd2a63364006adc065a349c911ddd32bc8b META.yml
+SHA1 7374747a723acb908be8ca62e98000c2bbf2e292 MANIFEST
+SHA1 b778d939a7c6999fcf2392df0f4ebecde67b3276 META.json
+SHA1 3574b9c7ad743b35a646fd34e6e8d37c029979e8 META.yml
 SHA1 a306765a010702845e45dc0e031b7e0c1e96927f Makefile.PL
-SHA1 bcfe8bc3c22cfae733ba9934c2b5548f1276e229 NEWS
-SHA1 8ad8a4c24c9bcdd85de98a9b4e4616221bc455b8 README.md
+SHA1 134f2611171863f8199680cb7528929e9b93de13 NEWS
+SHA1 b615afe8ddf889b6b970848611f557dd92634a40 README.md
 SHA1 84ac0838050be76f8603f5bb53c9607f832d7ffe TODO
 SHA1 2338297f6496897d7f7cc30f2ae5f9af3331557d example/fib.pl
 SHA1 a6b82a88e68d9e0bd337c784051000007c78b974 example/multiline.pl
-SHA1 5a78e45651fcd4f8a22a33efcde1c4df6da5bf9f lib/B/DeparseTree.pm
-SHA1 703e498c7fa82fe31befd482adf61b2c4c8c4521 lib/B/DeparseTree.pod
+SHA1 b678c484df57c2e6e19acf2a3910f8602835cf2d lib/B/DeparseTree.pm
+SHA1 4580e75b06623b6862036dc9ee9904055b5361d2 lib/B/DeparseTree.pod
 SHA1 38de87da1dae0bd0b86ae06dae5ac7a58fb38c41 lib/B/DeparseTree/Common.pm
+SHA1 3dc7dc2e32a0e0a8e1765774ee93d8e202f60f6f lib/B/DeparseTree/P518.pm
 SHA1 1640efdd2d224ed69c8cffaa817a21da55f02eb8 lib/B/DeparseTree/P520.pm
-SHA1 6847b70900f091b1e6f944c3336bd04069564bac lib/B/DeparseTree/P522.pm
-SHA1 a3557ddee3bc971062f35aff6225ca510a457545 lib/B/DeparseTree/P524.pm
+SHA1 0b924447711e14e9edebd6d650b2feb45fcf08b2 lib/B/DeparseTree/P522.pm
+SHA1 13b6b006c25caccd6c3e7511d6c1489484a8d62f lib/B/DeparseTree/P524.pm
+SHA1 c79098e4e6980af256bef524093be6e9dfefcd1a lib/B/DeparseTree/P526.pm
 SHA1 d41e39868c7949a8bab72a65e8888a3cbd7474f3 lib/B/DeparseTree/PP.pm
 SHA1 41f78769670b0cad1f28f4ff3488d805539c63b2 lib/B/DeparseTree/Printer.pm
 SHA1 f3f0f22ea5210d37d9f01ad108b9dc210590df54 t/10subclass.t
+SHA1 66becc0bf094a48f61cbf990bd2cf7715b0a8264 t/20-core-518.t
 SHA1 348917f8580c318f934e2876dc2a2087217532fa t/20-core-520.t
 SHA1 734e6fd175460b3444159eec4707342d541ab837 t/20-core-522.t
+SHA1 a7ea6a1375b4bffd3af222e790e3c0c9b51f296d t/20-core-524.t
+SHA1 870e30a9bc6d8b9736812ee144a6d537571781d7 t/20-core-526.t
+SHA1 57efe69dffdfaaa84a2b2999694ce00bd823c098 t/20-deparse-518.small.t
 SHA1 015e11460e5375986acc6418d0bce4ed667c89db t/20-deparse-520-small.t
 SHA1 e6651c30010f014f6b615d3b87841f53d6874d11 t/20-deparse-522-small.t
-SHA1 b65d450d530e571622db7897114277507650838e t/20-deparse-524-small.t
+SHA1 1bdf0efbe9c424d1da0803d16f2bd1f4a32031a3 t/20-deparse-524-small.t
+SHA1 a7fb5b4ea3bdde41b31822a4446bff2608562f2a t/20-deparse-526-small.t
+SHA1 c556570a21678b94f1e3e3f8aa459fd0c9a76aad t/testdata/P520.pm
+SHA1 a77ac04df927d29e7317a9e149ba4c7421f0b777 t/testdata/P522.pm
+SHA1 10a29199891a46406bc50d85961e1e1df4dfa394 t/testdata/P524.pm
+SHA1 52a33d7959d086209cb88a00bacb44c19dc89f58 t/testdata/P526.pm
+SHA1 b4042ff0c90d54a811028590aa64d2fca585efbe t/testdata/README.pod
 SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 testdata/base/cond.t
 SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 testdata/base/if.t
 SHA1 ab1ebc344bf7d8d909fa831c2bf3e34fdc66883e testdata/base/lex.t
@@ -56,7 +68,7 @@ SHA1 451bc0e3d41684d129bc72d7202e9bc972d48779 testdata/runtests.pl
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAldXRlUACgkQGo3lAIJ17CEBywCfZBSjoLPklIsNTnt9gl/xomeF
-YSYAnRK2V003sXA2iWWLUCQi6eKTlkcu
-=L2p2
+iEYEARECAAYFAlltqeAACgkQGo3lAIJ17CEGMQCfXrtSjcKsGcLxCP9ZH8IY31d6
+39IAni2gbO6eqaMs4T53D599r9yJEzV9
+=BdaI
 -----END PGP SIGNATURE-----

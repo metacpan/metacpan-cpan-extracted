@@ -5,8 +5,6 @@
  *
  * The library is free for all purposes without any express
  * guarantee it works.
- *
- * Tom St Denis, tomstdenis@gmail.com, http://libtom.org
  */
 #include "tomcrypt.h"
 
@@ -20,7 +18,7 @@
 
 /**
   Gets length of DER encoding of GeneralizedTime
-  @param utctime      The UTC time structure to get the size of
+  @param gtime        The GeneralizedTime structure to get the size of
   @param outlen [out] The length of the DER encoding
   @return CRYPT_OK if successful
 */
@@ -55,6 +53,6 @@ int der_length_generalizedtime(ltc_generalizedtime *gtime, unsigned long *outlen
 
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

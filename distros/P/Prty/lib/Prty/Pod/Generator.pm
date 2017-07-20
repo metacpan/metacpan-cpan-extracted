@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Prty::Unindent;
 
@@ -223,8 +223,7 @@ Der Code ist um $n Leerzeichen (den Wert des Objekt-Attributs
 sub code {
     my ($self,$text) = @_;
 
-    $text =~ s/^\n+//;
-    $text =~ s/\s+$//;
+    $text = Prty::Unindent->trim($text);
 
     my $indent = ' ' x $self->indentation;
     $text =~ s/^/$indent/mg;
@@ -595,7 +594,7 @@ sub fmt {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

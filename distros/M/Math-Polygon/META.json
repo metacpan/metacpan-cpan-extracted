@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-Polygon",
    "no_index" : {
@@ -34,11 +34,10 @@
          "requires" : {
             "Math::Trig" : "0",
             "Scalar::Util" : "1.13",
-            "Test::More" : "0.47",
-            "Test::Pod" : "1"
+            "Test::More" : "0.47"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "1.05"
+   "version" : "1.06"
 }

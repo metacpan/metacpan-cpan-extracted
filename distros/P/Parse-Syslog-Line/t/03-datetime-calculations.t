@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use bignum;
 
 use Test::More;
 use Test::Deep;
@@ -14,7 +15,6 @@ use Time::Moment;
 use Storable qw(dclone);
 
 use Parse::Syslog::Line qw/:with_timezones/;
-
 
 subtest 'If logdate is "in the future" it is actually "in the past"' => sub {
 

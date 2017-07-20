@@ -6,6 +6,13 @@ use t::helper;
 use Test::More;
 use Text::Xslate;
 
+{
+    package Some::Model::User;
+    sub new  { my $class = shift; bless +{ @_ }, $class }
+    sub name { $_[0]->{name} }
+}
+
+
 my $xslate = Text::Xslate->new(
     path         => path,
     cache_dir    => cache_dir,
@@ -15,26 +22,30 @@ my $xslate = Text::Xslate->new(
     ],
 );
 
-like $xslate->render('template.tx', {
-    name   => 'Text::Xslate',
-    engine => $xslate,
-}), qr/Text::Xslate version is/;
+is $xslate->render('template.tx', +{
+    user  => Some::Model::User->new(name => 'pokutuna'),
+    drink => 'Cocoa',
+}), <<EOS;
+pokutuna is drinking a cup of Cocoa.
+EOS
 
-is $xslate->render('template.tx', {
-    name   => 'Template::Toolkit',
-    engine => 'TT',
+is $xslate->render('template.tx', +{
+    user  => Some::Model::User->new(name => 'pokutuna'),
+    drink => 'Oil',
 }), <<EOS;
 <pre class="type-declaration-mismatch">
-Declaration mismatch for `engine`
-  declaration: &#39;Text::Xslate&#39;
-        value: &#39;TT&#39;
+Declaration mismatch for `drink`
+  Value &quot;Oil&quot; did not pass type constraint &quot;Enum[&quot;Cocoa&quot;,&quot;Cappuchino&quot;,&quot;Tea&quot;]&quot;
 </pre>
-Template::Toolkit version is .
+pokutuna is drinking a cup of Oil.
 EOS
 
 done_testing;
 
 __DATA__
 @@ template.tx
-<:- declare(name => 'Str', engine => 'Text::Xslate') -:>
-<: $name :> version is <: $engine.VERSION :>.
+<:- declare(
+  user  => 'Some::Model::User',
+  drink => 'Enum["Cocoa", "Cappuchino", "Tea"]'
+) -:>
+<: $user.name :> is drinking a cup of <: $drink :>.

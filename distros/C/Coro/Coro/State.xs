@@ -118,7 +118,19 @@ static void *coro_thx;
 # endif
 #endif
 
-/* perl usually suppressed asserts. for debugging, we sometimes force it to be on */
+/* one off bugfix for perl 5.22 */
+#if PERL_VERSION_ATLEAST(5,22,0) && !PERL_VERSION_ATLEAST(5,24,0)
+# undef PadlistNAMES
+# define PadlistNAMES(pl) *((PADNAMELIST **)PadlistARRAY (pl))
+#endif
+
+#if PERL_VERSION_ATLEAST(5,24,0)
+# define SUB_ARGARRAY PL_curpad[0]
+#else
+# define SUB_ARGARRAY (SV *)cx->blk_sub.argarray
+#endif
+
+/* perl usually suppresses asserts. for debugging, we sometimes force it to be on */
 #if 0
 # undef NDEBUG
 # include <assert.h>
@@ -1412,7 +1424,7 @@ runops_trace (pTHX)
                           PUSHMARK (SP);
                           PUSHs (&PL_sv_yes);
                           PUSHs (fullname);
-                          PUSHs (CxHASARGS (cx) ? sv_2mortal (newRV_inc ((SV *)cx->blk_sub.argarray)) : &PL_sv_undef);
+                          PUSHs (CxHASARGS (cx) ? sv_2mortal (newRV_inc (SUB_ARGARRAY)) : &PL_sv_undef);
                           PUTBACK;
                           cb = hv_fetch ((HV *)SvRV (coro_current), "_trace_sub_cb", sizeof ("_trace_sub_cb") - 1, 0);
                           if (cb) call_sv (*cb, G_KEEPERR | G_EVAL | G_VOID | G_DISCARD);
@@ -3587,6 +3599,9 @@ jit_init (pTHX)
 
   map_base = mmap (0, map_len, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 
+  if (map_base == (char *)MAP_FAILED)
+    map_base = mmap (0, map_len, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
   assert (("Coro: unable to mmap jit code page, cannot continue.", map_base != (char *)MAP_FAILED));
 
   load_perl_slots = (load_save_perl_slots_type)map_base;
@@ -4066,7 +4081,7 @@ BOOT:
           coroapi.enterleave_scope_hook = api_enterleave_scope_hook;
 
           /*GCoroAPI = &coroapi;*/
-          sv_setiv (sv, (IV)&coroapi);
+          sv_setiv (sv, PTR2IV (&coroapi));
           SvREADONLY_on (sv);
         }
 }

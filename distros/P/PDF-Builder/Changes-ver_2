@@ -1,8 +1,6 @@
 Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
 
-2.034     2017-07-07
-
-2.033     2017-07-06
+2.033     2017-07-10
 
     - [RT #122371] Remove a couple of improperly-placed weaken statements
       (reported by Phil Perry).
@@ -13,7 +11,7 @@ Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
     - Fix Bank Gothic core font (reported by Phil Perry).
 
 
-2.032     2017-07-06 (in progress)
+2.032     2017-07-06 
 
     - PDF::API2 has many circular references, and the end() method doesn't clear
       them all, so memory is leaked.  This release uses Scalar::Util's weaken() 

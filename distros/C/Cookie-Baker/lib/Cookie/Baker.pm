@@ -7,7 +7,7 @@ use base qw/Exporter/;
 use URI::Escape;
 
 BEGIN {
-    our $VERSION = "0.07";
+    our $VERSION = "0.08";
     our @EXPORT = qw/bake_cookie crush_cookie/;
     my $use_pp = $ENV{COOKIE_BAKER_PP};
     if (!$use_pp) {
@@ -38,7 +38,7 @@ sub bake_cookie {
     $cookie .= 'domain=' . $args{domain} . '; '  if $args{domain};
     $cookie .= 'path='. $args{path} . '; '       if $args{path};
     $cookie .= 'expires=' . _date($args{expires}) . '; ' if exists $args{expires} && defined $args{expires};
-    $cookie .= 'max-age=' . $args{"max-age"} . '; ' if $args{"max-age"};
+    $cookie .= 'max-age=' . $args{"max-age"} . '; ' if exists $args{"max-age"};
     $cookie .= 'secure; '                     if $args{secure};
     $cookie .= 'HttpOnly; '                   if $args{httponly};
     substr($cookie,-2,2,'');
@@ -87,7 +87,7 @@ sub pp_crush_cookie {
     my $cookie_string = shift;
     return {} unless $cookie_string;
     my %results;
-    my @pairs = grep m/=/, split "[;,] ?", $cookie_string;
+    my @pairs = grep m/=/, split /; ?/, $cookie_string;
     for my $pair ( @pairs ) {
         # trim leading trailing whitespace
         $pair =~ s/^\s+//; $pair =~ s/\s+$//;

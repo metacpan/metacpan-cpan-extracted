@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Classic;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '1.74'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '1.76'; # VERSION
 
 use 5.010001;
 #use strict; # enabled by Moo
@@ -22,7 +22,6 @@ with 'Color::Theme::Role::ANSI' unless $ENV{COMP_LINE};
 with 'Perinci::CmdLine::Classic::Role::Help' unless $ENV{COMP_LINE};
 with 'Term::App::Role::Attrs' unless $ENV{COMP_LINE};
 
-has log => (is => 'rw', default=>sub{1});
 has undo => (is=>'rw', default=>sub{0});
 has undo_dir => (
     is => 'rw',
@@ -79,13 +78,11 @@ has action_metadata => (
             clear_history => {
             },
             help => {
-                default_log => 0,
                 use_utf8 => 1,
             },
             history => {
             },
             subcommands => {
-                default_log => 0,
                 use_utf8 => 1,
             },
             redo => {
@@ -95,16 +92,12 @@ has action_metadata => (
             undo => {
             },
             version => {
-                default_log => 0,
                 use_utf8 => 1,
             },
         },
     },
 );
 has default_prompt_template => (is=>'rw');
-
-# OLD name for backward compat, will be removed later
-sub log_any_app { goto \&log }
 
 sub VERSION {
     my ($pkg, $req) = @_;
@@ -126,15 +119,12 @@ sub BUILD {
     if (!$self->{actions}) {
         $self->{actions} = {
             version => {
-                default_log => 0,
                 use_utf8 => 1,
             },
             help => {
-                default_log => 0,
                 use_utf8 => 1,
             },
             subcommands => {
-                default_log => 0,
                 use_utf8 => 1,
             },
             call => {},
@@ -453,22 +443,6 @@ sub _unsetup_progress_output {
     $setup_progress = 0;
 }
 
-sub _load_log_any_app {
-    my ($self, $r) = @_;
-    # Log::Any::App::init can already avoid being run twice, but we need to
-    # check anyway to avoid logging starting message below twice.
-    return if $r->{_log_any_app_loaded}++;
-    require Log::Any::App;
-    Log::Any::App::init();
-
-    # we log this after we initialize Log::Any::App, since Log::Any::App might
-    # not be loaded at all. yes, this means that this log message is printed
-    # rather late and might not be the first message to be logged (see log
-    # messages in run()) if user already loads Log::Any::App by herself.
-    log_debug("Program %s started with arguments: %s",
-                 $0, $r->{orig_argv});
-}
-
 # this hook is called at the start of run(), can be used to initialize stuffs
 sub hook_before_run {
     my ($self, $r) = @_;
@@ -480,20 +454,6 @@ sub hook_before_run {
 }
 
 sub hook_after_parse_argv {
-    my ($self, $r) = @_;
-
-    # We load Log::Any::App rather late here, so user can customize level via
-    # --debug, --dry-run, etc.
-    unless ($ENV{COMP_LINE}) {
-        my $do_log = $r->{subcommand_data}{log} //
-            $r->{subcommand_data}{log_any_app} # OLD compat, will be removed later
-                if $r->{subcommand_data};
-        $do_log //= $ENV{LOG};
-        $do_log //= $self->action_metadata->{$r->{action}}{default_log}
-            if $self->{action};
-        $do_log //= $self->log;
-        $self->_load_log_any_app($r) if $do_log;
-    }
 }
 
 sub hook_format_result {
@@ -795,7 +755,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.74 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-10.
+This document describes version 1.76 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2017-07-14.
 
 =head1 SYNOPSIS
 
@@ -965,11 +925,6 @@ any newline to keep the data being printed unmodified.
 =head1 ATTRIBUTES
 
 All the attributes of L<Perinci::CmdLine::Base>, plus:
-
-=head2 log => BOOL (default: 1)
-
-Whether to load L<Log::Any::App> (enable logging output) by default. See
-L</"LOGGING"> for more details.
 
 =head2 use_utf8 => BOOL
 

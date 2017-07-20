@@ -1,4 +1,4 @@
-# Copyright (c) 2011-16, Mitchell Cooper
+# Copyright (c) 2011-17, Mitchell Cooper
 #
 # Evented::Object: a simple yet featureful base class event framework.
 # https://github.com/cooper/evented-object
@@ -14,11 +14,11 @@ use 5.010;
 ### EVENT FIRE OBJECTS ###
 ##########################
 
-our $VERSION = '5.63';
+our $VERSION = '5.65';
 our $events  = $Evented::Object::events;
 our $props   = $Evented::Object::props;
 
-# create a new event object.
+# create a new fire object.
 sub new {
     my ($class, %opts) = @_;
     $opts{callback_i} ||= 0;
@@ -178,3 +178,247 @@ BEGIN {
 }
 
 1;
+
+=head1 NAME
+
+B<Evented::Object::EventFire> - represents an L<Evented::Object> event fire.
+
+=head1 DESCRIPTION
+
+The fire object provides methods for fetching information related to the current
+event fire. It also provides an interface for modifying the behavior of the
+remaining callbacks.
+
+Fire objects are specific to the particular event fire, not the event itself.
+If you fire the same event twice in a row, the fire object used the first time
+will not be the same as the second time. Therefore, all modifications made by
+the fire object's methods apply only to the callbacks remaining in this
+particular fire. For example, C<< $fire->cancel($callback) >> will only cancel
+the supplied callback once.
+
+=head1 METHODS
+
+=head2 $fire->object
+
+Returns the evented object.
+
+ $fire->object->delete_event('myEvent');
+
+=head2 $fire->caller
+
+Returns the value of C<caller(1)> from within the C<< ->fire() >> method.
+This allows you to determine from where the event was fired.
+
+ my $name   = $fire->event_name;
+ my @caller = $fire->caller;
+ say "Package $caller[0] line $caller[2] called event $name";
+
+=head2 $fire->stop($reason)
+
+Cancels all remaining callbacks. This stops the rest of the event firing. After
+a callback calls $fire->stop, the name of that callback is stored as
+C<< $fire->stopper >>.
+
+If the event has already been stopped, this method returns the reason for which
+the fire was stopped or "unspecified" if no reason was given.
+
+ # ignore messages from trolls
+ if ($user eq 'noah') {
+     # user is a troll.
+     # stop further callbacks.
+     return $fire->stop;
+ }
+
+=over
+
+=item *
+
+B<$reason> - I<optional>, the reason for stopping the event fire.
+
+=back
+
+=head2 $fire->stopper
+
+Returns the callback which called C<< $fire->stop >>.
+
+ if ($fire->stopper) {
+     say 'Fire was stopped by '.$fire->stopper;
+ }
+
+=head2 $fire->exception
+
+If the event was fired with the C<< safe >> option, it is possible that an
+exception occurred in one (or more if C<< fail_continue >> enabled) callbacks.
+This method returns the last exception that occurred or C<< undef >> if none
+did.
+
+ if (my $e = $fire->exception) {
+    say "Exception! $e";
+ }
+
+=head2 $fire->called($callback)
+
+If no argument is supplied, returns the number of callbacks called so far,
+including the current one. If a callback argument is supplied, returns whether
+that particular callback has been called.
+
+ say $fire->called, 'callbacks have been called so far.';
+
+ if ($fire->called('some.callback')) {
+     say 'some.callback has been called already.';
+ }
+
+B<Parameters>
+
+=over
+
+=item *
+
+B<$callback> - I<optional>, the callback being checked.
+
+=back
+
+=head2 $fire->pending($callback)
+
+If no argument is supplied, returns the number of callbacks pending to be
+called, excluding the current one. If a callback  argument is supplied, returns
+whether that particular callback is pending for being called.
+
+ say $fire->pending, ' callbacks are left.';
+
+ if ($fire->pending('some.callback')) {
+     say 'some.callback will be called soon (unless it gets canceled)';
+ }
+
+B<Parameters>
+
+=over
+
+=item *
+
+B<$callback> - I<optional>, the callback being checked.
+
+=back
+
+=head2 $fire->cancel($callback)
+
+Cancels the supplied callback once.
+
+ if ($user eq 'noah') {
+     # we don't love noah!
+     $fire->cancel('send.hearts');
+ }
+
+B<Parameters>
+
+=over
+
+=item *
+
+B<$callback> - callback to be cancelled.
+
+=back
+
+=head2 $fire->return_of($callback)
+
+Returns the return value of the supplied callback.
+
+ if ($fire->return_of('my.callback')) {
+     say 'my.callback returned a true value';
+ }
+
+B<Parameters>
+
+=over
+
+=item *
+
+B<$callback> - desired callback.
+
+=back
+
+=head2 $fire->last
+
+Returns the most recent previous callback called.
+This is also useful for determining which callback was the last to be called.
+
+ say $fire->last, ' was called before this one.';
+
+ my $fire = $eo->fire_event('myEvent');
+ say $fire->last, ' was the last callback called.';
+
+=head2 $fire->last_return
+
+Returns the last callback's return value.
+
+ if ($fire->last_return) {
+     say 'the callback before this one returned a true value.';
+ }
+ else {
+     die 'the last callback returned a false value.';
+ }
+
+=head2 $fire->event_name
+
+Returns the name of the event.
+
+ say 'the event being fired is ', $fire->event_name;
+
+=head2 $fire->callback_name
+
+Returns the name of the current callback.
+
+ say 'the current callback being called is ', $fire->callback_name;
+
+=head2 $fire->callback_priority
+
+Returns the priority of the current callback.
+
+ say 'the priority of the current callback is ', $fire->callback_priority;
+
+=head2 $fire->callback_data($key)
+
+Returns the data supplied to the callback when it was registered, if any. If the
+data is a hash reference, an optional key parameter can specify a which value to
+fetch.
+
+ say 'my data is ', $fire->callback_data;
+ say 'my name is ', $fire->callback_data('name');
+
+B<Parameters>
+
+=over
+
+=item *
+
+B<$key> - I<optional>, a key to fetch a value if the data registered was a hash.
+
+=back
+
+=head2 $fire->data($key)
+
+Returns the data supplied to the collection when it was fired, if any. If the
+data is a hash reference, an optional key parameter can specify a which value to
+fetch.
+
+ say 'fire data is ', $fire->data;
+ say 'fire time was ', $fire->data('time');
+
+B<Parameters>
+
+=over
+
+=item *
+
+B<$key> - I<optional>, a key to fetch a value if the data registered was a hash.
+
+=back
+
+=head1 AUTHOR
+
+L<Mitchell Cooper|https://github.com/cooper> <cooper@cpan.org>
+
+Copyright E<copy> 2011-2017. Released under New BSD license.
+
+Comments, complaints, and recommendations are accepted. Bugs may be reported on
+L<GitHub|https://github.com/cooper/evented-object/issues>.

@@ -1,4 +1,11 @@
-Revision history for Business-OnlinePayment-Iridium
+1.01    Mon Jul 17 12:28:00 2017 BST
+        - Sort out indexing issue on the CPAN
+
+1.00    Mon Jul 17 11:30:00 2017 BST
+        - Migrate to Dist::Zilla
+        - Mention new name of PayVector
+        - 100% authortests
+        - Pod::Weaver
 
 0.11    Thu Nov 27 21:30:00 2010 GMT
         - Add cross_reference in returned data

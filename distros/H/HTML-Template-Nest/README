@@ -1,4 +1,4 @@
-HTML-Template-Nest version 0.02
+HTML-Template-Nest version 0.03
 ===============================
 
 Nest Templates created by HTML::Template according to a nesting structure specified using a hash.

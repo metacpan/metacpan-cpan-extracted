@@ -9,17 +9,6 @@
 #include <GL/glxext.h>
 #include "PerlXlib.h"
 
-// typedef GLXContext ( * PFNGLXIMPORTCONTEXTEXTPROC) (Display* dpy, GLXContextID contextID);
-// typedef GLXContextID ( * PFNGLXGETCONTEXTIDEXTPROC) (const GLXContext context);
-// typedef void ( * PFNGLXFREECONTEXTEXTPROC) (Display* dpy, GLXContext context);
-// typedef Bool ( * PFNGLXQUERYCONTEXTINFOEXTPROC) (Display *dpy, GLXContext context, int id, int *out_val);
-// PFNGLXIMPORTCONTEXTEXTPROC    import_context_fn;
-// PFNGLXGETCONTEXTIDEXTPROC     get_context_id_fn;
-// PFNGLXQUERYCONTEXTINFOEXTPROC query_context_info_fn;
-// PFNGLXFREECONTEXTEXTPROC      free_context_fn;
-
-//GLXContextID glXGetContextID(const GLXContext context);
-
 extern GLXContextID glXGetContextIDEXT(GLXContext cx);
 extern Bool glXQueryContextInfoEXT(Display *dpy, GLXContext cx, int attr, int *out_val);
 extern GLXContext glXImportContextEXT(Display *dpy, GLXContextID id);
@@ -56,10 +45,10 @@ glXChooseVisual(dpy, screen=DefaultScreen(dpy), attrs=NULL)
 	int screen
 	SV *attrs
 	INIT:
-		SV *tmp, **ep;
+		SV *tmp, **ep, *vis_sv, *dpy_sv;
 		AV *attr_av;
 		HV *attr_hv;
-		int i, n;
+		int i, n, *attr_array;
 		XVisualInfo *match;
 		int default_attrs[] = {
 			GLX_USE_GL, GLX_RGBA,
@@ -67,51 +56,165 @@ glXChooseVisual(dpy, screen=DefaultScreen(dpy), attrs=NULL)
 			GLX_DOUBLEBUFFER, None
 		};
 	PPCODE:
+		dpy_sv= ST(0);
 		if (!attrs || !SvOK(attrs)) {
 			match= glXChooseVisual(dpy, screen, default_attrs);
 		}
 		else if (SvROK(attrs) && (SvTYPE(attrs) == SVt_PVAV)) {
 			attr_av= (AV*) SvRV(attrs);
 			n= av_len(attr_av)+1;
-			tmp= sv_2mortal(newSV(0));
-			sv_grow(tmp, sizeof(int) * (n+1));
-			for (i= 0; i<n; i++) {
+			Newx(attr_array, n+1, int);
+			SAVEFREEPV(attr_array);
+			for (i= 0; i < n; i++) {
 				ep= av_fetch(attr_av, i, 0);
-				if (!ep)
-					croak("Found NULL in attributes array");
-				((int*)(void*)SvPVX(tmp))[i]= SvIV(*ep);
+				if (!ep || !*ep) croak("Can't access attrib %d", i);
+				attr_array[i]= SvIV(*ep);
 			}
-			((int*)(void*)SvPVX(tmp))[n]= None;
-			match= glXChooseVisual(dpy, screen, ((int*)(void*)SvPVX(tmp)));
+			attr_array[n]= None;
+			match= glXChooseVisual(dpy, screen, attr_array);
 		}
-		if (!match)
-			croak("glXChooseVisual failed");
-		PUSHs( sv_2mortal( sv_setref_pvn(newSV(0), "X11::Xlib::XVisualInfo", (void*)match, sizeof(XVisualInfo)) ) );
-		XFree(match);
+		if (match) {
+			vis_sv= sv_setref_pvn(newSV(0), "X11::Xlib::XVisualInfo", (void*)match, sizeof(XVisualInfo));
+			PUSHs(sv_2mortal(vis_sv));
+			XFree(match);
+			PerlXlib_set_displayobj_of_opaque(SvRV(vis_sv), dpy_sv);
+		}
 
-GLXContext
+#ifdef GLX_VERSION_1_3
+
+void
+glXChooseFBConfig(dpy, screen, attr_av)
+	Display *dpy
+	ScreenNumber screen
+	AV *attr_av
+	INIT:
+		int *attr_array;
+		int i, n_elem;
+		SV **elem, *dpy_sv, *fb;
+		GLXFBConfig *cfgs;
+	PPCODE:
+		dpy_sv= ST(0);
+		/* Re-package attr_av into int[] */
+		n_elem= av_len(attr_av)+1;
+		Newx(attr_array, n_elem+1, int);
+		SAVEFREEPV(attr_array);
+		for (i= 0; i < n_elem; i++) {
+			elem= av_fetch(attr_av, i, 0);
+			if (!elem || !*elem) croak("Can't access attrib %d", i);
+			attr_array[i]= SvIV(*elem);
+		}
+		attr_array[n_elem]= None; /* in case user didn't 'None'-terminate the list */
+		cfgs= glXChooseFBConfig(dpy, screen, attr_array, &n_elem);
+		if (cfgs) {
+			EXTEND(SP, n_elem);
+			for (i= 0; i < n_elem; i++)
+				PUSHs(PerlXlib_obj_for_display_innerptr(dpy, cfgs[i], "X11::GLX::FBConfig", SVt_PVMG, 1));
+			XFree(cfgs);
+		}
+
+void
+glXGetFBConfigs(dpy, screen= -1)
+	Display *dpy
+	ScreenNumber screen
+	INIT:
+		GLXFBConfig *cfgs;
+		int n_elem, i;
+		SV *fb;
+	PPCODE:
+		cfgs= glXGetFBConfigs(dpy, screen, &n_elem);
+		if (cfgs) {
+			EXTEND(SP, n_elem);
+			for (i= 0; i < n_elem; i++)
+				PUSHs(PerlXlib_obj_for_display_innerptr(dpy, cfgs[i], "X11::GLX::FBConfig", SVt_PVMG, 1));
+			/* no indication in docs that we should free cfg ... */
+		}
+
+int
+glXGetFBConfigAttrib(dpy, fbcfg, attr, value_sv)
+	Display *dpy
+	GLXFBConfig fbcfg
+	int attr
+	SV *value_sv
+	INIT:
+		int value;
+	CODE:
+		RETVAL= glXGetFBConfigAttrib(dpy, fbcfg, attr, &value);
+		if (RETVAL == Success)
+			sv_setiv(value_sv, value);
+	OUTPUT:
+		RETVAL
+
+void
+glXGetVisualFromFBConfig(dpy, fbcfg)
+	Display *dpy
+	GLXFBConfig fbcfg
+	INIT:
+		XVisualInfo *vis;
+		SV *dpy_sv, *vis_sv;
+	PPCODE:
+		dpy_sv= ST(0);
+		vis= glXGetVisualFromFBConfig(dpy, fbcfg);
+		if (vis) {
+			vis_sv= sv_setref_pvn(newSV(0), "X11::Xlib::XVisualInfo", (void*) vis, sizeof(XVisualInfo));
+			PUSHs(sv_2mortal(vis_sv));
+			XFree(vis);
+			PerlXlib_set_displayobj_of_opaque(SvRV(vis_sv), dpy_sv);
+		}
+
+void
+glXCreateNewContext(dpy, fbcfg, render_type, shared, direct)
+	Display *dpy
+	GLXFBConfig fbcfg
+	int render_type
+	GLXContextOrNull shared
+	Bool direct
+	INIT:
+	INIT:
+		SV *cx_obj;
+	PPCODE:
+		GLXContext cx= glXCreateNewContext(dpy, fbcfg, render_type, shared, direct);
+		if (cx) {
+			cx_obj= PerlXlib_obj_for_display_innerptr(dpy, cx, "X11::GLX::Context", SVt_PVHV, 1);
+			PUSHs(cx_obj);
+			/* set autofree, by default */
+			hv_stores((HV*)SvRV(cx_obj), "autofree", newSViv(1));
+		}
+		else {
+			PUSHs(&PL_sv_undef);
+		}
+
+#endif /* GLX_VERSION_1_3 */
+
+void
 glXCreateContext(dpy, vis_info, shared, direct)
 	Display *dpy
 	XVisualInfo *vis_info
 	GLXContextOrNull shared
 	Bool direct
+	INIT:
+		SV *cx_obj;
+	PPCODE:
+		GLXContext cx= glXCreateContext(dpy, vis_info, shared, direct);
+		if (cx) {
+			cx_obj= PerlXlib_obj_for_display_innerptr(dpy, cx, "X11::GLX::Context", SVt_PVHV, 1);
+			PUSHs(cx_obj);
+			/* set autofree, by default */
+			hv_stores((HV*)SvRV(cx_obj), "autofree", newSViv(1));
+		}
+		else {
+			PUSHs(&PL_sv_undef);
+		}
 
 void
-glXDestroyContext(dpy, cx_sv)
+glXDestroyContext(dpy, cx)
 	Display *dpy
-	SV *cx_sv
+	GLXContext cx
+	INIT:
+		SV *cx_sv= ST(1);
 	CODE:
-		if (!sv_derived_from(cx_sv, "X11::GLX::Context"))
-			croak("second argument must be a GLX::Context");
-		if (!SvIV(SvRV(cx_sv)))
-			croak("Attempt to destroy X11::GLX::Context twice");
-		glXDestroyContext(dpy, (GLXContext) (void*) SvIV(SvRV(cx_sv)));
-		// If it was imported, then also free it
-		if (sv_isa(cx_sv, "X11::GLX::Context::Imported"))
-			glXFreeContextEXT(dpy, (GLXContext) (void*) SvIV(SvRV(cx_sv)));
-		else
-			// Now, null the pointer to mark it as being properly freed
-			SvIV_set(SvRV(cx_sv), 0);
+		glXDestroyContext(dpy, cx);
+		/* Now, null the pointer to mark it as being properly freed */
+		PerlXlib_set_magic_dpy_innerptr(cx_sv, NULL);
 
 Bool
 glXMakeCurrent(dpy, xid= None, cx= NULL)
@@ -151,17 +254,15 @@ glXImportContextEXT(dpy, cx_id)
 	GLXContextID cx_id
 
 void
-glXFreeContextEXT(dpy, cx_sv)
+glXFreeContextEXT(dpy, cx)
 	Display *dpy
-	SV *cx_sv
+	GLXContextImported cx
+	INIT:
+		SV *cx_sv= ST(1);
 	CODE:
-		if (!sv_isa(cx_sv, "X11::GLX::Context::Imported"))
-			croak("argument must be a GLX::Context::Imported");
-		if (!SvIV(SvRV(cx_sv)))
-			croak("Attempt to destroy GLX::Context twice");
-		glXFreeContextEXT(dpy, (GLXContext) (void*) SvIV(SvRV(cx_sv)));
-		// Now, null the pointer to mark it as being properly freed
-		SvIV_set(SvRV(cx_sv), 0);
+		glXFreeContextEXT(dpy, cx);
+		/* Now, null the pointer to mark it as being properly freed */
+		PerlXlib_set_magic_dpy_innerptr(cx_sv, NULL);
 
 int
 glXQueryContextInfoEXT(dpy, cx, attr_id, val_out_sv)
@@ -189,24 +290,15 @@ id(self)
 	OUTPUT:
 		RETVAL
 
-void
-DESTROY(self)
-	GLXContext self
+bool
+_already_freed(cx)
+	GLXContextOrNull cx
 	CODE:
-		// Display pointer is required to free a GLXContext.  Must be handled by perl code.
-		if (self) croak("Memory leak! incorrect destruction of GLX::Context");
-
-MODULE = X11::GLX                     PACKAGE = X11::GLX::Context::Imported
-
-void
-DESTROY(self)
-	GLXContext self
-	CODE:
-		// Display pointer is required to free a GLXContext.  Must be handled by perl code.
-		if (self) croak("Memory leak! incorrect destruction of GLX::Context::Imported");
+		RETVAL = !cx;
+	OUTPUT:
+		RETVAL
 
 MODULE = X11::GLX                     PACKAGE = X11::GLX::DWIM
-
 
 void
 _set_blank_cursor(dpy, wnd)
@@ -230,116 +322,677 @@ _set_blank_cursor(dpy, wnd)
 		XFreeCursor(dpy, invisibleCursor);
 
 void
-_init_ctx(self, dpy, direct, link_to= 0)
-	HV *self
-	Display *dpy
-	int direct
-	GLXContextID link_to
-	INIT:
-		// Create the GL context, either direct or indirect, and optionally sharing
-		//  resource IDs with another context.
-		//SV *s;
-		//const char *extensions= NULL;
-		//int visual_id, vmajor, vminor, cx_id;
-		//PFNGLXIMPORTCONTEXTEXTPROC    import_context_fn;
-		//PFNGLXGETCONTEXTIDEXTPROC     get_context_id_fn;
-		//PFNGLXQUERYCONTEXTINFOEXTPROC query_context_info_fn;
-		//PFNGLXFREECONTEXTEXTPROC      free_context_fn;
-		//GLXContext remote_context= NULL, cx= NULL;
-		//XVisualInfo vis_info, *vis_match;
+_const_unavailable()
 	PPCODE:
-		//if (!glXQueryVersion(dpy, &vmajor, &vminor))
-		//	croak("Display does not support GLX");
-		//
-		//// glXQueryExtensionsString doesn't exist before 1.1
-		//if (vmajor >= 1 && vminor >= 1) {
-		//	// TODO: find out if this needs freed.  Docs don't say, and all examples I can find
-		//	// hold onto the pointer for the life of the program.
-		//	extensions= glXQueryExtensionsString(dpy, DefaultScreen(dpy));
-		//}
-		//
-		//// Shared GL contexts are not well documented.  The process is to use an
-		//// extension to first find an X11 ID for the GL context on the process that
-		//// created it, then send that to the peer, then the peer imports the context,
-		//// then creates a new context sharing GL IDs with it, then can free the
-		//// imported context.   I don't yet know if the new context needs the same
-		//// XVisualInfo as the imported one, so I commented that out for now.
-		//if (link_to) {
-		//	import_context_fn= (PFNGLXIMPORTCONTEXTEXTPROC) glXGetProcAddress("glXImportContextEXT");
-		//	free_context_fn=   (PFNGLXFREECONTEXTEXTPROC)   glXGetProcAddress("glXFreeContextEXT");
-		//	query_context_info_fn= (PFNGLXQUERYCONTEXTINFOEXTPROC) glXGetProcAddress("glXQueryContextInfoEXT");
-		//	if (!import_context_fn || !free_context_fn || !query_context_info_fn)
-		//		croak("Can't connect to shared GL context; extension not supported by this X server.");
-		//
-		//	remote_context= import_context_fn(dpy, link_to);
-		//	if (!remote_context)
-		//		croak("Can't import remote GL context %d", link_to);
-		//	
-		//	// Get the visual ID used by the existing context
-		//	if (Success != query_context_info_fn(dpy, remote_context, GLX_VISUAL_ID_EXT, &visual_id)) {
-		//		free_context_fn(remote_context);
-		//		croak("Can't retrieve visual ID of existing GL context");
-		//	}
-		//	
-		//	vis_info.visual_id= visual_id;
-		//	vis_match= XGetVisualInfo(dpy, VisualIDMask, &vis_info, &n);
-		//	if (vis_match && n > 0)
-		//		memcpy(&vis_info, vis_match, sizeof(*vis_match));
-		//	if (vis_match)
-		//		XFree(vis_match);
-		//	if (n > 0)
-		//		cx= glXCreateContext(dpy, &vis_info, remote_context, direct);
-		//	free_context_fn(dpy, remote_context);
-		//	if (n < 1)
-		//		croak("Can't find visual %d used by remote context", visual_id);
-		//}
-		//else {
-		//	int attrs[]= { GLX_USE_GL, GLX_RGBA,
-		//		GLX_RED_SIZE, 8, GLX_GREEN_SIZE, 8, GLX_BLUE_SIZE, 8, GLX_ALPHA_SIZE, 8,
-		//		GLX_DOUBLEBUFFER, None
-		//	};
-		//	vis_match= glXChooseVisual(dpy, DefaultScreen(dpy), attrs);
-		//	if (!vis_match)
-		//		croak("glXChooseVisual failed");
-		//	memcpy(&vis_info, vis_match, sizeof(*vis_match));
-		//	XFree(vis_match);
-		//
-		//	cx= glXCreateContext(dpy, &vis_info, NULL, direct);
-		//}
-		//if (!cx)
-		//	croak("glXCreateContext failed");
-		//
-		//cx_id= (get_context_id_fn= (PFNGLXGETCONTEXTIDEXTPROC) glXGetProcAddress("glXGetContextIDEXT"))
-		//	? get_context_id_fn(cx) : 0;
-		//
-		//if (!hv_store(self, "version_major", 13, (s=newSViv(vmajor)), 0)
-		// || !hv_store(self, "version_minor", 13, (s=newSViv(vminor)), 0)
-		// || (extensions &&
-		//	!hv_store(self, "extensions", 10, (s=newSVpv(extensions)), 0))
-		// || !hv_store(self, "visual_info", 11, (s=sv_setref_pvn(newSV(0), "X11::Xlib::XVisualInfo", &vis_info, sizeof(vis_info))), 0)
-		// || (cx_id &&
-		//	!hv_store(self, "context_id", 10, (s=newSViv(cx_id)), 0))
-		// || !hv_store(self, "_ctx", 4, (s=sv_setref_pv(newSV(0), "X11::MinimalOpenGLContext::GLXContext", cx)), 0)
-		//) {
-		//	// hv_store failed, cleanup:
-		//	if (sv_isa(s, "X11::MinimalOpenGLContext::GLXContext"))
-		//		SvPV_set(SvRV(s), NULL); // prevent warning about destroyed pointer
-		//	sv_2mortal(s);
-		//	glXDestroyContext(cx);
-		//	croak("hv_store failed");
-		//}
+		croak("Symbol not avilable on this version of GLX");
 
 BOOT:
 # BEGIN GENERATED BOOT CONSTANTS
   HV* stash= gv_stashpvn("X11::GLX", 8, 1);
+#ifdef GLX_USE_GL
   newCONSTSUB(stash, "GLX_USE_GL", newSViv(GLX_USE_GL));
+#else
+  newXS("X11::GLX::GLX_USE_GL", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BUFFER_SIZE
+  newCONSTSUB(stash, "GLX_BUFFER_SIZE", newSViv(GLX_BUFFER_SIZE));
+#else
+  newXS("X11::GLX::GLX_BUFFER_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_LEVEL
+  newCONSTSUB(stash, "GLX_LEVEL", newSViv(GLX_LEVEL));
+#else
+  newXS("X11::GLX::GLX_LEVEL", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RGBA
   newCONSTSUB(stash, "GLX_RGBA", newSViv(GLX_RGBA));
-  newCONSTSUB(stash, "GLX_RED_SIZE", newSViv(GLX_RED_SIZE));
-  newCONSTSUB(stash, "GLX_GREEN_SIZE", newSViv(GLX_GREEN_SIZE));
-  newCONSTSUB(stash, "GLX_BLUE_SIZE", newSViv(GLX_BLUE_SIZE));
-  newCONSTSUB(stash, "GLX_ALPHA_SIZE", newSViv(GLX_ALPHA_SIZE));
+#else
+  newXS("X11::GLX::GLX_RGBA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_DOUBLEBUFFER
   newCONSTSUB(stash, "GLX_DOUBLEBUFFER", newSViv(GLX_DOUBLEBUFFER));
+#else
+  newXS("X11::GLX::GLX_DOUBLEBUFFER", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_STEREO
+  newCONSTSUB(stash, "GLX_STEREO", newSViv(GLX_STEREO));
+#else
+  newXS("X11::GLX::GLX_STEREO", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX_BUFFERS
+  newCONSTSUB(stash, "GLX_AUX_BUFFERS", newSViv(GLX_AUX_BUFFERS));
+#else
+  newXS("X11::GLX::GLX_AUX_BUFFERS", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RED_SIZE
+  newCONSTSUB(stash, "GLX_RED_SIZE", newSViv(GLX_RED_SIZE));
+#else
+  newXS("X11::GLX::GLX_RED_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_GREEN_SIZE
+  newCONSTSUB(stash, "GLX_GREEN_SIZE", newSViv(GLX_GREEN_SIZE));
+#else
+  newXS("X11::GLX::GLX_GREEN_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BLUE_SIZE
+  newCONSTSUB(stash, "GLX_BLUE_SIZE", newSViv(GLX_BLUE_SIZE));
+#else
+  newXS("X11::GLX::GLX_BLUE_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_ALPHA_SIZE
+  newCONSTSUB(stash, "GLX_ALPHA_SIZE", newSViv(GLX_ALPHA_SIZE));
+#else
+  newXS("X11::GLX::GLX_ALPHA_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_DEPTH_SIZE
+  newCONSTSUB(stash, "GLX_DEPTH_SIZE", newSViv(GLX_DEPTH_SIZE));
+#else
+  newXS("X11::GLX::GLX_DEPTH_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_STENCIL_SIZE
+  newCONSTSUB(stash, "GLX_STENCIL_SIZE", newSViv(GLX_STENCIL_SIZE));
+#else
+  newXS("X11::GLX::GLX_STENCIL_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_ACCUM_RED_SIZE
+  newCONSTSUB(stash, "GLX_ACCUM_RED_SIZE", newSViv(GLX_ACCUM_RED_SIZE));
+#else
+  newXS("X11::GLX::GLX_ACCUM_RED_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_ACCUM_GREEN_SIZE
+  newCONSTSUB(stash, "GLX_ACCUM_GREEN_SIZE", newSViv(GLX_ACCUM_GREEN_SIZE));
+#else
+  newXS("X11::GLX::GLX_ACCUM_GREEN_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_ACCUM_BLUE_SIZE
+  newCONSTSUB(stash, "GLX_ACCUM_BLUE_SIZE", newSViv(GLX_ACCUM_BLUE_SIZE));
+#else
+  newXS("X11::GLX::GLX_ACCUM_BLUE_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_ACCUM_ALPHA_SIZE
+  newCONSTSUB(stash, "GLX_ACCUM_ALPHA_SIZE", newSViv(GLX_ACCUM_ALPHA_SIZE));
+#else
+  newXS("X11::GLX::GLX_ACCUM_ALPHA_SIZE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BAD_SCREEN
+  newCONSTSUB(stash, "GLX_BAD_SCREEN", newSViv(GLX_BAD_SCREEN));
+#else
+  newXS("X11::GLX::GLX_BAD_SCREEN", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BAD_ATTRIBUTE
+  newCONSTSUB(stash, "GLX_BAD_ATTRIBUTE", newSViv(GLX_BAD_ATTRIBUTE));
+#else
+  newXS("X11::GLX::GLX_BAD_ATTRIBUTE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_NO_EXTENSION
+  newCONSTSUB(stash, "GLX_NO_EXTENSION", newSViv(GLX_NO_EXTENSION));
+#else
+  newXS("X11::GLX::GLX_NO_EXTENSION", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BAD_VISUAL
+  newCONSTSUB(stash, "GLX_BAD_VISUAL", newSViv(GLX_BAD_VISUAL));
+#else
+  newXS("X11::GLX::GLX_BAD_VISUAL", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BAD_CONTEXT
+  newCONSTSUB(stash, "GLX_BAD_CONTEXT", newSViv(GLX_BAD_CONTEXT));
+#else
+  newXS("X11::GLX::GLX_BAD_CONTEXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BAD_VALUE
+  newCONSTSUB(stash, "GLX_BAD_VALUE", newSViv(GLX_BAD_VALUE));
+#else
+  newXS("X11::GLX::GLX_BAD_VALUE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BAD_ENUM
+  newCONSTSUB(stash, "GLX_BAD_ENUM", newSViv(GLX_BAD_ENUM));
+#else
+  newXS("X11::GLX::GLX_BAD_ENUM", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_VENDOR
+  newCONSTSUB(stash, "GLX_VENDOR", newSViv(GLX_VENDOR));
+#else
+  newXS("X11::GLX::GLX_VENDOR", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_VERSION
+  newCONSTSUB(stash, "GLX_VERSION", newSViv(GLX_VERSION));
+#else
+  newXS("X11::GLX::GLX_VERSION", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_EXTENSIONS
+  newCONSTSUB(stash, "GLX_EXTENSIONS", newSViv(GLX_EXTENSIONS));
+#else
+  newXS("X11::GLX::GLX_EXTENSIONS", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_CONFIG_CAVEAT
+  newCONSTSUB(stash, "GLX_CONFIG_CAVEAT", newSViv(GLX_CONFIG_CAVEAT));
+#else
+  newXS("X11::GLX::GLX_CONFIG_CAVEAT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_DONT_CARE
+  newCONSTSUB(stash, "GLX_DONT_CARE", newSViv(GLX_DONT_CARE));
+#else
+  newXS("X11::GLX::GLX_DONT_CARE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_X_VISUAL_TYPE
+  newCONSTSUB(stash, "GLX_X_VISUAL_TYPE", newSViv(GLX_X_VISUAL_TYPE));
+#else
+  newXS("X11::GLX::GLX_X_VISUAL_TYPE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRANSPARENT_TYPE
+  newCONSTSUB(stash, "GLX_TRANSPARENT_TYPE", newSViv(GLX_TRANSPARENT_TYPE));
+#else
+  newXS("X11::GLX::GLX_TRANSPARENT_TYPE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRANSPARENT_INDEX_VALUE
+  newCONSTSUB(stash, "GLX_TRANSPARENT_INDEX_VALUE", newSViv(GLX_TRANSPARENT_INDEX_VALUE));
+#else
+  newXS("X11::GLX::GLX_TRANSPARENT_INDEX_VALUE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRANSPARENT_RED_VALUE
+  newCONSTSUB(stash, "GLX_TRANSPARENT_RED_VALUE", newSViv(GLX_TRANSPARENT_RED_VALUE));
+#else
+  newXS("X11::GLX::GLX_TRANSPARENT_RED_VALUE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRANSPARENT_GREEN_VALUE
+  newCONSTSUB(stash, "GLX_TRANSPARENT_GREEN_VALUE", newSViv(GLX_TRANSPARENT_GREEN_VALUE));
+#else
+  newXS("X11::GLX::GLX_TRANSPARENT_GREEN_VALUE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRANSPARENT_BLUE_VALUE
+  newCONSTSUB(stash, "GLX_TRANSPARENT_BLUE_VALUE", newSViv(GLX_TRANSPARENT_BLUE_VALUE));
+#else
+  newXS("X11::GLX::GLX_TRANSPARENT_BLUE_VALUE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRANSPARENT_ALPHA_VALUE
+  newCONSTSUB(stash, "GLX_TRANSPARENT_ALPHA_VALUE", newSViv(GLX_TRANSPARENT_ALPHA_VALUE));
+#else
+  newXS("X11::GLX::GLX_TRANSPARENT_ALPHA_VALUE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_WINDOW_BIT
+  newCONSTSUB(stash, "GLX_WINDOW_BIT", newSViv(GLX_WINDOW_BIT));
+#else
+  newXS("X11::GLX::GLX_WINDOW_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_PIXMAP_BIT
+  newCONSTSUB(stash, "GLX_PIXMAP_BIT", newSViv(GLX_PIXMAP_BIT));
+#else
+  newXS("X11::GLX::GLX_PIXMAP_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_PBUFFER_BIT
+  newCONSTSUB(stash, "GLX_PBUFFER_BIT", newSViv(GLX_PBUFFER_BIT));
+#else
+  newXS("X11::GLX::GLX_PBUFFER_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX_BUFFERS_BIT
+  newCONSTSUB(stash, "GLX_AUX_BUFFERS_BIT", newSViv(GLX_AUX_BUFFERS_BIT));
+#else
+  newXS("X11::GLX::GLX_AUX_BUFFERS_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_FRONT_LEFT_BUFFER_BIT
+  newCONSTSUB(stash, "GLX_FRONT_LEFT_BUFFER_BIT", newSViv(GLX_FRONT_LEFT_BUFFER_BIT));
+#else
+  newXS("X11::GLX::GLX_FRONT_LEFT_BUFFER_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_FRONT_RIGHT_BUFFER_BIT
+  newCONSTSUB(stash, "GLX_FRONT_RIGHT_BUFFER_BIT", newSViv(GLX_FRONT_RIGHT_BUFFER_BIT));
+#else
+  newXS("X11::GLX::GLX_FRONT_RIGHT_BUFFER_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BACK_LEFT_BUFFER_BIT
+  newCONSTSUB(stash, "GLX_BACK_LEFT_BUFFER_BIT", newSViv(GLX_BACK_LEFT_BUFFER_BIT));
+#else
+  newXS("X11::GLX::GLX_BACK_LEFT_BUFFER_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BACK_RIGHT_BUFFER_BIT
+  newCONSTSUB(stash, "GLX_BACK_RIGHT_BUFFER_BIT", newSViv(GLX_BACK_RIGHT_BUFFER_BIT));
+#else
+  newXS("X11::GLX::GLX_BACK_RIGHT_BUFFER_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_DEPTH_BUFFER_BIT
+  newCONSTSUB(stash, "GLX_DEPTH_BUFFER_BIT", newSViv(GLX_DEPTH_BUFFER_BIT));
+#else
+  newXS("X11::GLX::GLX_DEPTH_BUFFER_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_STENCIL_BUFFER_BIT
+  newCONSTSUB(stash, "GLX_STENCIL_BUFFER_BIT", newSViv(GLX_STENCIL_BUFFER_BIT));
+#else
+  newXS("X11::GLX::GLX_STENCIL_BUFFER_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_ACCUM_BUFFER_BIT
+  newCONSTSUB(stash, "GLX_ACCUM_BUFFER_BIT", newSViv(GLX_ACCUM_BUFFER_BIT));
+#else
+  newXS("X11::GLX::GLX_ACCUM_BUFFER_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_NONE
+  newCONSTSUB(stash, "GLX_NONE", newSViv(GLX_NONE));
+#else
+  newXS("X11::GLX::GLX_NONE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_SLOW_CONFIG
+  newCONSTSUB(stash, "GLX_SLOW_CONFIG", newSViv(GLX_SLOW_CONFIG));
+#else
+  newXS("X11::GLX::GLX_SLOW_CONFIG", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRUE_COLOR
+  newCONSTSUB(stash, "GLX_TRUE_COLOR", newSViv(GLX_TRUE_COLOR));
+#else
+  newXS("X11::GLX::GLX_TRUE_COLOR", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_DIRECT_COLOR
+  newCONSTSUB(stash, "GLX_DIRECT_COLOR", newSViv(GLX_DIRECT_COLOR));
+#else
+  newXS("X11::GLX::GLX_DIRECT_COLOR", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_PSEUDO_COLOR
+  newCONSTSUB(stash, "GLX_PSEUDO_COLOR", newSViv(GLX_PSEUDO_COLOR));
+#else
+  newXS("X11::GLX::GLX_PSEUDO_COLOR", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_STATIC_COLOR
+  newCONSTSUB(stash, "GLX_STATIC_COLOR", newSViv(GLX_STATIC_COLOR));
+#else
+  newXS("X11::GLX::GLX_STATIC_COLOR", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_GRAY_SCALE
+  newCONSTSUB(stash, "GLX_GRAY_SCALE", newSViv(GLX_GRAY_SCALE));
+#else
+  newXS("X11::GLX::GLX_GRAY_SCALE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_STATIC_GRAY
+  newCONSTSUB(stash, "GLX_STATIC_GRAY", newSViv(GLX_STATIC_GRAY));
+#else
+  newXS("X11::GLX::GLX_STATIC_GRAY", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRANSPARENT_RGB
+  newCONSTSUB(stash, "GLX_TRANSPARENT_RGB", newSViv(GLX_TRANSPARENT_RGB));
+#else
+  newXS("X11::GLX::GLX_TRANSPARENT_RGB", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TRANSPARENT_INDEX
+  newCONSTSUB(stash, "GLX_TRANSPARENT_INDEX", newSViv(GLX_TRANSPARENT_INDEX));
+#else
+  newXS("X11::GLX::GLX_TRANSPARENT_INDEX", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_VISUAL_ID
+  newCONSTSUB(stash, "GLX_VISUAL_ID", newSViv(GLX_VISUAL_ID));
+#else
+  newXS("X11::GLX::GLX_VISUAL_ID", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_SCREEN
+  newCONSTSUB(stash, "GLX_SCREEN", newSViv(GLX_SCREEN));
+#else
+  newXS("X11::GLX::GLX_SCREEN", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_VISUAL_ID_EXT
   newCONSTSUB(stash, "GLX_VISUAL_ID_EXT", newSViv(GLX_VISUAL_ID_EXT));
+#else
+  newXS("X11::GLX::GLX_VISUAL_ID_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_SCREEN_EXT
   newCONSTSUB(stash, "GLX_SCREEN_EXT", newSViv(GLX_SCREEN_EXT));
+#else
+  newXS("X11::GLX::GLX_SCREEN_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_NON_CONFORMANT_CONFIG
+  newCONSTSUB(stash, "GLX_NON_CONFORMANT_CONFIG", newSViv(GLX_NON_CONFORMANT_CONFIG));
+#else
+  newXS("X11::GLX::GLX_NON_CONFORMANT_CONFIG", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_DRAWABLE_TYPE
+  newCONSTSUB(stash, "GLX_DRAWABLE_TYPE", newSViv(GLX_DRAWABLE_TYPE));
+#else
+  newXS("X11::GLX::GLX_DRAWABLE_TYPE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDER_TYPE
+  newCONSTSUB(stash, "GLX_RENDER_TYPE", newSViv(GLX_RENDER_TYPE));
+#else
+  newXS("X11::GLX::GLX_RENDER_TYPE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_X_RENDERABLE
+  newCONSTSUB(stash, "GLX_X_RENDERABLE", newSViv(GLX_X_RENDERABLE));
+#else
+  newXS("X11::GLX::GLX_X_RENDERABLE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_FBCONFIG_ID
+  newCONSTSUB(stash, "GLX_FBCONFIG_ID", newSViv(GLX_FBCONFIG_ID));
+#else
+  newXS("X11::GLX::GLX_FBCONFIG_ID", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RGBA_TYPE
+  newCONSTSUB(stash, "GLX_RGBA_TYPE", newSViv(GLX_RGBA_TYPE));
+#else
+  newXS("X11::GLX::GLX_RGBA_TYPE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_COLOR_INDEX_TYPE
+  newCONSTSUB(stash, "GLX_COLOR_INDEX_TYPE", newSViv(GLX_COLOR_INDEX_TYPE));
+#else
+  newXS("X11::GLX::GLX_COLOR_INDEX_TYPE", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_MAX_PBUFFER_WIDTH
+  newCONSTSUB(stash, "GLX_MAX_PBUFFER_WIDTH", newSViv(GLX_MAX_PBUFFER_WIDTH));
+#else
+  newXS("X11::GLX::GLX_MAX_PBUFFER_WIDTH", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_MAX_PBUFFER_HEIGHT
+  newCONSTSUB(stash, "GLX_MAX_PBUFFER_HEIGHT", newSViv(GLX_MAX_PBUFFER_HEIGHT));
+#else
+  newXS("X11::GLX::GLX_MAX_PBUFFER_HEIGHT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_MAX_PBUFFER_PIXELS
+  newCONSTSUB(stash, "GLX_MAX_PBUFFER_PIXELS", newSViv(GLX_MAX_PBUFFER_PIXELS));
+#else
+  newXS("X11::GLX::GLX_MAX_PBUFFER_PIXELS", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_PRESERVED_CONTENTS
+  newCONSTSUB(stash, "GLX_PRESERVED_CONTENTS", newSViv(GLX_PRESERVED_CONTENTS));
+#else
+  newXS("X11::GLX::GLX_PRESERVED_CONTENTS", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_LARGEST_PBUFFER
+  newCONSTSUB(stash, "GLX_LARGEST_PBUFFER", newSViv(GLX_LARGEST_PBUFFER));
+#else
+  newXS("X11::GLX::GLX_LARGEST_PBUFFER", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_WIDTH
+  newCONSTSUB(stash, "GLX_WIDTH", newSViv(GLX_WIDTH));
+#else
+  newXS("X11::GLX::GLX_WIDTH", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_HEIGHT
+  newCONSTSUB(stash, "GLX_HEIGHT", newSViv(GLX_HEIGHT));
+#else
+  newXS("X11::GLX::GLX_HEIGHT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_EVENT_MASK
+  newCONSTSUB(stash, "GLX_EVENT_MASK", newSViv(GLX_EVENT_MASK));
+#else
+  newXS("X11::GLX::GLX_EVENT_MASK", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_DAMAGED
+  newCONSTSUB(stash, "GLX_DAMAGED", newSViv(GLX_DAMAGED));
+#else
+  newXS("X11::GLX::GLX_DAMAGED", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_SAVED
+  newCONSTSUB(stash, "GLX_SAVED", newSViv(GLX_SAVED));
+#else
+  newXS("X11::GLX::GLX_SAVED", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_WINDOW
+  newCONSTSUB(stash, "GLX_WINDOW", newSViv(GLX_WINDOW));
+#else
+  newXS("X11::GLX::GLX_WINDOW", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_PBUFFER
+  newCONSTSUB(stash, "GLX_PBUFFER", newSViv(GLX_PBUFFER));
+#else
+  newXS("X11::GLX::GLX_PBUFFER", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_PBUFFER_HEIGHT
+  newCONSTSUB(stash, "GLX_PBUFFER_HEIGHT", newSViv(GLX_PBUFFER_HEIGHT));
+#else
+  newXS("X11::GLX::GLX_PBUFFER_HEIGHT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_PBUFFER_WIDTH
+  newCONSTSUB(stash, "GLX_PBUFFER_WIDTH", newSViv(GLX_PBUFFER_WIDTH));
+#else
+  newXS("X11::GLX::GLX_PBUFFER_WIDTH", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RGBA_BIT
+  newCONSTSUB(stash, "GLX_RGBA_BIT", newSViv(GLX_RGBA_BIT));
+#else
+  newXS("X11::GLX::GLX_RGBA_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_COLOR_INDEX_BIT
+  newCONSTSUB(stash, "GLX_COLOR_INDEX_BIT", newSViv(GLX_COLOR_INDEX_BIT));
+#else
+  newXS("X11::GLX::GLX_COLOR_INDEX_BIT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_PBUFFER_CLOBBER_MASK
+  newCONSTSUB(stash, "GLX_PBUFFER_CLOBBER_MASK", newSViv(GLX_PBUFFER_CLOBBER_MASK));
+#else
+  newXS("X11::GLX::GLX_PBUFFER_CLOBBER_MASK", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_SAMPLE_BUFFERS
+  newCONSTSUB(stash, "GLX_SAMPLE_BUFFERS", newSViv(GLX_SAMPLE_BUFFERS));
+#else
+  newXS("X11::GLX::GLX_SAMPLE_BUFFERS", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_SAMPLES
+  newCONSTSUB(stash, "GLX_SAMPLES", newSViv(GLX_SAMPLES));
+#else
+  newXS("X11::GLX::GLX_SAMPLES", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BIND_TO_TEXTURE_RGB_EXT
+  newCONSTSUB(stash, "GLX_BIND_TO_TEXTURE_RGB_EXT", newSViv(GLX_BIND_TO_TEXTURE_RGB_EXT));
+#else
+  newXS("X11::GLX::GLX_BIND_TO_TEXTURE_RGB_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BIND_TO_TEXTURE_RGBA_EXT
+  newCONSTSUB(stash, "GLX_BIND_TO_TEXTURE_RGBA_EXT", newSViv(GLX_BIND_TO_TEXTURE_RGBA_EXT));
+#else
+  newXS("X11::GLX::GLX_BIND_TO_TEXTURE_RGBA_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BIND_TO_MIPMAP_TEXTURE_EXT
+  newCONSTSUB(stash, "GLX_BIND_TO_MIPMAP_TEXTURE_EXT", newSViv(GLX_BIND_TO_MIPMAP_TEXTURE_EXT));
+#else
+  newXS("X11::GLX::GLX_BIND_TO_MIPMAP_TEXTURE_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BIND_TO_TEXTURE_TARGETS_EXT
+  newCONSTSUB(stash, "GLX_BIND_TO_TEXTURE_TARGETS_EXT", newSViv(GLX_BIND_TO_TEXTURE_TARGETS_EXT));
+#else
+  newXS("X11::GLX::GLX_BIND_TO_TEXTURE_TARGETS_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_Y_INVERTED_EXT
+  newCONSTSUB(stash, "GLX_Y_INVERTED_EXT", newSViv(GLX_Y_INVERTED_EXT));
+#else
+  newXS("X11::GLX::GLX_Y_INVERTED_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_FORMAT_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_FORMAT_EXT", newSViv(GLX_TEXTURE_FORMAT_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_FORMAT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_TARGET_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_TARGET_EXT", newSViv(GLX_TEXTURE_TARGET_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_TARGET_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_MIPMAP_TEXTURE_EXT
+  newCONSTSUB(stash, "GLX_MIPMAP_TEXTURE_EXT", newSViv(GLX_MIPMAP_TEXTURE_EXT));
+#else
+  newXS("X11::GLX::GLX_MIPMAP_TEXTURE_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_FORMAT_NONE_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_FORMAT_NONE_EXT", newSViv(GLX_TEXTURE_FORMAT_NONE_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_FORMAT_NONE_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_FORMAT_RGB_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_FORMAT_RGB_EXT", newSViv(GLX_TEXTURE_FORMAT_RGB_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_FORMAT_RGB_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_FORMAT_RGBA_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_FORMAT_RGBA_EXT", newSViv(GLX_TEXTURE_FORMAT_RGBA_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_FORMAT_RGBA_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_1D_BIT_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_1D_BIT_EXT", newSViv(GLX_TEXTURE_1D_BIT_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_1D_BIT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_2D_BIT_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_2D_BIT_EXT", newSViv(GLX_TEXTURE_2D_BIT_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_2D_BIT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_RECTANGLE_BIT_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_RECTANGLE_BIT_EXT", newSViv(GLX_TEXTURE_RECTANGLE_BIT_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_RECTANGLE_BIT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_1D_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_1D_EXT", newSViv(GLX_TEXTURE_1D_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_1D_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_2D_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_2D_EXT", newSViv(GLX_TEXTURE_2D_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_2D_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_TEXTURE_RECTANGLE_EXT
+  newCONSTSUB(stash, "GLX_TEXTURE_RECTANGLE_EXT", newSViv(GLX_TEXTURE_RECTANGLE_EXT));
+#else
+  newXS("X11::GLX::GLX_TEXTURE_RECTANGLE_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_FRONT_LEFT_EXT
+  newCONSTSUB(stash, "GLX_FRONT_LEFT_EXT", newSViv(GLX_FRONT_LEFT_EXT));
+#else
+  newXS("X11::GLX::GLX_FRONT_LEFT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_FRONT_RIGHT_EXT
+  newCONSTSUB(stash, "GLX_FRONT_RIGHT_EXT", newSViv(GLX_FRONT_RIGHT_EXT));
+#else
+  newXS("X11::GLX::GLX_FRONT_RIGHT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BACK_LEFT_EXT
+  newCONSTSUB(stash, "GLX_BACK_LEFT_EXT", newSViv(GLX_BACK_LEFT_EXT));
+#else
+  newXS("X11::GLX::GLX_BACK_LEFT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BACK_RIGHT_EXT
+  newCONSTSUB(stash, "GLX_BACK_RIGHT_EXT", newSViv(GLX_BACK_RIGHT_EXT));
+#else
+  newXS("X11::GLX::GLX_BACK_RIGHT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_FRONT_EXT
+  newCONSTSUB(stash, "GLX_FRONT_EXT", newSViv(GLX_FRONT_EXT));
+#else
+  newXS("X11::GLX::GLX_FRONT_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_BACK_EXT
+  newCONSTSUB(stash, "GLX_BACK_EXT", newSViv(GLX_BACK_EXT));
+#else
+  newXS("X11::GLX::GLX_BACK_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX0_EXT
+  newCONSTSUB(stash, "GLX_AUX0_EXT", newSViv(GLX_AUX0_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX0_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX1_EXT
+  newCONSTSUB(stash, "GLX_AUX1_EXT", newSViv(GLX_AUX1_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX1_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX2_EXT
+  newCONSTSUB(stash, "GLX_AUX2_EXT", newSViv(GLX_AUX2_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX2_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX3_EXT
+  newCONSTSUB(stash, "GLX_AUX3_EXT", newSViv(GLX_AUX3_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX3_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX4_EXT
+  newCONSTSUB(stash, "GLX_AUX4_EXT", newSViv(GLX_AUX4_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX4_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX5_EXT
+  newCONSTSUB(stash, "GLX_AUX5_EXT", newSViv(GLX_AUX5_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX5_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX6_EXT
+  newCONSTSUB(stash, "GLX_AUX6_EXT", newSViv(GLX_AUX6_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX6_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX7_EXT
+  newCONSTSUB(stash, "GLX_AUX7_EXT", newSViv(GLX_AUX7_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX7_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX8_EXT
+  newCONSTSUB(stash, "GLX_AUX8_EXT", newSViv(GLX_AUX8_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX8_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_AUX9_EXT
+  newCONSTSUB(stash, "GLX_AUX9_EXT", newSViv(GLX_AUX9_EXT));
+#else
+  newXS("X11::GLX::GLX_AUX9_EXT", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_VENDOR_ID_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_VENDOR_ID_MESA", newSViv(GLX_RENDERER_VENDOR_ID_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_VENDOR_ID_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_DEVICE_ID_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_DEVICE_ID_MESA", newSViv(GLX_RENDERER_DEVICE_ID_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_DEVICE_ID_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_VERSION_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_VERSION_MESA", newSViv(GLX_RENDERER_VERSION_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_VERSION_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_ACCELERATED_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_ACCELERATED_MESA", newSViv(GLX_RENDERER_ACCELERATED_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_ACCELERATED_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_VIDEO_MEMORY_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_VIDEO_MEMORY_MESA", newSViv(GLX_RENDERER_VIDEO_MEMORY_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_VIDEO_MEMORY_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_UNIFIED_MEMORY_ARCHITECTURE_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_UNIFIED_MEMORY_ARCHITECTURE_MESA", newSViv(GLX_RENDERER_UNIFIED_MEMORY_ARCHITECTURE_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_UNIFIED_MEMORY_ARCHITECTURE_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_PREFERRED_PROFILE_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_PREFERRED_PROFILE_MESA", newSViv(GLX_RENDERER_PREFERRED_PROFILE_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_PREFERRED_PROFILE_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_OPENGL_CORE_PROFILE_VERSION_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_OPENGL_CORE_PROFILE_VERSION_MESA", newSViv(GLX_RENDERER_OPENGL_CORE_PROFILE_VERSION_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_OPENGL_CORE_PROFILE_VERSION_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_OPENGL_COMPATIBILITY_PROFILE_VERSION_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_OPENGL_COMPATIBILITY_PROFILE_VERSION_MESA", newSViv(GLX_RENDERER_OPENGL_COMPATIBILITY_PROFILE_VERSION_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_OPENGL_COMPATIBILITY_PROFILE_VERSION_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_OPENGL_ES_PROFILE_VERSION_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_OPENGL_ES_PROFILE_VERSION_MESA", newSViv(GLX_RENDERER_OPENGL_ES_PROFILE_VERSION_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_OPENGL_ES_PROFILE_VERSION_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_OPENGL_ES2_PROFILE_VERSION_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_OPENGL_ES2_PROFILE_VERSION_MESA", newSViv(GLX_RENDERER_OPENGL_ES2_PROFILE_VERSION_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_OPENGL_ES2_PROFILE_VERSION_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_RENDERER_ID_MESA
+  newCONSTSUB(stash, "GLX_RENDERER_ID_MESA", newSViv(GLX_RENDERER_ID_MESA));
+#else
+  newXS("X11::GLX::GLX_RENDERER_ID_MESA", XS_X11__GLX__const_unavailable, file);
+#endif
+#ifdef GLX_FLOAT_COMPONENTS_NV
+  newCONSTSUB(stash, "GLX_FLOAT_COMPONENTS_NV", newSViv(GLX_FLOAT_COMPONENTS_NV));
+#else
+  newXS("X11::GLX::GLX_FLOAT_COMPONENTS_NV", XS_X11__GLX__const_unavailable, file);
+#endif
 # END GENERATED BOOT CONSTANTS
 # ----------------------------------------------------------------------------

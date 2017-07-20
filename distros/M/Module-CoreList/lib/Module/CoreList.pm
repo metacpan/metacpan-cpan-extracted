@@ -3,7 +3,7 @@ use strict;
 use vars qw/$VERSION %released %version %families %upstream
 	    %bug_tracker %deprecated %delta/;
 use version;
-$VERSION = '5.20170621';
+$VERSION = '5.20170715';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -316,6 +316,8 @@ sub changes_between {
     5.026000 => '2017-05-30',
     5.027000 => '2017-05-31',
     5.027001 => '2017-06-20',
+    5.022004 => '2017-07-15',
+    5.024002 => '2017-07-15',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -14111,9 +14113,9 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'B::Deparse'            => '1.41',
             'B::Op_private'         => '5.027000',
             'Config'                => '5.027',
-            'Module::CoreList'      => '5.20170620',
-            'Module::CoreList::TieHashDelta'=> '5.20170620',
-            'Module::CoreList::Utils'=> '5.20170620',
+            'Module::CoreList'      => '5.20170531',
+            'Module::CoreList::TieHashDelta'=> '5.20170531',
+            'Module::CoreList::Utils'=> '5.20170531',
             'O'                     => '1.02',
             'attributes'            => '0.3',
             'feature'               => '1.48',
@@ -14263,6 +14265,32 @@ for my $version ( sort { $a <=> $b } keys %released ) {
             'threads::shared'       => '1.57',
             'version'               => '0.9918',
             'version::regex'        => '0.9918',
+        },
+        removed => {
+        }
+    },
+    5.022004 => {
+        delta_from => 5.022003,
+        changed => {
+            'B::Op_private'         => '5.022004',
+            'Config'                => '5.022004',
+            'Module::CoreList'      => '5.20170715_22',
+            'Module::CoreList::TieHashDelta'=> '5.20170715_22',
+            'Module::CoreList::Utils'=> '5.20170715_22',
+            'base'                  => '2.22_01',
+        },
+        removed => {
+        }
+    },
+    5.024002 => {
+        delta_from => 5.024001,
+        changed => {
+            'B::Op_private'         => '5.024002',
+            'Config'                => '5.024002',
+            'Module::CoreList'      => '5.20170715_24',
+            'Module::CoreList::TieHashDelta'=> '5.20170715_24',
+            'Module::CoreList::Utils'=> '5.20170715_24',
+            'base'                  => '2.23_01',
         },
         removed => {
         }
@@ -15033,6 +15061,20 @@ sub is_core
     },
     5.027001 => {
         delta_from => 5.027,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.022004 => {
+        delta_from => 5.022003,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.024002 => {
+        delta_from => 5.024001,
         changed => {
         },
         removed => {

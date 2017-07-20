@@ -1,4 +1,4 @@
-Locale-TextDomain-OO-Util version 3.006
+Locale-TextDomain-OO-Util version 3.008
 =======================================
 
 Utils for Perl OO Interface to Uniforum Message Translation
@@ -17,7 +17,6 @@ DEPENDENCIES
 This module requires these other modules and libraries:
 
     Carp
-    Clone
     English
     Safe
     charnames

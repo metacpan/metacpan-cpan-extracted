@@ -1,7 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:  rmp
+# Author: rmp
 # Created: 2007-03-28
 #
 package ClearPress::view;
@@ -15,15 +15,17 @@ use Carp;
 use English qw(-no_match_vars);
 use POSIX qw(strftime);
 use HTML::Entities qw(encode_entities_numeric);
+use HTTP::Headers;
+use HTTP::Status qw(:constants);
 use XML::Simple qw(XMLin);
 use utf8;
 use ClearPress::Localize;
 use MIME::Base64 qw(encode_base64);
-use HTTP::Status qw(:constants);
 use JSON;
 use Readonly;
 
-our $VERSION = q[475.3.3];
+our $VERSION = q[476.1.1];
+
 our $DEBUG_OUTPUT   = 0;
 our $DEBUG_L10N     = 0;
 our $TEMPLATE_CACHE = {};
@@ -66,6 +68,7 @@ sub new { ## no critic (Complexity)
   $self->{content_type} ||= 'text/html';
 
   $self->{charset}      ||= 'UTF-8';
+  $self->{headers}      ||= HTTP::Headers->new;
 
   return $self;
 }
@@ -262,7 +265,7 @@ sub method_name {
 }
 
 sub streamed_aspects {
-  return [];
+  return [qw(options)];
 }
 
 sub streamed {
@@ -310,12 +313,13 @@ sub render {
   # Figure out and call the appropriate action if available
   #
   my $method = $self->method_name;
-  if($method !~ /^(?:add|edit|create|read|update|delete|list)/smx) {
+  if($method !~ /^(?:add|edit|create|read|update|delete|list|options)/smx) {
     croak qq[Illegal method: $method];
   }
 
   if($self->can($method)) {
-    if($aspect =~ /_(?:jpg|png|gif|svg|svgz)/smx) {
+    if($aspect eq 'options' ||
+       $aspect =~ /_(?:jpg|png|gif|svg|svgz)/smx) {
       return $self->$method();
     }
 
@@ -545,6 +549,10 @@ sub add {
 sub edit {
   my $self = shift;
   return $self->_populate_from_cgi;
+}
+
+sub options {
+  return 1;
 }
 
 sub list {
@@ -1037,6 +1045,12 @@ e.g.
 =head2 delete_csv - default passthrough to delete for csv service
 
 =head2 init - post-constructor initialisation hook for subclasses
+
+=head2 headers - an HTTP::Headers object for responses
+
+  my $oHeaders = $oView->headers;
+
+  $oView->headers->header('Status', 500); # usually symbolic named values from HTTP::Status
 
 =head2 process_template - process a template with standard parameters
 

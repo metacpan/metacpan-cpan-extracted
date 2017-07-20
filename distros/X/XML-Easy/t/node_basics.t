@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use Params::Classify qw(is_ref);
 use t::DataSets (map { ("COUNT_$_", "foreach_$_") } qw(
 	yes_name

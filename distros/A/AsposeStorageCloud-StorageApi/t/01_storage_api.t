@@ -18,19 +18,19 @@ use_ok('AsposeStorageCloud::Configuration');
 use_ok('AsposeStorageCloud::ApiClient');
 use_ok('AsposeStorageCloud::StorageApi');
 
-$AsposeStorageCloud::Configuration::app_sid = 'XXX';
-$AsposeStorageCloud::Configuration::api_key = 'XXX';
+$AsposeStorageCloud::Configuration::app_sid = 'xxxx';
+$AsposeStorageCloud::Configuration::api_key = 'xxxx';
 
-if(not defined $AsposeStorageCloud::Configuration::app_sid or $AsposeStorageCloud::Configuration::app_sid =~ /^XXX/i){
+if(not defined $AsposeStorageCloud::Configuration::app_sid or $AsposeStorageCloud::Configuration::app_sid =~ /^xxxx/i){
 		done_testing();
     	exit;
   }
     
-if (not defined $AsposeStorageCloud::Configuration::api_key or $AsposeStorageCloud::Configuration::api_key =~ /^XXX/i){
+if (not defined $AsposeStorageCloud::Configuration::api_key or $AsposeStorageCloud::Configuration::api_key =~ /^xxxx/i){
 	done_testing();
     exit;
 }
-my $data_path = './data/';
+my $data_path = '../../../Data/';
 
 if (not -d $data_path){
 	done_testing();
@@ -39,6 +39,13 @@ if (not -d $data_path){
 
 $AsposeStorageCloud::Configuration::debug = 1;
 my $storageApi = AsposeStorageCloud::StorageApi->new();
+
+subtest 'testPutCreate' => sub {
+ 	my $response = $storageApi->PutCreate(Path => 'SampleWordDocument.docx', file => $data_path.'SampleWordDocument.docx');
+ 	isa_ok($response, 'AsposeStorageCloud::Object::ResponseMessage');
+ 	is($response->{'Status'}, "OK"); 
+};
+	
 
 subtest 'testGetDiscUsage' => sub {
  	my $response = $storageApi->GetDiscUsage();
@@ -59,12 +66,6 @@ subtest 'testPutCopy' => sub {
  	is($response->{'Status'}, "OK"); 
 };
 
-subtest 'testPutCreate' => sub {
- 	my $response = $storageApi->PutCreate(Path => 'SampleWordDocument.docx', file => $data_path.'SampleWordDocument.docx');
- 	isa_ok($response, 'AsposeStorageCloud::Object::ResponseMessage');
- 	is($response->{'Status'}, "OK"); 
-};
-	
 subtest 'testGetDownload' => sub {
 	my $response = $storageApi->PutCreate(Path => 'SampleWordDocument.docx', file => $data_path.'SampleWordDocument.docx');
 	$response = $storageApi->GetDownload(Path => 'SampleWordDocument.docx');
@@ -143,5 +144,6 @@ subtest 'testGetIsStorageExist' => sub {
  	isa_ok($response, 'AsposeStorageCloud::Object::StorageExistResponse');
  	is($response->{'Status'}, "OK"); 
 };
+
 	
 done_testing();

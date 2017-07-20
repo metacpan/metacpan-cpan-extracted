@@ -25,14 +25,17 @@ BEGIN {
 
 use POE qw(Component::Client::Ping);
 
-use Test::More tests => 2;
+use Test::More tests => 6;
+my $retries = 5;
 
 POE::Component::Client::Ping->spawn(
   Alias               => "pingthing",  # defaults to "pinger"
-  Retry               => 2,            # defaults to 1 attempt
+  Retry               => $retries,     # defaults to 1 attempt
   Parallelism         => 64,           # defaults to autodetect
   BufferSize          => 65536,        # defaults to undef
 );
+
+my $count = 0;
 
 POE::Session->create(
   inline_states => {
@@ -44,9 +47,11 @@ POE::Session->create(
       my $round_trip = $rsp->[1];
       return unless defined $round_trip; # final timeout
       ok( $round_trip < 1, "response time not affected by timeout" );
+      $count++;
     },
   },
 );
 
 POE::Kernel->run();
+is( $count, $retries, "$retries retries ok");
 exit;

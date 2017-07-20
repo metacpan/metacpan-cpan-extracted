@@ -46,7 +46,7 @@ FORK INFO
     not related to these changes should be reported directly to the
     Mojolicious issue tracker.
 
-    This release of Mojo::DOM58 is up to date with version 7.29 of
+    This release of Mojo::DOM58 is up to date with version 7.36 of
     Mojolicious.
 
 NODES AND ELEMENTS
@@ -93,15 +93,15 @@ CASE-SENSITIVITY
       my $dom = Mojo::DOM58->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
       say $dom->at('P[ID]')->text;
 
-    XML detection can also be disabled with the "xml" method.
+    HTML or XML semantics can also be forced with the "xml" method.
 
-      # Force XML semantics
-      my $dom = Mojo::DOM58->new->xml(1)->parse('<P ID="greeting">Hi!</P>');
-      say $dom->at('P[ID]')->text;
-    
       # Force HTML semantics
       my $dom = Mojo::DOM58->new->xml(0)->parse('<P ID="greeting">Hi!</P>');
       say $dom->at('p[id]')->text;
+    
+      # Force XML semantics
+      my $dom = Mojo::DOM58->new->xml(1)->parse('<P ID="greeting">Hi!</P>');
+      say $dom->at('P[ID]')->text;
 
 SELECTORS
 
@@ -283,11 +283,29 @@ SELECTORS
 
         my $foo = $dom->at('div#foo');
 
-    E:not(s)
+    E:not(s1, s2)
 
-      An E element that does not match simple selector s.
+      An E element that does not match either compound selector s1 or
+      compound selector s2. Note that support for compound selectors is
+      EXPERIMENTAL and might change without warning!
 
-        my $others = $dom->find('div p:not(:first-child)');
+        my $others = $dom->find('div p:not(:first-child, :last-child)');
+
+      Support for compound selectors was added as part of Selectors Level 4
+      <http://dev.w3.org/csswg/selectors-4>, which is still a work in
+      progress.
+
+    E:matches(s1, s2)
+
+      An E element that matches compound selector s1 and/or compound
+      selector s2. Note that this selector is EXPERIMENTAL and might change
+      without warning!
+
+        my $headers = $dom->find(':matches(section, article, aside, nav) h1');
+
+      This selector is part of Selectors Level 4
+      <http://dev.w3.org/csswg/selectors-4>, which is still a work in
+      progress.
 
     E F
 

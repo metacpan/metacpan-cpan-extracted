@@ -64,4 +64,4 @@ ok $dbh->do("DROP TABLE $table");
 
 ok $dbh->disconnect();
 #error
-$insert_id = $dbh->last_insert_id(undef, undef, $table, undef);
+#$insert_id = $dbh->last_insert_id(undef, undef, $table, undef);

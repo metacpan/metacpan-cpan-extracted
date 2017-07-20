@@ -93,7 +93,7 @@ sub warnhook { &$WARNHOOK }
 use XSLoader;
 
 BEGIN {
-   our $VERSION = 6.511;
+   our $VERSION = 6.513;
 
    # must be done here because the xs part expects it to exist
    # it might exist already because Coro::Specific created it.
@@ -178,7 +178,7 @@ program, but due to libc bugs on many BSDs, this doesn't work reliable
 everywhere.
 
 If the coderef is omitted this function will create a new "empty"
-thread, i.e. a thread that cannot be transfered to but can be used
+thread, i.e. a thread that cannot be transferred to but can be used
 to save the current thread state in (note that this is dangerous, as no
 reference is taken to ensure that the "current thread state" survives,
 the caller is responsible to ensure that the cloned state does not go
@@ -247,7 +247,7 @@ See the corresponding method(s) for L<Coro> objects.
 
 Forcefully destructs the given Coro::State. While you can keep the
 reference, and some memory is still allocated, the Coro::State object is
-effectively dead, destructors have been freed, it cannot be transfered to
+effectively dead, destructors have been freed, it cannot be transferred to
 anymore, it's pushing up the daisies.
 
 =item $state->call ($coderef)
@@ -321,9 +321,9 @@ it's the variables that they point to that count). For example, the
 following sequence will remove the swap of C<$x> and C<$y>, while keeping
 the swap of C<$x> and C<$z>:
 
-   $coro->swap-sv (\$x, \$y);
-   $coro->swap-sv (\$x, \$z);
-   $coro->swap-sv (\$x, \$y);
+   $coro->swap_sv (\$x, \$y);
+   $coro->swap_sv (\$x, \$z);
+   $coro->swap_sv (\$x, \$y);
 
 =item $bytes = $state->rss
 
@@ -346,7 +346,7 @@ away from abusing it.
 
 =head3 METHODS FOR C CONTEXTS
 
-Most coros only consist of some Perl data structures - transfering to a
+Most coros only consist of some Perl data structures - transferring to a
 coro just reconfigures the interpreter to continue somewhere else.
 
 However. this is not always possible: For example, when Perl calls a C/XS function

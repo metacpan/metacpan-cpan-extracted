@@ -10,7 +10,7 @@ use POE qw(
 );
 use Sys::Hostname;
 
-our $VERSION = '2.0';
+our $VERSION = '2.2';
 
 my @_STREAM_NAMES = qw(subscribers match debug full regex);
 my %_STREAM_ASSISTERS = (
@@ -21,15 +21,15 @@ my %_STREAM_ASSISTERS = (
 
 # Precompiled Regular Expressions
 my %_PRE = (
-    program => qr/\d{1,2}:\d{1,2}:\d{1,2}(?:\.\d{3,})?(?:\+\d{1,2}:\d{1,2})?\s+\S+\s+([^:\s]+)(:|\s)/,
+    program => qr/(?>[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}(?:\.[0-9]{3,})?(?:\+[0-9]{1,2}:[0-9]{1,2})?\s+\S+\s+([^:\s]+)(:|\s))/,
 );
 
 sub _benchmark_regex {
     eval {
-        require Benchmark;
+        require Dumbbench;
     };
     if( $@ ) {
-        warn "unable to load Benchmark.pm: $@";
+        warn "unable to load Dumbbench.pm: $@";
         return;
     }
     my @msgs = (
@@ -43,16 +43,24 @@ sub _benchmark_regex {
     );
     my %tests = ();
     my %misses = ();
+    my $bench = Dumbbench->new(initial_runs => 10_000);
+
     foreach my $re (keys %_PRE) {
-       $tests{$re} = sub {
-            for (@msgs) {
-                if( $_ !~ /$_PRE{$re}/ ) {
-                    $misses{"$re | $_"}=1;
-                }
-            }
-        };
+        $bench->add_instances(
+            Dumbbench::Instance::PerlSub->new(
+                name => $re,
+                code => sub {
+                        for (@msgs) {
+                        if( $_ !~ /$_PRE{$re}/ ) {
+                            $misses{"$re | $_"}=1;
+                        }
+                    }
+                },
+            ),
+        );
     }
-    Benchmark::cmpthese(500_000, \%tests);
+    $bench->run();
+    print $bench->report();
     if( keys %misses ) {
         print "\nREGEX MISSES:\n\n";
         print "  $_\n" for sort keys %misses;
@@ -170,11 +178,11 @@ sub graphite_connect {
 
     # Build the Graphite Handler
     $heap->{_graphite} = POE::Component::Client::TCP->new(
-        Alias => 'graphite',
-        RemoteHost => $heap->{config}{GraphiteHost},
-        RemotePort => $heap->{config}{GraphitePort},
+        Alias          => 'graphite',
+        RemoteAddress  => $heap->{config}{GraphiteHost},
+        RemotePort     => $heap->{config}{GraphitePort},
         ConnectTimeout => 5,
-        Connected => sub {
+        Connected      => sub {
             # let the parent know we're able to write
             $heap->{graphite} = 1;
         },
@@ -194,6 +202,11 @@ sub graphite_connect {
             send => sub {
                 $_[HEAP]->{server}->put($_[ARG0]);
             },
+        },
+        ServerInput => sub {
+            # Shouldn't get any
+            $_[HEAP]->{stats}{graphite_feedback} ||= 0;
+            $_[HEAP]->{stats}{graphite_feedback}++;
         },
         ServerError => sub {
             $_[KERNEL]->yield( 'reconnect' );
@@ -259,17 +272,19 @@ sub _dispatch_messages {
         $heap->{stats}{received_bytes} += length $msg;
 
         # Program based subscriptions
-        if( my ($program) = map { lc } ($msg =~ /$_PRE{program}/o) ) {
-            # remove the sub process and PID from the program
-            $program =~ s/\(.*//g;
-            $program =~ s/\[.*//g;
+        if( keys %{ $heap->{subscribers} } ) {
+            if( my ($program) = map { lc } ($msg =~ /$_PRE{program}/o) ) {
+                # remove the sub process and PID from the program
+                $program =~ s/\(.*//g;
+                $program =~ s/\[.*//g;
 
-            if( exists $heap->{programs}{$program} && $heap->{programs}{$program} > 0 ) {
-                foreach my $sid (keys %{ $heap->{subscribers} }) {
-                    next unless exists $heap->{subscribers}{$sid}{$program};
-                    push @{ $heap->{buffers}{$sid} }, $msg;
-                    $dispatched++;
-                    $bytes += length $msg;
+                if( exists $heap->{programs}{$program} && $heap->{programs}{$program} > 0 ) {
+                    foreach my $sid (keys %{ $heap->{subscribers} }) {
+                        next unless exists $heap->{subscribers}{$sid}{$program};
+                        push @{ $heap->{buffers}{$sid} }, $msg;
+                        $dispatched++;
+                        $bytes += length $msg;
+                    }
                 }
             }
         }
@@ -806,7 +821,7 @@ POE::Component::Server::eris - POE eris message dispatcher
 
 =head1 VERSION
 
-version 2.0
+version 2.2
 
 =head1 SYNOPSIS
 

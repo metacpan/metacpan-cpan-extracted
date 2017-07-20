@@ -35,7 +35,7 @@ use strict;
 
 use Digest::CRC 0.14 qw(crc32);
 
-our $VERSION = "2.006";
+our $VERSION = "2.007";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -420,7 +420,7 @@ Copyright (C) 2002 Jean-loup Gailly <http://gailly.net>
 Based in part on code from John the Ripper, Copyright (C) 1996-2002
 Solar Designer
 
-Copyright (C) 2006, 2007, 2009, 2010, 2011
+Copyright (C) 2006, 2007, 2009, 2010, 2011, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

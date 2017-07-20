@@ -13,9 +13,9 @@
 #                    <code>false</code>, no service setup will be attempted.
 #
 class [% name %] (
-    $ensure  = hiera('[% name %]::ensure', 'present'),
-    $package = hiera('[% name %]::package', $[% name %]::params::package),
-    $service = hiera('[% name %]::service', $[% name %]::params::service),
+    $ensure  = 'present',
+    $package = $[% name %]::params::package,
+    $service = $[% name %]::params::service,
 ) inherits ::[% name %]::params {
     class {
         '::[% name %]::install':

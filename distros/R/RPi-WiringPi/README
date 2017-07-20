@@ -1,236 +1,268 @@
 NAME
+
     RPi::WiringPi - Perl interface to Raspberry Pi's board, GPIO, LCDs and
     other various items
 
 SYNOPSIS
+
         use RPi::WiringPi;
         use RPi::WiringPi::Constant qw(:all);
-
+    
         my $pi = RPi::WiringPi->new;
-
+    
         #
         # pin
         #
-
+    
         my $pin = $pi->pin(5);
         $pin->mode(OUTPUT);
         $pin->write(ON);
-
+    
         my $num = $pin->num;
         my $mode = $pin->mode;
         my $state = $pin->read;
-
+    
         #
         # analog to digital converter (ADS1115)
         #
-
+    
         my $adc = $pi->adc;
-   
+       
         # read channel A0 on the ADC
-
+    
         my $v = $adc->volts(0);
         my $p = $adc->percent(0);
-
+    
         # analog to digital converter (MCP3008)
-
+    
         my $adc = $pi->adc(model => 'MCP3008', channel => 0);
-
+    
         print $adc->raw(0);
         print $adc->percent(0);
-
+    
         #
         # I2C
         #
-
+    
         my $device_addr = 0x7c;
-
+    
         my $i2c_device = $pi->i2c($device_addr);
-
+    
         my $register = 0x0A;
-
+    
         $i2c_device->write_block([55, 29, 255], $register);
-
+    
         my $byte = $i2c_device->read;
-
+    
         my @bytes = $i2c_device->read_block;
-
+    
         #
         # SPI
         #
-
+    
         my $channel = 0; # SPI channel /dev/spidev0.0
-
+    
         my $spi = $pi->spi($channel);
-
+    
         my $buf = [0x01, 0x02];
         my $len = scalar @$buf;
-
+    
         my @read_bytes = $spi->rw($buf, $len);
-
+    
         #
         # Serial
         #
-
+    
         my $dev  = "/dev/ttyAMA0";
         my $baud = 115200;
-
+    
         my $ser = $pi->serial($dev, $baud);
-
+    
         $ser->putc(5);
-
+    
         my $char = $ser->getc;
-
+    
         $ser->puts("hello, world!");
-
+    
         my $num_bytes = 12;
         my $str  = $ser->gets($num_bytes);
-
+    
         $ser->flush;
-
+    
         my $bytes_available = $ser->avail;
-
+    
         #
         # digital to analog converter (DAC)
         #
-
+    
         my $dac_cs_pin = $pi->pin(29);
         my $spi_chan = 0;
-
+    
         my $dac = $pi->dac(
             model   => 'MCP4922',
             channel => $spi_chan,
             cs      => $dac_cs_pin
         );
-
+    
         my ($dacA, $dacB) = (0, 0);
-
+    
         $dac->set($dacA, 4095); # 100% output
         $dac->set($dacB, 0);    # 0% output
-
+    
         #
         # digital potentiometer
         #
-
+    
         my $cs = 18;     # GPIO pin connected to dpot CS pin
         my $channel = 0; # SPI channel /dev/spidev0.0
-
+    
         my $dpot = $pi->dpot($cs, $channel);
-
+    
         # set to 50% output
-
+    
         $dpot->set(127);
-
+    
         # shutdown (sleep) the potentiometer
-
+    
         $dpot->shutdown;
-
+    
         #
         # shift register
         #
-    
+        
         my ($base, $num_pins, $data, $clk, $latch)
           = (100, 8, 5, 6, 13);
-
+    
         $pi->shift_register(
             $base, $num_pins, $data, $clk, $latch
         );
-
+    
         # now we can access the new 8 pins of the
         # register commencing at new pin 100-107
-
+    
         for (100..107){
             my $pin = $pi->pin($_);
             $pin->write(HIGH);
         }
-
+    
         #
         # BMP180 barometric pressure sensor
         #
-    
+        
         my $base = 300; 
-
+    
         my $bmp = $pi->bmp($base);
-
+    
         my $farenheit = $bmp->temp;
         my $celcius   = $bmp->temp('c');
         my $pressure  = $bmp->pressure; # kPa
-
+    
         #
         # DHT11 temperature/humidity sensor
         #
-
+    
         my $sensor_pin = 21;
-
+    
         my $env = $pi->hygrometer($sensor_pin);
-
+    
         my $humidity  = $env->humidity;
         my $temp      = $env->temp; # celcius
         my $farenheit = $env->temp('f');
-
+    
         # GPS (requires gpsd to be installed and running)
-
+    
         my $gps = $pi->gps;
-
+    
         print $gps->tpv('lat')   . "\n";
         print $gps->tpv('lon')   . "\n";
         print $gps->tpv('speed') . "\n";
         print $gps->direction    . "\n";
-
+    
         #
         # LCD
         #
-
-        my $lcd = $pi->lcd(...);
-
-        # first column, first row
     
+        my $lcd = $pi->lcd(...);
+    
+        # first column, first row
+        
         $lcd->position(0, 0); 
         $lcd->print("hi there!");
-
-        # first column, second row
     
+        # first column, second row
+        
         $lcd->position(0, 1);
         $lcd->print("pin $num... mode: $mode, state: $state");
-
+    
         $lcd->clear;
         $lcd->display(OFF);
-
+    
         $pi->cleanup;
+    
+        #
+        # ultrasonic distance sensor
+        #
+    
+        my $trig_pin = 23;
+        my $echo_pin = 24;
+    
+        my $ruler = $pi->hcsr04($trig_pin, $echo_pin);
+    
+        my $inches = $sensor->inch;
+        my $cm     = $sensor->cm;
+        my $raw    = $sensor->raw;
+    
+        #
+        # servo
+        #
+    
+        my $pin_num = 18;
+    
+        my $servo = $pi->servo($pin_num);
+    
+        $servo->pwm(150); # centre position
+        $servo->pwm(50);  # left position
+        $servo->pwm(250); # right position
 
 DESCRIPTION
-    This is the root module for the `RPi::WiringPi' system. It interfaces to
-    a Raspberry Pi board, its accessories and its GPIO pins via the wiringPi
-    library through the Perl wrapper WiringPi::API module, and various other
-    custom device specific modules.
 
-    wiringPi must be installed prior to installing/using this module
-    (v2.36+).
+    This is the root module for the RPi::WiringPi system. It interfaces to
+    a Raspberry Pi board, its accessories and its GPIO pins via the
+    wiringPi <http://wiringpi.com> library through the Perl wrapper
+    WiringPi::API <https://metacpan.org/pod/WiringPi::API> module, and
+    various other custom device specific modules.
 
-    We always and only use the `GPIO' pin numbering scheme. These are the
-    pin numbers that are printed on the Pi board itself.
+    wiringPi <http://wiringpi.com> must be installed prior to
+    installing/using this module (v2.36+).
+
+    We always and only use the GPIO pin numbering scheme. These are the pin
+    numbers that are printed on the Pi board itself.
 
     This module is essentially a 'manager' for the sub-modules (ie.
     components). You can use the component modules directly, but retrieving
     components through this module instead has many benefits. We maintain a
-    registry of pins and other data. We also trap `$SIG{__DIE__}' and
-    `$SIG{INT}', so that in the event of a crash, we can reset the Pi back
-    to default settings, so components are not left in an inconsistent
-    state. Component modules do none of these things.
+    registry of pins and other data. We also trap $SIG{__DIE__} and
+    $SIG{INT}, so that in the event of a crash, we can reset the Pi back to
+    default settings, so components are not left in an inconsistent state.
+    Component modules do none of these things.
 
     There are a basic set of constants that can be imported. See
     RPi::WiringPi::Constant.
 
     It's handy to have access to a pin mapping conversion chart. There's an
-    excellent pin scheme map for reference at pinout.xyz. You can also run
-    the `pinmap' command that was installed by this module, or `wiringPi''s
-    `gpio readall' command.
+    excellent pin scheme map for reference at pinout.xyz
+    <https://pinout.xyz/pinout/wiringpi>. You can also run the pinmap
+    command that was installed by this module, or wiringPi's gpio readall
+    command.
 
 METHODS
-    See RPi::WiringPi::Util for utility/helper methods that are imported
-    into an `RPi::WiringPi' object.
 
-  new(%args)
-    Returns a new `RPi::WiringPi' object. We exclusively use the `GPIO'
+    See RPi::WiringPi::Util for utility/helper methods that are imported
+    into an RPi::WiringPi object.
+
+ new([%args])
+
+    Returns a new RPi::WiringPi object. We exclusively use the GPIO
     (Broadcom (BCM) GPIO) pin numbering scheme. These pin numbers are
     printed on the Pi's board itself.
 
@@ -238,15 +270,15 @@ METHODS
 
         fatal_exit => $bool
 
-    Optional: We trap all `die()' calls and clean up for safety reasons. If
-    a call to `die()' is trapped, by default, we clean up, and then
-    `exit()'. Set `fatal_exit' to false (`0') to perform the cleanup, and
-    then continue running your script. This is for unit testing purposes
-    only.
+    Optional: We trap all die() calls and clean up for safety reasons. If a
+    call to die() is trapped, by default, we clean up, and then exit(). Set
+    fatal_exit to false (0) to perform the cleanup, and then continue
+    running your script. This is for unit testing purposes only.
 
-  pin($pin_num)
-    Returns a RPi::Pin object, mapped to a specified GPIO pin, which you can
-    then perform operations on. See that documentation for full usage
+ pin($pin_num)
+
+    Returns a RPi::Pin object, mapped to a specified GPIO pin, which you
+    can then perform operations on. See that documentation for full usage
     details.
 
     Parameters:
@@ -255,35 +287,40 @@ METHODS
 
     Mandatory, Integer: The pin number to attach to.
 
-  lcd(...)
+ lcd(...)
+
     Returns a RPi::LCD object, which allows you to fully manipulate LCD
     displays connected to your Raspberry Pi.
 
     Please see the linked documentation for information regarding the
     parameters required.
 
-  i2c($addr, [$device])
+ i2c($addr, [$device])
+
     Creates a new RPi::I2C device object which allows you to communicate
     with the devices on an I2C bus.
 
     See the linked documentation for full documentation on usage, or the
     RPi::WiringPi::FAQ-Tutorial for usage examples.
 
-  serial($device, $baud)
-    Creates a new RPi::Serial object which allows basic read/write access to
-    a serial bus.
+ serial($device, $baud)
+
+    Creates a new RPi::Serial object which allows basic read/write access
+    to a serial bus.
 
     See the linked documentation for full documentation on usage, or the
     RPi::WiringPi::FAQ-Tutorial for usage examples.
 
-  spi($channel, $speed)
+ spi($channel, $speed)
+
     Creates a new RPi::SPI object which allows you to communicate on the
     Serial Peripheral Interface (SPI) bus with attached devices.
 
     See the linked documentation for full documentation on usage, or the
     RPi::WiringPi::FAQ-Tutorial for usage examples.
 
-  dpot($cs, $channel)
+ dpot($cs, $channel)
+
     Returns a RPi::DigiPot::MCP4XXXX object, which allows you to manage a
     digital potentiometer (only the MCP4XXXX versions are currently
     supported).
@@ -291,14 +328,16 @@ METHODS
     See the linked documentation for full documentation on usage, or the
     RPi::WiringPi::FAQ-Tutorial for usage examples.
 
-  gps
+ gps
+
     Returns a GPSD::Parse object, allowing you to track your location.
 
-    The GPS distribution requires `gpsd' to be installed and running. All
+    The GPS distribution requires gpsd to be installed and running. All
     parameters for the GPS can be sent in here and we'll pass them along.
     Please see the link above for the full documentation on that module.
 
-  shift_register($base, $num_pins, $data, $clk, $latch)
+ shift_register($base, $num_pins, $data, $clk, $latch)
+
     Allows you to access the output pins of up to four 74HC595 shift
     registers in series, for a total of eight new output pins per register.
     Numerous chains of four registers are permitted, each chain uses three
@@ -310,8 +349,8 @@ METHODS
 
     Mandatory: Integer, represents the number at which you want to start
     referencing the new output pins attached to the register(s). For
-    example, if you use `100' here, output pin `0' of the register will be
-    `100', output `1' will be `101' etc.
+    example, if you use 100 here, output pin 0 of the register will be 100,
+    output 1 will be 101 etc.
 
         $num_pins
 
@@ -321,26 +360,29 @@ METHODS
 
         $data
 
-    Mandatory: Integer, the GPIO pin number attached to the `DS' pin (14) on
+    Mandatory: Integer, the GPIO pin number attached to the DS pin (14) on
     the shift register.
 
         $clk
 
-    Mandatory: Integer, the GPIO pin number attached to the `SHCP' pin (11)
+    Mandatory: Integer, the GPIO pin number attached to the SHCP pin (11)
     on the shift register.
 
         $latch
 
-    Mandatory: Integer, the GPIO pin number attached to the `STCP' pin (12)
+    Mandatory: Integer, the GPIO pin number attached to the STCP pin (12)
     on the shift register.
 
-  adc()
+ adc()
+
     There are two different ADCs that you can select from. The default is
     the ADS1x15 series:
 
-    ADS1115
-    Returns a RPi::ADC::ADS object, which allows you to read the four analog
-    input channels on an Adafruit ADS1xxx analog to digital converter.
+  ADS1115
+
+    Returns a RPi::ADC::ADS object, which allows you to read the four
+    analog input channels on an Adafruit ADS1xxx analog to digital
+    converter.
 
     Parameters:
 
@@ -348,7 +390,8 @@ METHODS
     review the documentation in the link above for further information, and
     have a look at the ADC tutorial section in this distribution.
 
-    MCP3008
+  MCP3008
+
     You can also use an RPi::ADC::MCP3008 ADC.
 
     Parameters:
@@ -359,38 +402,82 @@ METHODS
 
         channel => $channel
 
-    Mandatory, Integer. `0' or `1' for the Pi's onboard hardware CS/SS CE0
-    and CE1 pins, or any GPIO number above `1' in order to use an arbitrary
-    GPIO pin for the CS pin, and we'll do the bit-banging of the SPI bus
+    Mandatory, Integer. 0 or 1 for the Pi's onboard hardware CS/SS CE0 and
+    CE1 pins, or any GPIO number above 1 in order to use an arbitrary GPIO
+    pin for the CS pin, and we'll do the bit-banging of the SPI bus
     automatically.
 
-  dac(model => 'MCP4922')
+ dac(model => 'MCP4922')
+
     Returns a RPi::DAC::MCP4922 object (supports all 49x2 series DACs).
     These chips provide analog output signals from the Pi's digital output.
     Please see the documentation of that module for further information on
     both the configuration and use of the DAC object.
 
-    Note that if the `model' parameter is not sent in, we default to
-    `MCP4922'.
+    Note that if the model parameter is not sent in, we default to MCP4922.
 
-  bmp()
+ bmp()
+
     Returns a RPi::BMP180 object, which allows you to return the current
     temperature in farenheit or celcius, along with the ability to retrieve
     the barometric pressure in kPa.
 
-  hygrometer($pin)
+ hygrometer($pin)
+
     Returns a RPi::DHT11 temperature/humidity sensor object, allows you to
     fetch the temperature (celcius or farenheit) as well as the current
     humidity level.
 
+ hcsr04($trig, $echo)
+
+    Returns a RPi::HCSR04 ultrasonic distance measurement sensor object,
+    allowing you to retrieve the distance from the sensor in inches,
+    centimetres or raw data.
+
+    Parameters:
+
+        $trig
+
+    The trigger pin number, in GPIO numbering scheme.
+
+        $echo
+
+    The echo pin number, in GPIO numbering scheme.
+
+ servo($pin_num)
+
+    This method configures PWM clock and divisor to operate a typical 50Hz
+    servo, and returns a special RPi::Pin object. These servos have a left
+    pulse of 50, a centre pulse of 150 and a right pulse of 250. On exit of
+    the program (or a crash), we automatically clean everything up
+    properly.
+
+    Parameters:
+
+        $pin_num
+
+    Mandatory, Integer: The pin number (technically, this *must* be 18 on
+    the Raspberry Pi 3, as that's the only hardware PWM pin.
+
+    Example:
+
+        my $servo = $pi->servo(18);
+    
+        $servo->pwm(50);  # all the way left
+        $servo->pwm(250); # all the way right
+
 INTERNAL PUBLIC METHODS
+
 RUNNING TESTS
+
     Please see RUNNING TESTS in the FAQ.
 
 AUTHOR
+
     Steve Bertrand, <steveb@cpan.org>
 
 COPYRIGHT AND LICENSE
+
     Copyright (C) 2017 by Steve Bertrand
 
     This library is free software; you can redistribute it and/or modify it

@@ -21,6 +21,7 @@
       },
       "configure" : {
          "requires" : {
+            "Alien::Base" : "0",
             "Alien::Base::ModuleBuild" : "0.023",
             "ExtUtils::CppGuess" : "0.11",
             "Module::Build" : "0.28"
@@ -41,6 +42,6 @@
          "web" : "https://github.com/mbarbon/alien-protobuf"
       }
    },
-   "version" : "0.05"
+   "version" : "0.06"
 }
 

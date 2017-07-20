@@ -4,7 +4,7 @@
       "KOBAYASHI, Hiroaki <hkoba@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -44,7 +44,7 @@
    "provides" : {
       "App::perlminlint" : {
          "file" : "lib/App/perlminlint.pm",
-         "version" : "0.23"
+         "version" : "0.24"
       },
       "App::perlminlint::Object" : {
          "file" : "lib/App/perlminlint/Object.pm"
@@ -77,5 +77,7 @@
          "url" : "https://github.com/hkoba/app-perlminlint"
       }
    },
-   "version" : "0.23"
+   "version" : "0.24",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_static_install" : 1
 }

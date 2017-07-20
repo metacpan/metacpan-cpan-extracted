@@ -18,7 +18,7 @@
                     |___/                        
 
 
-This is the README for WWW::Wikipedia::LangTitles version 0.03.
+This is the README for WWW::Wikipedia::LangTitles version 0.04.
 
 WWW::Wikipedia::LangTitles is a "module" for the Perl computer programming
 language, a library of computer code to install on a computer.  This
@@ -38,8 +38,8 @@ document contains four sections:
 
 WWW::Wikipedia::LangTitles - get interwiki links from Wikipedia.
 
-This module retrieves the Wikipedia interwiki link titles from
-wikidata.org. It can be used, for example, to translate a term in
+This module retrieves the Wikipedia interwiki link titles from the web
+site wikidata.org. It can be used, for example, to translate a term in
 English into other languages, or to get near equivalents.
 
 -----------------------------------------------------------------------------
@@ -74,10 +74,10 @@ If you have the App::cpanminus installer, you may prefer
     cpanm WWW::Wikipedia::LangTitles
 
 To install the module from the source file,
-WWW-Wikipedia-LangTitles-0.03.tar.gz, follow this sequence of commands:
+WWW-Wikipedia-LangTitles-0.04.tar.gz, follow this sequence of commands:
 
-    tar xfz WWW-Wikipedia-LangTitles-0.03.tar.gz
-    cd WWW-Wikipedia-LangTitles-0.03
+    tar xfz WWW-Wikipedia-LangTitles-0.04.tar.gz
+    cd WWW-Wikipedia-LangTitles-0.04
     perl Makefile.PL
     make
     make install
@@ -102,6 +102,6 @@ the public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Dec 27 09:25:25 2016.
+This README was written on Thu Jul 20 13:16:31 2017.
 
 -----------------------------------------------------------------------------

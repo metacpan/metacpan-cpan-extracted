@@ -147,7 +147,9 @@ bt_create_name_format (char * parts, boolean abbrev_first)
     * discretionary tie, and the join between parts is a space (except for
     * 'von': if followed by 'last', we will have a discretionary tie).
     */
-   for (i = 0; i < num_parts; i++)
+
+   // INITIALIZA ALL!!!! PARTS
+   for (i = 0; i < BT_MAX_NAMEPARTS; i++)
    {
       format->join_tokens[i] = BTJ_MAYTIE;
       format->join_part[i] = BTJ_SPACE;

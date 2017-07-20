@@ -31,6 +31,7 @@ option 'data_tar' => (
     documentation => 'Location of tar file for hpcrunner logging data.',
     trigger       => sub {
         my $self = shift;
+        $self->data_tar->touchpath;
         my $tar  = $self->set_archive;
         $self->archive($tar);
     },
@@ -56,6 +57,7 @@ sub set_archive {
         $tar->read( $self->data_tar );
     }
     elsif ( $self->has_data_tar ) {
+        $self->data_tar->touchpath;
         $tar->write( $self->data_tar );
     }
     else {

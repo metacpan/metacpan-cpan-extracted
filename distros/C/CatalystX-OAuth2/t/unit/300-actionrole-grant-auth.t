@@ -3,9 +3,8 @@ use Test::More;
 
 use HTTP::Request::Common;
 use lib 't/lib';
-use CatalystX::Test::MockContext;
+use Catalyst::Test 'AuthServer';
 
-my $mock = mock_context('AuthServer');
 
 my $code =
   AuthServer->model('DB::Code')
@@ -25,7 +24,7 @@ my $code =
   );
   $code->discard_changes;
   ok(!$code->is_active);
-  my $c = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
   $c->dispatch;
   is_deeply( $c->error, [], 'dispatches to request action cleanly' );
   is( $c->res->body, undef, q{doesn't produce warning} );
@@ -65,7 +64,7 @@ my $code =
   );
   $code->discard_changes;
   ok(!$code->is_active);
-  my $c = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
   $c->dispatch;
   is_deeply( $c->error, [], 'dispatches to request action cleanly' );
   is( $c->res->body, undef, q{doesn't produce warning} );
@@ -103,7 +102,7 @@ my $code =
   );
   $code->discard_changes;
   ok(!$code->is_active);
-  my $c = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
   $c->dispatch;
   is_deeply( $c->error, [], 'dispatches to request action cleanly' );
   is( $c->res->body, undef, q{doesn't produce warning} );
@@ -133,7 +132,7 @@ my $code =
   );
   $code->discard_changes;
   ok(!$code->is_active);
-  my $c = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
   $c->dispatch;
   is_deeply( $c->error, [], 'dispatches to request action cleanly' );
   is( $c->res->body, undef, q{doesn't produce warning} );
@@ -172,7 +171,7 @@ my $code =
   );
   $code->discard_changes;
   ok(!$code->is_active);
-  my $c = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
   $c->dispatch;
   is_deeply( $c->error, [], 'dispatches to request action cleanly' );
   is( $c->res->body, undef, q{doesn't produce warning} );

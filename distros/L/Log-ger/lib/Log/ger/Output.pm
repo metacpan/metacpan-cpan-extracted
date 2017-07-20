@@ -1,7 +1,7 @@
 package Log::ger::Output;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 use parent 'Log::ger::Plugin';
 
@@ -20,7 +20,7 @@ Log::ger::Output - Set logging output
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 SYNOPSIS
 

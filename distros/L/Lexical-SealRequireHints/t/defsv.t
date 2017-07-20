@@ -4,6 +4,7 @@ use strict;
 use Test::More tests => 5;
 
 BEGIN { use_ok "Lexical::SealRequireHints"; }
+BEGIN { unshift @INC, "./t/lib"; }
 
 SKIP: {
 	skip "CORE::GLOBAL::require breaks require() on this perl", 4

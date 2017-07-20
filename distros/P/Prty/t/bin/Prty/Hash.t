@@ -19,11 +19,11 @@ sub test_new_keyVal : Test(5) {
     my $self = shift;
 
     my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
-    $self->is(ref($h),'Prty::Hash','new: Test Klasse');
-    $self->is($h->{'a'},1,'new: Test a');
-    $self->is($h->{'b'},2,'new: Test b');
-    $self->is($h->{'c'},3,'new: Test c');
-    $self->ok(!$h->exists('d'),'new: Test d');
+    $self->is(ref($h),'Prty::Hash');
+    $self->is($h->{'a'},1);
+    $self->is($h->{'b'},2);
+    $self->is($h->{'c'},3);
+    $self->ok(!$h->exists('d'));
 }
 
 sub test_new_keys_vals : Test(5) {
@@ -33,11 +33,11 @@ sub test_new_keys_vals : Test(5) {
     my @vals = qw/1 2 3/;
 
     my $h = Prty::Hash->new(\@keys,\@vals);
-    $self->is(ref($h),'Prty::Hash','new: Test Klasse');
-    $self->is($h->{'a'},1,'new: Test a');
-    $self->is($h->{'b'},2,'new: Test b');
-    $self->is($h->{'c'},3,'new: Test c');
-    $self->ok(!$h->exists('d'),'new: Test d');
+    $self->is(ref($h),'Prty::Hash');
+    $self->is($h->{'a'},1);
+    $self->is($h->{'b'},2);
+    $self->is($h->{'c'},3);
+    $self->ok(!$h->exists('d'));
 }
 
 sub test_new_keys_val : Test(5) {
@@ -46,22 +46,22 @@ sub test_new_keys_val : Test(5) {
     my @keys = qw/a b c/;
 
     my $h = Prty::Hash->new(\@keys,1);
-    $self->is(ref($h),'Prty::Hash','new: Test Klasse');
-    $self->is($h->{'a'},1,'new: Test a');
-    $self->is($h->{'b'},1,'new: Test b');
-    $self->is($h->{'c'},1,'new: Test c');
-    $self->ok(!$h->exists('d'),'new: Test d');
+    $self->is(ref($h),'Prty::Hash');
+    $self->is($h->{'a'},1);
+    $self->is($h->{'b'},1);
+    $self->is($h->{'c'},1);
+    $self->ok(!$h->exists('d'));
 }
 
 sub test_new_hash : Test(5) {
     my $self = shift;
 
     my $h = Prty::Hash->new({a=>1,b=>2,c=>3});
-    $self->is(ref($h),'Prty::Hash','new: Test Klasse');
-    $self->is($h->{'a'},1,'new: Test a');
-    $self->is($h->{'b'},2,'new: Test b');
-    $self->is($h->{'c'},3,'new: Test c');
-    $self->ok(!$h->exists('d'),'new: Test d');
+    $self->is(ref($h),'Prty::Hash');
+    $self->is($h->{'a'},1);
+    $self->is($h->{'b'},2);
+    $self->is($h->{'c'},3);
+    $self->ok(!$h->exists('d'));
 }
 
 # -----------------------------------------------------------------------------
@@ -72,19 +72,19 @@ sub test_get : Test(5) {
     my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
 
     my $val = $h->get('b');
-    $self->is($val,2,'get: Skalarkontext');
+    $self->is($val,2,'Skalarkontext');
 
     $val = $h->{'b'};
-    $self->is($val,2,'get: direkter Hashzugriff');
+    $self->is($val,2,'Direkter Hashzugriff');
 
     my @arr = $h->get('b','a');
-    $self->isDeeply(\@arr,[2,1],'get: Listkontext');
+    $self->isDeeply(\@arr,[2,1],'Listkontext');
 
     @arr = @{$h}{'b','a'};
-    $self->isDeeply(\@arr,[2,1],'get: direkter Hashzugriff');
+    $self->isDeeply(\@arr,[2,1],'Direkter Hashzugriff');
 
     $val = eval {$h->get('d')};
-    $self->ok($@,'get: unerlaubter Schlüssel -> Exception');
+    $self->ok($@,'Unerlaubter Schlüssel -> Exception');
 }
 
 # -----------------------------------------------------------------------------
@@ -121,10 +121,10 @@ sub test_try : Test(2) {
     my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
 
     my $val = $h->try('b');
-    $self->is($val,2,'try: Skalarkontext');
+    $self->is($val,2,'Skalarkontext');
     
     my @arr = $h->try('b','a');
-    $self->isDeeply(\@arr,[2,1],'try: Listkontext');
+    $self->isDeeply(\@arr,[2,1],'Listkontext');
 }
 
 # -----------------------------------------------------------------------------
@@ -156,8 +156,8 @@ sub test_add : Test(2) {
     my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
 
     $h->add(b=>5,d=>7);
-    $self->is($h->{'b'},5,'add: neuer Wert');
-    $self->is($h->{'d'},7,'add: neues Schlüssel/Wert-Paar');
+    $self->is($h->{'b'},5,'Neuer Wert');
+    $self->is($h->{'d'},7,'Neues Schlüssel/Wert-Paar');
 }
 
 # -----------------------------------------------------------------------------
@@ -222,7 +222,7 @@ sub test_hashSize : Test(1) {
 
     my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
     my $n = $h->hashSize;
-    $self->is($n,3,'hashSize');
+    $self->is($n,3);
 }
 
 # -----------------------------------------------------------------------------
@@ -247,8 +247,8 @@ sub test_copy : Test(2) {
     my $h1 = Prty::Hash->new(a=>1,b=>2,c=>3);
 
     my $h2 = $h1->copy;
-    $self->isnt($h1,$h2,'copy: Referenzen verschieden');
-    $self->isDeeply($h1,$h2,'copy: gleiche Schlüssel/Wert-Paare');
+    $self->isnt($h1,$h2,'Referenzen verschieden');
+    $self->isDeeply($h1,$h2,'Gleiche Schlüssel/Wert-Paare');
 }
 
 # -----------------------------------------------------------------------------
@@ -322,10 +322,10 @@ sub test_exists : Test(2) {
     my $h = Prty::Hash->new(a=>1);
 
     my $bool = $h->exists('a');
-    $self->ok($bool,'exists: a existiert');
+    $self->ok($bool,'a existiert');
 
     $bool = $h->exists('b');
-    $self->ok(!$bool,'exists: b existiert nicht');
+    $self->ok(!$bool,'b existiert nicht');
 }
 
 # -----------------------------------------------------------------------------
@@ -336,10 +336,10 @@ sub test_defined : Test(2) {
     my $h = Prty::Hash->new(a=>1,b=>undef);
 
     my $bool = $h->defined('a');
-    $self->ok($bool,'defined: a ist definiert');
+    $self->ok($bool,'a ist definiert');
 
     $bool = $h->defined('b');
-    $self->ok(!$bool,'defined: b ist nicht definiert');
+    $self->ok(!$bool,'b ist nicht definiert');
 }
 
 # -----------------------------------------------------------------------------
@@ -349,11 +349,11 @@ sub test_isEmpty : Test(2) {
 
     my $h = Prty::Hash->new(a=>1,b=>2,c=>3);
     my $bool = $h->isEmpty;
-    $self->ok(!$bool,'isEmpty: nicht leer');
+    $self->ok(!$bool,'Nicht leer');
 
     $h->clear;
     $bool = $h->isEmpty;
-    $self->ok($bool,'isEmpty: leer');
+    $self->ok($bool,'Leer');
 }
 
 # -----------------------------------------------------------------------------
@@ -364,19 +364,24 @@ sub test_isLocked : Test(3) {
     # Leerer Hash
 
     my $h = Prty::Hash->new;
-    $self->ok($h->isLocked);
+    if ($] < 5.018) {
+        # Bug in Perl-Versionen kleiner 5.18.0
+        $self->is($h->isLocked,0,'Leerer Hash ist nicht gelocked');
+    }
+    else {
+        $self->is($h->isLocked,1,'Leerer Hash ist gelocked');
+    }
 
     # Nicht-Leerer Hash
 
     $h = Prty::Hash->new(a=>1,b=>2,c=>3);
 
     my $isLocked = $h->isLocked;
-    $self->ok($isLocked);
+    $self->is($isLocked,1,'Nicht-leerer Hash ist gelocked');
 
     $h->unlockKeys;
     $isLocked = $h->isLocked;
-    # Fehler unter Perl 5.10.1
-    $self->ok(!$isLocked);
+    $self->is($isLocked,0,'Lock ist aufgehoben');
 }
 
 # -----------------------------------------------------------------------------
@@ -389,10 +394,10 @@ sub test_lockKeys : Test(2) {
     $h->lockKeys;
 
     my $val = $h->{'b'};
-    $self->is($val,2,'lockKeys: Key b');
+    $self->is($val,2,'Key b');
 
     $val = eval {$h->{'d'}};
-    $self->like($@,qr/disallowed key 'd'/,'lockKeys: Key d - Exception');
+    $self->like($@,qr/disallowed key 'd'/,'Key d - Exception');
 }
 
 # -----------------------------------------------------------------------------
@@ -404,15 +409,15 @@ sub test_unlockKeys : Test(3) {
     $h->lockKeys;
 
     my $val = $h->{'b'};
-    $self->is($val,2,'unlockKeys: Key b');
+    $self->is($val,2,'Key b');
 
     $val = eval { $h->{'d'} };
-    $self->like($@,qr/disallowed key 'd'/,'unlockKeys: Key d - Exception');
+    $self->like($@,qr/disallowed key 'd'/,'Key d - Exception');
 
     $h->unlockKeys;
 
     $val = $h->{'d'};
-    $self->is($val,undef,'unlockKeys: Key d - undef');
+    $self->is($val,undef,'Key d - undef');
 }
 
 # -----------------------------------------------------------------------------
@@ -463,9 +468,9 @@ sub test_weaken : Test(2) {
     my $child = Prty::Hash->new;
     my $parent = Prty::Hash->new(child=>$child);
     $parent->weaken('child');
-    $self->ok($parent->get('child'),'weaken: Schwache Referenz');
+    $self->ok($parent->get('child'),'Schwache Referenz');
     $child = undef;
-    $self->is($parent->get('child'),undef,'weaken: Referenz entfernt');
+    $self->is($parent->get('child'),undef,'Referenz entfernt');
 }
 
 # -----------------------------------------------------------------------------
@@ -487,25 +492,11 @@ sub test_bucketsUsed : Test(2) {
 
     my $h = Prty::Hash->new;
     my $n = $h->bucketsUsed;
-    $self->is($n,0,'bucketsUsed: Hash ist leer');
+    $self->is($n,0,'Hash ist leer');
 
     $h->add(a=>1,b=>2,c=>3);
     $n = $h->bucketsUsed;
-    $self->ok($n,'bucketsUsed: Buckets vorhanden (Anzahl schwankt)');
-}
-
-# -----------------------------------------------------------------------------
-
-sub test_debugMode : Test(2) {
-    my $self = shift;
-
-    my $h = Prty::Hash->new;
-    eval {$h->set(a=>1)};
-    $self->ok($@);
-
-    $h->debugMode(1);
-    eval {$h->set(a=>1)};
-    $self->like($@,qr/HASH-00004/);
+    $self->ok($n,'Buckets vorhanden (Anzahl schwankt)');
 }
 
 # -----------------------------------------------------------------------------

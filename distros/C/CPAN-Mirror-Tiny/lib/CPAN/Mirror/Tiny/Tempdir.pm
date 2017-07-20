@@ -5,8 +5,6 @@ use File::Temp ();
 use File::Path ();
 use File::pushd ();
 
-use overload '""' => sub { shift->as_string };
-
 sub as_string { shift->{tempdir} }
 
 sub new {

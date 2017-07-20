@@ -1,12 +1,12 @@
 ## no critic (RequireUseStrict)
 package Plack::Test::AnyEvent;
-$Plack::Test::AnyEvent::VERSION = '0.07';
+$Plack::Test::AnyEvent::VERSION = '0.08';
 ## use critic (RequireUseStrict)
 use strict;
 use warnings;
-use autodie qw(pipe);
 
 use AnyEvent::Handle;
+use AnyEvent::Util qw (portable_pipe);
 use Carp;
 use HTTP::Request;
 use HTTP::Message::PSGI;
@@ -44,7 +44,7 @@ sub test_psgi {
                 $cond->send;
 
                 unless(defined $body) {
-                    pipe $read, $write;
+                    ( $read, $write ) = portable_pipe or die $!;
                     $write = IO::Handle->new_from_fd($write, 'w');
                     $write->autoflush(1);
                     return $write;
@@ -159,7 +159,7 @@ Plack::Test::AnyEvent - Run Plack::Test on AnyEvent-based PSGI applications
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -231,7 +231,7 @@ the exception is propagated by C<$res-E<gt>recv>.  Here's an example:
         my ( $respond ) = @_;
 
         die 'still thrown by $cb';
-            
+
         if($streaming) {
             my $writer = $respond->([
                 200,
@@ -322,7 +322,7 @@ Rob Hoelz <rob@hoelz.ro>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Rob Hoelz.
+This software is copyright (c) 2017 by Rob Hoelz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

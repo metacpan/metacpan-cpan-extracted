@@ -2,6 +2,11 @@ use strict;
 use warnings;
 use utf8;
 
+BEGIN {
+    # Silence 'wide character' warning in Unicode test
+    binmode STDOUT, ':encoding(utf-8)';
+}
+
 use Test::More tests => 41;
 
 use File::Spec::Functions;

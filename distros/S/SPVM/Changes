@@ -1,3 +1,42 @@
+0.0225 2017-07-19
+  - add SPVM::Array::Byte::get_elements method
+  - add SPVM::Array::Short::get_elements method
+  - add SPVM::Array::Int::get_elements method
+  - add SPVM::Array::Long::get_elements method
+  - add SPVM::Array::Float::get_elements method
+  - add SPVM::Array::Double::get_elements method
+0.0224 2017-07-19
+  - fix memory leak bugs. fix reference count.
+0.0223 2017-07-18
+  - fix hash segmentation fault bug when many hash is created.
+0.0222 2017-07-18
+  - add SPVM::Object::set
+  - add SPVM::Object::get
+  - rename SPVM::byte_array to SPVM::new_byte_array
+  - rename SPVM::short_array to SPVM::new_short_array
+  - rename SPVM::int_array to SPVM::new_int_array
+  - rename SPVM::long_array to SPVM::new_long_array
+  - rename SPVM::float_array to SPVM::new_float_array
+  - rename SPVM::double_array to SPVM::new_double_array
+  - rename SPVM::string_raw to SPVM::new_string_raw
+  - rename SPVM::string to SPVM::new_string
+  - rename SPVM::object to SPVM::new_object
+0.0221 2017-07-15
+  - fix && not working bug
+  - fix || not working bug
+  - fix ! not working  bug
+0.0220 2017-07-14
+  - Support array return type in SPVM::call_sub
+0.0219 2017-07-13
+  - Support constant floating point E expression
+    0.5E3
+    0.5e3
+    0.5E+3
+    0.5e+3
+    0.5E-3
+    0.5e-3
+  - add SPVM::string function
+  - add SPVM::string_raw function
 0.0218 2017-07-13
   - Fix float culcuration bugs
   - add SPVM::byte_array, SPVM::short_array, SPVM::long_array, SPVM::float_array, SPVM::double_array function

@@ -71,7 +71,6 @@ lib/Pcore/Core/Autoload.pm
 lib/Pcore/Core/CLI.pm
 lib/Pcore/Core/CLI/Arg.pm
 lib/Pcore/Core/CLI/Cmd.pm
-lib/Pcore/Core/CLI/Cmd/Service.pm
 lib/Pcore/Core/CLI/Opt.pm
 lib/Pcore/Core/CLI/Opt/Daemonize.pm
 lib/Pcore/Core/CLI/Opt/Perms.pm
@@ -211,8 +210,6 @@ lib/common/header.pm
 script/pcore
 script/src
 script/update-pcore-share.pl
-share/bin/nssm_x32.exe
-share/bin/nssm_x64.exe
 share/data/ca_file.pem
 share/data/mime.json
 share/data/par.ico

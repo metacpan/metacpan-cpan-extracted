@@ -1,5 +1,5 @@
 package Number::MuPhone::Parser;
-use strictures 2;
+use 5.012;
 use Moo;
 use Number::MuPhone::Config;
 
@@ -131,7 +131,7 @@ sub dial {
 sub display_from {
   my ($self,$str) = @_;
   my $from = $self->_get_obj_from($str);
-  if ( $from->country eq $self->country ) {
+  if ( $from->country_code eq $self->country_code ) {
     return $self->_national_display;
   }
   else {
@@ -146,7 +146,7 @@ sub display_from {
 sub dial_from {
   my ($self,$str) = @_;
   my $obj = $self->_get_obj_from($str);
-  if ( $obj->country eq $self->country ) {
+  if ( $obj->country_code eq $self->country_code ) {
     return $self->_national_dial;
   }
   else {

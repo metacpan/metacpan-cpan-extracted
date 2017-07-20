@@ -1,4 +1,4 @@
-# Copyright (c) 2011-16, Mitchell Cooper
+# Copyright (c) 2011-17, Mitchell Cooper
 #
 # Evented::Object: a simple yet featureful base class event framework.
 # https://github.com/cooper/evented-object
@@ -14,7 +14,7 @@ use Scalar::Util qw(weaken blessed);
 use List::Util qw(min max);
 use Carp qw(carp);
 
-our $VERSION = '5.63';
+our $VERSION = '5.65';
 our $events  = $Evented::Object::events;
 our $props   = $Evented::Object::props;
 
@@ -374,3 +374,88 @@ sub _return_check {
 }
 
 1;
+
+=head1 NAME
+
+B<Evented::Object::Collection> - represents a group of pending
+L<Evented::Object> callbacks.
+
+=head1 DESCRIPTION
+
+L</Collections> are returned by the evented object 'prepare' methods. They
+represent a group of callbacks that are about to be fired. Using collections
+allows you to prepare a fire ahead of time before executing it. You can also
+fire events with special options this way.
+
+=head1 METHODS
+
+
+=head2 $col->fire(@options)
+
+Fires the pending callbacks with the specified options, if any. If the callbacks
+have not yet been sorted, they are sorted before the event is fired.
+
+ $eo->prepare(some_event => @arguments)->fire('safe');
+
+B<Parameters>
+
+=over
+
+=item *
+
+B<@options> - I<optional>, a mixture of boolean and key:value options for the
+event fire.
+
+=back
+
+B<@options> - fire options
+
+=over
+
+=item *
+
+B<caller> - I<requires value>, use an alternate C<[caller 1]> value for the event
+fire. This is typically only used internally.
+
+=item *
+
+B<return_check> - I<boolean>, if true, the event will yield that it was stopped
+if any of the callbacks return a false value. Note however that if one callbacks
+returns false, the rest will still be called. The fire object will only yield
+stopped status after all callbacks have been called and any number of them
+returned false.
+
+=item *
+
+B<safe> - I<boolean>, wrap all callback calls in C<eval> for safety. if any of
+them fail, the event will be stopped at that point with the error.
+
+=item *
+
+B<fail_continue> - I<boolean>, if C<safe> above is enabled, this tells the fire
+to continue even if one of the callbacks fails. This could be dangerous if any
+of the callbacks expected a previous callback to be done when it actually
+failed.
+
+=item *
+
+B<data> - I<requires value>, a scalar value that can be fetched by
+C<< $fire->data >> from within the callbacks. Good for data that might be useful
+sometimes but not frequently enough to deserve a spot in the argument list. If
+C<data> is a hash reference, its values can be fetched conveniently with
+C<< $fire->data('key') >>.
+
+=back
+
+=head2 $col->sort
+
+Sorts the callbacks according to C<priority>, C<before>, and C<after> options.
+
+=head1 AUTHOR
+
+L<Mitchell Cooper|https://github.com/cooper> <cooper@cpan.org>
+
+Copyright E<copy> 2011-2017. Released under New BSD license.
+
+Comments, complaints, and recommendations are accepted. Bugs may be reported on
+L<GitHub|https://github.com/cooper/evented-object/issues>.

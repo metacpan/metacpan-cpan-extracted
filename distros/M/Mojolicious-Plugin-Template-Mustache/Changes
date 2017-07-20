@@ -1,5 +1,14 @@
 Revision history for Perl extension Mojolicious-Plugin-Template-Mustache
 
+0.03 2017-07-18T08:04:42Z
+    - adapted the code to the new version Template::Mustache
+    - fix code style, depends and adapt to IDEA plugin
+    - add travis-ci config and travis badget 
+
+0.02 2017-07-17T17:29:34Z
+
+    - add path to local lib into tests
+
 0.01 2017-06-28T10:02:06Z
 
     - original version

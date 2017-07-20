@@ -11,6 +11,7 @@ use RPi::ADC::MCP3008;
 use RPi::BMP180;
 use RPi::DAC::MCP4922;
 use RPi::DigiPot::MCP4XXXX;
+use RPi::HCSR04;
 use RPi::I2C;
 use RPi::LCD;
 use RPi::Pin;
@@ -18,14 +19,13 @@ use RPi::Serial;
 use RPi::SPI;
 use RPi::WiringPi::Constant qw(:all);
 
-our $VERSION = '2.3619';
+our $VERSION = '2.3620';
 
 my $fatal_exit = 1;
 
 BEGIN {
     sub _error {
         my $err = shift;
-        print "\ndie() caught... ".  __PACKAGE__ ." is cleaning up\n",
         RPi::WiringPi::Util::cleanup();
         print "\ncleaned up, exiting...\n";
         print "\noriginal error: $err\n";
@@ -35,8 +35,33 @@ BEGIN {
     $SIG{__DIE__} = \&_error;
     $SIG{INT} = \&_error;
 };
+
 # core
 
+sub servo {
+    my ($self, $pin_num) = @_;
+
+    if ($> != 0){
+        die "\n\nat this time, servo() requires PWM functionality, and PWM " .
+            "requires your script to be run as the 'root' user (sudo)\n\n";
+    }
+
+    $self->_pwm_in_use(1);
+
+    my $servo = $self->pin($pin_num);
+    $servo->mode(PWM_OUT);
+    
+    $self->pwm_mode(PWM_MODE_MS);
+    $self->pwm_clock(192);
+    $self->pwm_range(2000);
+
+    return $servo;
+}
+sub _pwm_in_use {
+    my $self = shift;
+    $ENV{PWM_IN_USE} = 1 if @_;
+    return $self->{pwm_in_use};
+}
 sub new {
     my ($self, %args) = @_;
     $self = bless {%args}, $self;
@@ -99,8 +124,13 @@ sub adc {
     }
     return $adc;
 }
+sub bmp {
+    my ($self, $base) = @_;
+    return RPi::BMP180->new($base);
+}
 sub dac {
     my ($self, %args) = @_;
+    # we don't use the pin objects; we generate them simply for registration
     my $cs_pin = $self->pin($args{cs});
     my $shdn_pin = $self->pin($args{shdn}) if defined $args{shdn};
     $args{model} = 'MCP4922' if ! defined $args{model};
@@ -109,7 +139,8 @@ sub dac {
 }
 sub dpot {
     my ($self, $cs, $channel) = @_;
-    $self->register($self->pin($cs));
+    # we don't use the pin objects; we generate them simply for registration
+    my $cs_pin = $self->pin($cs);
     my $dpot = RPi::DigiPot::MCP4XXXX->new($cs, $channel);
     return $dpot;
 }
@@ -118,23 +149,18 @@ sub gps {
     my $gps = GPSD::Parse->new(%args);
     return $gps;
 }
-sub pin {
-    my ($self, $pin_num) = @_;
-
-    my $pins_in_use = $self->registered_pins;
-    my $gpio = $self->pin_to_gpio($pin_num);
-
-    if (grep {$gpio == $_} @{ $self->registered_pins }){
-        die "\npin $pin_num is already in use... can't create second object\n";
-    }
-
-    my $pin = RPi::Pin->new($pin_num);
-    $self->register_pin($pin);
-    return $pin;
+sub hcsr04 {
+    my ($self, $t, $e) = @_;
+    # we don't use the pin objects; we generate them simply for registration
+    my $trig_pin = $self->pin($t);
+    my $echo_pin = $self->pin($e);
+    return RPi::HCSR04->new($t, $e);
 }
-sub serial {
-    my ($self, $device, $baud) = @_;
-    return RPi::Serial->new($device, $baud);
+sub hygrometer {
+    my ($self, $pin) = @_;
+    $self->register_pin($pin);
+    my $sensor = RPi::DHT11->new($pin);
+    return $sensor;
 }
 sub i2c {
     my ($self, $addr, $i2c_device) = @_;
@@ -158,20 +184,25 @@ sub lcd {
     $lcd->init(%args);
     return $lcd;
 }
-sub bmp {
-    my ($self, $base) = @_;
-    return RPi::BMP180->new($base);
-}
-sub hygrometer {
-    my ($self, $pin) = @_;
+sub pin {
+    my ($self, $pin_num) = @_;
+
+    # we don't use the pin objects; we generate them simply for registration
+
+    my $pins_in_use = $self->registered_pins;
+    my $gpio = $self->pin_to_gpio($pin_num);
+
+    if (grep {$gpio == $_} @{ $self->registered_pins }){
+        die "\npin $pin_num is already in use... can't create second object\n";
+    }
+
+    my $pin = RPi::Pin->new($pin_num);
     $self->register_pin($pin);
-    my $sensor = RPi::DHT11->new($pin);
-    return $sensor;
+    return $pin;
 }
-sub spi {
-    my ($self, $chan, $speed) = @_;
-    my $spi = RPi::SPI->new($chan, $speed);
-    return $spi;
+sub serial {
+    my ($self, $device, $baud) = @_;
+    return RPi::Serial->new($device, $baud);
 }
 sub shift_register {
     my ($self, $base, $num_pins, $data, $clk, $latch) = @_;
@@ -183,6 +214,11 @@ sub shift_register {
         push @pin_nums, $pin->num;
     }
     $self->shift_reg_setup($base, $num_pins, @pin_nums);
+}
+sub spi {
+    my ($self, $chan, $speed) = @_;
+    my $spi = RPi::SPI->new($chan, $speed);
+    return $spi;
 }
 
 # private
@@ -402,6 +438,31 @@ various items
 
     $pi->cleanup;
 
+    #
+    # ultrasonic distance sensor
+    #
+
+    my $trig_pin = 23;
+    my $echo_pin = 24;
+
+    my $ruler = $pi->hcsr04($trig_pin, $echo_pin);
+
+    my $inches = $sensor->inch;
+    my $cm     = $sensor->cm;
+    my $raw    = $sensor->raw;
+
+    #
+    # servo
+    #
+
+    my $pin_num = 18;
+
+    my $servo = $pi->servo($pin_num);
+
+    $servo->pwm(150); # centre position
+    $servo->pwm(50);  # left position
+    $servo->pwm(250); # right position
+
 =head1 DESCRIPTION
 
 This is the root module for the C<RPi::WiringPi> system. It interfaces to a
@@ -601,6 +662,42 @@ the barometric pressure in kPa.
 
 Returns a L<RPi::DHT11> temperature/humidity sensor object, allows you to fetch
 the temperature (celcius or farenheit) as well as the current humidity level.
+
+=head2 hcsr04($trig, $echo)
+
+Returns a L<RPi::HCSR04> ultrasonic distance measurement sensor object, allowing
+you to retrieve the distance from the sensor in inches, centimetres or raw data.
+
+Parameters:
+
+    $trig
+
+The trigger pin number, in GPIO numbering scheme.
+
+    $echo
+
+The echo pin number, in GPIO numbering scheme.
+
+=head2 servo($pin_num)
+
+This method configures PWM clock and divisor to operate a typical 50Hz servo,
+and returns a special L<RPi::Pin> object. These servos have a C<left> pulse of
+C<50>, a C<centre> pulse of C<150> and a C<right> pulse of C<250>. On exit of
+the program (or a crash), we automatically clean everything up properly.
+
+Parameters:
+
+    $pin_num
+
+Mandatory, Integer: The pin number (technically, this *must* be C<18> on the
+Raspberry Pi 3, as that's the only hardware PWM pin.
+
+Example:
+
+    my $servo = $pi->servo(18);
+
+    $servo->pwm(50);  # all the way left
+    $servo->pwm(250); # all the way right
 
 =head1 INTERNAL PUBLIC METHODS
 

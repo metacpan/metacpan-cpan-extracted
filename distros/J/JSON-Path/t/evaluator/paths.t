@@ -10,20 +10,23 @@ my %data = %{ decode_json($json) };
 
 subtest filter => sub {
     my @expressions = (
+        '$..[?(@.price > 10)]' => [ grep { $_->{price} > 10 } @{ $data{store}{book} } ],
         '$.complex_array[?(@.weight > 10)]' =>
+            [ map { dclone $_ } grep { $_->{weight} > 10 } @{ $data{complex_array} } ],
+        '$.complex_array[?($_->{weight} > 10)]' =>
             [ map { dclone $_ } grep { $_->{weight} > 10 } @{ $data{complex_array} } ],
         '$.complex_array[?(@.type.code=="CODE_ALPHA")]' =>
             [ dclone( ( grep { $_->{type}{code} eq 'CODE_ALPHA' } @{ $data{complex_array} } )[0] ) ],
         '$.complex_array[?(@.weight > 10)].classification.quux' =>
             [ map { $_->{classification}{quux} } grep { $_->{weight} > 10 } @{ $data{complex_array} } ],
         '$.complex_array[?(@.quux)]' => [ grep { $_->{quux} } @{ $data{complex_array} } ],
-        '$..nonexistent'             => [],
     );
     do_test(@expressions);
 };
 
 subtest simple => sub {
     my @expressions = (
+        '$.nonexistent'               => [ ],
         '$.simple'                    => [ $data{simple} ],
         '$.long_hash.key1.subkey2'    => [ $data{long_hash}{key1}{subkey2} ],
         '$.long_hash.key1'            => [ dclone $data{long_hash}{key1} ],
@@ -31,7 +34,6 @@ subtest simple => sub {
         '$.multilevel_array.1.0.0'    => [ $data{multilevel_array}->[1][0][0] ],
         '$.multilevel_array.0.1[0]'   => [ $data{multilevel_array}->[0][1][0] ],
         '$.multilevel_array[0][0][1]' => [ $data{multilevel_array}->[0][0][1] ],
-        '$.nonexistent'               => [undef],
         '$.store.book[0].title'       => [ $data{store}{book}->[0]{title} ],
         '$.array[0]'                  => [ $data{array}->[0] ],
     );
@@ -48,7 +50,8 @@ subtest all => sub {
 
 subtest recursive => sub {
     my @expressions = (
-        '$..foo' => [qw/bar baz bak/],
+        '$..nonexistent' => [],
+        '$..foo'         => [qw/bar baz bak/],
         '$..complex_array[?(@.weight > 10)].classification.quux' =>
             [ map { $_->{classification}{quux} } grep { $_->{weight} > 10 } @{ $data{complex_array} } ],
         '$..key2.subkey1' => ['2value1'],

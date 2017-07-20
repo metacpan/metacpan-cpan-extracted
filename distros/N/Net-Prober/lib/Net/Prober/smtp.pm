@@ -1,5 +1,5 @@
 package Net::Prober::smtp;
-$Net::Prober::smtp::VERSION = '0.16';
+$Net::Prober::smtp::VERSION = '0.17';
 use strict;
 use warnings;
 use base 'Net::Prober::Probe::TCP';
@@ -73,7 +73,7 @@ Net::Prober::smtp
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package App::Muter::Chain;
 # ABSTRACT: main programmatic interface to muter
-$App::Muter::Chain::VERSION = '0.002000';
+$App::Muter::Chain::VERSION = '0.002001';
 use strict;
 use warnings;
 
@@ -81,7 +81,7 @@ App::Muter::Chain - main programmatic interface to muter
 
 =head1 VERSION
 
-version 0.002000
+version 0.002001
 
 =head1 SYNOPSIS
 

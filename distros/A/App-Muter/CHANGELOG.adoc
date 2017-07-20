@@ -1,5 +1,10 @@
 = Changelog
 
+v0.2.1::
+* The "All of These Moments I'll Never Replace" release.
+* Add core-only compatibility with 5.14.0, minus SHA-3 and tests.
+* Remove use of experimental to aid compatibility with CentOS.
+
 v0.2.0::
 * The "Ignore Them Still" release.
 * Add an App::Muter package so PAUSE will index the distribution.

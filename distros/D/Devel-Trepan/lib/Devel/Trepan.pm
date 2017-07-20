@@ -18,8 +18,7 @@ use Exporter;
 
 
 use constant PROGRAM => 'trepan.pl';
-use version;
-$VERSION='0.73'; # To fool CPAN indexer. Is <= real version
+our $VERSION='0.73'; # To fool CPAN indexer. Is <= real version
 $VERSION = $Devel::Trepan::Version::VERSION;
 $PROGRAM = PROGRAM;
 
@@ -271,6 +270,10 @@ L<Set a breakpoint (break)|Devel::Trepan::CmdProcessor::Command::Break>
 =item *
 
 L<Add or modify a condition on a breakpoint (condition)|Devel::Trepan::CmdProcessor::Command::Condition>
+
+=item *
+
+L<Clear some breakpoints by line number (clear)|Devel::Trepan::CmdProcessor::Command::Clear>
 
 =item *
 

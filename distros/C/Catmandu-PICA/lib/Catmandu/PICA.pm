@@ -1,6 +1,6 @@
 package Catmandu::PICA;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 1;
 __END__
@@ -40,6 +40,10 @@ introduction into Catmandu.
 
 =item * L<Catmandu::Fix::pica_map>
 
+=item * L<Catmandu::Fix::pica_add>
+
+=item * L<Catmandu::Fix::pica_set>
+
 =back
 
 =head1 CONTRIBUTORS
@@ -49,6 +53,8 @@ introduction into Catmandu.
 Johann Rolschewski, <jorol@cpan.org>
 
 Jakob Voß <voss@gbv.de>
+
+Carsten Klee <klee@cpan.org>
 
 =head1 COPYRIGHT
 

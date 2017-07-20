@@ -4,7 +4,7 @@ package HTTP::OAI::MetadataFormat;
 
 use strict;
 
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 
 sub metadataPrefix { shift->_elem('metadataPrefix',@_) }
 sub schema { shift->_elem('schema',@_) }

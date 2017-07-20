@@ -18,6 +18,14 @@ sub promise_reject  { MyTestPromise->reject(@_) }
 }
 
 # fulfill chain
+F_FIN_RETURNS_EMPTY: {
+  my $p = promise_resolve('VAL');
+  my ($V, $called);
+  $p->finally(sub() { $called++; my @foo; })->then(sub($v) { $V = $v; }, sub {fail});
+  loop_start;
+  is $called, 1;
+  is $V,      'VAL';
+}
 F_FIN_RETURNS_VALUE: {
   my $p = promise_resolve('VAL');
   my ($V, $called);

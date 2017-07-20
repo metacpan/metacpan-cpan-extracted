@@ -3,7 +3,7 @@ package Prty::JavaScript;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Prty::Path;
 use Scalar::Util ();
@@ -165,7 +165,7 @@ sub script {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

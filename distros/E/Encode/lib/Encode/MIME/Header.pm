@@ -2,7 +2,7 @@ package Encode::MIME::Header;
 use strict;
 use warnings;
 
-our $VERSION = do { my @r = ( q$Revision: 2.26 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.27 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 
 use Carp ();
 use Encode ();
@@ -56,7 +56,7 @@ my $re_capture_encoded_word_split = qr/=\?($re_charset)((?:\*$re_language)?)\?($
 my $re_encoding_strict_b = qr/[Bb]/;
 my $re_encoding_strict_q = qr/[Qq]/;
 my $re_encoded_text_strict_b = qr/[0-9A-Za-z\+\/]*={0,2}/;
-my $re_encoded_text_strict_q = qr/(?:[^\?\s=]|=[0-9A-Fa-f]{2})*/;
+my $re_encoded_text_strict_q = qr/(?:[\x21-\x3C\x3E\x40-\x7E]|=[0-9A-Fa-f]{2})*/; # NOTE: first part are printable US-ASCII except ?, =, SPACE and TAB
 my $re_encoded_word_strict = qr/=\?$re_charset(?:\*$re_language)?\?(?:$re_encoding_strict_b\?$re_encoded_text_strict_b|$re_encoding_strict_q\?$re_encoded_text_strict_q)\?=/;
 my $re_capture_encoded_word_strict = qr/=\?($re_charset)((?:\*$re_language)?)\?($re_encoding_strict_b\?$re_encoded_text_strict_b|$re_encoding_strict_q\?$re_encoded_text_strict_q)\?=/;
 

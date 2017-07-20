@@ -8,12 +8,7 @@ requires "warnings" => "0";
 on 'build' => sub {
   requires "Alien::Build" => "0.40";
   requires "Alien::Build::MM" => "0.40";
-  requires "Alien::Google::GRPC" => "0";
-  requires "Archive::Extract" => "0";
-  requires "Env" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
-  requires "File::Copy" => "0";
-  requires "File::Copy::Recursive" => "0";
 };
 
 on 'test' => sub {
@@ -23,7 +18,12 @@ on 'test' => sub {
 on 'configure' => sub {
   requires "Alien::Build" => "0.40";
   requires "Alien::Build::MM" => "0.40";
+  requires "Alien::Google::GRPC" => "0.03";
+  requires "Archive::Extract" => "0";
+  requires "Env" => "0";
   requires "ExtUtils::MakeMaker" => "6.52";
+  requires "File::Copy" => "0";
+  requires "File::Copy::Recursive" => "0";
 };
 
 on 'develop' => sub {

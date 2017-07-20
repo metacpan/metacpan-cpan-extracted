@@ -1,8 +1,154 @@
+NAME
+    Complete::File - Completion routines related to files
+
+VERSION
+    This document describes version 0.43 of Complete::File (from Perl
+    distribution Complete-File), released on 2017-07-14.
+
 DESCRIPTION
+FUNCTIONS
+  complete_dir
+    Usage:
+
+     complete_dir(%args) -> array
+
+    Complete directory from local filesystem (wrapper for complete_dir()
+    that only picks directories).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_dot => *bool* (default: 1)
+
+        If turned off, will not allow "." or ".." in path.
+
+        This is most useful when combined with "starting_path" option to
+        prevent user going up/outside the starting path.
+
+    *   filter => *str|code*
+
+        Only return items matching this filter.
+
+        Filter can either be a string or a code.
+
+        For string filter, you can specify a pipe-separated groups of
+        sequences of these characters: f, d, r, w, x. Dash can appear
+        anywhere in the sequence to mean not/negate. An example: "f" means
+        to only show regular files, "-f" means only show non-regular files,
+        "drwx" means to show only directories which are readable, writable,
+        and executable (cd-able). "wf|wd" means writable regular files or
+        writable directories.
+
+        For code filter, you supply a coderef. The coderef will be called
+        for each item with these arguments: $name. It should return true if
+        it wants the item to be included.
+
+    *   handle_tilde => *bool* (default: 1)
+
+    *   starting_path => *str* (default: ".")
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  complete_file
+    Usage:
+
+     complete_file(%args) -> array
+
+    Complete file and directory from local filesystem.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   allow_dot => *bool* (default: 1)
+
+        If turned off, will not allow "." or ".." in path.
+
+        This is most useful when combined with "starting_path" option to
+        prevent user going up/outside the starting path.
+
+    *   exclude_dir => *bool*
+
+        This is also an alternative to specifying full "filter". Set this to
+        true if you do not want directories.
+
+        If you only want directories, take a look at "complete_dir()".
+
+    *   file_ext_filter => *re|array[str]*
+
+        This is also an alternative to specifying full "filter" or
+        "file_regex_filter". You can set this to a regex or a set of
+        extensions to accept. Note that like in "file_regex_filter",
+        directories of any name is also still allowed.
+
+    *   file_regex_filter => *re*
+
+        Filter shortcut for file regex.
+
+        This is a shortcut for constructing a filter. So instead of using
+        "filter", you use this option. This will construct a filter of
+        including only directories or regular files, and the file must match
+        a regex pattern. This use-case is common.
+
+    *   filter => *str|code*
+
+        Only return items matching this filter.
+
+        Filter can either be a string or a code.
+
+        For string filter, you can specify a pipe-separated groups of
+        sequences of these characters: f, d, r, w, x. Dash can appear
+        anywhere in the sequence to mean not/negate. An example: "f" means
+        to only show regular files, "-f" means only show non-regular files,
+        "drwx" means to show only directories which are readable, writable,
+        and executable (cd-able). "wf|wd" means writable regular files or
+        writable directories.
+
+        For code filter, you supply a coderef. The coderef will be called
+        for each item with these arguments: $name. It should return true if
+        it wants the item to be included.
+
+    *   handle_tilde => *bool* (default: 1)
+
+    *   starting_path => *str* (default: ".")
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-File>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-File>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-File>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     Complete
 
-    Other Complete::* modules.
+    Other "Complete::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

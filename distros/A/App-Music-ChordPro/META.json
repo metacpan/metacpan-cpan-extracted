@@ -4,9 +4,8 @@
       "Johan Vromans <jvromans@squirrel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "unknown",
       "perl_5"
    ],
    "meta-spec" : {
@@ -30,7 +29,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
          }
       },
       "configure" : {
@@ -44,27 +44,22 @@
             "Font::TTF" : "1.04",
             "PDF::API2" : "2.02"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0"
-         }
       }
    },
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/App/Music/ChordPro.pm",
-         "version" : "0.80"
+         "version" : "0.81"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "0.80"
+         "version" : "0.81"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "http://www.chordpro.org"
    },
-   "version" : "0.80",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.81",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

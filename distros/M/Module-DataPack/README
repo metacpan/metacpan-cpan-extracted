@@ -1,5 +1,123 @@
-SEE ALSO
+NAME
+    Module::DataPack - Like Module::FatPack, but uses datapacking instead of
+    fatpack
 
+VERSION
+    This document describes version 0.21 of Module::DataPack (from Perl
+    distribution Module-DataPack), released on 2017-07-14.
+
+FUNCTIONS
+  datapack_modules
+    Usage:
+
+     datapack_modules(%args) -> [status, msg, result, meta]
+
+    Like Module::FatPack, but uses datapacking instead of fatpack.
+
+    Both this module and "Module:FatPack" generate source code that embeds
+    modules' source codes and load them on-demand via require hook. The
+    difference is that the modules' source codes are put in "__DATA__"
+    section instead of regular Perl hashes (fatpack uses %fatpacked). This
+    reduces compilation overhead, although this is not noticeable unless
+    when the number of embedded modules is quite large. For example, in
+    "App::pause", the "pause" script embeds ~320 modules with a total of
+    ~54000 lines. The overhead of fatpack code is ~49ms on my PC, while with
+    datapack the overhead is about ~10ms.
+
+    There are two downsides of this technique. The major one is that you
+    cannot load modules during BEGIN phase (e.g. using "use") because at
+    that point, DATA section is not yet available. You can only use run-time
+    require()'s.
+
+    Another downside of this technique is that you cannot use "__DATA__"
+    section for other purposes (well, actually with some care, you still
+    can).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   module_names => *array[str]*
+
+        Module names to search.
+
+    *   module_srcs => *hash*
+
+        Module source codes (a hash, keys are module names).
+
+    *   output => *str*
+
+        Output filename.
+
+    *   overwrite => *bool* (default: 0)
+
+        Whether to overwrite output if previously exists.
+
+    *   postamble => *str*
+
+        Perl source code to add after the datapack code (but before the
+        __DATA__ section).
+
+    *   preamble => *str*
+
+        Perl source code to add before the datapack code.
+
+    *   put_hook_at_the_end => *bool*
+
+        Put the require hook at the end of @INC using "push" instead of at
+        the front using "unshift".
+
+    *   stripper => *bool* (default: 0)
+
+        Whether to strip included modules using Perl::Stripper.
+
+    *   stripper_comment => *bool* (default: 1)
+
+        Set strip_comment=1 (strip comments) in Perl::Stripper.
+
+    *   stripper_log => *bool* (default: 0)
+
+        Set strip_log=1 (strip log statements) in Perl::Stripper.
+
+    *   stripper_maintain_linum => *bool* (default: 0)
+
+        Set maintain_linum=1 in Perl::Stripper.
+
+    *   stripper_pod => *bool* (default: 1)
+
+        Set strip_pod=1 (strip POD) in Perl::Stripper.
+
+    *   stripper_ws => *bool* (default: 1)
+
+        Set strip_ws=1 (strip whitespace) in Perl::Stripper.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-DataPack>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-DataPack>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-DataPack>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Module::FatPack for a similar module which uses fatpacking technique
     instead of datapacking.
 
@@ -7,5 +125,14 @@ SEE ALSO
 
     Data::Section::Seekable, the format used for the data section
 
-    datapack-modules, CLI for datapack_modules.
+    datapack-modules, CLI for "datapack_modules".
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

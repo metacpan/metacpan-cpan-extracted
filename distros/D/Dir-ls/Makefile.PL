@@ -27,9 +27,10 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "File::chdir" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,6 +42,7 @@ my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
+  "File::chdir" => 0,
   "Path::Tiny" => "0.097",
   "Sort::filevercmp" => 0,
   "Test::More" => "0.88",

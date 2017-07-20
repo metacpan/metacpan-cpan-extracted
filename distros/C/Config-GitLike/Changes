@@ -1,5 +1,12 @@
 Revision history for perl module Config::GitLike
 
+1.17 2017-07-16
+ - Read and write files with non-UNIX-newlines
+ - Filter multiple values correctly when using `get_regexp`
+ - Throw an error when `get` is passed no section
+ - Perl 5.28.0 compatibility, by pushing '.' into @INC in Makefile.PL
+   for Module::Install
+
 1.16 2015-02-16
  - Canonicalize paths using File::Spec->canonpath; this addresses
    failures on Windows where /-separated paths were stored in the

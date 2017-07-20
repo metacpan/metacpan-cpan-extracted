@@ -11,6 +11,7 @@ my %module_build_args = (
     "Module::Build" => "0.28"
   },
   "configure_requires" => {
+    "Alien::Base" => 0,
     "Alien::Base::ModuleBuild" => "0.023",
     "ExtUtils::CppGuess" => "0.11",
     "Module::Build" => "0.28"
@@ -20,7 +21,7 @@ my %module_build_args = (
     "Mattia Barbon <mattia\@barbon.org>"
   ],
   "dist_name" => "Alien-ProtoBuf",
-  "dist_version" => "0.05",
+  "dist_version" => "0.06",
   "license" => "perl",
   "module_name" => "Alien::ProtoBuf",
   "recursive_test_files" => 1

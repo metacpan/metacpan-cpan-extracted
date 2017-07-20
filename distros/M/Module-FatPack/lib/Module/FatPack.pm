@@ -1,7 +1,7 @@
 package Module::FatPack;
 
-our $DATE = '2016-12-29'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.17'; # VERSION
 
 use 5.010001;
 use strict;
@@ -21,11 +21,11 @@ $SPEC{fatpack_modules} = {
     summary => 'Generate source code that contains fatpacked modules',
     description => <<'_',
 
-This routine provides the same core technique employed by `App::Fatpack` (which
-is putting modules' source code inside Perl variables and loading them on-demand
-via require hook) without all the other stuffs. All you need is supply the names
-of modules (or the modules' source code themselves) and you'll get the output in
-a file or string.
+This routine provides the same core technique employed by `App::FatPacker`
+(which is putting modules' source code inside Perl variables and loading them
+on-demand via require hook) without all the other stuffs. All you need is supply
+the names of modules (or the modules' source code themselves) and you'll get the
+output in a file or string.
 
 _
     args_rels => {
@@ -277,20 +277,24 @@ Module::FatPack - Generate source code that contains fatpacked modules
 
 =head1 VERSION
 
-This document describes version 0.16 of Module::FatPack (from Perl distribution Module-FatPack), released on 2016-12-29.
+This document describes version 0.17 of Module::FatPack (from Perl distribution Module-FatPack), released on 2017-07-14.
 
 =head1 FUNCTIONS
 
 
-=head2 fatpack_modules(%args) -> [status, msg, result, meta]
+=head2 fatpack_modules
+
+Usage:
+
+ fatpack_modules(%args) -> [status, msg, result, meta]
 
 Generate source code that contains fatpacked modules.
 
-This routine provides the same core technique employed by C<App::Fatpack> (which
-is putting modules' source code inside Perl variables and loading them on-demand
-via require hook) without all the other stuffs. All you need is supply the names
-of modules (or the modules' source code themselves) and you'll get the output in
-a file or string.
+This routine provides the same core technique employed by C<App::FatPacker>
+(which is putting modules' source code inside Perl variables and loading them
+on-demand via require hook) without all the other stuffs. All you need is supply
+the names of modules (or the modules' source code themselves) and you'll get the
+output in a file or string.
 
 This function is not exported by default, but exportable.
 
@@ -399,7 +403,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<App::FatPack>, the original implementation.
+L<App::FatPacker>, the original implementation.
 
 L<App::depak> for more options e.g. use various tracing methods, etc.
 
@@ -411,7 +415,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

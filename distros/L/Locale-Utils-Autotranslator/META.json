@@ -23,11 +23,6 @@
             "Test::NoWarnings" : "0"
          }
       },
-      "configure" : {
-         "requires" : {
-            "Module::Build" : "0.42"
-         }
-      },
       "runtime" : {
          "recommends" : {
             "Test::Pod" : "1.14",
@@ -58,7 +53,7 @@
    "provides" : {
       "Locale::Utils::Autotranslator" : {
          "file" : "lib/Locale/Utils/Autotranslator.pm",
-         "version" : "1.004"
+         "version" : "1.007"
       },
       "Locale::Utils::Autotranslator::ApiMymemoryTranslatedNet" : {
          "file" : "lib/Locale/Utils/Autotranslator/ApiMymemoryTranslatedNet.pm",
@@ -71,6 +66,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.004",
+   "version" : "1.007",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

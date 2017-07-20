@@ -1,6 +1,16 @@
 CHANGES
     Revision history for Perl extension Tk::AbstractCanvas:
 
+    - 1.82 H7DMAlTk Thu Jul 13 10:47:29:46 -0500 2017
+      * could not do VERSION 1.10 since same as 1.1 and 1.12 is still less
+      than 1.8, but probably would work if I had started with 1.01 or 'v'
+      instead
+
+      * added Tk to required in Makefile and METAs, and put eval use Tk in
+      01podc.t to hopefully resolve newest CPANTesters failure on make test
+
+      * removed duplicate description heading from POD
+
     - 1.8 H79M9Rot Sun Jul 9 09:27:50:55 -0500 2017
       * added test skipping in 02acnv.t to resolve
       <HTTPS://RT.CPAN.Org/Ticket/Display.html?id=122405>. (Thanks again

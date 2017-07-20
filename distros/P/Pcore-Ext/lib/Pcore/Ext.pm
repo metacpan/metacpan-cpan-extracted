@@ -1,4 +1,4 @@
-package Pcore::Ext v0.11.0;
+package Pcore::Ext v0.11.2;
 
 use Pcore -dist, -const;
 use Pcore::Ext::Context;

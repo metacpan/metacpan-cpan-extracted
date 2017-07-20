@@ -1,4 +1,4 @@
-use 5.010_000;  # see README
+use 5.008_000;
 use Config;
 use ExtUtils::MakeMaker;
 
@@ -7,7 +7,7 @@ WriteMakefile(
   AUTHOR        => 'Carsten Gaebler',
   ABSTRACT_FROM => 'lib/Math/Random/MTwist.pm',
   VERSION_FROM  => 'lib/Math/Random/MTwist.pm',
-  MIN_PERL_VERSION => '5.010000',
+  MIN_PERL_VERSION => '5.008000',
   PREREQ_PM     => { 'Time::HiRes' => 0 },
   TEST_REQUIRES => { 'Test::More' => 0 },
   INC           => '-I.',

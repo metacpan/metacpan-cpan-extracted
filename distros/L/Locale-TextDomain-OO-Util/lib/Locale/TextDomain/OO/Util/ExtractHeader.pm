@@ -139,7 +139,7 @@ __END__
 =head1 NAME
 Locale::TextDomain::OO::Util::ExtractHeader - Gettext header extractor
 
-$Id: ExtractHeader.pm 600 2015-07-01 04:58:40Z steffenw $
+$Id: ExtractHeader.pm 635 2017-02-23 06:54:16Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-TextDomain-OO-Util/trunk/lib/Locale/TextDomain/OO/Util/ExtractHeader.pm $
 

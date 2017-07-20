@@ -96,7 +96,9 @@ sub test_crush_cookie {
 sub test_bake_cookie {
     for my $cookie (@cookie_list) {
         my $c = _sort_cookie(bake_cookie($cookie->{name}, $cookie->{fields}));
-        my $result = $cookie->{result} // _sort_cookie($cookie->{string});
+        my $result = defined($cookie->{result})
+                   ? $cookie->{result}
+                   :  _sort_cookie($cookie->{string});
         is($c, $result, 'bake ' . $cookie->{name});
     }
 }

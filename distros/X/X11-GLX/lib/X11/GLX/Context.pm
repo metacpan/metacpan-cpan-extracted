@@ -1,9 +1,33 @@
 package X11::GLX::Context;
-$X11::GLX::Context::VERSION = '0.02';
-require X11::GLX; # all comes from XS.  don't need to load this file.
+$X11::GLX::Context::VERSION = '0.03';
+use strict;
+use warnings;
+use X11::GLX;
+use parent 'X11::Xlib::Opaque';
 
 # ABSTRACT: Opaque wrapper for GLXContext pointer
 
+
+# display comes from parent class
+
+sub autofree { $_[0]{autofree}= $_[1] if @_ > 1; $_[0]{autofree} }
+
+sub imported { 0 }
+
+# id comes from XS
+
+sub DESTROY {
+	my $self= shift;
+	unless ($self->_already_freed) {
+		X11::GLX::glXDestroyContext($self->display, $self)
+			if $self->autofree;
+		X11::GLX::glXFreeContextEXT($self->display, $self)
+			if $self->imported;
+	}
+}
+
+@X11::GLX::Context::Imported::ISA= ( __PACKAGE__ );
+sub X11::GLX::Context::Imported::imported { 1 }
 
 1;
 
@@ -19,7 +43,7 @@ X11::GLX::Context - Opaque wrapper for GLXContext pointer
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 
@@ -33,6 +57,19 @@ See L<X11::GLX::DWIM> for a convenient object-oriented interface to GLX that
 performs the things you probably want it to do.
 
 =head1 ATTRIBUTES
+
+=head2 display
+
+X11 connection this Context was created from.
+
+=head2 autofree
+
+Whether to automatically call L<glXDestroyContext|X11::GLX/glXDestroyContext>
+when this object goes out of scope.
+
+=head2 imported
+
+Read-only.  Always False in base class.  Overridden in subclass ::Imported to be True.
 
 =head2 id
 

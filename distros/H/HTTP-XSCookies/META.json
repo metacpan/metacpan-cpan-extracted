@@ -50,6 +50,6 @@
          "web" : "https://github.com/gonzus/http-xscookies"
       }
    },
-   "version" : "0.000009",
+   "version" : "0.000011",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

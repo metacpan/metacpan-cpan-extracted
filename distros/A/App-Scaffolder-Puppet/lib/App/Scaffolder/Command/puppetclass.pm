@@ -1,7 +1,5 @@
 package App::Scaffolder::Command::puppetclass;
-{
-  $App::Scaffolder::Command::puppetclass::VERSION = '0.002001';
-}
+$App::Scaffolder::Command::puppetclass::VERSION = '0.003001';
 use parent qw(App::Scaffolder::Puppet::Command);
 
 # ABSTRACT: Scaffold one or more related Puppet classes
@@ -12,9 +10,11 @@ use warnings;
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ App::Scaffolder::Command::puppetclass - Scaffold one or more related Puppet clas
 
 =head1 VERSION
 
-version 0.002001
+version 0.003001
 
 =head1 SYNOPSIS
 
@@ -73,10 +73,9 @@ Manfred Stock <mstock@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Manfred Stock.
+This software is copyright (c) 2017 by Manfred Stock.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

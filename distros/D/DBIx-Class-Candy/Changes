@@ -1,5 +1,9 @@
 Revision history for DBIx-Class-Candy
 
+0.005003  2017-07-14 09:29:22-07:00 America/Los_Angeles
+ - Stop depending on String::CamelCase (closes GH#15)
+   (Good find Peter Rabbitson!)
+
 0.005002  2016-04-29 09:20:41-07:00 America/Los_Angeles
   - Fix test issue when run under `prove -lr` (Thanks Peter Rabbitson!)
 

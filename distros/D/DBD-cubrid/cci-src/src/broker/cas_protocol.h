@@ -198,10 +198,8 @@ extern "C"
     CAS_FC_GET_SHARD_INFO = 43,
     CAS_FC_CAS_CHANGE_MODE = 44,
 
-    /* Whenever you want to introduce a new function code,
-     * you must add a corresponding function entry to server_fn_table
-     * of both CUBRID and (MySQL, Oracle).
-     */
+    /* Whenever you want to introduce a new function code, you must add a corresponding function entry to
+     * server_fn_table of both CUBRID and (MySQL, Oracle). */
     CAS_FC_MAX,
 
     /* function code list of protocol version V2 - 9.0.0.xxxx */
@@ -218,7 +216,9 @@ extern "C"
     PROTOCOL_V3 = 3,		/* session information extend with server session key */
     PROTOCOL_V4 = 4,		/* send as_index to driver */
     PROTOCOL_V5 = 5,		/* shard feature, fetch end flag */
-    CURRENT_PROTOCOL = PROTOCOL_V5
+    PROTOCOL_V6 = 6,		/* cci/cas4m support unsigned integer type */
+    PROTOCOL_V7 = 7,		/* timezone types, to pin xasl entry for retry */
+    CURRENT_PROTOCOL = PROTOCOL_V7
   };
   typedef enum t_cas_protocol T_CAS_PROTOCOL;
 
@@ -304,6 +304,8 @@ extern "C"
                       (DRIVER_INFO)[SRV_CON_MSG_IDX_MINOR_VER], \
                       (DRIVER_INFO)[SRV_CON_MSG_IDX_PATCH_VER])
 
+#define CAS_TYPE_FIRST_BYTE_PROTOCOL_MASK 0x80
+
 /* For backward compatibility */
 #define CAS_VER_TO_MAJOR(VER)    ((int) (((VER) >> 16) & 0xFF))
 #define CAS_VER_TO_MINOR(VER)    ((int) (((VER) >> 8) & 0xFF))
@@ -346,9 +348,7 @@ extern "C"
   extern void cas_bi_set_renewed_error_code (const bool renewed_error_code);
   extern bool cas_bi_get_renewed_error_code (void);
   extern bool cas_di_understand_renewed_error_code (const char *driver_info);
-  extern void cas_bi_make_broker_info (char *broker_info, char dbms_type,
-				       char statement_pooling,
-				       char cci_pconnect);
+  extern void cas_bi_make_broker_info (char *broker_info, char dbms_type, char statement_pooling, char cci_pconnect);
 #ifdef __cplusplus
 }
 #endif

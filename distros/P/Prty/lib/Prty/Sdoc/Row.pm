@@ -4,7 +4,7 @@ use base qw/Prty::Sdoc::Node/;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 # -----------------------------------------------------------------------------
 
@@ -188,7 +188,7 @@ sub dump {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

@@ -59,7 +59,10 @@ DESCRIPTION
 
     Mojo::SQLite is a tiny wrapper around DBD::SQLite that makes SQLite
     <https://www.sqlite.org/> a lot of fun to use with the Mojolicious
-    <https://mojolico.us> real-time web framework.
+    <https://mojolico.us> real-time web framework. Use all SQL features
+    <http://sqlite.org/lang.html> SQLite has to offer, generate CRUD
+    queries from data structures, and manage your database schema with
+    migrations.
 
     Database and statement handles are cached automatically, so they can be
     reused transparently to increase performance. And you can handle
@@ -93,8 +96,10 @@ DESCRIPTION
     "Write-Ahead Log" journal is enabled for all connections, allowing
     multiple processes to read and write concurrently to the same database
     file (but only one can write at a time). You can prevent this mode from
-    being enabled by passing the option no_wal. See
-    http://sqlite.org/wal.html for more information.
+    being enabled by passing the option no_wal, but note that this is
+    incompatible with SQLite databases that have already had WAL mode
+    enabled. See http://sqlite.org/wal.html and "journal_mode" in
+    DBD::SQLite for more information.
 
       # Performed concurrently
       my $pid = fork || die $!;
@@ -131,9 +136,9 @@ EXAMPLES
 
     This distribution also contains a well-structured example blog
     application
-    <https://github.com/kraih/mojo-pg/tree/master/examples/blog> you can
-    use for inspiration. This application shows how to apply the MVC design
-    pattern in practice.
+    <https://github.com/Grinnz/Mojo-SQLite/tree/master/examples/blog> you
+    can use for inspiration. This application shows how to apply the MVC
+    design pattern in practice.
 
 EVENTS
 
@@ -171,7 +176,7 @@ ATTRIBUTES
       $sql     = $sql->auto_migrate($bool);
 
     Automatically migrate to the latest database schema with "migrations",
-    as soon as the first database connection has been established.
+    as soon as "db" has been called for the first time.
 
  database_class
 
@@ -195,7 +200,7 @@ ATTRIBUTES
       $sql    = $sql->max_connections(3);
 
     Maximum number of idle database handles to cache for future use,
-    defaults to 5.
+    defaults to 1.
 
  migrations
 
@@ -220,9 +225,13 @@ ATTRIBUTES
     "ATTRIBUTES COMMON TO ALL HANDLES" in DBI and "DRIVER PRIVATE
     ATTRIBUTES" in DBD::SQLite for more information on available options.
 
- pubsub
+ parent
 
-    This attribute is DEPRECATED.
+      my $parent = $sql->parent;
+      $sql       = $sql->parent(Mojo::SQLite->new);
+
+    Another Mojo::SQLite object to use for connection management, instead
+    of establishing and caching our own database connections.
 
 METHODS
 
@@ -234,6 +243,7 @@ METHODS
       my $sql = Mojo::SQLite->new;
       my $sql = Mojo::SQLite->new('file:test.db);
       my $sql = Mojo::SQLite->new('sqlite:test.db');
+      my $sql = Mojo::SQLite->new(Mojo::SQLite->new);
 
     Construct a new Mojo::SQLite object and parse connection string with
     "from_string" if necessary.
@@ -292,16 +302,17 @@ METHODS
       $sql = $sql->from_string('file:test.db');
       $sql = $sql->from_string('file:///C:/foo/bar.db');
       $sql = $sql->from_string('sqlite:C:%5Cfoo%5Cbar.db');
+      $sql = $sql->from_string(Mojo::SQLite->new);
 
-    Parse configuration from connection string. Connection strings are
-    parsed as URLs, so you should construct them using a module like
-    Mojo::URL, URI::file, or URI::db. For portability on non-Unix-like
-    systems, either construct the URL with the sqlite scheme, or use "new"
-    in URI::file to construct a URL with the file scheme. A URL with no
-    scheme will be parsed as a file URL, and file URLs are parsed according
-    to the current operating system. If specified, the hostname must be
-    localhost. If the URL has a query string, it will be parsed and applied
-    to "options".
+    Parse configuration from connection string or use another Mojo::SQLite
+    object as "parent". Connection strings are parsed as URLs, so you
+    should construct them using a module like Mojo::URL, URI::file, or
+    URI::db. For portability on non-Unix-like systems, either construct the
+    URL with the sqlite scheme, or use "new" in URI::file to construct a
+    URL with the file scheme. A URL with no scheme will be parsed as a file
+    URL, and file URLs are parsed according to the current operating
+    system. If specified, the hostname must be localhost. If the URL has a
+    query string, it will be parsed and applied to "options".
 
       # Absolute filename
       $sql->from_string('sqlite:////home/fred/data.db');

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.03
+    version 0.04
 
 SYNOPSIS
 
@@ -33,6 +33,13 @@ FUNCTIONS
     runs the given code. If the code calls exec, then this function will
     return an arrayref with its arguments. If the code never calls exec, it
     will return undef.
+
+ never_exec_ok
+
+     never_exec_ok { ... }
+
+    Runs the given code. If the code calls exec, then the test will fail
+    (but exec will be intercepted and not performed).
 
 CAVEATS
 

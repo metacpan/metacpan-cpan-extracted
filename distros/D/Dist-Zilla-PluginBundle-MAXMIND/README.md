@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::MAXMIND - MAXMIND's plugin bundle
 
 # VERSION
 
-version 0.80
+version 0.81
 
 # SYNOPSIS
 
@@ -292,6 +292,8 @@ Dave Rolsky <autarch@urth.org>
 - Greg Oschwald <goschwald@maxmind.com>
 - Mark Fowler <mark@twoshortplanks.com>
 - Olaf Alders <oalders@maxmind.com>
+- Patrick Cronin <PatrickCronin@users.noreply.github.com>
+- Patrick Cronin <pcronin@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 

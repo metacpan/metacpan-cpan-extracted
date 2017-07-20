@@ -1,22 +1,22 @@
 use Module::Build;
 
+unlink $_ for
+ qw(
+/home/phil/z/perl/cpan/DataEditXmlLint/zzz.html
+/home/phil/z/perl/cpan/DataEditXmlLint/pod2htmd.tmp
+/home/phil/z/perl/cpan/DataEditXmlLint/lib/Data/Edit/Xml/doc.data
+/home/phil/z/perl/cpan/DataEditXmlLint/lib/Data/Edit/Xml/methods.data
+);
+
 my $b = Module::Build->new
  (module_name   => 'Data::Edit::Xml::Lint',
   create_readme =>  0,
   dist_author   => 'philiprbrenan@gmail.com',
-  dist_abstract => 'Lint an xml file using xmllint',
+  dist_abstract => 'Lint xml files using xmllint and report the failure rate',
   license       => 'perl',
   perl          => '5.16.0',
-  requires      => {Carp=>0, POSIX=>0, Data::Table::Text=>0, Carp=>0, XML::Parser=>0},
+  requires      => {Data::Table::Text=>0, Carp=>0, Digest::SHA=>0, Encode=>0},
   can_run       => 'xmllint',
  );
 
 $b->create_build_script();
-
-unlink $_ for
- qw(
-/home/phil/z/perl/cpan/DataEditXmlLint/zzz.html
-/home/phil/z/perl/cpan/DataEditXmlLint/pod2html.data
-/home/phil/z/perl/cpan/DataEditXmlLint/lib/Data/Edit/Xml/doc.data
-/home/phil/z/perl/cpan/DataEditXmlLint/lib/Data/Edit/Xml/methods.data
-);

@@ -243,6 +243,17 @@ use tests 2; # import_page
       'import_page with two MediaBox';
 }
 
+use tests 1; # modified
+# Test that modified works on the trailer.
+$fn = tempfile;
+copy "t/4pages.pdf", $fn;
+$pdf = new PDF'Tiny $fn;
+delete $pdf->trailer->[1]{'Info'}; # we hates metadata
+$pdf->modified("trailer");
+$pdf->append;
+cmp_ok -s $fn, ">", -s "t/4pages.pdf", 'file with just trailer modified';
+undef $pdf;
+
 use tests 1; # Test huge amounts of whitespace.
 # t/spaces.t has 4K of whitespace in the reference to the first page.
 like PDF'Tiny'serialize(

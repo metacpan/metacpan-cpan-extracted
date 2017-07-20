@@ -16,8 +16,8 @@ use Module::Build 0.32;
 use File::Find;
 
 our $data = {};
-require "inc/build_common.pl";
-require "lib/EB/Version.pm";
+require "./inc/build_common.pl";
+require "./lib/EB/Version.pm";
 
 # Warn on non-standard install locations.
 checkbin(<<EOD);

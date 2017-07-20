@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 8;
 
 use Mac::PropertyList;
 
@@ -31,3 +31,18 @@ my @values = $plist->values;
 ok( eq_array( \@values, [qw(Mimi Roscoe Juliet Buster)] ),
 	"Object has right values" );
 
+note 'Try non-canonical layout';
+$plist = Mac::PropertyList::parse_plist( <<"HERE" );
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array><string>Athos</string><string>Porthos</string><string>Aramis</string></array>
+</array>
+</plist>
+HERE
+isa_ok( $plist, "Mac::PropertyList::array", "Make object from non-canonical plist string" );
+is( $plist->count, 3, "Non-canonical object has right number of values" );
+
+@values = $plist->values();
+ok( eq_array( \@values, [ qw{ Athos Porthos Aramis } ] ),
+	"Non-canonical object has right values" );

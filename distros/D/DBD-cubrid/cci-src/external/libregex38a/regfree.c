@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #include "utils.h"
-//#include "include/regex38a.h"
+#include "include/regex38a.h"
 #include "regmem.ih"
 #include "regex2.h"
 

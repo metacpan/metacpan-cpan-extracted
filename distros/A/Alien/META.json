@@ -62,7 +62,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.94",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+   "version" : "0.95",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0224"
 }
 

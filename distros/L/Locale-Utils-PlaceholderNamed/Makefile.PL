@@ -3,21 +3,21 @@ require 5.006;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'VERSION_FROM' => 'lib/Locale/Utils/PlaceholderNamed.pm',
-  'PL_FILES' => {},
   'INSTALLDIRS' => 'site',
   'NAME' => 'Locale::Utils::PlaceholderNamed',
+  'PL_FILES' => {},
+  'EXE_FILES' => [],
   'PREREQ_PM' => {
-                   'MooX::Types::MooseLike' => 0,
+                   'Test::Differences' => '0.60',
+                   'Test::Exception' => 0,
+                   'MooX::StrictConstructor' => 0,
+                   'MooX::Types::MooseLike::Base' => 0,
                    'namespace::autoclean' => 0,
                    'Test::NoWarnings' => 0,
                    'Test::More' => 0,
-                   'MooX::StrictConstructor' => 0,
-                   'Carp' => 0,
                    'Moo' => '1.003001',
-                   'Test::Differences' => '0.60',
-                   'Test::Exception' => 0
+                   'Carp' => 0
                  },
-  'EXE_FILES' => []
+  'VERSION_FROM' => 'lib/Locale/Utils/PlaceholderNamed.pm'
 )
 ;

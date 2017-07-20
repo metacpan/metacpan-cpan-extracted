@@ -1,5 +1,11 @@
 Revision history for Perl extension Locale::Utils::PlaceholderBabelFish.
 
+0.007  Wed Jul 19 13:19:21 2017
+- removed makefile dependency Module::Build (2nd try)
+
+0.005  Sun Jul 16 11:46:11 2017
+- removed makefile dependency Module::Build
+
 0.004  Fri Feb 24 07:08:02 2017
 - fixed pod, documentet method new
 

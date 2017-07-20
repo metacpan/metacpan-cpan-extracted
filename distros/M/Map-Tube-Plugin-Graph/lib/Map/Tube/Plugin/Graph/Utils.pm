@@ -1,6 +1,6 @@
 package Map::Tube::Plugin::Graph::Utils;
 
-$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.25';
+$Map::Tube::Plugin::Graph::Utils::VERSION   = '0.26';
 $Map::Tube::Plugin::Graph::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Plugin::Graph::Utils - Helper package for Map::Tube::Plugin::Graph.
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
@@ -56,10 +56,10 @@ sub graph_line_image {
         line_number => $caller[2] })
         unless defined $line_name;
 
-    my $line = $map->{_lines}->{uc($line_name)};
+    my $line = $map->_get_line_object_by_name($line_name);
     Map::Tube::Exception::InvalidLineName->throw({
         method      => __PACKAGE__."::_validate_param",
-        message     => "ERROR: Invalid Line name [$line].",
+        message     => "ERROR: Invalid Line name [$line_name].",
         filename    => $caller[1],
         line_number => $caller[2] })
         unless defined $line;

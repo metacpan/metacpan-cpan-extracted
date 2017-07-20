@@ -33,6 +33,50 @@ Module::Build->subclass(code => q{
 		return {} unless $self->have_c_compiler;
 		return $self->SUPER::find_xs_files;
 	}
+	sub compile_c {
+		my($self, $file, %args) = @_;
+		my $cc0_h =
+			$self->localize_file_path("lib/Params/callchecker0.h");
+		unless(-f $cc0_h) {
+			my $content = eval {
+				local $SIG{__DIE__};
+				require Devel::CallChecker;
+				Devel::CallChecker->VERSION(0.003);
+				&Devel::CallChecker::callchecker0_h();
+			} || "";
+			$self->add_to_cleanup($cc0_h);
+			require IO::File;
+			my $fh = IO::File->new($cc0_h, "w") or die $!;
+			$fh->printflush($content) or die $!;
+			$fh->close or die $!;
+		}
+		return $self->SUPER::compile_c($file, %args);
+	}
+	sub link_c {
+		no strict "refs";
+		my($self, $spec) = @_;
+		my $cb = $self->cbuilder;
+		my $cbclass = ref($cb);
+		my $orig_cb_link = $cb->can("link");
+		local *{"${cbclass}::link"} = sub {
+			my($self, %args) = @_;
+			if($args{module_name} eq "Params::Classify") {
+				my $cc_linkables = eval {
+				    local $SIG{__DIE__};
+				    require Devel::CallChecker;
+				    Devel::CallChecker->VERSION(0.003);
+				    [&Devel::CallChecker::callchecker_linkable];
+				} || [];
+				$args{objects} = [
+				    @{$args{objects}},
+				    @$cc_linkables,
+				];
+			}
+			@_ = ($self, %args);
+			goto &$orig_cb_link;
+		};
+		$self->SUPER::link_c($spec);
+	}
 })->new(
 	module_name => "Params::Classify",
 	license => "perl",
@@ -54,6 +98,7 @@ Module::Build->subclass(code => q{
 		"warnings" => 0,
 	},
 	build_recommends => {
+		"Devel::CallChecker" => "0.003",
 		"ExtUtils::CBuilder" => "0.15",
 	},
 	requires => {
@@ -65,12 +110,12 @@ Module::Build->subclass(code => q{
 		"warnings" => 0,
 	},
 	recommends => {
+		"Devel::CallChecker" => "0.003",
 		"XSLoader" => 0,
 	},
 	needs_compiler => 0,
-	dynamic_config => 1,
+	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
 	sign => 1,
 )->create_build_script;
 

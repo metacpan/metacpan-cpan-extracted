@@ -4,7 +4,6 @@ Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
 lib/XML/Easy.pm
 lib/XML/Easy.xs
@@ -15,12 +14,12 @@ lib/XML/Easy/NodeBasics.pm
 lib/XML/Easy/Syntax.pm
 lib/XML/Easy/Text.pm
 lib/XML/Easy/Transform.pod
-t/DataSets.pm
-t/ErrorCases.pm
 t/classify.t
 t/classify_pp.t
 t/easy_module.t
 t/easy_module_pp.t
+t/lib/t/DataSets.pm
+t/lib/t/ErrorCases.pm
 t/node_basics.t
 t/node_basics_pp.t
 t/node_object.t
@@ -33,6 +32,7 @@ t/read.t
 t/read_pp.t
 t/setup_pp.pl
 t/syntax_main.t
+t/version_synch.t
 t/write.data
 t/write.t
 t/write_pp.t

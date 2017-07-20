@@ -9,6 +9,9 @@ INSTALLATION
 	make test
 	make install         ( or sudo make install )
 
+PREREQUISITES
+
+   graphviz
 
 Copyright (C) 2017 René Nyffenegger
 

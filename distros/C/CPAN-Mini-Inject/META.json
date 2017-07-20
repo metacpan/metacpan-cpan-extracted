@@ -7,10 +7,11 @@
       "Randy Stauner <rwstauner@cpan.org>",
       "Karen Etheridge <ether@cpan.org>",
       "Salve J. Nilsen <sjn@cpan.org>",
-      "Wolfgang Pecho <pecho@belwue.de>"
+      "Wolfgang Pecho <pecho@belwue.de>",
+      "Konstantin Yakunin <twinhooker@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.131560",
+   "generated_by" : "Module::Build version 0.421",
    "license" : [
       "perl_5"
    ],
@@ -44,6 +45,7 @@
             "HTTP::Server::Simple" : "0.07",
             "IO::Zlib" : "0",
             "LWP::Simple" : "0",
+            "Net::EmptyPort" : "0",
             "Pod::Usage" : "0",
             "Test::More" : "0",
             "YAML" : "0"
@@ -53,11 +55,11 @@
    "provides" : {
       "CPAN::Mini::Inject" : {
          "file" : "lib/CPAN/Mini/Inject.pm",
-         "version" : "0.33"
+         "version" : "0.35"
       },
       "CPAN::Mini::Inject::Config" : {
          "file" : "lib/CPAN/Mini/Inject/Config.pm",
-         "version" : "0.33"
+         "version" : "0.35"
       }
    },
    "release_status" : "stable",
@@ -72,5 +74,5 @@
          "url" : "git://github.com/AndyA/CPAN--Mini--Inject.git"
       }
    },
-   "version" : "0.33"
+   "version" : "0.35"
 }

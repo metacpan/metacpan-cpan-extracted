@@ -11,8 +11,8 @@ has '+_international_dial_prefix' => ( default => '00'             );
 has '+_international_dial_spacer' => ( default => ''               );
 
 # format the number for display
-# also used as a core validator - if it can't be formatted, assume bad number
-# when validating, ensure you set an error and *not* set _formatted_number
+# also used as a core validator - if it can't be formatted, 
+# set an error here
 sub _format_number {
   my $self = shift;
   my $num = $self->_cleaned_number;

@@ -1,5 +1,5 @@
 package JSON::Path::Evaluator;
-$JSON::Path::Evaluator::VERSION = '0.310';
+$JSON::Path::Evaluator::VERSION = '0.400';
 use strict;
 use warnings;
 use 5.008;
@@ -10,11 +10,12 @@ use Carp;
 use Carp::Assert qw(assert);
 use Exporter::Tiny ();
 use JSON::MaybeXS;
-use JSON::Path::Constants qw(:operators);
+use JSON::Path::Constants qw(:operators :symbols);
 use JSON::Path::Tokenizer qw(tokenize);
+use List::Util qw/pairs/;
 use Readonly;
 use Safe;
-use Scalar::Util qw/looks_like_number blessed/;
+use Scalar::Util qw/looks_like_number blessed refaddr/;
 use Storable qw/dclone/;
 use Sys::Hostname qw/hostname/;
 use Try::Tiny;
@@ -63,7 +64,10 @@ sub new {
     }
     $self->{want_ref}         = $args{want_ref}         || 0;
     $self->{_calling_context} = $args{_calling_context} || 0;
-    $self->{script_engine}    = $args{script_engine}    || 'PseudoJS';
+
+    my $script_engine =
+        $args{script_engine} ? $args{script_engine} : $self->{expression} =~ /\$_/ ? 'perl' : undef;
+    $self->{script_engine} = $script_engine || 'PseudoJS';
     bless $self, $class;
     return $self;
 }
@@ -81,14 +85,16 @@ sub evaluate_jsonpath {
         }
     }
 
-    my $want_ref = delete $args{want_ref} || 0;
+    my $want_ref  = delete $args{want_ref}  || 0;
+    my $want_path = delete $args{want_path} || 0;
+
     my $self = __PACKAGE__->new(
         root             => $json_object,
         expression       => $expression,
         _calling_context => wantarray ? 'ARRAY' : 'SCALAR',
         %args
     );
-    return $self->evaluate( $expression, want_ref => $want_ref );
+    return $self->evaluate( $expression, want_ref => $want_ref, want_path => $want_path );
 }
 
 
@@ -97,148 +103,219 @@ sub evaluate {
 
     my $json_object = $self->{root};
 
-    return $self->_evaluate( $json_object, [ tokenize($expression) ], $args{want_ref} );
+    my $token_stream = [ tokenize($expression) ];
+    shift @{$token_stream} if $token_stream->[0] eq $TOKEN_ROOT;
+    shift @{$token_stream} if $token_stream->[0] eq $TOKEN_CHILD;
+
+    if ( $args{want_path} ) {
+        my %reftable = $self->_reftable_walker($json_object);
+        my @refs = $self->_evaluate( $json_object, dclone $token_stream, 1 );
+
+        my @paths;
+        for my $ref (@refs) {
+            my $refaddr = ref ${$ref} ? refaddr ${$ref} : refaddr $ref;
+            push @paths, $reftable{$refaddr};
+        }
+        return @paths;
+    }
+
+    my @ret = $self->_evaluate( $json_object, $token_stream, $args{want_ref} );
+    return wantarray ? @ret : $ret[0];
+}
+
+sub _reftable_walker {
+    my ( $self, $json_object, $base_path ) = @_;
+
+    $base_path   ||= '$';
+    $json_object ||= $self->root;
+
+    my @entries = ( refaddr $json_object => $base_path );
+
+    if ( ref $json_object eq 'ARRAY' ) {
+        for ( 0 .. $#{$json_object} ) {
+            my $path = sprintf q{%s['%d']}, $base_path, $_;
+            if ( ref $json_object->[$_] ) {
+                push @entries, $self->_reftable_walker( $json_object->[$_], $path );
+            }
+            else {
+                push @entries, refaddr \( $json_object->[$_] ) => $path;
+            }
+        }
+    }
+    else {
+        for my $index ( keys %{$json_object} ) {
+            my $path = sprintf q{%s['%s']}, $base_path, $index;
+            if ( ref $json_object->{$index} ) {
+                push @entries, $self->_reftable_walker( $json_object->{$index}, $path );
+            }
+            else {
+                push @entries, refaddr \( $json_object->{$index} ) => $path;
+            }
+        }
+    }
+    return @entries;
 }
 
 sub _evaluate {    # This assumes that the token stream is syntactically valid
     my ( $self, $obj, $token_stream, $want_ref ) = @_;
 
+    return unless ref $obj;
+
     $token_stream ||= [];
 
-    while ( defined( my $token = _get_token($token_stream) ) ) {
-        next                                       if $token eq $TOKEN_CURRENT;
-        next                                       if $token eq $TOKEN_CHILD;
-        assert( $token ne $TOKEN_SUBSCRIPT_OPEN )  if $ASSERT_ENABLE;
-        assert( $token ne $TOKEN_SUBSCRIPT_CLOSE ) if $ASSERT_ENABLE;
+    while ( defined( my $token = shift @{$token_stream} ) ) {
+        next if $token eq $TOKEN_CURRENT;
+        next if $token eq $TOKEN_CHILD;
 
-        if ( $token eq $TOKEN_ROOT ) {
-            return $self->_evaluate( $self->{root}, $token_stream, $want_ref );
-        }
-        elsif ( $token eq $TOKEN_FILTER_OPEN ) {
-            confess q{Filters not supported on hashrefs} if _hashlike($obj);
+        if ( $token eq $TOKEN_FILTER_OPEN ) {
+            my $filter_expression = shift @{$token_stream};
 
-            my @sub_stream;
+            my $closing_token = shift @{$token_stream};
+            assert( $closing_token eq $TOKEN_FILTER_SCRIPT_CLOSE, q{Closing token seen} ) if $ASSERT_ENABLE;
 
-            # Build a stream of just the tokens between the filter open and close
-            while ( defined( my $token = _get_token($token_stream) ) ) {
-                last if $token eq $TOKEN_FILTER_SCRIPT_CLOSE;
-                if ( $token eq $TOKEN_CURRENT ) {
-                    push @sub_stream, $token, $TOKEN_CHILD, $TOKEN_ALL;
-                }
-                else {
-                    push @sub_stream, $token;
-                }
-            }
-
-            my @matching_indices;
-            if ( $self->{script_engine} eq 'PseudoJS' ) {
-                @matching_indices = $self->_process_pseudo_js( $obj, [@sub_stream] );
-            }
-            elsif ( $self->{script_engine} eq 'perl' ) {
-                @matching_indices = $self->_process_perl( $obj, [@sub_stream] );
-            }
-            else {
-                croak qq{Unsupported script engine "$self->{script_engine}"};
-            }
+            # Find all indices matching the filter expression. This modifies $token_stream
+            my @matching_indices = $self->_process_filter( $obj, $filter_expression );
 
             if ( !@{$token_stream} ) {
-                return $want_ref ? map { \( $obj->[$_] ) } @matching_indices : map { $obj->[$_] } @matching_indices;
+                my @got = map { _get( $obj, $_ ) } @matching_indices;
+                return $want_ref ? @got : map { ${$_} } @got;
             }
-
-            # Evaluate the token stream on all elements that pass the comparison in compare()
-            return map { $self->_evaluate( $obj->[$_], dclone($token_stream), $want_ref ) } @matching_indices;
+            else {
+                return map { $self->_evaluate( _get( $obj, $_ ), dclone($token_stream), $want_ref ) } @matching_indices;
+            }
         }
-        elsif ( $token eq $TOKEN_RECURSIVE ) {
-            my $index = _get_token($token_stream);
+        elsif ( $token eq $TOKEN_RECURSIVE )
+        {    # Sweet Jesus, Pooh, that's not honey! You're eating Sweet Jesus, Pooh, that's not honey! You're eating...
+            my $index = shift @{$token_stream};
+            my @matched;
+            if ( $index eq $TOKEN_FILTER_OPEN ) {
+                my $filter_expression = shift @{$token_stream};
 
-            my $matched = [ _match_recursive( $obj, $index, $want_ref ) ];
-            if ( !scalar @{$token_stream} ) {
-                return @{$matched};
+                my $closing_token = shift @{$token_stream};
+                assert( $closing_token eq $TOKEN_FILTER_SCRIPT_CLOSE, q{Closing token seen} ) if $ASSERT_ENABLE;
+
+                return $self->_filter_recursive( $obj, $filter_expression, $want_ref );
             }
-            return map { $self->_evaluate( $_, dclone($token_stream), $want_ref ) } @{$matched};
+
+            @matched = _match_recursive( $obj, $index, $want_ref );
+            if ( !@{$token_stream} ) {
+                return @matched;
+            }
+            return map { $self->_evaluate( $_, dclone($token_stream), $want_ref ) } @matched;
         }
         else {
-            my $index = normalize($token);
-
-            assert( !$OPERATORS{$index}, qq{"$index" is not an operator} ) if $index ne $TOKEN_ALL;
-            assert( ref $index eq 'HASH', q{Index is a hashref} ) if $ASSERT_ENABLE && ref $index;
-
-            if ( !@{$token_stream} ) {
-                my $got = _get( $obj, $index );
-                if ( ref $got eq 'ARRAY' ) {
-                    return $want_ref ? @{$got} : map { ${$_} } @{$got};
-                }
-                else {
-                    return $want_ref ? $got : ${$got};
-                }
+            my $index;
+            if ( $token eq $TOKEN_SUBSCRIPT_OPEN ) {
+                $index = shift @{$token_stream};
+                my $closing_token = shift @{$token_stream};
+                assert $closing_token eq $TOKEN_SUBSCRIPT_CLOSE if $ASSERT_ENABLE;
             }
             else {
-                my $got = _get( $obj, $index );
-                if ( ref $got eq 'ARRAY' ) {
-                    return map { $self->_evaluate( ${$_}, dclone($token_stream), $want_ref ) } @{$got};
-                }
-                else {
-                    return $self->_evaluate( ${$got}, dclone($token_stream), $want_ref );
-                }
+                $index = $token;
+            }
+
+            assert( !$OPERATORS{$index}, qq{"$index" is not an operator} ) if $index ne $TOKEN_ALL;
+            assert( !ref $index,         q{Index is a scalar} )            if $ASSERT_ENABLE;
+
+            my (@got) = _get( $obj, $index, create_key => $want_ref );    # This always returns a ref
+            if ( !@{$token_stream} ) {
+                return $want_ref ? @got : map { ${$_} } @got;
+            }
+            else {
+                return map { $self->_evaluate( ${$_}, dclone($token_stream), $want_ref ) } @got;
             }
         }
     }
 }
 
-sub _get {
-    my ( $object, $index ) = @_;
+sub _process_filter {
+    my ( $self, $obj, $filter_expression ) = @_;
 
-    $object = ${$object} if ref $object eq 'REF';    # KLUDGE
+    my @matching_indices;
+    if ( $self->{script_engine} eq 'PseudoJS' ) {
+        @matching_indices = $self->_process_pseudo_js( $obj, $filter_expression );
+    }
+    elsif ( $self->{script_engine} eq 'perl' ) {
+        @matching_indices = $self->_process_perl( $obj, $filter_expression );
+    }
+    else {
+        croak qq{Unsupported script engine "$self->{script_engine}"};
+    }
+    return @matching_indices;
+}
+
+# This _always_ has to return a ref so that when it's called from evaluate( ... , want_ref => 1)
+# So that we can return a ref into the object (e.g. for use as an lvalue), even when the path points
+# to a scalar (which will of course be copied).
+#
+# I.E.: for { foo => 'bar' }, we always want \( foo->{bar} ) so that
+# JSON::Path->new('$.foo')->value($obj) = 'baz' works  like it oughtta.
+sub _get {
+    my ( $object, $index, %args ) = @_;
 
     assert( _hashlike($object) || _arraylike($object), 'Object is a hashref or an arrayref' ) if $ASSERT_ENABLE;
 
-    my $scalar_context;
-    my @indices;
+    my $create_key = $args{create_key};
+
+    # When want_ref is passed to _evaluate(), it will return a reference to whatever was matched.
+    # If what was matched is itself a ref (e.g. an arrayref), _evaluate() will return a ref of
+    # type 'REF'.
+    if ( ref $object eq 'REF' ) {
+        $object = ${$object};
+    }
+
     if ( $index eq $TOKEN_ALL ) {
-        @indices = keys( %{$object} )   if _hashlike($object);
-        @indices = ( 0 .. $#{$object} ) if _arraylike($object);
-    }
-    elsif ( ref $index ) {
-        assert( ref $index eq 'HASH', q{Index supplied in a hashref} ) if $ASSERT_ENABLE;
-        if ( $index->{union} ) {
-            @indices = @{ $index->{union} };
-        }
-        elsif ( $index->{slice} ) {
-            confess qq(Slices not supported for hashlike objects) if _hashlike($object);
-            @indices = _slice( scalar @{$object}, $index->{slice} );
-        }
-        else { assert( 0, q{Handling a slice or a union} ) if $ASSERT_ENABLE }
-    }
-    else {
-        $scalar_context = 1;
-        @indices        = ($index);
-    }
-    @indices = grep { looks_like_number($_) } @indices if _arraylike($object);
-
-    if ($scalar_context) {
-        return unless @indices;
-
-        my ($index) = @indices;
         if ( _hashlike($object) ) {
-            return \( $object->{$index} );
+            return map { \($_) } values %{$object};
         }
         else {
-            no warnings qw/numeric/;
-            return \( $object->[$index] );
-            use warnings qw/numeric/;
+            return map { \($_) } @{$object};
         }
     }
     else {
-        return [] unless @indices;
-
-        if ( _hashlike($object) ) {
-            return [ map { \( $object->{$_} ) } @indices ];
+        my @indices;
+        if ( $index =~ /$TOKEN_ARRAY_SLICE/ ) {
+            my $length = _hashlike($object) ? scalar values %{$object} : scalar @{$object};
+            @indices = _slice( $index, $length );
+        }
+        elsif ( $index =~ /$TOKEN_UNION/ ) {
+            @indices = split /$TOKEN_UNION/, $index;
         }
         else {
-            my @ret;
-            return [ map { \( $object->[$_] ) } grep { looks_like_number($_) } @indices ];
+            @indices = ($index);
+        }
+
+        if ( _hashlike($object) ) {
+            if ($create_key) {
+                return map { \( $object->{$_} ) } @indices;
+            }
+            else {
+                my @ret;
+                for my $index (@indices) {
+                    push @ret, \( $object->{$index} ) if exists $object->{$index};
+                }
+                return @ret;
+            }
+        }
+        else {
+            my @numeric_indices = grep { looks_like_number($_) } @indices;
+            if ($create_key) {
+                return map { \( $object->[$_] ) } @numeric_indices;
+            }
+            else {
+                my @ret;
+                for my $index (@numeric_indices) {
+                    push @ret, \( $object->[$index] ) if exists $object->[$index];
+                }
+                return @ret;
+            }
         }
     }
+}
+
+sub _indices {
+    my $object = shift;
+    return _hashlike($object) ? keys %{$object} : ( 0 .. $#{$object} );
 }
 
 sub _hashlike {
@@ -309,13 +386,19 @@ sub _get_token {
 # in particular, for the slice [n:m], m is *one greater* than the last index to slice.
 # This means that the slice [3:5] will return indices 3 and 4, but *not* 5.
 sub _slice {
-    my ( $length, $spec ) = @_;
-    my ( $start, $end, $step ) = @{$spec};
+    my ( $index, $length ) = @_;
 
-    # start, end, and step are set in get_token
-    assert( defined $start ) if $ASSERT_ENABLE;
-    assert( defined $end )   if $ASSERT_ENABLE;
-    assert( defined $step )  if $ASSERT_ENABLE;
+    my ( $start, $end, $step ) = split /$TOKEN_ARRAY_SLICE/, $index, 3;
+
+    if ( !defined($start) || $start eq '' ) {
+        $start = 0;
+    }
+    if ( !defined($end) || $end eq '' ) {
+        $end = -1;
+    }
+    if ( !defined($step) || $step eq '' ) {
+        $step = 1;
+    }
 
     $start = ( $length - 1 ) if $start == -1;
     $end   = $length         if $end == -1;
@@ -334,7 +417,11 @@ sub _match_recursive {
     my ( $obj, $index, $want_ref ) = @_;
 
     my @match;
+
     if ( _arraylike($obj) ) {
+        if ( looks_like_number($index) && exists $obj->[$index] ) {
+            push @match, $want_ref ? \( $obj->[$index] ) : $obj->[$index];
+        }
         for ( 0 .. $#{$obj} ) {
             next unless ref $obj->[$_];
             push @match, _match_recursive( $obj->[$_], $index, $want_ref );
@@ -352,7 +439,117 @@ sub _match_recursive {
     return @match;
 }
 
-sub normalize {
+sub _filter_recursive {
+    my ( $self, $obj, $expression, $want_ref ) = @_;
+
+    my @ret;
+
+    # Evaluate the filter expression for the current object
+    my @matching_indices = $self->_process_filter( $obj, $expression );
+    for my $index (@matching_indices) {
+        my ($got) = _get( $obj, $index );
+        push @ret, $want_ref ? $got : ${$got};
+    }
+
+    # Evaluate the filter expression for any subordinate objects
+    for my $index ( _indices($obj) ) {
+        my ($got) = _get( $obj, $index );
+        $got = ${$got};    # _get will always return a reference. We want the value, so dereference it
+        next unless ref $got;
+        push @ret, $self->_filter_recursive( $got, $expression, $want_ref );
+    }
+
+    return @ret;
+}
+
+sub _process_pseudo_js {
+    my ( $self, $object, $expression ) = @_;
+
+    my ( $lhs, $operator, $rhs ) = _parse_psuedojs_expression($expression);
+
+    my (@token_stream) = tokenize($lhs);
+
+    my $index;
+
+    my @lhs;
+    if ( _hashlike($object) ) {
+        @lhs = map { $self->_evaluate( $_, [@token_stream] ) } values %{$object};
+    }
+    else {
+        for my $value (@{$object}) {
+            my ($got) = $self->_evaluate($value, [@token_stream]);
+            push @lhs, $got;
+        }
+    }
+
+    # get indexes that pass compare()
+    my @matching;
+    for ( 0 .. $#lhs ) {
+        my $val = $lhs[$_];
+        push @matching, $_ if _compare( $operator, $val, $rhs );
+    }
+
+    return @matching;
+}
+
+sub _parse_psuedojs_expression {
+    my $expression = shift;
+    my @parts;
+
+    my ( $lhs, $operator, $rhs );
+
+    # The operator could be '=', '!=', '==', '===', '<=', or '>='
+    if ( $expression =~ /$EQUAL_SIGN/ ) {
+        my $position = index( $expression, '=' );
+        if ( substr( $expression, $position + 1, 1 ) eq $EQUAL_SIGN ) {    # could be '==' or '==='
+            if ( substr( $expression, $position + 2, 1 ) eq $EQUAL_SIGN ) {    # ===
+                $operator = $TOKEN_TRIPLE_EQUAL;
+            }
+            else {
+                $operator = $TOKEN_DOUBLE_EQUAL;
+            }
+        }
+        else {
+            my $preceding_char = substr( $expression, $position - 1, 1 );
+            if ( $preceding_char eq $GREATER_THAN_SIGN ) {
+                $operator = $TOKEN_GREATER_EQUAL;
+            }
+            elsif ( $preceding_char eq $LESS_THAN_SIGN ) {
+                $operator = $TOKEN_LESS_EQUAL;
+            }
+            elsif ( $preceding_char eq $EXCLAMATION_MARK ) {
+                $operator = $TOKEN_NOT_EQUAL;
+            }
+            else {
+                $operator = $TOKEN_SINGLE_EQUAL;
+            }
+        }
+        ( $lhs, $rhs ) = split /$operator/, $expression, 2;
+    }
+    else {
+        for ( grep { $OPERATORS{$_} eq $OPERATOR_TYPE_COMPARISON } keys %OPERATORS ) {
+            next if /$EQUAL_SIGN/;
+            if ( $expression =~ /$_/ ) {
+                ( $lhs, $rhs ) = split /$_/, $expression, 2;
+                $operator = $_;
+                last;
+            }
+        }
+    }
+
+    # FIXME: RHS is assumed to be a single value. This isn't necessarily a safe assumption.
+    if ($operator) {
+        $rhs = _normalize( $rhs || '' );
+        $lhs = _normalize($lhs);
+    }
+    else {
+        $operator = $OPERATOR_IS_TRUE;
+        $lhs      = $expression;
+    }
+    return ( $lhs, $operator, $rhs );
+}
+
+sub _normalize {
     my $string = shift;
 
     # NB: Stripping spaces *before* stripping quotes allows the caller to quote spaces in an index.
@@ -363,54 +560,29 @@ sub normalize {
     return $string;
 }
 
-sub _process_pseudo_js {
-    my ( $self, $object, $token_stream ) = @_;
-
-    # Treat as @.foo IS TRUE
-    my $rhs      = pop @{$token_stream};
-    my $operator = pop @{$token_stream};
-
-    # This assumes that RHS is only a single token. I think that's a safe assumption.
-    if ( $OPERATORS{$operator} eq $OPERATOR_TYPE_COMPARISON ) {
-        $rhs = normalize($rhs);
-    }
-    else {
-        push @{$token_stream}, $operator, $rhs;
-        $operator = $OPERATOR_IS_TRUE;
-    }
-
-    my $index     = normalize( pop @{$token_stream} );
-    my $separator = pop @{$token_stream};
-
-    # Evaluate the left hand side of the comparison first. .
-    my @lhs = $self->_evaluate( $object, dclone $token_stream );
-
-    # get indexes that pass compare()
-    my @matching;
-    for ( 0 .. $#lhs ) {
-        my $val = ${ _get( $lhs[$_], $index ) };
-        push @matching, $_ if _compare( $operator, $val, $rhs );
-    }
-
-    return @matching;
-}
-
 sub _process_perl {
-    my ( $self, $object, $token_stream ) = @_;
+    my ( $self, $object, $code ) = @_;
 
-    assert( _arraylike($object), q{Object is an arrayref} ) if $ASSERT_ENABLE;
-
-    my $code = join '', @{$token_stream};
     my $cpt = Safe->new;
     $cpt->permit_only( ':base_core', qw/padsv padav padhv padany rv2gv/ );
     ${ $cpt->varglob('root') } = dclone( $self->{root} );
 
     my @matching;
-    for my $index ( 0 .. $#{$object} ) {
-        local $_ = $object->[$index];
-        my $ret = $cpt->reval($code);
-        croak qq{Error in filter: $@} if $@;
-        push @matching, $index if $cpt->reval($code);
+    if ( _hashlike($object) ) {
+        for my $index ( keys %{$object} ) {
+            local $_ = $object->{$index};
+            my $ret = $cpt->reval($code);
+            croak qq{Error in filter: $@} if $@;
+            push @matching, $index if $ret;
+        }
+    }
+    else {
+        for my $index ( 0 .. $#{$object} ) {
+            local $_ = $object->[$index];
+            my $ret = $cpt->reval($code);
+            croak qq{Error in filter: $@} if $@;
+            push @matching, $index if $ret;
+        }
     }
     return @matching;
 }
@@ -460,92 +632,16 @@ JSON::Path::Evaluator - A module that recursively evaluates JSONPath expressions
 
 =head1 VERSION
 
-version 0.310
+version 0.400
 
-=head1 METHODS
-
-=head2 new 
-
-Constructor for the object-oriented interface to this module. Arguments may be specified in a hash or a hashref.
-
-Args:
-
-=over 4
-
-=item root
-
-Required. JSONPath expressions will be evaluated with respect to this. Must be a hashref or an arrayref.
-
-=item expression
-
-JSONPath expression to evaluate
-
-=item want_ref 
-
-Set this to true if you want a reference to the thing the JSONPath expression matches, rather than the value
-of said thing. Useful if you want to use this to modify hashrefs / arrayrefs in place.
-
-=item script_engine
-
-Defaults to "PseudoJS", which is my clever name for a subset of Javascript-B<like> operators for Boolean expressions. 
-See L</"Filtering with PseudoJS">. You may also specify "perl" here, in which case the filter will be treated as Perl code. 
-See L</"Filtering with Perl">.
-
-=back
-
-=head2 evaluate_jsonpath 
-
-Evaluate a JSONPath expression on the given object. CLASS METHOD.
-
-Args:
-
-=over 4
-
-=item $json_object
-
-JSON object for which the expression will be evaluated. If this is a scalar, it will be treated
-as a JSON string and parsed into the appropriate Perl data structure first. 
-
-=item $expression 
-
-JSONPath expression to evaluate on the object.
-
-=item %args 
-
-Misc. arguments to this method. Currently the only supported argument is 'want_ref' - set this to
-true in order to return a reference to the matched portion of the object, rather than the value 
-of that matched portion.
-
-=back
-
-=head2 evaluate 
-
-Evaluate a JSONPath expression on the object passed to the constructor.  OBJECT METHOD.
-
-Args:
-
-=over 4
-
-=item $expression 
-
-JSONPath expression to evaluate on the object.
-
-=item %args 
-
-Misc. arguments to this method. Currently the only supported argument is 'want_ref' - set this to
-true in order to return a reference to the matched portion of the object, rather than the value 
-of that matched portion.
-
-=back
-
-=head1 SYNOPSIS 
+=head1 SYNOPSIS
 
     use JSON::MaybeXS qw/decode_json/; # Or whatever JSON thing you like. I won't judge.
     use JSON::Path::Evaluator qw/evaluate_jsonpath/;
 
     my $obj = decode_json(q(
         { "store": {
-            "book": [ 
+            "book": [
               { "category": "reference",
                 "author": "Nigel Rees",
                 "title": "Sayings of the Century",
@@ -598,17 +694,106 @@ of that matched portion.
     #     }
     # );
 
-=head1 JSONPath 
+=head1 METHODS
 
-This code implements the JSONPath specification at L<JSONPath specification|http://goessner.net/articles/JsonPath/>. 
+=head2 new
+
+Constructor for the object-oriented interface to this module. Arguments may be specified in a hash or a hashref.
+
+Args:
+
+=over 4
+
+=item root
+
+Required. JSONPath expressions will be evaluated with respect to this. Must be a hashref or an arrayref.
+
+=item expression
+
+JSONPath expression to evaluate
+
+=item want_ref
+
+Set this to true if you want a reference to the thing the JSONPath expression matches, rather than the value
+of said thing. Useful if you want to use this to modify hashrefs / arrayrefs in place.
+
+=item script_engine
+
+Defaults to "PseudoJS", which is my clever name for a subset of Javascript-B<like> operators for Boolean expressions.
+See L</"Filtering with PseudoJS">. You may also specify "perl" here, in which case the filter will be treated as Perl code.
+See L</"Filtering with Perl">.
+
+=back
+
+=head2 evaluate_jsonpath
+
+Evaluate a JSONPath expression on the given object. CLASS METHOD.
+
+Args:
+
+=over 4
+
+=item $json_object
+
+JSON object for which the expression will be evaluated. If this is a scalar, it will be treated
+as a JSON string and parsed into the appropriate Perl data structure first.
+
+=item $expression
+
+JSONPath expression to evaluate on the object.
+
+=item %args
+
+Misc. arguments to this method. Currently the only supported argument is 'want_ref' - set this to
+true in order to return a reference to the matched portion of the object, rather than the value
+of that matched portion.
+
+=back
+
+=head2 evaluate
+
+Evaluate a JSONPath expression on the object passed to the constructor.  OBJECT METHOD.
+
+Args:
+
+=over 4
+
+=item $expression
+
+JSONPath expression to evaluate on the object.
+
+=item %args
+
+Misc. arguments to this method.
+
+Supported keys:
+
+=over 4
+
+=item want_ref
+
+Set this to true in order to return a reference to the matched portion of the object, rather than
+the value of the matched portion.
+
+=item want_path
+
+Set this to true in order to return the canonical path(s) to the elements matching the expression.
+
+=back
+
+=back
+
+=head1 JSONPath
+
+This code implements the JSONPath specification at L<JSONPath specification|http://goessner.net/articles/JsonPath/>.
 
 JSONPath is a tool, similar to XPath for XML, that allows one to construct queries to pick out parts of a JSON structure.
 
 =head2 JSONPath Expressions
 
-From the spec: "JSONPath expressions always refer to a JSON structure in the same way as XPath 
-expression are used in combination with an XML document. Since a JSON structure is usually anonymous 
-and doesn't necessarily have a "root member object" JSONPath assumes the abstract name $ assigned 
+From the spec: "JSONPath expressions always refer to a JSON structure in the same way as XPath
+expression are used in combination with an XML document. Since a JSON structure is usually anonymous
+and doesn't necessarily have a "root member object" JSONPath assumes the abstract name $ assigned
 to the outer level object."
 
 Note that in JSONPath square brackets operate on the object or array addressed by the previous path fragment. Indices always start by 0.
@@ -617,43 +802,43 @@ Note that in JSONPath square brackets operate on the object or array addressed b
 
 =over 4
 
-=item $                   
+=item $
 
 the root object/element
 
-=item @                   
+=item @
 
 the current object/element
 
-=item . or []             
+=item . or []
 
 child operator
 
-=item ..                  
+=item ..
 
 recursive descent. JSONPath borrows this syntax from E4X.
 
-=item *                   
+=item *
 
 wildcard. All objects/elements regardless their names.
 
-=item []                  
+=item []
 
 subscript operator. XPath uses it to iterate over element collections and for predicates. In Javascript and JSON it is the native array operator.
 
-=item [,]                 
+=item [,]
 
 Union operator in XPath results in a combination of node sets. JSONPath allows alternate names or array indices as a set.
 
-=item [start:end:step]    
+=item [start:end:step]
 
 array slice operator borrowed from ES4.
 
-=item ?()                 
+=item ?()
 
 applies a filter (script) expression. See L<Filtering>.
 
-=item ()                  
+=item ()
 
 script expression, using the underlying script engine. Handled the same as "?()".
 
@@ -661,33 +846,33 @@ script expression, using the underlying script engine. Handled the same as "?()"
 
 =head2 Filtering
 
-Filters are the most powerful feature of JSONPath. They allow the caller to retrieve data 
+Filters are the most powerful feature of JSONPath. They allow the caller to retrieve data
 conditionally, similar to Perl's C<grep> operator.
 
 Filters are specified using the '?(' token, terminated by ')'. Anything in between these
 two tokens is treated as a filter expression. Filter expressions must return a boolean value.
 
-=head3 Filtering with PseudoJS 
+=head3 Filtering with PseudoJS
 
 By default, this module uses a limited subset of Javascript expressions to evaluate filters. Using
 this script engine, specify the filter in the form "<LHS> <operator> <RHS>", or "<LHS>". This latter
 case will be evaluated as "<LHS> is true".
 
-<LHS> must be a valid JSONPath expression. <RHS> must be a scalar value; comparison of two JSONPath 
-expressions is not supported at this time. 
+<LHS> must be a valid JSONPath expression. <RHS> must be a scalar value; comparison of two JSONPath
+expressions is not supported at this time.
 
 Example:
 
 Using the JSON in L<SYNOPSIS> above and the JSONPath expression C<$..book[?(@.category == "fiction")]>,
-the filter expression C<@.category == "fiction"> will match all values having a value of "fiction" for 
+the filter expression C<@.category == "fiction"> will match all values having a value of "fiction" for
 the key "category".
 
 =head2 Filtering with Perl
 
-When the script engine is set to "perl", filter 
+When the script engine is set to "perl", filter
 Using the JSON in L<SYNOPSIS> above and the JSONPath expression C<$..book[?(@.category == "fiction")]>,
 
-This is understandably dangerous. Although steps have been taken (Perl expressions are evaluated using 
+This is understandably dangerous. Although steps have been taken (Perl expressions are evaluated using
 L<Safe> and a limited set of permitted opcodes) to reduce the risk, callers should be aware of the risk
 when using filters.
 
@@ -697,13 +882,13 @@ When filtering in Perl, there are some differences between the JSONPath spec and
 
 =item *
 
-JSONPath uses the token '$' to refer to the root node. As this is not valid Perl, this should be 
+JSONPath uses the token '$' to refer to the root node. As this is not valid Perl, this should be
 
 replaced with '$root' in a filter expression.
 
 =item *
 
-JSONPath uses the token '@' to refer to the current node. This is also not valid Perl. Use '$_' 
+JSONPath uses the token '@' to refer to the current node. This is also not valid Perl. Use '$_'
 
 instead.
 

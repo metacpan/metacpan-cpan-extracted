@@ -17,58 +17,54 @@ WWW::Wikipedia::LangTitles - get interwiki links from Wikipedia.
     print "$title is '$links->{de}' in German.\n";
     my $film = '東京物語';
     my $flinks = get_wiki_titles ($film, lang => 'ja');
-    print "映画「$film」はイタリア語で'$flinks->{it}'と名付けた。\n";
-    
+    print "映画「$film」はイタリア語で「$flinks->{it}」と名付けた。\n";
 
 
 produces output
 
     Three-phase electric power is 'Dreiphasenwechselstrom' in German.
-    映画「東京物語」はイタリア語で'Viaggio a Tokyo'と名付けた。
+    映画「東京物語」はイタリア語で「Viaggio a Tokyo」と名付けた。
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/WWW-Wikipedia-LangTitles-0.03/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/WWW-Wikipedia-LangTitles-0.04/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.03 of
-WWW::Wikipedia::LangTitles corresponding to L<git commit 7abf04f07649708e751600544787dfa42c2fad9f|https://github.com/benkasminbullock/www-wikipedia-langtitles/commit/7abf04f07649708e751600544787dfa42c2fad9f> released
-on Tue Dec 27 09:25:03 2016 +0900.
+This documents version 0.04 of
+WWW::Wikipedia::LangTitles corresponding to L<git commit cd5d0156c401472bc424421159fca7d3c0f769fe|https://github.com/benkasminbullock/www-wikipedia-langtitles/commit/cd5d0156c401472bc424421159fca7d3c0f769fe> released
+on Thu Jul 20 13:15:53 2017 +0900.
 
 =head1 DESCRIPTION
 
-This module retrieves the Wikipedia interwiki link titles from
-wikidata.org. It can be used, for example, to translate a term in
+This module retrieves the Wikipedia interwiki link titles from the web
+site wikidata.org. It can be used, for example, to translate a term in
 English into other languages, or to get near equivalents.
 
 =head1 FUNCTIONS
 
 =head2 get_wiki_titles
 
-   my $ref = get_wiki_titles ('Helium');
+    my $ref = get_wiki_titles ('Helium');
 
-Returns a hash reference with all the articles in each language,
-indexed by the language. For example C<< $ref->{th} >> will be equal
-to ฮีเลียม, the Thai title of the equivalent Wikipedia article.
+Given a word or phrase as an argument, which is the title of a
+Wikipedia article, the return value is a hash reference containing
+keys which are language codes, and values which are the names of the
+equivalent Wikipedia article in other languages. For example, in the
+above case of B<Helium>, C<< $ref->{th} >> will be equal to ฮีเลียม, the
+Thai title of the Wikipedia article on helium.
 
 The language of the original page can be specified like this:
 
-   use utf8;
-   my $from_th = get_wiki_titles ('ฮีเลียม', lang => 'th');
+    use utf8;
+    my $from_th = get_wiki_titles ('ฮีเลียม', lang => 'th');
 
-The URL is encoded using L<URI::Escape/uri_escape_utf8>, so you must
-use character strings not byte strings (use "use utf8;" etc.)
+The URL is encoded using L<URI::Escape/uri_escape_utf8>, so use
+character, not byte, strings (use "use utf8;" etc.)
 
-An option "verbose" switches on verbose messages with any true value:
-
-   my $ref = get_wiki_titles ($name, verbose => 1);
-
-The contents of these messages is not specified, and is liable to
-change without notice in future releases.
-
-As of this version, this deletes the non-Wikipedia sites like
-Wikiquote and Wikiversity from the list of returned values
+As of version 0.04, get_wiki_titles deletes the
+non-encyclopedia sites like Wikiquote and Wikiversity from the list of
+returned values.
 
 =head2 make_wiki_url
 
@@ -89,7 +85,7 @@ produces output
     https://www.wikidata.org/w/api.php?action=wbgetentities&sites=thwiki&titles=%E0%B8%AE%E0%B8%B5%E0%B9%80%E0%B8%A5%E0%B8%B5%E0%B8%A2%E0%B8%A1&props=sitelinks/urls|datatype&format=json
 
 
-(This example is included as L<F<thai-url.pl>|https://api.metacpan.org/source/BKB/WWW-Wikipedia-LangTitles-0.03/examples/thai-url.pl> in the distribution.)
+(This example is included as L<F<thai-url.pl>|https://fastapi.metacpan.org/source/BKB/WWW-Wikipedia-LangTitles-0.04/examples/thai-url.pl> in the distribution.)
 
 
 If no language is specified, the default is C<en> for English.
@@ -102,8 +98,48 @@ This method was added in version 0.02 of the module.
 
 =item L<Locale::Codes>
 
-You may be able to convert the language codes to and from the language
-names using this module. (I have not tested it yet.)
+This module enables one to convert the language key names given by
+this module into the English-language names of the languages.
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use WWW::Wikipedia::LangTitles 'get_wiki_titles';
+    use Locale::Codes::Language;
+    my $article = 'King Kong';
+    my $titles = get_wiki_titles ($article);
+    for my $lang (keys %$titles) {
+        my $l2c = code2language ($lang);
+        if (! $l2c) {
+            $l2c = $lang;
+        }
+        my $name = $titles->{$lang};
+        if ($name ne $article) {
+            print "$name in $l2c.\n";
+        }
+    }
+
+
+produces output
+
+    king.kong in jbo.
+    קינג קונג in Hebrew.
+    Кинг Конг in Bulgarian.
+    キングコング in Japanese.
+    كينغ كونغ in Arabic.
+    Кінг-Конг in Ukrainian.
+    King Kong (hahmo) in Finnish.
+    金剛 (怪獸) in Chinese.
+    Քինգ Քոնգ in Armenian.
+    คิงคอง in Thai.
+    کینگ کونگ in Persian.
+    Кинг-Конг in Russian.
+    킹콩 in Korean.
+    კინგ კონგი in Georgian.
+
+
+(This example is included as L<F<locale-codes.pl>|https://fastapi.metacpan.org/source/BKB/WWW-Wikipedia-LangTitles-0.04/examples/locale-codes.pl> in the distribution.)
+
 
 =back
 
@@ -167,7 +203,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2016
+2016-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

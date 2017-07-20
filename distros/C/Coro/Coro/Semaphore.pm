@@ -17,7 +17,7 @@ Coro::Semaphore - counting semaphores
 =head1 DESCRIPTION
 
 This module implements counting semaphores. You can initialize a mutex
-with any level of parallel users, that is, you can intialize a sempahore
+with any level of parallel users, that is, you can initialize a sempahore
 that can be C<down>ed more than once until it blocks. There is no owner
 associated with semaphores, so one thread can C<down> it while another can
 C<up> it (or vice versa), C<up> can be called before C<down> and so on:
@@ -42,9 +42,9 @@ use common::sense;
 
 use Coro ();
 
-our $VERSION = 6.511;
+our $VERSION = 6.513;
 
-=item new [inital count]
+=item new [initial count]
 
 Creates a new sempahore object with the given initial lock count. The
 default lock count is 1, which means it is unlocked by default. Zero (or

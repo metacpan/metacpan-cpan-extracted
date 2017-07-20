@@ -4,8 +4,8 @@
 # Package name for the code distribution.
 PACKAGE=	tzcode
 
-# Version numbers of the code and data distributions.
-VERSION=	2014g
+# Version number for the distribution, overridden in the 'tarballs' rule below.
+VERSION=	unknown
 
 # Email address for bug reports.
 BUGEMAIL=	tz@iana.org
@@ -72,11 +72,11 @@ MANDIR=		$(TOPDIR)/man
 
 LIBDIR=		$(TOPDIR)/lib
 
-# If you always want time values interpreted as "seconds since the epoch
-# (not counting leap seconds)", use
+# If you want only POSIX time, with time values interpreted as
+# seconds since the epoch (not counting leap seconds), use
 #	REDO=		posix_only
-# below.  If you always want right time values interpreted as "seconds since
-# the epoch" (counting leap seconds)", use
+# below.  If you want want only "right" time, with values interpreted
+# as seconds since the epoch (counting leap seconds), use
 #	REDO=		right_only
 # below.  If you want both sets of data available, with leap seconds not
 # counted normally, use
@@ -84,51 +84,62 @@ LIBDIR=		$(TOPDIR)/lib
 # below.  If you want both sets of data available, with leap seconds counted
 # normally, use
 #	REDO=		right_posix
-# below.  If you want just POSIX-compatible time values, but with
-# out-of-scope and often-wrong data from the file 'backzone', use
-#	REDO=		posix_packrat
-# POSIX mandates that leap seconds not be counted; for compatibility with it,
-# use "posix_only", "posix_right", or "posix_packrat".
+# below.  POSIX mandates that leap seconds not be counted; for compatibility
+# with it, use "posix_only" or "posix_right".  Use POSIX time on systems with
+# leap smearing; this can work better than unsmeared "right" time with
+# applications that are not leap second aware, and is closer to unsmeared
+# "right" time than unsmeared POSIX time is (e.g., 0.5 vs 1.0 s max error).
 
 REDO=		posix_right
+
+# If you want out-of-scope and often-wrong data from the file 'backzone', use
+#	PACKRATDATA=	backzone
+# To omit this data, use
+#	PACKRATDATA=
+
+PACKRATDATA=
 
 # Since "." may not be in PATH...
 
 YEARISTYPE=	./yearistype
 
 # Non-default libraries needed to link.
-# Add -lintl if you want to use 'gettext' on Solaris.
 LDLIBS=
 
 # Add the following to the end of the "CFLAGS=" line as needed.
 #  -DBIG_BANG=-9999999LL if the Big Bang occurred at time -9999999 (see zic.c)
-#  -DHAVE_ADJTIME=0 if 'adjtime' does not exist (SVR0?)
+#  -DHAVE_DECL_ASCTIME_R=0 if <time.h> does not declare asctime_r
+#  -DHAVE_DIRECT_H if mkdir needs <direct.h> (MS-Windows)
 #  -DHAVE_DOS_FILE_NAMES if file names have drive specifiers etc. (MS-DOS)
-#  -DHAVE_GETTEXT=1 if 'gettext' works (GNU, Linux, Solaris); also see LDLIBS
+#  -DHAVE_GETTEXT=1 if 'gettext' works (e.g., GNU/Linux, FreeBSD, Solaris)
 #  -DHAVE_INCOMPATIBLE_CTIME_R=1 if your system's time.h declares
-#	ctime_r and asctime_r incompatibly with the POSIX standard (Solaris 8).
+#	ctime_r and asctime_r incompatibly with the POSIX standard
+#	(Solaris when _POSIX_PTHREAD_SEMANTICS is not defined).
 #  -DHAVE_INTTYPES_H=1 if you have a pre-C99 compiler with "inttypes.h"
 #  -DHAVE_LINK=0 if your system lacks a link function
 #  -DHAVE_LOCALTIME_R=0 if your system lacks a localtime_r function
 #  -DHAVE_LOCALTIME_RZ=0 if you do not want zdump to use localtime_rz
 #	This defaults to 1 if a working localtime_rz seems to be available.
 #	localtime_rz can make zdump significantly faster, but is nonstandard.
-#  -DHAVE_SETTIMEOFDAY=0 if settimeofday does not exist (SVR0?)
-#  -DHAVE_SETTIMEOFDAY=1 if settimeofday has just 1 arg (SVR4)
-#  -DHAVE_SETTIMEOFDAY=2 if settimeofday uses 2nd arg (4.3BSD)
-#  -DHAVE_SETTIMEOFDAY=3 if settimeofday ignores 2nd arg (4.4BSD)
+#  -DHAVE_POSIX_DECLS=0 if your system's include files do not declare
+#	functions like 'link' or variables like 'tzname' required by POSIX
 #  -DHAVE_STDINT_H=1 if you have a pre-C99 compiler with "stdint.h"
 #  -DHAVE_STRFTIME_L=1 if <time.h> declares locale_t and strftime_l
 #	This defaults to 0 if _POSIX_VERSION < 200809, 1 otherwise.
+#  -DHAVE_STRDUP=0 if your system lacks the strdup function
 #  -DHAVE_SYMLINK=0 if your system lacks the symlink function
 #  -DHAVE_SYS_STAT_H=0 if your compiler lacks a "sys/stat.h"
 #  -DHAVE_SYS_WAIT_H=0 if your compiler lacks a "sys/wait.h"
 #  -DHAVE_TZSET=0 if your system lacks a tzset function
 #  -DHAVE_UNISTD_H=0 if your compiler lacks a "unistd.h" (Microsoft C++ 7?)
-#  -DHAVE_UTMPX_H=1 if your compiler has a "utmpx.h"
+#  -DEPOCH_LOCAL=1 if the 'time' function returns local time not UT
+#  -DEPOCH_OFFSET=N if the 'time' function returns a value N greater
+#	than what POSIX specifies, assuming local time is UT.
+#	For example, N is 252460800 on AmigaOS.
 #  -DNO_RUN_TIME_WARNINGS_ABOUT_YEAR_2000_PROBLEMS_THANK_YOU=1
 #	if you do not want run time warnings about formats that may cause
 #	year 2000 grief
+#  -Dssize_t=long on ancient hosts that lack ssize_t
 #  -DTHREAD_SAFE=1 to make localtime.c thread-safe, as POSIX requires;
 #	not needed by the main-program tz code, which is single-threaded.
 #	Append other compiler flags as needed, e.g., -pthread on GNU/Linux.
@@ -145,21 +156,21 @@ LDLIBS=
 #  -DZIC_MAX_ABBR_LEN_WO_WARN=3
 #	(or some other number) to set the maximum time zone abbreviation length
 #	that zic will accept without a warning (the default is 6)
-#  $(GCC_DEBUG_FLAGS) if you are using GCC and want lots of checking
+#  $(GCC_DEBUG_FLAGS) if you are using recent GCC and want lots of checking
 GCC_DEBUG_FLAGS = -Dlint -g3 -O3 -fno-common -fstrict-aliasing \
 	-Wall -Wextra \
-	-Wbad-function-cast -Wcast-align -Wcast-qual \
+	-Wbad-function-cast -Wcast-align -Wdate-time \
 	-Wdeclaration-after-statement \
+	-Wdouble-promotion \
 	-Wformat=2 -Winit-self -Wjump-misses-init \
-	-Wmissing-declarations -Wmissing-noreturn -Wmissing-prototypes \
-	-Wnested-externs -Wno-address -Wno-cast-qual \
-	-Wno-format-nonliteral -Wno-sign-compare -Wno-sign-conversion \
-	-Wno-type-limits \
-	-Wno-unused-parameter -Woverlength-strings -Wpointer-arith \
+	-Wlogical-op -Wmissing-prototypes -Wnested-externs \
+	-Wold-style-definition -Woverlength-strings -Wpointer-arith \
 	-Wshadow -Wstrict-prototypes -Wsuggest-attribute=const \
 	-Wsuggest-attribute=format -Wsuggest-attribute=noreturn \
 	-Wsuggest-attribute=pure -Wtrampolines \
-	-Wwrite-strings
+	-Wundef -Wunused -Wwrite-strings \
+	-Wno-address -Wno-format-nonliteral -Wno-sign-compare \
+	-Wno-type-limits -Wno-unused-parameter
 #
 # If you want to use System V compatibility code, add
 #	-DUSG_COMPAT
@@ -236,14 +247,25 @@ GCC_DEBUG_FLAGS = -Dlint -g3 -O3 -fno-common -fstrict-aliasing \
 CFLAGS=
 
 # Linker flags.  Default to $(LFLAGS) for backwards compatibility
-# to tzcode2012h and earlier.
+# to release 2012h and earlier.
 
 LDFLAGS=	$(LFLAGS)
+
+# For leap seconds, this Makefile uses LEAPSECONDS='-L leapseconds' in
+# submake command lines.  The default is no leap seconds.
+
+LEAPSECONDS=
+
+# The zic command and its arguments.
 
 zic=		./zic
 ZIC=		$(zic) $(ZFLAGS)
 
 ZFLAGS=
+
+# How to use zic to install tz binary files.
+
+ZIC_INSTALL=	$(ZIC) -y $(YEARISTYPE) -d $(DESTDIR)$(TZDIR) $(LEAPSECONDS)
 
 # The name of a Posix-compliant 'awk' on your system.
 AWK=		awk
@@ -257,16 +279,16 @@ AWK=		awk
 KSHELL=		/bin/bash
 
 # The path where SGML DTDs are kept and the catalog file(s) to use when
-# validating.  The default is appropriate for Ubuntu 13.10.
+# validating.  The default should work on both Debian and Red Hat.
 SGML_TOPDIR= /usr
 SGML_DTDDIR= $(SGML_TOPDIR)/share/xml/w3c-sgml-lib/schema/dtd
 SGML_SEARCH_PATH= $(SGML_DTDDIR)/REC-html401-19991224
 SGML_CATALOG_FILES= \
-  $(SGML_TOPDIR)/share/doc/w3-recs/html/www.w3.org/TR/1999/REC-html401-19991224/HTML4.cat
+  $(SGML_TOPDIR)/share/doc/w3-recs/html/www.w3.org/TR/1999/REC-html401-19991224/HTML4.cat:$(SGML_TOPDIR)/share/sgml/html/4.01/HTML4.cat
 
 # The name, arguments and environment of a program to validate your web pages.
-# See <http://www.jclark.com/sp/> for a validator, and
-# <http://validator.w3.org/source/> for a validation library.
+# See <http://openjade.sourceforge.net/doc/> for a validator, and
+# <https://validator.w3.org/source/> for a validation library.
 VALIDATE = nsgmls
 VALIDATE_FLAGS = -s -B -wall -wno-unused-param
 VALIDATE_ENV = \
@@ -290,27 +312,28 @@ TAB_CHAR=	'	'
 SAFE_CHARSET1=	$(TAB_CHAR)' !\"'$$sharp'$$%&'\''()*+,./0123456789:;<=>?@'
 SAFE_CHARSET2=	'ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\^_`'
 SAFE_CHARSET3=	'abcdefghijklmnopqrstuvwxyz{|}~'
-SAFE_CHARSET=	]$(SAFE_CHARSET1)$(SAFE_CHARSET2)$(SAFE_CHARSET3)-
-SAFE_CHAR=	'['$(SAFE_CHARSET)']'
-# NONSYM_CHAR is a regular expression that matches any character
-# except for a small number of symbols, where we prefer to stick with
+SAFE_CHARSET=	$(SAFE_CHARSET1)$(SAFE_CHARSET2)$(SAFE_CHARSET3)
+SAFE_CHAR=	'[]'$(SAFE_CHARSET)'-]'
+
+# OK_CHAR matches any character allowed in the distributed files.
+# This is the same as SAFE_CHAR, except that multibyte letters are
+# also allowed so that commentary can contain people's names and quote
+# non-English sources.  For non-letters the sources are limited to
 # ASCII renderings for the convenience of maintainers whose text editors
 # mishandle UTF-8 by default (e.g., XEmacs 21.4.22).
-NONSYM_CHAR=	'[^–—°′″≈≠≤≥±−×÷∞←→↔·•§¶«»‘’‚‛“”„‟‹›「」『』〝〞〟]'
+OK_CHAR=	'[][:alpha:]'$(SAFE_CHARSET)'-]'
 
 # SAFE_LINE matches a line of safe characters.
-# SAFE_SHARP_LINE is similar, except any character can follow '#';
+# SAFE_SHARP_LINE is similar, except any OK character can follow '#';
 # this is so that comments can contain non-ASCII characters.
-# NONSYM_LINE matches a line of non-symbols.
-# VALID_LINE matches a line of any validly-encoded characters.
+# OK_LINE matches a line of OK characters.
 SAFE_LINE=	'^'$(SAFE_CHAR)'*$$'
-SAFE_SHARP_LINE='^'$(SAFE_CHAR)'*('$$sharp$(NONSYM_CHAR)'*)?$$'
-NONSYM_LINE=	'^'$(NONSYM_CHAR)'*$$'
-VALID_LINE=	'^.*$$'
+SAFE_SHARP_LINE='^'$(SAFE_CHAR)'*('$$sharp$(OK_CHAR)'*)?$$'
+OK_LINE=	'^'$(OK_CHAR)'*$$'
 
 # Flags to give 'tar' when making a distribution.
 # Try to use flags appropriate for GNU tar.
-GNUTARFLAGS=	--numeric-owner --owner=0 --group=0 --mode=go+u,go-w
+GNUTARFLAGS= --numeric-owner --owner=0 --group=0 --mode=go+u,go-w --sort=name
 TARFLAGS=	`if tar $(GNUTARFLAGS) --version >/dev/null 2>&1; \
 		 then echo $(GNUTARFLAGS); \
 		 else :; \
@@ -321,6 +344,8 @@ GZIPFLAGS=	-9n
 
 ###############################################################################
 
+#MAKE=		make
+
 cc=		cc
 CC=		$(cc) -DTZDIR=\"$(TZDIR)\"
 
@@ -329,13 +354,13 @@ AR=		ar
 # ':' on typical hosts; 'ranlib' on the ancient hosts that still need ranlib.
 RANLIB=		:
 
-TZCOBJS=	zic.o scheck.o ialloc.o
+TZCOBJS=	zic.o
 TZDOBJS=	zdump.o localtime.o asctime.o
 DATEOBJS=	date.o localtime.o strftime.o asctime.o
 LIBSRCS=	localtime.c asctime.c difftime.c
 LIBOBJS=	localtime.o asctime.o difftime.o
 HEADERS=	tzfile.h private.h
-NONLIBSRCS=	zic.c zdump.c scheck.c ialloc.c
+NONLIBSRCS=	zic.c zdump.c
 NEWUCBSRCS=	date.c strftime.c
 SOURCES=	$(HEADERS) $(LIBSRCS) $(NONLIBSRCS) $(NEWUCBSRCS) \
 			tzselect.ksh workman.sh
@@ -345,8 +370,8 @@ MANTXTS=	newctime.3.txt newstrftime.3.txt newtzset.3.txt \
 			time2posix.3.txt \
 			tzfile.5.txt tzselect.8.txt zic.8.txt zdump.8.txt \
 			date.1.txt
-COMMON=		CONTRIBUTING Makefile NEWS README Theory
-WEB_PAGES=	tz-art.htm tz-link.htm
+COMMON=		CONTRIBUTING LICENSE Makefile NEWS README Theory version
+WEB_PAGES=	tz-art.htm tz-how-to.html tz-link.htm
 DOCS=		$(MANS) date.1 $(MANTXTS) $(WEB_PAGES)
 PRIMARY_YDATA=	africa antarctica asia australasia \
 		europe northamerica southamerica
@@ -358,26 +383,50 @@ TABDATA=	iso3166.tab leapseconds $(ZONETABLES)
 LEAP_DEPS=	leapseconds.awk leap-seconds.list
 DATA=		$(YDATA) $(NDATA) backzone $(TABDATA) \
 			leap-seconds.list yearistype.sh
-AWK_SCRIPTS=	checktab.awk leapseconds.awk
+AWK_SCRIPTS=	checklinks.awk checktab.awk leapseconds.awk
 MISC=		$(AWK_SCRIPTS) zoneinfo2tdf.pl
-ENCHILADA=	$(COMMON) $(DOCS) $(SOURCES) $(DATA) $(MISC)
+TZS_YEAR=	2050
+TZS=		to$(TZS_YEAR).tzs
+TZS_NEW=	to$(TZS_YEAR)new.tzs
+TZS_DEPS=	$(PRIMARY_YDATA) asctime.c localtime.c \
+			private.h tzfile.h zdump.c zic.c
+ENCHILADA=	$(COMMON) $(DOCS) $(SOURCES) $(DATA) $(MISC) $(TZS)
+
+# Consult these files when deciding whether to rebuild the 'version' file.
+# This list is not the same as the output of 'git ls-files', since
+# .gitignore is not distributed.
+VERSION_DEPS= \
+		CONTRIBUTING LICENSE Makefile NEWS README Theory \
+		africa antarctica asctime.c asia australasia \
+		backward backzone \
+		checklinks.awk checktab.awk \
+		date.1 date.c difftime.c \
+		etcetera europe factory iso3166.tab \
+		leap-seconds.list leapseconds.awk localtime.c \
+		newctime.3 newstrftime.3 newtzset.3 northamerica \
+		pacificnew private.h \
+		southamerica strftime.c systemv \
+		time2posix.3 tz-art.htm tz-how-to.html tz-link.htm \
+		tzfile.5 tzfile.h tzselect.8 tzselect.ksh \
+		workman.sh yearistype.sh \
+		zdump.8 zdump.c zic.8 zic.c \
+		zone.tab zone1970.tab zoneinfo2tdf.pl
 
 # And for the benefit of csh users on systems that assume the user
 # shell should be used to handle commands in Makefiles. . .
 
 SHELL=		/bin/sh
 
-all:		tzselect zic zdump libtz.a $(TABDATA)
+all:		tzselect yearistype zic zdump libtz.a $(TABDATA)
 
-ALL:		all date
+ALL:		all date $(ENCHILADA)
 
 install:	all $(DATA) $(REDO) $(MANS)
 		mkdir -p $(DESTDIR)$(ETCDIR) $(DESTDIR)$(TZDIR) \
 			$(DESTDIR)$(LIBDIR) \
 			$(DESTDIR)$(MANDIR)/man3 $(DESTDIR)$(MANDIR)/man5 \
 			$(DESTDIR)$(MANDIR)/man8
-		$(ZIC) -y $(YEARISTYPE) \
-			-d $(DESTDIR)$(TZDIR) -l $(LOCALTIME) -p $(POSIXRULES)
+		$(ZIC_INSTALL) -l $(LOCALTIME) -p $(POSIXRULES)
 		cp -f iso3166.tab $(ZONETABLES) $(DESTDIR)$(TZDIR)/.
 		cp tzselect zic zdump $(DESTDIR)$(ETCDIR)/.
 		cp libtz.a $(DESTDIR)$(LIBDIR)/.
@@ -391,15 +440,26 @@ INSTALL:	ALL install date.1
 		cp date $(DESTDIR)$(BINDIR)/.
 		cp -f date.1 $(DESTDIR)$(MANDIR)/man1/.
 
-version.h:
-		(echo 'static char const PKGVERSION[]="($(PACKAGE)) ";' && \
-		 echo 'static char const TZVERSION[]="$(VERSION)";' && \
-		 echo 'static char const REPORT_BUGS_TO[]="$(BUGEMAIL)";') >$@
+version:	$(VERSION_DEPS)
+		{ (type git) >/dev/null 2>&1 && \
+		  V=`git describe --match '[0-9][0-9][0-9][0-9][a-z]*' \
+				--abbrev=7 --dirty` || \
+		  V=$(VERSION); } && \
+		printf '%s\n' "$$V" >$@.out
+		mv $@.out $@
+
+version.h:	version
+		VERSION=`cat version` && printf '%s\n' \
+		  'static char const PKGVERSION[]="($(PACKAGE)) ";' \
+		  "static char const TZVERSION[]=\"$$VERSION\";" \
+		  'static char const REPORT_BUGS_TO[]="$(BUGEMAIL)";' \
+		  >$@.out
+		mv $@.out $@
 
 zdump:		$(TZDOBJS)
 		$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(TZDOBJS) $(LDLIBS)
 
-zic:		$(TZCOBJS) yearistype
+zic:		$(TZCOBJS)
 		$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(TZCOBJS) $(LDLIBS)
 
 yearistype:	yearistype.sh
@@ -407,15 +467,31 @@ yearistype:	yearistype.sh
 		chmod +x yearistype
 
 leapseconds:	$(LEAP_DEPS)
-		$(AWK) -f leapseconds.awk leap-seconds.list >$@
+		$(AWK) -f leapseconds.awk leap-seconds.list >$@.out
+		mv $@.out $@
 
-posix_only:	zic $(TDATA)
-		$(ZIC) -y $(YEARISTYPE) -d $(DESTDIR)$(TZDIR) \
-			-L /dev/null $(TDATA)
+# Arguments to pass to submakes of install_data.
+# They can be overridden by later submake arguments.
+INSTALLARGS = \
+ DESTDIR=$(DESTDIR) \
+ LEAPSECONDS='$(LEAPSECONDS)' \
+ PACKRATDATA='$(PACKRATDATA)' \
+ TZDIR=$(TZDIR) \
+ YEARISTYPE=$(YEARISTYPE) \
+ ZIC='$(ZIC)'
 
-right_only:	zic leapseconds $(TDATA)
-		$(ZIC) -y $(YEARISTYPE) -d $(DESTDIR)$(TZDIR) \
-			-L leapseconds $(TDATA)
+# 'make install_data' installs one set of tz binary files.
+# It can be tailored by setting LEAPSECONDS, PACKRATDATA, etc.
+install_data:	zic leapseconds yearistype $(PACKRATDATA) $(TDATA)
+		$(ZIC_INSTALL) $(TDATA)
+		$(AWK) '/^Rule/' $(TDATA) | $(ZIC_INSTALL) - $(PACKRATDATA)
+
+posix_only:
+		$(MAKE) $(INSTALLARGS) LEAPSECONDS= install_data
+
+right_only:
+		$(MAKE) $(INSTALLARGS) LEAPSECONDS='-L leapseconds' \
+			install_data
 
 # In earlier versions of this makefile, the other two directories were
 # subdirectories of $(TZDIR).  However, this led to configuration errors.
@@ -426,71 +502,109 @@ right_only:	zic leapseconds $(TDATA)
 # Therefore, the other two directories are now siblings of $(TZDIR).
 # You must replace all of $(TZDIR) to switch from not using leap seconds
 # to using them, or vice versa.
-right_posix:	right_only leapseconds
+right_posix:	right_only
 		rm -fr $(DESTDIR)$(TZDIR)-leaps
 		ln -s $(TZDIR_BASENAME) $(DESTDIR)$(TZDIR)-leaps || \
-		  $(ZIC) -y $(YEARISTYPE) -d $(DESTDIR)$(TZDIR)-leaps \
-			-L leapseconds $(TDATA)
-		$(ZIC) -y $(YEARISTYPE) -d $(DESTDIR)$(TZDIR)-posix \
-			-L /dev/null $(TDATA)
+		  $(MAKE) $(INSTALLARGS) TZDIR=$(TZDIR)-leaps right_only
+		$(MAKE) $(INSTALLARGS) TZDIR=$(TZDIR)-posix posix_only
 
-posix_right:	posix_only leapseconds
+posix_right:	posix_only
 		rm -fr $(DESTDIR)$(TZDIR)-posix
 		ln -s $(TZDIR_BASENAME) $(DESTDIR)$(TZDIR)-posix || \
-		  $(ZIC) -y $(YEARISTYPE) -d $(DESTDIR)$(TZDIR)-posix \
-			-L /dev/null $(TDATA)
-		$(ZIC) -y $(YEARISTYPE) -d $(DESTDIR)$(TZDIR)-leaps \
-			-L leapseconds $(TDATA)
+		  $(MAKE) $(INSTALLARGS) TZDIR=$(TZDIR)-posix posix_only
+		$(MAKE) $(INSTALLARGS) TZDIR=$(TZDIR)-leaps right_only
 
-posix_packrat:	posix_only backzone
-		$(AWK) '/^Rule/' $(TDATA) | \
-		  $(ZIC) -y $(YEARISTYPE) -d $(DESTDIR)$(TZDIR) \
-			-L /dev/null - backzone
+# This obsolescent rule is present for backwards compatibility with
+# tz releases 2014g through 2015g.  It should go away eventually.
+posix_packrat:
+		$(MAKE) $(INSTALLARGS) PACKRATDATA=backzone posix_only
 
 zones:		$(REDO)
 
+$(TZS_NEW):	$(TDATA) zdump zic
+		mkdir -p tzs.dir
+		$(zic) -d tzs.dir $(TDATA)
+		$(AWK) '/^Link/{print $$1 "\t" $$2 "\t" $$3}' \
+		   $(TDATA) | LC_ALL=C sort >$@.out
+		wd=`pwd` && \
+		zones=`$(AWK) -v wd="$$wd" \
+				'/^Zone/{print wd "/tzs.dir/" $$2}' $(TDATA) \
+			 | LC_ALL=C sort` && \
+		./zdump -i -c $(TZS_YEAR) $$zones >>$@.out
+		sed 's,^TZ=".*tzs\.dir/,TZ=",' $@.out >$@.sed.out
+		rm -fr tzs.dir $@.out
+		mv $@.sed.out $@
+
+# If $(TZS) does not already exist (e.g., old-format tarballs), create it.
+# If it exists but 'make check_tzs' fails, a maintainer should inspect the
+# failed output and fix the inconsistency, perhaps by running 'make force_tzs'.
+$(TZS):
+		$(MAKE) force_tzs
+
+force_tzs:	$(TZS_NEW)
+		cp $(TZS_NEW) $(TZS)
+
 libtz.a:	$(LIBOBJS)
-		$(AR) ru $@ $(LIBOBJS)
+		rm -f $@
+		$(AR) -rc $@ $(LIBOBJS)
 		$(RANLIB) $@
 
 date:		$(DATEOBJS)
 		$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $(DATEOBJS) $(LDLIBS)
 
-tzselect:	tzselect.ksh
-		sed \
+tzselect:	tzselect.ksh version
+		VERSION=`cat version` && sed \
 			-e 's|#!/bin/bash|#!$(KSHELL)|g' \
 			-e 's|AWK=[^}]*|AWK=$(AWK)|g' \
 			-e 's|\(PKGVERSION\)=.*|\1='\''($(PACKAGE)) '\''|' \
 			-e 's|\(REPORT_BUGS_TO\)=.*|\1=$(BUGEMAIL)|' \
 			-e 's|TZDIR=[^}]*|TZDIR=$(TZDIR)|' \
-			-e 's|\(TZVERSION\)=.*|\1=$(VERSION)|' \
-			<$? >$@
-		chmod +x $@
+			-e 's|\(TZVERSION\)=.*|\1='"$$VERSION"'|' \
+			<$@.ksh >$@.out
+		chmod +x $@.out
+		mv $@.out $@
 
-check:		check_character_set check_white_space check_tables check_web
+check:		check_character_set check_white_space check_links check_sorted \
+		  check_tables check_tzs check_web
 
 check_character_set: $(ENCHILADA)
 		LC_ALL=en_US.utf8 && export LC_ALL && \
 		sharp='#' && \
 		! grep -Env $(SAFE_LINE) $(MANS) date.1 $(MANTXTS) \
-			$(MISC) $(SOURCES) $(WEB_PAGES) && \
+			$(MISC) $(SOURCES) $(WEB_PAGES) \
+			CONTRIBUTING LICENSE Makefile README version && \
 		! grep -Env $(SAFE_SHARP_LINE) $(TDATA) backzone \
-			iso3166.tab leapseconds yearistype.sh zone.tab && \
-		test $$(grep -Ecv $(SAFE_SHARP_LINE) Makefile) -eq 1 && \
-		! grep -Env $(NONSYM_LINE) CONTRIBUTING NEWS README Theory \
-			$(MANS) date.1 zone1970.tab && \
-		! grep -Env $(VALID_LINE) $(ENCHILADA)
+			leapseconds yearistype.sh zone.tab && \
+		! grep -Env $(OK_LINE) $(ENCHILADA)
 
 check_white_space: $(ENCHILADA)
-		! grep -n ' '$(TAB_CHAR) $(ENCHILADA)
+		patfmt=' \t|[\f\r\v]' && pat=`printf "$$patfmt\\n"` && \
+		! grep -En "$$pat" $(ENCHILADA)
 		! grep -n '[[:space:]]$$' $(ENCHILADA)
-		! grep -n "$$(printf '[\f\r\v]\n')" $(ENCHILADA)
+
+CHECK_CC_LIST = { n = split($$1,a,/,/); for (i=2; i<=n; i++) print a[1], a[i]; }
+
+check_sorted: backward backzone iso3166.tab zone.tab zone1970.tab
+		$(AWK) '/^Link/ {print $$3}' backward | LC_ALL=C sort -cu
+		$(AWK) '/^Zone/ {print $$2}' backzone | LC_ALL=C sort -cu
+		$(AWK) '/^[^#]/ {print $$1}' iso3166.tab | LC_ALL=C sort -cu
+		$(AWK) '/^[^#]/ {print $$1}' zone.tab | LC_ALL=C sort -c
+		$(AWK) '/^[^#]/ {print substr($$0, 1, 2)}' zone1970.tab | \
+		  LC_ALL=C sort -c
+		$(AWK) '/^[^#]/ $(CHECK_CC_LIST)' zone1970.tab | \
+		  LC_ALL=C sort -cu
+
+check_links:	checklinks.awk $(TDATA)
+		$(AWK) -f checklinks.awk $(TDATA)
 
 check_tables:	checktab.awk $(PRIMARY_YDATA) $(ZONETABLES)
 		for tab in $(ZONETABLES); do \
 		  $(AWK) -f checktab.awk -v zone_table=$$tab $(PRIMARY_YDATA) \
 		    || exit; \
 		done
+
+check_tzs:	$(TZS) $(TZS_NEW)
+		diff -u $(TZS) $(TZS_NEW)
 
 check_web:	$(WEB_PAGES)
 		$(VALIDATE_ENV) $(VALIDATE) $(VALIDATE_FLAGS) $(WEB_PAGES)
@@ -499,12 +613,12 @@ clean_misc:
 		rm -f core *.o *.out \
 		  date tzselect version.h zdump zic yearistype libtz.a
 clean:		clean_misc
-		rm -fr tzpublic
+		rm -fr *.dir tzdb-*/ $(TZS_NEW)
 
 maintainer-clean: clean
 		@echo 'This command is intended for maintainers to use; it'
 		@echo 'deletes files that may need special tools to rebuild.'
-		rm -f leapseconds $(MANTXTS) *.asc *.tar.gz
+		rm -f leapseconds version $(MANTXTS) $(TZS) *.asc *.tar.*
 
 names:
 		@echo $(ENCHILADA)
@@ -523,7 +637,8 @@ zdump.8.txt:	zdump.8
 zic.8.txt:	zic.8
 
 $(MANTXTS):	workman.sh
-		LC_ALL=C sh workman.sh `expr $@ : '\(.*\)\.txt$$'` >$@
+		LC_ALL=C sh workman.sh `expr $@ : '\(.*\)\.txt$$'` >$@.out
+		mv $@.out $@
 
 # Set the time stamps to those of the git repository, if available,
 # and if the files have not changed since then.
@@ -534,7 +649,8 @@ $(MANTXTS):	workman.sh
 # to be the maximum of the files it depends on.
 set-timestamps.out: $(ENCHILADA)
 		rm -f $@
-		if files=`git ls-files $(ENCHILADA)` && \
+		if (type git) >/dev/null 2>&1 && \
+		   files=`git ls-files $(ENCHILADA)` && \
 		   touch -md @1 test.out; then \
 		  rm -f test.out && \
 		  for file in $$files; do \
@@ -551,20 +667,22 @@ set-timestamps.out: $(ENCHILADA)
 		  touch -cmr `ls -t $$file workman.sh | sed 1q` $$file.txt || \
 		    exit; \
 		done
+		touch -cmr `ls -t $(TZS_DEPS) | sed 1q` $(TZS)
+		touch -cmr `ls -t $(VERSION_DEPS) | sed 1q` version
 		touch $@
 
 # The zics below ensure that each data file can stand on its own.
 # We also do an all-files run to catch links to links.
 
-check_public:	$(ENCHILADA)
-		make maintainer-clean
-		make "CFLAGS=$(GCC_DEBUG_FLAGS)" $(ENCHILADA) all
-		mkdir tzpublic
+check_public:
+		$(MAKE) maintainer-clean
+		$(MAKE) "CFLAGS=$(GCC_DEBUG_FLAGS)" ALL
+		mkdir -p public.dir
 		for i in $(TDATA) ; do \
-		  $(zic) -v -d tzpublic $$i 2>&1 || exit; \
+		  $(zic) -v -d public.dir $$i 2>&1 || exit; \
 		done
-		$(zic) -v -d tzpublic $(TDATA)
-		rm -fr tzpublic
+		$(zic) -v -d public.dir $(TDATA)
+		rm -fr public.dir
 
 # Check that the code works under various alternative
 # implementations of time_t.
@@ -574,17 +692,18 @@ check_time_t_alternatives:
 		else \
 		  quiet_option=''; \
 		fi && \
+		wd=`pwd` && \
 		zones=`$(AWK) '/^[^#]/ { print $$3 }' <zone1970.tab` && \
 		for type in $(TIME_T_ALTERNATIVES); do \
-		  mkdir -p tzpublic/$$type && \
-		  make clean_misc && \
-		  make TOPDIR=`pwd`/tzpublic/$$type \
+		  mkdir -p time_t.dir/$$type && \
+		  $(MAKE) clean_misc && \
+		  $(MAKE) TOPDIR="$$wd/time_t.dir/$$type" \
 		    CFLAGS='$(CFLAGS) -Dtime_tz='"'$$type'" \
 		    REDO='$(REDO)' \
 		    install && \
 		  diff $$quiet_option -r \
-		    tzpublic/int64_t/etc/zoneinfo \
-		    tzpublic/$$type/etc/zoneinfo && \
+		    time_t.dir/int64_t/etc/zoneinfo \
+		    time_t.dir/$$type/etc/zoneinfo && \
 		  case $$type in \
 		  int32_t) range=-2147483648,2147483647;; \
 		  uint32_t) range=0,4294967296;; \
@@ -593,29 +712,47 @@ check_time_t_alternatives:
 		  *) range=-10000000000,10000000000;; \
 		  esac && \
 		  echo checking $$type zones ... && \
-		  tzpublic/int64_t/etc/zdump -V -t $$range $$zones \
-		      >tzpublic/int64_t.out && \
-		  tzpublic/$$type/etc/zdump -V -t $$range $$zones \
-		      >tzpublic/$$type.out && \
-		  diff -u tzpublic/int64_t.out tzpublic/$$type.out \
+		  time_t.dir/int64_t/etc/zdump -V -t $$range $$zones \
+		      >time_t.dir/int64_t.out && \
+		  time_t.dir/$$type/etc/zdump -V -t $$range $$zones \
+		      >time_t.dir/$$type.out && \
+		  diff -u time_t.dir/int64_t.out time_t.dir/$$type.out \
 		    || exit; \
 		done
-		rm -fr tzpublic
+		rm -fr time_t.dir
 
-tarballs:	tzcode$(VERSION).tar.gz tzdata$(VERSION).tar.gz
+tarballs traditional_tarballs signatures traditional_signatures: version
+		VERSION=`cat version` && \
+		$(MAKE) VERSION="$$VERSION" $@_version
+
+tarballs_version: traditional_tarballs_version tzdb-$(VERSION).tar.lz
+traditional_tarballs_version: \
+  tzcode$(VERSION).tar.gz tzdata$(VERSION).tar.gz
+signatures_version: traditional_signatures_version tzdb-$(VERSION).tar.lz.asc
+traditional_signatures_version: \
+  tzcode$(VERSION).tar.gz.asc tzdata$(VERSION).tar.gz.asc \
 
 tzcode$(VERSION).tar.gz: set-timestamps.out
 		LC_ALL=C && export LC_ALL && \
 		tar $(TARFLAGS) -cf - \
 		    $(COMMON) $(DOCS) $(SOURCES) | \
-		  gzip $(GZIPFLAGS) > $@
+		  gzip $(GZIPFLAGS) >$@.out
+		mv $@.out $@
 
 tzdata$(VERSION).tar.gz: set-timestamps.out
 		LC_ALL=C && export LC_ALL && \
 		tar $(TARFLAGS) -cf - $(COMMON) $(DATA) $(MISC) | \
-		  gzip $(GZIPFLAGS) > $@
+		  gzip $(GZIPFLAGS) >$@.out
+		mv $@.out $@
 
-signatures:	tzcode$(VERSION).tar.gz.asc tzdata$(VERSION).tar.gz.asc
+tzdb-$(VERSION).tar.lz: set-timestamps.out
+		rm -fr tzdb-$(VERSION)
+		mkdir tzdb-$(VERSION)
+		ln $(ENCHILADA) tzdb-$(VERSION)
+		touch -cmr `ls -t tzdb-$(VERSION)/* | sed 1q` tzdb-$(VERSION)
+		LC_ALL=C && export LC_ALL && \
+		tar $(TARFLAGS) -cf - tzdb-$(VERSION) | lzip -9 >$@.out
+		mv $@.out $@
 
 tzcode$(VERSION).tar.gz.asc: tzcode$(VERSION).tar.gz
 		gpg --armor --detach-sign $?
@@ -623,13 +760,16 @@ tzcode$(VERSION).tar.gz.asc: tzcode$(VERSION).tar.gz
 tzdata$(VERSION).tar.gz.asc: tzdata$(VERSION).tar.gz
 		gpg --armor --detach-sign $?
 
+tzdb-$(VERSION).tar.lz.asc: tzdb-$(VERSION).tar.lz
+		gpg --armor --detach-sign $?
+
 typecheck:
-		make clean
+		$(MAKE) clean
 		for i in "long long" unsigned; \
 		do \
-			make CFLAGS="-DTYPECHECK -D__time_t_defined -D_TIME_T \"-Dtime_t=$$i\"" ; \
+			$(MAKE) CFLAGS="-DTYPECHECK -D__time_t_defined -D_TIME_T \"-Dtime_t=$$i\"" ; \
 			./zdump -v Europe/Rome ; \
-			make clean ; \
+			$(MAKE) clean ; \
 		done
 
 zonenames:	$(TDATA)
@@ -638,9 +778,7 @@ zonenames:	$(TDATA)
 asctime.o:	private.h tzfile.h
 date.o:		private.h
 difftime.o:	private.h
-ialloc.o:	private.h
 localtime.o:	private.h tzfile.h
-scheck.o:	private.h
 strftime.o:	private.h tzfile.h
 zdump.o:	version.h
 zic.o:		private.h tzfile.h version.h
@@ -648,8 +786,12 @@ zic.o:		private.h tzfile.h version.h
 .KEEP_STATE:
 
 .PHONY: ALL INSTALL all
-.PHONY: check check_character_set check_public check_tables
-.PHONY: check_time_t_alternatives check_web check_white_space clean clean_misc
-.PHONY: install maintainer-clean names posix_packrat posix_only posix_right
-.PHONY: public right_only right_posix signatures tarballs typecheck
+.PHONY: check check_character_set check_links
+.PHONY: check_public check_sorted check_tables
+.PHONY: check_time_t_alternatives check_tzs check_web check_white_space
+.PHONY: clean clean_misc force_tzs
+.PHONY: install install_data maintainer-clean names
+.PHONY: posix_only posix_packrat posix_right
+.PHONY: public right_only right_posix signatures signatures_version
+.PHONY: tarballs tarballs_version typecheck
 .PHONY: zonenames zones

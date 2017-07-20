@@ -24,6 +24,7 @@ do { my $x = {
                                       'Exporter' => '0',
                                       'Hash::Flatten' => '0',
                                       'JSON::XS' => '0',
+                                      'LWP::Authen::Negotiate' => '0',
                                       'LWP::UserAgent' => '0',
                                       'Moo' => '0',
                                       'Moo::Role' => '0',

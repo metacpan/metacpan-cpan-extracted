@@ -5,10 +5,13 @@ BEGIN { $ENV{MOJO_REACTOR} = 'Mojo::Reactor::Poll' }
 use Test::More;
 
 use Mojo::IOLoop;
+use Mojo::SQLite;
 use Mojolicious::Lite;
 use Test::Mojo;
 
-plugin Minion => {SQLite => 'sqlite::temp:'};
+my $sql = Mojo::SQLite->new;
+
+plugin Minion => {SQLite => $sql};
 
 app->minion->add_task(
   add => sub {

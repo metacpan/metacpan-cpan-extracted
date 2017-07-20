@@ -1,4 +1,4 @@
-Locale::Utils::PlaceholderBabelFish version 0.004
+Locale::Utils::PlaceholderBabelFish version 0.006
 =================================================
 
 Utils to expand placeholders in BabelFish style.
@@ -24,7 +24,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2015,
+Copyright (c) 2015 - 2017,
 Steffen Winkler
 steffenw at cpan.org.
 All rights reserved.

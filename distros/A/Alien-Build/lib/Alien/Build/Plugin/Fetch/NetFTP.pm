@@ -8,10 +8,10 @@ use File::Temp ();
 use Path::Tiny qw( path );
 
 # ABSTRACT: Net::FTP plugin for fetching files
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
-has '+url' => sub { Carp::croak "url is a required property" };
+has '+url' => '';
 
 
 has ssl => 0;
@@ -22,6 +22,10 @@ has passive => 0;
 sub init
 {
   my($self, $meta) = @_;
+
+  $meta->prop->{start_url} ||= $self->url;
+  $self->url($meta->prop->{start_url});
+  $self->url || Carp::croak('url is a required property');
 
   $meta->add_requires('share' => 'Net::FTP' => 0 );
   $meta->add_requires('share' => 'URI' => 0 );
@@ -153,14 +157,13 @@ Alien::Build::Plugin::Fetch::NetFTP - Net::FTP plugin for fetching files
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 
  use alienfile;
- plugin 'Fetch::NetFTP' => (
-   url => 'ftp://ftp.gnu.org/gnu/make',
- );
+ meta->prop->{start_url} = 'ftp://ftp.gnu.org/gnu/make';
+ plugin 'Fetch::NetFTP' => ();
 
 =head1 DESCRIPTION
 

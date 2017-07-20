@@ -1,5 +1,16 @@
 Revision history for Alien::JPCRE2.
 
+0.005000 2017-07-20
+
+    - Disable C++11 Features, Support Older Compilers
+    - Test Suite, Remove t/02_make_check.t, Move `make check` To alienfile
+    - Require Alien::PCRE2 v0.012
+    - Test Suite, Begin Upgrade To Test::Alien
+
+0.004000 2017-07-13
+
+    - Alien::PCRE2 Dependency, Require At Configure Time
+
 0.003000 2017-07-13
 
     - Test Suite, Skip `make check` On System Install

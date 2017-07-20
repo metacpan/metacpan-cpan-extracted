@@ -1,5 +1,14 @@
 Revision history for PDF::Tiny
 
+0.09    16 July, 2017
+      • Incompatible change:
+        • The xref method has been removed.  Its API was too volatile,
+          and it would likely have continued to change.
+      • New feature:
+        • The ‘modified’ method now accepts "trailer"  as an argument,
+          so you can append to a PDF file after  modifying  just  the
+          trailer and nothing else.
+
 0.08    7 April, 2017
       • Uncompressed streams can now  be  read  [rt.cpan.org #120836].
         Thanks to Pali for the patch.

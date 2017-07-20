@@ -71,34 +71,33 @@
  ************************************************************************/
 
 extern int ut_str_to_bigint (char *str, INT64 * value);
+extern int ut_str_to_ubigint (char *str, UINT64 * value);
 extern int ut_str_to_int (char *str, int *value);
+extern int ut_str_to_uint (char *str, unsigned int *value);
 extern int ut_str_to_float (char *str, float *value);
 extern int ut_str_to_double (char *str, double *value);
 extern int ut_str_to_date (char *str, T_CCI_DATE * value);
 extern int ut_str_to_time (char *str, T_CCI_DATE * value);
+extern int ut_str_to_timetz (char *str, T_CCI_DATE_TZ * value);
 extern int ut_str_to_mtime (char *str, T_CCI_DATE * value);
 extern int ut_str_to_timestamp (char *str, T_CCI_DATE * value);
+extern int ut_str_to_timestamptz (char *str, T_CCI_DATE_TZ * value);
 extern int ut_str_to_datetime (char *str, T_CCI_DATE * value);
+extern int ut_str_to_datetimetz (char *str, T_CCI_DATE_TZ * value);
 extern int ut_str_to_oid (char *str, T_OBJECT * value);
 extern void ut_int_to_str (INT64 value, char *str, int size);
+extern void ut_uint_to_str (UINT64 value, char *str, int size);
 extern void ut_float_to_str (float value, char *str, int size);
 extern void ut_double_to_str (double value, char *str, int size);
-extern void ut_date_to_str (T_CCI_DATE * value, T_CCI_U_TYPE u_type,
-			    char *str, int size);
+extern void ut_date_to_str (T_CCI_DATE * value, T_CCI_U_TYPE u_type, char *str, int size);
+extern void ut_date_tz_to_str (T_CCI_DATE_TZ * value, T_CCI_U_TYPE u_type, char *str, int size);
 extern void ut_oid_to_str (T_OBJECT * oid, char *str);
 extern void ut_lob_to_str (T_LOB * lob, char *str, int size);
-extern void ut_bit_to_str (char *bit_str, int bit_size, char *str,
-			   int str_size);
+extern void ut_bit_to_str (char *bit_str, int bit_size, char *str, int str_size);
 extern int ut_is_deleted_oid (T_OBJECT * oid);
 
 extern int cci_url_match (const char *src, char *token[]);
 extern long ut_timeval_diff_msec (struct timeval *start, struct timeval *end);
-
-#ifdef UNICODE_DATA
-extern char *ut_ansi_to_unicode (char *str);
-extern char *ut_unicode_to_ansi (char *str);
-#endif
-
 
 /************************************************************************
  * EXPORTED VARIABLES							*

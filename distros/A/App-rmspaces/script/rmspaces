@@ -1,0 +1,120 @@
+#!/bin/perl
+
+# Copyright 2017 Athos Ribeiro <athoscr@fedoraproject.org>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+use strict;
+use warnings;
+use File::Copy;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage;
+
+my $help = 0;
+my $verbose = 0;
+my $separator = '_';
+my $target = ' ';
+
+GetOptions('separator=s' => \$separator,
+           'target=s' => \$target,
+           'verbose' => \$verbose,
+           'help' => \$help) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+pod2usage(2) if scalar @ARGV < 1;
+foreach my $source (@ARGV) {
+  die "$source: no such file\n" if not(-e $source);
+  my $dest = $source;
+  if($dest =~ s/$target/$separator/g) {
+    move($source, $dest);
+    print "$source was moved to $dest\n";
+  }
+  else {
+    print "No matches for $source\n" if $verbose;
+  }
+}
+
+__END__
+
+=head1 NAME
+
+rmspaces - Remove lame spaces from file names
+
+=head1 SYNOPSIS
+
+rmspaces [options] filename [filename...]
+
+Use -h for detailed help.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-v, --verbose>
+
+Print information on each file rmspaces tried to apply substitutions on. This may be useful if you are using wildcards.
+
+=item B<-s, --separator>
+
+The character (or string) that will replace the spaces. Defaults to an underline character (_).
+
+=item B<-t, --target>
+
+The character (or string) to be substituted. Defaults to a single space.
+
+=item B<-h, --help>
+
+Print help message.
+
+=back
+
+=head1 DESCRIPTION
+
+This is a simple script to remove those anoying, lame, awful spaces from file
+names. Just add it to your PATH and run
+
+=over 8
+
+rmspaces FILENAME
+
+=back
+
+Note that it could also be used to change multiple file names by using the
+--target and the --separator arguments. For example, if you have the following
+files in the current directory:
+
+=over 8
+
+march_report  march_status  march_updates
+
+=back
+
+and you run
+
+=over 8
+
+rmspaces -t march -s 032017 *
+
+=back
+
+Now you get
+
+=over 8
+
+032017_report  032017_status  032017_updates
+
+=back
+
+=cut

@@ -4,6 +4,6 @@ use Test::More;
 eval "use Test::Pod::Coverage 1.00";
 plan skip_all => "Test::Pod::Coverage 1.00 required for testing POD coverage" if $@;
 
-use lib qw(t); # for Net::LDAP
+use lib qw(t/lib);# for Net::LDAP
 
 all_pod_coverage_ok();

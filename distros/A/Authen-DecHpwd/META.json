@@ -10,63 +10,68 @@
       "Mike McCauley <mikem@open.com.au>",
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
-      "gpl_1"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Authen-DecHpwd",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : 0,
-            "Scalar::String" : 0,
-            "Test::More" : 0,
+            "Module::Build" : "0",
+            "Scalar::String" : "0",
+            "Test::More" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : 0,
+            "Module::Build" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "recommends" : {
-            "XSLoader" : 0
+            "XSLoader" : "0"
          },
          "requires" : {
             "Data::Integer" : "0.003",
             "Digest::CRC" : "0.14",
-            "Exporter" : 0,
-            "Scalar::String" : 0,
-            "constant" : 0,
-            "parent" : 0,
+            "Exporter" : "0",
+            "Scalar::String" : "0",
+            "constant" : "0",
+            "parent" : "0",
             "perl" : "5.006",
-            "strict" : 0,
-            "warnings" : 0
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Authen::DecHpwd" : {
          "file" : "lib/Authen/DecHpwd.pm",
-         "version" : "2.006"
+         "version" : "2.007"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Authen-DecHpwd@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Authen-DecHpwd"
+      },
       "license" : [
-         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+         "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
       ]
    },
-   "version" : "2.006"
+   "version" : "2.007",
+   "x_serialization_backend" : "JSON::PP version 2.93"
 }

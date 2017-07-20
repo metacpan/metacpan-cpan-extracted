@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 -no_srand => 1;
 use Test::Alien::Build;
 use lib 't/lib';
 use lib 'corpus/lib';
@@ -1091,6 +1091,43 @@ subtest 'requires pulls helpers' => sub {
   $build->load_requires('any');
   ok($build->meta->interpolator->has_helper('foo1'), 'has helper foo1');
   ok($build->meta->interpolator->has_helper('foo2'), 'has helper foo2');
+
+};
+
+subtest 'around bug?' => sub {
+
+  my $build = alienfile_ok q{
+  
+    use alienfile;
+    
+    meta->register_hook(
+      foo => sub {
+        my($build, $arg) = @_;
+        return scalar reverse $arg;
+      },
+    );
+  
+  };
+  
+  is $build->_call_hook(foo => 'bar'), 'rab';
+
+  $build->meta->around_hook(
+    foo => sub {
+      my($orig, $build, $arg) = @_;
+      $orig->($build, "a${arg}b");
+    },
+  );
+  
+  is $build->_call_hook(foo => 'bar'), 'braba';
+
+  $build->meta->around_hook(
+    foo => sub {
+      my($orig, $build, $arg) = @_;
+      $orig->($build, "|${arg}|");
+    },
+  );
+  
+  is $build->_call_hook(foo => 'bar'), 'b|rab|a';
 
 };
 

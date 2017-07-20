@@ -56,6 +56,8 @@ authcomplex-passwd - change user password
 
 =head1 DESCRIPTION
 
+B<NOTE: This script does not support scrypt passphrases.>
+
 The authcomplex-passwd script changes the password for an user.
 Takes one mandatory argument, the user whose password should be changed.
 

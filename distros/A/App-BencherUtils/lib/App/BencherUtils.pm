@@ -1,7 +1,7 @@
 package App::BencherUtils;
 
-our $DATE = '2017-06-20'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '0.22'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -545,6 +545,9 @@ _
             greedy => 1,
             cmdline_src => 'stdin_or_args',
         },
+        with_process_size => {
+            schema => 'bool*',
+        },
     },
 
 };
@@ -553,10 +556,13 @@ sub bencher_module_startup_overhead {
 
     my $mods = $args{modules};
 
+    my $with_process_size = $args{with_process_size} //
+        $^O =~ /linux/ ? 1:0;
+
     my $scenario = {
         module_startup => 1,
         participants => [],
-        (with_process_size => 1) x ($^O =~ /linux/ ? 1:0),
+        with_process_size => $with_process_size,
     };
     for my $mod (@$mods) {
         push @{$scenario->{participants}}, {
@@ -599,6 +605,11 @@ and running that scenario with `bencher`.
 
 _
     args => {
+        startup => {
+            summary => 'Use code_startup mode instead of normal benchmark',
+            schema => 'bool*',
+            default => 0,
+        },
         codes => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'module',
@@ -607,6 +618,12 @@ _
             pos => 0,
             greedy => 1,
             cmdline_src => 'stdin_or_args',
+        },
+        with_process_size => {
+            schema => 'bool*',
+        },
+        precision => {
+            schema => 'float*',
         },
     },
 
@@ -629,6 +646,9 @@ sub bencher_code {
     my $res = Bencher::Backend::bencher(
         action => 'bench',
         scenario => $scenario,
+        code_startup => $args{startup},
+        with_process_size => $args{with_process_size},
+        (precision => $args{precision}) x !!(defined $args{precision}),
     );
     return $res unless $res->[0] == 200;
 
@@ -654,7 +674,7 @@ App::BencherUtils - Utilities related to bencher
 
 =head1 VERSION
 
-This document describes version 0.20 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2017-06-20.
+This document describes version 0.22 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2017-07-13.
 
 =head1 SYNOPSIS
 
@@ -712,6 +732,14 @@ Arguments ('*' denotes required arguments):
 
 =item * B<codes>* => I<array[str]>
 
+=item * B<precision> => I<float>
+
+=item * B<startup> => I<bool> (default: 0)
+
+Use code_startup mode instead of normal benchmark.
+
+=item * B<with_process_size> => I<bool>
+
 =back
 
 Returns an enveloped result (an array).
@@ -756,6 +784,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<modules>* => I<array[perl::modname]>
+
+=item * B<with_process_size> => I<bool>
 
 =back
 

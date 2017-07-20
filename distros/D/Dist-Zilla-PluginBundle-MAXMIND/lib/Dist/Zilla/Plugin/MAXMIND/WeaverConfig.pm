@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 use Moose;
 
@@ -37,7 +37,7 @@ Dist::Zilla::Plugin::MAXMIND::WeaverConfig - A plugin that exists solely to hold
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =for Pod::Coverage .*
 

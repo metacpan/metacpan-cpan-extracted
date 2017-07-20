@@ -31,7 +31,9 @@ note "Catmandu::Importer::SRU::Parser::picaxml";
 
     isa_ok($importer, 'Catmandu::Importer::SRU');
     can_ok($importer, 'each');
-    is($importer->url, 'http://www.unicat.be/sru?version=1.1&operation=searchRetrieve&query=sru_picaxml.xml&recordSchema=picaxml&startRecord=1&maximumRecords=10');
+    can_ok($importer, 'to_array');
+    can_ok($importer, 'first');
+    is($importer->url, 'http://www.unicat.be/sru?version=1.1&operation=searchRetrieve&query=sru_picaxml.xml&recordSchema=picaxml&startRecord=1&maximumRecords=10', 'query url');
 
     my $marcparser = Catmandu::Importer::SRU::Parser::picaxml->new;
     my @parsers = ( 

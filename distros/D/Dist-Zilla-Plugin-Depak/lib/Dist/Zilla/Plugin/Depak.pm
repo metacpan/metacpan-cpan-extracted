@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::Depak;
 
-our $DATE = '2016-03-16'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.21'; # VERSION
 
 use 5.010001;
 use strict;
@@ -32,6 +32,7 @@ with (
 
 has include_script => (is => 'rw');
 has exclude_script => (is => 'rw');
+has put_hook_at_the_end => (is => 'rw');
 
 use namespace::autoclean;
 
@@ -141,6 +142,10 @@ sub munge_script {
             "--config-profile", $profile,
             "--config-path", "depak.conf",
         );
+    }
+
+    if ($self->put_hook_at_the_end) {
+        push @depak_cmd, "--put-hook-at-the-end";
     }
 
     $self->log_debug(["Depak-ing %s: %s", $file->{name}, \@depak_cmd]);
@@ -255,7 +260,7 @@ Dist::Zilla::Plugin::Depak - Pack dependencies onto scripts during build using '
 
 =head1 VERSION
 
-This document describes version 0.20 of Dist::Zilla::Plugin::Depak (from Perl distribution Dist-Zilla-Plugin-Depak), released on 2016-03-16.
+This document describes version 0.21 of Dist::Zilla::Plugin::Depak (from Perl distribution Dist-Zilla-Plugin-Depak), released on 2017-07-14.
 
 =head1 SYNOPSIS
 
@@ -317,6 +322,10 @@ scripts in the distribution.
 
 Exclude a script. Can be specified multiple times.
 
+=head2 put_hook_at_the_end => bool
+
+Will be passed to C<depak>.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-Depak>.
@@ -343,7 +352,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

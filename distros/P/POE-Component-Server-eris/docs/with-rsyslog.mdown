@@ -15,7 +15,24 @@ daemon for most modern Linux distributions
  * RELP Support
  * Flexible Input and Output
 
-## Setting up the eris dispatcher
+## Setting up the eris dispatcher (stdin)
+
+The STDIN method has an advantage.  Rsyslog starts and stops the dispatcher,
+so you don't need to manage another service.  This is accomplished with the 
+program module, to set it up:
+
+```
+# Load the Module
+$ModLoad omprog
+
+# Send everything to the dispatcher
+$ActionOMProgBinary /usr/local/bin/eris-dispatcher-stdin.pl
+*.* :omprog:
+```
+
+Restart rsyslogd and you should be able to connect to localhost:9514. 
+
+## Setting up the eris dispatcher (TCP)
 
 The eris-dispatcher-tcp.pl in the examples directory demonstrates one way to
 handle messages from rsyslog via it's TCP output module.  You may want to
@@ -27,7 +44,7 @@ file, you can use something like monit to startup and maintain the
 eris-dispatcher-tcp.pl server.  It shouldn't crash, but if it does, we'll
 setup disk-assisted queues to make sure no event are dropped.
 
-## Configuring rsyslog to work with eris
+## Configuring rsyslog to work with eris (TCP)
 
 If you've enabled central logging on your network with rsyslog and are using
 versions 4+, you're using rulesets to accomplish your remote loggers traffic.

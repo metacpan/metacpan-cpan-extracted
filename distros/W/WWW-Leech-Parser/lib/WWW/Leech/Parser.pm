@@ -29,6 +29,8 @@ sub new{
     $params->{'fields'} = $fields;
   }
 
+  $params->{'current_dom'} = undef;
+
   return bless $params, __PACKAGE__;
 
 }
@@ -37,19 +39,19 @@ sub parseList{
   my $this = shift;
   my $str = shift;
 
-  my $tree= HTML::TreeBuilder::XPath->new;
-  $tree->parse_content($str);
+  $this->{'current_dom'} = HTML::TreeBuilder::XPath->new;
+  $this->{'current_dom'}->parse_content($str);
 
   my $links = [];
   my $links_text = [];
-  foreach(@{$tree->findnodes($this->{'item:link'})}){
+  foreach(@{$this->{'current_dom'}->findnodes($this->{'item:link'})}){
     push(@$links, $_->attr('href'));
     push(@$links_text, $_->as_text());    
   }
 
   my $np = undef;
   if($this->{'nextpage:link'}){
-    $np = $tree->findnodes($this->{'nextpage:link'})->[0];
+    $np = $this->{'current_dom'}->findnodes($this->{'nextpage:link'})->[0];
 
     if($np){
       $np = $np->attr('href');
@@ -71,9 +73,9 @@ sub parse{
     $str = decode('UTF-8',$str);
   }
 
-  my $tree= HTML::TreeBuilder::XPath->new;
-  $tree->ignore_unknown(0);
-  $tree->parse_content($str);
+  $this->{'current_dom'}= HTML::TreeBuilder::XPath->new;
+  $this->{'current_dom'}->ignore_unknown(0);
+  $this->{'current_dom'}->parse_content($str);
 
   my $item = {};
 
@@ -104,12 +106,12 @@ sub parse{
 
         if($type eq 'html'){
 
-          foreach my $n ($tree->findnodes($field->{'xpath'})){
+          foreach my $n ($this->{'current_dom'}->findnodes($field->{'xpath'})){
             push(@$value,$n->as_XML);
           }
           
         } else {
-          $value = [$tree->findvalues($field->{'xpath'})];
+          $value = [$this->{'current_dom'}->findvalues($field->{'xpath'})];
 
           if($type eq 'unique'){
             my %u;
@@ -120,13 +122,13 @@ sub parse{
       } else {
         if($type eq 'html'){
 
-          if([$tree->findnodes($field->{'xpath'})]->[0]){
-            $value = [$tree->findnodes($field->{'xpath'})]->[0]->as_XML;
+          if([$this->{'current_dom'}->findnodes($field->{'xpath'})]->[0]){
+            $value = [$this->{'current_dom'}->findnodes($field->{'xpath'})]->[0]->as_XML;
           }
           
         }
         else {
-          $value = $tree->findvalue($field->{'xpath'});
+          $value = $this->{'current_dom'}->findvalue($field->{'xpath'});
         }
 
         if($type eq 'int'){

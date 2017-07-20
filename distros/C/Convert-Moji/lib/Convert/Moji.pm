@@ -9,7 +9,7 @@ our @EXPORT_OK = qw/make_regex length_one unambiguous/;
 
 use Carp;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Load a converter from a file and return a hash reference containing
 # the left/right pairs.

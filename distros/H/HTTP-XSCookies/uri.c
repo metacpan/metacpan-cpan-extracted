@@ -7,6 +7,14 @@
  */
 #include "uri_tables.h"
 
+/*
+ * We need to mask the index to character arrays in case of platforms with more
+ * than 8-bit chars since our table only has sufficient characters for that
+ * many conversions.  Results could potentially be wrong in that case, but at
+ * least we won't crash.
+ */
+#define CAST_INDEX(x) (((unsigned char) (x)) & 0xff)
+
 Buffer* url_decode(Buffer* src, int length,
                    Buffer* tgt)
 {
@@ -24,8 +32,8 @@ Buffer* url_decode(Buffer* src, int length,
             isxdigit(src->data[s+1]) &&
             isxdigit(src->data[s+2])) {
             /* put a byte together from the next two hex digits */
-            tgt->data[t++] = MAKE_BYTE(uri_decode_tbl[(int)src->data[s+1]],
-                                       uri_decode_tbl[(int)src->data[s+2]]);
+            tgt->data[t++] = MAKE_BYTE(uri_decode_tbl[CAST_INDEX(src->data[s+1])],
+                                       uri_decode_tbl[CAST_INDEX(src->data[s+2])]);
             /* we used up 3 characters (%XY) from source */
             s += 3;
         } else {
@@ -53,7 +61,7 @@ Buffer* url_encode(Buffer* src, int length,
     int s = src->pos;
     int t = tgt->pos;
     while (s < (src->pos + length)) {
-        char* v = uri_encode_tbl[(int)src->data[s]];
+        char* v = uri_encode_tbl[CAST_INDEX(src->data[s])];
 
         /* if current source character doesn't need to be encoded,
            just copy it to target*/

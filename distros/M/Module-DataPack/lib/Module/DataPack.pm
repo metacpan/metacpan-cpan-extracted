@@ -1,7 +1,7 @@
 package Module::DataPack;
 
-our $DATE = '2016-12-28'; # DATE
-our $VERSION = '0.20'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.21'; # VERSION
 
 use 5.010001;
 use strict;
@@ -94,6 +94,11 @@ _
             tags => ['category:output'],
         },
 
+        put_hook_at_the_end => {
+            summary => 'Put the require hook at the end of @INC using "push" '.
+                'instead of at the front using "unshift"',
+            schema => ['bool*', is=>1],
+        },
     },
     examples => [
         {
@@ -108,6 +113,8 @@ _
 };
 sub datapack_modules {
     my %args = @_;
+
+    my $put_hook_at_the_end = $args{put_hook_at_the_end} // 0;
 
     my %module_srcs; # key: mod_pm
     if ($args{module_srcs}) {
@@ -151,7 +158,17 @@ sub datapack_modules {
 {
     my $toc;
     my $data_linepos = 1;
+_
+    if ($put_hook_at_the_end) {
+        push @res, <<'_';
+    push @INC, sub {
+_
+    } else {
+        push @res, <<'_';
     unshift @INC, sub {
+_
+    }
+    push @res, <<'_';
         $toc ||= do {
 
             my $fh = \*DATA;
@@ -268,12 +285,16 @@ Module::DataPack - Like Module::FatPack, but uses datapacking instead of fatpack
 
 =head1 VERSION
 
-This document describes version 0.20 of Module::DataPack (from Perl distribution Module-DataPack), released on 2016-12-28.
+This document describes version 0.21 of Module::DataPack (from Perl distribution Module-DataPack), released on 2017-07-14.
 
 =head1 FUNCTIONS
 
 
-=head2 datapack_modules(%args) -> [status, msg, result, meta]
+=head2 datapack_modules
+
+Usage:
+
+ datapack_modules(%args) -> [status, msg, result, meta]
 
 Like Module::FatPack, but uses datapacking instead of fatpack.
 
@@ -322,6 +343,10 @@ Perl source code to add after the datapack code (but before the __DATA__ section
 =item * B<preamble> => I<str>
 
 Perl source code to add before the datapack code.
+
+=item * B<put_hook_at_the_end> => I<bool>
+
+Put the require hook at the end of @INC using "push" instead of at the front using "unshift".
 
 =item * B<stripper> => I<bool> (default: 0)
 
@@ -393,7 +418,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

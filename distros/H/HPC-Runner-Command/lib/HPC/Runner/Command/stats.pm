@@ -97,20 +97,32 @@ has 'task_data' => (
     clearer => 'clear_task_data',
 );
 
+parameter 'stats_type' => (
+    is      => 'rw',
+    isa     => 'Str',
+    default => 'JSON',
+    documentation =>
+      'hpcrunner.pl stats json/sqlite/elasticsearch --other_opts',
+);
+
 sub BUILD {
     my $self = shift;
 
     if ( $self->json && $self->summary ) {
-      apply_all_roles($self, 'HPC::Runner::Command::stats::Logger::JSON::Summary::JSONOutput');
+        apply_all_roles( $self,
+            'HPC::Runner::Command::stats::Logger::'.$self->stats_type.'::Summary::JSONOutput' );
     }
-    elsif(! $self->json && $self->summary ) {
-      apply_all_roles($self, 'HPC::Runner::Command::stats::Logger::JSON::Summary::TableOutput');
+    elsif ( !$self->json && $self->summary ) {
+        apply_all_roles( $self,
+            'HPC::Runner::Command::stats::Logger::'.$self->stats_type.'::Summary::TableOutput' );
     }
     elsif ( $self->json && $self->long ) {
-      apply_all_roles($self, 'HPC::Runner::Command::stats::Logger::JSON::Long::JSONOutput');
+        apply_all_roles( $self,
+            'HPC::Runner::Command::stats::Logger::'.$self->stats_type.'::Long::JSONOutput' );
     }
-    elsif(! $self->json && $self->long ) {
-      apply_all_roles($self, 'HPC::Runner::Command::stats::Logger::JSON::Long::TableOutput');
+    elsif ( !$self->json && $self->long ) {
+        apply_all_roles( $self,
+            'HPC::Runner::Command::stats::Logger::'.$self->stats_type.'::Long::TableOutput' );
     }
 }
 
@@ -139,6 +151,11 @@ sub iter_submissions {
             $self->iter_jobs_summary( $submission, $jobref )
               if $self->summary;
             $self->iter_jobs_long( $submission, $jobref ) if $self->long;
+        }
+        else {
+            $self->app_log->info( 'Data Tar '
+                  . $self->data_tar
+                  . ' does not contain any submission info!' );
         }
     }
 

@@ -3,7 +3,7 @@ BEGIN {
     %PREREQ_PM= (
         'ExtUtils::Depends' => '0.405',
         'Devel::CheckLib'   => '1.03',
-        'X11::Xlib'         => '0.12',
+        'X11::Xlib'         => '0.15',
     );
 
     # If the prereqs for this script are missing,

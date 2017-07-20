@@ -29,6 +29,35 @@ has clone_uri_ssh_hggit   => ( is => 'lazy', isa => Str, init_arg => undef );
 
 # NOTE https://bitbucket.org/repo_owner/repo_name - upstream SCM type can't be recognized correctly, use ".git" suffix fot git repositories
 
+# hggit upstream url type:
+# [SSH]     git+ssh://git@github.com:zdm/test.git
+# [SSH]     git+ssh://git@github.com:zdm/test
+# [INVALID] ssh://git@github.com:zdm/test.git
+# [INVALID] ssh://git@github.com:zdm/test
+# [INVALID] git@github.com:zdm/test.git - clone remote using SSH, but set upstream repo to local path in hgrc
+# [INVALID] git@github.com:zdm/test - clone remote using SSH, but set upstream repo to local path in hgrc
+# [HTTPS]   https://github.com/zdm/test.git
+# [INVALID] https://github.com/zdm/test - without .git suffix hggit can't recognize, that this is a git upstream
+# [HTTPS]   git://github.com/zdm/test.git
+# [HTTPS]   git://github.com/zdm/test
+
+# git upstream url type:
+# [INVALID] git+ssh://git@github.com:zdm/test.git
+# [INVALID] git+ssh://git@github.com:zdm/test
+# [INVALID] ssh://git@github.com:zdm/test.git
+# [INVALID] ssh://git@github.com:zdm/test
+# [SSH]     git@github.com:zdm/test.git
+# [SSH]     git@github.com:zdm/test
+# [HTTPS]   https://github.com/zdm/test.git
+# [HTTPS]   https://github.com/zdm/test
+# [HTTPS]   git://github.com/zdm/test.git
+# [HTTPS]   git://github.com/zdm/test
+
+# hg upstream url type:
+# ssh://hg@bitbucket.org/zdm/test
+# https://zdm@bitbucket.org/zdm/test
+# http://zdm@bitbucket.org/zdm/test
+
 sub BUILDARGS ( $self, $args ) {
     $args->{uri} = P->uri( $args->{uri}, authority => 1, base => 'ssh:' ) if !ref $args->{uri};
 
@@ -39,12 +68,18 @@ sub _build_host ($self) {
     return $self->uri->host->name;
 }
 
+# TODO maybe rename to id
 sub _build_path ($self) {
-    if ( $self->uri->scheme =~ /ssh/sm ) {
-        return $self->uri->port . $self->uri->path->to_string;
+    if ( $self->remote_scm_type == $SCM_TYPE_HG ) {
+        return $self->uri->path->to_string;
     }
     else {
-        return $self->uri->path->to_string;
+        if ( $self->uri->port ) {
+            return q[/] . $self->uri->port . $self->uri->path->to_string;
+        }
+        else {
+            return $self->uri->path->to_string;
+        }
     }
 }
 
@@ -59,10 +94,12 @@ sub _build_hosting_api_class ($self) {
     else                    {return}
 }
 
+# TODO rename to owner
 sub _build_namespace ($self) {
     return ( $self->path =~ m[/(.+?)/]sm )[0];
 }
 
+# TODO rename to slug
 sub _build_repo_name ($self) {
     return ( $self->path =~ m[/.+?/([[:alnum:]_-]+)]sm )[0];
 }
@@ -83,12 +120,13 @@ sub _build_remote_scm_type ($self) {
         return $SCM_TYPE_GIT;
     }
     else {
-        return $SCM_TYPE_GIT if $self->path =~ /[.]git\z/sm;
+        return $SCM_TYPE_GIT if $uri->path =~ /[.]git\z/sm;
     }
 
     return $SCM_TYPE_HG;
 }
 
+# TODO impossible to detect local SCM type, using remote url only
 sub _build_local_scm_type ($self) {
     if ( $self->uri->scheme =~ /\Agit[+]/sm ) {
         return $SCM_TYPE_HG;

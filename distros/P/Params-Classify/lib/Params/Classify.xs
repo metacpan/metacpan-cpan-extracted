@@ -1,6 +1,7 @@
 #define PERL_NO_GET_CONTEXT 1
 #include "EXTERN.h"
 #include "perl.h"
+#include "callchecker0.h"
 #include "XSUB.h"
 
 #define PERL_VERSION_DECIMAL(r,v,s) (r*1000000 + v*1000 + s)
@@ -8,6 +9,10 @@
 	PERL_VERSION_DECIMAL(PERL_REVISION,PERL_VERSION,PERL_SUBVERSION)
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
+
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
 
 #ifndef PERL_UNUSED_VAR
 # define PERL_UNUSED_VAR(x) ((void)x)
@@ -33,6 +38,12 @@
 # define newSVpvn_share(s, l, h) newSVpvn(s, l)
 #endif /* !newSVpvn_share */
 
+#if PERL_VERSION_GE(5,19,4)
+typedef SSize_t array_ix_t;
+#else /* <5.19.4 */
+typedef I32 array_ix_t;
+#endif /* <5.19.4 */
+
 #ifndef DPTR2FPTR
 # define DPTR2FPTR(t,x) ((t)(UV)(x))
 #endif /* !DPTR2FPTR */
@@ -41,7 +52,23 @@
 # define FPTR2DPTR(t,x) ((t)(UV)(x))
 #endif /* !FPTR2DPTR */
 
-#ifndef ptr_table_new
+#ifndef OpMORESIB_set
+# define OpMORESIB_set(o, sib) ((o)->op_sibling = (sib))
+# define OpLASTSIB_set(o, parent) ((o)->op_sibling = NULL)
+# define OpMAYBESIB_set(o, sib, parent) ((o)->op_sibling = (sib))
+#endif /* !OpMORESIB_set */
+#ifndef OpSIBLING
+# define OpHAS_SIBLING(o) (cBOOL((o)->op_sibling))
+# define OpSIBLING(o) (0 + (o)->op_sibling)
+#endif /* !OpSIBLING */
+
+#ifdef cv_set_call_checker
+# define QUSE_CUSTOM_OPS 1
+#else /* !cv_set_call_checker */
+# define QUSE_CUSTOM_OPS 0
+#endif /* !cv_set_call_checker */
+
+#if defined(QUSE_CUSTOM_OPS) && !defined(ptr_table_new)
 
 struct q_ptr_tbl_ent {
 	struct q_ptr_tbl_ent *next;
@@ -95,7 +122,7 @@ static void *THX_ptr_table_fetch(pTHX_ PTR_TBL_t *tbl, void *from)
 	return NULL;
 }
 
-#endif /* !ptr_table_new */
+#endif /* QUSE_CUSTOM_OPS && !ptr_table_new */
 
 #if PERL_VERSION_GE(5,11,0)
 # define case_SVt_RV_
@@ -132,25 +159,23 @@ static void *THX_ptr_table_fetch(pTHX_ PTR_TBL_t *tbl, void *from)
 #define sv_is_untyped_ref(sv) (SvROK(sv) && !SvOBJECT(SvRV(sv)))
 #define sv_is_untyped_blessed(sv) (SvROK(sv) && SvOBJECT(SvRV(sv)))
 
-#define bool_sv(b) ((b) ? &PL_sv_yes : &PL_sv_no)
+static bool THX_sv_is_undef(pTHX_ SV *sv) { return cBOOL(sv_is_undef(sv)); }
 
-static bool THX_sv_is_undef(pTHX_ SV *sv) { return !!sv_is_undef(sv); }
+static bool THX_sv_is_string(pTHX_ SV *sv) { return cBOOL(sv_is_string(sv)); }
 
-static bool THX_sv_is_string(pTHX_ SV *sv) { return !!sv_is_string(sv); }
-
-static bool THX_sv_is_glob(pTHX_ SV *sv) { return !!sv_is_glob(sv); }
+static bool THX_sv_is_glob(pTHX_ SV *sv) { return cBOOL(sv_is_glob(sv)); }
 
 static bool THX_sv_is_regexp(pTHX_ SV *sv) {
 	PERL_UNUSED_ARG(sv);
-	return !!sv_is_regexp(sv);
+	return cBOOL(sv_is_regexp(sv));
 }
 
 static bool THX_sv_is_untyped_ref(pTHX_ SV *sv) {
-	return !!sv_is_untyped_ref(sv);
+	return cBOOL(sv_is_untyped_ref(sv));
 }
 
 static bool THX_sv_is_untyped_blessed(pTHX_ SV *sv) {
-	return !!sv_is_untyped_blessed(sv);
+	return cBOOL(sv_is_untyped_blessed(sv));
 }
 
 enum {
@@ -321,7 +346,7 @@ static bool THX_call_bool_method(pTHX_ SV *objref, const char *methodname,
 	SPAGAIN;
 	if(retcount != 1) croak("call_method misbehaving\n");
 	ret = POPs;
-	retval = !!SvTRUE(ret);
+	retval = cBOOL(SvTRUE(ret));
 	PUTBACK;
 	FREETMPS;
 	LEAVE;
@@ -375,7 +400,7 @@ static void THX_pp1_check_sclass(pTHX_ I32 t)
 				sclassmeta->desc_adj_or_noun_phrase);
 		if(GIMME_V == G_SCALAR) XPUSHs(&PL_sv_undef);
 	} else {
-		SV *result = bool_sv(matches);
+		SV *result = boolSV(matches);
 		XPUSHs(result);
 	}
 	PUTBACK;
@@ -397,7 +422,7 @@ static void THX_pp1_check_rtype(pTHX_ I32 t)
 				rtypemeta->desc_noun);
 		if(GIMME_V == G_SCALAR) XPUSHs(&PL_sv_undef);
 	} else {
-		SV *result = bool_sv(matches);
+		SV *result = boolSV(matches);
 		XPUSHs(result);
 	}
 	PUTBACK;
@@ -424,7 +449,7 @@ static void THX_pp1_check_dyn_battr(pTHX_ I32 t)
 			meth = attr;
 		} else {
 			AV *methods_av;
-			I32 alen, pos;
+			array_ix_t alen, pos;
 			if(!SvROK(attr) || SvOBJECT(SvRV(attr)) ||
 					SvTYPE(SvRV(attr)) != SVt_PVAV)
 				croak("methods argument is not "
@@ -451,7 +476,7 @@ static void THX_pp1_check_dyn_battr(pTHX_ I32 t)
 				matches = call_bool_method(arg, "can", attr);
 			} else {
 				AV *methods_av = (AV*)SvRV(attr);
-				I32 alen = av_len(methods_av), pos;
+				array_ix_t alen = av_len(methods_av), pos;
 				for(pos = 0; pos <= alen; pos++) {
 					meth = *av_fetch(methods_av, pos, 0);
 					if(!call_bool_method(arg, "can",
@@ -495,11 +520,13 @@ static void THX_pp1_check_dyn_battr(pTHX_ I32 t)
 		}
 		if(GIMME_V == G_SCALAR) XPUSHs(&PL_sv_undef);
 	} else {
-		SV *result = bool_sv(matches);
+		SV *result = boolSV(matches);
 		XPUSHs(result);
 	}
 	PUTBACK;
 }
+
+#if QUSE_CUSTOM_OPS
 
 static OP *THX_pp_scalar_class(pTHX)
 {
@@ -542,6 +569,8 @@ static OP *THX_pp_check_dyn_battr(pTHX)
 	pp1_check_dyn_battr(PL_op->op_private);
 	return NORMAL;
 }
+
+#endif /* QUSE_CUSTOM_OPS */
 
 #ifndef PERL_ARGS_ASSERT_CROAK_XS_USAGE
 static void S_croak_xs_usage(pTHX_ const CV *, const char *);
@@ -602,55 +631,37 @@ static void THX_xsfunc_check_blessed(pTHX_ CV *cv)
 # undef croak_xs_usage
 #endif /* !PERL_ARGS_ASSERT_CROAK_XS_USAGE */
 
-#define rvop_cv(rvop) THX_rvop_cv(aTHX_ rvop)
-static CV *THX_rvop_cv(pTHX_ OP *rvop)
-{
-	switch(rvop->op_type) {
-		case OP_CONST: {
-			SV *rv = cSVOPx_sv(rvop);
-			return SvROK(rv) ? (CV*)SvRV(rv) : NULL;
-		} break;
-		case OP_GV: return GvCV(cGVOPx_gv(rvop));
-		default: return NULL;
-	}
-}
+#if QUSE_CUSTOM_OPS
 
 static PTR_TBL_t *ppmap;
 
-static OP *(*nxck_entersub)(pTHX_ OP *o);
-static OP *myck_entersub(pTHX_ OP *op)
+static OP *THX_ck_entersub_pc(pTHX_ OP *entersubop, GV *namegv, SV *protosv)
 {
-	OP *pushop, *cvop, *aop, *bop;
-	CV *cv;
-	OP *(*ppfunc)(pTHX);
-	I32 cvflags;
-	pushop = cUNOPx(op)->op_first;
-	if(!pushop->op_sibling) pushop = cUNOPx(pushop)->op_first;
-	for(cvop = pushop; cvop->op_sibling; cvop = cvop->op_sibling) ;
-	if(!(cvop->op_type == OP_RV2CV &&
-			!(cvop->op_private & OPpENTERSUB_AMPER) &&
-			(cv = rvop_cv(cUNOPx(cvop)->op_first)) &&
-			(ppfunc = DPTR2FPTR(OP*(*)(pTHX),
-					ptr_table_fetch(ppmap, cv)))))
-		return nxck_entersub(aTHX_ op);
-	cvflags = CvXSUBANY(cv).any_i32;
-	op = nxck_entersub(aTHX_ op);   /* for prototype checking */
-	aop = pushop->op_sibling;
-	bop = aop->op_sibling;
-	if(bop == cvop) {
-		if(!(cvflags & PC_ALLOW_UNARY)) return op;
+	CV *cv = (CV*)protosv;
+	OP *(*THX_ppfunc)(pTHX) =
+		DPTR2FPTR(OP*(*)(pTHX), ptr_table_fetch(ppmap, cv));
+	I32 cvflags = CvXSUBANY(cv).any_i32;
+	OP *pushop, *aop, *bop, *cop, *op;
+	entersubop = ck_entersub_args_proto(entersubop, namegv, protosv);
+	pushop = cUNOPx(entersubop)->op_first;
+	if(!OpHAS_SIBLING(pushop)) pushop = cUNOPx(pushop)->op_first;
+	aop = OpSIBLING(pushop);
+	bop = OpSIBLING(aop);
+	cop = bop ? OpSIBLING(bop) : NULL;
+	if(bop && !cop) {
+		if(!(cvflags & PC_ALLOW_UNARY)) return entersubop;
 		unary:
-		pushop->op_sibling = bop;
-		aop->op_sibling = NULL;
-		op_free(op);
+		OpMORESIB_set(pushop, bop);
+		OpLASTSIB_set(aop, NULL);
+		op_free(entersubop);
 		op = newUNOP(OP_NULL, 0, aop);
 		op->op_type = OP_RAND;
-		op->op_ppaddr = ppfunc;
+		op->op_ppaddr = THX_ppfunc;
 		op->op_private = (U8)cvflags;
 		return op;
-	} else if(bop && bop->op_sibling == cvop) {
-		if(!(cvflags & PC_ALLOW_BINARY)) return op;
-		if(ppfunc == THX_pp_check_sclass &&
+	} else if(cop && !OpHAS_SIBLING(cop)) {
+		if(!(cvflags & PC_ALLOW_BINARY)) return entersubop;
+		if(THX_ppfunc == THX_pp_check_sclass &&
 				(cvflags & PC_TYPE_MASK) == SCLASS_REF) {
 			I32 rtype;
 			cvflags &= ~PC_TYPE_MASK;
@@ -658,28 +669,30 @@ static OP *myck_entersub(pTHX_ OP *op)
 				(rtype = read_reftype_or_neg(cSVOPx_sv(bop)))
 					>= 0) {
 				cvflags |= rtype;
-				ppfunc = THX_pp_check_rtype;
+				THX_ppfunc = THX_pp_check_rtype;
 				goto unary;
 			}
-			ppfunc = THX_pp_check_dyn_rtype;
-		} else if(ppfunc == THX_pp_check_sclass &&
+			THX_ppfunc = THX_pp_check_dyn_rtype;
+		} else if(THX_ppfunc == THX_pp_check_sclass &&
 				(cvflags & PC_TYPE_MASK) == SCLASS_BLESSED) {
 			cvflags &= ~PC_TYPE_MASK;
-			ppfunc = THX_pp_check_dyn_battr;
+			THX_ppfunc = THX_pp_check_dyn_battr;
 		}
-		pushop->op_sibling = cvop;
-		aop->op_sibling = NULL;
-		bop->op_sibling = NULL;
-		op_free(op);
+		OpMORESIB_set(pushop, cop);
+		OpLASTSIB_set(aop, NULL);
+		OpLASTSIB_set(bop, NULL);
+		op_free(entersubop);
 		op = newBINOP(OP_NULL, 0, aop, bop);
 		op->op_type = OP_RAND;
-		op->op_ppaddr = ppfunc;
+		op->op_ppaddr = THX_ppfunc;
 		op->op_private = (U8)cvflags;
 		return op;
 	} else {
-		return op;
+		return entersubop;
 	}
 }
+
+#endif /* QUSE_CUSTOM_OPS */
 
 MODULE = Params::Classify PACKAGE = Params::Classify
 
@@ -688,15 +701,33 @@ PROTOTYPES: DISABLE
 BOOT:
 {
 	int i;
+	for(i = RTYPE_COUNT; i--; ) {
+		struct rtype_metadata *rtypemeta = &rtype_metadata[i];
+		rtypemeta->keyword_sv =
+			newSVpvn_share(rtypemeta->keyword_pv,
+					strlen(rtypemeta->keyword_pv), 0);
+	}
+}
+{
+	int i;
 	SV *tsv = sv_2mortal(newSV(0));
+#if QUSE_CUSTOM_OPS
 	ppmap = ptr_table_new();
+# define SETUP_CUSTOM_OP(cv, THX_ppfunc) \
+	do { \
+		ptr_table_store(ppmap, FPTR2DPTR(void*, cv), \
+			FPTR2DPTR(void*, THX_ppfunc)); \
+		cv_set_call_checker(cv, THX_ck_entersub_pc, (SV*)cv); \
+	} while(0)
+#else /* !QUSE_CUSTOM_OPS */
+# define SETUP_CUSTOM_OP(cv, THX_ppfunc) ((void)0)
+#endif /* !QUSE_CUSTOM_OPS */
 #define SETUP_SIMPLE_UNARY_XSUB(NAME) \
 	do { \
 		CV *cv = newXSproto_portable("Params::Classify::"#NAME, \
 			THX_xsfunc_##NAME, __FILE__, "$"); \
 		CvXSUBANY(cv).any_i32 = PC_ALLOW_UNARY; \
-		ptr_table_store(ppmap, FPTR2DPTR(void*, cv), \
-			FPTR2DPTR(void*, THX_pp_##NAME)); \
+		SETUP_CUSTOM_OP(cv, THX_pp_##NAME); \
 	} while(0)
 	SETUP_SIMPLE_UNARY_XSUB(scalar_class);
 	SETUP_SIMPLE_UNARY_XSUB(ref_type);
@@ -709,7 +740,7 @@ BOOT:
 		I32 cvflags = PC_ALLOW_UNARY |
 			(is_refish ? PC_ALLOW_BINARY : 0) | i;
 		I32 variant = (i == SCLASS_BLESSED ? PC_ABLE : 0) | PC_CROAK;
-		void (*xsfunc)(pTHX_ CV*) =
+		void (*THX_xsfunc)(pTHX_ CV*) =
 			i == SCLASS_REF ? THX_xsfunc_check_ref :
 			i == SCLASS_BLESSED ? THX_xsfunc_check_blessed :
 			THX_xsfunc_check_sclass;
@@ -726,18 +757,9 @@ BOOT:
 				variant & PC_STRICTBLESS ? "strictly_blessed" :
 				lckeyword);
 			cv = newXSproto_portable(SvPVX(tsv),
-				xsfunc, __FILE__, is_refish ? "$;$" : "$");
+				THX_xsfunc, __FILE__, is_refish ? "$;$" : "$");
 			CvXSUBANY(cv).any_i32 = cvflags | variant;
-			ptr_table_store(ppmap, cv,
-				FPTR2DPTR(void*, THX_pp_check_sclass));
+			SETUP_CUSTOM_OP(cv, THX_pp_check_sclass);
 		}
 	}
-	for(i = RTYPE_COUNT; i--; ) {
-		struct rtype_metadata *rtypemeta = &rtype_metadata[i];
-		rtypemeta->keyword_sv =
-			newSVpvn_share(rtypemeta->keyword_pv,
-					strlen(rtypemeta->keyword_pv), 0);
-	}
-	nxck_entersub = PL_check[OP_ENTERSUB];
-	PL_check[OP_ENTERSUB] = myck_entersub;
 }

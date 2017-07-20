@@ -1,7 +1,7 @@
 package Log::ger::App;
 
-our $DATE = '2017-07-12'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 # IFUNBUILT
 # use strict;
@@ -119,7 +119,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

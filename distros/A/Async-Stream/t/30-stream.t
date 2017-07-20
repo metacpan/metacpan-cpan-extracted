@@ -6,7 +6,7 @@ use Test::More;
 
 use Async::Stream qw(merge branch);
 
- plan tests => 25;
+ plan tests => 24;
 
 
 subtest 'Method new' => sub {
@@ -125,7 +125,7 @@ subtest 'Method reduce' => sub {
 
 
 subtest 'Method filter' => sub {
-	plan tests => 2;
+	plan tests => 3;
 
 	my @test_array = (1,2,3);
 	my $test_stream = Async::Stream->new_from(@test_array);
@@ -133,33 +133,29 @@ subtest 'Method filter' => sub {
 		->filter(sub{$_ != 2})
 		->to_arrayref(sub{is_deeply($_[0],[grep {$_!=2} @test_array],"Method filter")});
 
+	$test_stream = Async::Stream->new_from(@test_array);
+	$test_stream
+		->filter(sub{$_[0]->($_ != 2)},'async')
+		->to_arrayref(sub{is_deeply($_[0],[grep {$_!=2} @test_array],"Method transform async")});
+
 	eval {$test_stream->filter('bad argument')};
 	ok($@, "Method filter with bad argument");
 };
 
 
-subtest 'Method smap' => sub {
-	plan tests => 2;
-
-	my @test_array = (1,2,3);
-	my $test_stream = Async::Stream->new_from(@test_array);
-	$test_stream
-		->smap(sub{$_ * 2})
-		->to_arrayref(sub{is_deeply($_[0],[map {$_*2} @test_array],"Method smap")});
-
-	eval {$test_stream->smap('bad argument')};
-	ok($@, "Method smap with bad argument");
-};
-
-
 subtest 'Method transform' => sub {
-	plan tests => 2;
+	plan tests => 3;
 
 	my @test_array = (1,2,3);
 	my $test_stream = Async::Stream->new_from(@test_array);
 	$test_stream
-		->transform(sub{$_[0]->($_ * 2)})
-		->to_arrayref(sub{is_deeply($_[0],[map {$_*2} @test_array],"Method transform")});
+		->transform(sub{$_ * 2})
+		->to_arrayref(sub{is_deeply($_[0],[map {$_*2} @test_array],"Method transform sync")});
+
+	$test_stream = Async::Stream->new_from(@test_array);
+	$test_stream
+		->transform(sub{$_[0]->($_ * 2)},'async')
+		->to_arrayref(sub{is_deeply($_[0],[map {$_*2} @test_array],"Method transform async")});
 
 	eval {$test_stream->transform('bad argument')};
 	ok($@, "Method transform with bad argument");
@@ -234,44 +230,44 @@ subtest 'Method limit' => sub {
 };
 
 
-subtest 'Method arrange' => sub {
+subtest 'Method sorted' => sub {
 	plan tests => 2;
 	
 	my @test_array = (3,1,2);
 	my $test_stream = Async::Stream->new_from(@test_array);
 	$test_stream
-		->arrange(sub{$a <=> $b})
-		->to_arrayref(sub{is_deeply($_[0],[sort {$a <=> $b} @test_array],"Method arrange")});
+		->sorted(sub{$a <=> $b})
+		->to_arrayref(sub{is_deeply($_[0],[sort {$a <=> $b} @test_array],"Method sorted")});
 
-	eval {$test_stream->arrange('bad argument')};
-	ok($@, "Method arrange with bad argument");
+	eval {$test_stream->sorted('bad argument')};
+	ok($@, "Method sorted with bad argument");
 };
 
 
-subtest 'Method cut_arrange' => sub {
+subtest 'Method cut_sorted' => sub {
 	plan tests => 5;
 
 	my @test_array = (2,1,30,20,5,6);
 	my $test_stream = Async::Stream->new_from(@test_array);
 	$test_stream
-		->cut_arrange(sub {length($a) != length($b)},sub {$a <=> $b})
-		->to_arrayref(sub{is_deeply($_[0],[1,2,20,30,5,6],"Method cut_arrange 1")});
+		->cut_sorted(sub {length($a) != length($b)},sub {$a <=> $b})
+		->to_arrayref(sub{is_deeply($_[0],[1,2,20,30,5,6],"Method cut_sorted 1")});
 
 	@test_array = (2,1,30,20,5,6);
 	$test_stream = Async::Stream->new_from(@test_array);
 	$test_stream
 		->limit(0)
-		->cut_arrange(sub {length($a) != length($b)},sub {$a <=> $b})
-		->to_arrayref(sub{is_deeply($_[0],[],"Method cut_arrange 2")});
+		->cut_sorted(sub {length($a) != length($b)},sub {$a <=> $b})
+		->to_arrayref(sub{is_deeply($_[0],[],"Method cut_sorted 2")});
 
-	eval {$test_stream->cut_arrange('bad argument', sub{})};
-	ok($@, "Method cut_arrange with bad argument 1");
+	eval {$test_stream->cut_sorted('bad argument', sub{})};
+	ok($@, "Method cut_sorted with bad argument 1");
 
-	eval {$test_stream->cut_arrange(sub{}, 'bad argument')};
-	ok($@, "Method cut_arrange with bad argument 2");
+	eval {$test_stream->cut_sorted(sub{}, 'bad argument')};
+	ok($@, "Method cut_sorted with bad argument 2");
 
-	eval {$test_stream->cut_arrange('bad argument','bad argument')};
-	ok($@, "Method cut_arrange with bad argument 3");
+	eval {$test_stream->cut_sorted('bad argument','bad argument')};
+	ok($@, "Method cut_sorted with bad argument 3");
 };
 
 
@@ -336,47 +332,47 @@ subtest 'Prefetch' => sub {
 				$tmp->[0]->($tmp->[1]);
 				$return_cb->($_);
 			}
-		});
+		}, 'async');
 
 	$test_stream->to_arrayref(sub{is_deeply($_[0],[1,3,4,2],"set prefetch after init")});
 };
 
-subtest 'Merge' => sub {
+subtest 'Merge_in' => sub {
 	plan tests => 3;
 
 	my @test_array = (1,2,3);
 	my $test_stream = Async::Stream->new_from(@test_array);
 	my $test_stream1 = Async::Stream->new_from(@test_array);
 
-	my $merge_stream = merge { $a <=> $b } $test_stream, $test_stream1;
+	$test_stream->merge_in(sub{ $a <=> $b }, $test_stream1);
 
-	$merge_stream->to_arrayref(sub {
+	$test_stream->to_arrayref(sub {
 			is_deeply(
 				$_[0], 
 				[sort {$a <=> $b} (@test_array, @test_array)], 
-				"Method concat",
+				"Method merge_in",
 			);
 		});
 
-	eval { $test_stream->merge(sub {$a <=> $b}) };
-	ok($@, "Static method merge with bad argument 1");
+	eval { $test_stream->merge_in('bad argument') };
+	ok($@, "Static method merge_in with bad argument 1");
 
-	eval { merge {$a <=> $b} 1,1 };
-	ok($@, "Static method merge with bad argument 2");
+	eval { $test_stream->merge_in(sub{$a <=> $b},1) };
+	ok($@, "Static method merge_in with bad argument 2");
 
 };
 
-subtest 'Branch' => sub {
+subtest 'Branch_out' => sub {
 	plan tests => 3;
 
 	my @test_array = (1,2,3,4,5,6);
 	my $test_stream = Async::Stream->new_from(@test_array);
 
-	my ($odd_stream, $even_stream) = branch {$_ % 2} $test_stream;
-	$odd_stream->to_arrayref(sub {is_deeply($_[0], [1, 3, 5], "Truth branch of stream")});
-	$even_stream->to_arrayref(sub {is_deeply($_[0], [2, 4, 6], "False branch of stream")});
+	my $odd_stream = $test_stream->branch_out(sub {$_ % 2});
+	$odd_stream->to_arrayref(sub {is_deeply($_[0], [1, 3, 5], "Branch part of stream")});
+	$test_stream->to_arrayref(sub {is_deeply($_[0], [2, 4, 6], "Main part of stream")});
 
-	eval { $test_stream->branch(sub {$a <=> $b}) };
+	eval { $test_stream->branch_out('bad argument') };
 	ok($@, "Static method branch with bad argument");
 };
 

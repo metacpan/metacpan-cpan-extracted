@@ -1,3 +1,18 @@
+version 0.011; 2017-07-15
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * no longer include a Makefile.PL in the distribution
+
+  * update op-munging code to the PERL_OP_PARENT-compatible style
+    (though none of it is actually used on Perls new enough to support
+    PERL_OP_PARENT)
+
+  * rename internal gen_*_op() functions into a better style
+
+  * consistently use THX_ prefix on internal function names
+
 version 0.010; 2016-03-18
 
   * skip test with lexical $_ on Perl 5.23.4+ where that feature has

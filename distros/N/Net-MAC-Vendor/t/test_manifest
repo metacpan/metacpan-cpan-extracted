@@ -4,6 +4,7 @@ pod_coverage.t
 normalize_mac.t
 oui.t
 fetch_oui_from_ieee.t
+fetch_oui_from_custom.t
 extract_oui_from_html.t
 parse_oui.t
 fetch_oui.t

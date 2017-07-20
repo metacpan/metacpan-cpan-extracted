@@ -1,6 +1,11 @@
 
 ===== ChangeLog of Mail::Box::POP3 version 3.*
 
+version 3.003: Sun 16 Jul 13:00:16 CEST 2017
+
+	Improvements:
+	- do not test when installing, only at module release.
+
 version 3.002: Thu 29 Jun 15:07:19 CEST 2017
 
 	Fixes:

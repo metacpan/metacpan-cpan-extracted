@@ -62,7 +62,8 @@ $m->callback( Fields => \@fields, ARGSRef => \%ARGS );
 
 my ( @seen);
 
-$Format ||= RT->Config->Get('AssetSearchFormat');
+$Format ||= ProcessAssetSearchFormatConfig;
+
 my @format = $m->comp('/Elements/CollectionAsTable/ParseFormat', Format => $Format);
 foreach my $field (@format) {
     # "title" is for columns like NEWLINE, which doesn't have "attribute"

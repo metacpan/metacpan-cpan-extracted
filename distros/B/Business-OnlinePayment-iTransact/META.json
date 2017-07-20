@@ -1,0 +1,53 @@
+{
+   "abstract" : "iTransact backend module for Business::OnlinePayment",
+   "author" : [
+      "Bill Gerrard <bill@gerrard.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-OnlinePayment-iTransact",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::OnlinePayment" : "3",
+            "Business::OnlinePayment::HTTPS" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "XML::Hash::LX" : "0",
+            "perl" : "5.008004",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/billgerrard/Business-OnlinePayment-iTransact.git",
+         "web" : "https://github.com/billgerrard/Business-OnlinePayment-iTransact"
+      }
+   },
+   "version" : "1.00"
+}

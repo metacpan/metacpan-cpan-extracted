@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use List::Util 'max';
-our $VERSION = '0.901';
+our $VERSION = '0.911';
 
 our $COLOR;
 our $VERBOSE;
@@ -18,6 +18,9 @@ my %color = (
     DONE => 32,
     WARN => 33,
 );
+
+use constant WIN32 => $^O eq 'MSWin32';
+our $HAS_WIN32_COLOR;
 
 sub new {
     my $class = shift;
@@ -34,6 +37,13 @@ sub log {
     my $is_color = ref $self ? $self->{color} : $COLOR;
     my $verbose = ref $self ? $self->{verbose} : $VERBOSE;
     my $show_progress = ref $self ? $self->{show_progress} : $SHOW_PROGRESS;
+
+    if ($is_color and WIN32) {
+        if (!defined $HAS_WIN32_COLOR) {
+            $HAS_WIN32_COLOR = eval { require Win32::Console::ANSI; 1 } ? 1 : 0;
+        }
+        $is_color = 0 unless $HAS_WIN32_COLOR;
+    }
 
     if ($is_color) {
         $type = "\e[$color{$type}m$type\e[m" if $type && $color{$type};

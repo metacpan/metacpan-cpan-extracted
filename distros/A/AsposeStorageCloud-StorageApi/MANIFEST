@@ -34,13 +34,9 @@ lib/AsposeStorageCloud/Object/TextEffect.pm
 lib/AsposeStorageCloud/Object/TimeSpan.pm
 lib/AsposeStorageCloud/Object/Underline.pm
 lib/AsposeStorageCloud/StorageApi.pm
-MANIFEST
-README
-t/01_storage_api.t
-t/data/SampleExecuteTemplate.doc
-t/data/SampleExecuteTemplateData.txt
-t/data/SampleWordDocument.docx
-t/data/testfile.txt
 Makefile.PL
-META.yml
+MANIFEST
 META.json
+META.yml
+README.md
+t/01_storage_api.t

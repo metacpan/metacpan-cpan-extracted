@@ -199,11 +199,15 @@ sub test_006 {
     my $basename = $test->data_tar->basename('.tar.gz');
     my $job_dir = File::Spec->catdir( $basename, 'job', );
 
-    is($test->lock_exists($job_dir), 0, 'Lock does not exist');
+    $test->counter(1);
+    $test->cmd('hello');
+    $test->start_command_log('1234');
+
+    is($test->lock_file->exists, undef, 'Lock does not exist');
     $test->write_lock($job_dir);
-    is($test->lock_exists($job_dir), 1, 'Lock exists');
-    $test->remove_lock($job_dir);
-    is($test->lock_exists($job_dir), 0, 'Lock does not exist');
+    is($test->lock_file->exists, 1, 'Lock exists');
+    $test->lock_file->remove;
+    is($test->lock_file->exists, undef, 'Lock does not exist');
 
 }
 

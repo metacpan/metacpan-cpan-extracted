@@ -1,0 +1,19 @@
+Changes
+lib/RPi/Const.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/23-const_pull.t
+t/24-const_edge.t
+t/25-const_pinmode.t
+t/26-const_state.t
+t/27-const_mode.t
+t/30-const_all.t
+t/35-pwm_mode.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

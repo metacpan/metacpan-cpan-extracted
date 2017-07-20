@@ -3,7 +3,7 @@ use 5.008_005;
 
 use Mouse::Exporter; # enables strict and warnings
 
-our $VERSION = 'v2.4.9';
+our $VERSION = 'v2.4.10';
 
 use Carp         ();
 use Scalar::Util ();
@@ -131,6 +131,9 @@ sub init_meta {
     my $metaclass  = $args{metaclass}  || 'Mouse::Meta::Class';
 
     my $meta = $metaclass->initialize($class);
+    my $filename = Mouse::Util::module_notional_filename($meta->name);
+    $INC{$filename} = '(set by Mouse)'
+        unless exists $INC{$filename};
 
     $meta->add_method(meta => sub{
         return $metaclass->initialize(ref($_[0]) || $_[0]);
@@ -155,7 +158,7 @@ Mouse - Moose minus the antlers
 
 =head1 VERSION
 
-This document describes Mouse version v2.4.9
+This document describes Mouse version v2.4.10
 
 =head1 SYNOPSIS
 

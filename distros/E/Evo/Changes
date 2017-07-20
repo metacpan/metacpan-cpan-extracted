@@ -1,6 +1,10 @@
 Revision history for Evo
 
-0.0403    2017-05-06 22:54:40+03:00 Europe/Kiev
+0.0405    2017-07-19 01:53:04+03:00 Europe/Kiev
+
+0.0404    2017-07-18 23:15:44+03:00 Europe/Kiev
+
+Fixed a bug when exception in promise(sub{}) isn't catched
 
 0.0402    2017-05-06 12:22:09+03:00 Europe/Kiev
 add no_method flag for Evo::Class

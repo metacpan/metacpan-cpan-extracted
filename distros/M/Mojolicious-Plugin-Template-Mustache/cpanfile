@@ -1,2 +1,2 @@
 requires 'Mojolicious';
-requires 'Template::Mustache';
+requires 'Template::Mustache', '>=1.0.2';

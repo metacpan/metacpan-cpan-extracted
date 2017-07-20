@@ -50,7 +50,7 @@ DBIx::SchemaChecksum::App - Manage your datebase schema via checksums
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 

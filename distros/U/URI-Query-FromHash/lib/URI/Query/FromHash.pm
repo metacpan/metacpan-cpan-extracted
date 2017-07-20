@@ -1,4 +1,4 @@
-package URI::Query::FromHash 0.005;
+package URI::Query::FromHash 0.006;
 
 use strict;
 use warnings;
@@ -20,14 +20,14 @@ sub hash2query(+%) {
     for my $k ( sort keys %$hash ) {
         my $v = $hash->{$k};
 
-        $k =~ s|([;/?:@&=+,\$\[\]%])|$escapes{$1}|g;
+        $k =~ s|([;/?:@&=+,\$\[\]%\\])|$escapes{$1}|g;
         $k =~ y| |+|;
 
         for ( ref $v ? @$v : $v ) {
             # Avoid modifying the original.
             my $v = $_ // '';
 
-            $v =~ s|([;/?:@&=+,\$\[\]%])|$escapes{$1}|g;
+            $v =~ s|([;/?:@&=+,\$\[\]%\\])|$escapes{$1}|g;
             $v =~ y| |+|;
 
             $q .= "$k=$v&";

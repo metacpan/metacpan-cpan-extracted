@@ -1,3 +1,7 @@
+0.04
+  - Parse all forms of the AssetSearchFormat config option.
+    Add a new default key, AssetSearchFormat, for the hashref form.
+
 0.03
   - add asset support for RT's upcoming CustomDateRanges
 

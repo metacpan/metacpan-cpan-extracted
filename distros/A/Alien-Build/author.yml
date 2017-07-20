@@ -58,6 +58,9 @@ pod_spelling_system:
     - subtests
     - subtest
     - unsets
+    - postload
+    - preload
+    - EUMM
 
 pod_coverage:
   skip: 0
@@ -69,4 +72,5 @@ pod_coverage:
     - Test::Alien::CanCompile#skip
     - Test::Alien::CanPlatypus#skip
     - Test::Alien#with_subtest
+    - Test::Alien#capture_merged
 

@@ -1,30 +1,36 @@
-SYNOPSIS
+NAME
+    Finance::Bank::ID::BCA - Check your BCA accounts from Perl
 
-    If you just want to download banking statements, and you use
-    Linux/Unix, you might want to use the download-bca script instead of
-    having to deal with this library directly.
+VERSION
+    This document describes version 0.48 of Finance::Bank::ID::BCA (from
+    Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
+
+SYNOPSIS
+    If you just want to download banking statements, and you use Linux/Unix,
+    you might want to use the download-bca script instead of having to deal
+    with this library directly.
 
     If you want to use the library in your Perl application:
 
         use Finance::Bank::ID::BCA;
-    
+
         # FBI::BCA uses Log::ger. to show logs to, for example, screen:
         use Log::ger::Output 'Screen';
-    
+
         my $ibank = Finance::Bank::ID::BCA->new(
             username => 'ABCDEFGH1234', # opt if only using parse_statement()
             password => '123456',       # idem
             verify_https => 1,          # default is 0
             #https_ca_dir => '/etc/ssl/certs', # default is already /etc/ssl/certs
         );
-    
+
         eval {
             $ibank->login(); # dies on error
-    
+
             my @accts = $ibank->list_accounts();
-    
+
             my $bal = $ibank->check_balance($acct); # $acct is optional
-    
+
             my $stmt = $ibank->get_statement(
                 account    => ..., # opt, default account will be used if undef
                 days       => 31,  # opt
@@ -32,14 +38,14 @@ SYNOPSIS
                                    # opt, takes precedence over 'days'
                 end_date   => DateTime->today, # opt, takes precedence over 'days'
             );
-    
+
             print "Transactions: ";
             for my $tx (@{ $stmt->{transactions} }) {
                 print "$tx->{date} $tx->{amount} $tx->{description}\n";
             }
         };
         warn if $@;
-    
+
         # remember to call this, otherwise you will have trouble logging in again
         # for some time
         $ibank->logout();
@@ -50,7 +56,6 @@ SYNOPSIS
         my $res = $ibank->parse_statement($html);
 
 DESCRIPTION
-
     This module provide a rudimentary interface to the web-based online
     banking interface of the Indonesian Bank Central Asia (BCA) at
     https://ibank.klikbca.com. You will need either Crypt::SSLeay or
@@ -64,151 +69,141 @@ DESCRIPTION
     module can parse statement page from both versions.
 
     Warning: This module is neither offical nor is it tested to be 100%
-    safe! Because of the nature of web-robots, everything may break from
-    one day to the other when the underlying web interface changes.
+    safe! Because of the nature of web-robots, everything may break from one
+    day to the other when the underlying web interface changes.
 
 WARNING
-
-    This warning is from Simon Cozens' Finance::Bank::LloydsTSB, and seems
+    This warning is from Simon Cozens' "Finance::Bank::LloydsTSB", and seems
     just as apt here.
 
     This is code for online banking, and that means your money, and that
-    means BE CAREFUL. You are encouraged, nay, expected, to audit the
-    source of this module yourself to reassure yourself that I am not doing
-    anything untoward with your banking data. This software is useful to
-    me, but is provided under NO GUARANTEE, explicit or implied.
+    means BE CAREFUL. You are encouraged, nay, expected, to audit the source
+    of this module yourself to reassure yourself that I am not doing
+    anything untoward with your banking data. This software is useful to me,
+    but is provided under NO GUARANTEE, explicit or implied.
 
 ERROR HANDLING AND DEBUGGING
-
     Most methods die() when encountering errors, so you can use eval() to
     trap them.
 
     Full response headers and bodies are dumped to a separate logger. See
-    documentation on new() below and the sample script in examples/
+    documentation on "new()" below and the sample script in examples/
     subdirectory in the distribution.
 
 ATTRIBUTES
-
 METHODS
-
- new(%args)
-
+  new(%args)
     Create a new instance. %args keys:
 
-      * username
+    *   username
 
-      Optional if you are just using utility methods like parse_statement()
-      and not login() etc.
+        Optional if you are just using utility methods like
+        "parse_statement()" and not "login()" etc.
 
-      * password
+    *   password
 
-      Optional if you are just using utility methods like parse_statement()
-      and not login() etc.
+        Optional if you are just using utility methods like
+        "parse_statement()" and not "login()" etc.
 
-      * mech
+    *   mech
 
-      Optional. A WWW::Mechanize-like object. By default this module
-      instantiate a new Finance::BankUtils::ID::Mechanize (a WWW::Mechanize
-      subclass) object to retrieve web pages, but if you want to use a
-      custom/different one, you are allowed to do so here. Use cases
-      include: you want to retry and increase timeout due to
-      slow/unreliable network connection (using
-      WWW::Mechanize::Plugin::Retry), you want to slow things down using
-      WWW::Mechanize::Sleepy, you want to use IE engine using
-      Win32::IE::Mechanize, etc.
+        Optional. A WWW::Mechanize-like object. By default this module
+        instantiate a new Finance::BankUtils::ID::Mechanize (a
+        WWW::Mechanize subclass) object to retrieve web pages, but if you
+        want to use a custom/different one, you are allowed to do so here.
+        Use cases include: you want to retry and increase timeout due to
+        slow/unreliable network connection (using
+        WWW::Mechanize::Plugin::Retry), you want to slow things down using
+        WWW::Mechanize::Sleepy, you want to use IE engine using
+        Win32::IE::Mechanize, etc.
 
-      * verify_https
+    *   verify_https
 
-      Optional. If you are using the default mech object (see previous
-      option), you can set this option to 1 to enable SSL certificate
-      verification (recommended for security). Default is 0.
+        Optional. If you are using the default mech object (see previous
+        option), you can set this option to 1 to enable SSL certificate
+        verification (recommended for security). Default is 0.
 
-      SSL verification will require a CA bundle directory, default is
-      /etc/ssl/certs. Adjust https_ca_dir option if your CA bundle is not
-      located in that directory.
+        SSL verification will require a CA bundle directory, default is
+        /etc/ssl/certs. Adjust https_ca_dir option if your CA bundle is not
+        located in that directory.
 
-      * https_ca_dir
+    *   https_ca_dir
 
-      Optional. Default is /etc/ssl/certs. Used to set HTTPS_CA_DIR
-      environment variable for enabling certificate checking in
-      Crypt::SSLeay. Only used if verify_https is on.
+        Optional. Default is /etc/ssl/certs. Used to set HTTPS_CA_DIR
+        environment variable for enabling certificate checking in
+        Crypt::SSLeay. Only used if verify_https is on.
 
-      * logger
+    *   logger
 
-      Optional. You can supply any object that responds to trace(),
-      debug(), info(), warn(), error(), or fatal() here. If not specified,
-      this module will use a default logger.
+        Optional. You can supply any object that responds to trace(),
+        debug(), info(), warn(), error(), or fatal() here. If not specified,
+        this module will use a default logger.
 
-      * logger_dump
+    *   logger_dump
 
-      Optional. This is just like logger but this module will log contents
-      of response here instead of to logger for debugging purposes. You can
-      configure something like Log::ger::Output::DirWriteRotate to save web
-      pages more conveniently as separate files. If unspecified, the
-      default logger is used (same as logger).
+        Optional. This is just like "logger" but this module will log
+        contents of response here instead of to "logger" for debugging
+        purposes. You can configure something like
+        Log::ger::Output::DirWriteRotate to save web pages more conveniently
+        as separate files. If unspecified, the default logger is used (same
+        as "logger").
 
- login()
-
+  login()
     Login to the net banking site. You actually do not have to do this
-    explicitly as login() is called by other methods like check_balance()
-    or get_statement().
+    explicitly as login() is called by other methods like "check_balance()"
+    or "get_statement()".
 
-    If login is successful, logged_in will be set to true and subsequent
-    calls to login() will become a no-op until logout() is called.
+    If login is successful, "logged_in" will be set to true and subsequent
+    calls to "login()" will become a no-op until "logout()" is called.
 
     Dies on failure.
 
- logout()
-
+  logout()
     Logout from the net banking site. You need to call this at the end of
-    your program, otherwise the site will prevent you from re-logging in
-    for some time (e.g. 10 minutes).
+    your program, otherwise the site will prevent you from re-logging in for
+    some time (e.g. 10 minutes).
 
-    If logout is successful, logged_in will be set to false and subsequent
-    calls to logout() will become a no-op until login() is called.
+    If logout is successful, "logged_in" will be set to false and subsequent
+    calls to "logout()" will become a no-op until "login()" is called.
 
     Dies on failure.
 
- list_accounts()
-
+  list_accounts()
     Return an array containing all account numbers that are associated with
     the current net banking login.
 
- check_balance([$account])
+  check_balance([$account])
+    Return balance for specified account, or the default account if $account
+    is not specified.
 
-    Return balance for specified account, or the default account if
-    $account is not specified.
-
- get_statement(%args) => $stmt
-
+  get_statement(%args) => $stmt
     Get account statement. %args keys:
 
-      * account
+    *   account
 
-      Optional. Select the account to get statement of. If not specified,
-      will use the already selected account.
+        Optional. Select the account to get statement of. If not specified,
+        will use the already selected account.
 
-      * days
+    *   days
 
-      Optional. Number of days between 1 and 31. If days is 1, then start
-      date and end date will be the same. Default is 31.
+        Optional. Number of days between 1 and 31. If days is 1, then start
+        date and end date will be the same. Default is 31.
 
-      * start_date
+    *   start_date
 
-      Optional. Default is end_date - days.
+        Optional. Default is end_date - days.
 
-      * end_date
+    *   end_date
 
-      Optional. Default is today (or some 1+ days from today if today is a
-      Saturday/Sunday/holiday, depending on the default value set by the
-      site's form).
+        Optional. Default is today (or some 1+ days from today if today is a
+        Saturday/Sunday/holiday, depending on the default value set by the
+        site's form).
 
     See parse_statement() on structure of $stmt.
 
- parse_statement($html, %opts) => $res
-
-    Given the HTML text of the account statement results page, parse it
-    into structured data:
+  parse_statement($html, %opts) => $res
+    Given the HTML text of the account statement results page, parse it into
+    structured data:
 
      $stmt = {
         start_date     => $start_dt, # a DateTime object
@@ -244,16 +239,41 @@ METHODS
 
     Options:
 
-      * return_datetime_obj => BOOL
+    *   return_datetime_obj => BOOL
 
-      Default is true. If set to false, the method will return dates as
-      strings with this format: 'YYYY-MM-DD HH::mm::SS' (produced by
-      DateTime->dmy . ' ' . DateTime->hms). This is to make it easy to pass
-      the data structure into YAML, JSON, MySQL, etc. Nevertheless,
-      internally DateTime objects are still used.
+        Default is true. If set to false, the method will return dates as
+        strings with this format: 'YYYY-MM-DD HH::mm::SS' (produced by
+        DateTime->dmy . ' ' . DateTime->hms). This is to make it easy to
+        pass the data structure into YAML, JSON, MySQL, etc. Nevertheless,
+        internally DateTime objects are still used.
 
     Additional notes:
 
     The method can also handle some copy-pasted text from the GUI browser,
     but this is no longer documented or guaranteed to keep working.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-Bank-ID-BCA>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-Bank-ID-BCA>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-Bank-ID-BCA>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014, 2013, 2012, 2011, 2010
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

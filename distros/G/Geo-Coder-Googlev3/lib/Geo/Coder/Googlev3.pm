@@ -12,7 +12,7 @@ package Geo::Coder::Googlev3;
 
 use strict;
 use vars qw($VERSION);
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Carp            ('croak');
 use Encode          ();
@@ -39,14 +39,14 @@ sub new {
             if ($sensor !~ m{^(false|true)$}) {
                 croak "sensor argument has to be either 'false' or 'true'";
             }
-        } else {
-            $sensor = 'false';
         }
         $self->{sensor} = $sensor;
     }
     if ($args{bounds}) {
         $self->bounds(delete $args{bounds});
     }
+    $self->{key} = delete $args{key};
+    $self->{use_https} = delete $args{use_https};
     croak "Unsupported arguments: " . join(" ", %args) if %args;
     $self;
 }
@@ -91,15 +91,16 @@ sub geocode {
 sub geocode_url {
     my($self, %args) = @_;
     my $loc = $args{location};
-    my $url = URI->new('http://maps.google.com/maps/api/geocode/json');
+    my $url = URI->new(($self->{use_https} ? 'https' : 'http') . '://maps.google.com/maps/api/geocode/json');
     my %url_params;
     $url_params{address}  = $loc;
-    $url_params{sensor}   = $self->{sensor};
+    $url_params{sensor}   = $self->{sensor}   if defined $self->{sensor};
     $url_params{region}   = $self->{region}   if defined $self->{region};
     $url_params{language} = $self->{language} if defined $self->{language};
     if (defined $self->{bounds}) {
         $url_params{bounds} = join '|', map { $_->{lat}.','.$_->{lng} } @{ $self->{bounds} };
     }
+    $url_params{key}      = $self->{key}      if defined $self->{key};
     while(my($k,$v) = each %url_params) {
         $url->query_param($k => Encode::encode_utf8($v));
     }
@@ -190,10 +191,9 @@ The C<ua> parameter may be supplied to override the default
 L<LWP::UserAgent> object. The default C<LWP::UserAgent> object sets
 the C<timeout> to 15 seconds and enables the C<env_proxy> option.
 
-The L<Geo::Coder::Google>'s C<oe> and C<apikey> parameters are not
-supported.
+The L<Geo::Coder::Google>'s C<oe> parameter is not supported.
 
-The parameters C<region>, C<language>, and C<bounds> are also
+The parameters C<region>, C<language>, C<bounds>, and C<key> are also
 accepted. The C<bounds> parameter should be in the form:
 
    [{lat => ..., lng => ...}, {lat => ..., lng => ...}]
@@ -201,7 +201,10 @@ accepted. The C<bounds> parameter should be in the form:
 The parameter C<sensor> should be set to the string C<true> if the
 geocoding request comes from a device with a location sensor (see
 L<https://developers.google.com/maps/documentation/geocoding/#GeocodingRequests>).
-The default is C<false>.
+There's no default.
+
+By default queries are done using C<http>. By setting the C<use_https>
+parameter to a true value C<https> is used.
 
 =back
 

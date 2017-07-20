@@ -368,7 +368,7 @@ our $idle;    # idle handler
 our $main;    # main coro
 our $current; # current coro
 
-our $VERSION = 6.511;
+our $VERSION = 6.513;
 
 our @EXPORT = qw(async async_pool cede schedule terminate current unblock_sub rouse_cb rouse_wait);
 our %EXPORT_TAGS = (
@@ -640,7 +640,7 @@ installed those handlers.
    };
 
 This can be used to localise about any resource (locale, uid, current
-working directory etc.) to a block, despite the existance of other
+working directory etc.) to a block, despite the existence of other
 coros.
 
 Another interesting example implements time-sliced multitasking using
@@ -756,7 +756,7 @@ that.
 Returns true iff this Coro object is "new", i.e. has never been run
 yet. Those states basically consist of only the code reference to call and
 the arguments, but consumes very little other resources. New states will
-automatically get assigned a perl interpreter when they are transfered to.
+automatically get assigned a perl interpreter when they are transferred to.
 
 =item $state->is_zombie
 
@@ -1125,7 +1125,7 @@ called. This occurs naturally when you use coro in an otherwise
 event-based program, or when you use event-based libraries.
 
 These typically register a callback for some event, and call that callback
-when the event occured. In a coro, however, you typically want to
+when the event occurred. In a coro, however, you typically want to
 just wait for the event, simplyifying things.
 
 For example C<< AnyEvent->child >> registers a callback to be called when
@@ -1264,7 +1264,7 @@ actually take advantage of custom hardware for this purpose (as evidenced
 by the forks module, which gives you the (i-) threads API, just much
 faster).
 
-Sharing data is in the i-threads model is done by transfering data
+Sharing data is in the i-threads model is done by transferring data
 structures between threads using copying semantics, which is very slow -
 shared data simply does not exist. Benchmarks using i-threads which are
 communication-intensive show extremely bad behaviour with i-threads (in

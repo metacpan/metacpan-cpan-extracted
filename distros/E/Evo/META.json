@@ -47,7 +47,7 @@
          "web" : "http://github.com/alexbyk/perl-evo"
       }
    },
-   "version" : "0.0403",
+   "version" : "0.0405",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

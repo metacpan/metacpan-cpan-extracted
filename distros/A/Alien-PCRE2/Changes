@@ -1,5 +1,23 @@
 Revision history for Alien::PCRE2.
 
+0.012000 2017-07-18
+
+    - Windows, Skip pcre-config Tests If sh Bourne Shell Not Found, Part 2
+
+0.011000 2017-07-18
+
+    - Windows, Skip pcre-config Tests If sh Bourne Shell Not Found
+
+0.010000 2017-07-16
+
+    - Require PCRE2 Minimum Version v10.30 During Build Time
+    - Test Suite, Skip cflags Test On system Install Type
+
+0.009000 2017-07-15
+
+    - Test Suite, Upgrade To Test::Alien
+    - Quality Assurance, Enable Debugging Output
+
 0.008000 2017-07-13
 
     - Require Alien::Build v0.60 For Bug Fixes

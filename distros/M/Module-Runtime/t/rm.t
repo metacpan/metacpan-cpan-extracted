@@ -5,6 +5,7 @@ use Test::More tests => 26;
 
 BEGIN { use_ok "Module::Runtime", qw(require_module); }
 
+unshift @INC, "./t/lib";
 my($result, $err);
 
 sub test_require_module($) {

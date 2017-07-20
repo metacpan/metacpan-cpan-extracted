@@ -1,5 +1,8 @@
 Revision history for Plack-Test-AnyEvent
 
+0.08 July 19 2017
+     Fix GH #3 - streaming apps hang on Windows (thanks to Alexandr Ciornii for reporting, and Paul Cochrane for helping me work on Windows)
+
 0.07 July 03 2017
      Fix some dist issues (thanks, Paul Cochrane!)
 

@@ -18,7 +18,7 @@ use IO::Socket::SSL qw(SSL_VERIFY_PEER SSL_VERIFY_NONE);
 
 use vars qw[ $VERSION ];
 
-$VERSION = '0.45';
+$VERSION = '0.47';
 
 
 BEGIN {
@@ -108,7 +108,10 @@ sub get_login_page {
 
   # OpenSSL 1.0.1 doesn't properly scan the certificate chain as supplied
   # by Mozilla::CA, so we only verify the certificate directly there:
-  if( Net::SSLeay::SSLeay() <= 0x100010bf ) { # 1.0.1k
+  if( IO::Socket::SSL->VERSION <= 1.990 ) {
+      # No OCSP support
+      @verify = ();
+  } elsif(     Net::SSLeay::SSLeay() <= 0x100010bf ) { # 1.0.1k
     @verify = (
     SSL_fingerprint => 'sha256$C0F407E7D1562B52D8896B4A00DFF538CBC84407E95D8E0A7E5BFC6647B98967',
     SSL_ocsp_mode => IO::Socket::SSL::SSL_OCSP_NO_STAPLE(),
@@ -134,7 +137,7 @@ sub get_login_page {
   );
 
   my $agent = $self->agent();
-  $agent->add_header("If-SSL-Cert-Subject" => qr{/(?:\Q1.3.6.1.4.1.311.60.2.1.3\E|jurisdictionC)=DE/(?:\Q1.3.6.1.4.1.311.60.2.1.1\E|jurisdictionL)=Bonn/(?:\Q2.5.4.15\E|businessCategory)=Private Organization/serialNumber=HRB6793/C=DE/postalCode=53113/ST=Nordrhein-Westfalen/L=Bonn/street=Friedrich Ebert Allee 114 126/O=Deutsche Postbank AG/OU=Postbank Systems AG/CN=banking.postbank.de$});
+  $agent->add_header("If-SSL-Cert-Subject" => qr{/(?:\Q1.3.6.1.4.1.311.60.2.1.3\E|jurisdictionC)=DE/(?:\Q1.3.6.1.4.1.311.60.2.1.2\E|jurisdictionST)=Nordrhein-Westfalen/(?:\Q1.3.6.1.4.1.311.60.2.1.1\E|jurisdictionL)=Bonn/(?:\Q2.5.4.15\E|businessCategory)=Private Organization/serialNumber=HRB6793/C=DE/postalCode=53113/ST=Nordrhein-Westfalen/L=Bonn/street=Friedrich Ebert Allee 114 126/O=Deutsche Postbank AG/OU=PB Systems AG/CN=banking.postbank.de$});
 
   $agent->get(LOGIN);
   $self->log_httpresult();

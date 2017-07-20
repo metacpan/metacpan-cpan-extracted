@@ -9,6 +9,10 @@
 #define PERL_VERSION_GE(r,v,s) \
 	(PERL_DECIMAL_VERSION >= PERL_VERSION_DECIMAL(r,v,s))
 
+#ifndef cBOOL
+# define cBOOL(x) ((bool)!!(x))
+#endif /* !cBOOL */
+
 #ifndef hv_fetchs
 # define hv_fetchs(hv, keystr, lval) \
 		hv_fetch(hv, ""keystr"", sizeof(keystr)-1, lval)
@@ -22,6 +26,12 @@
 # define sv_catpvs_nomg(sv, string) \
 	sv_catpvn_nomg(sv, ""string"", sizeof(string)-1)
 #endif /* !sv_catpvs_nomg */
+
+#if PERL_VERSION_GE(5,19,4)
+typedef SSize_t array_ix_t;
+#else /* <5.19.4 */
+typedef I32 array_ix_t;
+#endif /* <5.19.4 */
 
 /* parameter classification */
 
@@ -401,7 +411,7 @@ static SV *THX_array_to_hash(pTHX_ AV *array)
 {
 	HV *hash;
 	SV *href;
-	I32 alen, i;
+	array_ix_t alen, i;
 	alen = av_len(array);
 	if(!(alen & 1))
 		throw_constraint_error(
@@ -653,7 +663,7 @@ static void THX_serialise_datum(pTHX_ struct writer_options *wo,
 static void THX_serialise_array(pTHX_ struct writer_options *wo,
 	SV *out, AV *adatum)
 {
-	I32 alen = av_len(adatum), pos;
+	array_ix_t alen = av_len(adatum), pos;
 	if(alen == -1) {
 		sv_catpvs_nomg(out, "[]");
 		return;
@@ -799,11 +809,11 @@ CODE:
 		}
 		if((item_ptr = hv_fetchs(opthash, "undef_is_empty", 0))) {
 			SV *item = *item_ptr;
-			wo.undef_is_empty = !!SvTRUE(item);
+			wo.undef_is_empty = cBOOL(SvTRUE(item));
 		}
 		if((item_ptr = hv_fetchs(opthash, "unicode", 0))) {
 			SV *item = *item_ptr;
-			wo.unicode = !!SvTRUE(item);
+			wo.unicode = cBOOL(SvTRUE(item));
 		}
 	}
 	RETVAL = sv_2mortal(newSVpvs(""));

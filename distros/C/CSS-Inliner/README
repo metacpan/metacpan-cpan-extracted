@@ -14,8 +14,11 @@ SYNOPSIS
 DESCRIPTION
     Library for converting CSS style blocks into inline styles in an HTML
     document. Specifically this is intended for the ease of generating HTML
-    emails. This is useful as even in 2015 Gmail and Hotmail don't support
-    top level <style> declarations.
+    emails. This is useful as certain email clients don't support top level
+    <style> declarations despite it being 2017.
+
+    NOTE: The development of the this module is currently suspended as the
+    sponsoring entity, MailerMailer LLC, has been sold to j2 Global.
 
 METHODS
   new
@@ -155,12 +158,8 @@ METHODS
     time. In order to receive back content feedback you must perform
     inlinify first
 
-Sponsor
-    This code has been developed under sponsorship of MailerMailer LLC,
-    http://www.mailermailer.com/
-
 AUTHOR
-     Kevin Kamel <kamelkev@mailermailer.com>
+     Kevin Kamel <kamelkev@underprint.com>
 
 CONTRIBUTORS
      Dave Gray <cpan@doesntsuck.com>
@@ -169,6 +168,6 @@ CONTRIBUTORS
      Chelsea Rio <chelseario@gmail.com>
 
 LICENSE
-    This module is Copyright 2015 Khera Communications, Inc. It is licensed
+    This module is Copyright 2017 Khera Communications, Inc. It is licensed
     under the same terms as Perl itself.
 

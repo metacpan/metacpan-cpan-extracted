@@ -1,7 +1,6 @@
 name = "Mojolicious-Plugin-Template-Mustache"
-badges = ["metacpan"]
+badges = ["metacpan", "travis"]
 authority="cpan:CYNOVG"
-
 module_maker="ModuleBuildTiny"
 
 license="gpl_3"

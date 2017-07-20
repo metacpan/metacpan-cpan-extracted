@@ -5,6 +5,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+README.md
 dist.ini
 lib/Tie/FileSection.pm
 t/1_basics.t

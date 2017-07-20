@@ -1,9 +1,9 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
   'NAME'           => 'Tk::AbstractCanvas',
-# 'VERSION_FROM'   => 'lib/Tk/AbstractCanvas.pm',
-  'VERSION'        => '1.8',
-# 'ABSTRACT_FROM'  => 'lib/Tk/AbstractCanvas.pm',
+# 'VERSION_FROM'   => 'AbstractCanvas.pm',
+  'VERSION'        => '1.82',
+# 'ABSTRACT_FROM'  => 'AbstractCanvas.pm',
   'ABSTRACT'       => 'Canvas with Abstract center, zoom, and rotate methods',
   'LICENSE'        => 'gpl_3',
   'AUTHOR'         => [ 'Pip Stuart <Pip@CPAN.Org>' ],
@@ -15,6 +15,7 @@ WriteMakefile(
   }, # Module::Name                  => 1.1,
   'PREREQ_PM'      => {
     'Carp'                           => 0,
+    'Tk'                             => 0,
   },
   'dist'           => { 'COMPRESS'   => 'gzip',
                         'SUFFIX'     => '.tgz' },

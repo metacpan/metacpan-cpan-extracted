@@ -30,7 +30,7 @@ sub new {
         ],
         alien_repository => {
             protocol        => 'http',
-            exact_filename  => "http://github.com/mbarbon/upb/archive/$commit.zip",
+            exact_filename  => "https://github.com/mbarbon/upb/archive/$commit.zip",
         },
     );
 

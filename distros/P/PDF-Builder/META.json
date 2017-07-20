@@ -42,6 +42,7 @@
             "Math::Trig" : "0",
             "POSIX" : "0",
             "Scalar::Util" : "0",
+            "Test::Exception" : "0",
             "Unicode::UCD" : "0",
             "Win32::TieRegistry" : "0",
             "perl" : "5.008005",
@@ -51,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.004",
+   "version" : "3.005",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -7,12 +7,13 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 use Code::TidyAll::Config::INI::Reader 0.44;
 use List::Util 1.45 qw( uniqstr );
 use Path::Class qw( file );
 use Path::Iterator::Rule;
+use Perl::Critic::Freenode 0.021;
 use Perl::Critic::Moose 1.05;
 use Sort::ByExample qw( sbe );
 
@@ -51,7 +52,9 @@ EOF
 my $perlcriticrc = <<'EOF';
 severity = 3
 verbose = 11
+
 theme = core + pbp + bugs + maintenance + cosmetic + complexity + security + tests + moose
+
 program-extensions = pl psgi t
 
 exclude = Subroutines::ProhibitCallsToUndeclaredSubs
@@ -65,10 +68,35 @@ severity = 3
 [ControlStructures::ProhibitCStyleForLoops]
 severity = 3
 
+[Documentation::RequirePackageMatchesPodName]
+severity = 3
+
+[Documentation::PodSpelling]
+severity = 3
+stop_words_file = .stopwords
+
+[Freenode::WhileDiamondDefaultAssignment]
+set_themes = core
+
 [InputOutput::RequireCheckedSyscalls]
 functions = :builtins
 exclude_functions = sleep
 severity = 3
+
+[Moose::RequireCleanNamespace]
+modules = Moose Moose::Role MooseX::Role::Parameterized Moose::Util::TypeConstraints
+cleaners = namespace::autoclean
+
+[NamingConventions::Capitalization]
+package_exemptions = [A-Z]\w+|main
+file_lexical_variables = [A-Z]\w+|[^A-Z]+
+global_variables = :starts_with_upper
+scoped_lexical_variables = [A-Z]\w+|[^A-Z]+
+severity = 3
+
+# Given our code base, leaving this at 5 would be a huge pain
+[Subroutines::ProhibitManyArgs]
+max_arguments = 10
 
 [RegularExpressions::ProhibitComplexRegexes]
 max_characters = 200
@@ -92,33 +120,36 @@ severity = 3
 severity = 3
 
 [Variables::ProhibitPackageVars]
-add_packages = Carp Test::Builder
+add_packages = Test::Builder
 
-[-Subroutines::RequireFinalReturn]
-
-# This incorrectly thinks signatures are prototypes.
-[-Subroutines::ProhibitSubroutinePrototypes]
+[-ControlStructures::ProhibitCascadingIfElse]
 
 [-ErrorHandling::RequireCarping]
+[-InputOutput::RequireBriefOpen]
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
 
 # No need for /xsm everywhere
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireExtendedFormatting]
 [-RegularExpressions::RequireLineBoundaryMatching]
 
+# by concensus in standup 2015-05-12 we decided to allow return undef
+# this is mainly so bar can be written to return undef so that
+# foo( bar => bar(), bazz => baz() ) won't cause problems
+[-Subroutines::ProhibitExplicitReturnUndef]
+
+# This incorrectly thinks signatures are prototypes.
+[-Subroutines::ProhibitSubroutinePrototypes]
+
 # http://stackoverflow.com/questions/2275317/why-does-perlcritic-dislike-using-shift-to-populate-subroutine-variables
 [-Subroutines::RequireArgUnpacking]
+
+[-Subroutines::RequireFinalReturn]
 
 # "use v5.14" is more readable than "use 5.014"
 [-ValuesAndExpressions::ProhibitVersionStrings]
 
-# Explicitly returning undef is a _good_ thing in many cases, since it
-# prevents very common errors when using a sub in list context to construct a
-# hash and ending up with a missing value or key.
-[-Subroutines::ProhibitExplicitReturnUndef]
-
-# Sometimes I want to write "return unless $x > 4"
-[-ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
 EOF
 
 sub before_build {
@@ -285,7 +316,7 @@ Dist::Zilla::Plugin::MAXMIND::TidyAll - Creates default tidyall.ini, perltidyrc,
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =for Pod::Coverage .*
 

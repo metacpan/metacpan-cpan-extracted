@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Net-DNAT
+version:            0.15
+abstract:           Psuedo Layer7 Packet Processer
+author:
+    - Rob Brown
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IO::Multiplex:  1.02
+    Net::Server:    0.85
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

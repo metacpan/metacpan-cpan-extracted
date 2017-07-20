@@ -31,11 +31,11 @@ sub catalyst_component_name { shift->model->catalyst_component_name }
 sub respond {
   my ($self, $status, $headers) = @_;
   $self->_profile(begin => "=> ".Catalyst::Utils::class2classsuffix($self->catalyst_component_name)."->respond($status)");
-  for ($self->ctx->res) {
-    $_->status($status) if $_->status != 200; # Catalyst sets 200
-    $_->content_type('text/html') if !$_->content_type;
-    $_->headers->push_header(@{$headers}) if $headers;
-    $_->body($self->render);
+  for my $r ($self->ctx->res) {
+    $r->status($status) if $r->status != 200; # Catalyst sets 200
+    $r->content_type('text/html') if !$r->content_type;
+    $r->headers->push_header(@{$headers}) if $headers;
+    $r->body($self->render);
   }
   $self->_profile(end => "=> ".Catalyst::Utils::class2classsuffix($self->catalyst_component_name)."->respond($status)");
   return $self;

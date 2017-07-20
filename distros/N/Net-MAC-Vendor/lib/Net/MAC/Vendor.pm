@@ -54,6 +54,14 @@ There are older copies of the OUI file in the GitHub repository.
 
 These files are large (about 4MB), so you might want to cache a copy.
 
+A different source of information is linuxnet.ca that publishes sanitized
+and compressed versions of the list, such as:
+
+        http://linuxnet.ca/ieee/oui.txt.bz2
+
+The module can read and decompress compressed versions (as long as the url
+reflects the compression type in the filename as the linuxnet.ca links do).
+
 =head2 Functions
 
 =over 4
@@ -65,10 +73,12 @@ use Exporter qw(import);
 __PACKAGE__->run( @ARGV ) unless caller;
 
 use Carp;
+use Compress::Bzip2 qw(memBunzip);
+use Compress::Zlib  qw(memGunzip);
 use Mojo::URL;
 use Mojo::UserAgent;
 
-our $VERSION = '1.26';
+our $VERSION = '1.261';
 
 =item run( @macs )
 
@@ -225,7 +235,7 @@ sub fetch_oui_from_custom {
 
 	return unless defined $url;
 
-	my $html = get( $url );
+	my $html = __PACKAGE__->_fetch_oui_from_url( $url );
 	unless( defined $html ) {
 		carp "Could not fetch data from the IEEE!";
 		return;
@@ -247,16 +257,19 @@ MAC.
 =cut
 
 sub _search_url_base {
+# https://services13.ieee.org/RST/standards-ra-web/rest/assignments/download/?registry=MA-L&format=html&text=00-0D-93
 	state $url = Mojo::URL->new(
-		'http://standards.ieee.org/cgi-bin/ouisearch'
+		'https://services13.ieee.org/RST/standards-ra-web/rest/assignments/download/?registry=MA-L&format=html'
 		);
+
 	$url;
 	}
 
 sub _search_url {
 	my( $class, $mac ) = @_;
 	my $url = $class->_search_url_base->clone;
-	$url->query( $mac );
+	$url->query->merge( text => $mac );
+	$url;
 	}
 
 sub fetch_oui_from_ieee {
@@ -375,8 +388,9 @@ sub parse_oui {
 	my $oui = shift;
 	return [] unless $oui;
 	$oui =~ s|</?b>||g;
-	my @lines = map { s/^\s+//; $_ ? $_ : () } split /$/m, $oui;
-	splice @lines, 1, 1, ();
+	my @lines = map { s/^\s+//; $_ ? $_ : () } split /\s*$/m, $oui;
+	chomp @lines;
+	splice @lines, 1, 1, (); # should have documented this!
 
 	$lines[0] =~ s/\S+\s+\S+\s+//;
 	return \@lines;
@@ -413,6 +427,9 @@ By default, this uses the URL from C<oui_url>,
 but given an argument, it tries to use that. To load from a local
 file, use the C<file://> scheme.
 
+If the url indicates that the data is compressed, the response content is
+decompressed before being stored.
+
 If C<load_cache> cannot load the data, it issues a warning and returns
 nothing.
 
@@ -440,10 +457,13 @@ sub load_cache {
 			}
 		else {
 			#say time . " Fetching URL";
-			my $tx = __PACKAGE__->ua->get( oui_url() );
+			my $url = oui_url();
+			my $tx = __PACKAGE__->ua->get( $url );
 			#say time . " Fetched URL";
 			#say "size is " . $tx->res->headers->header( 'content-length' );
-			$tx->res->body;
+			($url =~ /\.bz2/) ? memBunzip($tx->res->body) :
+			($url =~ /\.gz/)  ? memGunzip($tx->res->body) :
+			                    $tx->res->body;
 			}
 		};
 
@@ -471,7 +491,7 @@ sub load_cache {
 	foreach my $entry ( @entries ) {
 		$entry =~ s/^\s+//;
 		my $oui = substr $entry, 0, 8;
-		__PACKAGE__->add_to_cache( parse_oui( $entry ) );
+		__PACKAGE__->add_to_cache( $oui, parse_oui( $entry ) );
 		}
 
 	return 1;
@@ -491,7 +511,7 @@ created some class methods for this.
 BEGIN {
 my $Cached = {};
 
-=item add_to_cache
+=item add_to_cache( OUI, PARSED_DATA )
 
 Add to the cache. This is mostly in place for a future expansion to
 full objects so you can override this in a subclass.
@@ -504,7 +524,7 @@ sub add_to_cache {
 	$Cached->{ $oui } = $parsed;
 	}
 
-=item get_from_cache
+=item get_from_cache( OUI )
 
 Get from the cache. This is mostly in place for a future expansion to
 full objects so you can override this in a subclass.
@@ -517,7 +537,7 @@ sub get_from_cache {
 	$Cached->{ $oui };
 	}
 
-=item get_cache_hash
+=item get_cache_hash()
 
 Get the hash the built-in cache uses. You should only use this if you
 were using the old C<$Cached> package variable.

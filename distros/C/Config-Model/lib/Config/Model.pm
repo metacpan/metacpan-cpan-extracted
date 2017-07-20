@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.105';
+$Config::Model::VERSION = '2.106';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -186,6 +186,8 @@ sub initialize_log4perl {
     my $args = shift;
 
     my $log4perl_syst_conf_file = path('/etc/log4config-model.conf');
+    # avoid undef warning when homedir is not defined (e.g. with Debian cowbuilder)
+    my $home = File::HomeDir->my_home // '';
     my $log4perl_user_conf_file = path( File::HomeDir->my_home . '/.log4config-model' );
 
     my $fallback_conf           = << 'EOC';
@@ -239,7 +241,14 @@ sub _tweak_instance_args {
     my $cat = '';
     if (defined $application) {
         my ( $categories, $appli_info, $appli_map ) = Config::Model::Lister::available_models;
-        $args->{root_class_name} ||= $appli_map->{$application} ;
+
+        # root_class_name may override class found (or not) by appli in tests
+        if (not $args->{root_class_name}) {
+            $args->{root_class_name} = $appli_map->{$application} ||
+                die "Unknown application $application. Expected one of "
+                . join(' ',sort keys %$appli_map)."\n";
+        }
+
         $cat = $appli_info->{_category} //  ''; # may be empty in tests
         # config_dir may be specified in application file
         $args->{config_dir} //= $appli_info->{$application}{config_dir};
@@ -1772,7 +1781,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.105
+version 2.106
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,7 @@
-Revision history for Dist-Zilla-Plugin-Depak
+0.21    2017-07-14 (PERLANCAR)
+
+	- Add configuration: put_hook_at_the_end (depak 0.56).
+
 
 0.20    2016-03-16 (PERLANCAR)
 

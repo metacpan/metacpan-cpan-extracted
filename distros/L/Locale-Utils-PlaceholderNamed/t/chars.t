@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use strict;
 use warnings;
@@ -47,7 +47,7 @@ find(
     $PATH,
 );
 
-plan tests => 6 * scalar @list;
+plan( tests => 6 * scalar @list );
 
 my @ignore_non_ascii = (
 );

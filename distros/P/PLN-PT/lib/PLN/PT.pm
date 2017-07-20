@@ -1,6 +1,6 @@
 package PLN::PT;
 # ABSTRACT: interface for the http://pln.pt web service
-$PLN::PT::VERSION = '0.004';
+$PLN::PT::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -150,7 +150,7 @@ PLN::PT - interface for the http://pln.pt web service
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -12,4 +12,6 @@ cpanfile
 dist.ini
 lib/Alien/Google/GRPC.pm
 t/00load.t
+t/01test-share-bins.t
+t/01test-system-bins.t
 t/author-pod-spell.t

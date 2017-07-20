@@ -1,4 +1,5 @@
 Changes
+GraphViz-Graph-0.03.tar.gz
 ignore.txt
 lib/GraphViz/Graph.pm
 lib/GraphViz/Graph/Edge.pm
@@ -18,6 +19,7 @@ t/006-nodes.t
 t/007-label-graph-top.t
 t/008-edge.t
 t/009-edge-arrowhead-tail.t
+t/010-same_rank.t
 t/test-002.dot.expected
 t/test-004.dot.expected
 t/test-005.dot.expected
@@ -25,5 +27,6 @@ t/test-006.dot.expected
 t/test-007.dot.expected
 t/test-008.dot.expected
 t/test-009.dot.expected
+t/test-010.dot.expected
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

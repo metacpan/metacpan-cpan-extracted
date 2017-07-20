@@ -192,7 +192,7 @@ sub _prepare_ext_app_js ( $self, $data ) {
             messages: $data->{locale}->{messages}->$*,
 
             l10n: function(msgid, domain) {
-                if (msgid in this.messages[domain] && typeof( this.messages[domain][msgid][0] ) != 'undefined' ) {
+                if (msgid in this.messages[domain] && typeof this.messages[domain][msgid][0] !== 'undefined' ) {
                     return this.messages[domain][msgid][0];
                 }
                 else {
@@ -203,7 +203,7 @@ sub _prepare_ext_app_js ( $self, $data ) {
             l10np: function(msgid, msgid_plural, n, domain) {
                 var idx = $data->{locale}->{plural_form_exp};
 
-                if (msgid in this.messages[domain] && typeof( this.messages[domain][msgid][idx] ) != 'undefined' ) {
+                if (msgid in this.messages[domain] && typeof this.messages[domain][msgid][idx] !== 'undefined' ) {
                     return this.messages[domain][msgid][idx];
                 }
                 else {

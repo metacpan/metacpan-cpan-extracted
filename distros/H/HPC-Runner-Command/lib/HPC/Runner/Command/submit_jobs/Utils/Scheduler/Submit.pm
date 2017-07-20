@@ -25,7 +25,7 @@ sub process_submit_command {
 
     my $logname = $self->create_log_name($counter);
 
-    $self->jobs->{$self->current_job}->add_lognames($logname);
+    $self->jobs->{ $self->current_job }->add_lognames($logname);
 
     $command = "sleep 20\n";
     $command .= "cd " . getcwd() . "\n";
@@ -40,6 +40,11 @@ sub process_submit_command {
 
     my $batch_index_start = $self->gen_batch_index_str;
 
+    my $log = "";
+    if ( $self->no_log_json ) {
+        $log =  "\t--no_log_json \\\n";
+    }
+
     $command .=
         "\t--infile "
       . $self->cmdfile . " \\\n"
@@ -53,11 +58,11 @@ sub process_submit_command {
       . $self->jobs->{ $self->current_job }->procs . " \\\n"
       . "\t--logname "
       . $logname . " \\\n"
+      . $log
       . "\t--data_tar "
       . $self->data_tar . " \\\n"
       . "\t--process_table "
       . $self->process_table;
-
 
     #TODO Update metastring to give array index
     my $metastr =
@@ -173,7 +178,7 @@ This is probably overkill - but occasionally the scheduler takes longer than we 
 
 =cut
 
-sub submit_to_scheduler   {
+sub submit_to_scheduler {
     my $self           = shift;
     my $submit_command = shift;
 

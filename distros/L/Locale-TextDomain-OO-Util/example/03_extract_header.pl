@@ -27,7 +27,7 @@ EOT
     ->Useqq(1)
     ->Dump;
 
-# $Id: 03_extract_header.pl 527 2014-10-18 11:01:51Z steffenw $
+# $Id: 03_extract_header.pl 635 2017-02-23 06:54:16Z steffenw $
 
 __END__
 

@@ -23,9 +23,13 @@ ok( $win_id > 0, 'got window id' );
 my ($netwmname, $type_utf8, $wm_proto, $wm_dest_win)
     = @{ $dpy->XInternAtoms([qw( _NET_WM_NAME UTF8_STRING WM_PROTOCOLS WM_DESTROY_WINDOW )], 0) };
 
-is_deeply( [ XListProperties($dpy, $win_id) ], [], 'no window properties yet' );
+# Window managers (or something) can auto-assign properties, according to CPAN testers
+my @initial_properties= XListProperties($dpy, $win_id);
+note "unexpected initial window properties: ".join(', ', @initial_properties)
+    if @initial_properties;
+#is_deeply( [ XListProperties($dpy, $win_id) ], [], 'no window properties yet' );
 XChangeProperty($dpy, $win_id, $netwmname, $type_utf8, 8, PropModeReplace, "Hello World", 11);
-is_deeply( [ XListProperties($dpy, $win_id) ], [ $netwmname ], 'window has title property' );
+is( scalar(grep { $_ eq $netwmname } XListProperties($dpy, $win_id)), 1, 'window has title property' );
 ok( Success == XGetWindowProperty($dpy, $win_id, $netwmname, 0, 32, 0, $type_utf8,
     my $actual_type, my $actual_format, my $n, my $remaining, my $data), 'XGetWindowProperty' );
 is( $actual_type, $type_utf8, 'correct type' );
@@ -34,17 +38,18 @@ is( $n, 11, '11 bytes' );
 is( $remaining, 0, 'no missing bytes' );
 is( $data, 'Hello World', 'correct string' );
 XDeleteProperty($dpy, $win_id, $netwmname);
-is_deeply( [ XListProperties($dpy, $win_id) ], [], 'no window properties again' );
+is_deeply( [ XListProperties($dpy, $win_id) ], \@initial_properties, 'deleted title property' );
 
 # Now check OO interface
 my $win= $dpy->get_cached_window($win_id);
 $win->set_property($netwmname, $type_utf8, "HelloAgain");
-is_deeply( [ $win->get_property_list ], [ $netwmname ], 'new window title' );
+is( scalar(grep { $_ eq $netwmname } $win->get_property_list), 1, 'new window title' );
 is_deeply( $win->get_property($netwmname)->{data}, "HelloAgain", 'correct title text' );
 $win->set_property($netwmname, undef);
-is_deeply( [ $win->get_property_list ], [ ], 'unset window title' );
+is( scalar(grep { $_ eq $netwmname } $win->get_property_list), 0, 'unset window title' );
+
 ok( XSetWMProtocols($dpy, $win_id, [ $wm_dest_win ]), 'XSetWMProtocols' );
-is_deeply( [ $win->get_property_list ], [ $wm_proto ], 'protocols set' );
+is( scalar(grep { $_ eq $wm_proto } $win->get_property_list), 1, 'protocols set' );
 is_deeply( [ XGetWMProtocols($dpy, $win_id) ], [ $wm_dest_win ], 'with expected values' );
 
 is( err{ XMapWindow($dpy, $win_id); }, '', 'XMapWindow' );

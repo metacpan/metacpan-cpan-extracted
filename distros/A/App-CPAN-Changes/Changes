@@ -1,4 +1,9 @@
-Revision history for App-CPAN-Changes
+0.003   2017-07-14 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild without depak (end of testing).
+
 
 0.002   2016-10-11 (PERLANCAR)
 

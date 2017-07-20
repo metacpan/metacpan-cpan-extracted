@@ -1,5 +1,11 @@
 Revision history for Perl extension Locale::Utils::PlaceholderMaketext.
 
+1.005  Wed Jul 19 13:30:24 2017
+- removed makefile dependency Module::Build (2nd try)
+
+1.004  Fri Feb 24 17:12:16 2017
+- removed makefile dependency Module::Build
+
 1.003  Fri Feb 24 17:12:16 2017
 - fixed pod
 

@@ -5,7 +5,7 @@ use warnings;
 
 use AI::PredictionClient::InceptionClient;
 # PODNAME: Inception.pl
-# ABSTRACT: Example command line Inception client
+# ABSTRACT: Runnable example command line Inception client
 
 use Moo;
 use MooX::Options;
@@ -140,11 +140,15 @@ __END__
 
 =head1 NAME
 
-Inception.pl - Example command line Inception client
+Inception.pl - Runnable example command line Inception client
 
 =head1 VERSION
 
-version 0.01
+version 0.03
+
+=head1 PLEASE SEE FOR DOCUMENTATION
+
+L<AI::PredictionClient>
 
 =head1 AUTHOR
 

@@ -1,26 +1,41 @@
+Build.PL
+ChangeLog
+GNUmakefile
+MANIFEST			This list of files
+META.json
+META.yml
+Makefile.PL
+NEWS
 README.md
 TODO
-NEWS
-GNUmakefile
-ChangeLog
-Build.PL
 example/fib.pl
 example/multiline.pl
 lib/B/DeparseTree.pm
 lib/B/DeparseTree.pod
 lib/B/DeparseTree/Common.pm
+lib/B/DeparseTree/P518.pm
 lib/B/DeparseTree/P520.pm
 lib/B/DeparseTree/P522.pm
 lib/B/DeparseTree/P524.pm
+lib/B/DeparseTree/P526.pm
 lib/B/DeparseTree/PP.pm
 lib/B/DeparseTree/Printer.pm
-MANIFEST			This list of files
 t/10subclass.t
+t/20-core-518.t
 t/20-core-520.t
 t/20-core-522.t
+t/20-core-524.t
+t/20-core-526.t
+t/20-deparse-518.small.t
 t/20-deparse-520-small.t
 t/20-deparse-522-small.t
 t/20-deparse-524-small.t
+t/20-deparse-526-small.t
+t/testdata/P520.pm
+t/testdata/P522.pm
+t/testdata/P524.pm
+t/testdata/P526.pm
+t/testdata/README.pod
 testdata/base/cond.t
 testdata/base/if.t
 testdata/base/lex.t
@@ -34,7 +49,4 @@ testdata/opbasic/arith.t
 testdata/opbasic/magic_phase.t
 testdata/opbasic/qq.t
 testdata/runtests.pl
-Makefile.PL
-META.yml
-META.json
 SIGNATURE    Added here by Module::Build

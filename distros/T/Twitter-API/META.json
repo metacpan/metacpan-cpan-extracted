@@ -68,9 +68,60 @@
          "requires" : {
             "Test::Fatal" : "0",
             "Test::More" : "0",
+            "Test::Pod" : "0",
             "Test::Spec" : "0",
             "Test::Warnings" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Twitter::API" : {
+         "file" : "lib/Twitter/API.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Context" : {
+         "file" : "lib/Twitter/API/Context.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Error" : {
+         "file" : "lib/Twitter/API/Error.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Role::RequestArgs" : {
+         "file" : "lib/Twitter/API/Role/RequestArgs.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Trait::ApiMethods" : {
+         "file" : "lib/Twitter/API/Trait/ApiMethods.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Trait::AppAuth" : {
+         "file" : "lib/Twitter/API/Trait/AppAuth.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Trait::DecodeHtmlEntities" : {
+         "file" : "lib/Twitter/API/Trait/DecodeHtmlEntities.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Trait::Enchilada" : {
+         "file" : "lib/Twitter/API/Trait/Enchilada.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Trait::Migration" : {
+         "file" : "lib/Twitter/API/Trait/Migration.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Trait::NormalizeBooleans" : {
+         "file" : "lib/Twitter/API/Trait/NormalizeBooleans.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Trait::RetryOnError" : {
+         "file" : "lib/Twitter/API/Trait/RetryOnError.pm",
+         "version" : "0.0113"
+      },
+      "Twitter::API::Util" : {
+         "file" : "lib/Twitter/API/Util.pm",
+         "version" : "0.0113"
       }
    },
    "release_status" : "stable",
@@ -86,8 +137,10 @@
       },
       "x_IRC" : "irc://irc.perl.org/#net-twitter"
    },
-   "version" : "0.0112",
+   "version" : "0.0113",
    "x_contributors" : [
+      "Andrew Grangaard <granny-github@ofb.net>",
+      "Desmond Daignault <nawglan@cpan.org>",
       "Karen Etheridge <ether@cpan.org>",
       "Marc Mims <marc@moz.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"

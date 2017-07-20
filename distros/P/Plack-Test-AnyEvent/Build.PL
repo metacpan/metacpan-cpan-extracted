@@ -18,7 +18,7 @@ my %module_build_args = (
     "Rob Hoelz <rob\@hoelz.ro>"
   ],
   "dist_name" => "Plack-Test-AnyEvent",
-  "dist_version" => "0.07",
+  "dist_version" => "0.08",
   "license" => "perl",
   "module_name" => "Plack::Test::AnyEvent",
   "recursive_test_files" => 1,
@@ -30,7 +30,9 @@ my %module_build_args = (
     "IO::Handle" => 0,
     "Plack" => 0,
     "autodie" => 0,
-    "perl" => "v5.8.8"
+    "perl" => "v5.8.8",
+    "strict" => 0,
+    "warnings" => 0
   },
   "test_requires" => {
     "File::Spec" => 0,

@@ -59,7 +59,7 @@ use Params::Classify 0.000 qw(is_string is_ref is_strictly_blessed);
 use XML::Easy::Syntax 0.000
 	qw($xml10_char_rx $xml10_name_rx $xml10_encname_rx);
 
-our $VERSION = "0.009";
+our $VERSION = "0.010";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -306,7 +306,8 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+Copyright (C) 2009, 2010, 2011, 2017
+Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE
 

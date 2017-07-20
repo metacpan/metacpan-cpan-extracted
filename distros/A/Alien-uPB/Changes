@@ -1,5 +1,9 @@
 Revision history for Alien-uPB
 
+0.10      2017-07-18 13:37:24 CEST
+
+    - Build fixes (patch by Mickey Nasriachi)
+
 0.09      2017-03-11 14:28:50 CET
 
     - New revision of uPB (compiles with Protobuf 3.2)

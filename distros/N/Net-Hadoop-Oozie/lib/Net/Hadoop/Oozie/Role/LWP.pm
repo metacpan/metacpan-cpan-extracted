@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Role::LWP;
-$Net::Hadoop::Oozie::Role::LWP::VERSION = '0.109';
+$Net::Hadoop::Oozie::Role::LWP::VERSION = '0.110';
 use 5.010;
 use strict;
 use warnings;
@@ -65,11 +65,22 @@ sub agent_request {
         return $res;
     }
 
-    my $info = $content =~ m{\Q<b>description</b>\E\s+<u>(.+?)</u>}xmsi
-                ? "$1 "
-                : '';
+    my $headers = $response->headers;
+    my $code    = $response->code;
+    my $info    = $content =~ m{\Q<b>description</b>\E\s+<u>(.+?)</u>}xmsi
+                    ? "$1 "
+                    : ''
+                    ;
+    my $extramsg;
+    if ( $code == 401 ) {
+        $extramsg = ( $headers->{'www-authenticate'} || '' ) eq 'Negotiate'
+                    ? eval { require LWP::Authen::Negotiate; 1; }
+                        ? q{ (Did you forget to run kinit?) }
+                        : q{ (LWP::Authen::Negotiate doesn't seem available) }
+                    : '';
+    }
 
-    confess sprintf '%s%s -> %s', $info, $response->status_line, $uri;
+    confess sprintf '%s%s -> %s', $info . $extramsg, $response->status_line, $uri;
 }
 
 1;
@@ -86,7 +97,7 @@ Net::Hadoop::Oozie::Role::LWP
 
 =head1 VERSION
 
-version 0.109
+version 0.110
 
 =head1 SYNOPSIS
 

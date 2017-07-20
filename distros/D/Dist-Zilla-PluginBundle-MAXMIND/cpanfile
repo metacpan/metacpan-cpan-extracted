@@ -65,6 +65,7 @@ requires "PadWalker" => "0";
 requires "Parse::PMFile" => "0";
 requires "Path::Class" => "0";
 requires "Path::Iterator::Rule" => "0";
+requires "Perl::Critic::Freenode" => "0.021";
 requires "Perl::Critic::Moose" => "1.05";
 requires "Pod::Elemental::Transformer::List" => "0";
 requires "Pod::Elemental::Transformer::Verbatim" => "0";

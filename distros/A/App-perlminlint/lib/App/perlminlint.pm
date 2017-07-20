@@ -4,10 +4,12 @@ use 5.009;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Carp;
 use autodie;
+use Encode qw/is_utf8/;
+use open qw/:utf8 :std/;
 
 sub CFGFILE () {'.perlminlint.yml'}
 
@@ -18,6 +20,8 @@ use App::perlminlint::Object -as_base,
 		dryrun
 
 		no_auto_libdir
+                no_widechar
+                no_force_strict
 
 		_plugins
 		_lib_list _lib_dict
@@ -110,13 +114,26 @@ sub upward_first_file_from (&@) {
 sub add_lib_to_inc_for {
   (my MY $self, my $fn) = @_;
 
+  my $adder = sub {
+    my ($libdir) = @_;
+    if (not $self->{_lib_dict}{$libdir}) {
+      import lib $libdir;
+      push @{$self->{_lib_list}}, $libdir;
+    }
+  };
+
   upward_first_file_from {
     my ($libdir) = @_;
     if (-d $libdir) {
-      if (not $self->{_lib_dict}{$libdir}) {
-	import lib $libdir;
-	push @{$self->{_lib_list}}, $libdir;
+      $adder->($libdir);
+
+      # Auto add carton's local/lib/perl5 too.
+      my $carton = $self->catdir($self->dirname($self->rel2abs($libdir))
+                                 , qw(local lib perl5));
+      if (-d $carton) {
+        $adder->($carton);
       }
+
       1;
     }
   } lib => $fn;
@@ -150,6 +167,10 @@ sub load_config {
 
 sub lint {
   (my MY $self, my $fn) = @_;
+
+  if ($fn =~ /\P{ASCII}/ and not is_utf8($fn)) {
+    Encode::_utf8_on($fn);
+  }
 
   my @fallback;
   foreach my $plugin ($self->plugins) {
@@ -198,6 +219,8 @@ sub plugins {
 sub run_perl {
   my MY $self = shift;
   my @opts;
+  push @opts, '-C' unless $self->{no_widechar};
+  push @opts, '-Mstrict' unless $self->{no_force_strict};
   push @opts, lexpand($self->{_perl_opts});
   push @opts, map {"-I$_"} lexpand($self->{_lib_list});
   if ($self->{verbose} || $self->{dryrun}) {
@@ -212,7 +235,7 @@ sub run_perl {
 
 sub read_file {
   (my MY $self, my $fn) = @_;
-  open my $fh, '<', $fn;
+  open my $fh, '<:utf8', $fn;
   local $/;
   scalar <$fh>;
 }
@@ -329,10 +352,10 @@ App::perlminlint - minimalistic lint for perl
     #  => This tests "perl -wc myscript.pl"
 
     % perlminlint  MyModule.pm
-    #  => This tests "perl -MMyModule -we0"
+    #  => This tests "perl -we 'require MyModule'"
 
     % perlminlint  MyInnerModule.pm
-    #  => This tests "perl -I.. -MMyApp::MyInnerModule -we0"
+    #  => This tests "perl -I.. -we 'require MyApp::MyInnerModule'"
 
     % perlminlint  cpanfile
     #  => This tests Module::CPANfile->load
@@ -345,7 +368,7 @@ so that to integrate automatic check into editors like Emacs and Vim.
 Because most real-world perl scripts consist of many other modules,
 and to load them correctly, you must give correct search path for perl
 as L<-I$DIR|perlrun/-I> and/or L<-Mlib=$DIR|lib>.
-Also, to test modules, "perl -M$MOD -e0" is better than "perl -wc".
+Also, to test modules, "perl -we 'require THE_MODULE'" is better than "perl -wc".
 
 C<perlminlint> wraps all such details so that you can just run C<perlminlint $yourfile> to test your script.
 

@@ -1,13 +1,12 @@
 package Perinci::CmdLine::Lite;
 
-our $DATE = '2017-06-28'; # DATE
-our $VERSION = '1.75'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '1.76'; # VERSION
 
 use 5.010001;
 # use strict; # already enabled by Mo
 # use warnings; # already enabled by Mo
 use Log::ger;
-use Log::ger::LevelFromEnv;
 
 use List::Util qw(first);
 use Mo qw(build default);
@@ -21,37 +20,6 @@ extends 'Perinci::CmdLine::Base';
 has default_prompt_template => (
     is=>'rw',
     default => 'Enter %s: ',
-);
-has log => (
-    is=>'rw',
-    default => sub {
-        if (defined $ENV{LOG}) {
-            return $ENV{LOG};
-        } elsif ($ENV{LOG_LEVEL} && $ENV{LOG_LEVEL} =~ /^(off|none)$/) {
-            return 0;
-        } elsif ($ENV{LOG_LEVEL} || $ENV{TRACE} || $ENV{DEBUG} ||
-                     $ENV{VERBOSE} || $ENV{QUIET}) {
-            return 0;
-        }
-        0;
-    },
-);
-has log_level => (
-    is=>'rw',
-    default => sub {
-        if ($ENV{LOG_LEVEL}) {
-            return $ENV{LOG_LEVEL};
-        } elsif ($ENV{TRACE}) {
-            return 'trace';
-        } elsif ($ENV{DEBUG}) {
-            return 'debug';
-        } elsif ($ENV{VERBOSE}) {
-            return 'info';
-        } elsif ($ENV{QUIET}) {
-            return 'error';
-        }
-        'warning';
-    },
 );
 has validate_args => (
     is=>'rw',
@@ -168,19 +136,6 @@ sub hook_after_parse_argv {
         } elsif ($as->{schema} && exists $as->{schema}[1]{default}) {
             $args->{$_} = $as->{schema}[1]{default};
         }
-    }
-
-    # set up log adapter
-    if ($self->log) {
-        require Log::ger::Output;
-        require Log::ger::Util;
-        my $str_level = $r->{log_level} // $self->log_level;
-        $Log::ger::Current_Level =
-            Log::ger::Util::numeric_level($str_level) // 3;
-        Log::ger::Output->set(
-            'Screen',
-            formatter => sub { $self->program_name . ": $_[0]" },
-        );
     }
 }
 
@@ -527,7 +482,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.75 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-06-28.
+This document describes version 1.76 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2017-07-14.
 
 =head1 SYNOPSIS
 
@@ -677,20 +632,6 @@ any newline to keep the data being printed unmodified.
 =head1 ATTRIBUTES
 
 All the attributes of L<Perinci::CmdLine::Base>, plus:
-
-=head2 log => bool (default: from env or 0)
-
-Whether to enable logging. This currently means calling L<Log::ger::Output> to
-set logging output to C<Screen> (set in C<hook_after_parse_argv>, so tab
-completion skips this step). To produce log, you use L<Log::ger> in your code.
-
-The default is off. If you set LOG_LEVEL or TRACE/DEBUG/VERBOSE/QUIET, then the
-default will be on. It defaults to off if you set LOG_LEVEL=off.
-
-=head2 log_level => str (default: from env, or 'warning')
-
-Set default log level. The default can also be set via
-LOG_LEVEL/TRACE/DEBUG/VERBOSE/QUIET.
 
 =head2 validate_args => bool (default: 1)
 

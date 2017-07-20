@@ -12,17 +12,17 @@ my %WriteMakefileArgs = (
   "BUILD_REQUIRES" => {
     "Alien::Build" => "0.40",
     "Alien::Build::MM" => "0.40",
-    "Alien::Google::GRPC" => 0,
+    "ExtUtils::MakeMaker" => "6.52"
+  },
+  "CONFIGURE_REQUIRES" => {
+    "Alien::Build" => "0.40",
+    "Alien::Build::MM" => "0.40",
+    "Alien::Google::GRPC" => "0.03",
     "Archive::Extract" => 0,
     "Env" => 0,
     "ExtUtils::MakeMaker" => "6.52",
     "File::Copy" => 0,
     "File::Copy::Recursive" => 0
-  },
-  "CONFIGURE_REQUIRES" => {
-    "Alien::Build" => "0.40",
-    "Alien::Build::MM" => "0.40",
-    "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "AI-PredictionClient-Alien-TensorFlowServingProtos",
   "LICENSE" => "perl",
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,11 +50,7 @@ my %FallbackPrereqs = (
   "Alien::Build" => "0.40",
   "Alien::Build::MM" => "0.40",
   "Alien::Google::GRPC" => 0,
-  "Archive::Extract" => 0,
-  "Env" => 0,
   "ExtUtils::MakeMaker" => "6.52",
-  "File::Copy" => 0,
-  "File::Copy::Recursive" => 0,
   "Test::More" => 0,
   "base" => 0,
   "strict" => 0,

@@ -15,7 +15,7 @@ Module::Build->new(
 	},
 	build_requires => {
 		"Module::Build" => 0,
-		"Test::More" => 0,
+		"Test::More" => "0.41",
 		"perl" => "5.006",
 		"strict" => 0,
 		"warnings" => 0,
@@ -31,7 +31,7 @@ Module::Build->new(
 				"git://git.fysh.org/zefram/Module-Runtime.git",
 		},
 	},
-	create_makefile_pl => "passthrough",
+	create_makefile_pl => "traditional",
 	sign => 1,
 )->create_build_script;
 

@@ -6,7 +6,7 @@ PDF::Tiny - Minimal Lightweight PDF Library
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 This is an alpha version.  The API is still subject to change.
 
@@ -209,6 +209,8 @@ the PDF file format.
 
 =over
 
+=begin comment
+
 =item xref
 
 Returns a reference to a hash containing the cross-reference table.  If you
@@ -220,6 +222,8 @@ really know what you are doing, you can modify it.  (Don’t.)
       ... }
 
 Newly-created PDFs have an empty, unused cross-reference table.
+
+=end comment
 
 =item modified
 
@@ -260,8 +264,8 @@ Any changes made by the high-level methods
 All of those methods themselves mark the objects as modified.
 
 The arguments follow the same format as described below for L</get_obj>,
-except that the first argument must be an object id ("1 0") or a trailer
-entry ("/Info").
+except that the first argument must be an object id ("1 0"), a trailer
+entry ("/Info") or the word "trailer".
 
 B<Warning>: Getting this right can be tricky.  If a modified object is not
 marked as such, the changes made will not be saved by C<append>.  If the
@@ -786,7 +790,7 @@ a bonus):
   PDF reader        | FineReader | PDF::Tiny | Acrobat 6+
   ------------------+------------+-----------+-----------
   CAM::PDF 1.60     | no         | yes       | yes
-  PDF::API2 2.031   | yes        | no        | yes
+  PDF::API2 2.032   | yes        | yes       | yes
   PDF::Tiny 0.05    | yes        | yes       | yes
   Text::PDF 0.31    | no         | no        | no
   PDF::Reuse 0.39   | yes*       | no        | yes
@@ -827,10 +831,10 @@ file in the distribution.  The results (on a 2.8 GHz Intel Core 2 Duo):
 
                       Page count | Page extraction | Resulting file size
   ------------------+------------+-----------------+--------------------
-  PDF::Tiny 0.07    | 0.010499 s |   0.08672 s     | 952   KB
+  PDF::Tiny 0.07    | 0.010197 s |   0.08735 s     | 952   KB
   CAM::PDF 1.60     | 0.6923   s |   1.1849  s     | 995   KB
+  PDF::API2 2.033   | 1.7974   s |   2.1135  s     | 953   KB
   PDF::Xtract 0.08  | 3.7902   s |   3.7805  s     | 992   KB
-  PDF::API2 2.031   | 3.585    s |   4.613   s     | 953   KB
   PDF::Reuse 0.39   | N/A        |  15.36    s     | 169.5 MB
   PDF::Extract 3.04 | N/A        | 158.54    s     | 954   KB
 

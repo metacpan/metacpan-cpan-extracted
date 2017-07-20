@@ -1,0 +1,54 @@
+{
+   "abstract" : "Documentation formatting for Lab::Measurement",
+   "author" : [
+      "Andreas K. Huettel <dilfridge@gentoo.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lab-Measurement-DocWriter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "Pod::LaTeX" : "0",
+            "Pod::Simple::XHTML" : "0",
+            "Pod::Usage" : "0",
+            "Syntax::Highlight::Engine::Simple::Perl" : "0",
+            "YAML" : "0",
+            "parent" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lab-measurement/Lab-Measurement-DocWriter/issues"
+      },
+      "homepage" : "https://github.com/lab-measurement/Lab-Measurement-DocWriter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lab-measurement/Lab-Measurement-DocWriter.git",
+         "web" : "https://github.com/lab-measurement/Lab-Measurement-DocWriter"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

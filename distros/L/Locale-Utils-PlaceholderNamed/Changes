@@ -1,5 +1,11 @@
 Revision history for Perl extension Locale::Utils::PlaceholderNamed.
 
+1.004  Wed Jul 19 13:41:09 2017
+- removed makefile dependency Module::Build (2nd try)
+
+1.003  Sun Jul 16 12:40:09 2017
+- removed makefile dependency Module::Build
+
 1.002  Fri Feb 24 17:03:28 2017
 - fixed pod
 

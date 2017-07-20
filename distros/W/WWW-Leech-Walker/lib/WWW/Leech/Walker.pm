@@ -26,6 +26,12 @@ sub new{
 	$this = bless $this, __PACKAGE__;
 
 	$this->{'parser'} = new WWW::Leech::Parser($this->{'parser'});
+
+	if(!$this->{'raw_preprocessor'}){
+		$this->{'raw_preprocessor'} = sub {
+			return shift();
+		}
+	}
 	
 	return $this;
 }
@@ -67,8 +73,16 @@ sub leech{
 		}
 
 		# get and parse individual items
+		my $i = 0;
+		my $llength = scalar(@$links);
 		foreach(@$links){
-			$this->log("\tGetting item: $_ ");
+
+			$i++;
+
+			# some log
+			my $ll = length($llength);
+		
+			$this->log("\tGetting item (".sprintf("%0${ll}d",$i)."/$llength): $_ ");
 
 			my $item = $this->{'parser'}->parse($this->_get($_));
 			$item->{'_url'} = $_->as_string;
@@ -101,6 +115,11 @@ sub leech{
 	}
 
 	
+}
+
+sub getCurrentDOM{
+	my $this = shift;
+	return $this->{'parser'}->{'current_dom'};
 }
 
 sub log{
@@ -139,10 +158,11 @@ sub _get{
 		$req = new HTTP::Request('GET',$url);
 	}
 
-	my $res = $this->{'ua'}->request($req);
 
-	return $res->decoded_content();
-	
+	my $res = $this->{'ua'}->request($req)->decoded_content();
+	$res = $this->{'raw_preprocessor'}->($res);
+
+	return $res;
 	
 }
 
@@ -168,6 +188,12 @@ WWW::Leech::Walker - small web content grabbing framework
   	state => {},
 
   	logger => sub {print shift()},
+
+  	raw_preprocessor => sub{
+  		my $html = shift();
+  		my $walker_obj = shift;
+  		return $html;
+  	}
 
   	filter => sub{
 		my $urls = shift;
@@ -240,10 +266,13 @@ Optional logging callback. Whenever something happens walker runs this subroutin
 
 Optional urls filtering callback. When walker gets a list of items-pages urls it passes that list to the filter subroutine. Walker itself is passed as a second argument and an arrayref with links text as third. Walker expects it to return filtered list. Empty list is okay.
 
-
 =item processor
 
 This callback is launched after the individual item is parsed and converted to a hashref. This hashref is passed to the processor to be saved, or processed in some other way.
+
+=item raw_preprocessor
+
+This optional callback is launched after any page was retrieved but before parsing started. Walker expects it to return scalar.
 
 =item next_page_link_post_process
 
@@ -269,6 +298,9 @@ If walker is restarted with B<leech()> method it will run as if it was newly cre
 
 Runs the 'logger' callback with $message argument.
 
+=item getCurrentDOM()
+
+Returns DOM currently beeing processed.
 
 =back
 

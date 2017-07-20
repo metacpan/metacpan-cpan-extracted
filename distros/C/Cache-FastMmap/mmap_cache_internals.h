@@ -1,5 +1,5 @@
 #ifndef mmap_cache_internals_h
-#define mmap_cache_interanls_h
+#define mmap_cache_internals_h
 
 #ifdef DEBUG
 #define ASSERT(x) assert(x)
@@ -52,6 +52,7 @@ struct mmap_cache {
   int    fh;
 #endif  
   char * share_file;
+  int    permissions;
   int    init_file;
   int    test_file;
   int    cache_not_found;

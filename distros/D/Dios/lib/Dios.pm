@@ -1,5 +1,5 @@
 package Dios;
-our $VERSION = '0.002002';
+our $VERSION = '0.002004';
 
 use 5.014; use warnings;
 use Dios::Types;
@@ -514,7 +514,8 @@ sub _unpack_code {
         $default ||= $sigil eq '$' ? 'undef'
                    : $sigil eq '@' ? '[]'
                    :                 '{}';
-        $value_source = qq{ \@_ && ref(\$_[0]) eq '$type_of->{$sigil}' ? shift() : $default };
+        my $and_type_test = $sigil eq '$' ? '' : "&& ref(\$_[0]) eq '$type_of->{$sigil}'";
+        $value_source = qq{ \@_ $and_type_test ? shift() : $default };
         $type_check   = q{};
     }
 
@@ -770,7 +771,7 @@ sub _compose_field {
     # Is it type-checked???
     my $TYPE_SETUP = q{};
     if ($type) {
-        $TYPE_SETUP = qq[ :Type( sub { Dios::Types::validate(q{$container_type}, shift, 'Value (%s) for $sigil$name attribute', $constraint ) } ) ];
+        $TYPE_SETUP = qq[ :Type( sub { state \$check = Dios::Types::validator_for(q{$container_type}, 'Value (%s) for $sigil$name attribute', $constraint ); \$check->(shift); } ) ];
     }
 
     # Define accessors...
@@ -804,7 +805,7 @@ sub _compose_field {
 
         # Adapt initializer value to sigil...
            if ($sigil eq '@') { $init_val = "[$init_val]"; }
-        elsif ($sigil eq '%') { $init_val = "{$init_val}";  }
+        elsif ($sigil eq '%') { $init_val = "+{$init_val}";  }
 
         $init = qq{:DEFAULT(___i_n_i_t__${name}___(\$self)) } . ($init_field{DEFAULT_INIT} ? $init : q{});
         $INIT_FUNC = qq{sub ___i_n_i_t__${name}___ { my (\$self) = \@_; $init_val }};
@@ -877,7 +878,7 @@ sub _compose_shared {
     # Build type checking sub...
     my $type_func = q{};
     if ($type) {
-        $type_func = qq[ sub ___t_y_p_e__${name}___ { Dios::Types::validate(q{$type}, shift, 'Value (%s) for \$$name attribute' ) } ___t_y_p_e__${name}___($sigil$name); ];
+        $type_func = qq[ sub ___t_y_p_e__${name}___ { state \$check = Dios::Types::validator_for(q{$type}, 'Value (%s) for \$$name attribute' ); \$check->($_[0]) } ___t_y_p_e__${name}___($sigil$name); ];
     }
     else {
         $type_func = q{};
@@ -1251,7 +1252,7 @@ Dios - Declarative Inside-Out Syntax
 
 =head1 VERSION
 
-This document describes Dios version 0.002002
+This document describes Dios version 0.002004
 
 
 =head1 SYNOPSIS

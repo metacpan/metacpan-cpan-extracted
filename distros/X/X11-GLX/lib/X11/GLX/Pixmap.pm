@@ -1,5 +1,5 @@
 package X11::GLX::Pixmap;
-$X11::GLX::Pixmap::VERSION = '0.02';
+$X11::GLX::Pixmap::VERSION = '0.03';
 use strict;
 use warnings;
 use parent 'X11::Xlib::Pixmap';
@@ -31,7 +31,7 @@ X11::GLX::Pixmap - Object representing a GLX Pixmap
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 DESCRIPTION
 

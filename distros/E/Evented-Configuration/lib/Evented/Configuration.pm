@@ -41,7 +41,7 @@ use parent 'Evented::Object';
 use Scalar::Util qw(blessed);
 use File::Basename qw(dirname);
 
-our $VERSION = '4.01';
+our $VERSION = '4.02';
 
 my ($true, $false) = (1, 0);
 sub on  () { state $on  = bless \$true,  'Evented::Configuration::Boolean' }
@@ -336,7 +336,7 @@ Perl software built upon L<Evented::Object>.
  my $conf = Evented::Configuration->new(conffile => 'etc/some.conf');
 
  # attach a callback to respond to changes of the user:age key.
- $conf->on_change('user', 'name', sub {
+ $conf->on_change('user', 'age', sub {
      my ($event, $old, $new) = @_;
      say 'The user\'s age changed from ', $old || '(not born)', "to $new";
  });

@@ -1,12 +1,12 @@
 package CPAN::Mirror::Tiny::CLI;
 use strict;
 use warnings;
+use CPAN::Mirror::Tiny::Util 'WIN32';
 use CPAN::Mirror::Tiny;
 use File::Find ();
 use File::Spec;
 use File::stat ();
 use Getopt::Long ();
-use HTTP::Tinyish;
 use POSIX ();
 use Pod::Usage 1.33 ();
 
@@ -14,7 +14,6 @@ sub new {
     my $class = shift;
     bless {
         base => $ENV{PERL_CPAN_MIRROR_TINY_BASE} || "darkpan",
-        http => HTTP::Tinyish->new(agent => "CPAN::Mirror::Tiny/$CPAN::Mirror::Tiny::VERSION"),
     }, $class;
 }
 
@@ -89,17 +88,19 @@ sub cmd_inject {
 sub cmd_gen_index {
     my ($self, @argv) = @_;
     my $cpan = CPAN::Mirror::Tiny->new(base => $self->{base});
-    print STDERR "Generating index for $self->{base}" unless $self->{quiet};
-    $cpan->write_index(compress => 1);
-    print STDERR " DONE\n" unless $self->{quiet};
+    $cpan->write_index(compress => 1, $self->{quiet} ? () : (show_progress => 1));
+    warn sprintf "Generated %s\n", $cpan->index_path(compress => 1) unless $self->{quiet};
     return 1;
 }
 
 sub cmd_cat_index {
     my ($self, @argv) = @_;
-    my $index = File::Spec->catfile($self->{base}, "modules", "02packages.details.txt.gz");
+    my $cpan = CPAN::Mirror::Tiny->new(base => $self->{base});
+    my $index = $cpan->index_path(compress => 1);
     return unless -f $index;
-    return !system "gzip", "--decompress", "--stdout", $index;
+    my @cmd = ($cpan->{gzip}, "--decompress", "--stdout", $index);
+    @cmd = CPAN::Mirror::Tiny::Util::shell_quote(@cmd) if WIN32;
+    return !system @cmd;
 }
 
 sub cmd_list {
@@ -119,9 +120,9 @@ sub cmd_list {
     File::Find::find({wanted => $wanted, no_chdir => 1}, $self->{base});
 
     my $print = sub {
-        printf "%s %4dKB %s\n",
+        printf "%s %8d %s\n",
             POSIX::strftime("%FT%T", localtime($_[0]->{mtime})),
-            $_[0]->{size} / 1024,
+            $_[0]->{size},
             $_[0]->{name};
     };
     $print->($index) if $index;

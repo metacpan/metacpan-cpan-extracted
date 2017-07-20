@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::Classes::SimpleTensor;
-$AI::PredictionClient::Classes::SimpleTensor::VERSION = '0.01';
+$AI::PredictionClient::Classes::SimpleTensor::VERSION = '0.03';
 
 # ABSTRACT: A simplified version of the TensorFlow Tensor proto.
 
@@ -117,7 +117,7 @@ AI::PredictionClient::Classes::SimpleTensor - A simplified version of the Tensor
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

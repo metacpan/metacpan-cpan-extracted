@@ -16,7 +16,12 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "AI::PredictionClient::Alien::TensorFlowServingProtos" : "0.03",
+            "Alien::Google::GRPC" : "0.03",
+            "ExtUtils::MakeMaker" : "0",
+            "Inline" : "0",
+            "Inline::CPP" : "0",
+            "Inline::MakeMaker" : "0"
          }
       },
       "develop" : {
@@ -60,7 +65,7 @@
          "web" : "https://github.com/mountaintom/AI-PredictionClient"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

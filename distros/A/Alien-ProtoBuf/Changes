@@ -1,5 +1,9 @@
 Revision history for Alien-ProtoBuf
 
+0.06      2017-07-18 13:37:06 CEST
+
+    - Add dependency from Alien::Base
+
 0.05      2016-03-10 21:27:41 CET
 
     - Fix configure_requires

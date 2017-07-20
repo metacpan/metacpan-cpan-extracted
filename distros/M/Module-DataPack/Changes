@@ -1,4 +1,7 @@
-Revision history for Module-DataPack
+0.21    2017-07-14 (PERLANCAR)
+
+        - Add option --put-hook-at-the-end like in Module::FatPack.
+
 
 0.20    2016-12-28 (PERLANCAR)
 

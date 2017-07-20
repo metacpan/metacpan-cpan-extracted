@@ -1,5 +1,9 @@
 Revision history for Perl extension Math::Random::MTwist.
 
+0.18  2017-07-15
+* Fixed mt_lrand() call with surplus state argument (RT#121093).
+* Removed Perl 5.10 dependency (RT#96482).
+
 0.17  2014-08-04
 * Fixed version mismatch.
 

@@ -219,6 +219,7 @@ if ($iface eq "u") {
    print "\nUsing ucontext implementation\n\n";
    conftest ("TEST_makecontext");
 } elsif ($iface eq "s") {
+   $DEFINE .= " -D_FORTIFY_SOURCE=0";
    $DEFINE .= " -DCORO_SJLJ";
    print "\nUsing setjmp/longjmp/sigaltstack implementation\n\n";
    conftest ("TEST_sigaltstack");

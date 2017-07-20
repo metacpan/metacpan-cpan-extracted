@@ -15,34 +15,25 @@ use warnings;
 
 use Data::Dumper;
 use LWP::Online ':skip_all';
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 use Net::Prober;
 
 my $result = Net::Prober::probe_http({
-    host    => 'sitecheck2.opera.com',
-    url     => '/ping',
-    match   => 'pong',
-    timeout => 5.0,
-});
-
-ok($result && ref $result eq 'HASH', 'probe_http() returns a hashref');
-ok(exists $result->{ok} && $result->{ok}, 'Page downloaded and MD5 verified');
-ok(exists $result->{time}
-    && $result->{time} > 0.0
-    && $result->{time} <= 5.0,
-    "Got an elapsed time too ($result->{time}s)",
-);
-
-$result = Net::Prober::probe({
-    class   => 'http',
-    host    => 'www.opera.com',
-    url     => '/computer',
-    match   => 'Opera',
+    host    => 'www.google.com',
+    url     => '/robots.txt',
+    match   => 'Sitemap',
     timeout => 10.0,
 });
 
-ok($result->{ok}) or diag($result->{reason});
+ok($result && ref $result eq 'HASH', 'probe_http() returns a hashref');
+ok(exists $result->{ok} && $result->{ok}, 'Page downloaded and MD5 verified')
+    or diag($result->{reason});
+ok(exists $result->{time}
+    && $result->{time} > 0.0
+    && $result->{time} <= 10.0,
+    "Got an elapsed time too ($result->{time}s)",
+);
 
 my $t0 = time;
 

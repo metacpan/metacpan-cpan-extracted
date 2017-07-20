@@ -1,5 +1,8 @@
 Revision history for Perl extension X11::Xlib.
 
+0.16 - 2017-07-16
+    - Tweak testcases for window properties, which failed on some systems
+
 0.15 - 2017-07-03
     - Fix bug in XEvent member XErrorEvent, which has different field
       order than other XEvent "subclass" structs

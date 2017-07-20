@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Scalar::Util ();
 use Hash::Util ();
@@ -67,7 +67,6 @@ C<Alternative Formulierung> angegeben.
 
 # -----------------------------------------------------------------------------
 
-our $Debug = 0;
 our $GetCount = 0;
 our $SetCount = 0;
 
@@ -246,23 +245,7 @@ sub get {
     # @_: @keys
 
     $GetCount++;
-    if ($Debug) {
-        my @arr;
-        while (@_) {
-            my $key = shift;
-            my $val = eval {$self->{$key}};
-            if ($@) {
-                $self->throw(
-                    q{HASH-00003: Unzulässiger Lesezugriff},
-                    Key=>$key,
-                    Value=>$val,
-                );
-            }
-            push @arr,$val;
-        }
-        return wantarray? @arr: $arr[0];
-    }
-    elsif (wantarray) {
+    if (wantarray) {
         my @arr;
         while (@_) {
             my $key = shift;
@@ -400,31 +383,13 @@ sub set {
     my $self = shift;
     # @_: @keyVal
 
-    if ($Debug && !Hash::Util::hash_unlocked(%$self)) {
-        # Restricted Hash -> Exception-Handling
+    # Hash mit freiem Zugriff
 
-        while (@_) {
-            my $key = shift;
-            my $val = shift;
-            eval {$self->{$key} = $val};
-            if ($@) {
-                $self->throw(
-                    q{HASH-00004: Unzulässiger Schreibzugriff},
-                    Key=>$key,
-                    Value=>$val,
-                );
-            }
-        }
-    }
-    else {
-        # Hash mit freiem Zugriff
-
-        while (@_) {
-            my $key = shift;
-            $self->{$key} = shift;
-        }
-    }
     $SetCount++;
+    while (@_) {
+        my $key = shift;
+        $self->{$key} = shift;
+    }
 
     return;
 }
@@ -452,15 +417,15 @@ sub add {
     my $self = shift;
     # @_: @keyVal
 
-    my $isLocked = !Hash::Util::hash_unlocked(%$self);
-    if ($isLocked) {
-        Hash::Util::unlock_keys(%$self);
-    }
+    # Test auf einen gelockten Hash funktioniert erst ab 5.18.0,
+    # daher arbeiten wir hier mit eval{}.
 
-    my @arr = $self->set(@_);
-
-    if ($isLocked) {
-        Hash::Util::lock_keys(%$self);
+    local $@;
+    my @arr = eval {$self->set(@_)};
+    if ($@) {
+        $self->unlockKeys;
+        @arr = $self->set(@_);
+        $self->lockKeys;
     }
 
     return wantarray? @arr: $arr[0];
@@ -968,17 +933,25 @@ sub isEmpty {
 Prüfe, ob der Hash gelockt ist. Wenn ja, liefere I<wahr>,
 andernfalls I<falsch>.
 
-Alternative Formulierung:
-
-    !Hash::Util::hash_unlocked(%$h);
-
 =cut
 
 # -----------------------------------------------------------------------------
 
 sub isLocked {
     my $self = shift;
-     return !Hash::Util::hashref_unlocked($self);
+
+    if ($] < 5.018) {
+        local $@;
+        # Ohne $r gibt es eine Warning
+        my $r = eval {$self->{'this_key_does_not_exist'}};
+        if ($@) {
+            return 1;
+        }
+        delete $self->{'this_key_does_not_exist'};
+        return 0;
+    }
+
+    return Hash::Util::hashref_unlocked($self)? 0: 1;
 }
 
 # -----------------------------------------------------------------------------
@@ -1234,39 +1207,6 @@ sub bucketsUsed {
 
 # -----------------------------------------------------------------------------
 
-=head2 Debugging
-
-=head3 debugMode() - Schalte Debug-Modus ein/aus
-
-=head4 Synopsis
-
-    $bool = $this->debugMode;
-    $bool = $this->debugMode($bool);
-
-=head4 Description
-
-Ist Debug-Modus eingeschaltet, wird bei einem unerlaubten Zugriff
-via $h->get() oder $h->set() eine Exception mit Stacktrace
-geworfen. Per Default ist der Debug-Modus ausgeschaltet, um den
-Zugriffs-Overhead zu verringern. Siehe Abschnitt L</Benchmark>.
-
-=cut
-
-# -----------------------------------------------------------------------------
-
-sub debugMode {
-    my $self = shift;
-    # @_: $bool
-
-    if (@_) {
-        $Debug = shift;
-    }
-
-    return $Debug;
-}
-
-# -----------------------------------------------------------------------------
-
 =head3 getCount() - Anzahl der get-Aufrufe
 
 =head4 Synopsis
@@ -1337,12 +1277,10 @@ verzichtet und per $h->{$key} zugegriffen (E), ist der Zugriff nur
 11% langsamer. Es ist also ratsam, intern per $h->{$key}
 zuzugreifen. Per $h->get() können immerhin 1.400.000 Lookups pro
 CPU-Sekunde ausgeführt werden. Bei nicht-zugriffsintensiven
-Anwendungen ist das sicherlich schnell genug. Bei eingeschaltetem
-Debug-Modus halbiert sich diese Anzahl wegen des eval{} in etwa,
-daher ist der Debug-Modus per Default ausgeschaltet. Siehe Methode
-$h->L</debugMode>(). Die Anzahl der Aufrufe von $h->get() und $h->set()
-wird intern gezählt und kann per $class->L</getCount>() und
-$class->L</setCount>() abgefragt werden.
+Anwendungen ist das sicherlich schnell genug.  Die Anzahl der
+Aufrufe von $h->get() und $h->set() wird intern gezählt und kann
+per $class->L</getCount>() und $class->L</setCount>() abgefragt
+werden.
 
 Das Benchmark-Programm (bench-hash):
 
@@ -1383,7 +1321,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

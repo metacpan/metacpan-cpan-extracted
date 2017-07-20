@@ -46,7 +46,8 @@
       "test" : {
          "requires" : {
             "Test::Class" : "0.50",
-            "Test::Most" : "0.35"
+            "Test::Most" : "0.35",
+            "Test::RedisDB" : "2.35"
          }
       }
    },
@@ -62,7 +63,7 @@
          "web" : "https://github.com/Inspire-com/perl-CHI-Driver-Cache-RedisDB"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::XS version 3.03"
 }
 

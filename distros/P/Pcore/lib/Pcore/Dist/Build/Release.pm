@@ -24,28 +24,28 @@ sub run ($self) {
     return if !$new_ver;
 
     # check for resolved issues without milestone
-    if ( $self->dist->build->issues ) {
-        my $resolved_issues = $self->dist->build->issues->get( resolved => 1 );
-
-        if ( !$resolved_issues ) {
-            say 'Error retrieving issues from tracker';
-
-            return;
-        }
-
-        if ( $resolved_issues->{data} ) {
-            say qq[Following issues are resolved and not closed:$LF];
-
-            $self->dist->build->issues->print_issues( $resolved_issues->{data} );
-
-            say qq[${LF}Close or re-open this issues. Release is impossible.$LF];
-
-            return;
-        }
-    }
+    # if ( $self->dist->build->issues ) {
+    #     my $resolved_issues = $self->dist->build->issues->get( resolved => 1 );
+    #
+    #     if ( !$resolved_issues ) {
+    #         say 'Error retrieving issues from tracker';
+    #
+    #         return;
+    #     }
+    #
+    #     if ( $resolved_issues->{data} ) {
+    #         say qq[Following issues are resolved and not closed:$LF];
+    #
+    #         $self->dist->build->issues->print_issues( $resolved_issues->{data} );
+    #
+    #         say qq[${LF}Close or re-open this issues. Release is impossible.$LF];
+    #
+    #         return;
+    #     }
+    # }
 
     # get closed issues sinse latest release
-    my $closed_issues = $self->dist->build->issues && $self->dist->build->issues->get( closed => 1 );
+    # my $closed_issues = $self->dist->build->issues && $self->dist->build->issues->get( closed => 1 );
 
     say qq[${LF}Current version is: $cur_ver];
 
@@ -63,81 +63,81 @@ sub run ($self) {
     # NOTE !!!WARNING!!! start release, next changes will be hard to revert
 
     # working with the issue tracker
-    if ( $self->dist->build->issues ) {
-        my $cv = AE::cv;
-
-        # create new version on issues tracker
-        print q[Creating new version and milestone on issues tracker ... ];
-
-        $cv->begin;
-
-        $self->dist->build->issues->create_version(
-            $new_ver,
-            sub ($res) {
-                if ( !$res ) {
-                    say qq[Error creating new version on issues tracker: $res];
-
-                    exit;
-                }
-
-                $cv->end;
-
-                return;
-            }
-        );
-
-        # create new milestone on issues tracker
-        $cv->begin;
-
-        $self->dist->build->issues->create_milestone(
-            $new_ver,
-            sub ($res) {
-                if ( !$res ) {
-                    say qq[Error creating new milestone on issues tracker: $res];
-
-                    exit;
-                }
-
-                $cv->end;
-
-                return;
-            }
-        );
-
-        $cv->recv;
-
-        say 'done';
-
-        # get closed issues, set milestone for closed issues
-        if ( $closed_issues->{data} ) {
-            $cv = AE::cv;
-
-            print q[Updating milestone for closed issues ... ];
-
-            for my $issue ( $closed_issues->{data}->@* ) {
-                $cv->begin;
-
-                $issue->set_milestone(
-                    $new_ver,
-                    sub ($res) {
-                        if ( !$res ) {
-                            say qq[Error updating milestone for issue: $res];
-
-                            exit;
-                        }
-
-                        $cv->end;
-
-                        return;
-                    }
-                );
-            }
-
-            $cv->recv;
-
-            say 'done';
-        }
-    }
+    # if ( $self->dist->build->issues ) {
+    #     my $cv = AE::cv;
+    #
+    #     # create new version on issues tracker
+    #     print q[Creating new version and milestone on issues tracker ... ];
+    #
+    #     $cv->begin;
+    #
+    #     $self->dist->build->issues->create_version(
+    #         $new_ver,
+    #         sub ($res) {
+    #             if ( !$res ) {
+    #                 say qq[Error creating new version on issues tracker: $res];
+    #
+    #                 exit;
+    #             }
+    #
+    #             $cv->end;
+    #
+    #             return;
+    #         }
+    #     );
+    #
+    #     # create new milestone on issues tracker
+    #     $cv->begin;
+    #
+    #     $self->dist->build->issues->create_milestone(
+    #         $new_ver,
+    #         sub ($res) {
+    #             if ( !$res ) {
+    #                 say qq[Error creating new milestone on issues tracker: $res];
+    #
+    #                 exit;
+    #             }
+    #
+    #             $cv->end;
+    #
+    #             return;
+    #         }
+    #     );
+    #
+    #     $cv->recv;
+    #
+    #     say 'done';
+    #
+    #     # get closed issues, set milestone for closed issues
+    #     if ( $closed_issues->{data} ) {
+    #         $cv = AE::cv;
+    #
+    #         print q[Updating milestone for closed issues ... ];
+    #
+    #         for my $issue ( $closed_issues->{data}->@* ) {
+    #             $cv->begin;
+    #
+    #             $issue->set_milestone(
+    #                 $new_ver,
+    #                 sub ($res) {
+    #                     if ( !$res ) {
+    #                         say qq[Error updating milestone for issue: $res];
+    #
+    #                         exit;
+    #                     }
+    #
+    #                     $cv->end;
+    #
+    #                     return;
+    #                 }
+    #             );
+    #         }
+    #
+    #         $cv->recv;
+    #
+    #         say 'done';
+    #     }
+    # }
 
     # update release version in the main module
     unless ( $self->dist->module->content->$* =~ s[^(\s*package\s+\w[\w\:\']*\s+)v?[\d._]+(\s*;)][$1$new_ver$2]sm ) {
@@ -155,7 +155,8 @@ sub run ($self) {
     $self->dist->build->update;
 
     # update CHANGES file
-    $self->_create_changes( $new_ver, $closed_issues->{data} );
+    # $self->_create_changes( $new_ver, $closed_issues->{data} );
+    $self->_create_changes( $new_ver, undef );
 
     # generate wiki
     if ( $self->dist->build->wiki ) {
@@ -267,6 +268,7 @@ sub _can_release ($self) {
         return if P->term->prompt( q[No changes since last release. Continue?], [qw[yes no]], enter => 1 ) eq 'no';
     }
 
+    # check parent docker repo tag
     if ( $self->dist->docker ) {
         if ( !$ENV->user_cfg->{DOCKERHUB}->{username} || !$ENV->user_cfg->{DOCKERHUB}->{password} ) {
             say q[You need to specify DockerHub credentials.];
@@ -276,11 +278,8 @@ sub _can_release ($self) {
 
         say qq[Docker base image is "@{[$self->dist->docker->{from}]}".];
 
-        if ( $self->dist->docker->{from_tag} eq 'latest' ) {
-            return if P->term->prompt( 'Are you sure to continue release with the "latest" tag?', [qw[yes no]], enter => 1 ) eq 'no';
-        }
-        elsif ( $self->dist->docker->{from_tag} !~ /\Av\d+[.]\d+[.]\d+\z/sm ) {
-            say q[Docker base image tag can be "latest" or "vx.x.x". Use "pcore docker --from <TAG>" to set needed tag.];
+        if ( $self->dist->docker->{from_tag} !~ /\Av\d+[.]\d+[.]\d+\z/sm ) {
+            say q[Docker base image tag must be set to "vx.x.x". Use "pcore docker --from <TAG>" to set needed tag.];
 
             return;
         }
@@ -396,9 +395,10 @@ sub _create_changes ( $self, $ver, $issues ) {
             $rel->add_changes( { group => uc $group_name }, $group->{$group_name}->@* );
         }
     }
-    else {
-        $rel->add_changes('No issues on bugtracker were closed since the last release');
-    }
+
+    # else {
+    #     $rel->add_changes('No issues on bugtracker were closed since the last release');
+    # }
 
     # get changesets since latest release
     my $tag = $ver eq 'v0.1.0' ? undef : 'latest';
@@ -454,13 +454,12 @@ TXT
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (36)                       |
+## |    3 | 14                   | Subroutines::ProhibitExcessComplexity - Subroutine "run" with high complexity score (26)                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 28, 39, 48, 74, 92,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
-## |      | 143, 162, 219, 224,  |                                                                                                                |
-## |      | 229, 234             |                                                                                                                |
+## |    2 | 143, 163, 220, 225,  | ValuesAndExpressions::ProhibitLongChainsOfMethodCalls - Found method-call chain of length 4                    |
+## |      | 230, 235             |                                                                                                                |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    1 | 391                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
+## |    1 | 390                  | BuiltinFunctions::ProhibitReverseSortBlock - Forbid $b before $a in sort blocks                                |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -34,6 +34,18 @@ MyTestPromise::->loop_start;
 is $v, 'hello';
 is $r, "Foo\n";
 
+# promise with error
+($v, $r) = ();
+$p = MyTestPromise::->promise(sub { die "Foo\n" })->then(sub { $v = 'bad' })
+  ->catch(sub { $r = shift });
+
+ok !$v;
+ok !$r;
+
+MyTestPromise::->loop_start;
+
+ok !$v;
+
 
 # deferred
 ($v, $r) = @_;

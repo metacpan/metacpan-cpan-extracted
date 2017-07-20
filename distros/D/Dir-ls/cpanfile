@@ -6,3 +6,4 @@ requires 'Exporter' => '5.57';
 requires 'Path::Tiny' => '0.097';
 requires 'Sort::filevercmp';
 test_requires 'Test::More' => '0.88';
+test_requires 'File::chdir';

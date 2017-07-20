@@ -1,9 +1,78 @@
 ==================================================
-Changes from 2015-07-02 00:00:00 +0000 to present.
+Changes from 2015-07-18 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 3.7 at 2017-07-01 01:09:29 +0000
+version 4.0 at 2017-07-17 04:52:25 +0000
+----------------------------------------
+
+  Change: 47382a670e105bae399d01ed68ec82fb4c4dc2d8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-17 06:52:15 +0000
+
+    Version 4.0 to fix broken 3.9 upload. 
+
+  Change: 57866bb6a97c5d839fd1f599432bec770041d6e9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-17 06:49:42 +0000
+
+    Fix broken dependencies
+
+    Mistakenly added Datetime::TimeZone, instead of DateTime::TimeZone and as a
+    general requires when it's only a test requirement. 
+
+----------------------------------------
+version 3.9 at 2017-07-17 04:45:03 +0000
+----------------------------------------
+
+  Change: af6d87cb22522c8cdde612e6f50576240e7b4df3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-17 06:45:03 +0000
+
+    Version 3.9 Release Adjustments 
+
+  Change: 0818c63aebe2b2c2e862c48772998c43d65971de
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-16 21:08:29 +0000
+
+    Fix "Dist::Zilla = >= 1.23" to "DateTime >= 1.23"
+
+    Doing too many things at once, including debugging why the newest version
+    of Dist::Zilla broke a few plugins. Brain replaced "DateTime" with
+    Dist::Zilla for some reason. 
+
+----------------------------------------
+version 3.8 at 2017-07-17 01:28:59 +0000
+----------------------------------------
+
+  Change: db048f6090f235a2d260fc2b3c05200f31c6b35e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-17 03:28:59 +0000
+
+    Version bump for 3.8 to fix failing CPAN Testers tests 
+
+  Change: c54d620cc4d258a970cf029e99cac9f40557ba17
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-17 03:26:29 +0000
+
+    Bug inolder versions of DateTime causes rounding errors.
+
+    Require DateTime >= 1.23 where the bug with from_epoch() is corrected. 
+
+  Change: ece9daed98be2eb239e9311529fd34c99ac9688d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-15 23:37:28 +0000
+
+    Fixes for some test failures on CPAN Testers 
+
+  Change: 8e6000cf2505bbac212257c151e222443f79598a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-15 22:21:24 +0000
+
+    Adding tests for date parsing libraries to the benchmarks directory. 
+
+----------------------------------------
+version 3.7 at 2017-07-01 01:09:14 +0000
 ----------------------------------------
 
   Change: 38fd47d87a1748d6f5d629b4d08c27d1d7e6a7b6
@@ -248,5 +317,5 @@ version 3.3 at 2016-01-24 21:09:02 +0000
     Parse microseconds 
 
 =================================================
-Plus 23 releases after 2015-07-02 00:00:00 +0000.
+Plus 23 releases after 2015-07-18 00:00:00 +0000.
 =================================================

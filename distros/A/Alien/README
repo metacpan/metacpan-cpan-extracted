@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.94
+    version 0.95
 
 SYNOPSIS
 
@@ -79,8 +79,8 @@ CAVEATS
 
       The original Alien documentation recommends the use of Module::Build
       (MB), which at the time was recommended over ExtUtils::MakeMaker
-      (EUMM). May Alien distributions have been written using MB. Including
-      the original installer that came with Alien::Base,
+      (EUMM). Many Alien distributions have been written using MB.
+      Including the original installer that came with Alien::Base,
       Alien::Base::ModuleBuild. I believe this is because it is an easier
       build system to adapt to the Alien concept. MB is no longer
       universally recommended over EUMM, and has been removed from Perl's
@@ -167,11 +167,10 @@ SEE ALSO
       An (optional) base class and framework for creating Alien
       distributions.
 
-    Alien::Build::FAQ
+    Alien::Base::FAQ
 
-      Frequently Asked Questions for Alien::Build. Mostly specific to
-      Alien::Build, but also addresses some challenges for Alien in
-      general.
+      Frequently Asked Questions for Alien::Base. Mostly specific to
+      Alien::Base, but also addresses some challenges for Alien in general.
 
     #native on irc.perl.org <http://chat.mibbit.com/#native@irc.perl.org>
 

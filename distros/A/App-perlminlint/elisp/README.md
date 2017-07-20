@@ -34,9 +34,11 @@ by adding following snippet in init.el:
 ;;
 (let ((load-all-subdirs
        (lambda (this-dir)
+	 (message "load-all-subdirs for this-dir: %s" this-dir)
          (let (fn err (default-directory this-dir))
            (dolist (file (cdr (cdr (directory-files this-dir))))
-             (setq fn (concat (file-name-as-directory file) "subdirs.el"))
+             (setq fn (expand-file-name
+		       (concat (file-name-as-directory file) "subdirs.el")))
              (if (and (file-directory-p file)
                       (file-exists-p fn))
                  (condition-case err

@@ -5,7 +5,7 @@ package Crypt::SRP;
 use strict;
 use warnings;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use Math::BigInt lib => 'LTM'; # Math::BigInt::LTM is part of CryptX-0.029+
 use Crypt::Mac::HMAC qw(hmac);
@@ -16,7 +16,7 @@ use Config;
 use Carp;
 
 use constant _state_vars  => [ qw(Bytes_I Bytes_K Bytes_M1 Bytes_M2 Bytes_P Bytes_s Num_a Num_A Num_b Num_B Num_k Num_S Num_u Num_v Num_x) ];
-use constant _static_vars => [ qw(HASH INTERLEAVED GROUP FORMAT SALT_LEN) ];
+use constant _static_vars => [ qw(HASH INTERLEAVED GROUP FORMAT SALTLEN SRPTOOLS APPLETV) ];
 
 ### predefined parameters - see http://tools.ietf.org/html/rfc5054 appendix A
 
@@ -181,15 +181,9 @@ use constant _predefined_groups => {
 ### class constructor
 
 sub new {
-  my ($class, $group, $hash, $format, $interleaved, $default_salt_len) = @_;
+  my $class = shift;
   my $self = bless {}, $class;
-
-  $self->{GROUP} = $group || 'RFC5054-2048bit';
-  $self->{HASH} = $hash || 'SHA256';
-  $self->{FORMAT} = $format || 'raw';
-  $self->{INTERLEAVED} = $interleaved || 0;
-  $self->{SALT_LEN} = $default_salt_len || 32;
-
+  $self->_parse_args(1, @_); # 1 = use defaults
   $self->_initialize();
   return $self;
 }
@@ -197,23 +191,17 @@ sub new {
 ### class PUBLIC methods
 
 sub reset {
-  my ($self, $group, $hash, $format, $interleaved, $default_salt_len) = @_;
-
-  $self->{GROUP} = $group if defined $group;
-  $self->{HASH} = $hash if defined $hash;
-  $self->{FORMAT} = $format if defined $format;
-  $self->{INTERLEAVED} = $interleaved if defined $interleaved;
-  $self->{SALT_LEN} = $default_salt_len if defined $default_salt_len;
-
+  my $self = shift;
   delete $self->{$_} for (@{_state_vars()});
-
+  $self->_parse_args(0, @_); # 0 = do not use defaults
   $self->_initialize();
   return $self;
 }
 
 sub dump {
   my $self = shift;
-  my $state = [ map {$self->{$_}} (@{_state_vars()}, @{_static_vars()}) ];
+  my $state = { map { $_ => $self->{$_} } (@{_state_vars()}, @{_static_vars()}) };
+  $state->{__VER__} = $VERSION;
   eval { require Storable } or croak "FATAL: dump() requires Storable";
   return encode_b64(Storable::nfreeze($state));
 }
@@ -223,8 +211,10 @@ sub load {
   $self->reset;
   eval { require Storable } or croak "FATAL: load() requires Storable";
   my $s = Storable::thaw(decode_b64($state));
+  croak "FATAL: load() invalid data" if ref($s) ne 'HASH' || !defined $s->{__VER__};
+  croak "FATAL: load() version mismatch" if $s->{__VER__} ne $VERSION;
   my @list = (@{_state_vars()}, @{_static_vars()});
-  $self->{$list[$_]} = $s->[$_] for 0..$#list;
+  $self->{$_} = $s->{$_} for (@list);
   $self->_initialize();
   return $self;
 }
@@ -240,6 +230,9 @@ sub client_init {
   $self->{Num_B}   = _bytes2bignum($self->_unformat($Bytes_B)) if defined $Bytes_B;
   $self->{Num_A}   = _bytes2bignum($self->_unformat($Bytes_A)) if defined $Bytes_A;
   $self->{Num_a}   = _bytes2bignum($self->_unformat($Bytes_a)) if defined $Bytes_a;
+  if (defined $Bytes_a && !defined $Bytes_A) {
+    $self->{Num_A} = $self->_calc_A;
+  }
   return $self;
 }
 
@@ -253,6 +246,9 @@ sub server_init {
   $self->{Num_A}   = _bytes2bignum($self->_unformat($Bytes_A)) if defined $Bytes_A;
   $self->{Num_B}   = _bytes2bignum($self->_unformat($Bytes_B)) if defined $Bytes_B;
   $self->{Num_b}   = _bytes2bignum($self->_unformat($Bytes_b)) if defined $Bytes_b;
+  if (defined $Bytes_b && !defined $Bytes_B) {
+    $self->{Num_B} = $self->_calc_B;
+  }
   return $self;
 }
 
@@ -297,7 +293,7 @@ sub server_compute_B {
 sub server_fake_B_s {
   my ($self, $I, $nonce, $s_len) = @_;
   return unless $I;
-  $s_len ||= $self->{SALT_LEN};
+  $s_len ||= $self->{SALTLEN};
   # default $nonce should be fixed for repeated invocation on the same machine (in different processes)
   $nonce ||= join(":", @INC, $Config{archname}, $Config{myuname}, $^X, $^V, $<, $(, $ENV{PATH}, $ENV{HOSTNAME}, $ENV{HOME});
   my $b = _bytes2bignum(_random_bytes(6)); #NOTE: maybe too short but we do not want to waste too much CPU on modpow
@@ -347,7 +343,7 @@ sub compute_verifier {
 sub compute_verifier_and_salt {
   my ($self, $Bytes_I, $Bytes_P, $salt_len) = @_;
   # do not unformat $Bytes_I, $Bytes_P
-  $salt_len ||= $self->{SALT_LEN};
+  $salt_len ||= $self->{SALTLEN};
   my $Bytes_s = _random_bytes($salt_len);
   $self->client_init($Bytes_I, $Bytes_P, $self->_format($Bytes_s));
   return ($self->_format($self->_calc_v), $self->_format($Bytes_s));
@@ -376,6 +372,41 @@ sub random_bytes {
 }
 
 ### class PRIVATE methods
+
+sub _parse_args {
+  my ($self, $use_defaults) = (shift, shift);
+
+  my %args = ();
+  if (@_ == 1 && ref $_[0] eq 'HASH') {
+    # new interface
+    %args = %{$_[0]};
+  }
+  else {
+    # old interface
+    ($args{group}, $args{hash}, $args{format}, $args{interleaved}, $args{saltlen}) = @_;
+  }
+
+  if ($use_defaults) {
+    $self->{GROUP}       = $args{group}       || 'RFC5054-2048bit';
+    $self->{HASH}        = $args{hash}        || 'SHA256';
+    $self->{FORMAT}      = $args{format}      || 'raw';
+    $self->{INTERLEAVED} = $args{interleaved} || 0;
+    $self->{SALTLEN}     = $args{saltlen}     || 32;
+    $self->{APPLETV}     = $args{appletv}     || 0;
+    $self->{SRPTOOLS}    = $args{srptools}    || 0;
+  }
+  else {
+    $self->{GROUP}       = $args{group}       if defined $args{group};
+    $self->{HASH}        = $args{hash}        if defined $args{hash};
+    $self->{FORMAT}      = $args{format}      if defined $args{format};
+    $self->{INTERLEAVED} = $args{interleaved} if defined $args{interleaved};
+    $self->{SALTLEN}     = $args{saltlen}     if defined $args{saltlen};
+    $self->{APPLETV}     = $args{appletv}     if defined $args{appletv};
+    $self->{SRPTOOLS}    = $args{srptools}    if defined $args{srptools};
+  }
+
+  return $self;
+}
 
 sub _initialize {
   my $self = shift;
@@ -455,7 +486,7 @@ sub _calc_A {
 sub _calc_u {
   my $self = shift;
   return undef unless defined $self->{Num_A} && defined $self->{Num_B};
-  # u = HASH(PAD(A) | PAD(B))
+  # u = HASH(PAD(A) | PAD(B)) [the same for SRPTOOLS & APPLETV]
   my $Bytes_u = $self->_HASH( $self->_PAD(_bignum2bytes($self->{Num_A})) . $self->_PAD(_bignum2bytes($self->{Num_B})) );
   my $Num_u = _bytes2bignum($Bytes_u);
   return $Num_u;
@@ -464,7 +495,7 @@ sub _calc_u {
 sub _calc_k {
   my $self = shift;
   return undef unless defined $self->{Num_N} && defined $self->{Num_g};
-  # k = HASH(N | PAD(g))
+  # k = HASH(N | PAD(g)) [the same for SRPTOOLS & APPLETV]
   my $Num_k = _bytes2bignum( $self->_HASH(_bignum2bytes($self->{Num_N}) . $self->_PAD(_bignum2bytes($self->{Num_g}))) );
   return $Num_k;
 }
@@ -499,8 +530,19 @@ sub _calc_K {
   my $self = shift;
   return undef unless defined $self->{Num_S};
   my $Bytes_S = _bignum2bytes($self->{Num_S});
-  # K = HASH(PAD(S))  or  K = HASH_Interleaved(PAD(S))
-  my $Bytes_K = $self->{INTERLEAVED} ? $self->_HASH_Interleaved($self->_PAD($Bytes_S)) : $self->_HASH($self->_PAD($Bytes_S));
+  my $Bytes_K;
+  if ($self->{SRPTOOLS}) {
+    # K = HASH(S)  or  K = HASH_Interleaved(S)
+    $Bytes_K = $self->{INTERLEAVED} ? $self->_HASH_Interleaved($Bytes_S) : $self->_HASH($Bytes_S);
+  }
+  elsif ($self->{APPLETV}) {
+    # K = H(S | 0000) | H(S | 0001) ... (where 0000 means 4 NULL bytes)
+    $Bytes_K = $self->_HASH($Bytes_S . "\x00\x00\x00\x00") . $self->_HASH($Bytes_S . "\x00\x00\x00\x01");
+  }
+  else {
+    # K = HASH(PAD(S))  or  K = HASH_Interleaved(PAD(S))
+    $Bytes_K = $self->{INTERLEAVED} ? $self->_HASH_Interleaved($self->_PAD($Bytes_S)) : $self->_HASH($self->_PAD($Bytes_S));
+  }
   return $Bytes_K
 }
 
@@ -508,18 +550,34 @@ sub _calc_M1 {
   my $self = shift;
   return undef unless defined $self->{Num_A} && defined $self->{Num_B} && defined $self->{Num_N} && defined $self->{Num_g};
   return undef unless defined $self->{Bytes_K} && defined $self->{Bytes_I} && defined $self->{Bytes_s};
-  # M1 = HASH( HASH(N) XOR HASH(PAD(g)) | HASH(I) | s | PAD(A) | PAD(B) | K )
-  my $data1 = ($self->_HASH(_bignum2bytes($self->{Num_N})) ^ $self->_HASH($self->_PAD(_bignum2bytes($self->{Num_g})))) . $self->_HASH($self->{Bytes_I});
-  my $data2 = $self->{Bytes_s} . $self->_PAD(_bignum2bytes($self->{Num_A})) . $self->_PAD(_bignum2bytes($self->{Num_B})) . $self->{Bytes_K};
-  my $Bytes_M1 = $self->_HASH( $data1 . $data2 );
+  my $Bytes_M1;
+  if ($self->{SRPTOOLS} || $self->{APPLETV}) {
+    # M1 = HASH( HASH(N) XOR HASH(g) | HASH(I) | s | A | B | K )
+    my $data1 = ($self->_HASH(_bignum2bytes($self->{Num_N})) ^ $self->_HASH(_bignum2bytes($self->{Num_g}))) . $self->_HASH($self->{Bytes_I});
+    my $data2 = $self->{Bytes_s} . _bignum2bytes($self->{Num_A}) . _bignum2bytes($self->{Num_B}) . $self->{Bytes_K};
+    $Bytes_M1 = $self->_HASH( $data1 . $data2 );
+  }
+  else {
+    # M1 = HASH( HASH(N) XOR HASH(PAD(g)) | HASH(I) | s | PAD(A) | PAD(B) | K )
+    my $data1 = ($self->_HASH(_bignum2bytes($self->{Num_N})) ^ $self->_HASH($self->_PAD(_bignum2bytes($self->{Num_g})))) . $self->_HASH($self->{Bytes_I});
+    my $data2 = $self->{Bytes_s} . $self->_PAD(_bignum2bytes($self->{Num_A})) . $self->_PAD(_bignum2bytes($self->{Num_B})) . $self->{Bytes_K};
+    $Bytes_M1 = $self->_HASH( $data1 . $data2 );
+  }
   return $Bytes_M1;
 }
 
 sub _calc_M2 {
   my $self = shift;
   return undef unless defined $self->{Bytes_K} && defined $self->{Num_A} && defined $self->{Bytes_M1};
-  # M2 = HASH( PAD(A) | M1 | K )
-  my $Bytes_M2 = $self->_HASH( $self->_PAD(_bignum2bytes($self->{Num_A})) . $self->{Bytes_M1} . $self->{Bytes_K});
+  my $Bytes_M2;
+  if ($self->{SRPTOOLS} || $self->{APPLETV}) {
+    # M2 = HASH( A | M1 | K )
+    $Bytes_M2 = $self->_HASH( _bignum2bytes($self->{Num_A}) . $self->{Bytes_M1} . $self->{Bytes_K} );
+  }
+  else {
+    # M2 = HASH( PAD(A) | M1 | K )
+    $Bytes_M2 = $self->_HASH( $self->_PAD(_bignum2bytes($self->{Num_A})) . $self->{Bytes_M1} . $self->{Bytes_K} );
+  }
   return $Bytes_M2;
 }
 
@@ -678,7 +736,7 @@ Example 1 - SRP login handshake:
 
  ###CLIENT###
  if ($M2 && $cli->client_verify_M2($M2)) {
-   my $K = $srv->get_secret_K; # shared secret
+   my $K = $cli->get_secret_K; # shared secret
    print "SUCCESS";
  }
  else {
@@ -714,9 +772,11 @@ More info about SRP protocol:
 
 =item * L<http://srp.stanford.edu/design.html>
 
-=item * L<http://en.wikipedia.org/wiki/Secure_Remote_Password_protocol>
+=item * L<https://en.wikipedia.org/wiki/Secure_Remote_Password_protocol>
 
-=item * L<http://tools.ietf.org/html/rfc5054>
+=item * L<https://tools.ietf.org/html/rfc2945>
+
+=item * L<https://tools.ietf.org/html/rfc5054>
 
 =back
 
@@ -738,25 +798,35 @@ the same encoding as well.
 =item * new
 
  my $srp = Crypt::SRP->new();
+
  #or
+ my $srp = Crypt::SRP->new({ group => $group, hash => $hash, format => $format });
+ # group       - DEFAULT='RFC5054-2048bit'
+ #               'RFC5054-1024bit' or 'RFC5054-1536bit' or 'RFC5054-2048bit' or
+ #               'RFC5054-3072bit' or 'RFC5054-4096bit' or 'RFC5054-6144bit' or
+ #               'RFC5054-8192bit' see rfc5054 (appendix A)
+ # hash        - DEFAULT='SHA256'
+ #               'SHA1' or 'SHA256' or 'SHA384' or 'SHA512'
+ # format      - DEFAULT='raw'
+ #               'raw' or 'hex' or 'base64' or 'base64url'
+ # interleaved - DEFAULT=0
+ #               indicates whether the final shared secret K will be computed
+ #               as SHAx(S) or SHAx_Interleaved(S) see rfc2945 (3.1 Interleaved SHA)
+ # saltlen     - DEFAULT=32
+ #               default length (in bytes) for generated salt
+ # srptools    - DEFAULT=0 (since v0.018)
+ #               operate in a mode compatible with python package srptools
+ # appletv     - DEFAULT=0 (since v0.018)
+ #               operate in a mode compatible with SRP6a used by AppleTV / AirPlayAuth
+
+ #or (OLD interface)
  my $srp = Crypt::SRP->new($group, $hash, $format, $interleaved, $default_salt_len);
- # $group ... (optional, DEFAULT='RFC5054-2048bit')
- #            'RFC5054-1024bit' or 'RFC5054-1536bit' or 'RFC5054-2048bit' or
- #            'RFC5054-3072bit' or 'RFC5054-4096bit' or 'RFC5054-6144bit' or
- #            'RFC5054-8192bit' see rfc5054 (appendix A)
- # $hash  ... (optional, DEFAULT='SHA256')
- #            'SHA1' or 'SHA256' or 'SHA384' or 'SHA512'
- # $format ... (optional, DEFAULT='raw')
- #             'raw' or 'hex' or 'base64' or 'base64url'
- # $interleaved ... (optional, DEFAULT=0) indicates whether the final shared
- #                  secret K will be computed as SHAx(S) or SHAx_Interleaved(S)
- #                  see rfc2945 (3.1 Interleaved SHA)
- # $default_salt_len ... (optional, DEFAULT=32)
- #                        default length (in bytes) for generated salt
 
 =item * reset
 
  $srp->reset();
+ #or
+ $srp->reset({ group => $group, hash => $hash, format => $format });    # see new()
  #or
  $srp->reset($group, $hash, $format, $interleaved, $default_salt_len);  # see new()
 
@@ -869,4 +939,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2012 DCIT, a.s. L<http://www.dcit.cz> / Karel Miko
+Copyright (c) 2012+ DCIT, a.s. L<http://www.dcit.cz> / Karel Miko

@@ -1,3 +1,32 @@
+version 0.006; 2017-07-17
+
+  * when invoking make in the Olson distribution directory, suppress
+    rebuilding of the version file, to cope with copies of the
+    distribution in which timestamps have been mangled, or which are git
+    working directories for projects other than the Olson database, or
+    from which some version-contributing files (such as the copyrighted
+    ones) have been omitted
+
+version 0.005; 2017-07-16
+
+  * bugfix: require bugfixed version of Net::FTP
+
+  * accept non-ASCII UTF-8 strings in iso3166.tab, seen from tzdata
+    version 2015e onwards, consequently increasing the Perl version
+    requirement to 5.8
+
+  * avoid unescaped brace in regexp, which is deprecated starting in
+    Perl 5.21.1
+
+  * in documentation, indicate that the ->new_from_local_source
+    constructor accepts multiple attribute parameters
+
+  * new author test to try out the module's actual functionality (not
+    automatically run due to dependence on network and on the content
+    of the latest Olson distribution)
+
+  * no longer include a Makefile.PL in the distribution
+
 version 0.004; 2012-07-20
 
   * switch to new official repository, <ftp://ftp.iana.org/tz/releases/>

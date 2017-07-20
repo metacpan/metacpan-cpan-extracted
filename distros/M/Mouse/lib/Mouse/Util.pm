@@ -50,7 +50,7 @@ BEGIN{
         },
     );
 
-    our $VERSION = 'v2.4.9';
+    our $VERSION = 'v2.4.10';
 
     my $xs = !(defined(&is_valid_class_name) || $ENV{MOUSE_PUREPERL} || $ENV{PERL_ONLY});
 
@@ -62,6 +62,7 @@ BEGIN{
         (my $hack_mouse_file = __FILE__) =~ s/.Util//; # .../Mouse/Util.pm -> .../Mouse.pm
         $xs = eval sprintf("#line %d %s\n", __LINE__, $hack_mouse_file) . q{
             local $^W = 0; # workaround 'redefine' warning to &install_subroutines
+            no warnings 'redefine';
             require XSLoader;
             XSLoader::load('Mouse', $VERSION);
             Mouse::Util->import({ into => 'Mouse::Meta::Method::Constructor::XS' }, ':meta');
@@ -232,6 +233,15 @@ sub does_role {
     }
 }
 
+# Taken from Module::Runtime
+sub module_notional_filename {
+    my $class = shift;
+
+    $class =~ s{::}{/}g;
+
+    return $class.'.pm';
+}
+
 # Utilities from Class::MOP
 
 sub get_code_info;
@@ -278,12 +288,11 @@ sub _try_load_one_class {
 
     return '' if is_class_loaded($class);
 
-    $class  =~ s{::}{/}g;
-    $class .= '.pm';
+    my $filename = module_notional_filename($class);
 
     return do {
         local $@;
-        eval { require $class };
+        eval { require $filename };
         $@;
     };
 }
@@ -414,7 +423,7 @@ Mouse::Util - Utilities for working with Mouse classes
 
 =head1 VERSION
 
-This document describes Mouse version v2.4.9
+This document describes Mouse version v2.4.10
 
 =head1 SYNOPSIS
 

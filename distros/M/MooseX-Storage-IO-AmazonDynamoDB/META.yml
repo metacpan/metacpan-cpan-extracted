@@ -3,17 +3,12 @@ abstract: "Store and retrieve Moose objects to AWS's DynamoDB, via MooseX::Stora
 author:
   - 'Steve Caldwell <scaldwell@gmail.com>'
 build_requires:
-  Clone: '0'
-  Future: '0'
-  Kavorka: '0'
-  MooseX::ClassAttribute: '0'
-  Test::Most: '0'
-  Test::Pod: '0'
-  Test::Warnings: '0'
+  Test::DescribeMe: '0'
+  Test::More: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.029, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,23 +16,20 @@ meta-spec:
 name: MooseX-Storage-IO-AmazonDynamoDB
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  AWS::CLI::Config: '0'
-  Amazon::DynamoDB: '0'
   Data::Dumper: '0'
-  IO::Socket::SSL: '0'
   JSON::MaybeXS: '0'
-  Module::Runtime: '0'
   Moose: '0'
   MooseX::Role::Parameterized: '0'
   MooseX::Storage: '0'
-  Throwable::Error: '0'
+  Paws: '0'
+  PawsX::DynamoDB::DocumentClient: '0'
   Type::Tiny: '0'
   namespace::autoclean: '0'
   perl: '5.014'
@@ -45,4 +37,7 @@ resources:
   bugtracker: https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB/issues
   homepage: https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB
   repository: https://github.com/stevecaldwell77/MooseX-Storage-IO-AmazonDynamoDB.git
-version: '0.06'
+version: '0.07'
+x_contributors:
+  - 'Stephen Caldwell <steve@campusexplorer.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

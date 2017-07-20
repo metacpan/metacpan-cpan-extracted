@@ -26,5 +26,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/bes-internal/Date-Holidays-BY.git
-version: 0.2017.0
+version: 0.2017.2
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,8 @@
 Revision history for Perl extension B::Flags.
 
+0.17  2017-07-14 rurban
+	- SVpbm_TAIL/SvVALID_on gone with 5.25.7/v5.25.3c
+
 0.16  2016-02-04 rurban
 	- fix duplicate UTF8 and IsUV
 

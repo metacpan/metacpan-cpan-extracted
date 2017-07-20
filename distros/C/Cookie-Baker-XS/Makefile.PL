@@ -3,18 +3,19 @@
 # DO NOT EDIT DIRECTLY.
 # =========================================================================
 
-use 5.008_001;
+use 5.006;
 use strict;
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 
 
 my %WriteMakefileArgs = (
     NAME     => 'Cookie::Baker::XS',
     DISTNAME => 'Cookie-Baker-XS',
-    VERSION  => '0.07',
+    VERSION  => '0.08',
+    EXE_FILES => [glob('script/*'), glob('bin/*')],
     CONFIGURE_REQUIRES => {
-  "ExtUtils::MakeMaker" => 0
+  "ExtUtils::MakeMaker" => "6.64"
 }
 ,
     BUILD_REQUIRES     => {}
@@ -29,29 +30,5 @@ my %WriteMakefileArgs = (
 }
 ,
 );
-
-my $full_prereqs = {
-  "Exporter" => 0,
-  "ExtUtils::MakeMaker" => 0,
-  "Test::More" => "0.98",
-  "perl" => "5.008001"
-}
-;
-
-unless (eval { ExtUtils::MakeMaker->VERSION(6.63_03) }) {
-    delete $WriteMakefileArgs{TEST_REQUIRES};
-    delete $WriteMakefileArgs{BUILD_REQUIRES};
-    $WriteMakefileArgs{PREREQ_PM} = $full_prereqs;
-}
-
-unless (eval { ExtUtils::MakeMaker->VERSION(6.52) }) {
-    delete $WriteMakefileArgs{CONFIGURE_REQUIRES};
-}
-
-unless (eval { ExtUtils::MakeMaker->VERSION(6.57_01) }) {
-    use File::Copy;
-    copy('META.yml', 'MYMETA.yml')   or warn "META.yml: $!";
-    copy('META.json', 'MYMETA.json') or warn "META.json: $!";
-}
 
 WriteMakefile(%WriteMakefileArgs);

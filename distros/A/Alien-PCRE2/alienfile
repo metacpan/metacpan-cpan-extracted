@@ -1,11 +1,14 @@
 use alienfile;
 
-#our $VERSION = 0.017_000;
+#our $VERSION = 0.019_000;
  
-# NEED ANSWER: which should we be using below?
-plugin 'PkgConfig' => 'libpcre2-8';
-#plugin 'PkgConfig' => 'libpcre2-16';
-#plugin 'PkgConfig' => 'libpcre2-32';
+plugin 'PkgConfig' => (
+    # NEED ANSWER: which should we be using below?
+    pkg_name =>'libpcre2-8',
+#    pkg_name =>'libpcre2-16',
+#    pkg_name =>'libpcre2-32',
+    minimum_version => '10.30',
+);
  
 share {
     plugin Download => (

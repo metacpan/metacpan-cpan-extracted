@@ -1,4 +1,5 @@
 package Catalyst::Model::LDAP::Entry;
+# ABSTRACT: Convenience methods for Net::LDAP::Entry
 
 use strict;
 use warnings;
@@ -8,9 +9,70 @@ use MRO::Compat;
 
 __PACKAGE__->mk_accessors(qw/_ldap_client/);
 
+
+sub new {
+    my ( $class, $dn, %attributes ) = @_;
+
+    my $client = delete $attributes{_ldap_client};
+
+    my $self = $class->next::method( $dn, %attributes );
+
+    if ($client) {
+        $self->_ldap_client($client);
+    }
+
+    return $self;
+}
+
+
+sub update {
+    my $self = shift;
+    my $client = shift || $self->_ldap_client;
+    croak 'No LDAP client provided to update' unless $client;
+
+    return $self->next::method( $client, @_ );
+}
+
+
+sub can {
+    my ( $self, $method ) = @_;
+    return 0 unless ref($self);
+    $self->exists($method) || $self->SUPER::can($method);
+}
+
+sub AUTOLOAD {
+    my ( $self, @args ) = @_;
+
+    my ($attribute) = ( our $AUTOLOAD =~ /([^:]+)$/ );
+    return if $attribute eq 'DESTROY';
+
+    croak qq[Can't locate object method "$attribute" via package "]
+      . ref($self) . qq["]
+      unless $self->exists($attribute);
+
+    if ( scalar @args ) {
+        $self->replace( $attribute, @args );
+    }
+
+    return $self->get_value($attribute);
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Catalyst::Model::LDAP::Entry - Convenience methods for Net::LDAP::Entry
+
+=head1 VERSION
+
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -78,65 +140,15 @@ Override the L<Net::LDAP::Entry> object constructor to take an
 optional LDAP handle.  If provided this will be used automatically on
 L</update>.
 
-=cut
-
-sub new {
-    my ($class, $dn, %attributes) = @_;
-
-    my $client = delete $attributes{_ldap_client};
-
-    my $self = $class->next::method($dn, %attributes);
-
-    if ($client) {
-        $self->_ldap_client($client);
-    }
-
-    return $self;
-}
-
 =head2 update
 
 Override C<update> to default to the optional LDAP handle provided to
 the constructor.
 
-=cut
-
-sub update {
-    my $self   = shift;
-    my $client = shift || $self->_ldap_client;
-    croak 'No LDAP client provided to update' unless $client;
-
-    return $self->next::method($client, @_);
-}
-
 =head2 can
 
 Override C<can> to declare existence of the LDAP entry attribute
 methods from C<AUTOLOAD>.
-
-=cut
-
-sub can {
-    my ($self, $method) = @_;
-    return 0 unless ref($self);
-    $self->exists($method) || $self->SUPER::can($method);
-}
-
-sub AUTOLOAD {
-    my ($self, @args) = @_;
-
-    my ($attribute) = (our $AUTOLOAD =~ /([^:]+)$/);
-    return if $attribute eq 'DESTROY';
-
-    croak qq[Can't locate object method "$attribute" via package "] . ref($self) . qq["]
-        unless $self->exists($attribute);
-
-    if (scalar @args) {
-        $self->replace($attribute, @args);
-    }
-
-    return $self->get_value($attribute);
-}
 
 =head1 SEE ALSO
 
@@ -161,6 +173,15 @@ sub AUTOLOAD {
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=cut
+=head1 AUTHOR
 
-1;
+Gavin Henry <ghenry@surevoip.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gavin Henry.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

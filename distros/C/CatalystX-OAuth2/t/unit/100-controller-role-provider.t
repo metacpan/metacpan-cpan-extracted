@@ -3,7 +3,6 @@ use Test::More;
 use Test::Exception;
 use Plack::Test;
 use HTTP::Request::Common;
-use CatalystX::Test::MockContext;
 
 use lib 't/lib';
 use AuthServer;
@@ -27,9 +26,11 @@ around check_provider_actions => sub {
 package main;
 
 {
+  use Catalyst::Test 'AuthServer';
+  my ($res, $c) = ctx_request('/request');
 
-  my $mock = mock_context('AuthServer');
-  my $c    = $mock->( GET '/request' );
+  use Devel::Dwarn;
+  Dwarn $c;
 
   throws_ok {
     AuthServer::Mock::Controller->COMPONENT(

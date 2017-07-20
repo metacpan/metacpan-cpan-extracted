@@ -36,14 +36,10 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Archive::Tar" => 0,
-    "File::Spec" => 0,
-    "File::Temp" => 0,
-    "IO::Handle" => 0,
-    "IPC::Open3" => 0,
     "Test::More" => "0.88",
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "0.019",
+  "VERSION" => "0.020",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,12 +50,8 @@ my %FallbackPrereqs = (
   "Archive::Tar" => 0,
   "CPAN::DistnameInfo" => 0,
   "Compress::Zlib" => 0,
-  "File::Spec" => 0,
-  "File::Temp" => 0,
   "HTTP::Tiny" => "0.056",
-  "IO::Handle" => 0,
   "IO::Socket::SSL" => "1.56",
-  "IPC::Open3" => 0,
   "JSON::MaybeXS" => "1.001000",
   "List::Util" => 0,
   "Memoize" => 0,

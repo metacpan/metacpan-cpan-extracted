@@ -1,7 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:  rmp
+# Author: rmp
 # Created: 2007-03-28
 #
 # method id action  aspect  result CRUD
@@ -25,24 +25,26 @@ use CGI;
 use HTTP::Status qw(:constants :is);
 use HTTP::Headers;
 
-our $VERSION = q[475.3.3];
-our $CRUD    = {
-		POST   => 'create',
-		GET    => 'read',
-		PUT    => 'update',
-		DELETE => 'delete',
-                HEAD   => 'null',
-                TRACE  => 'null',
+our $VERSION = q[476.1.1];
+our $CRUD    = { # these map HTTP verbs to $action
+		POST    => 'create',
+		GET     => 'read',
+		PUT     => 'update',
+		DELETE  => 'delete',
+                OPTIONS => 'options',
+                HEAD    => 'null',
+                TRACE   => 'null',
 	       };
-our $REST   = {
-	       create => 'POST',
-	       read   => 'GET',
-	       update => 'PUT|POST',
-	       delete => 'DELETE|POST',
-	       add    => 'GET',
-	       edit   => 'GET',
-	       list   => 'GET',
-               null   => 'HEAD|TRACE'
+our $REST   = { # these assist sanitising $aspect
+	       create  => 'POST',
+	       read    => 'GET',
+	       update  => 'PUT|POST',
+	       delete  => 'DELETE|POST',
+	       add     => 'GET',
+	       edit    => 'GET',
+	       list    => 'GET',
+               options => 'OPTIONS',
+               null    => 'HEAD|TRACE'
 	      };
 
 sub accept_extensions {
@@ -322,6 +324,11 @@ sub process_request { ## no critic (Subroutines::ProhibitExcessComplexity)
     }
 
     $aspect = $action_extended . ($aspect?"_$aspect":q[]);
+  }
+
+  if($method eq 'OPTIONS') {
+    $action = 'options';
+    $aspect = 'options';
   }
 
   #########
@@ -724,8 +731,15 @@ sub dispatch {
       1;
     } or do {
       # bail out
-      $headers->header('Status', HTTP_INTERNAL_SERVER_ERROR);
-      croak qq[Failed to instantiate $entity model: $EVAL_ERROR];
+
+      my $code = $headers->header('Status');
+
+      if(!$code || $code == HTTP_OK) {
+        $headers->header('Status', HTTP_INTERNAL_SERVER_ERROR);
+        croak qq[Failed to instantiate $entity model: $EVAL_ERROR];
+      }
+
+      croak $EVAL_ERROR;
     };
   }
 
@@ -741,8 +755,14 @@ sub dispatch {
                                   });
     1;
   } or do {
-    $headers->header('Status', HTTP_INTERNAL_SERVER_ERROR);
-    croak qq[Failed to instantiate $entity view: $EVAL_ERROR];
+    my $code = $headers->header('Status');
+
+    if(!$code || $code == HTTP_OK) {
+      $headers->header('Status', HTTP_INTERNAL_SERVER_ERROR);
+      croak qq[Failed to instantiate $entity view: $EVAL_ERROR];
+    }
+
+    croak $EVAL_ERROR;
   };
 
   return $viewobject;

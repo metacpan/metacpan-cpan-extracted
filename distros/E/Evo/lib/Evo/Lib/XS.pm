@@ -1,7 +1,7 @@
 package Evo::Lib::XS;
 use Evo 'XSLoader; -Export';
 
-our $VERSION = '0.0403';    # VERSION
+our $VERSION = '0.0405';    # VERSION
 
 # to be able to run with and without dzil
 my $version = eval '$VERSION';    ## no critic
@@ -23,7 +23,7 @@ Evo::Lib::XS
 
 =head1 VERSION
 
-version 0.0403
+version 0.0405
 
 =head1 AUTHOR
 

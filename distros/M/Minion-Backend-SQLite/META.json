@@ -39,8 +39,8 @@
       "runtime" : {
          "requires" : {
             "Minion" : "7.01",
-            "Mojo::SQLite" : "1.002",
-            "Mojolicious" : "6.0",
+            "Mojo::SQLite" : "3.000",
+            "Mojolicious" : "7.29",
             "Sys::Hostname" : "0",
             "Time::HiRes" : "0",
             "perl" : "5.010001"
@@ -63,7 +63,7 @@
    "provides" : {
       "Minion::Backend::SQLite" : {
          "file" : "lib/Minion/Backend/SQLite.pm",
-         "version" : "2.000"
+         "version" : "2.001"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#mojo"
    },
-   "version" : "2.000",
+   "version" : "2.001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -146,7 +146,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.5.5",
+                  "git_version" : "2.9.4",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -187,7 +187,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.5.5",
+                  "git_version" : "2.9.4",
                   "repo_root" : "."
                }
             },
@@ -256,7 +256,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.5.5",
+                  "git_version" : "2.9.4",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -273,12 +273,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v2.000",
+                  "tag" : "v2.001",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.5.5",
+                  "git_version" : "2.9.4",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -321,7 +321,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.5.5",
+                  "git_version" : "2.9.4",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -341,7 +341,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.5.5",
+                  "git_version" : "2.9.4",
                   "repo_root" : "."
                }
             },

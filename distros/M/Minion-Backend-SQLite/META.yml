@@ -26,11 +26,11 @@ no_index:
 provides:
   Minion::Backend::SQLite:
     file: lib/Minion/Backend/SQLite.pm
-    version: '2.000'
+    version: '2.001'
 requires:
   Minion: '7.01'
-  Mojo::SQLite: '1.002'
-  Mojolicious: '6.0'
+  Mojo::SQLite: '3.000'
+  Mojolicious: '7.29'
   Sys::Hostname: '0'
   Time::HiRes: '0'
   perl: '5.010001'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Minion-Backend-SQLite/issues
   homepage: https://github.com/Grinnz/Minion-Backend-SQLite
   repository: https://github.com/Grinnz/Minion-Backend-SQLite.git
-version: '2.000'
+version: '2.001'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -91,7 +91,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.5.5
+          git_version: 2.9.4
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -123,7 +123,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
       version: '2.042'
@@ -176,7 +176,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -189,11 +189,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.000
+          tag: v2.001
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -224,7 +224,7 @@ x_Dist_Zilla:
             - (?^:^(?:lib|script|bin)/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -238,7 +238,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.5.5
+          git_version: 2.9.4
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
       version: '2.042'

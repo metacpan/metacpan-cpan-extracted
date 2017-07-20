@@ -3,8 +3,8 @@ NAME
     framework
 
 VERSION
-    This document describes version 1.74 of Perinci::CmdLine::Classic (from
-    Perl distribution Perinci-CmdLine-Classic), released on 2017-07-10.
+    This document describes version 1.76 of Perinci::CmdLine::Classic (from
+    Perl distribution Perinci-CmdLine-Classic), released on 2017-07-14.
 
 SYNOPSIS
     In "gen-random-num" script:
@@ -147,10 +147,6 @@ RESULT METADATA
 
 ATTRIBUTES
     All the attributes of Perinci::CmdLine::Base, plus:
-
-  log => BOOL (default: 1)
-    Whether to load Log::Any::App (enable logging output) by default. See
-    "LOGGING" for more details.
 
   use_utf8 => BOOL
     From Term::App::Role::Attrs (please see its docs for more details).

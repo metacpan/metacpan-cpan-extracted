@@ -1,5 +1,5 @@
 #
-# $Id: Encode.pm,v 2.91 2017/06/22 08:11:05 dankogai Exp dankogai $
+# $Id: Encode.pm,v 2.92 2017/07/18 07:15:29 dankogai Exp dankogai $
 #
 package Encode;
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use constant DEBUG => !!$ENV{PERL_ENCODE_DEBUG};
 our $VERSION;
 BEGIN {
-    $VERSION = sprintf "%d.%02d", q$Revision: 2.91 $ =~ /(\d+)/g;
+    $VERSION = sprintf "%d.%02d", q$Revision: 2.92 $ =~ /(\d+)/g;
     require XSLoader;
     XSLoader::load( __PACKAGE__, $VERSION );
 }
@@ -49,7 +49,7 @@ our %EXPORT_TAGS = (
 
 our $ON_EBCDIC = ( ord("A") == 193 );
 
-use Encode::Alias;
+use Encode::Alias ();
 use Encode::MIME::Name;
 
 use Storable;
@@ -136,6 +136,15 @@ sub getEncoding {
         }
     }
     return;
+}
+
+# HACK: These two functions must be defined in Encode and because of
+# cyclic dependency between Encode and Encode::Alias, Exporter does not work
+sub find_alias {
+    goto &Encode::Alias::find_alias;
+}
+sub define_alias {
+    goto &Encode::Alias::define_alias;
 }
 
 sub find_encoding($;$) {
@@ -342,13 +351,15 @@ if ($ON_EBCDIC) {
 
 {
     package Encode::utf8;
-    BEGIN {
-        $Encode::Encoding{utf8} = bless { Name => 'utf8' } => __PACKAGE__;
-    }
     use parent 'Encode::Encoding';
-    my $strict_obj =
-      bless { Name => 'utf-8-strict', strict_utf8 => 1 } => __PACKAGE__;
-    Encode::define_encoding($strict_obj, 'utf-8-strict');
+    my %obj = (
+        'utf8'         => { Name => 'utf8' },
+        'utf-8-strict' => { Name => 'utf-8-strict', strict_utf8 => 1 }
+    );
+    for ( keys %obj ) {
+        bless $obj{$_} => __PACKAGE__;
+        Encode::define_encoding( $obj{$_} => $_ );
+    }
     sub cat_decode {
         # ($obj, $dst, $src, $pos, $trm, $chk)
         # currently ignores $chk

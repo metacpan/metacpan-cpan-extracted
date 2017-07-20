@@ -1,15 +1,50 @@
 package Catalyst::Model::LDAP;
+# ABSTRACT: LDAP model class for Catalyst
 
 use strict;
 use warnings;
 use base qw/Catalyst::Model/;
 use Carp qw/croak/;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
+
+
+sub ACCEPT_CONTEXT {
+    my ($self) = @_;
+
+    my %args = %$self;
+
+    # Remove Catalyst-specific parameters (e.g. catalyst_component_name), which
+    # cause issues Net::LDAP
+    delete $args{$_} for ( grep { /^_?catalyst/ } keys %args );
+
+    my $class = $args{connection_class} || 'Catalyst::Model::LDAP::Connection';
+    eval { require $class };
+    die $@ if $@;
+
+    my $conn = $class->new(%args);
+    my $mesg = $conn->bind(%args);
+    croak 'LDAP error: ' . $mesg->error if $mesg->is_error;
+
+    return $conn;
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 Catalyst::Model::LDAP - LDAP model class for Catalyst
+
+=head1 VERSION
+
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -120,28 +155,6 @@ method is automatically called when you use e.g. C<< $c->model('LDAP') >>.
 See L<Catalyst::Model::LDAP::Connection/bind> for information on how
 the bind operation is done.
 
-=cut
-
-sub ACCEPT_CONTEXT {
-    my ($self) = @_;
-
-    my %args = %$self;
-
-    # Remove Catalyst-specific parameters (e.g. catalyst_component_name), which
-    # cause issues Net::LDAP
-    delete $args{$_} for (grep { /^_?catalyst/ } keys %args);
-
-    my $class = $args{connection_class} || 'Catalyst::Model::LDAP::Connection';
-    eval "require $class";
-    die $@ if $@;
-
-    my $conn = $class->new(%args);
-    my $mesg = $conn->bind(%args);
-    croak 'LDAP error: ' . $mesg->error if $mesg->is_error;
-
-    return $conn;
-}
-
 =head1 SEE ALSO
 
 =over 4
@@ -187,6 +200,15 @@ sub ACCEPT_CONTEXT {
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=cut
+=head1 AUTHOR
 
-1;
+Gavin Henry <ghenry@surevoip.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gavin Henry.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

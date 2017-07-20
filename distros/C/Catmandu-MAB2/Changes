@@ -1,5 +1,8 @@
 Changelog for Catmandu-MAB2
 
+0.20  2017-07-15 13:47:56 CEST
+ - gh#9: MYMETA must not be included
+
 0.19  2017-07-09 15:05:56 CEST
  - fix version number of required dependency
 

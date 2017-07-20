@@ -5,7 +5,7 @@ use warnings;
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Alien::Build command sequence
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
 sub new
@@ -148,7 +148,7 @@ Alien::Build::CommandSequence - Alien::Build command sequence
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 CONSTRUCTOR
 

@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.80';
+our $VERSION = '0.81';
 
 use Parse::PMFile;
 
@@ -51,7 +51,7 @@ Dist::Zilla::Plugin::MAXMIND::VersionProvider - Gets the distribution version fr
 
 =head1 VERSION
 
-version 0.80
+version 0.81
 
 =for Pod::Coverage .*
 

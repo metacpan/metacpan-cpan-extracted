@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 package Regexp::Common::time;
-$Regexp::Common::time::VERSION = '0.10';
+$Regexp::Common::time::VERSION = '0.12';
 use Regexp::Common qw(pattern);
 
 sub _croak { require Carp; goto &Carp::croak}

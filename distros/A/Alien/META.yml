@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/plicease/Alien/issues
   homepage: https://metacpan.org/pod/Alien
   repository: git://github.com/plicease/Alien.git
-version: '0.94'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+version: '0.95'
+x_serialization_backend: 'YAML::Tiny version 1.69'

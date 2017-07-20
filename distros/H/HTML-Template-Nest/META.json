@@ -1,12 +1,12 @@
 {
    "abstract" : "manipulate a nested html template structure via a perl hash",
    "author" : [
-      "tom <tom@>"
+      "Tom Gracey <tomgracey@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -31,9 +31,14 @@
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "Carp" : "1.22",
+            "Data::Dumper" : "2.101",
+            "File::Spec" : "3.26",
+            "HTML::Template" : "2.1"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02"
+   "version" : "0.03"
 }

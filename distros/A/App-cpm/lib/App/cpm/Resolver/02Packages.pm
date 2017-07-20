@@ -4,7 +4,7 @@ use warnings;
 use App::cpm::version;
 use Cwd ();
 use File::Path ();
-our $VERSION = '0.901';
+our $VERSION = '0.911';
 
 {
     package
@@ -62,7 +62,7 @@ our $VERSION = '0.901';
 
 sub new {
     my ($class, %option) = @_;
-    my $cache_base = $option{cache} || "$ENV{HOME}/.perl-cpm/sources";
+    my $cache_base = $option{cache} or die "cache option is required\n";
     my $mirror = $option{mirror} or die "mirror option is required\n";
     $mirror =~ s{/*$}{/};
 

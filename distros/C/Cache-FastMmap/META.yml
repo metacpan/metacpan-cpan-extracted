@@ -21,4 +21,4 @@ requires:
   Storable: '0'
 resources:
   repository: https://github.com/robmueller/cache-fastmmap
-version: '1.45'
+version: '1.46'

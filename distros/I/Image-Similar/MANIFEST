@@ -1,11 +1,14 @@
 Changes
+examples/find-all-images.pl
 examples/gd.pl
 examples/imager.pl
+examples/imlib2.pl
 examples/libpng.pl
+examples/make-signatures.pl
+examples/show-hash.pl
 examples/synopsis.pl
 examples/x.png
 examples/y.jpg
-image-similar-perl.c
 lib/Image/Similar.pm
 lib/Image/Similar.pod
 Makefile.PL
@@ -18,6 +21,7 @@ similar-image.c
 similar-image.h
 Similar.xs
 t/gd.t
+t/image-imlib2.t
 t/image-similar.t
 t/imager.t
 t/images/chess/chess-100.png

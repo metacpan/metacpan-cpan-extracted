@@ -1,5 +1,13 @@
 Changelog for Catmandu-PICA
 
+0.23  2017-07-14 10:29:48 CEST
+ - requires Catmandu::SRU 0.41
+0.22  2017-07-13 14:10:25 CEST
+ - added more fixes to POD
+ - changes in cpanfile & travis.yml
+0.21  2017-07-13 13:45:13 CEST
+ - fixed bug importer expects string from parser
+ - new Exporter with type ppxml
 0.20  2017-06-30 18:02:47 CEST
  - Upgrading Catmandu using new group binds for pica_each
  - pica_add and pica_set

@@ -77,11 +77,14 @@ DBIx::SchemaChecksum::App::ShowUpdatePath - Show the update path
 
 =head1 VERSION
 
-version 1.101
+version 1.102
 
 =head1 DESCRIPTION
 
-Show the whole update path starting from the current checksum, or from the one provided via C<--from_checksum>. Use C<--output concat> to concat all changes to STDOUT. Use C<--output psql --dbname your-db> to print some C<psql> commands to apply changes.
+Show the whole update path starting from the current checksum, or from
+the one provided via C<--from_checksum>. Use 'C<--output concat>' to
+concat all changes to STDOUT. Use 'C<--output psql --dbname your-db>'
+to print some C<psql> commands to apply changes.
 
 =head1 AUTHORS
 

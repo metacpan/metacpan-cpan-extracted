@@ -1,0 +1,42 @@
+NAME
+    Log::ger::Output::SimpleFile - Send logs to file
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+     use Log::ger::Output 'SimpleFile' => (
+         path => '/path/to/file.log', # or handle => $fh
+     );
+     use Log::ger;
+
+     log_warn "blah ...";
+
+DESCRIPTION
+    This is a simple output to file. File will be opened with append mode.
+    Filehandle will be flushed after each log. No locking, rotation, or
+    other fancy features (see Log::ger::Output::File for that).
+
+CONFIGURATION
+  path => filename
+    Specify filename to open. File will be opened in append mode.
+
+  handle => glob|obj
+    Alternatively, you can provide an already opened filehandle.
+
+SEE ALSO
+    Log::ger
+
+    Log::ger::Output::File
+
+    Log::ger::Output::FileWriteRotate
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

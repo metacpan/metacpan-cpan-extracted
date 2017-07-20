@@ -19,7 +19,6 @@ RL::read_history("$ENV{HOME}/.pl_history");
 while (1) {
     my $line = RL::readline("");
     if (!defined $line) {
-        print "\n";
         last;
     }
     if ($line =~ /^(q|quit|e|exit)$/) {

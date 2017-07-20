@@ -18,9 +18,9 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "LWP" => "6.08",
     "URI::URL" => "5.04",
-    "WWW::Leech::Parser" => "0.02"
+    "WWW::Leech::Parser" => "0.03"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => ""
   }
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "LWP" => "6.08",
   "URI::URL" => "5.04",
-  "WWW::Leech::Parser" => "0.02"
+  "WWW::Leech::Parser" => "0.03"
 );
 
 

@@ -6,16 +6,28 @@ use warnings;
 
 use SPVM::BaseObject;
 use SPVM::Object;
-use SPVM::ArrayObject;
+use SPVM::Array;
+use SPVM::Array::Byte;
+use SPVM::Array::Short;
+use SPVM::Array::Int;
+use SPVM::Array::Long;
+use SPVM::Array::Float;
+use SPVM::Array::Double;
+use SPVM::String;
+use SPVM::Array::Object;
+
+use Encode 'encode';
 
 use Carp 'croak';
 
 my $INT_MAX = 2147483647;
 
-our $VERSION = '0.0218';
+our $VERSION = '0.0225';
 
 our $COMPILER;
 our @PACKAGE_INFOS;
+our %PACKAGE_SYMTABLE;
+our %FIELD_SYMTABLE;
 our %SUB_SYMTABLE;
 our %TYPE_SYMTABLE;
 our $API;
@@ -28,8 +40,14 @@ CHECK {
   # Build resolved type symbol table
   build_type_symtable();
   
-  # Build subroutine symbole table
+  # Build subroutine symbol table
   build_sub_symtable();
+  
+  # Build package symbol table
+  build_package_symtable();
+  
+  # Build field symbol table
+  build_field_symtable();
   
   # Build SPVM subroutine
   build_spvm_subs();
@@ -41,7 +59,25 @@ CHECK {
   free_compiler();
 }
 
-sub byte_array {
+sub new_string_raw {
+  my $string = shift;
+  
+  my $array = SPVM::String->malloc_raw($string);
+  
+  return $array;
+}
+
+sub new_string {
+  my $string = shift;
+  
+  $string = Encode::encode('UTF-8', $string);
+  
+  my $array = SPVM::String->malloc_raw($string);
+  
+  return $array;
+}
+
+sub new_byte_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
@@ -50,22 +86,22 @@ sub byte_array {
   
   my $length = @$elements;
   
-  my $array_object = SPVM::ArrayObject->malloc_byte_array($length);
+  my $array = SPVM::Array::Byte->malloc($length);
   
-  $array_object->set_byte_array_elements($elements);
+  $array->set_elements($elements);
   
-  return $array_object;
+  return $array;
 }
 
-sub byte_array_len {
+sub new_byte_array_len {
   my $length = shift;
   
-  my $array_object = SPVM::ArrayObject->malloc_byte_array($length);
+  my $array = SPVM::Array::Byte->malloc($length);
   
-  return $array_object;
+  return $array;
 }
 
-sub short_array {
+sub new_short_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
@@ -74,22 +110,22 @@ sub short_array {
   
   my $length = @$elements;
   
-  my $array_object = SPVM::ArrayObject->malloc_short_array($length);
+  my $array = SPVM::Array::Short->malloc($length);
   
-  $array_object->set_short_array_elements($elements);
+  $array->set_elements($elements);
   
-  return $array_object;
+  return $array;
 }
 
-sub short_array_len {
+sub new_short_array_len {
   my $length = shift;
   
-  my $array_object = SPVM::ArrayObject->malloc_short_array($length);
+  my $array = SPVM::Array::Short->malloc($length);
   
-  return $array_object;
+  return $array;
 }
 
-sub int_array {
+sub new_int_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
@@ -98,22 +134,22 @@ sub int_array {
   
   my $length = @$elements;
   
-  my $array_object = SPVM::ArrayObject->malloc_int_array($length);
+  my $array = SPVM::Array::Int->malloc($length);
   
-  $array_object->set_int_array_elements($elements);
+  $array->set_elements($elements);
   
-  return $array_object;
+  return $array;
 }
 
-sub int_array_len {
+sub new_int_array_len {
   my $length = shift;
   
-  my $array_object = SPVM::ArrayObject->malloc_int_array($length);
+  my $array = SPVM::Array::Int->malloc($length);
   
-  return $array_object;
+  return $array;
 }
 
-sub long_array {
+sub new_long_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
@@ -122,22 +158,22 @@ sub long_array {
   
   my $length = @$elements;
   
-  my $array_object = SPVM::ArrayObject->malloc_long_array($length);
+  my $array = SPVM::Array::Long->malloc($length);
   
-  $array_object->set_long_array_elements($elements);
+  $array->set_elements($elements);
   
-  return $array_object;
+  return $array;
 }
 
-sub long_array_len {
+sub new_long_array_len {
   my $length = shift;
   
-  my $array_object = SPVM::ArrayObject->malloc_long_array($length);
+  my $array = SPVM::Array::Long->malloc($length);
   
-  return $array_object;
+  return $array;
 }
 
-sub float_array {
+sub new_float_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
@@ -146,22 +182,22 @@ sub float_array {
   
   my $length = @$elements;
   
-  my $array_object = SPVM::ArrayObject->malloc_float_array($length);
+  my $array = SPVM::Array::Float->malloc($length);
   
-  $array_object->set_float_array_elements($elements);
+  $array->set_elements($elements);
   
-  return $array_object;
+  return $array;
 }
 
-sub float_array_len {
+sub new_float_array_len {
   my $length = shift;
   
-  my $array_object = SPVM::ArrayObject->malloc_float_array($length);
+  my $array = SPVM::Array::Float->malloc($length);
   
-  return $array_object;
+  return $array;
 }
 
-sub double_array {
+sub new_double_array {
   my $elements = shift;
   
   if (ref $elements ne 'ARRAY') {
@@ -170,19 +206,27 @@ sub double_array {
   
   my $length = @$elements;
   
-  my $array_object = SPVM::ArrayObject->malloc_double_array($length);
+  my $array = SPVM::Array::Double->malloc($length);
   
-  $array_object->set_double_array_elements($elements);
+  $array->set_elements($elements);
   
-  return $array_object;
+  return $array;
 }
 
-sub double_array_len {
+sub new_double_array_len {
   my $length = shift;
   
-  my $array_object = SPVM::ArrayObject->malloc_double_array($length);
+  my $array = SPVM::Array::Double->malloc($length);
   
-  return $array_object;
+  return $array;
+}
+
+sub new_object {
+  my $package_name = shift;
+  
+  my $object = SPVM::Object->malloc_object($package_name);
+  
+  return $object;
 }
 
 sub import {
@@ -225,47 +269,47 @@ XSLoader::load('SPVM', $VERSION);
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
+=encoding UTF-8
 
 =head1 NAME
 
 SPVM - Fast calculation, GC, static typing, VM with perlish syntax
 
-B<SPVM is under developing! I will change implementation and specification without warnings.>
+B<SPVM is under development! I will change implementation and specification without warnings.>
 
 =head1 SYNOPSIS
-  
+
   use FindBin;
   use lib "$FindBin::Bin/lib";
 
   use SPVM 'MyModule2';
-  
+
   my $total = SPVM::MyModule2::foo(3, 5);
   print $total . "\n";
-  
+
 Module file
 
   # lib/SPVM/MyModule1.spvm
   package MyModule1 {
     has x : int;
     has y : int;
-    
+
     sub sum ($a : int, $b : int) : int {
-      
+
       my $total = $a + $b;
-      
+
       return $total;
     }
   }
-  
+
   # lib/SPVM/MyModule2.spvm
   use MyModule1;
   package MyModule2 {
-    
+
     sub foo ($a : int, $b : int) : int {
-      
+
       my $total = ($a * $b) + MyModule1::sum(2, 4);
-      
+
       return $total;
     }
   }
@@ -304,7 +348,7 @@ B<Perlish syntax> - SPVM syntax is very similar to Perl
 
 B<Perl module> - SPVM function can be called from Perl itself (Not yet implemented).
 
-=back;
+=back
 
 SPVM only work on the Perl which support 64 bit integer.
 
@@ -395,15 +439,15 @@ B<Multiple array type>
 =head2 Type inference
 
 If the type of right value is known, the type of left value is automatically decided.
-    
+
   # Type of $value2 is byte.
   my $value1 : byte;
   my $value2 = $value1;
-  
+
   # Type of $values2 is int[]
   my $values1 = malloc int[3];
   my $values2 = $values1;
-  
+
   # Type of $object2 is PackageName
   my $object1 = malloc PackageName
   my $object2 = $object1;
@@ -427,36 +471,36 @@ Array is created by malloc. Elements values is not initialized.
   my $len = @{$nums};
 
 =head3 Get and set array element
-  
+
   # Get
   my $num = $nums->[0];
-  
+
   # Set
   $nums->[0] = 5;
 
 =head2 Condition branch
 
   if (1) {
-    
+
   }
   elsif (2) {
-    
+
   }
   else {
-    
+
   }
 
 =head2 Loop
 
 =head3 for
-  
+
   my $nums = malloc int[10];
   for (my $i = 0; $i < @$nums; $i++) {
     $nums->[$i] = 0;
   }
 
 =head3 while
-  
+
   my $nums = malloc int[10];
   my $i = 0;
   while ($i < @$nums) {
@@ -468,7 +512,7 @@ Array is created by malloc. Elements values is not initialized.
 =head3 Constant type
 
 Type of constant default integral value is `int`.
-    
+
     # int type
     1;
     3;
@@ -478,15 +522,15 @@ Type of constant default floating-point value is `double`.
     # double
     1.2
     5.3
-    
+
 Type of constant is specified by type specifier.
-    
+
     # long
     3L
-    
+
     # float
     3.2f
-    
+
     # double
     3.2d
 
@@ -495,12 +539,12 @@ Type of constant is specified by type specifier.
 =head3 Package name
 
 Package name is a combination of alphabets, numbers, and `::`. Numbers should not appear as the first character. `_` can't be used in class name.
-    
+
     # OK
     Foo
     Foo::Bar
     Foo1::Bar1
-    
+
     # Not OK
     1Foo
     Foo::2Bar
@@ -514,7 +558,7 @@ Subroutine name is a combination of alphabets, numbers, and `_` separators. Cont
     foo
     foo1
     foo_bar
-    
+
     # Not OK
     1foo
     foo__bar
@@ -527,7 +571,7 @@ Field name is a combination of alphabets, numbers, and `_` separators. Continual
     foo
     foo1
     foo_bar
-    
+
     # Not OK
     1foo
     foo__bar
@@ -545,43 +589,91 @@ Object can't have object and array of object.
 
 If I have idea to implement weaken reference and implement weaken reference, this limitation is removed.
 
-=head2 FUNCTIONS
+=head1 FUNCTIONS
 
-=head2 byte_array
+=head2 new_byte_array
 
-Create byte array object
+Create new_byte array
 
-  my $array_object = SPVM::byte_array([1, 2, 3]);
+  my $array = SPVM::new_byte_array([1, 2, 3]);
 
-=head2 short_array
+If you get perl values, you can use C<get_elements> methods.
 
-Create short array object
+  my $values = $array->get_elements;
 
-  my $array_object = SPVM::short_array([1, 2, 3]);
+=head2 new_short_array
 
-=head2 int_array
+Create short array
 
-Create int array object
+  my $array = SPVM::new_short_array([1, 2, 3]);
 
-  my $array_object = SPVM::int_array([1, 2, 3]);
+If you get perl values, you can use C<get_elements> methods.
 
-=head2 long_array
+  my $values = $array->get_elements;
 
-Create long array object
+=head2 new_int_array
 
-  my $array_object = SPVM::long_array([1, 2, 3]);
+Create int array
 
-=head2 float_array
+  my $array = SPVM::new_int_array([1, 2, 3]);
 
-Create float array object
+If you get perl values, you can use C<get_elements> methods.
 
-  my $array_object = SPVM::float_array([1, 2, 3]);
+  my $values = $array->get_elements;
 
-=head2 double_array
+=head2 new_long_array
 
-Create double array object
+Create long array
 
-  my $array_object = SPVM::double_array([1, 2, 3]);
+  my $array = SPVM::new_long_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+
+=head2 new_float_array
+
+Create float array
+
+  my $array = SPVM::new_float_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+
+=head2 new_double_array
+
+Create double array
+
+  my $array = SPVM::new_double_array([1, 2, 3]);
+
+If you get perl values, you can use C<get_elements> methods.
+
+  my $values = $array->get_elements;
+
+=head2 new_string_raw
+
+Create byte array from B<not decoded> Perl string.
+This function is faster than C<SPVM::string> because copy is not executed.
+
+  my $array = SPVM::new_string_raw("AGTCAGTC");
+
+=head2 new_string
+
+Create byte array from B<decoded> Perl string.
+
+  my $array = SPVM::new_string("Å†Ç¢Å§Ç¶Å®");
+
+=head2 new_object
+
+Create object.
+
+  my $object = SPVM::new_object("Point");
+
+You can set and get value by C<set> and C<get> method.
+
+  $object->set(x => 1);
+  my $x = $object->get('x');
 
 =head2 FAQ
 
@@ -609,23 +701,23 @@ Yuki Kimoto E<lt>kimoto.yuki@gmail.com<gt>
 
 =item *
 
-[akinomyoga](https://github.com/akinomyoga) (Koichi Murase)
+L<akinomyoga|https://github.com/akinomyoga> (Koichi Murase)
 
 =item *
 
-[NAGAYASU Shinya](https://github.com/nagayasu-shinya)
+L<[NAGAYASU Shinya|https://github.com/nagayasu-shinya>
 
 =item *
 
-[Reini Urban](https://github.com/rurban)
+L<Reini Urban|https://github.com/rurban>
 
 =item *
 
-[chromatic](https://github.com/chromatic)
+L<chromatic|https://github.com/chromatic>
 
 =item *
 
-[Kazutake Hiramatsu](https://github.com/kazhiramatsu)
+L<Kazutake Hiramatsu|https://github.com/kazhiramatsu>
 
 =back
 

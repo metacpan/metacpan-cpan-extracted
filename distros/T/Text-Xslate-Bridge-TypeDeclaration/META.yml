@@ -1,10 +1,12 @@
 ---
-abstract: 'A Mouse-based Type Validator in Xslate.'
+abstract: 'A Type Validator in Xslate.'
 author:
   - 'pokutuna <popopopopokutuna@gmail.com>'
 build_requires:
   Data::Section::Simple: '0'
   File::Temp: '0'
+  Mouse::Util::TypeConstraints: '0'
+  MouseX::Types: '0'
   Test::Fatal: '0'
   Test::More: '0.98'
   Test::Name::FromLine: '0'
@@ -30,19 +32,22 @@ no_index:
 provides:
   Text::Xslate::Bridge::TypeDeclaration:
     file: lib/Text/Xslate/Bridge/TypeDeclaration.pm
-    version: '0.01'
+    version: '0.11'
+  Text::Xslate::Bridge::TypeDeclaration::Registry:
+    file: lib/Text/Xslate/Bridge/TypeDeclaration/Registry.pm
 requires:
   Carp: '0'
-  Data::Dumper: '0'
   List::Util: '0'
-  Mouse::Util::TypeConstraints: '0'
+  Scalar::Util: '0'
   Text::Xslate: '0'
   Text::Xslate::Bridge: '0'
+  Type::Tiny: '0'
+  Type::Tiny::XS: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/pokutuna/p5-Text-Xslate-Bridge-TypeDeclaration/issues
   homepage: https://github.com/pokutuna/p5-Text-Xslate-Bridge-TypeDeclaration
   repository: git://github.com/pokutuna/p5-Text-Xslate-Bridge-TypeDeclaration.git
-version: '0.01'
+version: '0.11'
 x_authority: cpan:POKUTUNA
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

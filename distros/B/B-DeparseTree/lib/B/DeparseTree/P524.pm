@@ -1,6 +1,6 @@
-# B::DeparseTree::P522.pm
+# B::DeparseTree::P524.pm
 # Copyright (c) 1998-2000, 2002, 2003, 2004, 2005, 2006 Stephen McCamant.
-# Copyright (c) 2015 Rocky Bernstein
+# Copyright (c) 2015, 2017 Rocky Bernstein
 # All rights reserved.
 # This module is free software; you can redistribute and/or modify
 # it under the same terms as Perl itself.
@@ -12,11 +12,11 @@
 # B::Parse in turn is based on the module of the same name by Malcolm Beattie,
 # but essentially none of his code remains.
 
-use v5.22;
+use v5.24;
 
 use rlib '../..';
 
-package B::DeparseTree::P522;
+package B::DeparseTree::P524;
 use Carp;
 use B qw(class opnumber
     OPf_WANT OPf_WANT_VOID OPf_WANT_SCALAR OPf_WANT_LIST
@@ -78,7 +78,7 @@ BEGIN {
 		PMf_CHARSET PMf_KEEPCOPY PMf_NOCAPTURE CVf_ANONCONST
 		CVf_LOCKED OPpREVERSE_INPLACE OPpSUBSTR_REPL_FIRST
 		PMf_NONDESTRUCT OPpCONST_ARYBASE OPpEVAL_BYTES)) {
-	eval { B->import B($_) };
+	eval { import B $_ };
 	no strict 'refs';
 	*{$_} = sub () {0} unless *{$_}{CODE};
     }
@@ -89,7 +89,7 @@ BEGIN {
 # In order to test modulie, we run this over Perl test suite.
 # Then we run the test on the deparsed code. Slick, eh?
 
-# Here are B::Deparse failure notes:
+# Here are B::DeparseTree failure notes:
 
 # Current test.deparse failures
 # comp/hints 6 - location of BEGIN blocks wrt. block openings
@@ -4359,7 +4359,11 @@ sub pp_qr { matchop(@_, "qr", "") }
 
 sub pp_runcv { unop(@_, "__SUB__"); }
 
-sub pp_split
+sub pp_split {
+    maybe_targmy(@_, \&split, "split");
+}
+
+sub split
 {
     my($self, $op, $cx) = @_;
     my($kid, @exprs, $ary_info, $expr);

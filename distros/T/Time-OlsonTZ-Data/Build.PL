@@ -33,7 +33,6 @@ my $build = Module::Build->new(
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
 	sign => 0,
 );
 $build->add_build_element("tz");

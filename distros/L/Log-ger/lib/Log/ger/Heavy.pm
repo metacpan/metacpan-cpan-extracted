@@ -1,7 +1,7 @@
 package Log::ger::Heavy;
 
-our $DATE = '2017-07-13'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.019'; # VERSION
 
 #IFUNBUILT
 # use strict;
@@ -400,7 +400,7 @@ Log::ger::Heavy - The bulk of the implementation of Log::ger
 
 =head1 VERSION
 
-version 0.016
+version 0.019
 
 =head1 DESCRIPTION
 

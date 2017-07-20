@@ -4,11 +4,8 @@ use strict;
 use warnings;
 use 5.010_000;
 
-our $VERSION = '2.036007';
+our $VERSION = '2.036008';
 use App::Netdisco::Configuration;
-
-use Module::Find ();
-Module::Find::usesub 'App::NetdiscoE::Init';
 
 =head1 NAME
 

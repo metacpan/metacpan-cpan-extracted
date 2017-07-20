@@ -1,7 +1,7 @@
 package JSON::Schema::AsType;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: generates Type::Tiny types out of JSON schemas
-$JSON::Schema::AsType::VERSION = '0.4.2';
+$JSON::Schema::AsType::VERSION = '0.4.3';
 use 5.14.0;
 
 use strict;
@@ -17,7 +17,6 @@ use Type::Utils;
 use LWP::Simple;
 use Clone 'clone';
 use URI;
-use Class::Load qw/ load_class /;
 
 use Moose::Util qw/ apply_all_roles /;
 
@@ -123,13 +122,10 @@ sub fetch {
     $url = $url->canonical;
 
     if ( my $schema = $self->registered_schema($url) ) {
-        return $schema;
+        return $schema if $schema->has_schema;
     }
 
     my $schema = eval { from_json LWP::Simple::get($url) };
-
-    $DB::single = not ref $schema;
-    
 
     die "couldn't get schema from '$url'\n" unless ref $schema eq 'HASH';
 
@@ -354,7 +350,7 @@ JSON::Schema::AsType - generates Type::Tiny types out of JSON schemas
 
 =head1 VERSION
 
-version 0.4.2
+version 0.4.3
 
 =head1 SYNOPSIS
 
@@ -537,7 +533,7 @@ Yanick Champoux <yanick@babyl.dyndns.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

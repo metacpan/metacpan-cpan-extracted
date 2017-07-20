@@ -1,11 +1,45 @@
 package Catalyst::Helper::Model::LDAP;
+# ABSTRACT: Helper for LDAP models
 
 use strict;
 use warnings;
 
+
+sub mk_compclass {
+    my ( $self, $helper, $host, $base, $dn, $password, $start_tls ) = @_;
+
+    $helper->{host}     = $host     || '';
+    $helper->{base}     = $base     || '';
+    $helper->{dn}       = $dn       || '';
+    $helper->{password} = $password || '';
+    $helper->{start_tls} = $start_tls ? 1 : 0;
+
+    $helper->render_file( 'modelclass', $helper->{file} );
+
+    return 1;
+}
+
+
+sub mk_comptest {
+    my ( $self, $helper ) = @_;
+
+    $helper->render_file( 'modeltest', $helper->{test} );
+}
+
+
+1;
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Catalyst::Helper::Model::LDAP - Helper for LDAP models
+
+=head1 VERSION
+
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -64,33 +98,9 @@ connections.
 
 Makes the LDAP model class.
 
-=cut
-
-sub mk_compclass {
-    my ($self, $helper, $host, $base, $dn, $password, $start_tls) = @_;
-
-    $helper->{host}      = $host      || '';
-    $helper->{base}      = $base      || '';
-    $helper->{dn}        = $dn        || '';
-    $helper->{password}  = $password  || '';
-    $helper->{start_tls} = $start_tls ? 1 : 0;
-
-    $helper->render_file('modelclass', $helper->{file});
-
-    return 1;
-}
-
 =head2 mk_comptest
 
 Makes tests for the LDAP model.
-
-=cut
-
-sub mk_comptest {
-    my ($self, $helper) = @_;
-
-    $helper->render_file('modeltest', $helper->{test});
-}
 
 =head1 SEE ALSO
 
@@ -119,9 +129,18 @@ sub mk_comptest {
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=cut
+=head1 AUTHOR
 
-1;
+Gavin Henry <ghenry@surevoip.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gavin Henry.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
 
 __DATA__
 

@@ -12,6 +12,7 @@ use aliased
   'Business::OnlinePayment::Iridium::Action::ThreeDSecureAuthentication';
 use Carp qw/carp croak/;
 
+
 sub FIELD_MAP {
     return (
         'login'                          => 'MerchantID',
@@ -50,6 +51,7 @@ sub FIELD_MAP {
     );
 }
 
+
 sub ACTION_MAP {
     return (
         'normal authorization' => 'SALE',
@@ -60,8 +62,6 @@ sub ACTION_MAP {
 }
 
 extends 'Business::OnlinePayment';
-
-our $VERSION = '0.11';
 
 has 'require_3d' => (
     isa     => 'Bool',
@@ -93,41 +93,9 @@ has 'cross_reference' => (
     required => '0'
 );
 
-=head1 NAME
+# PODNAME: Business::OnlinePayment::Iridium
+# ABSTRACT: PayVector (Iridium) backend for Business::OnlinePayment
 
-Business::OnlinePayment::Iridium - Iridium backend for Business::OnlinePayment
-
-=head1 SYNOPSIS
-
-  use Business::OnlinePayment;
-
-  my $tx = Business::OnlinePayment->new('Iridium');
-  $tx->content(
-     'login'          => 'MerchantID',
-     'password'       => 'Password',
-     'card_number'    => '4976000000003436',
-     'name_on_card'   => 'John Watson',
-     'expiration'     => '12/12',
-     'cv2'            => '242',
-     'invoice_number' => 'TUID',
-     'amount'         => '123.23',
-     'action'         => 'normal authorization'
-  );
-  $tx->submit;
-
-  if ($tx->is_success) {
-    print "Card processed successfully: " . $tx->authorization . "\n";
-  } else {
-    print "Card was rejected: " . $tx->error_message . "\n";
-  }
-
-=head1 DESCRIPTION
-
-Backend that allows you to easily make payments via the Iridium system.
-
-=head1 METHODS
-
-=cut
 
 sub _check_amount_field {
     my %content = shift->content;
@@ -194,21 +162,9 @@ override remap_fields => sub {
     $self->content(%content);
 };
 
-=head2 get_entry_points
-
-NOTE: Not supported yet.
-
-Returns the details of all the gateway entry points.
-
-=cut
 
 sub get_entry_points { confess 'Not supported yet.' }
 
-=head2 get_card_type
-
-This allows the merchant to determine the card type of the card in question.
-
-=cut
 
 sub get_card_type {
     my $self = shift;
@@ -237,9 +193,6 @@ sub get_card_type {
     }
 }
 
-=head2 submit
-
-=cut
 
 sub submit {
     my $self = shift;
@@ -281,9 +234,6 @@ sub submit {
     $self->_submit_callback( $res_result, $res->{'TransactionOutputData'} );
 }
 
-=head2 reference_transaction
-
-=cut
 
 sub reference_transaction {
     my $self = shift;
@@ -312,9 +262,6 @@ sub reference_transaction {
     $self->_submit_callback( $res_result, $res->{'TransactionOutputData'} );
 }
 
-=head2 submit_3d
-
-=cut
 
 sub submit_3d {
     my $self = shift;
@@ -349,6 +296,78 @@ sub submit_3d {
         $self->error_message( $res_result->{'Message'} );
     }
 }
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Business::OnlinePayment::Iridium - PayVector (Iridium) backend for Business::OnlinePayment
+
+=head1 VERSION
+
+version 1.01
+
+=head1 SYNOPSIS
+
+  use Business::OnlinePayment;
+
+  my $tx = Business::OnlinePayment->new('Iridium');
+  $tx->content(
+     'login'          => 'MerchantID',
+     'password'       => 'Password',
+     'card_number'    => '4976000000003436',
+     'name_on_card'   => 'John Watson',
+     'expiration'     => '12/12',
+     'cv2'            => '242',
+     'invoice_number' => 'TUID',
+     'amount'         => '123.23',
+     'action'         => 'normal authorization'
+  );
+  $tx->submit;
+
+  if ($tx->is_success) {
+    print "Card processed successfully: " . $tx->authorization . "\n";
+  } else {
+    print "Card was rejected: " . $tx->error_message . "\n";
+  }
+
+=head1 DESCRIPTION
+
+Backend that allows you to easily make payments via the Iridium system, which has now been
+rebranded to PayVector.
+
+=head2 FIELD_MAP
+
+Map convenient field names to PayVector SOAP string names
+
+=head2 ACTION_MAP
+
+A convenient way to set the transaction type
+
+=head1 METHODS
+
+=head2 get_entry_points
+
+NOTE: Not supported yet.
+
+Returns the details of all the gateway entry points.
+
+=head2 get_card_type
+
+This allows the merchant to determine the card type of the card in question.
+
+=head2 submit
+
+=head2 reference_transaction
+
+=head2 submit_3d
 
 =head2 test_transaction
 
@@ -423,16 +442,24 @@ L<Business::OnlinePayment>
 
   To Simon Elliott, for comments and questioning the design.
 
-=head1 COPYRIGHT 
+=head1 COPYRIGHT
 
 Copyright (C) 2008 wreis: Wallace Reis <reis.wallace@gmail.com>
-Copyright (C) 2010 ghenry: Gavin Henry <ghenry@suretecsystems.com>
-
+Copyright (C) 2017 ghenry: Gavin Henry <ghenry@suretecsystems.com>
 
 =head1 LICENSE
 
   This library is free software under the same license as perl itself.
 
-=cut
+=head1 AUTHOR
 
-1;
+[ 'Gavin Henry <ghenry@surevoip.co.uk>', 'Wallace Reis <reis.wallace@gmail.com>' ]
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by [ 'Gavin Henry', 'Wallace Reis' ].
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

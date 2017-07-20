@@ -15,7 +15,7 @@ use Image::PNG::Const ':all';
 use Scalar::Util 'looks_like_number';
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 require XSLoader;
 XSLoader::load ('Image::Similar', $VERSION);
 
@@ -94,6 +94,25 @@ sub load_image_gd
     return $is;
 }
 
+# Load an image assuming it's from Image::Imlib2.
+
+sub load_image_imlib2
+{
+    my ($imlib2, %options) = @_;
+    my $height = $imlib2->height ();
+    my $width = $imlib2->width ();
+    my $is = Image::Similar->new (height => $height, width => $width);
+    my $image = $is->{image};
+    for my $y (0..$height - 1) {
+	for my $x (0..$width - 1) {
+	    my ($r, $g, $b, $a) = $imlib2->query_pixel ($x, $y);
+	    my $greypixel = round (red * $r + green * $g + blue * $b);
+	    $image->set_pixel ($x, $y, $greypixel);
+	}
+    }
+    return $is;
+}
+
 # Load an image assuming it's from Imager.
 
 sub load_image_imager
@@ -123,27 +142,6 @@ sub load_image_imager
     return $is;
 }
 
-# # C<$libpng_ok> is set to a true value if Image::PNG::Libpng has
-# # already successfully been loaded.
-
-# my $libpng_ok;
-
-# # Load Image::PNG::Libpng.
-
-# sub load_libpng
-# {
-#     if ($libpng_ok) {
-# 	return 1;
-#     }
-#     my $use_ok = eval "use Image::PNG::Libpng;";
-#     if (! $use_ok || $@) {
-# 	carp "Error loading Image::PNG::Libpng: $@";
-# 	return;
-#     }
-#     $libpng_ok = 1;
-#     return 1;
-# }
-
 sub rgb_to_grey
 {
     my ($r, $g, $b) = @_;
@@ -155,7 +153,6 @@ sub rgb_to_grey
 sub load_image_libpng
 {
     my ($image) = @_;
-    #    load_libpng () or return;
     my $ihdr = $image->get_IHDR ();
     my $height = $ihdr->{height};
     my $width = $ihdr->{width};
@@ -177,7 +174,7 @@ sub load_image_libpng
     }
     elsif ($ihdr->{color_type} == PNG_COLOR_TYPE_GRAY_ALPHA) {
 	# GRAY_ALPHA
-	carp 'Discarding alpha channel and ignoring background';
+#	carp 'Discarding alpha channel and ignoring background';
 	for my $y (0..$height-1) {
 	    for my $x (0..$width-1) {
 		my $grey = ord (substr ($rows->[$y], $x * 2, 1));
@@ -195,7 +192,7 @@ sub load_image_libpng
 	    $offset = rgba_bytes;
 	    # We should try to use the alpha channel to blend in a
 	    # background colour here, but we don't.
-	    carp 'Discarding alpha channel and ignoring background';
+#	    carp 'Discarding alpha channel and ignoring background';
 	}
 	for my $y (0..$height-1) {
 	    for my $x (0..$width-1) {
@@ -246,6 +243,9 @@ sub load_image
     }
     elsif ($imtype eq 'GD::Image') {
 	$is = load_image_gd ($image);
+    }
+    elsif ($imtype eq 'Image::Imlib2') {
+	$is = load_image_imlib2 ($image);
     }
     else {
 	carp "Unknown object type $imtype, cannot load this image";

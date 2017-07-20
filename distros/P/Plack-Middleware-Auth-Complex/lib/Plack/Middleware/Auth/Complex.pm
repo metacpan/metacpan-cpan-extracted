@@ -4,15 +4,17 @@ use 5.014000;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003001';
 
 use parent qw/Plack::Middleware/;
 use re '/s';
 
 use Authen::Passphrase;
 use Authen::Passphrase::BlowfishCrypt;
-use Bytes::Random::Secure qw//;
-use Carp qw/croak/;
+use Data::Entropy qw/entropy_source/;
+use Data::Entropy::Source;
+use Data::Entropy::RawSource::Local;
+use Carp qw/carp croak/;
 use DBI;
 use Digest::SHA qw/hmac_sha1_base64 sha256/;
 use Email::Simple;
@@ -20,6 +22,18 @@ use Email::Sender::Simple qw/sendmail/;
 use MIME::Base64 qw/decode_base64/;
 use Plack::Request;
 use Tie::Hash::Expire;
+
+sub make_entropy_source {
+	if (-e '/dev/urandom') {
+		Data::Entropy::Source->new(
+			Data::Entropy::RawSource::Local->new('/dev/urandom'),
+			'sysread'
+		)
+	} else {
+		carp "/dev/urandom not found, using insecure random source\n";
+		entropy_source
+	}
+}
 
 sub default_opts {(
 	dbi_connect       => ['dbi:Pg:', '', ''],
@@ -43,6 +57,18 @@ sub new {
 	my ($class, $opts) = @_;
 	my %self = $class->default_opts;
 	%self = (%self, %$opts);
+	$self{entropy_source} //= make_entropy_source;
+	# If the user did not set [use_scrypt], we set it to 1 if scrypt
+	# is available and to 0 otherwise.
+	# If the user set [use_scrypt] to 1, we try to load scrypt and
+	# croak if we fail to do so.
+	unless (exists $self{use_scrypt}) {
+		my $success = eval 'use Authen::Passphrase::Scrypt';
+		$self{use_scrypt} = !!$success
+	}
+	if ($self{use_scrypt}) {
+		eval 'use Authen::Passphrase::Scrypt; 1' or croak "Failed to load Authen::Passphrase::Scrypt: $@\n";
+	}
 	my $self = bless \%self, $class;
 	$self
 }
@@ -79,18 +105,31 @@ sub check_passphrase {
 	return $self->{cache}{$cachekey} if exists $self->{cache}{$cachekey}; # uncoverable branch true
 	my $user = $self->get_user($username);
 	return 0 unless $user;
-	my $ret = Authen::Passphrase->from_rfc2307($user->{passphrase})->match($passphrase);
+	my $ret;
+	if ($user->{passphrase} =~ /^{SCRYPT}/) {
+		croak "$username has a scrypt password but use_scrypt is false\n" unless $self->{use_scrypt};
+		$ret = Authen::Passphrase::Scrypt->from_rfc2307($user->{passphrase})
+	} else {
+		$ret = Authen::Passphrase->from_rfc2307($user->{passphrase});
+	}
+	$ret = $ret->match($passphrase);
 	$self->{cache}{$cachekey} = $ret if $ret || $self->{cache_fail};
 	$ret
 }
 
 sub hash_passphrase {
 	my ($self, $passphrase) = @_;
-	Authen::Passphrase::BlowfishCrypt->new(
-		cost => 10,
-		passphrase => $passphrase,
-		salt_random => 1,
-	)->as_rfc2307
+	if ($self->{use_scrypt}) {
+		Authen::Passphrase::Scrypt->new({
+			passphrase => $passphrase,
+		})->as_rfc2307
+	} else {
+		Authen::Passphrase::BlowfishCrypt->new(
+			cost => 10,
+			passphrase => $passphrase,
+			salt_random => 1,
+		)->as_rfc2307
+	}
 }
 
 sub set_passphrase {
@@ -100,7 +139,7 @@ sub set_passphrase {
 
 sub make_reset_hmac {
 	my ($self, $username, @data) = @_;
-	$self->{hmackey} //= Bytes::Random::Secure->new(NonBlocking => 1)->bytes(512); # uncoverable condition false
+	$self->{hmackey} //= $self->{entropy_source}->get_bits(8 * 512); # uncoverable condition false
 	my $user = $self->get_user($username);
 	my $message = join ' ', $username, $user->{passphrase}, @data;
 	hmac_sha1_base64 $message, $self->{hmackey};
@@ -332,6 +371,30 @@ This URL performs a password reset.
 Arrayref of arguments to pass to DBI->connect. Defaults to
 C<['dbi:Pg', '', '']>.
 
+=item entropy_source
+
+C<Data::Entropy::Source> object to get random numbers from. By default
+uses F</dev/urandom> via C<Data::Entropy::RawSource::Local> if
+possible, or the default entropy source otherwise. A warning is
+printed if the default entropy source is used, to supress it set this
+argument to the default entropy source.
+
+=item use_scrypt
+
+Boolean determining whether to use the scrypt algorithm via the
+C<Authen::Passphrase::Scrypt> module.
+
+If true, the default implementation of C<hash_passphrase> uses scrypt
+and C<check_passphrase> accepts scrypt passphrases (in addition to
+passphrases supported by C<Authen::Passphrase>).
+
+If false, the default implementation of C<hash_passphrase> uses bcrypt
+and C<check_passphrase> only accepts passphrases supported by
+C<Authen::Passphrase>.
+
+The default value is true if C<Authen::Passphrase::Scrypt> is
+installed, false otherwise.
+
 =item post_connect_cb
 
 Callback (coderef) that is called just after connecting to the
@@ -449,13 +512,20 @@ address).
 =item B<check_passphrase>(I<$username>, I<$passphrase>)
 
 Returns true if the given plaintext passphrase matches the one
-obtained from database. Default implementation uses L<Authen::Passphrase>.
+obtained from database. Default implementation uses
+L<Authen::Passphrase> (and L<Authen::Passphrase::Scrypt> if
+C<use_scrypt> is true).
 
 =item B<hash_passphrase>(I<$passphrase>)
 
-Returns a RFC2307-formatted hash of the passphrase. Default
-implementation uses L<Authen::Passphrase::BlowfishCrypt> with a cost
-of 10 and a random salt.
+Returns a RFC2307-formatted hash of the passphrase.
+
+If C<use_scrypt> is true, default implementation uses
+L<Authen::Passphrase::Scrypt> with default parameters.
+
+If C<use_scrypt> is false, default implementation uses
+L<Authen::Passphrase::BlowfishCrypt> with a cost of 10 and a random
+salt.
 
 =item B<set_passphrase>(I<$username>, I<$passphrase>)
 

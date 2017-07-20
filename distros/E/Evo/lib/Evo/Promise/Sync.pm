@@ -41,7 +41,7 @@ Evo::Promise::Sync
 
 =head1 VERSION
 
-version 0.0403
+version 0.0405
 
 =head2 SYNOPSIS
 This class exists for internal purposes only to make C<d_resolve> a little bit

@@ -1,3 +1,11 @@
+Version 0.03 - 2017-07-16
+ - Most GLX_ constants are exportable now
+ - GLXFBConfig (and related functions) support
+ - Tighter integration with X11::Xlib, giving all objects ->display attr
+ - More test cases with better feature-detection of server
+ - ::DWIM module now uses FBConfig setup by default, when available
+ - More "DWIM" in ::DWIM module
+
 Version 0.02 - 2017-04-07
  - Corrrected "configure requires" prereqs in META & Makefile.PL
 

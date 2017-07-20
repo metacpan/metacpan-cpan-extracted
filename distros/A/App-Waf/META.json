@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Waf",
    "no_index" : {
@@ -45,5 +45,5 @@
          "web" : "http://ijz.me"
       }
    },
-   "version" : "0.06"
+   "version" : "0.07"
 }

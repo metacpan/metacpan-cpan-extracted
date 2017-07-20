@@ -7,7 +7,7 @@ use Carp;
 use GraphViz::Graph;
 #_}
 #_{ Version
-our $VERSION = $GraphViz::Graph::Version;
+our $VERSION = $GraphViz::Graph::VERSION;
 #_}
 #_{ Methods
 #_{ POD
@@ -45,7 +45,7 @@ sub arrow_end { #_{
     $edge_two->arrow_end('none');
 
 Sets the shape of the edge's end. L<Possible values|http://www.graphviz.org/doc/info/attrs.html#k:arrowType>.
-Technically, it sets the C<arrowhead|http://www.graphviz.org/doc/info/attrs.html#a:arrowhead> attribute. But because C<head> is
+Technically, it sets the L<arrowhead|http://www.graphviz.org/doc/info/attrs.html#a:arrowhead> attribute. But because C<head> is
 confusing, the method is named C<arrow_end>.
 
 TODO: L<Even more arrow shapes|http://www.graphviz.org/doc/info/arrows.html>

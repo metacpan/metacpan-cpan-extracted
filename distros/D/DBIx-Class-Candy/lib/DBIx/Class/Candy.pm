@@ -1,5 +1,5 @@
 package DBIx::Class::Candy;
-$DBIx::Class::Candy::VERSION = '0.005002';
+$DBIx::Class::Candy::VERSION = '0.005003';
 use strict;
 use warnings;
 
@@ -54,19 +54,29 @@ sub _extract_part {
    }
 }
 
+my $decamelize = sub {
+   my $s = shift;
+   $s =~ s{([^a-zA-Z]?)([A-Z]*)([A-Z])([a-z]?)}{
+      my $fc = pos($s)==0;
+      my ($p0,$p1,$p2,$p3) = ($1,lc$2,lc$3,$4);
+      my $t = $p0 || $fc ? $p0 : '_';
+      $t .= $p3 ? $p1 ? "${p1}_$p2$p3" : "$p2$p3" : "$p1$p2";
+      $t;
+   }ge;
+   $s;
+};
+
 sub gen_table {
    my ( $self, $class, $version ) = @_;
    if ($version eq 'singular') {
       my $part = $self->_extract_part($class);
-      require String::CamelCase;
       $part =~ s/:://g;
-      return String::CamelCase::decamelize($part);
+      return $decamelize->($part);
    } elsif ($version == 1) {
       my $part = $self->_extract_part($class);
       require Lingua::EN::Inflect;
-      require String::CamelCase;
       $part =~ s/:://g;
-      $part = String::CamelCase::decamelize($part);
+      $part = $decamelize->($part);
       return join q{_}, split /\s+/, Lingua::EN::Inflect::PL(join q{ }, split /_/, $part);
    }
 }
@@ -588,7 +598,7 @@ Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Arthur Axel "fREW" Schmidt.
+This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

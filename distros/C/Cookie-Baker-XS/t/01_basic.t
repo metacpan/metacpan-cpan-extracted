@@ -27,6 +27,10 @@ my @tests = (
     [ 'BADSTART="data;', { BADSTART => '"data' }],
     [ 'BADEND=data";', { BADEND => 'data"' }],
 
+     # disallow "," as a delimiter
+    [ 'Foo=Bar; Bar=Baz,  XXX=Foo%20Bar   ; YYY=; ', { Foo => 'Bar', Bar => 'Baz,  XXX=Foo Bar',YYY=>"" }],
+
+
     [ '', {} ],
     [ undef, {} ],
 );

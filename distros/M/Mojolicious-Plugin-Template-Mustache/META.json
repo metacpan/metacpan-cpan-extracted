@@ -43,14 +43,14 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "0",
-            "Template::Mustache" : "0"
+            "Template::Mustache" : "v1.0.2"
          }
       }
    },
    "provides" : {
       "Mojolicious::Plugin::Template::Mustache" : {
          "file" : "lib/Mojolicious/Plugin/Template/Mustache.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -64,10 +64,10 @@
          "web" : "https://github.com/cynovg/Mojolicious-Plugin-Template-Mustache"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_authority" : "cpan:CYNOVG",
    "x_contributors" : [
-      "Novgorodcev Cyrill <cynovg@gmail.com>",
+      "Cyrill Novgorodcev <cynovg@gmail.com>",
       "Kirill Novgorodcev <novgorodtsev.kirill@220-volt.ru>"
    ]
 }

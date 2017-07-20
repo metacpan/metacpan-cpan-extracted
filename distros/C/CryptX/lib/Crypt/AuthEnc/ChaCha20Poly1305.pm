@@ -2,7 +2,7 @@ package Crypt::AuthEnc::ChaCha20Poly1305;
 
 use strict;
 use warnings;
-our $VERSION = '0.048';
+our $VERSION = '0.050';
 
 use base qw(Crypt::AuthEnc Exporter);
 our %EXPORT_TAGS = ( all => [qw( chacha20poly1305_encrypt_authenticate chacha20poly1305_decrypt_verify )] );
@@ -54,8 +54,8 @@ Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20Poly1305 
 
  # encrypt and authenticate
  my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
- $ae->aad_add('additional_authenticated_data1');
- $ae->aad_add('additional_authenticated_data2');
+ $ae->adata_add('additional_authenticated_data1');
+ $ae->adata_add('additional_authenticated_data2');
  $ct = $ae->encrypt_add('data1');
  $ct = $ae->encrypt_add('data2');
  $ct = $ae->encrypt_add('data3');
@@ -63,8 +63,8 @@ Crypt::AuthEnc::ChaCha20Poly1305 - Authenticated encryption in ChaCha20Poly1305 
 
  # decrypt and verify
  my $ae = Crypt::AuthEnc::ChaCha20Poly1305->new($key, $iv);
- $ae->aad_add('additional_authenticated_data1');
- $ae->aad_add('additional_authenticated_data2');
+ $ae->adata_add('additional_authenticated_data1');
+ $ae->adata_add('additional_authenticated_data2');
  $pt = $ae->decrypt_add('ciphertext1');
  $pt = $ae->decrypt_add('ciphertext2');
  $pt = $ae->decrypt_add('ciphertext3');
@@ -117,11 +117,12 @@ You can export selected functions:
  # $key ..... encryption key of proper length (128 or 256 bits / 16 or 32 bytes)
  # $iv ...... initialization vector (64 or 96 bits / 8 or 12 bytes)
 
-=head2 aad_add
+=head2 adata_add
 
+Add B<additional authenticated data>.
 Can be called before the first C<encrypt_add> or C<decrypt_add>;
 
- $ae->aad_add($aad_data);                       #can be called multiple times
+ $ae->adata_add($aad_data);                       #can be called multiple times
 
 =head2 encrypt_add
 

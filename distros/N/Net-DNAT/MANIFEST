@@ -12,3 +12,4 @@ demo/suexec_mod_perl.pl
 demo/load_balancer.pl
 t/100_load_Net.t
 t/110_load_Apache.t
+META.yml                                 Module meta-data (added by MakeMaker)

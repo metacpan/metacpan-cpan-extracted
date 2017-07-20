@@ -3,7 +3,7 @@ package PDF::Builder::Util;
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-# VERSION
+our $VERSION = '3.005'; # VERSION
 my $LAST_UPDATE = '3.003'; # manually update whenever code is changed
 
 BEGIN {

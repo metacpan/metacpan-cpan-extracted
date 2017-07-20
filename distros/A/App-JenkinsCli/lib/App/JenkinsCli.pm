@@ -17,7 +17,7 @@ use File::ShareDir qw/dist_dir/;
 use Path::Tiny;
 use DateTime;
 
-our $VERSION = "0.008";
+our $VERSION = "0.009";
 
 has [qw/base_url api_key api_pass test/] => (
     is => 'rw',
@@ -364,21 +364,24 @@ sub _ls_job {
                         }
                     }
                 );
-                my $duration = $details->{lastBuild}{duration} / 1_000;
-                if ( $duration > 2 * 60 * 60 ) {
-                    $duration = int($duration / 60 / 60) . ' hrs';
-                }
-                elsif ( $duration >= 60 * 60 ) {
-                    $duration = '1 hr ' . (int( ($duration - 60 * 60) / 60 )) . ' min';
-                }
-                elsif ( $duration > 2 * 60 ) {
-                    $duration = int($duration / 60 ) . ' min';
-                }
-                elsif ( $duration >= 60 ) {
-                    $duration = '1 min ' . ($duration - 60) . ' sec';
-                }
-                else {
-                    $duration .= ' sec';
+                my $duration = 'Never run';
+                if ( $details->{lastBuild}{duration} ) {
+                    $duration = $details->{lastBuild}{duration} / 1_000;
+                    if ( $duration > 2 * 60 * 60 ) {
+                        $duration = int($duration / 60 / 60) . ' hrs';
+                    }
+                    elsif ( $duration >= 60 * 60 ) {
+                        $duration = '1 hr ' . (int( ($duration - 60 * 60) / 60 )) . ' min';
+                    }
+                    elsif ( $duration > 2 * 60 ) {
+                        $duration = int($duration / 60 ) . ' min';
+                    }
+                    elsif ( $duration >= 60 ) {
+                        $duration = '1 min ' . ($duration - 60) . ' sec';
+                    }
+                    else {
+                        $duration .= ' sec';
+                    }
                 }
 
                 $extra_post .= DateTime->from_epoch( epoch => ( $details->{lastBuild}{timestamp} || 0 ) / 1000 );
@@ -429,7 +432,7 @@ App::JenkinsCli - Command line tool for interacting with Jenkins
 
 =head1 VERSION
 
-This documentation refers to App::JenkinsCli version 0.008
+This documentation refers to App::JenkinsCli version 0.009
 
 =head1 SYNOPSIS
 

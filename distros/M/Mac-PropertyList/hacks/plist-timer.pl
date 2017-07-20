@@ -1,5 +1,3 @@
-# $Id$
-
 use Mac::PropertyList;
 use Time::HiRes;
 

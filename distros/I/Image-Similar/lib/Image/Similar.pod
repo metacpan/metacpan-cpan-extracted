@@ -1,4 +1,5 @@
 
+
 =encoding UTF-8
 
 =head1 NAME
@@ -10,24 +11,27 @@ Image::Similar - find out how similar two images are
     
     use Image::Similar 'load_image';
     use Imager;
+    use FindBin '$Bin';
     my $x = Imager->new ();
     # Get image data from file
-    $x->read (file => 'x.png');
+    $x->read (file => "$Bin/x.png");
     # Load image into Image::Similar
     my $xi = load_image ($x);
     my $y = Imager->new ();
     # Get image data from file
-    $y->read (file => 'y.jpg');
+    $y->read (file => "$Bin/y.jpg");
     # Load image into Image::Similar
     my $yi = load_image ($y);
     print "The difference is ", $xi->diff ($yi), ".\n";
-    
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-Similar-0.07/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.05 of Image::Similar corresponding to git
-commit 337e72f29409dc8ae2fbed3b64c8ee008b0b3203 released on Tue Aug 23 09:56:53 2016 +0900.
+This documents Image::Similar version 0.07
+corresponding to git commit L<b26adc57d72672372aa48cd62a27696160b74ba1|https://github.com/benkasminbullock/image-similar/commit/b26adc57d72672372aa48cd62a27696160b74ba1> released on Sat Jul 15 15:57:13 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -36,29 +40,37 @@ simplified form of the algorithm described in L</An image signature
 for any kind of image> to calculate image signatures and distances
 between images.
 
+The algorithm consists of converting the image into greyscale,
+chopping it into a grid, and then computing a signature based on
+relative lightness and darkness of the blocks of the grid.
+
 The module does not contain its own image-reading facility, so images
 must be loaded to the module via one of the following supported Perl
 modules:
 
 =over
 
+=item L<Imager> (recommended)
+
+All image types are supported. If you have no preference, I suggest
+using Imager, since it is a very well-behaved module. The conversion
+to greyscale is done using Imager's own routines.
+
 =item L<GD>
 
 All image types are supported. RGB images are combined to greyscale
 using constants taken from the source code of L<Imager>.
 
-=item L<Imager>
+=item L<Image::Imlib2>
 
-All image types are supported. Unless you only need to compare PNG
-images, and if you have no prior preference, we suggest using Imager
-since it is a very well-behaved module. The conversion to greyscale is
-done using Imager's own routines.
+All image types are supported. RGB images are combined to greyscale
+using constants taken from the source code of L<Imager>.
 
 =item L<Image::PNG::Libpng>
 
-This is used for some internals of Image::Similar related to testing
-thus it was installed when you installed Image::Similar. However,
-Image::PNG::Libpng is only for PNG images.
+This module is used for some internals of Image::Similar related to
+testing, thus it was installed when you installed
+Image::Similar. However, Image::PNG::Libpng is only for PNG images.
 
 Image::Similar supports all PNG image types. It currently only
 supports bit depths of eight.
@@ -75,6 +87,9 @@ Use L</load_image> to load the image.
 =head1 FUNCTIONS
 
 =head2 load_image
+
+This loads image data from various modules into an Image::Similar
+object. The return value is the Image::Similar object.
 
 Using L<Imager>:
 
@@ -97,6 +112,24 @@ Using L<Image::PNG::Libpng>:
 
 The return value is an Image::Similar object.
 
+Using L<GD>:
+
+    
+    use Image::Similar 'load_image';
+    use GD;
+    my $gd = GD::Image->newFromPng ("t/images/chess/chess-100.png");
+    my $is = load_image ($gd);
+
+
+Using L<Image::Imlib2>:
+
+    
+    use Image::Similar 'load_image';
+    use Image::Imlib2;
+    my $imlib2 = Image::Imlib2->load ("t/images/chess/chess-100.png");
+    my $is = load_image ($imlib2);
+
+
 =head1 METHODS
 
 =head2 new
@@ -116,15 +149,38 @@ which you need to use the L</set_pixel> method on to set the pixels.
 This returns a floating-point number which is the difference between
 images C<$is1> and C<$is2>. This is meant to be approximately the same
 value as given by L<Image::Libpuzzle/vector_euclidean_length()>, but
-no validation has been carried out yet.
+no validation has been carried out. Both C<$is1> and C<$is2> are
+Image::Similar objects created using L</load_image>.
 
 =head2 signature
 
     my $sig = $is->signature ();
 
-Get the signature of the image. This is currently a text string
-consisting of digits 0-4 which identifies the image. This is liable to
-change with future versions of the module.
+Get the signature of the image. This is a text string
+consisting of digits 0-4 which identifies the image. The following example demonstrates getting the signature of two similar images.
+
+    
+    use FindBin '$Bin';
+    use Image::Similar 'load_image';
+    use Imager;
+    for my $n (100, 1000) {
+        my $image = "$Bin/../t/images/lenagercke/lena-$n.png";
+        my $imager = Imager->new ();
+        $imager->read (file => $image);
+        my $is = load_image ($imager);
+        print $is->signature (), "\n";
+    }
+    
+
+
+(This example is included as L<F<show-hash.pl>|https://fastapi.metacpan.org/source/BKB/Image-Similar-0.07/examples/show-hash.pl> in the distribution.)
+
+
+Its output looks like this:
+
+    1333333311333333331333312311231111311311312233112213311123331311213111112111111323111133233213332131131111212223112213313323333313211133332323333222233133223313132131331211312223112212313323331311213131112111111123111133233333132131331111222323112111213323333313211312332331333121132133233314132130331211132311112111133123133113233333212111311123131134234334032030231312232312312131131121111133233311112111113123123134234314022030221211232311232131111121111133231333322333333121133134234323032020112221132333212312213123311211112313423313213331
+    1333333311333333331333211311331111311311312233112223321122332311213121112111112323111133233323332131131111212222112212312323333313211223332333333121133133232313132231231211322223212212313223231311223131112112111123111133233333132131331111222323112111213323333112211311332331323121132133233313132130331211132311112111133123133133233333312111312123131134234334132030231312232312312131131121111133233311112111113123113134234314022030221211232311232131111121111133231323332333333121133134234323032020112221132333212312213123311211112313423313213331
+
 
 =head2 sig_diff
 
@@ -158,14 +214,19 @@ PNG file.
 =head2 load_image_gd
 
     
-    use Image::Similar;
+    use Image::Similar 'load_image';
     use GD;
     my $gd = GD::Image->newFromPng ("t/images/chess/chess-100.png");
-    my $is = Image::Similar::load_image_gd ($gd);
+    my $is = load_image ($gd);
 
 
 This is the internal routine used by L</load_image> to load L<GD>
 images.
+
+=head2 load_image_imlib2
+
+This is the internal routine used by L</load_image> to load
+L<Image::Imlib2> images.
 
 =head2 load_image_imager
 
@@ -193,7 +254,7 @@ internal version.
 This loads an image from the return value of
 L<Image::PNG::Libpng/read_png_file>.
 
-=head2 INTERNAL Image::Similar::Image METHODS
+=head2 Image::Similar::Image methods
 
 These methods work on the XS object within an Image::Similar, which is
 called Image::Similar::Image.
@@ -202,10 +263,11 @@ called Image::Similar::Image.
 
     fill_grid ($img);
 
-Calculate the image's signature and store it within C<$img>. This
-method is called automatically by L</load_image>, and it does not need
-to be called by L</load_signature>, which overrides it with values
-from the signature, so it should only be used when calling L</new>,
+Calculate the image's signature and store it within C<$img>. All the
+pixel values should have been set with L</set_pixel> before calling
+this. This method is called automatically by
+L</load_image>. L</load_signature> overrides it with values from the
+signature, so this method should only be used when calling L</new>,
 filling the pixels by the user, and then making the signature "by
 hand" rather than via L</load_image>.
 
@@ -213,14 +275,19 @@ hand" rather than via L</load_image>.
 
     my $diff = image_diff ($img1, $img2);
 
-Compute the value for L</diff>.
+This computes the value of L</diff> from the signatures within
+C<$img1> and C<$img2>.
 
 =head3 set_pixel
 
     $img->set_pixel ($x, $y, $grey);
 
-C<$x> and C<$y> need to be integers, and C<$grey> needs to be an
-integer within 0-255.
+Set a greyscale pixel within the image.  C<$x> and C<$y> need to be
+integers, and C<$grey> needs to be an integer between 0-255. Typically
+one would first set the width and height of the image with L</new>,
+then get the Image::Similar::Image object from the Image::Similar
+object, then set its pixels with this method, then compute its
+signature with L</fill_grid>.
 
 =head3 get_rows
 
@@ -232,6 +299,9 @@ containing strings of bytes, one byte per pixel.
 =head3 signature
 
     my $sig = $image->signature ();
+
+Return the signature value which is set either by L</fill_grid> or
+directly by L</fill_from_sig>.
 
 =head3 valid_image
 
@@ -249,6 +319,121 @@ an actual image.
     my $image = Image::Similar::Image::fill_from_sig ($sig);
 
 Fill C<$image> using signature data.
+
+=head1 EXAMPLES
+
+=head2 Search many files for duplicate images
+
+This script makes a list of all files which may be images:
+
+    
+    
+    # Construct a list of all images on the accessible file systems.
+    
+    use File::Find;
+    use FindBin '$Bin';
+    
+    # The list of files under construction.
+    
+    my @files;
+    main ();
+    exit;
+    
+    # This returns a true value if its argument is an image file.
+    
+    sub is_image_file
+    {
+        my ($file) = @_;
+        if ($file =~ /\.(jpg|png|gif|jpeg)$/i) {
+            return 1;
+        }
+        return undef;
+    }
+    
+    sub check_file
+    {
+        if (is_image_file ($File::Find::name)) {
+            push @files, $File::Find::name;
+        }
+    }
+    
+    sub write_files
+    {
+        open my $out, ">", "$Bin/image-list.txt" or die $!;
+        for (@files) {
+            print $out "$_\n";
+        }
+        close $out or die $!;
+    }
+    
+    sub main
+    {
+        find ({
+            wanted => \& check_file,
+        }, "$Bin/..");
+        write_files ();
+    }
+
+
+(This example is included as L<F<find-all-images.pl>|https://fastapi.metacpan.org/source/BKB/Image-Similar-0.07/examples/find-all-images.pl> in the distribution.)
+
+
+This script then gets all the signatures of the images and compares
+them looking for similar images.
+
+    
+    
+    # Make signatures for all the images.
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Image::Similar ':all';
+    use Imager;
+    
+    main ();
+    
+    sub main
+    {
+        my %sigs;
+        open my $in, "<", "$Bin/image-list.txt" or die $!;
+        while (<$in>) {
+            chomp;
+            if (/^\s*$/) {
+                next;
+            }
+            my $image = $_; 
+            my $imager = Imager->new ();
+            my $ok = $imager->read (file => $image); 
+            if (! $ok) {
+                warn "$image is not ok: ", $imager->errstr ();
+                next;
+            }
+            my $is = load_image ($imager);
+            my $sig = $is->signature ();
+            if (! $sig) {
+                die "No signature for $image";
+            }
+            if ($sigs{$sig}) {
+                # Identical match.
+                print "$sigs{$sig} looks identical to $image.\n";
+            }
+            else {
+                for my $k (keys %sigs) {
+                    my $diff = $is->sig_diff ($k);
+                    if ($diff < 0.1) {
+                        print "$sigs{$k} looks similar to $image.\n";
+                    }
+                }
+                # Don't overwrite $sigs{$sig} if it already has a value.
+                $sigs{$sig} = $image;
+            }
+        }
+        close $in or die $!;
+    }
+
+
+(This example is included as L<F<make-signatures.pl>|https://fastapi.metacpan.org/source/BKB/Image-Similar-0.07/examples/make-signatures.pl> in the distribution.)
+
 
 =head1 KNOWN PROBLEMS
 
@@ -308,23 +493,54 @@ September 2002.
 
 =back
 
+=head2 Other
+
+=over
+
+=item L<Finding Similar Images|http://www.linux-mag.com/id/1437/>
+
+An article from Randal Schwartz from 2003. Contains Perl source code
+for finding similar images. 
+
+=item L<Questions about image similarity at Stackoverflow|https://stackoverflow.com/questions/tagged/similarity+image>
+
+Contains information about more libraries.
+
+=item L<findimagedupes|http://www.jhnc.org/findimagedupes/>
+
+A Perl script for finding duplicate and similar images by Rob Kudla /
+Jonathan H N Chin.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Image::PNG::Libpng>
+
+This is the fallback image loading module used if no other option is
+installed.
+
+=item L<Scalar::Util/looks_like_number>
+
+This is used to validate the parameters of L</new>.
+
+=item L<Carp/carp>
+
+This is used to warn the user about input values.
+
+=back
+
 
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2016
+2016-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

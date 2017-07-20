@@ -90,10 +90,15 @@ coro_init (void)
   coro_transfer (new_coro, create_coro);
 
 #if __GCC_HAVE_DWARF2_CFI_ASM && __amd64
-  asm (".cfi_undefined rip");
+  /*asm (".cfi_startproc");*/
+  /*asm (".cfi_undefined rip");*/
 #endif
 
   func ((void *)arg);
+
+#if __GCC_HAVE_DWARF2_CFI_ASM && __amd64
+  /*asm (".cfi_endproc");*/
+#endif
 
   /* the new coro returned. bad. just abort() for now */
   abort ();
@@ -120,7 +125,7 @@ trampoline (int sig)
   #if __arm__ && \
       (defined __ARM_ARCH_7__  || defined __ARM_ARCH_7A__ \
     || defined __ARM_ARCH_7R__ || defined __ARM_ARCH_7M__ \
-    || __ARCH_ARCH == 7)
+    || __ARM_ARCH == 7)
     #define CORO_ARM 1
   #endif
 

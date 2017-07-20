@@ -1,4 +1,4 @@
-use Test2::Bundle::Extended;
+use Test2::V0 -no_srand => 1;
 BEGIN { $ENV{MOJO_MODE}='testing'; };
 use Test::Clustericious::Blocking;
 use Mojolicious::Lite;

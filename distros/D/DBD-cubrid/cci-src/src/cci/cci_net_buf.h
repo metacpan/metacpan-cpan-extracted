@@ -38,6 +38,8 @@
 
 #ident "$Id$"
 
+#include <string.h>
+
 #ifdef CAS
 #error include error
 #endif
@@ -56,7 +58,7 @@
 
 #if (defined(SOLARIS) && !defined(SOLARIS_X86)) || defined(HPUX) || defined(AIX)
 #define BYTE_ORDER_BIG_ENDIAN
-#elif defined(WINDOWS) || defined(LINUX) || defined(SOLARIS_X86)|| defined(MAC_OS)
+#elif defined(WINDOWS) || defined(LINUX) || defined(SOLARIS_X86)
 #ifdef BYTE_ORDER_BIG_ENDIAN
 #error BYTE_ORDER_BIG_ENDIAN defined
 #endif
@@ -90,11 +92,13 @@
 #define NET_SIZE_TIMESTAMP	(NET_SIZE_SHORT * 6)
 #define NET_SIZE_DATETIME       (NET_SIZE_SHORT * 7)
 
+#define NET_SIZE_TZ(val)	(strlen (((T_CCI_DATE_TZ *)(val))->tz))
 /*
  *  change function names to avoid naming conflict with cas server.
   */
 #define net_buf_init		cnet_buf_init
 #define net_buf_clear		cnet_buf_clear
+#define net_buf_cp_byte		cnet_buf_cp_byte
 #define net_buf_cp_str		cnet_buf_cp_str
 #define net_buf_cp_int		cnet_buf_cp_int
 #define net_buf_cp_bigint       cnet_buf_cp_bigint
@@ -128,6 +132,7 @@ extern void cnet_buf_clear (T_NET_BUF *);
 extern int cnet_buf_cp_str (T_NET_BUF *, const char *, int);
 extern int cnet_buf_cp_int (T_NET_BUF *, int);
 extern int cnet_buf_cp_bigint (T_NET_BUF *, INT64);
+extern int cnet_buf_cp_byte (T_NET_BUF *, char);
 extern int cnet_buf_cp_float (T_NET_BUF *, float);
 extern int cnet_buf_cp_double (T_NET_BUF *, double);
 extern int cnet_buf_cp_short (T_NET_BUF *, short);

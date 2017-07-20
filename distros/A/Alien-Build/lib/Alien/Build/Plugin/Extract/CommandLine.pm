@@ -7,45 +7,45 @@ use Path::Tiny ();
 use File::Which ();
 
 # ABSTRACT: Plugin to extract an archive using command line tools
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
 has '+format' => 'tar';
 
 
 has gzip_cmd => sub {
-  File::Which::which('gzip') ? 'gzip' : undef;
+  _which('gzip') ? 'gzip' : undef;
 };
 
 
-# TODO: use Alien::Libbz2 if available
+sub _which { File::Which::which(@_) }
+
 has bzip2_cmd => sub {
-  File::Which::which('bzip2') ? 'bzip2' : undef;
+  _which('bzip2') ? 'bzip2' : undef;
 };
 
 
-# TODO: use Alien::xz if available
 has xz_cmd => sub {
-  File::Which::which('xz') ? 'xz' : undef;
+  _which('xz') ? 'xz' : undef;
 };
 
 
 has tar_cmd => sub {
-  File::Which::which('bsdtar')
+  _which('bsdtar')
     ? 'bsdtar'
     # TODO: GNU tar can be iffy on windows, where absolute
     # paths get confused with remote tars.  *sigh* fix later
     # if we can, for now just assume that 'tar.exe' is borked
     # on windows to be on the safe side.  The Fetch::ArchiveTar
     # is probably a better plugin to use on windows anyway.
-    : File::Which::which('tar') && $^O ne 'MSWin32'
+    : _which('tar') && $^O ne 'MSWin32'
       ? 'tar'
       : undef;
 };
 
 
 has unzip_cmd => sub {
-  File::Which::which('unzip') ? 'unzip' : undef;
+  _which('unzip') ? 'unzip' : undef;
 };
 
 sub _run
@@ -80,10 +80,22 @@ sub _dcon
 
   my $name;
   my $cmd;
-  
-  $cmd = $self->gzip_cmd if $src =~ /\.(gz|tgz|Z|taz)$/;
-  $cmd = $self->bzip2_cmd if $src =~ /\.(bz2|tbz)$/;
-  $cmd = $self->xz_cmd if $src =~ /\.(xz|txz)$/;
+
+  if($src =~ /\.(gz|tgz|Z|taz)$/)
+  {
+    $self->gzip_cmd(_which('gzip')) unless defined $self->gzip_cmd;
+    $cmd = $self->gzip_cmd;
+  }
+  elsif($src =~ /\.(bz2|tbz)$/)
+  {
+    $self->bzip2_cmd(_which('bzip2')) unless defined $self->bzip2_cmd;
+    $cmd = $self->bzip2_cmd;
+  }
+  elsif($src =~ /\.(xz|txz)$/)
+  {
+    $self->xz_cmd(_which('xz')) unless defined $self->xz_cmd;
+    $cmd = $self->xz_cmd;
+  }
   
   if($src =~ /\.(gz|bz2|xz|Z)$/)
   {
@@ -126,6 +138,19 @@ sub handles
 sub init
 {
   my($self, $meta) = @_;
+  
+  if($self->format eq 'tar.xz')
+  {
+    $meta->add_requires('share' => 'Alien::xz' => '0.06');
+  }
+  elsif($self->format eq 'tar.bz2')
+  {
+    $meta->add_requires('share' => 'Alien::Libbz2' => '0.22');
+  }
+  elsif($self->format eq 'tar.gz')
+  {
+    $meta->add_requires('share' => 'Alien::gzip' => '0.03');
+  }
   
   $meta->register_hook(
     extract => sub {
@@ -189,7 +214,7 @@ Alien::Build::Plugin::Extract::CommandLine - Plugin to extract an archive using 
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 

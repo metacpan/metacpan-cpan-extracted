@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Gen;
 
-our $DATE = '2017-07-01'; # DATE
-our $VERSION = '0.46'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.47'; # VERSION
 
 use 5.010001;
 use strict;
@@ -423,9 +423,9 @@ use experimental 'smartmatch'; no warnings ('void'); require List::Util; use exp
         # determine minimum required version
         if ($cmdline_mod =~ /\APerinci::CmdLine::(Lite|Any)\z/) {
             if ($cmdline_mod eq 'Perinci::CmdLine::Lite') {
-                $cmdline_mod_ver = "1.75";
+                $cmdline_mod_ver = "1.76";
             } else {
-                $extra_modules->{"Perinci::CmdLine::Base"} = "1.75";
+                $extra_modules->{"Perinci::CmdLine::Base"} = "1.76";
             }
         }
 
@@ -556,7 +556,7 @@ Perinci::CmdLine::Gen - Generate Perinci::CmdLine CLI script
 
 =head1 VERSION
 
-This document describes version 0.46 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2017-07-01.
+This document describes version 0.47 of Perinci::CmdLine::Gen (from Perl distribution Perinci-CmdLine-Gen), released on 2017-07-14.
 
 =head1 FUNCTIONS
 

@@ -1,3 +1,12 @@
+/* LibTomCrypt, modular cryptographic library -- Tom St Denis
+ *
+ * LibTomCrypt is a library that provides various cryptographic
+ * algorithms in a highly modular and flexible manner.
+ *
+ * The library is free for all purposes without any express
+ * guarantee it works.
+ */
+
 #ifndef TOMCRYPT_CUSTOM_H_
 #define TOMCRYPT_CUSTOM_H_
 
@@ -21,12 +30,15 @@
 #ifndef XMEMCPY
 #define XMEMCPY  memcpy
 #endif
-#ifndef XMEMCMP
-#define XMEMCMP  memcmp
-#endif
 #ifndef XMEMMOVE
 #define XMEMMOVE memmove
 #endif
+#ifndef XMEMCMP
+#define XMEMCMP  memcmp
+#endif
+/* A memory compare function that has to run in constant time,
+ * c.f. mem_neq() API summary.
+ */
 #ifndef XMEM_NEQ
 #define XMEM_NEQ  mem_neq
 #endif
@@ -367,16 +379,15 @@
 /* Supported Key Sizes */
 #define LTC_DH768
 #define LTC_DH1024
-#define LTC_DH1280
 #define LTC_DH1536
-#define LTC_DH1792
 #define LTC_DH2048
 
 #ifndef TFM_DESC
 /* tfm has a problem in fp_isprime for larger key sizes */
-#define LTC_DH2560
 #define LTC_DH3072
 #define LTC_DH4096
+#define LTC_DH6144
+#define LTC_DH8192
 #endif
 
 /* Include Katja (a Rabin variant like RSA) */
@@ -524,11 +535,6 @@
    #define LTC_PKCS_1
 #endif
 
-#if defined(TFM_DESC) && defined(LTC_RSA_BLINDING)
-    #warning RSA blinding currently not supported in combination with TFM
-    #undef LTC_RSA_BLINDING
-#endif
-
 #if defined(LTC_PELICAN) && !defined(LTC_RIJNDAEL)
    #error Pelican-MAC requires LTC_RIJNDAEL
 #endif
@@ -573,6 +579,10 @@
    #error LTC_BLAKE2BMAC requires LTC_BLAKE2B
 #endif
 
+#if defined(LTC_NO_MATH) && (defined(LTM_DESC) || defined(TFM_DESC) || defined(GMP_DESC))
+   #error LTC_NO_MATH defined, but also a math descriptor
+#endif
+
 /* THREAD management */
 #ifdef LTC_PTHREAD
 
@@ -581,9 +591,9 @@
 #define LTC_MUTEX_GLOBAL(x)   pthread_mutex_t x = PTHREAD_MUTEX_INITIALIZER;
 #define LTC_MUTEX_PROTO(x)    extern pthread_mutex_t x;
 #define LTC_MUTEX_TYPE(x)     pthread_mutex_t x;
-#define LTC_MUTEX_INIT(x)     pthread_mutex_init(x, NULL);
-#define LTC_MUTEX_LOCK(x)     pthread_mutex_lock(x);
-#define LTC_MUTEX_UNLOCK(x)   pthread_mutex_unlock(x);
+#define LTC_MUTEX_INIT(x)     LTC_ARGCHK(pthread_mutex_init(x, NULL) == 0);
+#define LTC_MUTEX_LOCK(x)     LTC_ARGCHK(pthread_mutex_lock(x) == 0);
+#define LTC_MUTEX_UNLOCK(x)   LTC_ARGCHK(pthread_mutex_unlock(x) == 0);
 
 #else
 
@@ -611,6 +621,6 @@
    #endif
 #endif
 
-/* $Source$ */
-/* $Revision$ */
-/* $Date$ */
+/* ref:         $Format:%D$ */
+/* git commit:  $Format:%H$ */
+/* commit time: $Format:%ai$ */

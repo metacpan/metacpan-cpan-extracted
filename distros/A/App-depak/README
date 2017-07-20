@@ -2,8 +2,8 @@ NAME
     App::depak - Pack your dependencies onto your script file
 
 VERSION
-    This document describes version 0.55 of App::depak (from Perl
-    distribution App-depak), released on 2017-07-10.
+    This document describes version 0.57 of App::depak (from Perl
+    distribution App-depak), released on 2017-07-14.
 
 SYNOPSIS
     See depak.
@@ -165,6 +165,18 @@ FUNCTIONS
         be skipped by default (when "exclude_core" option is enabled).
         Different perl versions have different sets of core modules as well
         as different versions of the modules.
+
+    *   put_hook_at_the_end => *bool*
+
+        Prefer modules from other sources (filesystem) first.
+
+        Normally, the "fatpack" or "datapack" require hook will be put at
+        the front of @INC. If this option is set to true, the require hook
+        will be put at the end. This means Perl will search modules from the
+        regular sources (filesystem) first. This is useful for example if
+        you want your application to use the possibly newer version of
+        modules on the filesystem before using the packed version as the
+        fallback when some modules are not installed.
 
     *   shebang => *str* (default: "/usr/bin/perl")
 

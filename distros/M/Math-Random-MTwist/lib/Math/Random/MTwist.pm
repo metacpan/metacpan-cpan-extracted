@@ -1,6 +1,5 @@
 package Math::Random::MTwist;
 
-use 5.010_000;  # see README
 use strict;
 use warnings;
 
@@ -8,14 +7,12 @@ use Exporter;
 use Time::HiRes;  # for timeseed()
 use XSLoader;
 
-use constant {
-  MT_TIMESEED => \0,
-  MT_FASTSEED => \0,
-  MT_GOODSEED => \0,
-  MT_BESTSEED => \0,
-};
+use constant MT_TIMESEED => \0;
+use constant MT_FASTSEED => \0;
+use constant MT_GOODSEED => \0;
+use constant MT_BESTSEED => \0;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 our @ISA = 'Exporter';
 our @EXPORT = qw(MT_TIMESEED MT_FASTSEED MT_GOODSEED MT_BESTSEED);

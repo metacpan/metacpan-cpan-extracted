@@ -27,6 +27,8 @@ my @tests = (
     [ 'foo', { value => 'val',expires => '0' }, 'foo=val; expires=Thu, 01-Jan-1970 00:00:00 GMT'],
     [ 'foo', { value => 'val',expires => '-1' }, 'foo=val; expires=Mon, 07-Oct-2013 13:56:56 GMT'],
     [ 'foo', { value => 'val',expires => 'foo' }, 'foo=val; expires=foo'],
+    [ 'foo', { value => 'val','max-age' => '1000' }, 'foo=val; max-age=1000'],
+    [ 'foo', { value => 'val','max-age' => '0' }, 'foo=val; max-age=0'],
 );
 
 for my $test (@tests) {

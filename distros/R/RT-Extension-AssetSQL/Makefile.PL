@@ -9,6 +9,8 @@ rt_too_new '4.6';
 
 perl_version '5.010001';
 
+repository('https://github.com/bestpractical/rt-extension-assetsql');
+
 my ($loaded) = ($INC{'RT.pm'} =~ /^(.*)[\\\/]/);
 my $lib_path = join( ' ', "$RT::LocalPath/lib", $loaded );
 

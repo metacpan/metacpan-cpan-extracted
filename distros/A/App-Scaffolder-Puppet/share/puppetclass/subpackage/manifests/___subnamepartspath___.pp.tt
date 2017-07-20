@@ -11,8 +11,8 @@
 #                    attempted.
 #
 class [% name %] (
-    $ensure  = hiera('[% name %]::ensure', 'present'),
-    $package = hiera('[% name %]::package', $[% nameparts.0 %]::params::[% subnamepartsjoined %]_package),
+    $ensure  = 'present',
+    $package = $[% nameparts.0 %]::params::[% subnamepartsjoined %]_package,
 ) inherits ::[% nameparts.0 %]::params {
     class {
         '::[% name %]::install':

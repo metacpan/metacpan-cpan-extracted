@@ -1,7 +1,7 @@
 package Bencher::Backend;
 
-our $DATE = '2017-07-02'; # DATE
-our $VERSION = '1.039'; # VERSION
+our $DATE = '2017-07-13'; # DATE
+our $VERSION = '1.040'; # VERSION
 
 use 5.010001;
 use strict;
@@ -495,6 +495,10 @@ sub _parse_scenario {
                         $p->{_name} = $p->{module};
                     } elsif ($p->{modules}) {
                         $p->{_name} = join("+", @{$p->{modules}});
+                    } elsif ($p->{code_template}) {
+                        $p->{_name} = substr($p->{code_template}, 0, 64);
+                    } elsif ($p->{fcall_template}) {
+                        $p->{_name} = substr($p->{fcall_template}, 0, 64);
                     }
                 }
             }
@@ -726,6 +730,7 @@ sub _gen_items {
     my $datasets;
     my $env_hashes;
     my $module_startup = $pargs->{module_startup} // $parsed->{module_startup};
+    my $code_startup   = $pargs->{code_startup}   // $parsed->{code_startup};
 
     my @modules = _get_participant_modules($parsed);
 
@@ -766,6 +771,42 @@ sub _gen_items {
         }
         return [412, "There are no modules to benchmark ".
                     "the startup overhead of"] unless %mem;
+    } elsif ($code_startup) {
+        push @$participants, {
+            seq  => 0,
+            name => "perl -e1 (baseline)",
+            type => 'command',
+            perl_cmdline => ["-e1"],
+        };
+        my $i = 0;
+        for my $p0 (@{ $parsed->{participants} }) {
+            if ($p0->{type} ne 'perl_code') {
+                log_info("Skipping participant #$p0->{seq}: type '$p0-{type}' not supported in code startup mode");
+                next;
+            }
+            if ($p0->{code}) {
+                log_info("Skipping participant #$p0->{seq}: raw 'code' not yet supported in code startup mode, use code_template instead");
+                next;
+            }
+            unless (defined $p0->{code_template} || defined $p0->{fcall_template}) {
+                log_info("Skipping participant #$p0->{seq}: perl code needs to be in code_template/fcall_template");
+                next;
+            }
+            $i++;
+            push @$participants, {
+                seq  => $i,
+                name => $p0->{name} // $p0->{_name},
+                type => 'command',
+                perl_cmdline_template => [
+                    (defined $p0->{module} ? ("-M$p0->{module}") : ()),
+                    (map { "-M$_" } @{ $p0->{modules} // [] }),
+                    (map { "-M$_" } @{ $p0->{helper_modules} // [] }),
+                    '-e', ($p0->{fcall_template} // $p0->{code_template}),
+                ],
+            };
+        }
+        return [412, "There are no participants that can be benchmarked in ".
+                    "code startup mode"] unless $i;
     } else {
         return [412, "Please load a scenario (-m, -f) or ".
                     "include at least one participant (-p)"]
@@ -1918,6 +1959,7 @@ sub format_result {
         'ScaleSize',
         ['RoundNumbers', {scientific_notation => $opts->{scientific_notation}}],
         ($envres->[3]{'func.module_startup'} ? ('ModuleStartup') : ()),
+        ($envres->[3]{'func.code_startup'} ? ('CodeStartup') : ()),
         'DeleteConstantFields',
         'DeleteNotesFieldIfEmpty',
         'DeleteSeqField',
@@ -2032,7 +2074,7 @@ sub chart_result {
         unless $num_different >= 1 && $num_different <= 2;
     my @permute = sort keys %permute;
 
-    my $data = $envres->[3]{'func.module_startup'} ? "time" : "rate";
+    my $data = $envres->[3]{'func.module_startup'} || $envres->[3]{'func.code_startup'} ? "time" : "rate";
 
     my $chart = Chart::Gnuplot->new(
         #imagesize => "0.5, 0.5",
@@ -2219,6 +2261,7 @@ _
         # XXX include_perls & exclude_perls are only relevant when multiperl=1
         'choose_one&' => [
             ['scenario_file', 'scenario_module', 'scenario'],
+            ['module_startup', 'code_startup'],
         ],
     },
     args => {
@@ -2446,6 +2489,11 @@ _
         module_startup => {
             schema => ['bool*', is=>1],
             summary => 'Benchmark module startup overhead instead of normal benchmark',
+            tags => ['category:action'],
+        },
+        code_startup => {
+            schema => ['bool*', is=>1],
+            summary => 'Benchmark code startup overhead instead of normal benchmark',
             tags => ['category:action'],
         },
         detail => {
@@ -3049,6 +3097,10 @@ or, when running in module startup mode:
 
     <NAME>.module_startup.<yyyy-dd-dd-"T"HH-MM-SS>.json
 
+or, when running in code startup mode:
+
+    <NAME>.code_startup.<yyyy-dd-dd-"T"HH-MM-SS>.json
+
 where <NAME> is scenario module name, or `NO_MODULE` if scenario is not from a
 module. The `::` (double colon in the module name will be replaced with `-`
 (dash).
@@ -3156,6 +3208,7 @@ sub bencher {
     }
 
     my $module_startup = $args{module_startup} // $parsed->{module_startup};
+    my $code_startup   = $args{code_startup}   // $parsed->{code_startup};
 
     # DEPRECATED/now undocumented, see before_parse_datasets for more
     # appropriate hook
@@ -3448,6 +3501,7 @@ sub bencher {
         $capture_stderr = 1 if $action eq 'show-items-outputs';
 
         $envres->[3]{'func.module_startup'} = $module_startup;
+        $envres->[3]{'func.code_startup'}   = $code_startup;
         $envres->[3]{'func.module_versions'}{perl} = "$^V" if $return_meta;
         {
             no strict 'refs';
@@ -3509,9 +3563,9 @@ sub bencher {
 
         my $with_process_size = $args{with_process_size} //
             $parsed->{with_process_size} //
-            # turn on with_process_size by default if we are in module_startup
+            # turn on with_process_size by default if we are in {module,code}_startup
             # mode on linux
-            ($module_startup && $^O =~ /linux/);
+            (($module_startup || $code_startup) && $^O =~ /linux/);
 
         # test code first
         my $test = $args{test} // $parsed->{test} // 1;
@@ -3522,9 +3576,9 @@ sub bencher {
             $parsed->{with_args_size} // 0;
         my $with_result_size = $args{with_result_size} //
             $parsed->{with_result_size} // 0;
-        $with_args_size   = 0 if $module_startup;
+        $with_args_size   = 0 if $module_startup || $code_startup;
         $with_result_size = 1 if $action eq 'show-items-results-sizes';
-        $with_result_size = 0 if $module_startup;
+        $with_result_size = 0 if $module_startup || $code_startup;
         {
             last if $args{multiperl} || $args{multimodver} || !$test;
             my $fitems = [];
@@ -4002,7 +4056,8 @@ sub bencher {
                 sprintf(
                     "%s%s.%s.json",
                     $mod,
-                    $module_startup ? ".module_startup" : "",
+                    $module_startup ? ".module_startup" :
+                        $code_startup ? ".code_startup" : "",
                     POSIX::strftime("%Y-%m-%dT%H-%M-%S",
                                     localtime($time_start)),
                 );
@@ -4104,7 +4159,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.039 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2017-07-02.
+This document describes version 1.040 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2017-07-13.
 
 =head1 FUNCTIONS
 
@@ -4144,6 +4199,10 @@ Trap output to stderr.
 =item * B<capture_stdout> => I<bool>
 
 Trap output to stdout.
+
+=item * B<code_startup> => I<bool>
+
+Benchmark code startup overhead instead of normal benchmark.
 
 =item * B<datasets> => I<array[hash]>
 
@@ -4448,6 +4507,10 @@ Default is:
 or, when running in module startup mode:
 
  <NAME>.module_startup.<yyyy-dd-dd-"T"HH-MM-SS>.json
+
+or, when running in code startup mode:
+
+ <NAME>.code_startup.<yyyy-dd-dd-"T"HH-MM-SS>.json
 
 where <NAME> is scenario module name, or C<NO_MODULE> if scenario is not from a
 module. The C<::> (double colon in the module name will be replaced with C<->

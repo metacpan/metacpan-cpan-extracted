@@ -1,10 +1,14 @@
 .TH TZFILE 5
 .SH NAME
 tzfile \- time zone information
-.SH SYNOPSIS
-.B
-#include <tzfile.h>
 .SH DESCRIPTION
+.ie '\(lq'' .ds lq \&"\"
+.el .ds lq \(lq\"
+.ie '\(rq'' .ds rq \&"\"
+.el .ds rq \(rq\"
+.de q
+\\$3\*(lq\\$1\*(rq\\$2
+..
 The time zone information files used by
 .IR tzset (3)
 begin with the magic characters "TZif" to identify them as
@@ -50,7 +54,8 @@ Next come
 .I tzh_timecnt
 one-byte unsigned integer values;
 each one tells which of the different types of local time types
-described in the file is associated with the same-indexed transition time.
+described in the file is associated with the time period
+starting with the same-indexed transition time.
 These values serve as indices into an array of
 .I ttinfo
 structures (with
@@ -99,7 +104,8 @@ the first value of each pair gives the time
 at which a leap second occurs;
 the second gives the
 .I total
-number of leap seconds to be applied after the given time.
+number of leap seconds to be applied during the time period
+starting at the given time.
 The pairs of values are sorted in ascending order by time.
 .PP
 Then there are
@@ -139,6 +145,13 @@ POSIX-TZ-environment-variable-style string for use in handling instants
 after the last transition time stored in the file
 (with nothing between the newlines if there is no POSIX representation for
 such instants).
+The POSIX-style string must must agree with the local time type after
+both data's last transition times; for example, given the string
+.q "WET0WEST,M3.5.0,M10.5.0/3"
+then if a last transition time is in July, the transition's local time
+type must specify a daylight-saving time abbreviated
+.q "WEST"
+that is one hour east of UT.
 .PP
 For version-3-format time zone files, the POSIX-TZ-style string may
 use two minor extensions to the POSIX TZ format, as described in

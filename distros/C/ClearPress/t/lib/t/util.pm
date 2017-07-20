@@ -13,17 +13,19 @@ use Digest::SHA qw(sha1_hex);
 use File::Temp qw(tempdir);
 
 our @EXPORT_OK = qw(is_rendered_js);
+our $DB_CLEANUP = 1;
 
 $ENV{dev} = q[test];
 
 sub _tmp_db_name {
-  return sprintf q[%s/%s.db], tempdir(CLEANUP => 1), sha1_hex($PROGRAM_NAME);
+  return sprintf q[%s/%s.db], tempdir(CLEANUP => $DB_CLEANUP), sha1_hex($PROGRAM_NAME);
 }
 
 sub new {
   my ($class, @args) = @_;
 
   my $db   = _tmp_db_name();
+  warn "Using $db\n";
   my $self = $class->SUPER::new(@args);
   $self->config->setval('test','dbname', $db);
 

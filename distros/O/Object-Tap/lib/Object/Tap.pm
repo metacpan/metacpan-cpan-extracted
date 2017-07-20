@@ -4,11 +4,15 @@ use strict;
 use warnings;
 use base qw(Exporter);
 
-our $VERSION = '1.000003'; # 1.0.3
+our $VERSION = '1.000006';
 
 our @EXPORT = qw($_tap);
 
-our $_tap = sub { my ($obj, $call, @args) = @_; $obj->$call(@args); $obj };
+our $_tap = sub {
+  my ($obj, $call, @args) = @_;
+  $obj->$call(@args) for $obj;
+  $obj
+};
 
 1;
 
@@ -29,6 +33,12 @@ you can instead write -
   use Object::Tap;
   
   my $thing = My::Class->new(...)->$_tap(sub { $_[0]->set_foo(1) });
+
+We also alias $_ to $_[0] within the subroutine so:
+
+  my $thing = My::Class->new(...)->$_tap(sub { $_->set_foo(1) });
+
+also works.
 
 To realise why this might be useful, consider instead -
 

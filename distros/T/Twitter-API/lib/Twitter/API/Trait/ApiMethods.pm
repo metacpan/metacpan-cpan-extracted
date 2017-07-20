@@ -1,6 +1,6 @@
 package Twitter::API::Trait::ApiMethods;
 # ABSTRACT: Convenient API Methods
-$Twitter::API::Trait::ApiMethods::VERSION = '0.0112';
+$Twitter::API::Trait::ApiMethods::VERSION = '0.0113';
 use 5.14.1;
 use Carp;
 use Moo::Role;
@@ -1212,7 +1212,7 @@ Twitter::API::Trait::ApiMethods - Convenient API Methods
 
 =head1 VERSION
 
-version 0.0112
+version 0.0113
 
 =head1 DESCRIPTION
 
@@ -1230,7 +1230,7 @@ calls are equivalent:
     $client->mentions;
     $client->mentions({});
     $client->get('statuses/mentions_timeline');
-    $client->get('statuses/mentions_timelien', {});
+    $client->get('statuses/mentions_timeline', {});
 
 Use the parameters hashref to pass optional parameters. For example,
 

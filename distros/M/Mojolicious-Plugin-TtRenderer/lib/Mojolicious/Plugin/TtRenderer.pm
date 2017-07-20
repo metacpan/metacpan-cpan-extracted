@@ -5,7 +5,7 @@ use warnings;
 use 5.010001;
 
 # ABSTRACT: Template Renderer Plugin for Mojolicious
-our $VERSION = '1.58'; # VERSION
+our $VERSION = '1.59'; # VERSION
 
 use base 'Mojolicious::Plugin';
 
@@ -38,7 +38,7 @@ Mojolicious::Plugin::TtRenderer - Template Renderer Plugin for Mojolicious
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 SYNOPSIS
 
@@ -272,6 +272,8 @@ spleenjack
 uwisser
 
 Dinis Lage
+
+jay mortensen (GMORTEN)
 
 =head1 COPYRIGHT AND LICENSE
 

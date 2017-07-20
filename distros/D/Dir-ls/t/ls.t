@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Dir::ls;
+use File::chdir;
 use Path::Tiny 'tempdir';
 use Sort::filevercmp;
 use Test::More;
@@ -32,9 +33,23 @@ my @default_list = ls $testdir;
 my @default_sort = grep { !m/^\./ } @sorted_byname;
 is_deeply \@default_list, \@default_sort, 'default list correct';
 
+{
+  local $CWD = $testdir;
+  my @cwd_list = ls;
+  my @cwd_sort = grep { !m/^\./ } @sorted_byname;
+  is_deeply \@cwd_list, \@cwd_sort, 'cwd list correct';
+}
+
 my @reverse_list = ls $testdir, {reverse => 1};
 my @reverse_sort = reverse grep { !m/^\./ } @sorted_byname;
 is_deeply \@reverse_list, \@reverse_sort, 'reverse list correct';
+
+{
+  local $CWD = $testdir;
+  my @cwd_reverse_list = ls {reverse => 1};
+  my @cwd_reverse_sort = reverse grep { !m/^\./ } @sorted_byname;
+  is_deeply \@cwd_reverse_list, \@cwd_reverse_sort, 'cwd reverse list correct';
+}
 
 my @almost_all_list = ls $testdir, {'almost-all' => 1};
 my @almost_all_sort = grep { !m/^\.\.?$/ } @sorted_byname;

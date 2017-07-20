@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Encode;
 use Carp;
-our $VERSION = "0.1.11";
+our $VERSION = "0.1.12";
 
 sub getDataType($){
 	# return empty string if not reference type.
@@ -1243,13 +1243,13 @@ sub loadText{
 	while( $$rText =~ /(\x0D\x0A|\x0D|\x0A)|(?<!\$)(\$\{(?:[^}"]*|"(?:[^"]|"")*")+)\}/gs ){
 		my $pre = substr($$rText,$lastend,$-[0] - $lastend); $lastend = $+[0];
 		if( defined($1) ){
-			$pre =~ s/\$\${/\$\{/g;
+			$pre =~ s/\$\$\{/\$\{/g;
 			length($pre) and push @line,$pre;
 			closeLine(\@list,\@line);
 			++$self->{lno};
 		}else{
 			my $inside = substr($2,2);
-			$pre =~ s/\$\${/\$\{/g;
+			$pre =~ s/\$\$\{/\$\{/g;
 			length($pre) and push @line,$pre;
 			push @line,eval{ $self->parseTemplateTag($inside);};
 			$self->{lno} += $inside =~ tr/\x0a/\x0a/;

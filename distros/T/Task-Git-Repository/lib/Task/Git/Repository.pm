@@ -1,11 +1,11 @@
 package Task::Git::Repository;
-$Task::Git::Repository::VERSION = '1.001';
+$Task::Git::Repository::VERSION = '1.002';
 use strict;
 use warnings;
 
 1;
 
-=pod
+__END__
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ Task::Git::Repository - Install all Git::Repository plugins at once
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -46,6 +46,8 @@ L<Git::Repository::Plugin::FileHistory> - Class representing file on git reposit
 
 L<Git::Repository::Plugin::Gerrit> - Add some integration with Gerrit
 
+L<Git::Repository::Plugin::GitHooks> - A Git::Repository plugin with some goodies for hook developers
+
 L<Git::Repository::Plugin::Hooks> - Work with hooks in a L<Git::Repository>
 
 L<Git::Repository::Plugin::Info> - Information about a L<Git::Repository>
@@ -70,7 +72,7 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2014-2015 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2014-2017 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 
@@ -78,8 +80,3 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 =cut
-
-__END__
-
-# ABSTRACT: Install all Git::Repository plugins at once
-

@@ -6,8 +6,6 @@ MANIFEST
 META.json
 META.yml
 README
-bin/oai_browser.pl
-bin/oai_pmh.pl
 bin/oai_static_gateway.pl
 cpanfile
 dist.ini
@@ -49,6 +47,8 @@ lib/HTTP/OAI/Set.pm
 lib/HTTP/OAI/UserAgent.pm
 lib/HTTP/OAI/Verb.pm
 minil.toml
+script/oai_browser.pl
+script/oai_pmh.pl
 t/000xml_sax.t
 t/00static.t
 t/01parse.t

@@ -11,7 +11,7 @@ use XML::XPath;
 use English qw(-no_match_vars);
 use Carp;
 
-use lib qw(t/headers//lib t/lib);
+use lib qw(t/headers/lib t/lib);
 use t::request;
 use t::model::response;
 use t::view::response;

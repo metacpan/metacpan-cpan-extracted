@@ -1,5 +1,17 @@
 Revision history for Perl extension Locale::Utils::Autotranslator.
 
+1.007  Sun Jul 16 20:48:04 2017
+- remove Module::Build from makefile dependencies (2nd try)
+- solved rights of tar directory (2nd try)
+  https://rt.cpan.org/Ticket/Display.html?id=122505
+
+1.006  Sun Jul 16 18:27:06 2017
+- solved rights of tar directory
+  https://rt.cpan.org/Ticket/Display.html?id=122505
+ 
+1.005  Sun Jul 16 11:36:46 2017
+- remove Module::Build from makefile dependencies
+ 
 1.004  Mon Jun  5 09:22:38 2017
 - handle bytes_max errors
 - handle errors on translate_any_msgid

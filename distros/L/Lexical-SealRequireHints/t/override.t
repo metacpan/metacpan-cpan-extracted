@@ -39,6 +39,7 @@ BEGIN {
 }
 
 BEGIN { use_ok "Lexical::SealRequireHints"; }
+BEGIN { unshift @INC, "./t/lib"; }
 
 BEGIN {
 	my $next_require = defined(&CORE::GLOBAL::require) ?

@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Prty::FFmpeg;
+
 # -----------------------------------------------------------------------------
 
 sub test_loadClass : Init(1) {

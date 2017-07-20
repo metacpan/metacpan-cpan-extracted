@@ -8,7 +8,7 @@ our @EXPORT_OK = qw/get_wiki_titles make_wiki_url/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use LWP::UserAgent;
 use URI::Escape 'uri_escape_utf8';

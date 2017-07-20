@@ -1,7 +1,7 @@
 package Complete::File;
 
-our $DATE = '2016-10-20'; # DATE
-our $VERSION = '0.42'; # VERSION
+our $DATE = '2017-07-14'; # DATE
+our $VERSION = '0.43'; # VERSION
 
 use 5.010001;
 use strict;
@@ -126,7 +126,7 @@ sub complete_file {
     my $starting_path = $args{starting_path} // '.';
     if ($handle_tilde && $word =~ s!\A(~[^/]*)/!!) {
         $result_prefix = "$1/";
-        my @dir = File::Glob::glob($1); # glob will expand ~foo to /home/foo
+        my @dir = File::Glob::bsd_glob($1); # glob will expand ~foo to /home/foo
         return [] unless @dir;
         $starting_path = Encode::decode('UTF-8', $dir[0]);
     } elsif ($allow_dot && $word =~ s!\A((?:\.\.?/+)+|/+)!!) {
@@ -296,14 +296,18 @@ Complete::File - Completion routines related to files
 
 =head1 VERSION
 
-This document describes version 0.42 of Complete::File (from Perl distribution Complete-File), released on 2016-10-20.
+This document describes version 0.43 of Complete::File (from Perl distribution Complete-File), released on 2017-07-14.
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
 
-=head2 complete_dir(%args) -> array
+=head2 complete_dir
+
+Usage:
+
+ complete_dir(%args) -> array
 
 Complete directory from local filesystem (wrapper for complete_dir() that only picks directories).
 
@@ -350,7 +354,11 @@ Word to complete.
 Return value:  (array)
 
 
-=head2 complete_file(%args) -> array
+=head2 complete_file
+
+Usage:
+
+ complete_file(%args) -> array
 
 Complete file and directory from local filesystem.
 
@@ -445,7 +453,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

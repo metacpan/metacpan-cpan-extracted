@@ -3,7 +3,7 @@ package Prty::Css;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Prty::Path;
 use Prty::String;
@@ -220,7 +220,7 @@ sub style {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

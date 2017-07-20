@@ -12,7 +12,7 @@ use File::Flock;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(newdaemon);
 
-our $VERSION = 0.84;
+our $VERSION = 0.85;
 
 our $force_quit_delay = 15;
 our $package = __PACKAGE__;

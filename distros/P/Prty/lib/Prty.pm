@@ -3,13 +3,13 @@ package Prty;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 =encoding utf8
 
 =head1 NAME
 
-Prty - Class library in Perl
+Prty - Class library
 
 =head1 DESCRIPTION
 
@@ -634,11 +634,11 @@ L<Prty::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 INSTALLATION
 
-            $ cpanm Prty
+    $ cpanm Prty
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

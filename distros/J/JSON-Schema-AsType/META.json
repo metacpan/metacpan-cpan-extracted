@@ -4,7 +4,7 @@
       "Yanick Champoux <yanick@babyl.dyndns.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Load" : "0",
             "Clone" : "0",
             "JSON" : "0",
             "LWP::Simple" : "0",
@@ -74,31 +73,31 @@
    "provides" : {
       "JSON::Schema::AsType" : {
          "file" : "lib/JSON/Schema/AsType.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       },
       "JSON::Schema::AsType::Draft3" : {
          "file" : "lib/JSON/Schema/AsType/Draft3.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       },
       "JSON::Schema::AsType::Draft3::Types" : {
          "file" : "lib/JSON/Schema/AsType/Draft3/Types.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       },
       "JSON::Schema::AsType::Draft4" : {
          "file" : "lib/JSON/Schema/AsType/Draft4.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       },
       "JSON::Schema::AsType::Draft4::Types" : {
          "file" : "lib/JSON/Schema/AsType/Draft4/Types.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       },
       "JSON::Schema::AsType::Draft6" : {
          "file" : "lib/JSON/Schema/AsType/Draft6.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       },
       "JSON::Schema::AsType::Draft6::Types" : {
          "file" : "lib/JSON/Schema/AsType/Draft6/Types.pm",
-         "version" : "v0.4.2"
+         "version" : "v0.4.3"
       }
    },
    "release_status" : "stable",
@@ -113,7 +112,7 @@
          "web" : "https://github.com/yanick/JSON-Schema-AsType"
       }
    },
-   "version" : "0.4.2",
+   "version" : "0.4.3",
    "x_author_pledge" : {
       "version" : 1
    },
@@ -123,6 +122,7 @@
       "Daniel Perrett <dp13@sanger.ac.uk>",
       "Ruslan Zakirov <ruz@bestpractical.com>",
       "Yanick Champoux <yanick@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
 }
 

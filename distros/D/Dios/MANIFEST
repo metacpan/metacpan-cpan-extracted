@@ -55,10 +55,10 @@ t/literal_parameters.t
 t/multisubs.t
 t/multisubs_named.t
 t/nameless.t
-t/optionals_then_slurpies.t
 t/return_types.t
 t/callsame.t
 t/callwith.t
 t/class_only.t
+t/types_basic_validator.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,8 +1,140 @@
-SEE ALSO
+NAME
+    Module::FatPack - Generate source code that contains fatpacked modules
 
-    App::FatPack, the original implementation.
+VERSION
+    This document describes version 0.17 of Module::FatPack (from Perl
+    distribution Module-FatPack), released on 2017-07-14.
+
+FUNCTIONS
+  fatpack_modules
+    Usage:
+
+     fatpack_modules(%args) -> [status, msg, result, meta]
+
+    Generate source code that contains fatpacked modules.
+
+    This routine provides the same core technique employed by
+    "App::FatPacker" (which is putting modules' source code inside Perl
+    variables and loading them on-demand via require hook) without all the
+    other stuffs. All you need is supply the names of modules (or the
+    modules' source code themselves) and you'll get the output in a file or
+    string.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add_begin_block => *bool*
+
+        Surround the code inside BEGIN { }.
+
+    *   assume_strict => *bool* (default: 1)
+
+        Assume code runs under stricture.
+
+    *   line_prefix => *str*
+
+    *   module_names => *array[str]*
+
+        Module names to search.
+
+    *   module_srcs => *hash*
+
+        Module source codes (a hash, keys are module names).
+
+    *   output => *str*
+
+        Output filename.
+
+    *   overwrite => *bool* (default: 0)
+
+        Whether to overwrite output if previously exists.
+
+    *   pm => *bool*
+
+        Make code suitable to put inside .pm file instead of script.
+
+        This setting adjusts the code so it is suitable to put one or
+        several instances of the code inside one or more .pm files. Also
+        sets default for --line-prefix '#' --no-add-begin-block
+        --put-hook-at-the-end.
+
+    *   postamble => *str*
+
+        Perl source code to add after the fatpack code.
+
+    *   preamble => *str*
+
+        Perl source code to add before the fatpack code.
+
+    *   put_hook_at_the_end => *bool*
+
+        Put the require hook at the end of @INC using "push" instead of at
+        the front using "unshift".
+
+    *   stripper => *bool* (default: 0)
+
+        Whether to strip included modules using Perl::Stripper.
+
+    *   stripper_comment => *bool* (default: 1)
+
+        Set strip_comment=1 (strip comments) in Perl::Stripper.
+
+    *   stripper_log => *bool* (default: 0)
+
+        Set strip_log=1 (strip log statements) in Perl::Stripper.
+
+    *   stripper_maintain_linum => *bool* (default: 0)
+
+        Set maintain_linum=1 in Perl::Stripper.
+
+    *   stripper_pod => *bool* (default: 1)
+
+        Set strip_pod=1 (strip POD) in Perl::Stripper.
+
+    *   stripper_ws => *bool* (default: 1)
+
+        Set strip_ws=1 (strip whitespace) in Perl::Stripper.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-FatPack>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-FatPack>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-FatPack>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    App::FatPacker, the original implementation.
 
     App::depak for more options e.g. use various tracing methods, etc.
 
-    fatpack-modules, CLI for fatpack_modules
+    fatpack-modules, CLI for "fatpack_modules"
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

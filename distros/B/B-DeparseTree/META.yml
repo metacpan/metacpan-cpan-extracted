@@ -17,15 +17,24 @@ name: B-DeparseTree
 provides:
   B::DeparseTree:
     file: lib/B/DeparseTree.pm
-    version: v2.1.3
+    version: v2.1.5
   B::DeparseTree::Common:
     file: lib/B/DeparseTree/Common.pm
     version: v1.1.0
+  B::DeparseTree::P516:
+    file: lib/B/DeparseTree/P518.pm
+    version: '2.0'
   B::DeparseTree::P520:
     file: lib/B/DeparseTree/P520.pm
     version: '2.0'
   B::DeparseTree::P522:
     file: lib/B/DeparseTree/P522.pm
+    version: '2.0'
+  B::DeparseTree::P524:
+    file: lib/B/DeparseTree/P524.pm
+    version: '2.0'
+  B::DeparseTree::P526:
+    file: lib/B/DeparseTree/P526.pm
     version: '2.0'
   B::DeparseTree::PP:
     file: lib/B/DeparseTree/PP.pm
@@ -38,6 +47,6 @@ requires:
   rlib: '0.02'
   version: '0'
 resources:
-  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
-version: v2.1.3
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  license: http://opensource.org/licenses/gpl-license.php
+version: v2.1.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,4 +1,10 @@
-Revision history for Complete-File
+0.43    2017-07-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid perl warning in 5.26+ that File::Glob::glob() will be
+	  removed in 5.30, switch to the recommended bsd_glob().
+
 
 0.42    2016-10-20 (PERLANCAR)
 

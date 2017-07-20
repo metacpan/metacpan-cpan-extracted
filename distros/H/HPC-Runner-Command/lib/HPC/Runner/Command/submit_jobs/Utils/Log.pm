@@ -126,7 +126,7 @@ sub write_task_project_table {
     write_file( $task_file, '| Job | TaskID | Status | Notes |'."\n" );
     foreach my $job ( $self->all_schedules ) {
         my $cmd_start         = $self->jobs->{$job}->{cmd_start} + 1;
-        my $cmd_end = $self->jobs->{$job}->cmd_counter + $cmd_start;
+        my $cmd_end = $self->jobs->{$job}->cmd_counter + $cmd_start - 1;
         for(my $x=$cmd_start; $x<=$cmd_end; $x++){
           write_file($task_file, {append => 1}, '| '.$job.' | '.$x.' | | |'."\n");
         }

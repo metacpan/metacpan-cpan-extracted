@@ -22,6 +22,8 @@ ONCE: {
   $d->called(1);
   $d->reject('BAD');
   $d->resolve('BAD');
+  $d->resolve();
+  $d->reject();
   is $d->promise->calls->@*, 0;
 }
 

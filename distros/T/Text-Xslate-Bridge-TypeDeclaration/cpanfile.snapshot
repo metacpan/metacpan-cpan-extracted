@@ -353,3 +353,11 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
+  Type-Tiny-XS-0.012
+    pathname: T/TO/TOBYINK/Type-Tiny-XS-0.012.tar.gz
+    provides:
+      Type::Tiny::XS 0.012
+      Type::Tiny::XS::Util 0.012
+    requirements:
+      ExtUtils::MakeMaker 6.17
+      perl 5.010001

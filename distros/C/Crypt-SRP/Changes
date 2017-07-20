@@ -1,5 +1,9 @@
 Changes for Crypt::SRP
 
+0.018   2017/07/14
+        - AppletTV compatibility mode
+        - srptool (python) compatibility mode
+
 0.017   2017/04/11
         - @INC & . fix
 

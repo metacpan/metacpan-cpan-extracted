@@ -1,6 +1,6 @@
 package Evo::Promise::Role;
 use Evo -Class;
-use Evo '-Promise::Sync; -Promise::Const *; -Promise::Deferred';
+use Evo '-Promise::Sync; -Lib try; -Promise::Const *; -Promise::Deferred';
 use Evo 'Carp croak; Scalar::Util blessed';
 
 requires 'postpone';
@@ -26,7 +26,12 @@ has 'state' => PENDING;
 ## CLASS METHODS
 sub promise ($me, $fn) {
   my $d = Evo::Promise::Deferred->new(promise => my $p = $me->new());
-  $fn->(sub { $d->resolve(@_) }, sub { $d->reject(@_) });
+  try {
+    $fn->(sub { $d->resolve(@_) }, sub { $d->reject(@_) });
+  }
+  sub($e) {
+    $d->reject(@_);
+  };
   $p;
 }
 
@@ -245,7 +250,7 @@ Evo::Promise::Role
 
 =head1 VERSION
 
-version 0.0403
+version 0.0405
 
 =head1 IMPLEMENTATION
 

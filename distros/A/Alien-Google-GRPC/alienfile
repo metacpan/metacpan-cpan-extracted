@@ -10,7 +10,6 @@ probe sub {
   return 'share';
 };
 
-
 share {
 
   download [ 'git clone -b $(curl -L http://grpc.io/release) https://github.com/grpc/grpc; '
@@ -20,22 +19,15 @@ share {
           . 'mkdir -p  %{.install.download}; '
           . 'touch %{.install.download}/placate_alien_sensibilities.x' ];
 
-  # extract [ 'cp -rp %{.install.download} .' ]; # Use this version if debugging, so files will not be re-downloaded.
-
-
   build [
     [ 'git submodule update --init' ],
     [ 'bash <<"USE_A_SHELL"
+        echo "** Build Dir is: "; pwd
+        prefix=%{.install.prefix}  PROTOBUF_CONFIG_OPTS=--prefix=%{.install.prefix} make
+        prefix=%{.install.prefix} make install
         cd ./third_party/protobuf
-        ./autogen.sh
-        ./configure --prefix=%{.install.prefix} --with-pic
-        make clean
-        make
         make install
         cd ../../
-        prefix=%{.install.prefix} make
-        prefix=%{.install.prefix} make install
-        cd lib && ln -s libgrpc++.so libgrpc++.so.1; cd ..
 USE_A_SHELL
     ' ],
   ];
@@ -47,7 +39,6 @@ USE_A_SHELL
     [ 'echo "-L%{.install.prefix}/lib -lgrpc -lgrpc++ -lprotobuf -lpthread"', \'%{.runtime.libs}'    ],
     [ 'echo "-I%{.install.prefix}/include -pthread"', \'%{.runtime.cflags}'    ],
   ];
-
 };
 
 sys {
@@ -57,5 +48,4 @@ sys {
     [ 'pkg-config --libs   grpc grpc++  protobuf', \'%{.runtime.libs}'    ],
   ];
 };
-
 

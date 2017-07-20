@@ -1,3 +1,11 @@
+v0.11.2 2017-07-14T21:22:02Z
+ - No issues on bugtracker were closed since the last release
+ - l10n translation search fixed
+
+v0.11.1 2017-07-14T10:29:02Z
+ - No issues on bugtracker were closed since the last release
+ - l10n fixed for empty translation
+
 v0.11.0 2017-07-11T23:54:16Z
  - No issues on bugtracker were closed since the last release
  - amchart class improved

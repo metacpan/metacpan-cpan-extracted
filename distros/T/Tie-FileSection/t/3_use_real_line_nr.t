@@ -6,7 +6,8 @@ my $line_ori= $.;
 sub getline{ 
 	my $fh = shift;
 	$_ = <$fh>;
-	s/[\r\n]+//r; 
+	s/[\r\n]+//;
+	$_;
 }
 
 sub reset_DATA{
@@ -16,9 +17,9 @@ sub reset_DATA{
 
 my $f = Tie::FileSection->new( file => \*DATA, first_line => 2, use_real_line_nr => 1 );
 cmp_ok getline($f), 'eq', 'Line 2', 'section data line 1';
-cmp_ok $f->input_line_number, '==', 2, 'section line number = 2';
+cmp_ok $., '==', 2, 'section line number = 2';
 cmp_ok getline($f), 'eq', 'Line 3', 'section data line 2';
-cmp_ok $f->input_line_number, '==', 3, 'section line number = 3';
+cmp_ok $., '==', 3, 'section line number = 3';
 undef $f;
 
 reset_DATA;

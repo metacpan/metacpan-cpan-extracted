@@ -2,11 +2,11 @@ Changes
 lib/HTML/Template/Nest.pm
 Makefile.PL
 MANIFEST
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/HTML-Template-Nest-to_html.t
 t/HTML-Template-Nest.t
 t/templates/table.html
 t/templates/td.html
 t/templates/tr.html
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

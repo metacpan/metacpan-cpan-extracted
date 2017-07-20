@@ -4,28 +4,53 @@
 
 use strict;
 use warnings;
+
+use Getopt::Long::Descriptive;
 use POE qw(
 	Component::Server::TCP
 	Component::Server::eris
 );
 
-# POE Session Initialization
-
-# Eris Dispatcher
-my $SESSION = POE::Component::Server::eris->spawn(
-	ListenAddress		=> '127.0.0.1',
-	ListenPort			=> 9514,
+# Process Arguments
+my ($opt,$usage) = describe_options( '%c - %o',
+    ['syslog-listen|sl:s', "Address to listen for incoming syslog, default: 0.0.0.0", { default => '0.0.0.0' } ],
+    ['syslog-port|sp:i',   "TCP port to listen for incoming syslog, default 514", { default => 514 } ],
+    [],
+    ['eris-listen|el:s', "Address to listen for eris clients, default: 127.0.0.1", { default => '127.0.0.1' } ],
+    ['eris-port|ep:i',   "TCP port to listen for incoming syslog, default 9514", { default => 9514 } ],
+    [],
+    ['graphite-host|g:s',  "Host to use to submit graphite metrics, default: disabled" ],
+    ['graphite-port|gp:i', "Port for graphite metric submission, default: 2003", {default => 2003} ],
+    ['graphite-prefix:s',  "Graphite prefix for metrics, default from POE::Component::Server::eris"],
+    [],
+    ['help',       "Show this message and exit.", { shortcircuit => 1 } ],
 );
 
-# TCP Session Master
+if( $opt->help ) {
+    print $usage->text;
+    exit 0;
+}
+
+#--------------------------------------------------------------------------#
+# POE Session Initialization
+
+# Eris Server
+my $SESSION = POE::Component::Server::eris->spawn(
+		ListenAddress	=> $opt->eris_listen,
+		ListenPort		=> $opt->eris_port,
+        GraphitePort    => $opt->graphite_port,
+        $opt->graphite_host ? ( GraphiteHost => $opt->graphite_host ) : (),
+        $opt->graphite_prefix ? ( GraphitePrefix => $opt->graphite_prefix ) : (),
+);
+
+# Syslog "server"
 POE::Component::Server::TCP->new(
 		Alias		=> 'server',
-		Address		=> '127.0.0.1',
-		Port		=> 9513,
-
+		Address		=> $opt->syslog_listen,
+		Port		=> $opt->syslog_port,
+        # Handle Inbound Syslog Data
 		ClientConnected		=> \&client_connect,
 		ClientInput			=> \&client_input,
-
 		ClientDisconnected	=> \&client_term,
 		ClientError			=> \&client_term,
 );
@@ -80,7 +105,7 @@ eris-dispatch-tcp.pl - Example using POE::Component::Server::eris with a PoCo::S
 
 =head1 VERSION
 
-version 2.0
+version 2.2
 
 =head1 AUTHOR
 

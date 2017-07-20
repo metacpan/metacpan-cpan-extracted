@@ -46,5 +46,5 @@ resources:
   homepage: http://www.pcre.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/alien-pcre2.git
-version: '0.008000'
+version: '0.012000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

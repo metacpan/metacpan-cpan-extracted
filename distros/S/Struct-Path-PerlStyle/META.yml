@@ -28,4 +28,4 @@ requires:
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Struct-Path-PerlStyle.pm
-version: 0.64
+version: 0.70

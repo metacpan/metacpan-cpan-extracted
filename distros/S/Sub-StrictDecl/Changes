@@ -1,3 +1,16 @@
+version 0.005; 2017-07-19
+
+  * update test suite to not rely on . in @INC, which is no longer
+    necessarily there from Perl 5.25.7
+
+  * use cleaner wrap_op_checker() API to control op checking
+
+  * no longer include a Makefile.PL in the distribution
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * consistently use THX_ prefix on internal function names
+
 version 0.004; 2015-03-20
 
   * bugfix: require bugfixed version of Lexical::SealRequireHints (for not

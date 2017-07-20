@@ -145,7 +145,7 @@ BEGIN { ${^WARNING_BITS} = ""; }
 # Also don't "use strict", because of consequences of compiling
 # strict.pm's code.
 
-our $VERSION = "0.010";
+our $VERSION = "0.011";
 
 if("$]" >= 5.012) {
 	# bug not present
@@ -270,7 +270,7 @@ Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009, 2010, 2011, 2012, 2015, 2016
+Copyright (C) 2009, 2010, 2011, 2012, 2015, 2016, 2017
 Andrew Main (Zefram) <zefram@fysh.org>
 
 =head1 LICENSE

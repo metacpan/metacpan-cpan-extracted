@@ -1,6 +1,7 @@
 use warnings;
 use strict;
 
+BEGIN { unshift @INC, "./t/lib"; }
 use t::DataSets (map { ("COUNT_$_", "foreach_$_") } qw(
 	yes_name
 	yes_attributes

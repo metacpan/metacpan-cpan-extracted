@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::Alien::TensorFlowServingProtos;
-$AI::PredictionClient::Alien::TensorFlowServingProtos::VERSION = '0.01';
+$AI::PredictionClient::Alien::TensorFlowServingProtos::VERSION = '0.03';
 use base qw( Alien::Base );
 
 =head1 NAME
@@ -74,6 +74,15 @@ Additional, the following dependencies need to be installed in order for this mo
 See the Alien::Google::GRPC for potential additional build dependencies.
 
 At this time only Linux builds are supported.
+
+=cut
+
+=head2 CPAN Testers Note
+
+It is normal for this module to fail the CPAN Testers' tests. 
+The build support tools needed by this module and especially the 
+Alien::Google::GRPC module are not normally installed on the 
+CPAN Testers' machines.
 
 =cut
 

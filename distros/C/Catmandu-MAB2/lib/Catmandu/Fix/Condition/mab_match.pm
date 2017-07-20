@@ -1,6 +1,6 @@
 package Catmandu::Fix::Condition::mab_match;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Catmandu::Sane;
 use Catmandu::Fix::mab_map;

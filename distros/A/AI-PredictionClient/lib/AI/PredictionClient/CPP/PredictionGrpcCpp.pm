@@ -1,6 +1,6 @@
 ## no critic
 package AI::PredictionClient::CPP::PredictionGrpcCpp;
-$AI::PredictionClient::CPP::PredictionGrpcCpp::VERSION = '0.01';
+$AI::PredictionClient::CPP::PredictionGrpcCpp::VERSION = '0.03';
 
 # ABSTRACT: The C++ interface to gRPC and Protocol Buffers
 
@@ -10,7 +10,7 @@ use AI::PredictionClient::Alien::TensorFlowServingProtos;
 use Inline
   CPP => 'DATA',
   with => ['Alien::Google::GRPC', 'AI::PredictionClient::Alien::TensorFlowServingProtos'],
-  version => '0.01',
+  version => '0.03',
   name => 'AI::PredictionClient::CPP::PredictionGrpcCpp',
   TYPEMAPS => getcwd . '/blib/lib/AI/PredictionClient/CPP/Typemaps/more_typemaps_STL_String.txt',
   LIBS => '-ldl',
@@ -32,7 +32,7 @@ AI::PredictionClient::CPP::PredictionGrpcCpp - The C++ interface to gRPC and Pro
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

@@ -13,7 +13,7 @@ use Capture::Tiny qw( capture_merged );
 our @EXPORT = qw( alienfile alienfile_ok );
 
 # ABSTRACT: Tools for testing Alien::Build + alienfile
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.66'; # VERSION
 
 
 sub alienfile
@@ -93,6 +93,7 @@ sub alienfile_ok
 
 
 delete $ENV{$_} for qw( ALIEN_BUILD_PRELOAD ALIEN_BUILD_POSTLOAD ALIEN_INSTALL_TYPE );
+$ENV{ALIEN_BUILD_RC} = '-';
 
 1;
 
@@ -108,7 +109,7 @@ Test::Alien::Build - Tools for testing Alien::Build + alienfile
 
 =head1 VERSION
 
-version 0.61
+version 0.66
 
 =head1 SYNOPSIS
 

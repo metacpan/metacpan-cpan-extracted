@@ -13,5 +13,26 @@ my $parser = HTTP::Entity::Parser->new(buffer_length => 100);
 ok($parser);
 is($parser->[1],100);
 
-done_testing;
+{
+    my $env = {
+        CONTENT_TYPE => 'multipart/form-data',
+    };
+    my $parser = HTTP::Entity::Parser->new(buffer_length => 100);
+    my ( $params, $uploads) = $parser->parse($env);
+    is_deeply($params,[]);
+    is_deeply($uploads,[]);
+}
 
+{
+    my $env = {
+        CONTENT_TYPE => 'multipart/form-data',
+        'psgi.input' => undef,
+    };
+    my $parser = HTTP::Entity::Parser->new(buffer_length => 100);
+    my ( $params, $uploads) = $parser->parse($env);
+    is_deeply($params,[]);
+    is_deeply($uploads,[]);
+}
+
+
+done_testing;

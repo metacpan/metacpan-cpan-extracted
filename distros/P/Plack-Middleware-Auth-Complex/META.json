@@ -33,11 +33,14 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Authen::Passphrase::Scrypt" : "0"
+         },
          "requires" : {
             "Authen::Passphrase" : "0",
             "Authen::Passphrase::BlowfishCrypt" : "0",
-            "Bytes::Random::Secure" : "0",
             "DBI" : "0",
+            "Data::Entropy" : "0",
             "Email::Sender::Simple" : "0",
             "Email::Simple" : "0",
             "IO::Prompter" : "0",
@@ -53,6 +56,6 @@
          "url" : "https://git.ieval.ro/?p=plack-middleware-auth-complex.git"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003001",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

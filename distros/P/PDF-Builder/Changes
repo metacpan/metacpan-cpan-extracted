@@ -1,6 +1,11 @@
+3.005     2017-07-14
+
+   Some minor POD cleanups (missing > brackets) and fix VERSION in .pm files.
+   Otherwise no code changes. Some build cleanup.
+
 3.004     2017-07-12
 
-   updates to official CPAN release (currently 2.032 in-progress) included:
+   updates to official CPAN release (2.033) included:
 
     - [RT #120756] Eliminate a warning for an ambiguous call to
       CORE::open (first reported by Abdelbaki Brahmia). fix already in
@@ -8,6 +13,9 @@
 
     - [RT #121832] fix t/resources/sample-xrefstm.pdf
             NOTE: STILL DOES NOT SEEM TO WORK
+
+   Hyphenate_en.pm changed to Hyphenate_basic.pm, and scope of built-in
+   hyphenation reduced somewhat.
 
    Prepare for release as PDF::Builder on GitHub and CPAN.
 
@@ -73,7 +81,7 @@
      used to fit the line. If this isn't enough, hscale() will be used as
      a last resort (as it severely distorts the characters).
 
-*    [ref RT #98548 (was rejected)] added preliminary code for line splitting
+     [ref RT #98548 (was rejected)] added preliminary code for line splitting
      (word hyphenation). This currently splits on soft hyphens, after runs of
      digits or ASCII letters, after certain punctuation, and within camelCase
      text. It does NOT yet split up normal words (still looking for a good

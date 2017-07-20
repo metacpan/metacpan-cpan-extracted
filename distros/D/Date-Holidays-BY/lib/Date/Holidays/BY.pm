@@ -1,5 +1,5 @@
 package Date::Holidays::BY;
-$Date::Holidays::BY::VERSION = '0.2017.0';
+$Date::Holidays::BY::VERSION = '0.2017.2';
 # ABSTRACT: Determine Belorussian official holidays and business days.
 
 
@@ -46,7 +46,7 @@ my @REGULAR_HOLIDAYS = (
     },
     {
         name => 'День Независимости Республики Беларусь',
-        days => '0603',
+        days => '0703',
     },
     {
         name => 'День Октябрьской революции',
@@ -65,7 +65,7 @@ my @REGULAR_HOLIDAYS = (
 
 my %HOLIDAYS_SPECIAL = (
     2017 => [ qw( 0102 0424 0425 0508 1106 ) ],
-    2018 => [ qw( 0514 ) ],
+    2018 => [ qw( 0417 ) ],
 );
 
 
@@ -74,8 +74,8 @@ my %BUSINESS_DAYS_ON_WEEKENDS = (
 );
 
 my %SHORT_BUSINESS_DAYS = (
-    2017 => [ qw( 0106 0307 0424 0508 1106 ) ],
-    2018 => [ qw( 0307 0430 0508 0602 1106 1231 ) ],
+    2017 => [ qw( 0106 0307 0429 0506 1104 ) ],
+    2018 => [ qw( 0307 0416 0430 0508 0602 1106 1224 1231 ) ],
 );
 
 
@@ -194,7 +194,7 @@ Date::Holidays::BY - Determine Belorussian official holidays and business days.
 
 =head1 VERSION
 
-version 0.2017.0
+version 0.2017.2
 
 =head1 SYNOPSIS
 
@@ -249,7 +249,7 @@ Date::Holidays::BY
 
 =head1 VERSION
 
-version 0.2017.0
+version 0.2017.2
 
 =head1 AUTHOR
 

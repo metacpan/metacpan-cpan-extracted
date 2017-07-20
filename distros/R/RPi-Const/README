@@ -1,0 +1,96 @@
+NAME
+
+    RPi::WiringPi::Constant - Constant variables for RPi::WiringPi
+
+SYNOPSIS
+
+        use RPi::WiringPi::Constant (:all);
+    
+        # or...
+    
+        use RPi::WiringPi::Constant (:pinmode);
+    
+        # etc
+
+DESCRIPTION
+
+    This module optionally exports selections or all constant variables
+    used within the RPi::WiringPi suite.
+
+CONSTANT EXPORT TAGS
+
+    These are the individual grouping of export tags. The :all tag includes
+    all of the below.
+
+ :mode
+
+    Setup modes. This is what determines which pin numbering scheme you're
+    using. See wiringPi setup modes <http://wiringpi.com/reference/setup>
+    for details.
+
+        RPI_MODE_WPI      =>  0, # wiringPi scheme
+        RPI_MODE_GPIO     =>  1, # GPIO scheme
+        RPI_MODE_GPIO_SYS =>  2, # GPIO scheme in SYS mode
+        RPI_MODE_PHYS     =>  3, # physical pin layout scheme
+        RPI_MODE_UNINIT   => -1, # setup not yet run
+
+ :pinmode
+
+    Pin modes.
+
+        INPUT            => 0,
+        OUTPUT           => 1,
+        PWM_OUT          => 2,
+        GPIO_CLOCK       => 3,
+        SOFT_PWM_OUTPUT  => 4,  # reserved
+        SOFT_TONE_OUTPUT => 5,  # reserved
+        PWM_TONE_OUTPUT  => 6,  # reserved
+
+ :altmode
+
+    Pin ALT modes.
+
+        ALT0 => 4,
+        ALT1 => 5,
+        ALT2 => 6,
+        ALT3 => 7,
+        ALT4 => 3,
+        ALT5 => 2,
+
+ :pull
+
+    Internal pin pull up/down resistor state.
+
+        PUD_OFF  => 0,
+        PUD_DOWN => 1,
+        PUD_UP   => 2,
+
+ :state
+
+        HIGH => 1,
+        LOW  => 0,
+        ON   => 1,
+        OFF  => 0,
+
+ :interrupt
+
+    Edge detection states for interrupts.
+
+        EDGE_SETUP   => 0,  # reserved
+        EDGE_FALLING => 1,
+        EDGE_RISING  => 2,
+        EDGE_BOTH    => 3,
+        
+
+AUTHOR
+
+    Steve Bertrand, <steveb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 by Steve Bertrand
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.18.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

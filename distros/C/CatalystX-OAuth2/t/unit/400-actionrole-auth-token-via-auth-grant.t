@@ -3,10 +3,10 @@ use Test::More;
 use JSON::Any;
 use HTTP::Request::Common;
 use lib 't/lib';
-use CatalystX::Test::MockContext;
+use Catalyst::Test 'AuthServer';
 
 my $json = JSON::Any->new;
-my $mock = mock_context('AuthServer');
+
 
 my $code = AuthServer->model('DB::Code')
   ->create( { client => { endpoint => '/client/foo' } } );
@@ -19,7 +19,7 @@ my $code = AuthServer->model('DB::Code')
       code         => $code->as_string
     }
   );
-  my $c = $mock->( GET $uri );
+  my ($res2, $c) = ctx_request($uri);
   $c->dispatch;
   is_deeply( $c->error, [] );
   my $res = $c->res;

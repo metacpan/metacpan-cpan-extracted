@@ -1,13 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Maintainer:    $Author: zerojinx $
-# Created:       2006-10-31
-# Last Modified: $Date: 2015-09-21 10:19:13 +0100 (Mon, 21 Sep 2015) $
-# Source:        $Source: /cvsroot/clearpress/clearpress/lib/ClearPress/util.pm,v $
-# Id:            $Id: util.pm 470 2015-09-21 09:19:13Z zerojinx $
-# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/util.pm $
+# Author: rmp
 #
 package ClearPress::util;
 use strict;
@@ -20,21 +14,62 @@ use English qw(-no_match_vars);
 use ClearPress::driver;
 use CGI;
 use IO::Capture::Stderr;
+use Data::UUID;
 
-our $VERSION = q[475.3.3];
+our $VERSION = q[476.1.1];
+our $DEBUG_UTIL           = 0;
 our $DEFAULT_TRANSACTIONS = 1;
 our $DEFAULT_DRIVER       = 'mysql';
-my  $INSTANCES = {};
+my  $INSTANCES            = {}; # per-process table of singletons (nasty!)
 
 __PACKAGE__->mk_accessors(qw(transactions username requestor profiler session));
+
+BEGIN {
+  use constant MP2 => eval { require Apache2::RequestUtil; Apache2::RequestUtil->can('request') && $Apache2::RequestUtil::VERSION > 1.99 }; ## no critic (ProhibitConstantPragma, RequireCheckingReturnValueOfEval)
+
+  if(MP2) {
+    carp q[Using request-based singletons [mod_perl2 found]];
+  } else {
+    carp q[Using process-based singletons [mod_perl2 not found]];
+  }
+}
+
+sub _singleton_key {
+  my ($self) = @_;
+  #########
+  # classic mode
+  #
+  my $class         = ref $self || $self;
+  my $singleton_key = $class;
+
+  #########
+  # per-request mode - should support mpm_worker & mpm_event
+  # Could this be done using $ENV{request-id} ||= uuid->new in regular CGI mode?
+  #
+  if(MP2) {
+    my $request    = Apache2::RequestUtil->request;
+    $singleton_key = $request->pnotes($class);
+
+    if(!$singleton_key) {
+      $singleton_key = Data::UUID->new->create_str;
+      $request->pnotes($class => $singleton_key);
+      $DEBUG_UTIL and carp qq[new util singleton = $singleton_key];
+    } else {
+      $DEBUG_UTIL and carp qq[reuse util singleton = $singleton_key];
+    }
+  }
+
+  return $singleton_key;
+}
 
 sub new {
   my ($class, $ref) = @_;
 
   my $self = {};
+  my $singleton_key = $class->_singleton_key;
 
-  if(exists $INSTANCES->{$class}) {
-    $self = $INSTANCES->{$class};
+  if(exists $INSTANCES->{$singleton_key}) {
+    $self = $INSTANCES->{$singleton_key};
   }
 
   if($ref && ref $ref eq 'HASH') {
@@ -47,9 +82,9 @@ sub new {
     $self->{transactions} = $DEFAULT_TRANSACTIONS;
   }
 
-  $INSTANCES->{$class} = bless $self, $class;
+  $INSTANCES->{$singleton_key} = bless $self, $class;
 
-  return $INSTANCES->{$class};
+  return $INSTANCES->{$singleton_key};
 }
 
 sub cgi {
@@ -163,9 +198,9 @@ sub cleanup {
   # carry over any stateful information to the next request - CGI,
   # DBH, TT and anything else cached in data members.
   #
-  my $class = ref $self || $self;
+  my $singleton_key = $self->_singleton_key;
 
-  delete $INSTANCES->{$class};
+  delete $INSTANCES->{$singleton_key};
 
   if(exists $self->{dbh}) {
     $self->{dbh}->disconnect();
@@ -371,6 +406,8 @@ $Revision: 470 $
 =item Config::IniFiles
 
 =item Carp
+
+=item Data::UUID
 
 =item POSIX
 

@@ -1,12 +1,10 @@
-.cvsignore
+.gitignore
 Build.PL
 Changes
 MANIFEST
 META.json
 META.yml
-Makefile.PL
 README
-lib/Authen/.cvsignore
 lib/Authen/DecHpwd.pm
 lib/Authen/DecHpwd.xs
 t/ad_ii.t

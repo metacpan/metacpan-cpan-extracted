@@ -9,7 +9,7 @@ use MooX::StrictConstructor;
 use MooX::Types::MooseLike::Base qw(Bool Str CodeRef);
 use namespace::autoclean;
 
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 has is_strict => (
     is  => 'rw',
@@ -234,13 +234,13 @@ __END__
 
 Locale::Utils::PlaceholderMaketext - Utils to expand maketext palaceholders
 
-$Id: PlaceholderMaketext.pm 590 2015-04-19 07:55:50Z steffenw $
+$Id: PlaceholderMaketext.pm 665 2017-07-16 10:12:00Z steffenw $
 
 $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/Locale-Utils-PlaceholderMaketext/trunk/lib/Locale/Utils/PlaceholderMaketext.pm $
 
 =head1 VERSION
 
-1.003
+1.005
 
 =head1 SYNOPSIS
 

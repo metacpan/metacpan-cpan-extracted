@@ -1,10 +1,8 @@
 package Encode::Alias;
 use strict;
 use warnings;
-our $VERSION = do { my @r = ( q$Revision: 2.22 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
+our $VERSION = do { my @r = ( q$Revision: 2.23 $ =~ /\d+/g ); sprintf "%d." . "%02d" x $#r, @r };
 use constant DEBUG => !!$ENV{PERL_ENCODE_DEBUG};
-
-use Encode ();
 
 use Exporter 'import';
 
@@ -108,6 +106,9 @@ sub define_alias {
         }
     }
 }
+
+# HACK: Encode must be used after define_alias is declarated as Encode calls define_alias
+use Encode ();
 
 # Allow latin-1 style names as well
 # 0  1  2  3  4  5   6   7   8   9  10

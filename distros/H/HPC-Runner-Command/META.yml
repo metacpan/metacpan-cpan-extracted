@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -104,7 +104,7 @@ resources:
   bugtracker: https://github.com/biosails/HPC-Runner-Command/issues
   homepage: https://github.com/biosails/HPC-Runner-Command
   repository: https://github.com/biosails/HPC-Runner-Command.git
-version: 3.2.7
+version: 3.2.8
 x_contributors:
   - 'Travis CI <nobody@nobody.org>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

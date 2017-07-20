@@ -18,14 +18,29 @@ use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.901';
+our $VERSION = '0.911';
 
 use constant WIN32 => $^O eq 'MSWin32';
+
+sub determine_home { # taken from Menlo
+    my $class = shift;
+
+    my $homedir = $ENV{HOME}
+      || eval { require File::HomeDir; File::HomeDir->my_home }
+      || join('', @ENV{qw(HOMEDRIVE HOMEPATH)}); # Win32
+
+    if (WIN32) {
+        require Win32; # no fatpack
+        $homedir = Win32::GetShortPathName($homedir);
+    }
+
+    return "$homedir/.perl-cpm";
+}
 
 sub new {
     my ($class, %option) = @_;
     bless {
-        home => "$ENV{HOME}/.perl-cpm",
+        home => $class->determine_home,
         workers => WIN32 ? 1 : 5,
         snapshot => "cpanfile.snapshot",
         cpanfile => "cpanfile",
@@ -78,11 +93,13 @@ sub parse_options {
         "man-pages" => \($self->{man_pages}),
         "home=s" => \($self->{home}),
         "retry!" => \($self->{retry}),
+        "exclude-vendor!" => \($self->{exclude_vendor}),
         "configure-timeout=i" => \($self->{configure_timeout}),
         "build-timeout=i" => \($self->{build_timeout}),
         "test-timeout=i" => \($self->{test_timeout}),
         "show-progress!" => \($self->{show_progress}),
         "prebuilt!" => \($self->{prebuilt}),
+        "reinstall" => \($self->{reinstall}),
         (map $with_option->($_), qw(requires recommends suggests)),
         (map $with_option->($_), qw(configure build test runtime develop)),
     or exit 1;
@@ -272,7 +289,8 @@ sub cmd_install {
     $master->add_job(type => "resolve", %$_) for @$packages;
     $master->add_distribution($_) for @$dists;
     $self->install($master, $worker, $self->{workers});
-    if (my $fail = $master->fail) {
+    my $fail = $master->fail;
+    if ($fail) {
         local $App::cpm::Logger::VERBOSE = 0;
         for my $type (qw(install resolve)) {
             App::cpm::Logger->log(result => "FAIL", type => $type, message => $_) for @{$fail->{$type}};
@@ -282,7 +300,7 @@ sub cmd_install {
     warn sprintf "%d distribution installed.\n", $master->installed_distributions;
     $self->cleanup;
 
-    if ($master->fail) {
+    if ($fail) {
         warn "See $self->{home}/build.log for details.\n";
         return 1;
     } else {
@@ -370,7 +388,12 @@ sub initial_job {
                 $arg =~ s/[~@]dev$// and $dev++;
                 $name = $arg;
             }
-            $package = {package => $name, version_range => $version_range || 0, dev => $dev};
+            $package = +{
+                package => $name,
+                version_range => $version_range || 0,
+                dev => $dev,
+                reinstall => $self->{reinstall},
+            };
         }
         push @package, $package if $package;
         push @dist, $dist if $dist;
@@ -603,8 +626,21 @@ Copyright 2015 Shoichi Kaji E<lt>skaji@cpan.orgE<gt>
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 SEE ALSO
+=head1 COMMUNITY
 
+=over 4
+
+=item L<https://github.com/skaji/cpm>
+
+Code repository and issue tracker
+
+=item L<https://gitter.im/skaji/cpm>
+
+Chat room. I would like to hear your thoughts about CPAN clients (not necessary about cpm)
+
+=back
+
+=head1 SEE ALSO
 
 L<Perl Advent Calendar 2015|http://www.perladvent.org/2015/2015-12-02.html>
 

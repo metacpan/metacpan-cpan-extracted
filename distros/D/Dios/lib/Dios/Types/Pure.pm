@@ -7,14 +7,30 @@ use Scalar::Util qw< reftype blessed looks_like_number openhandle >;
 use overload;
 use Sub::Uplevel;
 
+$Carp::CarpInternal{'Dios::Types::Pure'}=1;
 
+
+my %exportable = ( validate => 1, validator_for => 1 );
 sub import {
 
-    # Are we exporting validate()??? As what???
-    my (undef, $exported, $export_as) = @_;
-    if (defined $exported) {
-        croak "Can't export $exported" if $exported ne 'validate';
+    # Throw away the package name...
+    shift @_;
+
+    # Cycle through each SUB => AS pair...
+    while (my ($exported, $export_as) = splice(@_, 0, 2)) {
+        # If it's not a rename, don't change the name...
+        if ($export_as && $exportable{$export_as}) {
+            unshift @_, $export_as;
+            undef $export_as;
+        }
+
+        # If it's not exported, don't export it...
+        croak "Can't export $exported" if !$exportable{$exported};
+
+        # Unrenamed exports are exported under their own names...
         $export_as //= $exported;
+
+        # Do the export...
         no strict 'refs';
         *{caller.'::'.$export_as} = \&{$exported};
     }
@@ -64,38 +80,32 @@ my %handler_for = (
 
     # An integer...
     Int => sub {
-        my $value = shift;
-
-        # Value must be defined...
-        return 0 if !defined $value;
-
         # If it's an object, must have a warning-less numeric overloading...
-        if (blessed $value) {
+        if (ref($_[0])) {
+            # Normal references aren't integers...
+            return 0 if !blessed($_[0]);
+
             # Is there an overloading???
-            my $converter = overload::Method($value,'0+')
+            my $converter = overload::Method($_[0],'0+')
                 or return 0;
 
             # Does this object convert to a number without complaint???
             my $warned;
             local $SIG{__WARN__} = sub { $warned = 1 };
-            $value = eval{ $converter->($value) }
+            my $value = eval{ $converter->($_[0]) }
                 // return 0;
             return 0 if $warned;
+            return $value =~ m{\A \s*+ [+-]?+ (?: \d++ (\.0*+)?+ | inf(?:inity)?+ ) \s*+ \Z}ixms;
         }
 
-        # Can't be any other kind of reference...
-        elsif (ref $value) {
-            return 0;
-        }
-
-        # Otherwise does Perl think it's a number and does it look like an integer???
-        return looks_like_number($value)
-            && $value =~ m{\A \s*+ [+-]?+ (?: \d++ (\.0*+)?+ | inf(?:inity)?+ ) \s*+ \Z}ixms;
+        # Value must be defined, non-reference, looks like an integer...
+        return defined($_[0])
+            && $_[0] =~ m{\A \s*+ [+-]?+ (?: \d++ (\.0*+)?+ | inf(?:inity)?+ ) \s*+ \Z}ixms;
     },
 
     # A number
     Num => sub {
-        return 0 if !defined $_[0] || $_[0] =~ /NaN/i;
+        return 0 if !defined $_[0] || lc($_[0]) eq 'nan';
         &looks_like_number
     },
 
@@ -126,8 +136,7 @@ my %handler_for = (
 
     # Any loaded class (must have @ISA or $VERSION or at least one method defined)...
     Class => sub {
-        return 0 if ref $_[0];
-        return 0 if not $_[0];
+        return 0 if ref $_[0] || not $_[0];
         my $stash = \%main::;
         for my $partial_name (split /::/, $_[0]) {
             return 0 if !exists $stash->{$partial_name.'::'};
@@ -140,7 +149,6 @@ my %handler_for = (
         }
         return 0;
     },
-
 );
 
 # Built-in type checking...
@@ -203,12 +211,13 @@ my $TYPENAME_GRAMMAR = qr{
     |   List  \[  (?<list>   \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
     |   Array \[  (?<array>  \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
     |   Tuple \[  (?<tuple>  \s*+ (?&TUPLE_FORMAT)    \s*+ )  \]
-    |   Hash  \[  (?<hash>   \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
+    |   Hash  \[  (?<hash>   \s*+ (?&CONJ_TYPENAME) (?: \s*+ => \s*+ (?&CONJ_TYPENAME) )?+ \s*+ )  \]
     |   Dict  \[  (?<dict>   \s*+ (?&DICT_FORMAT)     \s*+ )  \]
     |   Ref   \[  (?<ref>    \s*+ (?&CONJ_TYPENAME)   \s*+ )  \]
     |   Eq    \[  (?<eq>     \s*+ (?&STR_SPEC)        \s*+ )  \]
     |   Match \[  (?<match>  \s*+ (?&REGEX_SPEC)      \s*+ )  \]
-    |   Can   \[  (?<can>    \s*+ (?&OPT_QUAL_IDENT)  \s*+ )  \]
+    |   Can   \[  (?<can>    \s*+ (?&OPT_QUAL_IDENT) \s*+ (?: , \s*+ (?&OPT_QUAL_IDENT) \s*+ )*+ ) \]
+    |   Overloads \[  (?<overloads>  [^]]++ )  \]
     |             (?<basic>       (?&BASIC)                )
     |             (?<user>        (?!(?&BASIC)) (?&IDENT) (?: \s*+ \[ \s*+ (?&TYPE_LIST) \s*+ \] )?+  )
     )
@@ -330,9 +339,8 @@ sub _build_handler_for {
                                             if (reftype($_[0]) // q{}) ne 'ARRAY';
 
                                         for (@{$_[0]}) {
-                                            my $okay = $value_handler->($_);
-                                            return _error_near($_, $type_is{array}, $okay)
-                                                if !$okay;
+                                            next if my $okay = $value_handler->($_);
+                                            return _error_near($_, $type_is{array}, $okay);
                                         }
 
                                         return 1;
@@ -346,9 +354,8 @@ sub _build_handler_for {
                                             if (reftype($_[0]) // q{}) ne 'ARRAY';
 
                                         for (@{$_[0]}) {
-                                            my $okay = $value_handler->($_);
-                                            return _error_near($_, $type_is{list}, $okay)
-                                                if !$okay;
+                                            next if my $okay = $value_handler->($_);
+                                            return _error_near($_, $type_is{list}, $okay);
                                         }
 
                                         return 1;
@@ -402,18 +409,45 @@ sub _build_handler_for {
                                   }
 
     # Hash[T] types require a hash ref, whose every value is of type T...
-    if ( exists $type_is{hash}  ) { my $value_handler = _build_handler_for($type_is{hash});
-                                    return sub {
-                                        return _error_near($_[0], "Hash[$type_is{hash}]")
-                                            if (reftype($_[0]) // q{}) ne 'HASH';
+    if ( exists $type_is{hash}  ) { my ($type_k, $type_v) = split '=>', $type_is{hash};
+                                    # Only value type specified...
+                                    if (!defined $type_v) {
+                                        my $value_handler = _build_handler_for($type_k);
+                                        return sub {
+                                            return _error_near($_[0], "Hash[$type_is{hash}]")
+                                                if (reftype($_[0]) // q{}) ne 'HASH';
 
-                                        for (values %{$_[0]}) {
-                                            my $okay = $value_handler->($_);
-                                            return _error_near($_, $type_is{hash}, $okay)
-                                                if !$okay;
+                                            for (values %{$_[0]}) {
+                                                my $okay = $value_handler->($_);
+                                                return _error_near($_, $type_is{hash}, $okay)
+                                                    if !$okay;
+                                            }
+
+                                            return 1;
                                         }
+                                    }
+                                    # Both key and value type specified...
+                                    else {
+                                        my $key_handler   = _build_handler_for($type_k);
+                                        my $value_handler = _build_handler_for($type_v);
+                                        return sub {
+                                            return _error_near($_[0], "Hash[$type_is{hash}]")
+                                                if (reftype($_[0]) // q{}) ne 'HASH';
 
-                                        return 1;
+                                            for (keys %{$_[0]}) {
+                                                my $okay = $key_handler->($_);
+                                                return _error_near($_, $type_is{hash}, $okay)
+                                                    if !$okay;
+                                            }
+
+                                            for (values %{$_[0]}) {
+                                                my $okay = $value_handler->($_);
+                                                return _error_near($_, $type_is{hash}, $okay)
+                                                    if !$okay;
+                                            }
+
+                                            return 1;
+                                        }
                                     }
                                   }
 
@@ -512,14 +546,32 @@ sub _build_handler_for {
                                     }
                                   }
 
-    # Can[M] types require a class or object with the specified method...
-    if ( exists $type_is{can}   ) { my $method_name = $type_is{can};
+    # Can[M] types require a class or object with the specified methods...
+    if ( exists $type_is{can}   ) { my @method_names = split q{,}, $type_is{can};
+                                    s{\s*}{}g for @method_names;
                                     return sub {
                                         return 0 if !blessed($_[0]) && !$handler_for{Class}($_[0]);
-                                        return 1 if eval{ $_[0]->can($method_name) };
-                                        return _error_near($_[0], "Can[$method_name]")
+                                        for my $method_name (@method_names) {
+                                            return _error_near($_[0], "Can[$type_is{can}]")
+                                                if !eval{ $_[0]->can($method_name) };
+                                        }
+                                        return 1
                                     }
                                   }
+
+    # Overloads[O] types require a class or object with the specified overloads...
+    if ( exists $type_is{overloads} ) { my @ops = split q{,}, $type_is{overloads};
+                                        s{\s*}{}g for @ops;
+                                        return sub {
+                                            use overload;
+                                            return 0 if !blessed($_[0]) && !$handler_for{Class}($_[0]);
+                                            for my $op (@ops) {
+                                                return _error_near($_[0], "Can[$type_is{overloads}]")
+                                                    if !overload::Method($_[0], $op);
+                                            }
+                                            return 1
+                                        }
+                                      }
 
     die "Internal error: could not generate a type from '$type'. Please report this as a bug."
 }
@@ -579,6 +631,72 @@ sub validate {
     }
 
     return 1;
+}
+
+sub validator_for {
+    my $typename = shift;
+    my ($value_desc, @constraints);
+    for my $arg (@_) {
+        # Subs are undescribed constraints...
+        if (ref($arg) eq 'CODE') {
+            push @constraints, $arg;
+        }
+
+        # Anything else is part of the value description...
+        elsif (defined $arg) {
+            $value_desc .= $arg;
+        }
+    }
+
+    # What's happening in the caller's lexical scope???
+    local $Dios::Types::Pure::lexical_hints = (caller 0)[10] // {};
+
+    # All but the basic handlers are built late, as needed...
+    if (!exists $handler_for{$typename}) {
+        $handler_for{$typename} = _build_handler_for($typename)
+            or die 'Internal error: unable to build type checker. Please report this as a bug.';
+    }
+
+    # Return the smallest sub that validates the type...
+    my $handler = $handler_for{$typename};
+
+    return $handler if !$value_desc && !@constraints;
+
+    return sub {
+        return 1 if $handler->($_[0]);
+
+        my $desc = _complete_desc($value_desc, $_[0]);
+        croak qq{\u$desc}
+            . ($desc =~ /\s$/ ? q{} : q{ })
+            . qq{is not of type $typename};
+    } if !@constraints;
+
+    return sub {
+        # Either the type matches or we die...
+        if (!$handler_for{$typename}($_[0])) {
+            my $desc = _complete_desc($value_desc, $_[0]);
+            croak qq{\u$desc}
+                . ($desc =~ /\s$/ ? q{} : q{ })
+                . qq{is not of type $typename};
+        }
+        return 1 if !@constraints;
+
+        # Either every constraint matches or we die...
+        for my $test (@constraints) {
+            local $@;
+
+            # If it fails to match...
+            if (! eval{ local $SIG{__WARN__} = sub{}; $test->(local $_ = $_[0]) }) {
+                my $desc = _complete_desc($value_desc, $_[0]);
+                my $constraint_desc = _describe_constraint($_[0], $desc, $test, $@);
+                croak qq{\u$desc}
+                    . ($desc =~ /\s$/ ? q{} : q{ })
+                    . qq{did not satisfy the constraint: $constraint_desc\n }
+            }
+        }
+
+        return 1;
+    }
 }
 
 package Dios::Types::Pure::TypedArray {
@@ -953,8 +1071,12 @@ sub _describe_constraint {
 
 sub _perl {
     use Data::Dump 'dump';
-    dump( map { my $classname = blessed $_; $classname ? "<$classname object>" : $_ } @_ )
-        =~ s{" (< \S++ \s object >) "}{$1}xgmsr;
+    dump( map {
+            if    (my $tiedclass = tied $_)    { $tiedclass =~ s/=.*//; "<$tiedclass tie>" }
+            elsif (my $classname = blessed $_) { "<$classname object>"      }
+            else                               { $_ }
+          } @_ )
+        =~ s{" (< \S++ \s (?:object|tie) >) "}{$1}xgmsr;
 
 }
 
@@ -990,6 +1112,17 @@ This document describes Dios::Types::Pure version 0.000001
     if (eval{ validate($TYPE, $VALUE) }) {
         warn "$VALUE not of type $TYPE. Proceeding anyway.";
     }
+
+    use Dios::Types::Pure 'validator_for';
+
+    # Same, but prebuild validator for faster checking...
+    my $check = validator_for($TYPE, $DESC, @CONSTRAINTS);
+
+    for my $VALUE (@MANY_VALUES) {
+        $check->($VALUE);
+    }
+
+
 
 
 =head1 DESCRIPTION
@@ -1204,18 +1337,38 @@ the remainder of the elements may be anything (or nothing)...
 That is, a trailing C<...> is just shorthand for a trailing C<Any...>
 
 
-=head3 C<< Hash >> and C<< Hash[T] >>
+=head3 C<< Hash >>, Hash[T], and C<< Hash[T=>T] >>
 
-Accepts any value that is a reference to a hash.
+The unparameterized type accepts any value that is a reference to a hash.
 
-The parameterized form specifies what kind of values
-the hash may contain:
+The singly parameterized form additionally constrains what kind of
+values the hash may contain:
 
-    Hash[Str]         # hash's values are only strings
-    Hash[Hash]        # hash's values are only hash refs
-    Hash[Code|Array]  # hash's values are subroutine or array refs
+    Hash[Str]         # Each hash value must be a string
 
-Hence an unparameterized C<Hash> is just a shorthand for C<Hash[Any]>.
+    Hash[Hash]        # Each hash value must be a hash reference
+
+    Hash[Code|Array]  # Each hash value must be a subroutine or array reference
+
+Hence an unparameterized C<Hash> is just a shorthand for C<< Hash[Any] >>.
+
+The doubly parameterized form additionally constrains the type of keys
+the hash may contain. The type specified before the arrow is the type of
+each key; the type after the arrow is the type of each value:
+
+    Hash[ Not[Empty] => Str ]  # Each key must be at least one character long
+                               # and each value must be a string
+
+    Hash[ Match[^q] => Any ]   # Each key must start with a 'q'
+                               # but values can be of any type
+
+    Hash[ Class => Obj|Undef ] # Each key must be the name of a class;
+                               # Each value must be an object or C<undef>
+
+Hence an unparameterized C<Hash> is also a shorthand for
+C<< Hash[Str=>Any] >>.
+
+
 
 =head3 C<< Empty >>
 
@@ -1298,10 +1451,11 @@ overload stringification...even if the pattern specified would match the
 default C<'MyClass=HASH[0x1d15ed17]'> stringification of objects.
 
 
-=head3 C<< Can[METHODNAME] >>
+=head3 C<< Can[METHODNAME1, METHODNAME2, ETC] >>
 
 Accepts any value that is either an object or a classname (i.e. C<Obj|Class>)
-and for which C<< $VALUE->can('METHODNAME') >> returns true.
+and for which C<< $VALUE->can('METHODNAME') >> returns true for each
+of the methodnames specified.
 
 If you need to be more specific as to whether the value itself is an
 object or a class, use a conjunction:
@@ -1309,6 +1463,20 @@ object or a class, use a conjunction:
       Obj&Can[dump]    # i.e. $object->can('dump') returns true
 
     Class&Can[dump]    # i.e. MyClass->can('dump') returns true
+
+
+=head3 C<< Overloads[OP1, OP2, ETC] >>
+
+Accepts any value that is either an object or a classname (i.e. C<Obj|Class>)
+and for which C<< overload::Method($VALUE,'OP') >> returns true for each
+of the ops specified.
+
+If you need to be more specific as to whether the value itself is an
+object or a class, use a conjunction:
+
+      Obj&Overloads["", 0+]   # object with overloaded stringification and numerification
+
+    Class&Overloads["", 0+]   # class with overloaded stringification and numerification
 
 
 =head3 C<T1&T2>
@@ -1484,16 +1652,24 @@ The C<validate()> subroutine is B<not> exported by default, but must be
 explicitly requested.
 
 
-=head2 C<< use Dios::Types::Pure 'validate' => 'OTHER_NAME'; >>
+=head2 C<< use Dios::Types::Pure 'validator_for'; >>
 
-When importing C<validate()>, you can request the module rename it, by
-passing the desired alternative name as a second argument. For example:
+The C<validator_for()> subroutine is B<not> exported by default, but must be
+explicitly requested.
+
+
+=head2 C<< use Dios::Types::Pure 'validate' => 'OTHER_NAME', 'validator_for' => 'ANOTHER_NAME'; >>
+
+When importing C<validate()> or C<validator_for()>, you can request the
+module rename it, by passing the desired alternative name as a second
+argument. For example:
 
     use Dios::Types::Pure 'validate' => 'typecheck';
 
     # and later...
 
     typecheck('Array', $data);
+
 
 
 =head2 C<< validate($type, $value, $value_desc, @constraint_subs) >>
@@ -1624,6 +1800,62 @@ Note that the two kinds of extra arguments to C<validate()> (i.e. value
 description strings and constraint subroutines) can be passed in any
 order, or even intermixed, as there is no ambiguity in the meaning of
 sub references vs non-references.
+
+=head2 C<< validator_for($type, $value_desc, @constraint_subs) >>
+
+This subroutine requires its first argument: a type specification.
+It also accepts one or more additional arguments, specifying a
+description of the value being checked, and any constraints.
+All these arguments are exactly the same as for C<validate()>.
+
+The C<validator_for()> subroutine returns a reference to an anonymous
+subroutine that should be called with a single value, to check that the
+specified type accepts that value. If the type accepts the value, the
+anonymous subroutine returns true. If the type doesn't accept the value, an
+exception is thrown.
+
+In other words, C<validator_for()> returns the same subroutine that
+C<validate()> would use to validate a value against a type. Or, in
+other words:
+
+    validate($type, $value, $desc, @constraints);
+
+is just a shorthand for:
+
+    my $check = validator_for($type, $desc, @constraints);
+    $check->($value);
+
+Because C<validator_for()> precompiles much of the checking API, it is
+usually a more efficient choice when you want to perform the same type
+check repeatedly. For example, to add type checking to a subroutine
+parameter, instead of:
+
+    sub delay {
+        my $wait = shift;
+        validate('Int', $wait, sub { $_ > 0 });
+
+        my $code = shift;
+        validate('Code', $code);
+
+        sleep $wait;
+        goto &$code;
+    }
+
+you could precompile each parameter's type check:
+
+    sub delay {
+        state $check_wait = validator_for('Int', sub { $_ > 0 });
+        $check_wait->( my $wait = shift );
+
+        state $check_code = validator_for('Code');
+        $check_code->( my $code = shift );
+
+        sleep $wait;
+        goto &$code;
+    }
+
+which would make the checking approximately three times faster.
+
 
 
 =head1 DIAGNOSTICS

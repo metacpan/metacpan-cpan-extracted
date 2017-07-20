@@ -32,10 +32,10 @@ no_index:
 provides:
   Mojo::DOM58:
     file: lib/Mojo/DOM58.pm
-    version: '1.002'
+    version: '1.003'
   Mojo::DOM58::Entities:
     file: lib/Mojo/DOM58/Entities.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -47,10 +47,10 @@ resources:
   bugtracker: https://github.com/Grinnz/Mojo-DOM58/issues
   homepage: https://github.com/Grinnz/Mojo-DOM58
   repository: https://github.com/Grinnz/Mojo-DOM58.git
-version: '1.002'
+version: '1.003'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GithubMeta
@@ -99,13 +99,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          'git --version': 2.5.5
+          git_version: 2.9.4
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@Author::DBOOK/Git::Contributors'
-      version: '0.029'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::MetaNoIndex
       name: '@Author::DBOOK/MetaNoIndex'
@@ -131,10 +131,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.9.4
           repo_root: .
       name: '@Author::DBOOK/Git::Check'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::RewriteVersion
       config:
@@ -184,12 +184,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Commit'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -197,16 +197,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.002
+          tag: v1.003
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Git::Tag'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -232,12 +232,12 @@ x_Dist_Zilla:
             - (?^:^(?:lib|script|bin)/)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.9.4
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Author::DBOOK/Commit_Version_Bump'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -246,10 +246,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          'git --version': 2.5.5
+          git_version: 2.9.4
           repo_root: .
       name: '@Author::DBOOK/Git::Push'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::DBOOK/PodSyntaxTests'
@@ -261,7 +261,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@Author::DBOOK/Test::ReportPrereqs'
-      version: '0.025'
+      version: '0.027'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -283,7 +283,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@Author::DBOOK/Git::GatherDir'
-      version: '2.041'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Regenerate::AfterReleasers
       config:

@@ -64,7 +64,7 @@
 #define NET_STR_TO_INT64(INT64_VALUE, PTR)                              \
         do {                                                            \
           INT64           macro_var_tmp_value;                          \
-          memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_INT64);        \
+          memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_INT64);    \
           macro_var_tmp_value = ntohi64(macro_var_tmp_value);           \
           INT64_VALUE = macro_var_tmp_value;                            \
         } while (0)
@@ -72,20 +72,47 @@
 #define NET_STR_TO_BIGINT(BIGINT_VALUE, PTR)  \
            NET_STR_TO_INT64(BIGINT_VALUE, PTR)
 
+#define NET_STR_TO_UINT64(UINT64_VALUE, PTR)                            \
+        do {                                                            \
+          UINT64           macro_var_tmp_value;                         \
+          memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_INT64);    \
+          macro_var_tmp_value = ntohi64(macro_var_tmp_value);           \
+          UINT64_VALUE = macro_var_tmp_value;                           \
+        } while (0)
+
+#define NET_STR_TO_UBIGINT(UBIGINT_VALUE, PTR)  \
+           NET_STR_TO_UINT64(UBIGINT_VALUE, PTR)
+
 #define NET_STR_TO_INT(INT_VALUE, PTR)		                        \
 	do {					                        \
 	  int		macro_var_tmp_value;		                \
-	  memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_INT);	        \
+	  memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_INT);      \
 	  macro_var_tmp_value = ntohl(macro_var_tmp_value);		\
 	  INT_VALUE = macro_var_tmp_value;		                \
+	} while (0)
+
+#define NET_STR_TO_UINT(UINT_VALUE, PTR)		                \
+	do {					                        \
+	  unsigned int	macro_var_tmp_value;		                \
+	  memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_INT);      \
+	  macro_var_tmp_value = ntohl(macro_var_tmp_value);		\
+	  UINT_VALUE = macro_var_tmp_value;		                \
 	} while (0)
 
 #define NET_STR_TO_SHORT(SHORT_VALUE, PTR)	                        \
 	do {					                        \
 	  short		macro_var_tmp_value;		                \
-	  memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_SHORT);        \
+	  memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_SHORT);    \
 	  macro_var_tmp_value = ntohs(macro_var_tmp_value);		\
 	  SHORT_VALUE = macro_var_tmp_value;		                \
+	} while (0)
+
+#define NET_STR_TO_USHORT(USHORT_VALUE, PTR)	                        \
+	do {					                        \
+	  unsigned short	macro_var_tmp_value;		        \
+	  memcpy((char*) &macro_var_tmp_value, PTR, NET_SIZE_SHORT);    \
+	  macro_var_tmp_value = ntohs(macro_var_tmp_value);		\
+	  USHORT_VALUE = macro_var_tmp_value;		                \
 	} while (0)
 
 #define NET_STR_TO_BYTE(BYTE_VALUE, PTR)                                \
@@ -137,6 +164,14 @@
 	  (TIME_VAL).ss = macro_var_ss;			                \
 	} while (0)
 
+#define NET_STR_TO_TIMETZ(TIME_VAL, PTR, TOTAL_SIZE)		        \
+	do {					                        \
+	  int tz_size;							\
+	  NET_STR_TO_TIME ((TIME_VAL), (PTR));				\
+	  tz_size = MIN (TOTAL_SIZE - NET_SIZE_TIME, CCI_TZ_SIZE);	\
+	  strncpy ((TIME_VAL).tz, (PTR) + NET_SIZE_TIME, tz_size);	\
+	} while (0)
+
 #define NET_STR_TO_MTIME(TIME_VAL, PTR)                                 \
         do {                                                            \
           short macro_var_hh, macro_var_mm, macro_var_ss, macro_var_ms; \
@@ -160,11 +195,27 @@
 	  NET_STR_TO_TIME((TS_VAL), (PTR) + NET_SIZE_DATE);	\
 	} while (0)
 
+#define NET_STR_TO_TIMESTAMPTZ(TS_VAL, PTR, TOTAL_SIZE)		        \
+	do {					                        \
+	  int tz_size;							\
+	  NET_STR_TO_TIMESTAMP ((TS_VAL), (PTR));			\
+	  tz_size = MIN (TOTAL_SIZE - NET_SIZE_TIMESTAMP, CCI_TZ_SIZE);	\
+	  strncpy ((TS_VAL).tz, (PTR) + NET_SIZE_TIMESTAMP, tz_size);   \
+	} while (0)
+
 #define NET_STR_TO_DATETIME(TS_VAL, PTR)                \
         do {                                            \
           NET_STR_TO_DATE((TS_VAL), (PTR));             \
           NET_STR_TO_MTIME((TS_VAL), (PTR) + NET_SIZE_DATE);\
         } while (0)
+
+#define NET_STR_TO_DATETIMETZ(DT_VAL, PTR, TOTAL_SIZE)		        \
+	do {					                        \
+	  int tz_size;							\
+	  NET_STR_TO_DATETIME ((DT_VAL), (PTR));			\
+	  tz_size = MIN (TOTAL_SIZE - NET_SIZE_DATETIME, CCI_TZ_SIZE);  \
+	  strncpy ((DT_VAL).tz, (PTR) + NET_SIZE_DATETIME, tz_size);    \
+	} while (0)
 
 #define NET_STR_TO_OBJECT(OBJ_VAL, PTR)		                \
 	do {					                \
@@ -196,19 +247,6 @@
 #define ADD_ARG_BIGINT(BUF, VALUE)  ADD_ARG_INT64(BUF, VALUE)
 
 
-#ifdef UNICODE_DATA
-#define ADD_ARG_STR(BUF, STR, SIZE, CHARSET)			\
-	do {							\
-	  char *_macro_tmp_str = STR;				\
-	  int _macro_tmp_int = 0;				\
-	  _macro_tmp_str = ut_ansi_to_unicode(STR);		\
-	  if (_macro_tmp_str != NULL)				\
-	    _macro_tmp_int = strlen(_macro_tmp_str) + 1;	\
-	  net_buf_cp_int(BUF, _macro_tmp_int);			\
-	  net_buf_cp_str(BUF, _macro_tmp_str, _macro_tmp_int);	\
-	  FREE_MEM(_macro_tmp_str);				\
-	} while (0)
-#else
 #if defined (WINDOWS)
 #define ADD_ARG_STR(BUF, STR, SIZE, CHARSET)		 \
 	do {                                             \
@@ -227,7 +265,7 @@
 	    else                                         \
 	      {                                          \
  	        ADD_ARG_BYTES(BUF, target, new_size);    \
- 	        free (target);                           \
+ 	        FREE (target);                           \
 	      }                                          \
  	  }                                              \
  	  else {                                         \
@@ -238,6 +276,45 @@
 #define ADD_ARG_STR(BUF, STR, SIZE, CHARSET)		 \
  	ADD_ARG_BYTES(BUF, STR, SIZE);
 #endif
+
+#if defined (WINDOWS)
+#define ADD_ARG_BIND_STR(BUF, STR, SIZE, CHARSET) \
+	do {                                             \
+ 	  if (CHARSET != NULL) {                         \
+ 	    int new_size;                                \
+ 	    char * target;                               \
+	    new_size = encode_string(STR, SIZE - 1, &target, CHARSET);\
+ 	    if (new_size < 0)                            \
+ 	      {                                          \
+ 		return new_size;                         \
+ 	      }                                          \
+	    else if (new_size == 0)                      \
+	      {                                          \
+		net_buf_cp_int (BUF, SIZE); \
+		net_buf_cp_str (BUF, STR, SIZE - 1); \
+		net_buf_cp_byte (BUF, '\0'); \
+	      }                                          \
+	    else                                         \
+	      {                                          \
+		net_buf_cp_int (BUF, new_size); \
+		net_buf_cp_str (BUF, target, new_size - 1); \
+		net_buf_cp_byte (BUF, '\0'); \
+ 	        FREE (target);                           \
+	      }                                          \
+ 	  }                                              \
+ 	  else {                                         \
+	    net_buf_cp_int (BUF, SIZE); \
+	    net_buf_cp_str (BUF, STR, SIZE - 1);         \
+	    net_buf_cp_byte (BUF, '\0');                 \
+ 	  }                                              \
+ 	} while (0)
+#else
+#define ADD_ARG_BIND_STR(BUF, STR, SIZE, CHARSET) \
+	do { \
+	  net_buf_cp_int (BUF, SIZE); \
+	  net_buf_cp_str (BUF, (char*) STR, SIZE - 1); \
+	  net_buf_cp_byte (BUF, '\0'); \
+	} while (0)
 #endif
 
 #define ADD_ARG_BYTES(BUF, STR, SIZE)		\
@@ -269,6 +346,21 @@
 	  net_buf_cp_short(BUF, macro_var_date_p->mm);	\
 	  net_buf_cp_short(BUF, macro_var_date_p->ss);	\
           net_buf_cp_short(BUF, macro_var_date_p->ms);  \
+	} while (0)
+
+#define ADD_ARG_DATETIMETZ(BUF, VALUE_P)		\
+	do {						\
+	  int tz_size = NET_SIZE_TZ (VALUE_P);		\
+	  T_CCI_DATE_TZ	*macro_var_date_tz_p = (T_CCI_DATE_TZ*) (VALUE_P);  \
+	  net_buf_cp_int(BUF, NET_SIZE_DATETIME + tz_size);   \
+	  net_buf_cp_short(BUF, macro_var_date_tz_p->yr);	\
+	  net_buf_cp_short(BUF, macro_var_date_tz_p->mon);	\
+	  net_buf_cp_short(BUF, macro_var_date_tz_p->day);	\
+	  net_buf_cp_short(BUF, macro_var_date_tz_p->hh);	\
+	  net_buf_cp_short(BUF, macro_var_date_tz_p->mm);	\
+	  net_buf_cp_short(BUF, macro_var_date_tz_p->ss);	\
+          net_buf_cp_short(BUF, macro_var_date_tz_p->ms);  \
+	  net_buf_cp_str(BUF, macro_var_date_tz_p->tz, tz_size); \
 	} while (0)
 
 #define ADD_ARG_OBJECT(BUF, OID_P)			\
@@ -304,148 +396,88 @@
  ************************************************************************/
 
 extern int qe_con_close (T_CON_HANDLE * con_handle);
-extern int qe_prepare (T_REQ_HANDLE * req_handle,
-		       T_CON_HANDLE * con_handle,
-		       char *sql_stmt,
-		       char flag, T_CCI_ERROR * err_buf, int reuse);
-extern int qe_prepare_and_execute (T_REQ_HANDLE * req_handle,
-				   T_CON_HANDLE * con_handle,
-				   char *sql_stmt, int max_col_size,
-				   T_CCI_ERROR * err_buf);
+extern int qe_prepare (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, char *sql_stmt, char flag,
+		       T_CCI_ERROR * err_buf, int reuse);
+extern int qe_prepare_and_execute (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, char *sql_stmt,
+				   int max_col_size, T_CCI_ERROR * err_buf);
 
 extern void qe_bind_value_free (T_REQ_HANDLE * req_handle);
-extern int qe_bind_param (T_REQ_HANDLE * req_handle,
-			  int index,
-			  T_CCI_A_TYPE a_type,
-			  void *value, T_CCI_U_TYPE u_type, char flag);
-extern int qe_execute (T_REQ_HANDLE * req_handle,
-		       T_CON_HANDLE * con_handle,
-		       char flag, int max_col_size, T_CCI_ERROR * err_buf);
-extern int qe_end_tran (T_CON_HANDLE * con_handle,
-			char type, T_CCI_ERROR * err_buf);
+extern int qe_bind_param (T_REQ_HANDLE * req_handle, int index, T_CCI_A_TYPE a_type, void *value, int length,
+			  T_CCI_U_TYPE u_type, char flag);
+extern int qe_execute (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, char flag, int max_col_size,
+		       T_CCI_ERROR * err_buf);
+extern int qe_end_tran (T_CON_HANDLE * con_handle, char type, T_CCI_ERROR * err_buf);
 extern int qe_end_session (T_CON_HANDLE * con_handle, T_CCI_ERROR * err_buf);
-extern int qe_get_db_parameter (T_CON_HANDLE * con_handle,
-				T_CCI_DB_PARAM param_name,
-				void *value, T_CCI_ERROR * err_buf);
-extern int qe_set_db_parameter (T_CON_HANDLE * con_handle,
-				T_CCI_DB_PARAM param_name,
-				void *value, T_CCI_ERROR * err_buf);
-extern int qe_set_cas_change_mode (T_CON_HANDLE * con_handle, int mode,
-				   T_CCI_ERROR * err_buf);
-extern int qe_close_query_result (T_REQ_HANDLE * req_handle,
-				  T_CON_HANDLE * con_handle);
-extern int qe_close_req_handle (T_REQ_HANDLE * req_handle,
-				T_CON_HANDLE * con_handle);
+extern int qe_get_db_parameter (T_CON_HANDLE * con_handle, T_CCI_DB_PARAM param_name, void *value,
+				T_CCI_ERROR * err_buf);
+extern int qe_set_db_parameter (T_CON_HANDLE * con_handle, T_CCI_DB_PARAM param_name, void *value,
+				T_CCI_ERROR * err_buf);
+extern int qe_set_cas_change_mode (T_CON_HANDLE * con_handle, int mode, T_CCI_ERROR * err_buf);
+extern int qe_close_query_result (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle);
+extern int qe_close_req_handle (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle);
 extern void qe_close_req_handle_all (T_CON_HANDLE * con_handle);
-extern int qe_cursor (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle,
-		      int offset, char origin, T_CCI_ERROR * err_buf);
-extern int qe_fetch (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle,
-		     char flag, int result_set_index, T_CCI_ERROR * err_buf);
-extern int qe_get_data (T_CON_HANDLE * con_handle, T_REQ_HANDLE * req_handle,
-			int col_no, int a_type, void *value, int *indicator);
+extern int qe_cursor (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, int offset, char origin,
+		      T_CCI_ERROR * err_buf);
+extern int qe_fetch (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, char flag, int result_set_index,
+		     T_CCI_ERROR * err_buf);
+extern int qe_get_data (T_CON_HANDLE * con_handle, T_REQ_HANDLE * req_handle, int col_no, int a_type, void *value,
+			int *indicator);
 extern int qe_get_cur_oid (T_REQ_HANDLE * req_handle, char *oid_str_buf);
-extern int qe_schema_info (T_REQ_HANDLE * req_handle,
-			   T_CON_HANDLE * con_handle,
-			   int type, char *arg1, char *arg2,
+extern int qe_schema_info (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, int type, char *arg1, char *arg2,
 			   char flag, int shard_id, T_CCI_ERROR * err_buf);
-extern int qe_oid_get (T_REQ_HANDLE * req_handle,
-		       T_CON_HANDLE * con_handle,
-		       char *oid_str,
-		       char **attr_name, T_CCI_ERROR * err_buf);
-extern int qe_oid_put (T_CON_HANDLE * con_handle,
-		       char *oid_str,
-		       char **attr_name,
-		       char **new_val, T_CCI_ERROR * err_buf);
-extern int qe_oid_put2 (T_CON_HANDLE * con_handle,
-			char *oid_str,
-			char **attr_name,
-			void **new_val, int *a_type, T_CCI_ERROR * err_buf);
-extern int qe_get_db_version (T_CON_HANDLE * con_handle,
-			      char *out_buf, int buf_size);
-extern int qe_get_class_num_objs (T_CON_HANDLE * con_handle,
-				  char *class_name,
-				  char flag,
-				  int *num_objs,
-				  int *num_pages, T_CCI_ERROR * err_buf);
-extern int qe_oid_cmd (T_CON_HANDLE * con_handle,
-		       char cmd,
-		       char *oid_str,
-		       char *out_buf,
-		       int out_buf_size, T_CCI_ERROR * err_buf);
-extern int qe_col_get (T_REQ_HANDLE * req_handle,
-		       T_CON_HANDLE * con_handle,
-		       char *oid_str,
-		       const char *col_attr,
-		       int *col_size, int *col_type, T_CCI_ERROR * err_buf);
-extern int qe_get_row_count (T_REQ_HANDLE * req_handle,
-			     T_CON_HANDLE * con_handle,
-			     int *row_count, T_CCI_ERROR * err_buf);
-extern int qe_get_last_insert_id (T_REQ_HANDLE * req_handle,
-				  T_CON_HANDLE * con_handle,
-				  void *value, T_CCI_ERROR * err_buf);
-extern int qe_col_size (T_CON_HANDLE * con_handle,
-			char *oid_str,
-			const char *col_attr, int *col_size,
+extern int qe_oid_get (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, char *oid_str, char **attr_name,
+		       T_CCI_ERROR * err_buf);
+extern int qe_oid_put (T_CON_HANDLE * con_handle, char *oid_str, char **attr_name, char **new_val,
+		       T_CCI_ERROR * err_buf);
+extern int qe_oid_put2 (T_CON_HANDLE * con_handle, char *oid_str, char **attr_name, void **new_val, int *a_type,
 			T_CCI_ERROR * err_buf);
-extern int qe_col_set_add_drop (T_CON_HANDLE * con_handle, char col_cmd,
-				char *oid_str, const char *col_attr,
+extern int qe_get_db_version (T_CON_HANDLE * con_handle, char *out_buf, int buf_size);
+extern int qe_get_class_num_objs (T_CON_HANDLE * con_handle, char *class_name, char flag, int *num_objs, int *num_pages,
+				  T_CCI_ERROR * err_buf);
+extern int qe_oid_cmd (T_CON_HANDLE * con_handle, char cmd, char *oid_str, char *out_buf, int out_buf_size,
+		       T_CCI_ERROR * err_buf);
+extern int qe_col_get (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, char *oid_str, const char *col_attr,
+		       int *col_size, int *col_type, T_CCI_ERROR * err_buf);
+extern int qe_get_row_count (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, int *row_count,
+			     T_CCI_ERROR * err_buf);
+extern int qe_get_last_insert_id (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, void *value,
+				  T_CCI_ERROR * err_buf);
+extern int qe_col_size (T_CON_HANDLE * con_handle, char *oid_str, const char *col_attr, int *col_size,
+			T_CCI_ERROR * err_buf);
+extern int qe_col_set_add_drop (T_CON_HANDLE * con_handle, char col_cmd, char *oid_str, const char *col_attr,
 				char *value, T_CCI_ERROR * err_buf);
-extern int qe_col_seq_op (T_CON_HANDLE * con_handle, char col_cmd,
-			  char *oid_str, const char *col_attr, int index,
+extern int qe_col_seq_op (T_CON_HANDLE * con_handle, char col_cmd, char *oid_str, const char *col_attr, int index,
 			  const char *value, T_CCI_ERROR * err_buf);
 
-extern int qe_next_result (T_REQ_HANDLE * req_handle,
-			   char flag, T_CON_HANDLE * con_handle,
-			   T_CCI_ERROR * err_buf);
-extern int qe_execute_array (T_REQ_HANDLE * req_handle,
-			     T_CON_HANDLE * con_handle,
-			     T_CCI_QUERY_RESULT ** qr, T_CCI_ERROR * err_buf);
-extern void qe_query_result_free (int num_q, T_CCI_QUERY_RESULT * qr);
-extern int qe_cursor_update (T_REQ_HANDLE * req_handle,
-			     T_CON_HANDLE * con_handle,
-			     int cursor_pos,
-			     int index,
-			     T_CCI_A_TYPE a_type,
-			     void *value, T_CCI_ERROR * err_buf);
-extern int qe_execute_batch (T_CON_HANDLE * con_handle,
-			     int num_query,
-			     char **sql_stmt,
-			     T_CCI_QUERY_RESULT ** qr, T_CCI_ERROR * err_buf);
-extern int qe_query_result_copy (T_REQ_HANDLE * req_handle,
-				 T_CCI_QUERY_RESULT ** res_qr);
-
-extern int qe_get_data_str (T_VALUE_BUF * conv_val_buf, T_CCI_U_TYPE u_type,
-			    char *col_value_p, int col_val_size, void *value,
-			    int *indicator);
-extern int qe_get_data_bigint (T_CCI_U_TYPE u_type, char *col_value_p,
-			       void *value);
-extern int qe_get_data_int (T_CCI_U_TYPE u_type,
-			    char *col_value_p, void *value);
-extern int qe_get_data_float (T_CCI_U_TYPE u_type,
-			      char *col_value_p, void *value);
-extern int qe_get_data_double (T_CCI_U_TYPE u_type,
-			       char *col_value_p, void *value);
-extern int qe_get_data_date (T_CCI_U_TYPE u_type,
-			     char *col_value_p, void *value);
-extern int qe_get_data_bit (T_CCI_U_TYPE u_type,
-			    char *col_value_p, int col_val_size, void *value);
-extern int qe_get_data_lob (T_CCI_U_TYPE u_type,
-			    char *col_value_p, int col_val_size, void *value);
-extern int qe_get_data_req_handle (T_CON_HANDLE * con_handle,
-				   T_REQ_HANDLE * req_handle,
-				   char *col_value_p, void *value);
-extern int qe_get_attr_type_str (T_CON_HANDLE * con_handle, char *class_name,
-				 char *attr_name, char *buf, int buf_size,
-				 T_CCI_ERROR * err_buf);
-extern int qe_get_query_info (T_REQ_HANDLE * req_handle,
-			      T_CON_HANDLE * con_handle, char log_type,
-			      char **out_buf);
-extern int qe_savepoint_cmd (T_CON_HANDLE * con_handle, char cmd,
-			     const char *savepoint_name,
+extern int qe_next_result (T_REQ_HANDLE * req_handle, char flag, T_CON_HANDLE * con_handle, T_CCI_ERROR * err_buf);
+extern int qe_execute_array (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, T_CCI_QUERY_RESULT ** qr,
 			     T_CCI_ERROR * err_buf);
-extern int qe_get_param_info (T_REQ_HANDLE * req_handle,
-			      T_CON_HANDLE * con_handle,
-			      T_CCI_PARAM_INFO ** param,
+extern void qe_query_result_free (int num_q, T_CCI_QUERY_RESULT * qr);
+extern int qe_cursor_update (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, int cursor_pos, int index,
+			     T_CCI_A_TYPE a_type, void *value, T_CCI_ERROR * err_buf);
+extern int qe_execute_batch (T_CON_HANDLE * con_handle, int num_query, char **sql_stmt, T_CCI_QUERY_RESULT ** qr,
+			     T_CCI_ERROR * err_buf);
+extern int qe_query_result_copy (T_REQ_HANDLE * req_handle, T_CCI_QUERY_RESULT ** res_qr);
+
+extern int qe_get_data_str (T_VALUE_BUF * conv_val_buf, T_CCI_U_TYPE u_type, char *col_value_p, int col_val_size,
+			    void *value, int *indicator);
+extern int qe_get_data_bigint (T_CCI_U_TYPE u_type, char *col_value_p, void *value);
+extern int qe_get_data_ubigint (T_CCI_U_TYPE u_type, char *col_value_p, void *value);
+extern int qe_get_data_int (T_CCI_U_TYPE u_type, char *col_value_p, void *value);
+extern int qe_get_data_uint (T_CCI_U_TYPE u_type, char *col_value_p, void *value);
+extern int qe_get_data_float (T_CCI_U_TYPE u_type, char *col_value_p, void *value);
+extern int qe_get_data_double (T_CCI_U_TYPE u_type, char *col_value_p, void *value);
+extern int qe_get_data_date (T_CCI_U_TYPE u_type, char *col_value_p, void *value);
+extern int qe_get_data_date_tz (T_CCI_U_TYPE u_type, char *col_value_p, void *value, int total_size);
+extern int qe_get_data_bit (T_CCI_U_TYPE u_type, char *col_value_p, int col_val_size, void *value);
+extern int qe_get_data_lob (T_CCI_U_TYPE u_type, char *col_value_p, int col_val_size, void *value);
+extern int qe_get_data_req_handle (T_CON_HANDLE * con_handle, T_REQ_HANDLE * req_handle, char *col_value_p,
+				   void *value);
+extern int qe_get_attr_type_str (T_CON_HANDLE * con_handle, char *class_name, char *attr_name, char *buf, int buf_size,
+				 T_CCI_ERROR * err_buf);
+extern int qe_get_query_info (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, char log_type, char **out_buf);
+extern int qe_savepoint_cmd (T_CON_HANDLE * con_handle, char cmd, const char *savepoint_name, T_CCI_ERROR * err_buf);
+extern int qe_get_param_info (T_REQ_HANDLE * req_handle, T_CON_HANDLE * con_handle, T_CCI_PARAM_INFO ** param,
 			      T_CCI_ERROR * err_buf);
 extern void qe_param_info_free (T_CCI_PARAM_INFO * param);
 
@@ -455,28 +487,21 @@ extern int encode_string (char *str, int size, char **target, char *charset);
 #endif
 
 #ifdef CCI_XA
-extern int qe_xa_prepare (T_CON_HANDLE * con_handle,
-			  XID * xid, T_CCI_ERROR * err_buf);
-extern int qe_xa_recover (T_CON_HANDLE * con_handle,
-			  XID * xid, int num_xid, T_CCI_ERROR * err_buf);
-extern int qe_xa_end_tran (T_CON_HANDLE * con_handle,
-			   XID * xid, char type, T_CCI_ERROR * err_buf);
+extern int qe_xa_prepare (T_CON_HANDLE * con_handle, XID * xid, T_CCI_ERROR * err_buf);
+extern int qe_xa_recover (T_CON_HANDLE * con_handle, XID * xid, int num_xid, T_CCI_ERROR * err_buf);
+extern int qe_xa_end_tran (T_CON_HANDLE * con_handle, XID * xid, char type, T_CCI_ERROR * err_buf);
 #endif
 
-extern int qe_lob_new (T_CON_HANDLE * con_handle, T_LOB ** lob,
-		       T_CCI_U_TYPE type, T_CCI_ERROR * err_buf);
-extern int qe_lob_write (T_CON_HANDLE * con_handle, T_LOB * lob,
-			 INT64 start_pos, int length, const char *buf,
+extern int qe_lob_new (T_CON_HANDLE * con_handle, T_LOB ** lob, T_CCI_U_TYPE type, T_CCI_ERROR * err_buf);
+extern int qe_lob_write (T_CON_HANDLE * con_handle, T_LOB * lob, INT64 start_pos, int length, const char *buf,
 			 T_CCI_ERROR * err_buf);
-extern int qe_lob_read (T_CON_HANDLE * con_handle, T_LOB * lob,
-			INT64 start_pos, int length, char *buf,
+extern int qe_lob_read (T_CON_HANDLE * con_handle, T_LOB * lob, INT64 start_pos, int length, char *buf,
 			T_CCI_ERROR * err_buf);
 
-extern int qe_get_shard_info (T_CON_HANDLE * con_handle,
-			      T_CCI_SHARD_INFO ** shard_info,
-			      T_CCI_ERROR * err_buf);
+extern int qe_get_shard_info (T_CON_HANDLE * con_handle, T_CCI_SHARD_INFO ** shard_info, T_CCI_ERROR * err_buf);
 extern int qe_shard_info_free (T_CCI_SHARD_INFO * shard_info);
 extern int qe_is_shard (T_CON_HANDLE * con_handle);
+extern bool is_connected_to_cubrid (T_CON_HANDLE * con_handle);
 extern bool is_connected_to_oracle (T_CON_HANDLE * con_handle);
 
 /************************************************************************

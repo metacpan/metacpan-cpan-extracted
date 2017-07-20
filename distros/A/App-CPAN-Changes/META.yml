@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,8 +18,16 @@ meta-spec:
 name: App-CPAN-Changes
 requires:
   CPAN::Changes: '0'
+  Data::Sah::Coerce::perl::date::float_epoch: '0'
+  Data::Sah::Coerce::perl::date::obj_DateTime: '0'
+  Data::Sah::Coerce::perl::date::obj_TimeMoment: '0'
+  Data::Sah::Coerce::perl::date::str_iso8601: '0'
+  Data::Sah::Compiler::perl::TH::array: '0'
+  Data::Sah::Compiler::perl::TH::date: '0'
+  Data::Sah::Compiler::perl::TH::str: '0'
   Fcntl: '0'
   POSIX: '0'
+  Perinci::CmdLine::Lite: '1.76'
   perl: '5.010001'
   strict: '0'
   warnings: '0'
@@ -27,10 +35,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CPAN-Changes
   homepage: https://metacpan.org/release/App-CPAN-Changes
   repository: git://github.com/perlancar/perl-App-CPAN-Changes.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
-    version: '5.024000'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -43,114 +51,122 @@ x_Dist_Zilla:
           prefix: ''
           prune_directory: []
           root: .
-      name: '@Filter/@Filter/GatherDir'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/GatherDir'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::PruneCruft
-      name: '@Filter/@Filter/PruneCruft'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/PruneCruft'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
-      name: '@Filter/@Filter/ManifestSkip'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/ManifestSkip'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::MetaYAML
-      name: '@Filter/@Filter/MetaYAML'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/MetaYAML'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::License
-      name: '@Filter/@Filter/License'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/License'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@Filter/@Filter/PodCoverageTests'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@Filter/@Filter/PodSyntaxTests'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::ExtraTests
-      name: '@Filter/@Filter/ExtraTests'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/ExtraTests'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::ExecDir
-      name: '@Filter/@Filter/ExecDir'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/ExecDir'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::ShareDir
-      name: '@Filter/@Filter/ShareDir'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/ShareDir'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
-      name: '@Filter/@Filter/MakeMaker'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/MakeMaker'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::Manifest
-      name: '@Filter/@Filter/Manifest'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/Manifest'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@Filter/@Filter/ConfirmRelease'
-      version: '6.007'
+      name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
+      version: '6.009'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::PERLANCAR/ExecDir script'
+      version: '6.009'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
+      name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
-      name: '@Filter/Rinci::AbstractFromMeta'
-      version: '0.09'
+      name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
+      version: '0.10'
     -
       class: Dist::Zilla::Plugin::PodnameFromFilename
-      name: '@Filter/PodnameFromFilename'
-      version: '0.01'
-    -
-      class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
-      name: '@Filter/PERLANCAR::EnsurePrereqToSpec'
+      name: '@Author::PERLANCAR/PodnameFromFilename'
       version: '0.02'
     -
+      class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      name: '@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec'
+      version: '0.05'
+    -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
-      name: '@Filter/PERLANCAR::MetaResources'
+      name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
       version: '0.03'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
-      name: '@Filter/CheckChangeLog'
-      version: '0.02'
+      name: '@Author::PERLANCAR/CheckChangeLog'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::CheckMetaResources
-      name: '@Filter/CheckMetaResources'
+      name: '@Author::PERLANCAR/CheckMetaResources'
       version: '0.001'
     -
+      class: Dist::Zilla::Plugin::CopyrightYearFromGit
+      name: '@Author::PERLANCAR/CopyrightYearFromGit'
+      version: '0.003'
+    -
       class: Dist::Zilla::Plugin::IfBuilt
-      name: '@Filter/IfBuilt'
+      name: '@Author::PERLANCAR/IfBuilt'
       version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
-      name: '@Filter/MetaJSON'
-      version: '6.007'
+      name: '@Author::PERLANCAR/MetaJSON'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::MetaConfig
-      name: '@Filter/MetaConfig'
-      version: '6.007'
-    -
-      class: Dist::Zilla::Plugin::GenShellCompletion
-      name: '@Filter/GenShellCompletion'
-      version: '0.11'
+      name: '@Author::PERLANCAR/MetaConfig'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::Authority
-      name: '@Filter/Authority'
+      name: '@Author::PERLANCAR/Authority'
       version: '1.009'
     -
       class: Dist::Zilla::Plugin::OurDate
-      name: '@Filter/OurDate'
+      name: '@Author::PERLANCAR/OurDate'
       version: '0.03'
     -
       class: Dist::Zilla::Plugin::OurDist
-      name: '@Filter/OurDist'
+      name: '@Author::PERLANCAR/OurDist'
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion
-      name: '@Filter/PERLANCAR::OurPkgVersion'
+      name: '@Author::PERLANCAR/PERLANCAR::OurPkgVersion'
       version: '0.04'
     -
       class: Dist::Zilla::Plugin::PodWeaver
@@ -163,55 +179,55 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -221,9 +237,9 @@ x_Dist_Zilla:
               name: '@Author::PERLANCAR/Completion::GetoptLongSubcommand'
               version: '0.04'
             -
-              class: Pod::Weaver::Section::Completion::PerinciCmdLine
-              name: '@Author::PERLANCAR/Completion::PerinciCmdLine'
-              version: '0.14'
+              class: Pod::Weaver::Section::Completion::GetoptLongMore
+              name: '@Author::PERLANCAR/Completion::GetoptLongMore'
+              version: '0.001'
             -
               class: Pod::Weaver::Section::Homepage::DefaultCPAN
               name: '@Author::PERLANCAR/Homepage::DefaultCPAN'
@@ -239,15 +255,15 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.67'
+              version: '0.77'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -255,36 +271,40 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsureUniqueSections
               name: '@Author::PERLANCAR/EnsureUniqueSections'
-              version: '0.121550'
+              version: '0.163250'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
-              version: '0.03'
-      name: '@Filter/PodWeaver'
+              version: '0.06'
+      name: '@Author::PERLANCAR/PodWeaver'
       version: '4.008'
     -
       class: Dist::Zilla::Plugin::PruneFiles
-      name: '@Filter/PruneFiles'
-      version: '6.007'
+      name: '@Author::PERLANCAR/PruneFiles'
+      version: '6.009'
     -
-      class: Dist::Zilla::Plugin::ReadmeFromPod
-      name: '@Filter/ReadmeFromPod'
-      version: '0.33'
+      class: Dist::Zilla::Plugin::Pod2Readme
+      name: '@Author::PERLANCAR/Pod2Readme'
+      version: '0.004'
+    -
+      class: Dist::Zilla::Plugin::Rinci::AddPrereqs
+      name: '@Author::PERLANCAR/Rinci::AddPrereqs'
+      version: '0.13'
     -
       class: Dist::Zilla::Plugin::Rinci::AddToDb
-      name: '@Filter/Rinci::AddToDb'
+      name: '@Author::PERLANCAR/Rinci::AddToDb'
       version: '0.01'
     -
       class: Dist::Zilla::Plugin::Rinci::Validate
-      name: '@Filter/Rinci::Validate'
-      version: '0.23'
+      name: '@Author::PERLANCAR/Rinci::Validate'
+      version: '0.24'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
-      name: '@Filter/SetScriptShebang'
+      name: '@Author::PERLANCAR/SetScriptShebang'
       version: '0.01'
     -
       class: Dist::Zilla::Plugin::Test::Compile
@@ -301,44 +321,41 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
-      name: '@Filter/Test::Compile'
-      version: '2.054'
+          switch: []
+      name: '@Author::PERLANCAR/Test::Compile'
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::Test::Rinci
-      name: '@Filter/Test::Rinci'
+      name: '@Author::PERLANCAR/Test::Rinci'
       version: '0.03'
     -
-      class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
-      name: '@Filter/UploadToCPAN::WWWPAUSESimple'
-      version: '0.03'
+      class: Dist::Zilla::Plugin::StaticInstall
+      config:
+        Dist::Zilla::Plugin::StaticInstall:
+          dry_run: 0
+          mode: on
+      name: '@Author::PERLANCAR/StaticInstall'
+      version: '0.010'
     -
       class: Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest
-      name: '@Filter/EnsureSQLSchemaVersionedTest'
-      version: '0.02'
+      name: '@Author::PERLANCAR/EnsureSQLSchemaVersionedTest'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
-      name: '@Filter/Acme::CPANLists::Blacklist'
-      version: '0.02'
+      name: '@Author::PERLANCAR/Acme::CPANLists::Blacklist'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
-      name: '@Filter/Prereqs::EnsureVersion'
-      version: '0.01'
+      name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
-      name: '@Filter/Prereqs::CheckCircular'
-      version: '0.003'
+      name: '@Author::PERLANCAR/Prereqs::CheckCircular'
+      version: '0.005'
     -
-      class: Dist::Zilla::Plugin::Depak
-      name: Depak
-      version: '0.20'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: TestRequires
-      version: '6.007'
+      class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
+      name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -346,331 +363,60 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
           phase: develop
-          type: recommends
-      name: DevelopRecommends
-      version: '6.007'
-    -
-      class: Dist::Zilla::Plugin::Extras
-      name: 'lint-prereqs / assume-provided'
-      version: '0.03'
+          type: x_spec
+      name: DevelopX_spec
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.007'
+      version: '6.009'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.007'
+      version: '6.009'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.007'
-x_Dist_Zilla_Plugin_Depak:
-  packed_dists: ~
-  packed_modules:
-    App::CPAN::Changes: '0.002'
-    CPAN::Changes: '0.400002'
-    CPAN::Changes::Group: ~
-    CPAN::Changes::Release: ~
-    Capture::Tiny: '0.44'
-    Class::Inspector: '1.28'
-    Class::Inspector::Functions: '1.28'
-    Clone::PP: 1.06
-    Color::ANSI::Util: '0.15'
-    Complete::Bash: '0.28'
-    Complete::Common: '0.22'
-    Complete::Env: '0.38'
-    Complete::File: '0.40'
-    Complete::Fish: '0.04'
-    Complete::Getopt::Long: '0.42'
-    Complete::Path: '0.23'
-    Complete::Tcsh: '0.02'
-    Complete::Util: '0.50'
-    Complete::Zsh: '0.02'
-    Config::IOD::Base: '0.28'
-    Config::IOD::Expr: '0.28'
-    Config::IOD::Reader: '0.28'
-    Data::Check::Structure: '0.03'
-    Data::Clean: '0.37'
-    Data::Clean::FromJSON: '0.37'
-    Data::Clean::JSON: '0.37'
-    Data::Dmp: '0.20'
-    Data::Dump: '1.23'
-    Data::Dump::FilterContext: ~
-    Data::Dump::Filtered: ~
-    Data::Dump::Trace: '0.02'
-    Data::ModeMerge: '0.35'
-    Data::ModeMerge::Config: '0.35'
-    Data::ModeMerge::Mode::ADD: '0.35'
-    Data::ModeMerge::Mode::Base: '0.35'
-    Data::ModeMerge::Mode::CONCAT: '0.35'
-    Data::ModeMerge::Mode::DELETE: '0.35'
-    Data::ModeMerge::Mode::KEEP: '0.35'
-    Data::ModeMerge::Mode::NORMAL: '0.35'
-    Data::ModeMerge::Mode::SUBTRACT: '0.35'
-    Data::Sah: '0.87'
-    Data::Sah::Coerce: '0.020'
-    Data::Sah::Coerce::js::bool::float: '0.020'
-    Data::Sah::Coerce::js::bool::str: '0.020'
-    Data::Sah::Coerce::js::date::float_epoch: '0.020'
-    Data::Sah::Coerce::js::date::obj_Date: '0.020'
-    Data::Sah::Coerce::js::date::str: '0.020'
-    Data::Sah::Coerce::js::duration::float_secs: '0.020'
-    Data::Sah::Coerce::js::duration::str_iso8601: '0.020'
-    Data::Sah::Coerce::perl::bool::str: '0.020'
-    Data::Sah::Coerce::perl::date::float_epoch: '0.020'
-    Data::Sah::Coerce::perl::date::obj_DateTime: '0.020'
-    Data::Sah::Coerce::perl::date::obj_TimeMoment: '0.020'
-    Data::Sah::Coerce::perl::date::str_iso8601: '0.020'
-    Data::Sah::Coerce::perl::duration::float_secs: '0.020'
-    Data::Sah::Coerce::perl::duration::obj_DateTimeDuration: '0.020'
-    Data::Sah::Coerce::perl::duration::str_human: '0.020'
-    Data::Sah::Coerce::perl::duration::str_iso8601: '0.020'
-    Data::Sah::CoerceCommon: '0.020'
-    Data::Sah::CoerceJS: '0.020'
-    Data::Sah::Compiler: '0.87'
-    Data::Sah::Compiler::Prog: '0.87'
-    Data::Sah::Compiler::Prog::TH: '0.87'
-    Data::Sah::Compiler::Prog::TH::all: '0.87'
-    Data::Sah::Compiler::Prog::TH::any: '0.87'
-    Data::Sah::Compiler::TH: '0.87'
-    Data::Sah::Compiler::TextResultRole: '0.87'
-    Data::Sah::Compiler::human: '0.87'
-    Data::Sah::Compiler::human::TH: '0.87'
-    Data::Sah::Compiler::human::TH::Comparable: '0.87'
-    Data::Sah::Compiler::human::TH::HasElems: '0.87'
-    Data::Sah::Compiler::human::TH::Sortable: '0.87'
-    Data::Sah::Compiler::human::TH::all: '0.87'
-    Data::Sah::Compiler::human::TH::any: '0.87'
-    Data::Sah::Compiler::human::TH::array: '0.87'
-    Data::Sah::Compiler::human::TH::bool: '0.87'
-    Data::Sah::Compiler::human::TH::buf: '0.87'
-    Data::Sah::Compiler::human::TH::cistr: '0.87'
-    Data::Sah::Compiler::human::TH::code: '0.87'
-    Data::Sah::Compiler::human::TH::date: '0.87'
-    Data::Sah::Compiler::human::TH::duration: '0.87'
-    Data::Sah::Compiler::human::TH::float: '0.87'
-    Data::Sah::Compiler::human::TH::hash: '0.87'
-    Data::Sah::Compiler::human::TH::int: '0.87'
-    Data::Sah::Compiler::human::TH::num: '0.87'
-    Data::Sah::Compiler::human::TH::obj: '0.87'
-    Data::Sah::Compiler::human::TH::re: '0.87'
-    Data::Sah::Compiler::human::TH::str: '0.87'
-    Data::Sah::Compiler::human::TH::undef: '0.87'
-    Data::Sah::Compiler::perl: '0.87'
-    Data::Sah::Compiler::perl::TH: '0.87'
-    Data::Sah::Compiler::perl::TH::all: '0.87'
-    Data::Sah::Compiler::perl::TH::any: '0.87'
-    Data::Sah::Compiler::perl::TH::array: '0.87'
-    Data::Sah::Compiler::perl::TH::bool: '0.87'
-    Data::Sah::Compiler::perl::TH::buf: '0.87'
-    Data::Sah::Compiler::perl::TH::cistr: '0.87'
-    Data::Sah::Compiler::perl::TH::code: '0.87'
-    Data::Sah::Compiler::perl::TH::date: '0.87'
-    Data::Sah::Compiler::perl::TH::duration: '0.87'
-    Data::Sah::Compiler::perl::TH::float: '0.87'
-    Data::Sah::Compiler::perl::TH::hash: '0.87'
-    Data::Sah::Compiler::perl::TH::int: '0.87'
-    Data::Sah::Compiler::perl::TH::num: '0.87'
-    Data::Sah::Compiler::perl::TH::obj: '0.87'
-    Data::Sah::Compiler::perl::TH::re: '0.87'
-    Data::Sah::Compiler::perl::TH::str: '0.87'
-    Data::Sah::Compiler::perl::TH::undef: '0.87'
-    Data::Sah::Human: '0.87'
-    Data::Sah::Lang: '0.87'
-    Data::Sah::Lang::fr_FR: '0.87'
-    Data::Sah::Lang::id_ID: '0.87'
-    Data::Sah::Lang::zh_CN: '0.87'
-    Data::Sah::Normalize: '0.04'
-    Data::Sah::Resolve: '0.004'
-    Data::Sah::Type::BaseType: '0.87'
-    Data::Sah::Type::Comparable: '0.87'
-    Data::Sah::Type::HasElems: '0.87'
-    Data::Sah::Type::Sortable: '0.87'
-    Data::Sah::Type::all: '0.87'
-    Data::Sah::Type::any: '0.87'
-    Data::Sah::Type::array: '0.87'
-    Data::Sah::Type::bool: '0.87'
-    Data::Sah::Type::buf: '0.87'
-    Data::Sah::Type::cistr: '0.87'
-    Data::Sah::Type::code: '0.87'
-    Data::Sah::Type::date: '0.87'
-    Data::Sah::Type::duration: '0.87'
-    Data::Sah::Type::float: '0.87'
-    Data::Sah::Type::hash: '0.87'
-    Data::Sah::Type::int: '0.87'
-    Data::Sah::Type::num: '0.87'
-    Data::Sah::Type::obj: '0.87'
-    Data::Sah::Type::re: '0.87'
-    Data::Sah::Type::str: '0.87'
-    Data::Sah::Type::undef: '0.87'
-    Data::Sah::Util::Func: '0.87'
-    Data::Sah::Util::Role: '0.87'
-    Data::Sah::Util::Type: '0.45'
-    Data::Sah::Util::Type::Date: '0.87'
-    Data::Sah::Util::TypeX: '0.87'
-    File::ShareDir: '1.102'
-    File::ShareDir::Tarball: 0.2.2
-    File::Slurper: '0.008'
-    File::Which: '1.21'
-    File::chdir: '0.1010'
-    Function::Fallback::CoreOrPP: '0.07'
-    Getopt::Long::Negate::EN: '0.05'
-    Getopt::Long::Util: '0.84'
-    HTTP::Tiny: '0.056'
-    HTTP::Tiny::UNIX: '0.04'
-    IO::Pty: '1.12'
-    IO::Tty: '1.12'
-    IPC::Run: '0.94'
-    IPC::Run::Debug: '0.90'
-    IPC::Run::IO: '0.90'
-    IPC::Run::Timer: '0.90'
-    IPC::Run::Win32Helper: '0.90'
-    IPC::Run::Win32IO: '0.90'
-    IPC::Run::Win32Pump: '0.90'
-    IPC::System::Options: '0.28'
-    JSON: '2.90'
-    JSON::PP: '2.27300'
-    JSON::PP::Boolean: ~
-    Lingua::EN::Numbers::Ordinate: '1.04'
-    Lingua::EN::PluralToSingular: '0.18'
-    Log::Any: '1.042'
-    Log::Any::Adapter: '1.042'
-    Log::Any::Adapter::Base: '1.042'
-    Log::Any::Adapter::File: '1.042'
-    Log::Any::Adapter::Null: '1.042'
-    Log::Any::Adapter::Screen: '0.13'
-    Log::Any::Adapter::Stderr: '1.042'
-    Log::Any::Adapter::Stdout: '1.042'
-    Log::Any::Adapter::Test: '1.042'
-    Log::Any::Adapter::Util: '1.042'
-    Log::Any::IfLOG: '0.08'
-    Log::Any::Manager: '1.042'
-    Log::Any::Proxy: '1.042'
-    Log::Any::Proxy::Test: '1.042'
-    Log::Any::Test: '1.042'
-    Mo: '0.40'
-    Mo::Golf: '0.40'
-    Mo::Inline: '0.40'
-    Mo::Moose: '0.40'
-    Mo::Mouse: '0.40'
-    Mo::build: '0.40'
-    Mo::builder: '0.40'
-    Mo::chain: '0.40'
-    Mo::coerce: '0.40'
-    Mo::default: '0.40'
-    Mo::exporter: '0.40'
-    Mo::import: '0.40'
-    Mo::importer: '0.40'
-    Mo::is: '0.40'
-    Mo::nonlazy: '0.40'
-    Mo::option: '0.40'
-    Mo::required: '0.40'
-    Mo::xs: '0.40'
-    Module::Installed::Tiny: '0.003'
-    Monkey::Patch::Action: '0.04'
-    Monkey::Patch::Action::Handle: '0.04'
-    Nodejs::Util: '0.006'
-    PERLANCAR::File::HomeDir: '0.03'
-    PERLANCAR::Module::List: '0.003005'
-    Perinci::Access::Lite: '0.14'
-    Perinci::AccessUtil: '0.06'
-    Perinci::CmdLine::Base: '1.61'
-    Perinci::CmdLine::Help: '0.11'
-    Perinci::CmdLine::Lite: '1.61'
-    Perinci::CmdLine::Util::Config: '1.61'
-    Perinci::Object: '0.24'
-    Perinci::Object::EnvResult: '0.24'
-    Perinci::Object::EnvResultMulti: '0.24'
-    Perinci::Object::Function: '0.24'
-    Perinci::Object::Metadata: '0.24'
-    Perinci::Object::Package: '0.24'
-    Perinci::Object::ResMeta: '0.24'
-    Perinci::Object::Variable: '0.24'
-    Perinci::Result::Format::Lite: '0.20'
-    Perinci::Sub::Complete: '0.86'
-    Perinci::Sub::ConvertArgs::Argv: '0.09'
-    Perinci::Sub::ConvertArgs::Array: '0.08'
-    Perinci::Sub::GetArgs::Argv: '0.74'
-    Perinci::Sub::GetArgs::Array: '0.15'
-    Perinci::Sub::Normalize: '0.18'
-    Perinci::Sub::To::CLIDocData: '0.25'
-    Perinci::Sub::Util: '0.45'
-    Perinci::Sub::Util::ResObj: '0.45'
-    Perinci::Sub::Util::Sort: '0.45'
-    Proc::ChildError: '0.04'
-    Progress::Any: '0.20'
-    Progress::Any::Output: '0.20'
-    Progress::Any::Output::Null: '0.20'
-    Progress::Any::Output::TermProgressBarColor: '0.22'
-    Regexp::Stringify: '0.05'
-    Role::Tiny: '2.000003'
-    Role::Tiny::With: '2.000003'
-    Sah::Schema::rinci::function_meta: 1.1.80.1
-    Sah::Schema::rinci::meta: 1.1.80.1
-    Sah::Schema::rinci::result_meta: 1.1.80.1
-    Sah::SchemaR::rinci::function_meta: 1.1.80.1
-    Sah::SchemaR::rinci::meta: 1.1.80.1
-    Sah::SchemaR::rinci::result_meta: 1.1.80.1
-    Sah::Schemas::Rinci: 1.1.80.1
-    Scalar::Util::Numeric::PP: '0.04'
-    String::Elide::Parts: '0.01'
-    String::LineNumber: '0.01'
-    String::PerlQuote: '0.02'
-    String::ShellQuote: '1.04'
-    String::Trim::More: '0.02'
-    String::Wildcard::Bash: '0.03'
-    Sub::Delete: '1.00002'
-    Test::CPAN::Changes: '0.400002'
-    Test::Config::IOD::Common: '0.28'
-    Test::Data::Sah: '0.87'
-    Test::Data::Sah::Human: '0.87'
-    Test::Data::Sah::Perl: '0.87'
-    Text::ANSI::BaseUtil: '0.22'
-    Text::ANSI::Util: '0.22'
-    Text::Table::Tiny: '0.04'
-    Text::sprintfn: '0.08'
-    Tie::IxHash: '1.23'
-    Time::Duration: '1.20'
-    experimental: '0.016'
+    version: '6.009'
 x_authority: cpan:PERLANCAR
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

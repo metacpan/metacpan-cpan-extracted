@@ -18,7 +18,7 @@ See [Exact Perl location with B::Deparse (and Devel::Callsite)](http://blogs.per
 INSTALLATION
 ------------
 
-Currently we only support Perl 5.18, 5.20 and 5.22.
+Currently we only support Perl 5.18, 5.20, 5.22, 5.24 and 5.26.
 
 To install this Devel::Trepan, run the following commands:
 

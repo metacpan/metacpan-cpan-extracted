@@ -2,7 +2,7 @@ NAME
     Log::ger - A lightweight, flexible logging framework
 
 VERSION
-    version 0.016
+    version 0.019
 
 SYNOPSIS
     In your module (producer):
@@ -43,11 +43,16 @@ DESCRIPTION
         Slim distribution. No non-core dependencies, extra functionalities
         are provided in separate distributions to be pulled as needed.
 
-        Low startup overhead. Only around 1-1.5ms or less, comparable with
-        Log::Any 0.15, less than Log::Any 1.0x at around 4-10ms, and
-        certainly less than Log::Log4perl at 20-30ms. This is measured on a
-        2014-2015 PC and before doing any output configuration. For more
-        benchmarks, see Bencher::Scenarios::LogGer.
+        Low startup overhead. Only ~0.5-1ms. For comparison, strict
+        ~0.2-0.5ms, warnings ~2ms, Log::Any 0.15 ~2-3ms, Log::Any 1.049
+        ~8-10ms, Log::Log4perl ~35ms. This is measured on a 2014-2015 PC and
+        before doing any output configuration. For more benchmarks, see
+        Bencher::Scenarios::LogGer or try yourself e.g. with bencher-code:
+
+         % bencher-code 'use Log::ger' 'use Log::Any' --startup
+
+        Fast. Low null-/stealth-logging overhead, about 1.5x faster than
+        Log::Any, 3x faster than Log4perl, and 5x faster than Log::Fast.
 
         Conditional compilation. There is a plugin to optimize away unneeded
         logging statements, like assertion/conditional compilation, so they

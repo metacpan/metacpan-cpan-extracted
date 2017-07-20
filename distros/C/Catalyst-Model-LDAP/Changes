@@ -1,5 +1,10 @@
 Revision history for Perl extension Catalyst::Model::LDAP.
 
+0.19  Fri Jul 14 20:22:00 BST 2017
+        - Migrate to Dist::Zilla due to:
+          [rt.cpan.org #122481] MYMETA must not be included 
+          https://rt.cpan.org/Ticket/Display.html?id=122481
+
 0.18  Mon Sep  5 15:23:00 BST 2016
         - Authz added to support Net::LDAP::Control::ProxyAuth 
         - Raw option added to support UTF8
@@ -8,7 +13,7 @@ Revision history for Perl extension Catalyst::Model::LDAP.
           in the control array of Net::LDAP search objects
         - Net::LDAP 0.65 added for min version as the current
           required version is so old and does not support ProxyAuth
-        - Makefile.pl updated for ProxyAuth
+        - Makefile.PL updated for ProxyAuth
 
 0.17  Thu Dec  3 16:48:27 EST 2009
         - Fix a problem when the Entry and Connection classes

@@ -27,6 +27,7 @@ requires 'URL::Encode';
 requires 'WWW::OAuth' => '0.006';
 
 on test => sub {
+    requires 'Test::Pod';
     requires 'Test::Fatal';
     requires 'Test::More';
     requires 'Test::Spec';

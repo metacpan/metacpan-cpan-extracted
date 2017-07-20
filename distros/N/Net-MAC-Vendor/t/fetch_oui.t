@@ -17,12 +17,16 @@ subtest cache_unlinked => sub {
 	ok( ! -e 'mac_oui.db', "Cache file has been unlinked" );
 	};
 
-my $connected = 0;
-subtest connected => sub {
+my $connected = do {
 	my $tx = $class->ua->head( Net::MAC::Vendor::oui_url() );
-	$connected = $tx->success && $tx->res->code;
-	ok( $connected, "Am connected to network [$connected]" );
+	$tx->success && $tx->res->code;
 	};
+
+diag 'Did', ( $connected ? '' : ' not' ),
+	' connect to ' . Net::MAC::Vendor::oui_url();
+
+SKIP: {
+skip "Skipping network tests when not connected", 3 unless $connected;
 
 my @ouis = qw(
 	00-0D-93
@@ -89,7 +93,7 @@ subtest load_from_cache => sub {
 		}
 
 	};
-
+} # end of big SKIP
 
 
 done_testing();

@@ -1,5 +1,42 @@
-1.117 2017-07-09
+1.119 2017-07-15
+================
+[Prty::Pod::Generator]
+Eingerückter Code wird nun getrimmt.
 
+[Prty::Test::Class]
+ClassLoader entfernt. Die von Tests benötigten Klassen müssen nun
+explizit geladen werden.
+
+[Prty::Hash]
+Methode isLocked() versions-portabel gemacht.
+    
+1.118 2017-07-13
+================
+Perl - erforderliche Version auf 5.10.0 gesenkt.
+
+File::Rsync - erforderliche Version auf 0.49 gehoben (in
+Version 0.43 wird Option -delete nicht verstanden)
+
+[Prty::Hash]
+Klasse umgeschrieben, so dass Hash::Util::hash_unlocked() nicht
+mehr genutzt wird, da die Funktion in Perl < 5.18.0 nicht
+funktioniert.
+
+Debug-Modus entfernt.
+
+[Prty::Object]
+Methode bless() umgeschrieben, so dass Hash::Util::hash_unlocked()
+nicht mehr genutzt wird.
+
+[Prty::Path]
+Methode copy() um Optionen -move und -overwrite ergänzt.
+
+[Prty::Sql]
+IN-Klausel-Werte werden jetzt generell als Stringliterale
+eingesetzt.
+
+1.117 2017-07-09
+================
 Datei LICENSE hinzugefügt.
     
 [Prty::Ipc]
@@ -10,7 +47,7 @@ Ausführung von false(1) kein SIGPIPE ausgelöst wird.
 Argumente, die undef sind, lösen keine Warning mehr aus.
 
 1.116 2017-07-09
-
+================
 [Prty::Hash]
 Unsinnigen Test auf gleiche Bucket-Größe nach clear() entfernt, da
 unportabel. Die zulässigen Keys in einem Restricted Hash

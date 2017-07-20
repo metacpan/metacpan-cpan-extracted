@@ -12,7 +12,7 @@ WriteMakefile
   PREREQ_PM    => { # e.g., Module::Name => 1.1
     'Net::Server' => 0.85,
     'IO::Multiplex' => 1.02,
-    'mod_perl' => 0,
+    #'mod_perl' => 0,
   },
   dist => {
     COMPRESS => "gzip -9 -vf",

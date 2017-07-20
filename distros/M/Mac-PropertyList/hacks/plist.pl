@@ -24,8 +24,7 @@ brian d foy, E<lt>bdfoy@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2002, brian d foy, All Rights Reserved
-
+Copyright © 2002-2015, brian d foy <bdfoy@cpan.org>. All rights reserved.
 =cut
 
 use Cwd;

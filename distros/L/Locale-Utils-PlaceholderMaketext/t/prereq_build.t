@@ -6,10 +6,12 @@ use warnings;
 use Test::More;
 
 $ENV{RELEASE_TESTING}
-    or plan skip_all => 'Author test.  Set $ENV{RELEASE_TESTING} to a true value to run.';
+    or plan(
+        skip_all => 'Author test.  Set $ENV{RELEASE_TESTING} to a true value to run.'
+    );
 
 eval 'use Test::Prereq::Build; 1'
-    or plan skip_all => 'Test::Prereq::Build not installed';
+    or plan( skip_all => 'Test::Prereq::Build not installed' );
 
 # These modules should not go into Build.PL
 my @skip_devel_only = qw(

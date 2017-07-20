@@ -2,7 +2,7 @@ package PDF::Tiny;
 
 use 5.01;
 
-$VERSION = '0.08'; # Update the POD, too!
+$VERSION = '0.09'; # Update the POD, too!
 
 # Fields
 sub vers () { 0 }
@@ -486,13 +486,14 @@ sub print {
 # LOW-LEVEL METHODS
 
 sub version :lvalue { $_[0][vers] }
-sub xref { $_[0][xrft] }
+#sub xref { $_[0][xrft] }
 
 sub modified {
  my $self = shift;
  @_ or return $self->[mods];
  if (@_ == 1 && $_[0] !~ m.^/.) {
-  croak "$_[0] is not an object id" unless $_[0] =~ /^[0-9]+ [0-9]+\z/;
+  croak "$_[0] is not an object id"
+   unless $_[0] =~ /^[0-9]+ [0-9]+\z/ || $_[0] eq 'trailer';
   $self->[mods]{$_[0]}++;
   return
  }

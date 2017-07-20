@@ -8,6 +8,6 @@
 #                   <code>absent</code>.
 #
 class [% name %]::config (
-    $ensure = hiera('[% name %]::config::ensure', 'present'),
-) {
+    $ensure = 'present',
+) inherits ::[% name %]::params {
 }

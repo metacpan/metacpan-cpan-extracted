@@ -9,14 +9,19 @@ use utf8;
 
 # -----------------------------------------------------------------------------
 
-sub test_loadClass : Init(1) {
-    shift->useOk('Prty::Xml::LibXml');
-}
-
 # -----------------------------------------------------------------------------
 
-sub test_unitTest : Test(3) {
+sub test_unitTest : Test(4) {
     my $self = shift;
+
+    # Klasse laden
+
+    if ($] < 5.018) {
+        # Fix: CPAN Testers
+        $self->skipTest('XML::LibXML - problematisch bei dieser Perl-Version');
+        return;
+    }
+    $self->useOk('Prty::Xml::LibXml');
 
     # 1. Einlesen
 
@@ -72,8 +77,6 @@ sub test_unitTest : Test(3) {
     # 2. Knoten hinzfügen
 
     for my $per ($doc->findnodes('//PERSON')) {
-        printf "%s\n",$per->localname;
-
         my $nam = $doc->createElement('NACHNAME');
         $nam->appendText('Müller');
         $per->appendChild($nam);

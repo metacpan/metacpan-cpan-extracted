@@ -7,9 +7,10 @@ use PICA::Writer::Plus;
 use PICA::Writer::Plain;
 use PICA::Writer::Binary;
 use PICA::Writer::XML;
+use PICA::Writer::PPXML;
 use Moo;
 
-our $VERSION = '0.20';
+our $VERSION = '0.23';
 
 with 'Catmandu::Exporter';
 
@@ -29,6 +30,8 @@ sub _build_writer {
         PICA::Writer::Plain->new( fh => $self->fh );
     } elsif ( $type eq 'xml') {
         PICA::Writer::XML->new( fh => $self->fh );
+    } elsif ( $type eq 'ppxml') {
+        PICA::Writer::PPXML->new( fh => $self->fh );
     } else {
         die "unknown type: $type";
     }
@@ -40,9 +43,10 @@ sub add {
     $self->writer->write($data);
 }
 
-sub commit { # TODO: why is this not called automatically?
+sub commit {
     my ($self) = @_;
-    $self->writer->end if $self->can('end');
+    # collection element is optional for type xml
+    $self->writer->end if $self->writer->can('end');
 }
 
 1;

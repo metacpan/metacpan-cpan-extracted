@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Alien::Google::GRPC;
-$Alien::Google::GRPC::VERSION = '0.01';
+$Alien::Google::GRPC::VERSION = '0.03';
 use base qw( Alien::Base );
 
 =head1 NAME
@@ -83,11 +83,9 @@ If a build is needed, it can be lengthy. A half hour or more to compile is not u
 
 The following dependencies need to be installed in order for gRPC to build.
 
- $ [sudo] apt-get install git
  $ [sudo] apt-get install build-essential autoconf libtool
- $ [sudo] apt-get install automake curl make g++ unzip pkg-config
- $ [sudo] apt-get install libgflags-dev libgtest-dev
- $ [sudo] apt-get install clang libc++-dev
+ $ [sudo] apt-get install automake curl
+ $ [sudo] apt-get install git
 
 The install information that this module is based on is available here:
 https://github.com/grpc/grpc/blob/master/INSTALL.md

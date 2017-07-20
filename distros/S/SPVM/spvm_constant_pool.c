@@ -9,7 +9,7 @@
 #include "spvm_field.h"
 #include "spvm_sub.h"
 #include "spvm_util_allocator.h"
-#include "spvm_array.h"
+#include "spvm_dynamic_array.h"
 #include "spvm_op.h"
 #include "spvm_constant_pool_sub.h"
 #include "spvm_constant_pool_field.h"
@@ -48,7 +48,12 @@ void SPVM_CONSTANT_POOL_extend(SPVM_COMPILER* compiler, SPVM_CONSTANT_POOL* cons
   
   if (constant_pool->length + extend >= capacity) {
     int32_t new_capacity = capacity * 2;
-    constant_pool->values = SPVM_UTIL_ALLOCATOR_safe_realloc_i32(constant_pool->values, new_capacity, sizeof(int32_t));
+    
+    int32_t* new_values = SPVM_UTIL_ALLOCATOR_safe_malloc_i32_zero(new_capacity, sizeof(int32_t));
+    memcpy(new_values, constant_pool->values, capacity * sizeof(int32_t));
+    free(constant_pool->values);
+    constant_pool->values = new_values;
+    
     constant_pool->capacity = new_capacity;
   }
 }
@@ -79,7 +84,7 @@ int32_t SPVM_CONSTANT_POOL_push_package(SPVM_COMPILER* compiler, SPVM_CONSTANT_P
     int32_t field_pos;
     constant_pool_package.field_indexes_constant_pool_index = constant_pool->length;
     for (field_pos = 0; field_pos < package->op_fields->length; field_pos++) {
-      SPVM_OP* op_field = SPVM_ARRAY_fetch(package->op_fields, field_pos);
+      SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(package->op_fields, field_pos);
       SPVM_FIELD* field = op_field->uv.field;
       SPVM_CONSTANT_POOL_push_int(compiler, constant_pool, field->constant_pool_index);
     }
@@ -123,7 +128,7 @@ int32_t SPVM_CONSTANT_POOL_push_sub(SPVM_COMPILER* compiler, SPVM_CONSTANT_POOL*
   {
     int32_t i;
     for (i = 0; i < sub->op_args->length; i++) {
-      SPVM_OP* op_arg = SPVM_ARRAY_fetch(sub->op_args, i);
+      SPVM_OP* op_arg = SPVM_DYNAMIC_ARRAY_fetch(sub->op_args, i);
       SPVM_TYPE* arg_type = SPVM_OP_get_type(compiler, op_arg);
       assert(arg_type);
       if (!SPVM_TYPE_is_numeric(compiler, arg_type)) {
@@ -143,7 +148,7 @@ int32_t SPVM_CONSTANT_POOL_push_sub(SPVM_COMPILER* compiler, SPVM_CONSTANT_POOL*
   {
     int32_t i;
     for (i = 0; i < sub->op_my_vars->length; i++) {
-      SPVM_OP* op_my_var = SPVM_ARRAY_fetch(sub->op_my_vars, i);
+      SPVM_OP* op_my_var = SPVM_DYNAMIC_ARRAY_fetch(sub->op_my_vars, i);
       SPVM_TYPE* my_var_type = SPVM_OP_get_type(compiler, op_my_var);
       assert(my_var_type);
       if (!SPVM_TYPE_is_numeric(compiler, my_var_type)) {

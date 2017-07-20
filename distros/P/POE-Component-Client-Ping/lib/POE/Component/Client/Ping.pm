@@ -24,7 +24,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 );
 
 use vars qw($VERSION $PKTSIZE);
-$VERSION = '1.174';
+$VERSION = '1.175';
 $PKTSIZE = $^O eq 'linux' ? 3_000 : 100;
 
 use Carp qw(croak);
@@ -164,8 +164,7 @@ sub _create_handle {
   my ($kernel, $heap) = @_;
   DEBUG_SOCKET and warn "opening a raw socket for icmp";
 
-  my $protocol = (getprotobyname('icmp'))[2]
-    or die "can't get icmp protocol by name: $!";
+  my $protocol = Socket::IPPROTO_ICMP;
 
   my $socket = gensym();
   socket($socket, PF_INET, SOCK_RAW, $protocol)
@@ -225,17 +224,12 @@ sub poco_ping_ping {
 
   DEBUG and warn "ping requested for $address ($tries_left try/tries left)\n";
 
-  _do_ping(
-    $kernel, $heap, $sender, $event, $address, $timeout, $tries_left, 0
-  );
+  _do_ping($kernel, $heap, $sender, $event, $address, $timeout, $tries_left);
 }
 
 
 sub _do_ping {
-  my (
-    $kernel, $heap, $sender, $event, $address, $timeout, $tries_left,
-    $is_a_retry
-  ) = @_;
+  my ($kernel, $heap, $sender, $event, $address, $timeout, $tries_left) = @_;
 
   # No current pings.  Open a socket, or setup the existing one.
   unless (scalar(keys %{$heap->{ping_by_seq}})) {
@@ -342,7 +336,6 @@ sub _do_ping {
     $event,             # PEND_EVENT
     $address,           # PEND_ADDR ???
     $timeout,           # PEND_TIMEOUT
-    $is_a_retry,        # PEND_IS_RETRY
   ];
 
   if ($tries_left and $tries_left > 1) {
@@ -386,7 +379,6 @@ sub _send_next_packet {
     $event,             # PEND_EVENT
     $address,           # PEND_ADDR ???
     $timeout,           # PEND_TIMEOUT
-    $is_a_retry,        # PEND_IS_RETRY
   ) = @$ping_info;
 
   # Send the packet.  If send() fails, then we bail with an error.
@@ -421,26 +413,19 @@ sub _send_next_packet {
   $kernel->delay( $seq => $timeout );
 
   DEBUG_PBS and warn "recording ping_by_seq($seq)";
-  if ($is_a_retry) {
-    # If retries, set the request time to the new/actual request time.
-    # Inserted by Ralph Schmitt 2009-09-12.
-    $heap->{ping_by_seq}->{$seq}->[PBS_REQUEST_TIME] = time();
-  }
-  else {
-    $heap->{ping_by_seq}->{$seq} = [
-      # PBS_POSTBACK
-      $sender->postback(
-        $event,
-        $address,    # REQ_ADDRESS
-        $timeout,    # REQ_TIMEOUT
-        time(),      # REQ_TIME
-        @user_args,  # REQ_USER_ARGS
-      ),
-      "$sender",   # PBS_SESSION (stringified to weaken reference)
-      $address,    # PBS_ADDRESS
-      time()       # PBS_REQUEST_TIME
-    ];
-  }
+  $heap->{ping_by_seq}->{$seq} = [
+    # PBS_POSTBACK
+    $sender->postback(
+      $event,
+      $address,    # REQ_ADDRESS
+      $timeout,    # REQ_TIMEOUT
+      time(),      # REQ_TIME
+      @user_args,  # REQ_USER_ARGS
+    ),
+    "$sender",   # PBS_SESSION (stringified to weaken reference)
+    $address,    # PBS_ADDRESS
+    time()       # PBS_REQUEST_TIME
+  ];
 
   # Duplicate pings?  Forcibly time out the previous one.
   if (exists $heap->{addr_to_seq}->{$sender}->{$address}) {
@@ -674,7 +659,10 @@ sub poco_ping_default {
   if ($retryinfo) {
     my ($sender, $event, $address, $timeout, $remaining) = @{$retryinfo};
     DEBUG and warn("retrying ping for $address (", $remaining - 1, ")\n");
-    _do_ping($kernel, $heap, $sender, $event, $address, $remaining - 1, 1);
+    _do_ping(
+      $kernel, $heap, $sender, $event, $address, $timeout,
+      $remaining - 1
+    );
     return;
   }
 

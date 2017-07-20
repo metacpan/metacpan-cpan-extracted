@@ -1,6 +1,7 @@
+use 5.10.0;
 use strict;
 package Tie::FileSection;
-$Tie::FileSection::VERSION = '0.171861';
+$Tie::FileSection::VERSION = '0.171950';
 # ABSTRACT: restrict files sequential access using array like boundaries
 require Tie::Handle;
 our @ISA  = qw( Tie::StdHandle );
@@ -178,7 +179,7 @@ Tie::FileSection - restrict files sequential access using array like boundaries
 
 =head1 VERSION
 
-version 0.171861
+version 0.171950
 
 =head1 SYNOPSIS
 

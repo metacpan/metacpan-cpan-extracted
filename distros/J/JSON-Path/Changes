@@ -1,3 +1,17 @@
+0.400     2017-07-17 17:44:44-05:00 America/Chicago
+
+    [ Other ]
+    Tokenizer has been rewritten and is now cleaner and 20% cooler.
+
+    [ Bug Fixes ]
+    - get() no longer creates keys in the object
+      Fixes RT #122493
+      Thomas Helsel++
+
+    - Fix for path construction failure when expression contains a filter
+      Fixes RT 122190
+      James Bowery++
+
 0.310     2017-07-11 13:36:54-05:00 America/Chicago
 
     [ Bug Fixes ]
@@ -5,8 +19,8 @@
     Slaven Rezic++
 
 0.301     2017-07-10 16:37:15-05:00 America/Chicago
-    
-    [ Bug Fixes ] 
+
+    [ Bug Fixes ]
     - Fix missing version information in main module
 
 0.300     2017-07-10 11:13:48-05:00 America/Chicago

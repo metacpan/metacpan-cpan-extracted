@@ -1,5 +1,9 @@
 Revision history for CPAN-Mirror-Tiny
 
+0.20  2017-07-15 22:30:29 JST
+  - Improve Windows support (#6)
+  - Make `cpan-mirror-tiny gen-index` verbose
+
 0.12  2017-03-19 14:27:29 JST
   - Follow latest WorePAN; fix warning 'Argument "..." isn't numeric in numeric eq (==)'
   - Show size in `cpan-mirror-tiny list`

@@ -1,5 +1,8 @@
 Revision history for Test-Clustericious-Blocking
 
+0.05      2017-07-14 10:54:09 -0400
+  - Migrate to Test2::V0
+
 0.04      2017-04-27 08:35:02 -0400
   - Tests require Test::Clustericious 0.35, Clustericious 1.24, Mojolicious 7.31
 

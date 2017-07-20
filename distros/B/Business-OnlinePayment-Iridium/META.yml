@@ -1,31 +1,31 @@
 ---
-abstract: 'Iridium backend for Business::OnlinePayment'
+abstract: 'PayVector (Iridium) backend for Business::OnlinePayment'
 author:
-  - 'wreis: Wallace Reis <reis.wallace@gmail.com>'
+  - "[ 'Gavin Henry <ghenry@surevoip.co.uk>', 'Wallace Reis <reis.wallace@gmail.com>' ]"
 build_requires:
-  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.91'
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
 name: Business-OnlinePayment-Iridium
-no_index:
-  directory:
-    - inc
-    - t
 requires:
-  Business::OnlinePayment: 2.01
-  HTTP::Request: 5.811
-  LWP::UserAgent: 5.81
-  Moose: 0.44
-  Template: 2.19
-  Test::More: 0
-  XML::Simple: 2.18
-  aliased: 0.22
+  Business::OnlinePayment: 0
+  Carp: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Moose::Role: 0
+  Template: 0
+  XML::Simple: 0
+  aliased: 0
+  strict: 0
+  warnings: 0
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.05
+  repository: https://github.com/wreis/Business-OnlinePayment-Iridium.git
+version: 1.01
+x_serialization_backend: 'YAML::Tiny version 1.51'

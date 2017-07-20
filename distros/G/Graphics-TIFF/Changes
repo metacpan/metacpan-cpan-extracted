@@ -1,0 +1,27 @@
+Revision history for Perl extension Graphics::TIFF.
+
+4   Mon, 17 Jul 2017 19:30 +0200
+        - rewrite test in 1.t to fix failure with older Perls
+        - skip 92_tiffinfo.t & 93_tiff2pdf.t if we don't have Perl 5.10, adding
+          Test::Requires to TEST_REQUIRES
+        - use Pod::Readme to build README from POD
+        - use perlmagick to build test images and thus fix test failures from
+          smokers without Imagemagick
+
+3   Sat, 15 Jul 2017 11:00 +0200
+	- Skip tests in 1.t, 92_tiffinfo.t & 93_tiff2pdf.t if tiffcmp, tiffinfo
+          & tiff2pdf not installed to fix RT 122486
+        - use Test::Deeply::num to fix test failures due to rounding in 1.t and
+          fix RT 122488
+        - invalid->illegal in error messages in tiffinfo.pl and tiff2pdf.pl for
+          freebsd to fix RT 122489
+
+2   Fri, 14 Jul 2017 19:30 +0200
+	- fix GetFieldDefaulted(TIFFTAG_EXTRASAMPLES)
+        - use $EXECUTABLE_NAME in tests to fix RT 122470
+        - + Readonly to PREREQ_PM in Makefile.PL
+        - Moved Test::More in BUILD_REQUIRES -> TEST_REQUIRES
+
+1   Thu, 13 Jul 2017 19:30 +0200
+	- original version; created by h2xs 1.23 with options
+		-A -n Graphics::TIFF

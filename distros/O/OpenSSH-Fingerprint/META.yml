@@ -1,0 +1,27 @@
+---
+abstract: 'The great new OpenSSH::Fingerprint!'
+author:
+  - 'ORANGE <bollwarm@ijz.me>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OpenSSH-Fingerprint
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Crypt::Digest::SHA256: '0'
+  Digest::MD5: '0'
+  MIME::Base64: '0'
+  perl: '5.006'
+resources:
+  repository: https://git.oschina.net/ijz/OpenSSH-Fingerprint
+version: '0.01'

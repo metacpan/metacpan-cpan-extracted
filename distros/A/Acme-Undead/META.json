@@ -47,6 +47,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -54,7 +55,7 @@
    "provides" : {
       "Acme::Undead" : {
          "file" : "lib/Acme/Undead.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -68,8 +69,9 @@
          "web" : "https://github.com/Likk/Acme-Undead"
       }
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_contributors" : [
+      "Likkradyus <git@li.que.jp>",
       "likkradyus <perl{at}li.que.jp>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27400"

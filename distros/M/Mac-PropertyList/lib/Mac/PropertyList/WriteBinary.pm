@@ -101,7 +101,7 @@ use constant {
     havePack64   => ( eval { pack('Q>', 1153202979583557643) eq "\x10\x01\0\0\0\0\0\x0B" } ? 1 : 0 ),
 };
 
-$VERSION = '1.41';
+$VERSION = '1.411';
 @EXPORT_OK = qw( as_string );
 
 sub as_string {

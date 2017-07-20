@@ -1,0 +1,19 @@
+use alienfile;
+
+probe sub { 'share' };
+
+share {
+
+  requires 'Alien::git';
+  
+  download [ [ '%{git}', 'clone', 'https://github.com/CastXML/CastXML.git' ] ];
+
+  plugin 'Extract::Directory';
+  
+  build [
+    [ '%{cmake}', 'CMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}', '.' ],
+    [ '%{make}' ],
+    [ '%{make}', 'install' ],
+  ]
+
+};

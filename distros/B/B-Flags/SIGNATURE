@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,20 +14,19 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 b3fc3cfd2a2212f96c3e77c7ec290347fea62a03 Changes
-SHA1 021f5de9b8180d74669ec672fa1d5ff68d62eb4b Flags.pm
-SHA1 20d9ee49de848f9858a0976c1e8dd16d22e6a941 Flags.xs
+SHA1 0b4ace74cea0214e7ab4896d24f2144a48e0a667 Changes
+SHA1 10a55cf45f09c05f433d3402d15df291a26e4cdd Flags.pm
+SHA1 c216286e4b5b05101b65e84b8a0d426374775d3e Flags.xs
 SHA1 f337db69bb7d48afeea60ff4d945af47408c2064 MANIFEST
-SHA1 f3e0fe40c4eae8b90ea14b048a30f9ae777de4bb META.json
-SHA1 4e5c39dc8d67e4246bf24c99cf551a7ba2a441a1 META.yml
+SHA1 d312ef8f5478d3c3052251f2d5fab6800a9369b7 META.json
+SHA1 4a60676b163d9b466785c4c0f53b7c1844552b60 META.yml
 SHA1 ff10ff49c66205cc7902bd9afaff9ee253b6a73a Makefile.PL
 SHA1 3cbb44528f8f3d75a13f49051fd4f7ac5e3a6faa README
 SHA1 4331480e588e418ff8ea2e0f22b3b3bf206a988f test.pl
 SHA1 4854db0c7a8ae09cbd8a62cf5eb2e02089efe0d9 typemap
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlazBj0ACgkQmm2SYo/9yUJzMACfUglWgXBgMDJTZPjf3cDPDQ81
-dDUAn3EKnLXlhVMkrt6m1JXb6zPw2l2/
-=uTpY
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWWiDxQAKCRCabZJij/3J
+QsuBAJoCPTlv+DeI1V+Ssrj/LTxkckRxqACgh9HcQ2XDyB5D1ni7Tt0GhG9BsUs=
+=MqG5
 -----END PGP SIGNATURE-----

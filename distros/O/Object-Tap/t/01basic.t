@@ -14,3 +14,5 @@ is($tapped, 'Foo one', 'subref tap');
 is(Foo->$_tap(bar => 'two'), 'Foo', 'invocant returned');
 
 is($tapped, 'Foo two', 'method name tap');
+
+Foo->$_tap(sub { is($_[0], $_, '$_ aliased to object') });

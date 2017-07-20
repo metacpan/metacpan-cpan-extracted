@@ -1,5 +1,8 @@
 Revision history for Perl module Daemon::Generic
 
+0.85 2017/07/17
+
+ - Fixed a race condition in test.  Bug 117927.
 
 0.84 2013/10/04
 

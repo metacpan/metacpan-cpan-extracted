@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+BEGIN { pop @INC if ($INC[-1] || "") eq "."; }
+
+{ use 5.006; }
 use warnings;
 use strict;
 
@@ -205,13 +208,15 @@ sub action_get_olson(@) {
 	};
 	mkpath($tdir);
 	my @files;
-	read_file("$dldir/README") =~ /
-		\n\n
-		Unless[ \n]otherwise[ \n]specified,[ \n]all[ \n]files[ \n]
-		in[ \n]the[ \n]tz[ \n]code[ \n]and[ \n]data[ \n]are[ \n]in[ \n]
-		the[ \n]public[ \n]domain,[ \n]so[ \n]clarified[ \n]as[ \n]
-		of[ \n]2009-05-17[ \n]by[ \n]Arthur[ \n]David[ \n]Olson\.
-	/x or die "could not confirm general PD status\n";
+	my $licence = read_file("$dldir/LICENSE");
+	$licence =~ s/[ \n]+/ /g;
+	$licence eq "".
+		"With a few exceptions, all files in the tz code and data ".
+		"(including this one) are in the public domain. The ".
+		"exceptions are date.c, newstrftime.3, and strftime.c, ".
+		"which contain material derived from BSD and which use the ".
+		"BSD 3-clause license. ".
+	"" or die "could not confirm general PD status\n";
 	find({
 		no_chdir => 1,
 		wanted => sub {
@@ -224,17 +229,21 @@ sub action_get_olson(@) {
 				# Is download tarball; not a source file.
 				return;
 			}
+			if($lname =~ /\A(?:date\.c|newstrftime\.3(?:\.txt)?|
+					strftime\.c)\z/x) {
+				return;
+			}
+			my $cop_rx = qr/copyright (?:\(c\)|[0-9]{4}\b)/i;
 			my $bname;
 			if($lname =~ /\A(.+\.[1-8])\.txt\z/ &&
 					-f $dldir."/".($bname = $1) &&
-					read_file("$dldir/$bname") =~
-						/copyright \(c\)/i) {
+					read_file("$dldir/$bname") =~ $cop_rx) {
 				# Is rendering of man page that's under
 				# copyright.
 				return;
 			}
 			my $content = read_file($_);
-			if($content =~ /copyright \(c\)/i) {
+			if($content =~ $cop_rx) {
 				# Is under copyright.
 				return;
 			}
@@ -569,7 +578,8 @@ developed by Andrew Main (Zefram) <zefram@fysh.org>.
 The Olson timezone database is is the public domain.
 
 The C<Time::OlsonTZ::Data> Perl module wrapper for the database is
-Copyright (C) 2010, 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>.
+Copyright (C) 2010, 2011, 2012, 2013, 2014, 2017
+Andrew Main (Zefram) <zefram@fysh.org>.
 
 =head1 LICENSE
 

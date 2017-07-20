@@ -1,11 +1,7 @@
 # -*- mode: cperl; tab-width: 8; indent-tabs-mode: nil; basic-offset: 2 -*-
 # vim:ts=8:sw=2:et:sta:sts=2
 #########
-# Author:        rmp
-# Last Modified: $Date: 2015-09-21 10:19:13 +0100 (Mon, 21 Sep 2015) $
-# Id:            $Id: authdecor.pm 470 2015-09-21 09:19:13Z zerojinx $
-# Source:        $Source$
-# $HeadURL: svn+ssh://zerojinx@svn.code.sf.net/p/clearpress/code/trunk/lib/ClearPress/authdecor.pm $
+# Author: rmp
 #
 package ClearPress::authdecor;
 use strict;
@@ -14,7 +10,8 @@ use base qw(ClearPress::decorator Exporter);
 use ClearPress::authenticator::session;
 use Readonly;
 
-our $VERSION = q[475.3.3];
+our $VERSION = q[476.1.1];
+
 Readonly::Scalar our $DOMAIN      => 'mysite.com';
 Readonly::Scalar our $AUTH_COOKIE => 'mysite_sso';
 Readonly::Array  our @EXPORT_OK   => qw($AUTH_COOKIE);

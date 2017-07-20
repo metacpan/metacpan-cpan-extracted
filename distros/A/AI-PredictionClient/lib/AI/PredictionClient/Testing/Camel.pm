@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::Testing::Camel;
-$AI::PredictionClient::Testing::Camel::VERSION = '0.01';
+$AI::PredictionClient::Testing::Camel::VERSION = '0.03';
 # ABSTRACT: Provides a camel image for testing  in various formats 
 use 5.010;
 use MIME::Base64 qw( encode_base64 decode_base64 );
@@ -167,7 +167,7 @@ AI::PredictionClient::Testing::Camel - Provides a camel image for testing  in va
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

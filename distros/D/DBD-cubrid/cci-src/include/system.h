@@ -99,9 +99,6 @@ typedef bool _Bool;
 # define true 1
 # define __bool_true_false_are_defined 1
 #endif
-#if !defined HAVE_STRLCPY || !defined HAVE_STRLCAT
-# include "stringl.h"
-#endif
 
 /* need more consideration for the system which is not LP64 model */
 #if SIZEOF_VOID_P < 4
@@ -261,7 +258,7 @@ typedef UINTPTR HL_HEAPID;
 #define HL_NULL_HEAPID 0
 
 typedef UINTPTR QUERY_ID;
-#define NULL_QUERY_ID (~0)
+#define NULL_QUERY_ID ((QUERY_ID) (~0))
 
 #if defined(WINDOWS)
 #define SSIZEOF(val) ((SSIZE_T) sizeof(val))
@@ -276,6 +273,10 @@ typedef UINTPTR QUERY_ID;
 #else
 #define __WORDSIZE 32
 #endif
+#endif
+
+#if defined(_POWER)
+# define __powerpc__
 #endif
 
 #endif /* _SYSTEM_H_ */

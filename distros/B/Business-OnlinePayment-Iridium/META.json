@@ -1,0 +1,65 @@
+{
+   "abstract" : "PayVector (Iridium) backend for Business::OnlinePayment",
+   "author" : [
+      "[ 'Gavin Henry <ghenry@surevoip.co.uk>', 'Wallace Reis <reis.wallace@gmail.com>' ]"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-OnlinePayment-Iridium",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::OnlinePayment" : "0",
+            "Carp" : "0",
+            "HTTP::Request" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Template" : "0",
+            "XML::Simple" : "0",
+            "aliased" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wreis/Business-OnlinePayment-Iridium.git",
+         "web" : "https://github.com/wreis/Business-OnlinePayment-Iridium"
+      }
+   },
+   "version" : "1.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 2.3403"
+}
+

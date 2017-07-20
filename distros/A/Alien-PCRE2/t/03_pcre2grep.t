@@ -1,71 +1,43 @@
 use strict;
 use warnings;
-our $VERSION = 0.013_000;
+our $VERSION = 0.020_000;
 
-use Test::More tests => 12;
-use File::Spec;
-use Capture::Tiny qw( capture_merged );
-use Env qw( @PATH );
-use IPC::Cmd qw(can_run);
+use Test2::V0;
+use Test::Alien;
+use Alien::PCRE2;
 use English qw(-no_match_vars);  # for $OSNAME
-#use Data::Dumper;  # DEBUG
+use Data::Dumper;  # DEBUG
 
-use_ok('Alien::PCRE2');
-my $pcre2_bin_dirs = [ Alien::PCRE2->bin_dir() ];
-#print {*STDERR} "\n\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $pcre2_bin_dirs = '}, Dumper($pcre2_bin_dirs), q{'}, "\n\n";
-unshift @PATH, @{ $pcre2_bin_dirs };
+plan(10);
 
-# SKIP TESTS, already done in t/02
-# test pcre2 directory permissions
-#foreach my $pcre2_bin_dir (@{$pcre2_bin_dirs}) {
-#    ok(defined $pcre2_bin_dir, 'Alien::PCRE2->bin_dir() element is defined');
-#    isnt($pcre2_bin_dir, q{}, 'Alien::PCRE2->bin_dir() element is not empty');
-#    ok(-e $pcre2_bin_dir, 'Alien::PCRE2->bin_dir() element exists');
-#    ok(-r $pcre2_bin_dir, 'Alien::PCRE2->bin_dir() element is readable');
-#    ok(-d $pcre2_bin_dir, 'Alien::PCRE2->bin_dir() element is a directory');
-#}
+# load alien
+alien_ok('Alien::PCRE2', 'Alien::PCRE2 loads successfully and conforms to Alien::Base specifications');
 
-# check if `pcre2grep` can be run, if so get path to binary executable
-my $pcre2_path = undef;
-if ($OSNAME eq 'MSWin32') {
-#    $pcre2_path = can_run('pcre2grep.exe');  # NEED ANSWER: is this correct???
-    $pcre2_path = can_run('pcre2grep');  # NEED ANSWER: is this correct???
-}
-else {
-    $pcre2_path = can_run('pcre2grep');
-}
-#print {*STDERR} "\n\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $pcre2_path = '}, $pcre2_path, q{'}, "\n\n";
-ok(defined $pcre2_path, '`pcre2grep` binary path is defined');
-isnt($pcre2_path, q{}, '`pcre2grep` binary path is not empty');
+# test version flag
+my $run_object = run_ok([ 'pcre2grep', '--version' ], 'Command `pcre2grep --version` runs');
+print {*STDERR} "\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $run_object->out() = }, Dumper($run_object->out()), "\n";
+print {*STDERR} "\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $run_object->err() = }, Dumper($run_object->err()), "\n";
+$run_object->success('Command `pcre2grep --version` runs successfully');
+is((substr $run_object->out(), 0, 18), 'pcre2grep version ', 'Command `pcre2grep --version` output starts correctly');
+# DEV NOTE: can't use out_like() on the next line because it does not properly capture to $1, as used in the following split
+ok($run_object->out() =~ m/([\d\.]+)(?:-DEV)?[\d\.\-\s]*$/xms, 'Command `pcre2grep --version` runs with valid output');
 
-# run `pcre2grep --version`, check for valid output
-my $version = [ split /\r?\n/, capture_merged { system $pcre2_path . ' --version'; }];
-#print {*STDERR} "\n\n", '<<< DEBUG >>> in t/03_pcre2grep.t, have $version =', Dumper($version), "\n\n";
-cmp_ok((scalar @{$version}), '==', 1, '`pcre2grep --version` executes with 1 line of output');
-
-my $version_0 = $version->[0];
-#print {*STDERR} "\n\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $version_0 = '}, $version_0, q{'}, "\n\n";
-ok(defined $version_0, '`pcre2grep --version` 1 line of output is defined');
-is((substr $version_0, 0, 18), 'pcre2grep version ', '`pcre2grep --version` 1 line of output starts correctly');
-#ok($version_0 =~ m/([\d\.]+)[\d\.\-\s]*$/xms, '`pcre2grep --version` 1 line of output ends correctly');  # NEED ENABLE: stable releases only
-ok($version_0 =~ m/([\d\.]+)-DEV[\d\.\-\s]*$/xms, '`pcre2grep --version` 1 line of output ends correctly');  # NEED DISABLE: unstable pre-release '-DEV' only
-
+# test actual version numbers
 my $version_split = [split /[.]/, $1];
-#print {*STDERR} "\n\n", '<<< DEBUG >>> in t/03_pcre2grep.t, have $version_split =', Dumper($version_split), "\n\n";
+print {*STDERR} "\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $version_split = }, Dumper($version_split), "\n";
 my $version_split_0 = $version_split->[0] + 0;
-#print {*STDERR} "\n\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $version_split_0 = '}, $version_split_0, q{'}, "\n\n";
-cmp_ok($version_split_0, '>=', 10, '`pcre2grep --version` returns major version 10 or newer');
+print {*STDERR} "\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $version_split_0 = '}, $version_split_0, q{'}, "\n";
+cmp_ok($version_split_0, '>=', 10, 'Command `pcre2grep --version` returns major version 10 or newer');
 if ($version_split_0 == 10) {
     my $version_split_1 = $version_split->[1] + 0;
-    cmp_ok($version_split_1, '>=', 23, '`pcre2grep --version` returns minor version 23 or newer');
+    cmp_ok($version_split_1, '>=', 23, 'Command `pcre2grep --version` returns minor version 23 or newer');
 }
 
 # run `pcre2grep Thursday t/_DaysOfWeek.txt`, check for valid output
-my $thursday = [ split /\r?\n/, capture_merged { system $pcre2_path . ' Thursday t/_DaysOfTheWeek.txt'; }];
-#print {*STDERR} "\n\n", '<<< DEBUG >>> in t/03_pcre2grep.t, have $thursday =', Dumper($thursday), "\n\n";
-cmp_ok((scalar @{$thursday}), '==', 1, '`pcre2grep Thursday t/_DaysOfWeek.txt` executes with 1 line of output');
+$run_object = run_ok([ 'pcre2grep', 'Thursday', 't/_DaysOfTheWeek.txt' ], 'Command `pcre2grep Thursday t/_DaysOfTheWeek.txt` runs');
+print {*STDERR} "\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $run_object->out() = }, Dumper($run_object->out()), "\n";
+print {*STDERR} "\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $run_object->err() = }, Dumper($run_object->err()), "\n";
+$run_object->success('Command `pcre2grep Thursday t/_DaysOfTheWeek.txt` runs successfully');
+is($run_object->out(), q{Thursday, Thor's (Jupiter's) Day} . "\n", '`pcre2grep Thursday t/_DaysOfWeek.txt` 1 line of output is valid');
 
-my $thursday_0 = $thursday->[0];
-#print {*STDERR} "\n\n", q{<<< DEBUG >>> in t/03_pcre2grep.t, have $thursday_0 = '}, $thursday_0, q{'}, "\n\n";
-ok(defined $thursday_0, '`pcre2grep Thursday t/_DaysOfWeek.txt` 1 line of output is defined');
-is($thursday_0, q{Thursday, Thor's (Jupiter's) Day}, '`pcre2grep Thursday t/_DaysOfWeek.txt` 1 line of output is valid');
+done_testing;

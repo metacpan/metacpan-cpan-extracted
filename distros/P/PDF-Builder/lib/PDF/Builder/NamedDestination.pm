@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-# VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.005'; # VERSION
+my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -208,7 +208,7 @@ within the window.
 
 =item $dest->dest($page, -xyz => [$left, $top, $zoom])
 
-Display the page designated by page, with the coordinates C<[$left, $top] 
+Display the page designated by page, with the coordinates C<[$left, $top]> 
 positioned at the top-left corner of the window and the contents of the page 
 magnified by the factor C<$zoom>. A zero (0) value for any of the parameters 
 C<$left>, C<$top>, or C<$zoom> specifies that the current value of that 

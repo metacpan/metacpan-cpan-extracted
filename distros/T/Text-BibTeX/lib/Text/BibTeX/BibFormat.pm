@@ -26,7 +26,7 @@ use Text::BibTeX::NameFormat;
 use Text::BibTeX::Structure;
 
 @ISA = qw(Text::BibTeX::StructuredEntry);
-$VERSION = 0.80;
+$VERSION = 0.81;
 
 use Text::BibTeX qw(:subs display_list :nameparts :joinmethods);
 

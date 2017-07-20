@@ -22,8 +22,6 @@ lib/Finance/GDAX/API/Withdrawl.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-MYMETA.json
-MYMETA.yml
 README
 t/010-initial.t
 t/020-account.t

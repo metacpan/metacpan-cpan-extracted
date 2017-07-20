@@ -16,8 +16,8 @@ package PDF::Builder::Basic::PDF::File;
 
 use strict;
 
-# VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.005'; # VERSION
+my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -91,8 +91,8 @@ in the file so far.
 
 =item outlist (P)
 
-This is a list of Objind which are to be output when the next C<appendfile() or 
-C<outfile()> occurs.
+This is a list of Objind which are to be output when the next C<appendfile()> 
+or C<outfile()> occurs.
 
 =item firstfree (P)
 

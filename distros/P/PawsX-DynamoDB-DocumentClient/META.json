@@ -1,0 +1,76 @@
+{
+   "abstract" : "a simplified way of working with AWS DynamoDB items that uses Paws under the hood.",
+   "author" : [
+      "Steve Caldwell <scaldwell@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PawsX-DynamoDB-DocumentClient",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.18",
+            "Test::Pod" : "1.41",
+            "UUID::Tiny" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::Runtime" : "0",
+            "Net::Amazon::DynamoDB::Marshaler" : "0",
+            "Paws" : "0",
+            "PerlX::Maybe" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevecaldwell77/PawsX-DynamoDB-DocumentClient/issues"
+      },
+      "homepage" : "https://github.com/stevecaldwell77/PawsX-DynamoDB-DocumentClient",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevecaldwell77/PawsX-DynamoDB-DocumentClient.git",
+         "web" : "https://github.com/stevecaldwell77/PawsX-DynamoDB-DocumentClient"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Stephen Caldwell <steve@campusexplorer.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Prty::Hash;
 use Prty::Option;
@@ -1634,7 +1634,7 @@ sub AUTOLOAD {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

@@ -7,4 +7,3 @@ Makefile.PL
 README
 dist.ini
 lib/WWW/Leech/Walker.pm
-pod2htmd.tmp

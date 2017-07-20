@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.11, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.0.12, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Aniki:
     file: lib/Aniki.pm
-    version: '1.04'
+    version: '1.06'
   Aniki::Filter:
     file: lib/Aniki/Filter.pm
   Aniki::Filter::Declare:
@@ -124,12 +124,12 @@ resources:
   bugtracker: https://github.com/karupanerura/Aniki/issues
   homepage: https://github.com/karupanerura/Aniki
   repository: git://github.com/karupanerura/Aniki.git
-version: '1.04'
+version: '1.06'
 x_authority: cpan:KARUPA
 x_contributors:
-  - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Pine Mizune <pinemz@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'mamimumemoomoo <k.k.n.n.ken.mmm@gmail.com>'
   - 'watanabe-yocihi <watanabe-yoichi@kayac.com>'
-  - 'hidaka-kenta <k.k.n.n.ken.mmm@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
 x_static_install: 1

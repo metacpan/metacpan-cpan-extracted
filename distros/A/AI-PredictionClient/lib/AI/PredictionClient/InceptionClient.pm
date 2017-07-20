@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package AI::PredictionClient::InceptionClient;
-$AI::PredictionClient::InceptionClient::VERSION = '0.01';
+$AI::PredictionClient::InceptionClient::VERSION = '0.03';
 
 # ABSTRACT: A module implementing the TensorFlow Serving Inception client
 
@@ -69,7 +69,7 @@ AI::PredictionClient::InceptionClient - A module implementing the TensorFlow Ser
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 AUTHOR
 

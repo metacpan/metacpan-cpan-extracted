@@ -16,7 +16,7 @@ use Mojo::DOM58::_CSS;
 use Mojo::DOM58::_HTML;
 use Scalar::Util qw(blessed weaken);
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 sub new {
   my $class = shift;
@@ -26,9 +26,9 @@ sub new {
 
 sub TO_JSON { shift->_delegate('render') }
 
-sub all_text { _text([_nodes(shift->tree)], 1) }
+sub all_text { _text(_nodes(shift->tree), 1) }
 
-sub ancestors { _select($_[0]->_collect($_[0]->_ancestors), $_[1]) }
+sub ancestors { _select($_[0]->_collect([$_[0]->_ancestors]), $_[1]) }
 
 sub append { shift->_add(1, @_) }
 sub append_content { shift->_content(1, 0, @_) }
@@ -68,7 +68,7 @@ sub content {
   if ($type eq 'root' || $type eq 'tag') {
     return $self->_content(0, 1, @_) if @_;
     my $html = Mojo::DOM58::_HTML->new(xml => $self->xml);
-    return join '', map { $html->tree($_)->render } _nodes($self->tree);
+    return join '', map { $html->tree($_)->render } @{_nodes($self->tree)};
   }
 
   return $self->tree->[1] unless @_;
@@ -78,10 +78,10 @@ sub content {
 
 sub descendant_nodes { $_[0]->_collect(_all(_nodes($_[0]->tree))) }
 
-sub find { $_[0]->_collect(@{$_[0]->_css->select($_[1])}) }
+sub find { $_[0]->_collect($_[0]->_css->select($_[1])) }
 
-sub following { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[1]}), $_[1]) }
-sub following_nodes { $_[0]->_collect(@{$_[0]->_siblings->[1]}) }
+sub following { _select($_[0]->_collect($_[0]->_siblings(1, 1)), $_[1]) }
+sub following_nodes { $_[0]->_collect($_[0]->_siblings(0, 1)) }
 
 sub matches { shift->_css->matches(@_) }
 
@@ -105,32 +105,32 @@ sub namespace {
   return undef;
 }
 
-sub next      { $_[0]->_maybe($_[0]->_siblings(1, 0)->[1]) }
-sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 0)->[1]) }
+sub next      { $_[0]->_maybe($_[0]->_siblings(1, 1, 0)) }
+sub next_node { $_[0]->_maybe($_[0]->_siblings(0, 1, 0)) }
 
 sub parent {
   my $self = shift;
-  return undef if $self->tree->[0] eq 'root';
-  return $self->_build($self->_parent, $self->xml);
+  return undef if (my $tree = $self->tree)->[0] eq 'root';
+  return $self->_build(_parent($tree), $self->xml);
 }
 
 sub parse { shift->_delegate(parse => @_) }
 
-sub preceding { _select($_[0]->_collect(@{$_[0]->_siblings(1)->[0]}), $_[1]) }
-sub preceding_nodes { $_[0]->_collect(@{$_[0]->_siblings->[0]}) }
+sub preceding { _select($_[0]->_collect($_[0]->_siblings(1, 0)), $_[1]) }
+sub preceding_nodes { $_[0]->_collect($_[0]->_siblings(0)) }
 
 sub prepend { shift->_add(0, @_) }
 sub prepend_content { shift->_content(0, 0, @_) }
 
-sub previous      { $_[0]->_maybe($_[0]->_siblings(1, -1)->[0]) }
-sub previous_node { $_[0]->_maybe($_[0]->_siblings(0, -1)->[0]) }
+sub previous      { $_[0]->_maybe($_[0]->_siblings(1, 0, -1)) }
+sub previous_node { $_[0]->_maybe($_[0]->_siblings(0, 0, -1)) }
 
 sub remove { shift->replace('') }
 
 sub replace {
   my ($self, $new) = @_;
   return $self->parse($new) if (my $tree = $self->tree)->[0] eq 'root';
-  return $self->_replace($self->_parent, $tree, _nodes($self->_parse($new)));
+  return $self->_replace(_parent($tree), $tree, _nodes($self->_parse($new)));
 }
 
 sub root {
@@ -155,7 +155,7 @@ sub tag {
 
 sub tap { Mojo::DOM58::_Collection::tap(@_) }
 
-sub text { _text([_nodes(shift->tree)], 0) }
+sub text { _text(_nodes(shift->tree), 0) }
 
 sub to_string { shift->_delegate('render') }
 
@@ -179,7 +179,8 @@ sub val {
   return $tag eq 'textarea' ? $self->text : $self->{value} if $tag ne 'select';
 
   # "select"
-  my $v = $self->find('option:checked')->map('val');
+  my $v = $self->find('option:checked:not([disabled])')
+    ->grep(sub { !$_->ancestors('optgroup[disabled]')->size })->map('val');
   return exists $self->{multiple} ? $v->size ? $v->to_array : undef : $v->last;
 }
 
@@ -193,21 +194,23 @@ sub _add {
 
   return $self if (my $tree = $self->tree)->[0] eq 'root';
 
-  my $parent = $self->_parent;
+  my $parent = _parent($tree);
   splice @$parent, _offset($parent, $tree) + $offset, 0,
-    _link($parent, _nodes($self->_parse($new)));
+    @{_link($parent, _nodes($self->_parse($new)))};
 
   return $self;
 }
 
 sub _all {
-  map { $_->[0] eq 'tag' ? ($_, _all(_nodes($_))) : ($_) } @_;
+  my $nodes = shift;
+  @$nodes = map { $_->[0] eq 'tag' ? ($_, @{_all(_nodes($_))}) : ($_) } @$nodes;
+  return $nodes;
 }
 
 sub _ancestors {
   my ($self, $root) = @_;
 
-  return () unless my $tree = $self->_parent;
+  return () unless my $tree = _parent($self->tree);
   my @ancestors;
   do { push @ancestors, $tree }
     while ($tree->[0] eq 'tag') && ($tree = $tree->[3]);
@@ -217,9 +220,9 @@ sub _ancestors {
 sub _build { shift->new->tree(shift)->xml(shift) }
 
 sub _collect {
-  my $self = shift;
-  my $xml  = $self->xml;
-  return Mojo::DOM58::_Collection->new(map { $self->_build($_, $xml) } @_);
+  my ($self, $nodes) = (shift, shift || []);
+  my $xml = $self->xml;
+  return Mojo::DOM58::_Collection->new(map { $self->_build($_, $xml) } @$nodes);
 }
 
 sub _content {
@@ -233,7 +236,7 @@ sub _content {
 
   $start  = $start  ? ($#$tree + 1) : _start($tree);
   $offset = $offset ? $#$tree       : 0;
-  splice @$tree, $start, $offset, _link($tree, _nodes($self->_parse($new)));
+  splice @$tree, $start, $offset, @{_link($tree, _nodes($self->_parse($new)))};
 
   return $self;
 }
@@ -248,16 +251,16 @@ sub _delegate {
 }
 
 sub _link {
-  my ($parent, @children) = @_;
+  my ($parent, $children) = @_;
 
   # Link parent to children
-  for my $node (@children) {
+  for my $node (@$children) {
     my $offset = $node->[0] eq 'tag' ? 3 : 2;
     $node->[$offset] = $parent;
     weaken $node->[$offset];
   }
 
-  return @children;
+  return $children;
 }
 
 sub _maybe { $_[1] ? $_[0]->_build($_[1], $_[0]->xml) : undef }
@@ -265,7 +268,7 @@ sub _maybe { $_[1] ? $_[0]->_build($_[1], $_[0]->xml) : undef }
 sub _nodes {
   return () unless my $tree = shift;
   my @nodes = @$tree[_start($tree) .. $#$tree];
-  return shift() ? grep { $_->[0] eq 'tag' } @nodes : @nodes;
+  return shift() ? [grep { $_->[0] eq 'tag' } @nodes] : \@nodes;
 }
 
 sub _offset {
@@ -275,36 +278,33 @@ sub _offset {
   return $i;
 }
 
-sub _parent { $_[0]->tree->[$_[0]->type eq 'tag' ? 3 : 2] }
+sub _parent { $_[0]->[$_[0][0] eq 'tag' ? 3 : 2] }
 
 sub _parse { Mojo::DOM58::_HTML->new(xml => shift->xml)->parse(shift)->tree }
 
 sub _replace {
-  my ($self, $parent, $child, @nodes) = @_;
-  splice @$parent, _offset($parent, $child), 1, _link($parent, @nodes);
+  my ($self, $parent, $child, $nodes) = @_;
+  splice @$parent, _offset($parent, $child), 1, @{_link($parent, $nodes)};
   return $self->parent;
 }
 
-sub _select {
-  my ($collection, $selector) = @_;
-  return $collection unless $selector;
-  return $collection->new(grep { $_->matches($selector) } @$collection);
-}
+sub _select { $_[1] ? $_[0]->grep(matches => $_[1]) : $_[0] }
 
 sub _siblings {
-  my ($self, $tags, $i) = @_;
+  my ($self, $tags, $tail, $i) = @_;
 
-  return [] unless my $parent = $self->parent;
+  return defined $i ? undef : [] if (my $tree = $self->tree)->[0] eq 'root';
 
-  my $tree = $self->tree;
-  my (@before, @after, $match);
-  for my $node (_nodes($parent->tree)) {
-    ++$match and next if !$match && $node eq $tree;
-    next if $tags && $node->[0] ne 'tag';
-    $match ? push @after, $node : push @before, $node;
-  }
+  my $nodes = _nodes(_parent($tree));
+  my $match = -1;
+  defined($match++) and $_ eq $tree and last for @$nodes;
 
-  return defined $i ? [$before[$i], $after[$i]] : [\@before, \@after];
+  if ($tail) { splice @$nodes, 0, $match + 1 }
+  else       { splice @$nodes, $match, ($#$nodes + 1) - $match }
+
+  @$nodes = grep { $_->[0] eq 'tag' } @$nodes if $tags;
+
+  return defined $i ? $i == -1 && !@$nodes ? undef : $nodes->[$i] : $nodes;
 }
 
 sub _start { $_[0][0] eq 'root' ? 1 : 4 }
@@ -322,7 +322,7 @@ sub _text {
     }
 
     # Nested tag
-    elsif ($type eq 'tag' && $all) { unshift @$nodes, _nodes($node) }
+    elsif ($type eq 'tag' && $all) { unshift @$nodes, @{_nodes($node)} }
   }
 
   return $text;
@@ -337,19 +337,19 @@ sub _wrap {
   # Find innermost tag
   my $current;
   my $first = $new = $self->_parse($new);
-  $current = $first while $first = (_nodes($first, 1))[0];
+  $current = $first while $first = _nodes($first, 1)->[0];
   return $self unless $current;
 
   # Wrap content
   if ($content) {
-    push @$current, _link($current, _nodes($tree));
-    splice @$tree, _start($tree), $#$tree, _link($tree, _nodes($new));
+    push @$current, @{_link($current, _nodes($tree))};
+    splice @$tree, _start($tree), $#$tree, @{_link($tree, _nodes($new))};
     return $self;
   }
 
   # Wrap element
-  $self->_replace($self->_parent, $tree, _nodes($new));
-  push @$current, _link($current, $tree);
+  $self->_replace(_parent($tree), $tree, _nodes($new));
+  push @$current, @{_link($current, [$tree])};
   return $self;
 }
 
@@ -404,7 +404,7 @@ closely compatible with upstream. It differs only in the standalone format and
 compatibility with Perl 5.8. Any bugs or patches not related to these changes
 should be reported directly to the L<Mojolicious> issue tracker.
 
-This release of L<Mojo::DOM58> is up to date with version C<7.29> of
+This release of L<Mojo::DOM58> is up to date with version C<7.36> of
 L<Mojolicious>.
 
 =head1 NODES AND ELEMENTS
@@ -449,15 +449,15 @@ mode and everything becomes case-sensitive.
   my $dom = Mojo::DOM58->new('<?xml version="1.0"?><P ID="greeting">Hi!</P>');
   say $dom->at('P[ID]')->text;
 
-XML detection can also be disabled with the L</"xml"> method.
-
-  # Force XML semantics
-  my $dom = Mojo::DOM58->new->xml(1)->parse('<P ID="greeting">Hi!</P>');
-  say $dom->at('P[ID]')->text;
+HTML or XML semantics can also be forced with the L</"xml"> method.
 
   # Force HTML semantics
   my $dom = Mojo::DOM58->new->xml(0)->parse('<P ID="greeting">Hi!</P>');
   say $dom->at('p[id]')->text;
+
+  # Force XML semantics
+  my $dom = Mojo::DOM58->new->xml(1)->parse('<P ID="greeting">Hi!</P>');
+  say $dom->at('P[ID]')->text;
 
 =head1 SELECTORS
 
@@ -639,11 +639,28 @@ An C<E> element with C<ID> equal to "myid".
 
   my $foo = $dom->at('div#foo');
 
-=item E:not(s)
+=item E:not(s1, s2)
 
-An C<E> element that does not match simple selector C<s>.
+An C<E> element that does not match either compound selector C<s1> or compound
+selector C<s2>. Note that support for compound selectors is EXPERIMENTAL and
+might change without warning!
 
-  my $others = $dom->find('div p:not(:first-child)');
+  my $others = $dom->find('div p:not(:first-child, :last-child)');
+
+Support for compound selectors was added as part of
+L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+in progress.
+
+=item E:matches(s1, s2)
+
+An C<E> element that matches compound selector C<s1> and/or compound selector
+C<s2>. Note that this selector is EXPERIMENTAL and might change without warning!
+
+  my $headers = $dom->find(':matches(section, article, aside, nav) h1');
+
+This selector is part of
+L<Selectors Level 4|http://dev.w3.org/csswg/selectors-4>, which is still a work
+in progress.
 
 =item E F
 

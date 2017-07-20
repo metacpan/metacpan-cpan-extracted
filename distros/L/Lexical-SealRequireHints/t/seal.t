@@ -19,6 +19,7 @@ sub test_runtime_hint_hash($$) {
 }
 
 BEGIN { use_ok "Lexical::SealRequireHints"; }
+BEGIN { unshift @INC, "./t/lib"; }
 
 BEGIN {
 	$^H |= 0x20000 if "$]" < 5.009004;

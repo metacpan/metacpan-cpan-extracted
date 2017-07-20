@@ -44,6 +44,7 @@
             "Exporter" : "0",
             "Hash::Flatten" : "0",
             "JSON::XS" : "0",
+            "LWP::Authen::Negotiate" : "0",
             "LWP::UserAgent" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
@@ -88,7 +89,7 @@
          "web" : "https://github.com/Perl-Hadoop/Net-Hadoop-Oozie"
       }
    },
-   "version" : "0.109",
+   "version" : "0.110",
    "x_contributors" : [
       "Burak Gursoy <burak@cpan.org>",
       "David Morel <dmor@cpan.org>",

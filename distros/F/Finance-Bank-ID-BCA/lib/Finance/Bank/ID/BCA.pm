@@ -1,11 +1,10 @@
 package Finance::Bank::ID::BCA;
 
-our $DATE = '2017-07-01'; # DATE
-our $VERSION = '0.46'; # VERSION
+our $DATE = '2017-07-20'; # DATE
+our $VERSION = '0.48'; # VERSION
 
 use 5.010001;
 use Moo;
-use DateTime;
 
 extends 'Finance::Bank::ID::Base';
 
@@ -147,6 +146,8 @@ sub check_balance {
 }
 
 sub get_statement {
+    require DateTime;
+
     my ($self, %args) = @_;
     my $s = $self->site;
     my $max_days = 31;
@@ -277,6 +278,8 @@ sub _ps_detect {
 }
 
 sub _ps_get_metadata {
+    require DateTime;
+
     my ($self, $page, $stmt) = @_;
 
     unless ($page =~ /\s*(?:(?:Nomor|No\.) [Rr]ekening|Account Number)\s*(?:<[^>]+>\s*)*[:\t]\s*(?:<[^>]+>\s*)*([\d-]+)/m) {
@@ -318,22 +321,24 @@ sub _ps_get_metadata {
 }
 
 sub _ps_get_transactions {
+    require DateTime;
+
     my ($self, $page, $stmt) = @_;
 
     my @e;
     # text version
     while ($page =~ m!^
-(\d\d/\d\d|\s?PEND|\s?NEXT)
-  (?:\s*\t\s*|\n)
-((?:[^\t]|\n)*?)
-  (?:\s*\t\s*|\n)
-(\d{4})
-  (?:\s*\t\s*|\n)
-([0-9,]+)\.(\d\d)
-  (?:\s*\t?\s*|\n)
-(CR|DB)
-  (?:\s*\t\s*|\n)
-([0-9,]+)\.(\d\d)
+(\d\d/\d\d|\s?PEND|\s?NEXT) # 1) date
+  (?:\s*\t\s*|\n)+
+((?:[^\t]|\n)*?) # 2) description
+  (?:\s*\t\s*|\n)+
+(\d{4}) # 3) branch code
+  (?:\s*\t\s*|\n)+
+([0-9,]+)\.(\d\d) # 4+5) amount
+  (?:\s*\t?\s*|\n)+
+(CR|DB) # 6)
+  (?:\s*\t\s*|\n)+
+([0-9,]+)\.(\d\d) # 7+8) balance
     !mxg) {
         push @e, {date=>$1, desc=>$2, br=>$3, amt=>$4, amtf=>$5, crdb=>$6, bal=>$7, balf=>$8};
     }
@@ -439,7 +444,7 @@ Finance::Bank::ID::BCA - Check your BCA accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.46 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-01.
+This document describes version 0.48 of Finance::Bank::ID::BCA (from Perl distribution Finance-Bank-ID-BCA), released on 2017-07-20.
 
 =head1 SYNOPSIS
 

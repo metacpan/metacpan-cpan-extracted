@@ -1,14 +1,650 @@
+NAME
+    Bencher::Backend - Backend for Bencher
+
+VERSION
+    This document describes version 1.040 of Bencher::Backend (from Perl
+    distribution Bencher-Backend), released on 2017-07-13.
+
+FUNCTIONS
+  bencher
+    Usage:
+
+     bencher(%args) -> [status, msg, result, meta]
+
+    A benchmark framework.
+
+    Bencher is a benchmark framework. You specify a *scenario* (either in a
+    "Bencher::Scenario::*" Perl module, or a Perl script, or over the
+    command-line) containing list of *participants* and *datasets*.
+    Participants are codes or commands to run, and datasets are arguments
+    for the codes/commands. Bencher will permute the participants and
+    datasets into benchmark items, ready to run.
+
+    You can choose to include only some participants, datasets, or items.
+    And there are options to view your scenario's
+    participants/datasets/items/mentioned modules, run benchmark against
+    multiple perls and module versions, and so on. Bencher comes as a CLI
+    script as well as Perl module. See the Bencher::Backend documentation
+    for more information.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "bench")
+
+    *   capture_stderr => *bool*
+
+        Trap output to stderr.
+
+    *   capture_stdout => *bool*
+
+        Trap output to stdout.
+
+    *   code_startup => *bool*
+
+        Benchmark code startup overhead instead of normal benchmark.
+
+    *   datasets => *array[hash]*
+
+        Add datasets.
+
+    *   detail => *bool*
+
+    *   env_hashes => *array[hash]*
+
+        Add environment hashes.
+
+    *   exclude_dataset_names => *array[str]*
+
+        Exclude datasets whose name matches this.
+
+    *   exclude_dataset_pattern => *re*
+
+        Exclude datasets matching this regex pattern.
+
+    *   exclude_dataset_seqs => *array[int]*
+
+        Exclude datasets whose sequence number matches this.
+
+    *   exclude_dataset_tags => *array[str]*
+
+        Exclude datasets whose tag matches this.
+
+        You can specify "A & B" to exclude datasets that have *both* tags A
+        and B.
+
+    *   exclude_datasets => *array[str]*
+
+        Exclude datasets whose seq/name matches this.
+
+    *   exclude_function_pattern => *re*
+
+        Exclude function(s) matching this regex pattern.
+
+    *   exclude_functions => *array[str]*
+
+        Exclude functions specified in this list.
+
+    *   exclude_item_names => *array[str]*
+
+        Exclude items whose name matches this.
+
+    *   exclude_item_pattern => *re*
+
+        Exclude items matching this regex pattern.
+
+    *   exclude_item_seqs => *array[int]*
+
+        Exclude items whose sequence number matches this.
+
+    *   exclude_items => *array[str]*
+
+        Exclude items whose seq/name matches this.
+
+    *   exclude_module_pattern => *re*
+
+        Exclude module(s) matching this regex pattern.
+
+    *   exclude_modules => *array[str]*
+
+        Exclude modules specified in this list.
+
+    *   exclude_participant_names => *array[str]*
+
+        Exclude participants whose name matches this.
+
+    *   exclude_participant_pattern => *re*
+
+        Exclude participants matching this regex pattern.
+
+    *   exclude_participant_seqs => *array[int]*
+
+        Exclude participants whose sequence number matches this.
+
+    *   exclude_participant_tags => *array[str]*
+
+        Exclude participants whose tag matches this.
+
+        You can specify "A & B" to exclude participants that have *both*
+        tags A and B.
+
+    *   exclude_participants => *array[str]*
+
+        Exclude participants whose seq/name matches this.
+
+    *   exclude_perls => *array[str]*
+
+        Exclude some perls.
+
+    *   exclude_pp_modules => *bool*
+
+        Exclude PP (pure-Perl) modules.
+
+    *   exclude_xs_modules => *bool*
+
+        Exclude XS modules.
+
+    *   include_dataset_names => *array[str]*
+
+        Only include datasets whose name matches this.
+
+    *   include_dataset_pattern => *re*
+
+        Only include datasets matching this regex pattern.
+
+    *   include_dataset_seqs => *array[int]*
+
+        Only include datasets whose sequence number matches this.
+
+    *   include_dataset_tags => *array[str]*
+
+        Only include datasets whose tag matches this.
+
+        You can specify "A & B" to include datasets that have *both* tags A
+        and B.
+
+    *   include_datasets => *array[str]*
+
+        Only include datasets whose seq/name matches this.
+
+    *   include_function_pattern => *re*
+
+        Only include functions matching this regex pattern.
+
+    *   include_functions => *array[str]*
+
+        Only include functions specified in this list.
+
+    *   include_item_names => *array[str]*
+
+        Only include items whose name matches this.
+
+    *   include_item_pattern => *re*
+
+        Only include items matching this regex pattern.
+
+    *   include_item_seqs => *array[int]*
+
+        Only include items whose sequence number matches this.
+
+    *   include_items => *array[str]*
+
+        Only include items whose seq/name matches this.
+
+    *   include_module_pattern => *re*
+
+        Only include modules matching this regex pattern.
+
+    *   include_modules => *array[str]*
+
+        Only include modules specified in this list.
+
+    *   include_participant_names => *array[str]*
+
+        Only include participants whose name matches this.
+
+    *   include_participant_pattern => *re*
+
+        Only include participants matching this regex pattern.
+
+    *   include_participant_seqs => *array[int]*
+
+        Only include participants whose sequence number matches this.
+
+    *   include_participant_tags => *array[str]*
+
+        Only include participants whose tag matches this.
+
+        You can specify "A & B" to include participants that have *both*
+        tags A and B.
+
+    *   include_participants => *array[str]*
+
+        Only include participants whose seq/name matches this.
+
+    *   include_path => *array[str]*
+
+        Additional module search paths.
+
+        Used when searching for scenario module, or when in multimodver
+        mode.
+
+    *   include_perls => *array[str]*
+
+        Only include some perls.
+
+    *   module_startup => *bool*
+
+        Benchmark module startup overhead instead of normal benchmark.
+
+    *   multimodver => *str*
+
+        Benchmark multiple module versions.
+
+        If set to a module name, will search for all (instead of the first
+        occurrence) of the module in @INC. Then will generate items for each
+        version.
+
+        Currently only one module can be multi version.
+
+    *   multiperl => *bool* (default: 0)
+
+        Benchmark against multiple perls.
+
+        Requires App::perlbrew to be installed. Will use installed perls
+        from the perlbrew installation. Each installed perl must have
+        Bencher::Backend module installed (in addition to having all modules
+        that you want to benchmark, obviously).
+
+        By default, only perls having Bencher::Backend will be included. Use
+        "--include-perl" and "--exclude-perl" to include and exclude which
+        perls you want.
+
+        Also note that due to the way this is currently implemented,
+        benchmark code that contains closures (references to variables
+        outside the code) won't work.
+
+    *   note => *str*
+
+        Put additional note in the result.
+
+    *   on_failure => *str*
+
+        What to do when there is a failure.
+
+        For a command participant, failure means non-zero exit code. For a
+        Perl-code participant, failure means Perl code dies or (if expected
+        result is specified) the result is not equal to the expected result.
+
+        The default is "die". When set to "skip", will first run the code of
+        each item before benchmarking and trap command failure/Perl
+        exception and if that happens, will "skip" the item.
+
+    *   on_result_failure => *str*
+
+        What to do when there is a result failure.
+
+        This is like "on_failure" except that it specifically refer to the
+        failure of item's result not being equal to expected result.
+
+        There is an extra choice of "warn" for this type of failure, which
+        is to print a warning to STDERR and continue.
+
+    *   participants => *array[hash]*
+
+        Add participants.
+
+    *   precision => *float*
+
+        Precision.
+
+        When benchmarking with the default Benchmark::Dumb runner, will pass
+        the precision to it. The value is a fraction, e.g. 0.5 (for 5%
+        precision), 0.01 (for 1% precision), and so on. Or, it can also be a
+        positive integer to speciify minimum number of iterations, usually
+        need to be at least 6 to avoid the "Number of initial runs is very
+        small (<6)" warning. The default precision is 0, which is to let
+        Benchmark::Dumb determine the precision, which is good enough for
+        most cases.
+
+        When benchmarking with Benchmark runner, will pass this value as the
+        $count argument. Which can be a positive integer to mean the number
+        of iterations to do (e.g. 10, or 100). Or, can also be set to a
+        negative number (e.g. -0.5 or -2) to mean minimum number of CPU
+        seconds. The default is -0.5.
+
+        When benchmarking with Benchmark::Dumb::SimpleTime, this value is a
+        positive integer which means the number of iterations to perform.
+
+        This setting overrides "default_precision" property in the scenario.
+
+    *   precision_limit => *float*
+
+        Set precision limit.
+
+        Instead of setting "precision" which forces a single value, you can
+        also set this "precision_limit" setting. If the precision in the
+        scenario is higher (=number is smaller) than this limit, then this
+        limit is used. For example, if the scenario specifies
+        "default_precision" 0.001 and "precision_limit" is set to 0.005 then
+        0.005 is used.
+
+        This setting is useful on slower computers which might not be able
+        to reach the required precision before hitting maximum number of
+        iterations.
+
+    *   raw => *bool*
+
+        Show "raw" data.
+
+        When action=show-items-result, will print result as-is instead of
+        dumping as Perl.
+
+    *   result_dir => *str*
+
+        Directory to use when saving benchmark result.
+
+        Default is from "BENCHER_RESULT_DIR" environment variable, or the
+        home directory.
+
+    *   result_filename => *str*
+
+        Filename to use when saving benchmark result.
+
+        Default is:
+
+         <NAME>.<yyyy-dd-dd-"T"HH-MM-SS>.json
+
+        or, when running in module startup mode:
+
+         <NAME>.module_startup.<yyyy-dd-dd-"T"HH-MM-SS>.json
+
+        or, when running in code startup mode:
+
+         <NAME>.code_startup.<yyyy-dd-dd-"T"HH-MM-SS>.json
+
+        where <NAME> is scenario module name, or "NO_MODULE" if scenario is
+        not from a module. The "::" (double colon in the module name will be
+        replaced with "-" (dash).
+
+    *   return_meta => *bool*
+
+        Whether to return extra metadata.
+
+        When set to true, will return extra metadata such as platform
+        information, CPU information, system load before & after the
+        benchmark, system time, and so on. This is put in result metadata
+        under "func.*" keys.
+
+        The default is to true (return extra metadata) unless when run as
+        CLI and format is text (where the extra metadata is not shown).
+
+    *   runner => *str*
+
+        Runner module to use.
+
+        The default is "Benchmark::Dumb" which should be good enough for
+        most cases.
+
+        You can use "Benchmark" runner ("Benchmark.pm") if you are
+        accustomed to it and want to see its output format.
+
+        You can use "Benchmark::Dumb::SimpleTime" if your participant code
+        runs for at least a few to many seconds and you want to use very few
+        iterations (like 1 or 2) because you don't want to wait for too
+        long.
+
+    *   save_result => *bool*
+
+        Whether to save benchmark result to file.
+
+        Will also be turned on automatically if "BENCHER_RESULT_DIR"
+        environment variabl is defined.
+
+        When this is turned on, will save a JSON file after benchmark,
+        containing the result along with metadata. The directory of the JSON
+        file will be determined from the "results_dir" option, while the
+        filename from the "results_filename" option.
+
+    *   scenario => *hash*
+
+        Load a scenario from data structure.
+
+    *   scenario_file => *str*
+
+        Load a scenario from a Perl file.
+
+        Perl file will be do()'ed and the last expression should be a hash
+        containing the scenario specification.
+
+    *   scenario_module => *str*
+
+        Load a scenario from a Bencher::Scenario:: Perl module.
+
+        Will try to load module "Bencher::Scenario::<NAME>" and expect to
+        find a package variable in the module called $scenario which should
+        be a hashref containing the scenario specification.
+
+    *   scientific_notation => *bool*
+
+    *   sorts => *array[str]* (default: ["-time"])
+
+    *   test => *bool*
+
+        Whether to test participant code once first before benchmarking.
+
+        By default, participant code is run once first for testing (e.g.
+        whether it dies or return the correct result) before benchmarking.
+        If your code runs for many seconds, you might want to skip this test
+        and set this to 0.
+
+    *   with_args_size => *bool*
+
+        Also return memory usage of item's arguments.
+
+        Memory size is measured using Devel::Size.
+
+    *   with_process_size => *bool*
+
+        Also return process size information for each item.
+
+        This is done by dumping each item's code into a temporary file and
+        running the file with a new perl interpreter process and measuring
+        the process size at the end (so it does not need to load Bencher
+        itself or the other items). Currently only works on Linux because
+        process size information is retrieved from "/proc/PID/smaps". Not
+        all code can work, e.g. if the code tries to access a closure or
+        outside data or extra modules (modules not specified in the
+        participant or loaded by the code itself). Usually does not make
+        sense to use this on external command participants.
+
+    *   with_result_size => *bool*
+
+        Also return memory usage of each item code's result (return value).
+
+        Memory size is measured using Devel::Size.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  chart_result
+    Usage:
+
+     chart_result(%args) -> [status, msg, result, meta]
+
+    Generate chart from the result.
+
+    Will use gnuplot (via Chart::Gnuplot) to generate the chart. Will
+    produce ".png" files in the specified directory.
+
+    Currently only results with one or two permutations of different items
+    will be chartable.
+
+    Options to customize the look/style of the chart will be added in the
+    future.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   envres* => *array*
+
+        Enveloped result from bencher.
+
+    *   output_file* => *str*
+
+    *   overwrite => *bool*
+
+    *   title => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  format_result
+    Usage:
+
+     format_result($envres, $formatters, $options) -> [status, msg, result, meta]
+
+    Format bencher result.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $envres* => *array*
+
+        Enveloped result from bencher.
+
+    *   $formatters* => *array[str|array]*
+
+        Formatters specification.
+
+    *   $options => *hash*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  parse_scenario
+    Usage:
+
+     parse_scenario(%args) -> [status, msg, result, meta]
+
+    Parse scenario (fill in default values, etc).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   scenario => *hash*
+
+        Unparsed scenario.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  split_result
+    Usage:
+
+     split_result($envres, $fields, $options) -> any
+
+    Split results based on one or more fields.
+
+    This routine splits a table into multiple table based on one or more
+    fields. If you want to split a result, you should do it before
+    "format_result()" and then format the split results individually.
+
+    A common use-case is to produce separate tables for each participant or
+    dataset, to make the benchmark results more readable (this is an
+    alternative to having to perform separate benchmark run per participant
+    or dataset).
+
+    Each split result clones all the result metadata (like
+    "func.module_version", "func.platform_info", "table.fields", and so on).
+    But the result items are only a subset of the original result.
+
+    Return an array where each element is "[\%field_values, $split_result]".
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   $envres* => *array*
+
+        Enveloped result from bencher.
+
+    *   $fields* => *array[str]*
+
+        Fields to split the results on.
+
+    *   $options => *hash*
+
+    Return value: (any)
+
 ENVIRONMENT
+  BENCHER_RESULT_DIR => str
+    Set default for "--results-dir".
 
- BENCHER_RESULT_DIR => str
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bencher-Backend>.
 
-    Set default for --results-dir.
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Bencher-Backend>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     bencher
 
     Bencher
 
-    Bencher::Manual::*
+    "Bencher::Manual::*"
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

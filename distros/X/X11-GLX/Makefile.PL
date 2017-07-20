@@ -5,14 +5,6 @@
 use strict;
 use warnings;
 
-# inserted by Dist::Zilla::Plugin::CheckLib 0.006
-use Devel::CheckLib;
-check_lib_or_exit(
-    header => [ 'GL/gl.h', 'X11/Xlib.h' ],
-    lib => [ 'X11', 'GL' ],
-    LIBS => '-lGL -lX11',
-);
-
 use ExtUtils::MakeMaker;
 
 our %PREREQ_PM;
@@ -20,7 +12,7 @@ BEGIN {
     %PREREQ_PM= (
         'ExtUtils::Depends' => '0.405',
         'Devel::CheckLib'   => '1.03',
-        'X11::Xlib'         => '0.12',
+        'X11::Xlib'         => '0.15',
     );
 
     # If the prereqs for this script are missing,
@@ -52,7 +44,7 @@ my %WriteMakefileArgs = (
     "Devel::CheckLib" => "1.03",
     "ExtUtils::Depends" => "0.405",
     "ExtUtils::MakeMaker" => 0,
-    "X11::Xlib" => "0.12"
+    "X11::Xlib" => "0.15"
   },
   "DISTNAME" => "X11-GLX",
   "LICENSE" => "perl",
@@ -61,9 +53,11 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Exporter" => 0,
     "Log::Any" => 0,
-    "Moo" => 0,
+    "Moo" => 2,
     "OpenGL" => 0,
+    "Scalar::Util" => 0,
     "X11::Xlib" => "0.11",
+    "X11::Xlib::Opaque" => 0,
     "X11::Xlib::Pixmap" => 0,
     "XSLoader" => 0,
     "parent" => 0,
@@ -71,11 +65,15 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "FindBin" => 0,
     "Log::Any::Adapter" => 0,
     "Log::Any::Adapter::TAP" => 0,
-    "Test::More" => 0
+    "POSIX" => 0,
+    "Test::More" => 0,
+    "Try::Tiny" => 0,
+    "lib" => 0
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -89,15 +87,21 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Exporter" => 0,
+  "FindBin" => 0,
   "Log::Any" => 0,
   "Log::Any::Adapter" => 0,
   "Log::Any::Adapter::TAP" => 0,
-  "Moo" => 0,
+  "Moo" => 2,
   "OpenGL" => 0,
+  "POSIX" => 0,
+  "Scalar::Util" => 0,
   "Test::More" => 0,
+  "Try::Tiny" => 0,
   "X11::Xlib" => "0.11",
+  "X11::Xlib::Opaque" => 0,
   "X11::Xlib::Pixmap" => 0,
   "XSLoader" => 0,
+  "lib" => 0,
   "parent" => 0,
   "strict" => 0,
   "warnings" => 0

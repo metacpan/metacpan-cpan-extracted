@@ -186,9 +186,22 @@ sub quote ( $self, $var, $type = undef ) {
 sub quote_id ( $self, $id ) {
     utf8::encode $id if utf8::is_utf8 $id;
 
-    $id =~ s/"/""/smg;
+    if ( index( $id, q[.] ) != -1 ) {
+        my @id = split /[.]/sm, $id;
 
-    return qq["$id"];
+        for my $s (@id) {
+            $s =~ s/"/""/smg;
+
+            $s = qq["$s"];
+        }
+
+        return join q[.], @id;
+    }
+    else {
+        $id =~ s/"/""/smg;
+
+        return qq["$id"];
+    }
 }
 
 sub _exec_sth ( $self, $query, @args ) {
@@ -286,7 +299,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
                 # check error
                 if ( defined $DBI::err ) {
-                    if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
+                    if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
                     else               { die $DBI::errstr }
                 }
 
@@ -301,7 +314,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
             $sth = $query;
         }
         else {
-            if ( defined $cb ) { $cb->( result( [ 500, 'Invalid STH class' ], rows => $rows ), $self, undef ); return $rows }
+            if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, 'Invalid STH class' ], rows => $rows ), $self, undef ); return $rows }
             else               { die 'Invalid STH class' }
         }
 
@@ -328,7 +341,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
         # check error
         if ( defined $DBI::err ) {
-            if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
+            if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
             else               { die $DBI::errstr }
         }
 
@@ -352,7 +365,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
         # check error
         if ( defined $DBI::err ) {
-            if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
+            if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
             else               { die $DBI::errstr }
         }
 
@@ -375,7 +388,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
             # prepare sth error
             if ( defined $DBI::err ) {
-                if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
+                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
                 else               { die $DBI::errstr }
             }
 
@@ -397,7 +410,7 @@ sub do ( $self, $query, @args ) {    ## no critic qw[Subroutines::ProhibitBuilti
 
             # execute error
             if ( defined $DBI::err ) {
-                if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
+                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return $rows }
                 else               { die $DBI::errstr }
             }
 
@@ -418,7 +431,7 @@ sub selectall ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
+        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
         else               { die $DBI::errstr }
     }
 
@@ -433,7 +446,7 @@ sub selectall ( $self, @ ) {
 
         # check error
         if ( defined $DBI::err ) {
-            if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
+            if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
             else               { die $DBI::errstr }
         }
 
@@ -455,7 +468,7 @@ sub selectall_arrayref ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
+        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
         else               { die $DBI::errstr }
     }
 
@@ -473,7 +486,7 @@ sub selectrow ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
+        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
         else               { die $DBI::errstr }
     }
 
@@ -491,7 +504,7 @@ sub selectrow_arrayref ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
+        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
         else               { die $DBI::errstr }
     }
 
@@ -510,7 +523,7 @@ sub selectcol ( $self, @ ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
+        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ], rows => $rows ), $self, undef ); return }
         else               { die $DBI::errstr }
     }
 
@@ -523,7 +536,7 @@ sub selectcol ( $self, @ ) {
     for my $col ( is_plain_arrayref $args->{col} ? $args->{col}->@* : $args->{col} ) {
         if ( looks_like_number $col) {
             if ( $col > $num_of_fields ) {
-                if ( defined $cb ) { $cb->( result( [ 500, qq[Invalid column index: "$col"] ], rows => $rows ), $self, undef ); return }
+                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, qq[Invalid column index: "$col"] ], rows => $rows ), $self, undef ); return }
                 else               { die qq[Invalid column index: "$col"] }
             }
 
@@ -533,7 +546,7 @@ sub selectcol ( $self, @ ) {
             $name2idx //= $sth->{NAME_hash};
 
             if ( !exists $name2idx->{$col} ) {
-                if ( defined $cb ) { $cb->( result( [ 500, qq[Invalid column name: "$col"] ], rows => $rows ), $self, undef ); return }
+                if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, qq[Invalid column name: "$col"] ], rows => $rows ), $self, undef ); return }
                 else               { die qq[Invalid column name: "$col"] }
             }
 
@@ -554,7 +567,7 @@ sub begin_work ( $self, $cb = undef ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ] ), $self ); return }
+        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ] ), $self ); return }
         else               { die $DBI::errstr }
     }
 
@@ -568,7 +581,7 @@ sub commit ( $self, $cb = undef ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ] ), $self ); return }
+        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ] ), $self ); return }
         else               { die $DBI::errstr }
     }
 
@@ -582,7 +595,7 @@ sub rollback ( $self, $cb = undef ) {
 
     # check error
     if ( defined $DBI::err ) {
-        if ( defined $cb ) { $cb->( result( [ 500, $DBI::errstr ] ), $self ); return }
+        if ( defined $cb ) { warn "DBI: $DBI::errstr"; $cb->( result( [ 500, $DBI::errstr ] ), $self ); return }
         else               { die $DBI::errstr }
     }
 
@@ -622,15 +635,15 @@ sub attach ( $self, $name, $path = undef ) {
 ## |    3 | 126                  | Subroutines::ProhibitUnusedPrivateSubroutines - Private subroutine/method '_get_schema_patch_table_query'      |
 ## |      |                      | declared but not used                                                                                          |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 268                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (40)                        |
+## |    3 | 281                  | Subroutines::ProhibitExcessComplexity - Subroutine "do" with high complexity score (40)                        |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 351                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
+## |    3 | 364                  | Subroutines::ProtectPrivateSubs - Private subroutine/method used                                               |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
 ## |    2 | 172                  | ValuesAndExpressions::ProhibitEscapedCharacters - Numeric escapes in interpolated string                       |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 243, 315, 388        | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
+## |    2 | 256, 328, 401        | ControlStructures::ProhibitCStyleForLoops - C-style "for" loop used                                            |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    2 | 544                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
+## |    2 | 557                  | ControlStructures::ProhibitPostfixControls - Postfix control "while" used                                      |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

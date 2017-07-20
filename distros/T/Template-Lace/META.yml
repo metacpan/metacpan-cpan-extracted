@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/jjn1056/Template-Lace/issues
   homepage: https://github.com/jjn1056/Template-Lace
   repository: https://github.com/jjn1056/Template-Lace.git
-version: '0.007'
+version: '0.009'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -22,7 +22,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,58 +31,58 @@ name: ClearPress
 provides:
   ClearPress:
     file: lib/ClearPress.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::Localize:
     file: lib/ClearPress/Localize.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::authdecor:
     file: lib/ClearPress/authdecor.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::authenticator:
     file: lib/ClearPress/authenticator.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::authenticator::db:
     file: lib/ClearPress/authenticator/db.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::authenticator::ldap:
     file: lib/ClearPress/authenticator/ldap.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::authenticator::passwd:
     file: lib/ClearPress/authenticator/passwd.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::authenticator::session:
     file: lib/ClearPress/authenticator/session.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::controller:
     file: lib/ClearPress/controller.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::decorator:
     file: lib/ClearPress/decorator.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::driver:
     file: lib/ClearPress/driver.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::driver::Pg:
     file: lib/ClearPress/driver/Pg.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::driver::SQLite:
     file: lib/ClearPress/driver/SQLite.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::driver::mysql:
     file: lib/ClearPress/driver/mysql.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::model:
     file: lib/ClearPress/model.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::util:
     file: lib/ClearPress/util.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::view:
     file: lib/ClearPress/view.pm
-    version: v475.3.3
+    version: v476.1.1
   ClearPress::view::error:
     file: lib/ClearPress/view/error.pm
-    version: v475.3.3
+    version: v476.1.1
 recommends:
   Crypt::MySQL: '0.04'
   DBD::SQLite: '1.14'
@@ -98,6 +98,7 @@ requires:
   Crypt::Blowfish: '2.10'
   Crypt::CBC: '2.30'
   DBI: '1.51'
+  Data::UUID: '1.220'
   English: '1.01'
   HTML::Entities: '1.35'
   HTTP::ClientDetect::Language: '0.03'
@@ -122,5 +123,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://github.com/rmp/libclearpress-perl
-version: v475.3.3
+version: v476.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

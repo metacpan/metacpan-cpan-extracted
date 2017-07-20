@@ -5,21 +5,17 @@ use Test::More;
 use Dios::Types 'validate' => 'type_check';
 
 sub type_okay {
-    my ($value, $type) = @_;
-
-    my $result = eval { type_check($type, $value) };
-    ok $result => Dios::Types::_perl($value)." --> $type";
+    my $result = eval { type_check($_[1], $_[0]) };
+    ok $result => Dios::Types::_perl($_[0])." --> $_[1]";
     diag "         ...Diagnostic was: " . $result->msg
         if ref($result) && !$result;
 }
 
 sub type_fail {
-    my ($value, $type) = @_;
-
-    my $result = eval { type_check($type, $value, 'the test value ('.Dios::Types::_perl($value).')') };
+    my $result = eval { type_check($_[1], $_[0], 'the test value ('.Dios::Types::_perl($_[0]).')') };
     chomp( my $error = $@ );
-    ok !$result => Dios::Types::_perl($value)." -/-> $type";
-    like $error, qr{The test value (.*) is not of type \Q$type\E}s, "...Exception was correct" if $error;
+    ok !$result => Dios::Types::_perl($_[0])." -/-> $_[1]";
+    like $error, qr{The test value (.*) is not of type \Q$_[1]\E}s, "...Exception was correct" if $error;
 }
 
 my $var = 123;
@@ -165,5 +161,32 @@ for my $num (@VALID_NUMS) {
     type_fail( "${num}a", 'Num' );
 }
 
+type_okay( { a => 1, e => 2, u => 3 },  'Hash[Match[^[aeiou]$] => Int]');
+type_okay( { a => 1, e => 2, u => [] }, 'Hash[Match[^[aeiou]$] => Int|Array]');
+type_fail( { a => 1, e => 2, v => 3 },  'Hash[Match[^[aeiou]$] => Int]');
+type_fail( { a => 1, e => 2, u => [] }, 'Hash[Match[^[aeiou]$] => Int]');
+
+type_okay( { a => 1, bb => 2, ccc => 3 }, 'Hash[Not[Empty]=>Int]');
+type_fail( { a => 1, bb => 2, q{} => 3 }, 'Hash[Not[Empty]=>Int]');
+
+type_okay( { 'Dios::Types' => undef },     'Hash[Class=>Undef]');
+type_fail( { 'Bios::Hypes' => undef },     'Hash[Class=>Undef]');
+
+
+type_okay( 'Dios::Types', 'Can[validate]');
+type_okay( 'Dios::Types', 'Class & Can[validate]');
+type_okay( 'Dios::Types', 'Can[ validate , import ]');
+type_fail( 'Dios::Types', 'Can[validate, export]');
+
+
+{ package Overloaded; use overload '+' => sub{}, q{""} => sub{}, '%{}' => sub{}; }
+
+type_okay( 'Overloaded', 'Overloads[+]' );
+type_fail( 'Overloaded', 'Overloads[-]' );
+
+type_okay( 'Overloaded', 'Overloads[ +, "", %{} ]' );
+type_fail( 'Overloaded', 'Overloads[ +, "", %{}, -- ]' );
+
+type_okay( 'Overloaded', 'Overloads[ +, "", %{} ] & Class' );
 
 done_testing;

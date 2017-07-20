@@ -14,8 +14,10 @@ use WiringPi::API qw(:perl);
 sub check_pin_status {
     setup_gpio();
 
+    # removed pins 4, 5, 6, 17, 22, 27 because of LCD
+
     my @gpio_pins = qw(
-        2 3 4 14 15 17 18 27 22 23 24 10 9 25 11 8 7 0 1 5 6 13 19 16 20 21
+        2 3 14 15 18 23 24 10 9 25 11 8 7 0 1 13 19 16 20 21
     );
 
     my $conf;
@@ -31,7 +33,7 @@ sub check_pin_status {
 sub default_pin_config {
     # default pin configurations
 
-    return {
+    my $pin_conf = {
       '3' => {
                'alt' => 4,
                'state' => 1
@@ -41,7 +43,6 @@ sub default_pin_config {
                'alt' => 0
              },
       '17' => {
-                # hot due to LCD
                 'state' => 1,
                 'alt' => 0
               },
@@ -84,7 +85,6 @@ sub default_pin_config {
                 'alt' => 0
               },
       '22' => {
-                # hot due to LCD
                 'alt' => 0,
                 'state' => 1
               },
@@ -138,7 +138,7 @@ sub default_pin_config {
                 'alt' => 4,
                 'state' => 0
               },
-      '5' => {
+              '5' => {
                'alt' => 0,
                'state' => 1
              },
@@ -155,4 +155,6 @@ sub default_pin_config {
                 'state' => 0
             },
     };
+
+    return $pin_conf;
 }

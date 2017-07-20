@@ -1,12 +1,12 @@
 package GraphViz::Graph::Label;
-
+#_{ use
 use warnings;
 use strict;
 
 use Carp;
-
+#_}
 #_{ Version
-our $VERSION = $GraphViz::Graph::Version;
+our $VERSION = $GraphViz::Graph::VERSION;
 #_}
 #_{ Methods
 #_{ POD
@@ -39,7 +39,7 @@ sub new { #_{
       $self->{text_or_html} = delete $opts->{html};
   }
   else {
-      croak "A label must be either a text or a html label";
+      croak "GraphViz::Graph::Label - new: A label must be either a text or a html label";
   }
 
   croak "Unrecognized opts " . join "/", keys %$opts if keys %$opts;

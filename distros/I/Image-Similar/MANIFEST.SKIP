@@ -38,4 +38,5 @@ MYMETA..*
 t/images/chess/make-chessboards\.pl$
 t/images/lenagercke/.*
 ^examples/.*-out\.txt$
+^examples/image-list\.txt$
 ^\.perlcriticrc$

@@ -1,5 +1,5 @@
 package Test::Net::Prober::HTTPServer;
-$Test::Net::Prober::HTTPServer::VERSION = '0.16';
+$Test::Net::Prober::HTTPServer::VERSION = '0.17';
 use strict;
 use IO::Socket::INET;
 use IO::Select;
@@ -80,7 +80,7 @@ Test::Net::Prober::HTTPServer
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 AUTHOR
 

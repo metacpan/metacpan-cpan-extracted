@@ -2,7 +2,7 @@ package CSS::Inliner;
 use strict;
 use warnings;
 
-our $VERSION = '4003';
+our $VERSION = '4008';
 
 use Carp;
 use Encode;
@@ -33,8 +33,11 @@ print $inliner->inlinify();
 
 Library for converting CSS style blocks into inline styles in an HTML
 document.  Specifically this is intended for the ease of generating
-HTML emails.  This is useful as even in 2015 Gmail and Hotmail don't
-support top level <style> declarations.
+HTML emails. This is useful as certain email clients don't support top
+level <style> declarations despite it being 2017.
+
+NOTE: The development of the this module is currently suspended as the
+sponsoring entity, MailerMailer LLC, has been sold to j2 Global.
 
 =cut
 
@@ -1054,14 +1057,9 @@ sub _grep_important_declarations {
 
 1;
 
-=head1 Sponsor
-
-This code has been developed under sponsorship of MailerMailer LLC,
-http://www.mailermailer.com/
-
 =head1 AUTHOR
 
- Kevin Kamel <kamelkev@mailermailer.com>
+ Kevin Kamel <kamelkev@underprint.com>
 
 =head1 CONTRIBUTORS
 
@@ -1072,7 +1070,7 @@ http://www.mailermailer.com/
 
 =head1 LICENSE
 
-This module is Copyright 2015 Khera Communications, Inc.  It is
+This module is Copyright 2017 Khera Communications, Inc. It is
 licensed under the same terms as Perl itself.
 
 =cut

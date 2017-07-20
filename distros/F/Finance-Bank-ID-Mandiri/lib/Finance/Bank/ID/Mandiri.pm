@@ -1,12 +1,11 @@
 package Finance::Bank::ID::Mandiri;
 
-our $DATE = '2017-07-03'; # DATE
-our $VERSION = '0.35'; # VERSION
+our $DATE = '2017-07-20'; # DATE
+our $VERSION = '0.37'; # VERSION
 
 use 5.010001;
 
 use Moo;
-use DateTime;
 
 use HTTP::Headers;
 use HTTP::Headers::Patch::DontUseStorable -load_target=>0;
@@ -177,6 +176,8 @@ sub check_balance {
 }
 
 sub get_statement {
+    require DateTime;
+
     my ($self, %args) = @_;
     my $s = $self->site;
 
@@ -193,15 +194,15 @@ sub get_statement {
     if (!$start_date) {
         if (defined $args{days}) {
             $start_date = $end_date->clone->subtract(days=>($args{days}-1));
-            $self->logger->debugf(
+            $self->logger->debug(sprintf(
                 'Setting start_date to %04d-%02d-%02d (end_date - %d days)',
                 $start_date->year, $start_date->month, $start_date->day,
-                $args{days});
+                $args{days}));
         } else {
             $start_date = $end_date->clone->subtract(months=>1);
-            $self->logger->debugf(
+            $self->logger->debug(sprintf(
                 'Setting start_date to %04d-%02d-%02d (end_date - 1mo)',
-                $start_date->year, $start_date->month, $start_date->day);
+                $start_date->year, $start_date->month, $start_date->day));
         }
     }
 
@@ -276,6 +277,8 @@ sub _ps_get_metadata {
 }
 
 sub _ps_get_metadata_ib {
+    require DateTime;
+
     my ($self, $page, $stmt) = @_;
 
     unless ($page =~ /Tampilkan Berdasarkan(?:\s+|(?:<[^>]+>\s*)*):(?:\s+|(?:<[^>]+>\s*)*)Tanggal(?:\s+|(?:<[^>]+>\s*)*)Urutkan Berdasarkan(?:\s+|(?:<[^>]+>\s*)*):(?:\s+|(?:<[^>]+>\s*)*)Mulai dari yang kecil/s) {
@@ -344,6 +347,8 @@ sub _ps_get_metadata_ib {
 }
 
 sub _ps_get_metadata_cms {
+    require DateTime;
+
     my ($self, $page, $stmt) = @_;
 
     unless ($page =~ /^- End Of Statement -/m) {
@@ -390,6 +395,8 @@ sub _ps_get_metadata_cms {
 }
 
 sub _ps_get_metadata_mcm {
+    require DateTime;
+
     my ($self, $page, $stmt) = @_;
 
     my $re_tx = $self->_re_tx;
@@ -429,6 +436,8 @@ sub _ps_get_transactions {
 }
 
 sub _ps_get_transactions_ib {
+    require DateTime;
+
     my ($self, $page, $stmt) = @_;
 
     my @tx;
@@ -500,6 +509,8 @@ sub _ps_get_transactions_ib {
 }
 
 sub _ps_get_transactions_cms {
+    require DateTime;
+
     my ($self, $page, $stmt) = @_;
 
     if ($page =~ /<br|<p/i) {
@@ -554,6 +565,8 @@ sub _ps_get_transactions_cms {
 }
 
 sub _ps_get_transactions_mcm {
+    require DateTime;
+
     my ($self, $page, $stmt) = @_;
 
     my $re_tx = $self->_re_tx;
@@ -638,7 +651,7 @@ Finance::Bank::ID::Mandiri - Check your Bank Mandiri accounts from Perl
 
 =head1 VERSION
 
-This document describes version 0.35 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2017-07-03.
+This document describes version 0.37 of Finance::Bank::ID::Mandiri (from Perl distribution Finance-Bank-ID-Mandiri), released on 2017-07-20.
 
 =head1 SYNOPSIS
 

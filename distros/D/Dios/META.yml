@@ -29,4 +29,4 @@ requires:
   Sub::Uplevel: '0.24'
   Variable::Magic: '0.59'
   perl: '5.014'
-version: '0.002002'
+version: '0.002004'

@@ -1,4 +1,4 @@
-use Test::More tests => 15;
+use Test::More tests => 21;
 
 use Mac::PropertyList;
 
@@ -47,4 +47,24 @@ is( $plist->exists( 'Mimi' ), 0, 'Mimi key does not exist' );
 ok( $plist->exists( 'Buster' ), 'Buster key exists after delete' );
 is( $plist->count, 1, "Has right count after delete" );
 
+note 'Try non-canonical layout';
 
+$plist = Mac::PropertyList::parse_plist( <<"HERE" );
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict><key>Clayton</key><string>John</string><key>Napier</key><string>Carson</string><key>Gridley</key><string>Jason</string></dict>
+</plist>
+HERE
+isa_ok( $plist, 'Mac::PropertyList::dict' );
+is( $plist->count, 3, "Has right number of keys" );
+
+@keys = sort $plist->keys;
+ok( eq_array( \@keys, [qw(Clayton Gridley Napier)] ), "Check hash keys" );
+
+@values = sort $plist->values;
+ok( eq_array( \@values, [qw(Carson Jason John)] ), "Check hash values" );
+
+ok( $plist->exists( 'Clayton' ), 'Claytin key exists' );
+
+is( $plist->value( 'Clayton' ),  'John', "Check Clayton's value" );

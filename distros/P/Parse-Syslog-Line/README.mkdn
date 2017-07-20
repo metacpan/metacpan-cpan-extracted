@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 3.7
+version 4.0
 
 # SYNOPSIS
 
@@ -229,7 +229,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Brad Lhotsky.
+This software is Copyright (c) 2017 by Brad Lhotsky.
 
 This is free software, licensed under:
 

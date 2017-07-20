@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     "Exporter" => 0,
     "Hash::Flatten" => 0,
     "JSON::XS" => 0,
+    "LWP::Authen::Negotiate" => 0,
     "LWP::UserAgent" => 0,
     "Moo" => 0,
     "Moo::Role" => 0,
@@ -51,7 +52,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "0.109",
+  "VERSION" => "0.110",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -73,6 +74,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::XS" => 0,
+  "LWP::Authen::Negotiate" => 0,
   "LWP::UserAgent" => 0,
   "Moo" => 0,
   "Moo::Role" => 0,

@@ -4,7 +4,7 @@ my $test_count = 2;
 use warnings;
 use strict;
 
-use PDF::API2;
+use PDF::Builder;
 
 my @possible_locations = (
     '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf',
@@ -18,7 +18,7 @@ SKIP: {
     skip "Skipping synthetic font tests... DejaVu Sans font not found", $test_count
         unless $font_file;
 
-    my $pdf = PDF::API2->new();
+    my $pdf = PDF::Builder->new();
     my $ttf = $pdf->ttfont($font_file);
     my $font = $pdf->synfont($ttf);
 

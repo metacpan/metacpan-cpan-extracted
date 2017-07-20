@@ -2,7 +2,13 @@
 
 use strict;
 use warnings;
-use experimental 'switch';
+use feature ':5.10';
+
+my $experimental;
+BEGIN {
+    $experimental = 1 if exists $warnings::Offsets{'experimental::smartmatch'};
+}
+no if $experimental, warnings => 'experimental::smartmatch';
 
 use FindBin;
 

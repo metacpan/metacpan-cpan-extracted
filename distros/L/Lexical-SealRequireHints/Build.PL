@@ -98,7 +98,6 @@ Module::Build->subclass(code => q{
 	needs_compiler => 0,
 	dynamic_config => 1,
 	meta_add => { distribution_type => "module" },
-	create_makefile_pl => "passthrough",
 	sign => 1,
 )->create_build_script;
 

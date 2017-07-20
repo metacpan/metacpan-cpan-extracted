@@ -4,7 +4,7 @@ use base qw/Prty::Hash/;
 use strict;
 use warnings;
 
-our $VERSION = 1.117;
+our $VERSION = 1.119;
 
 use Prty::Perl;
 use Prty::Process;
@@ -31,7 +31,7 @@ L<Prty::Hash>
 =head1 DESCRIPTION
 
 Ein Objekt der Klasse Prty::Config repräsentiert eine Menge von
-Attribut/Wert-Paaren, die in einer Perl-Datei spezifiziert sind.
+Attribut/Wert-Paaren, die in einer Perl-Datei definiert sind.
 
 Beispiel für den Inhalt einer Konfigurationsdatei:
 
@@ -248,7 +248,7 @@ sub try {
 
 =head1 VERSION
 
-1.117
+1.119
 
 =head1 AUTHOR
 

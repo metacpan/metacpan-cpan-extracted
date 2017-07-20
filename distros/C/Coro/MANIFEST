@@ -84,7 +84,6 @@ eg/bench
 eg/prodcons1
 eg/prodcons2
 eg/prodcons3
-eg/attributes
 eg/event
 eg/lwp
 eg/dns

@@ -37,8 +37,7 @@ my $xslate = Text::Xslate->new(
     is $res, <<EOS;
 <pre class="type-declaration-mismatch">
 Declaration mismatch for `num`
-  declaration: &#39;Int&#39;
-        value: &#39;hoge&#39;
+  Value &quot;hoge&quot; did not pass type constraint &quot;Int&quot;
 </pre>
 hoge
 EOS

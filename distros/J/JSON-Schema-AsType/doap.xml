@@ -89,5 +89,11 @@
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-04-16</dc:issued>
     </Version>
   </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.4.2</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-05-01</dc:issued>
+    </Version>
+  </release>
   <programming-language>Perl</programming-language>
 </Project>

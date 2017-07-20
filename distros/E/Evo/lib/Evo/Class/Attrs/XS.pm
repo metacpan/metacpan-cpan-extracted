@@ -8,7 +8,7 @@ export qw(
   ECA_OPTIONAL ECA_DEFAULT ECA_DEFAULT_CODE ECA_REQUIRED ECA_LAZY
 );
 
-our $VERSION = '0.0403';    # VERSION
+our $VERSION = '0.0405';    # VERSION
 
 # to be able to run with and without dzil
 my $version = eval '$VERSION';    ## no critic
@@ -38,7 +38,7 @@ Evo::Class::Attrs::XS - XS implementation of attributes and "new" method generat
 
 =head1 VERSION
 
-version 0.0403
+version 0.0405
 
 =head1 AUTHOR
 

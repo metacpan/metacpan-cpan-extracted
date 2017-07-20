@@ -1,3 +1,7 @@
+2.001     2017-07-20 02:40:46 EDT
+  - Bump Mojo::SQLite requirement to 3.000 to support sharing the database
+    connection cache with existing Mojo::SQLite objects.
+
 2.000     2017-06-26 00:42:49 EDT
   - Add support for rate limiting and unique jobs with lock and unlock methods.
   - Add support for job metadata with note method, notes option for enqueue

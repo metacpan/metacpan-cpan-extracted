@@ -53,7 +53,7 @@ subtest 'die' => sub {
         %common_args,
         module => [
             'Text::Xslate::Bridge::TypeDeclaration' => [
-                on_mismatch => 'die'
+                on_mismatch => 'die',
             ],
         ],
     );
@@ -69,13 +69,13 @@ subtest 'die' => sub {
 
     $res = $xslate->render('a.tx', { a => 123 });
     like $res, qr/Declaration mismatch for `b`/;
-    is $warned, 1, 'Xslate calls warn handler too';
+    is $warned, 0;
     is $died,   1;
 
     $res = $xslate->render('a.tx', { a => 'hoge', b => 'fuga' });
     like   $res, qr/Declaration mismatch for `a`/;
     unlike $res, qr/Declaration mismatch for `b`/, 'stop validation loop on die';
-    is $warned, 2;
+    is $warned, 0;
     is $died,   2;
 };
 
